@@ -1,17 +1,17 @@
 "use strict";
 offer((function() {
-	const createElements = function(namespace) {
-		const childrenArr = function(elem, children) {
-			if (typeof children === "string") {
-				elem.textContent = children;
-			} else if (children) {
-				if (children.hasOwnProperty("length")) {
-					Array.from(children).forEach(c => childrenArr(elem, c));
-				} else if(children instanceof Node) {
-					elem.appendChild(children);
-				}
+	const childrenArr = function(elem, children) {
+		if (typeof children === "string") {
+			elem.appendChild(document.createTextNode(children));
+		} else if (children) {
+			if (children.hasOwnProperty("length")) {
+				Array.from(children).forEach(c => childrenArr(elem, c));
+			} else if(children instanceof Node) {
+				elem.appendChild(children);
 			}
-		      };
+		}
+	      },
+	      createElements = function(namespace) {
 		return function(element, properties, children) {
 			const elem = typeof element === "string" ? document.createElementNS(namespace, element) : element;
 			if (typeof properties === "string" || properties instanceof Array || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node))) {
@@ -31,11 +31,16 @@ offer((function() {
 					}
 				});
 			}
-			childrenArr(elem, children);
+			if (typeof children === "string") {
+				elem.textContent = children;
+			} else {
+				childrenArr(elem, children);
+			}
 			return elem;
 		};
 	      },
-	      createHTML = createElements(document.getElementsByTagName("html")[0].namespaceURI),
+	      h = Array.from(document.getElementsByTagName("html")),
+	      createHTML = createElements(h.length > 0 ? h[0].namespaceURI : "http://www.w3.org/1999/xhtml"),
 	      formatText = function(text) {
 		const df = document.createDocumentFragment();
 		text.split("\n").forEach((t, n) => {
