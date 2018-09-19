@@ -358,7 +358,7 @@ func (j *jsParser) number(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) 
 	return parser.Token{
 		Type: TokenNumericLiteral,
 		Data: t.Get(),
-	}, j.identifier
+	}, j.inputElement
 }
 
 func (j *jsParser) identifier(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
@@ -467,12 +467,11 @@ Loop:
 }
 
 func (j *jsParser) template(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
-Loop:
 	for {
 		switch t.ExceptRun("`\\$") {
 		case '`':
 			t.Except("")
-			break Loop
+			break
 		case '\\':
 			if j.escapeSequence(t) {
 				continue
