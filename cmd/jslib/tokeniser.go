@@ -402,6 +402,7 @@ func (j *jsParser) unicodeEscapeSequence(t *parser.Tokeniser) bool {
 			return false
 		}
 	} else if !t.Accept(hexDigit) || !t.Accept(hexDigit) || !t.Accept(hexDigit) || !t.Accept(hexDigit) {
+		t.Except("")
 		return false
 	}
 	return true
