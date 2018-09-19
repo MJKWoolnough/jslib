@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	whitespace      = "\t\v\f \xa0\xfe\xff"  // Tab, Vertical Tab, Form Feed, Space, No-break space, ZeroWidth No-Break Space, https://www.ecma-international.org/ecma-262/8.0/index.html#table-32
-	lineTerminators = "\n\r\x20\x28\x20\x29" // Line Feed, Carriage Return, Line Separator, Paragraph Separator, https://www.ecma-international.org/ecma-262/8.0/index.html#table-33
+	whitespace      = "\t\v\f \xa0\xfe\xff" // Tab, Vertical Tab, Form Feed, Space, No-break space, ZeroWidth No-Break Space, https://www.ecma-international.org/ecma-262/8.0/index.html#table-32
+	lineTerminators = "\n\r\u2028\u2029"    // Line Feed, Carriage Return, Line Separator, Paragraph Separator, https://www.ecma-international.org/ecma-262/8.0/index.html#table-33
 
 	singleEscapeChar = "'\"\\bfbrtv"
 	binaryDigit      = "01"
@@ -59,7 +59,7 @@ func (j *jsParser) inputElement(t *parser.Tokeniser) (parser.Token, parser.Token
 		}, j.inputElement
 	}
 	if t.Accept(lineTerminators) {
-		t.Accept(lineTerminators)
+		t.AcceptRun(lineTerminators)
 		return parser.Token{
 			Type: TokenLineTerminator,
 			Data: t.Get(),
