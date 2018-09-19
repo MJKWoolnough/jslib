@@ -45,6 +45,38 @@ const (
 	TokenRegularExpressionLiteral
 )
 
+var (
+	idContinue = []*unicode.RangeTable{
+		unicode.L,
+		unicode.Nl,
+		unicode.Other_ID_Start,
+		unicode.Mn,
+		unicode.Mc,
+		unicode.Nd,
+		unicode.Pc,
+		unicode.Other_ID_Continue,
+	}
+	idStart = idContinue[:3]
+	notID   = []*unicode.RangeTable{
+		unicode.Pattern_Syntax,
+		unicode.Pattern_White_Space,
+	}
+)
+
+func isIDStart(c rune) bool {
+	if c == '$' || c == '_' || c == '\\' {
+		return true
+	}
+	return unicode.In(c, idStart...) && !unicode.In(c, notID...)
+}
+
+func isIDContinue(c rune) bool {
+	if c == '$' || c == '_' || c == '\\' || c == zwnj || c == zwj {
+		return true
+	}
+	return unicode.In(c, idContinue...) && !unicode.In(c, notID...)
+}
+
 type jsParser struct {
 	tokenDepth      []byte
 	divisionAllowed bool
@@ -136,7 +168,7 @@ func (j *jsParser) inputElement(t *parser.Tokeniser) (parser.Token, parser.Token
 			j.divisionAllowed = true
 			return j.number(t)
 		}
-		if unicode.Is(unicode.Other_ID_Start, c) || c == '$' || c == '_' || c == '\\' {
+		if isIDStart(c) {
 			tk, tf := j.identifier(t)
 			if tk.Type == TokenIdentifier {
 				if tk.Data == "true" || tk.Data == "false" {
@@ -310,7 +342,7 @@ Loop:
 		}
 	}
 	for {
-		if c := t.Peek(); !unicode.Is(unicode.Other_ID_Continue, c) && c != '$' && c != '_' && c != '\\' && c != zwnj && c != zwj {
+		if c := t.Peek(); !isIDContinue(c) {
 			break
 		}
 		t.Except("")
@@ -377,7 +409,7 @@ func (j *jsParser) identifier(t *parser.Tokeniser) (parser.Token, parser.TokenFu
 	}
 	for {
 		c = t.Peek()
-		if unicode.Is(unicode.Other_ID_Continue, c) || c == '$' || c == '_' || c == '\\' || c == zwnj || c == zwj {
+		if isIDContinue(c) {
 			t.Except("")
 			continue
 		}
