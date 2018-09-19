@@ -438,11 +438,12 @@ func (j *jsParser) stringToken(t *parser.Tokeniser) (parser.Token, parser.TokenF
 		chars = singleStringChars
 	}
 	t.Except("")
+Loop:
 	for {
 		switch c := t.ExceptRun(chars); c {
 		case '"', '\'':
 			t.Except("")
-			break
+			break Loop
 		case '\\':
 			if j.escapeSequence(t) {
 				continue
@@ -466,11 +467,12 @@ func (j *jsParser) stringToken(t *parser.Tokeniser) (parser.Token, parser.TokenF
 }
 
 func (j *jsParser) template(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+Loop:
 	for {
 		switch t.ExceptRun("`\\$") {
 		case '`':
 			t.Except("")
-			break
+			break Loop
 		case '\\':
 			if j.escapeSequence(t) {
 				continue
