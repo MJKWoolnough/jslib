@@ -1,35 +1,30 @@
 "use strict";
-const pageLoad = new Promise(successFn => window.addEventListener("load", successFn)),
-      offer = obj => document.currentScript.dispatchEvent(new CustomEvent("executed", {"detail": obj})),
-      include = (function() {
-	const included = new Map();
-	return function(url) {
-		if (included.has(url)) {
-			return included.get(url);
-		}
-		const css = url.substr(-3) === "css",
-		      elm = document.createElement(css ? "link" : "script");
-		elm.setAttribute(css ? "href" : "src", url);
-		elm.setAttribute("type", css ? "text/css" : "application/javascript")
-		if (css) {
-			elm.setAttribute("rel", "stylesheet");
-		}
-		const p = new Promise((successFn, errorFn) => {
-			elm.addEventListener("load", successFn);
-			elm.addEventListener("error", () => {
-				document.head.removeChild(elm);
-				errorFn(new URIError("error including: " + url));
-			});
-			if (!css) {
+const pageLoad = document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn)),
+      {offer, include, offerNow, includeNow} = (function() {
+	const included = new Map(),
+	      offer = obj => document.currentScript.dispatchEvent(new CustomEvent("executed", {"detail": obj})),
+	      include = (function() {
+		return function(url) {
+			if (included.has(url)) {
+				return included.get(url);
+			}
+			const p = new Promise((successFn, errorFn) => {
+				const elm = document.createElement("script");
+				elm.setAttribute("src", url);
+				elm.setAttribute("type", "application/javascript")
+				elm.addEventListener("error", () => {
+					document.head.removeChild(elm);
+					errorFn(new URIError("error including: " + url));
+				});
 				elm.addEventListener("executed", ({detail}) => {
-					elm.removeEventListener("load", successFn);
 					document.head.removeChild(elm);
 					successFn(detail);
 				});
-			}
-			document.head.appendChild(elm);
-		});
-		included.set(url, p);
-		return p;
-	}
+				document.head.appendChild(elm);
+			});
+			included.set(url, p);
+			return p;
+		}
+	      }());
+	return {offer, offerNow, include, includeNow};
       }());
