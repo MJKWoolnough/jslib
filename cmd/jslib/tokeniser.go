@@ -153,6 +153,7 @@ func (j *jsParser) inputElement(t *parser.Tokeniser) (parser.Token, parser.Token
 				Data: t.Get(),
 			}, j.inputElement
 		case '$':
+			j.tokenDepth = j.tokenDepth[:len(j.tokenDepth)-1]
 			return j.template(t)
 		}
 		t.Err = errors.WithContext("invalid character: ", errors.Error(t.Get()))
@@ -200,7 +201,7 @@ func (j *jsParser) inputElement(t *parser.Tokeniser) (parser.Token, parser.Token
 			j.tokenDepth = append(j.tokenDepth, byte(c))
 		case ';', ',', '?', ':', '~':
 		case ')', ']':
-			if j.lastDepth() != c {
+			if ld := j.lastDepth(); !(ld == '(' && c == ')') && !(ld == '[' && c == ']') {
 				t.Err = errors.WithContext("read invalid character: ", errors.Error(t.Get()))
 				return t.Error()
 			}
