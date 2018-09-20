@@ -500,11 +500,12 @@ Loop:
 }
 
 func (j *jsParser) template(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+Loop:
 	for {
 		switch t.ExceptRun("`\\$") {
 		case '`':
 			t.Except("")
-			break
+			break Loop
 		case '\\':
 			if j.escapeSequence(t) {
 				continue
