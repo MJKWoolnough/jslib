@@ -77,6 +77,7 @@ func main() {
 						}
 					}
 				}
+				ph.Data = ph.Data[2:]
 			case PhraseOffer:
 				ph.Data[0].Data = "offerNow"
 				ph.Data = append(ph.Data, parser.Token{TokenStringLiteral, escape(name)}, parser.Token{TokenPunctuator, ","}, parser.Token{TokenWhitespace, " "})
