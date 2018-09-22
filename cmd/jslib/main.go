@@ -11,33 +11,72 @@ import (
 	"vimagination.zapto.org/parser"
 )
 
-func main() {
+type fileDep struct {
+	buf        memio.Buffer
+	Requires   []*fileDep
+	RequiredBy []*fileDep
+}
 
-	var input, output string
+func (f *fileDep) AddDependency(g *fileDep) bool {
+	if !f.checkDependency(g) {
+		return false
+	}
+	f.Requires = append(f.Requires, g)
+	g.RequiredBy = append(g.RequiredBy, f)
+	return true
+}
+
+func (f *fileDep) checkDependency(g *fileDep) bool {
+	for _, h := range f.RequiredBy {
+		if h == g || !h.checkDependency(g) {
+			return false
+		}
+	}
+	return true
+}
+
+func (f *fileDep) WriteTo(w io.Writer) (int64, error) {
+	var n int64
+	for _, r := range f.Requires {
+		m, err := r.WriteTo(w)
+		n += m
+		if err != nil {
+			return n, err
+		}
+	}
+	m, err := w.Write(f.buf)
+	n += int64(m)
+	return n, err
+}
+
+func main() {
+	var input, inputName, output string
 
 	flag.StringVar(&input, "i", "-", "input file")
+	flag.StringVar(&input, "n", "-", "input file name when using stdin")
 	flag.StringVar(&output, "o", "-", "input file")
 	flag.Parse()
 
 	if input == "" {
 		input = "-"
+	} else {
+		inputName = input
 	}
 	if output == "" {
 		output = "-"
 	}
 
-	files := make(map[string]memio.Buffer, len(os.Args))
+	files := make(map[string]*fileDep, len(os.Args))
 	filesTodo := make([]string, 1, len(os.Args))
-	filesDone := make([]string, 0, len(os.Args))
 	filesTodo[0] = input
-	files[input] = nil
+	files[inputName] = new(fileDep)
 	for len(filesTodo) > 0 {
 		name := filesTodo[0]
 		filesTodo = filesTodo[1:]
-		filesDone = append(filesDone, name)
 		var f *os.File
 		if name == "-" {
 			f = os.Stdin
+			name = inputName
 		} else {
 			var err error
 			f, err = os.Open(name)
@@ -46,12 +85,12 @@ func main() {
 				os.Exit(1)
 			}
 		}
+		fd := files[name]
 		p := parser.New(parser.NewReaderTokeniser(f))
 		var j jsParser
 		p.TokeniserState(j.inputElement)
 		p.PhraserState(base)
-		var buf memio.Buffer
-		buf.WriteString("\n")
+		fd.buf.WriteString("\n")
 	Loop:
 		for {
 			ph, err := p.GetPhrase()
@@ -71,9 +110,15 @@ func main() {
 						ph.Data[n].Data = "includeNow"
 					case TokenStringLiteral:
 						str := unescape(t.Data)
-						if _, ok := files[str]; !ok {
-							files[str] = nil
+						gd, ok := files[str]
+						if !ok {
+							gd = new(fileDep)
+							files[str] = gd
 							filesTodo = append(filesTodo, str)
+						}
+						if !fd.AddDependency(gd) {
+							fmt.Fprintf(os.Stderr, "circular reference with %s and %s\n", name, str)
+							os.Exit(1)
 						}
 					}
 				}
@@ -83,11 +128,10 @@ func main() {
 				ph.Data = append(ph.Data, parser.Token{TokenStringLiteral, escape(name)}, parser.Token{TokenPunctuator, ","}, parser.Token{TokenWhitespace, " "})
 			}
 			for _, t := range ph.Data {
-				buf.WriteString(t.Data)
+				fd.buf.WriteString(t.Data)
 			}
 		}
 		f.Close()
-		files[name] = buf
 	}
 
 	var f *os.File
@@ -107,13 +151,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
 		os.Exit(1)
 	}
-	for len(filesDone) > 0 {
-		buf := files[filesDone[len(filesDone)-1]]
-		filesDone = filesDone[:len(filesDone)-1]
-		if _, err = f.Write(buf); err != nil {
-			fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
-			os.Exit(1)
-		}
+	main := files[inputName]
+	if _, err = main.WriteTo(f); err != nil {
+		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
+		os.Exit(1)
 	}
 	if err = f.Close(); err != nil {
 		fmt.Fprintf(os.Stderr, "error closing file: %s\n", err)
