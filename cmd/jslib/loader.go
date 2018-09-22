@@ -28,7 +28,14 @@ const pageLoad = document.readyState === "complete" ? Promise.resolve() : new Pr
 			return p;
 		}
 	      }()),
-	      offerNow = included.set.bind(included),
+	      offerNow = function(name, data) {
+		if (data.hasOwnProperty("then")) {
+			data.then(offerNow.bind(null, name));
+		} else {
+			included.set(name, data);
+		}
+	      },
 	      includeNow = included.get.bind(included);
 	return {offer, offerNow, include, includeNow};
-      }());`
+      }());
+`
