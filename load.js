@@ -1,6 +1,6 @@
 "use strict";
 const pageLoad = document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn)),
-      {offer, include, offerNow, includeNow} = (function() {
+      {offer, include} = (function() {
 	const included = new Map(),
 	      offer = obj => document.currentScript.dispatchEvent(new CustomEvent("executed", {"detail": obj})),
 	      include = (function() {
@@ -26,5 +26,5 @@ const pageLoad = document.readyState === "complete" ? Promise.resolve() : new Pr
 			return p;
 		}
 	      }());
-	return {offer, offerNow, include, includeNow};
+	return {offer, include};
       }());
