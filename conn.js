@@ -1,20 +1,5 @@
-offer((function() {
-	const Subscription = function(fn) {
-		const successFns = [],
-		      errorFns = [];
-		fn((...data) => successFns.forEach(f => f(...data)), (...data) => errorFns.forEach(f => f(...data)));
-		this.then = (successFn, errorFn) => {
-			if (successFn instanceof Function) {
-				successFns.push(successFn);
-			}
-			if (errorFn instanceof Function) {
-				errorFns.push(errorFn);
-			}
-			return this;
-		};
-		this.catch = errorFn => this.then(undefined, errorFn);
-		this.finally = afterFn => this.then(afterFn, afterFn);
-	      },
+offer((async function() {
+	const {Subscription} = await include("inter.js"),
 	      HTTPRequest = function(url, props = {}) {
 		return new Promise((successFn, errorFn) => {
 			const xh = new XMLHttpRequest();
