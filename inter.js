@@ -2,10 +2,10 @@ offer((function() {
 	class Pipe {
 		constructor(fn) {
 			const out = [];
-			this.send = (...data) => out.forEach(o => o(data));
+			this.send = (...data) => out.forEach(o => o(...data));
 			this.receive = fn => {
 				if (fn instanceof Function) {
-					out.push.bind(out);
+					out.push(fn);
 				} else if (fn !== null && fn !== undefined) {
 					throw new TypeError("pipe.receive requires function type");
 				}
