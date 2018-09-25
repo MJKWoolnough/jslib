@@ -44,8 +44,21 @@ func (f *fileDep) WriteTo(w io.Writer) (int64, error) {
 			return n, err
 		}
 	}
-	m, err := w.Write(f.buf)
+	m, err := io.WriteString(w, "\n		.then(included.set.bind(included, toURL(")
 	n += int64(m)
+	if err != nil {
+		return n, err
+	}
+	m, err = w.Write(f.buf)
+	n += int64(m)
+	if err != nil {
+		return n, err
+	}
+	m, err = io.WriteString(w, ")")
+	n += int64(m)
+	if err != nil {
+		return n, err
+	}
 	return n, err
 }
 
@@ -89,8 +102,7 @@ func main() {
 		p := parser.New(parser.NewReaderTokeniser(f))
 		var j jsParser
 		p.TokeniserState(j.inputElement)
-		p.PhraserState(base)
-		fd.buf.WriteString("\n")
+		p.PhraserState(j.start)
 	Loop:
 		for {
 			ph, err := p.GetPhrase()
@@ -104,10 +116,8 @@ func main() {
 			case parser.PhraseDone:
 				break Loop
 			case PhraseInclude:
-				for n, t := range ph.Data {
+				for _, t := range ph.Data {
 					switch t.Type {
-					case TokenIdentifier:
-						ph.Data[n].Data = "includeNow"
 					case TokenStringLiteral:
 						str := unescape(t.Data)
 						gd, ok := files[str]
@@ -122,13 +132,17 @@ func main() {
 						}
 					}
 				}
-				ph.Data = ph.Data[2:]
 			case PhraseOffer:
-				ph.Data[0].Data = "offerNow"
-				ph.Data = append(ph.Data, parser.Token{TokenStringLiteral, escape(name)}, parser.Token{TokenPunctuator, ","}, parser.Token{TokenWhitespace, " "})
+				ph.Data = []parser.Token{{Data: escape(name) + "), "}}
+			case PhraseNormal:
+			default:
+				continue Loop
 			}
 			for _, t := range ph.Data {
 				fd.buf.WriteString(t.Data)
+				if t.Type == TokenLineTerminator {
+					fd.buf.WriteString("		")
+				}
 			}
 		}
 		f.Close()
@@ -146,13 +160,17 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	_, err := f.WriteString(loader)
+	_, err := f.WriteString(loaderHead)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
 		os.Exit(1)
 	}
 	main := files[inputName]
 	if _, err = main.WriteTo(f); err != nil {
+		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
+		os.Exit(1)
+	}
+	if _, err = f.WriteString(loaderFoot); err != nil {
 		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
 		os.Exit(1)
 	}
