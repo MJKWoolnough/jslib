@@ -1,6 +1,5 @@
 "use strict";
-const pageLoad = document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn)),
-      {offer, include} = (function() {
+const {pageLoad, offer, include} = (function() {
 	const toURL = url => (new URL(url, (document.currentScript ? document.currentScript.src : window.location.href).match(/.*\//))).href,
 	      included = new Map(),
 	      offer = obj => document.currentScript.dispatchEvent(new CustomEvent("executed", {"detail": obj})),
@@ -27,6 +26,7 @@ const pageLoad = document.readyState === "complete" ? Promise.resolve() : new Pr
 			included.set(aURL, p);
 			return p;
 		}
-	      }());
-	return {offer, include};
+	      }()),
+	      pageLoad = document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn));
+	return {pageLoad, offer, include};
       }());
