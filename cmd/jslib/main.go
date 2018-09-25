@@ -15,6 +15,7 @@ type fileDep struct {
 	buf        memio.Buffer
 	Requires   []*fileDep
 	RequiredBy []*fileDep
+	written    bool
 }
 
 func (f *fileDep) AddDependency(g *fileDep) bool {
@@ -36,6 +37,10 @@ func (f *fileDep) checkDependency(g *fileDep) bool {
 }
 
 func (f *fileDep) WriteTo(w io.Writer) (int64, error) {
+	if f.written {
+		return 0, nil
+	}
+	f.written = true
 	var n int64
 	for _, r := range f.Requires {
 		m, err := r.WriteTo(w)
@@ -43,6 +48,9 @@ func (f *fileDep) WriteTo(w io.Writer) (int64, error) {
 		if err != nil {
 			return n, err
 		}
+	}
+	if f.buf == nil {
+		return n, nil
 	}
 	m, err := io.WriteString(w, "\n		.then(included.set.bind(included, toURL(")
 	n += int64(m)
@@ -62,27 +70,48 @@ func (f *fileDep) WriteTo(w io.Writer) (int64, error) {
 	return n, err
 }
 
-func main() {
-	var input, inputName, output string
+type Inputs []string
 
-	flag.StringVar(&input, "i", "-", "input file")
-	flag.StringVar(&input, "n", "-", "input file name when using stdin")
+func (i *Inputs) Set(v string) error {
+	*i = append(*i, v)
+	return nil
+}
+
+func (i *Inputs) String() string {
+	return ""
+}
+
+func main() {
+	var (
+		inputName, output string
+		filesTodo         Inputs
+	)
+
+	flag.Var(&filesTodo, "i", "input file")
+	flag.StringVar(&inputName, "n", "-", "input file name when using stdin")
 	flag.StringVar(&output, "o", "-", "input file")
 	flag.Parse()
 
-	if input == "" {
-		input = "-"
-	} else {
-		inputName = input
+	if len(filesTodo) == 0 {
+		filesTodo = append(filesTodo, "-")
 	}
 	if output == "" {
 		output = "-"
 	}
-
+	var main fileDep
 	files := make(map[string]*fileDep, len(os.Args))
-	filesTodo := make([]string, 1, len(os.Args))
-	filesTodo[0] = input
-	files[inputName] = new(fileDep)
+	for _, i := range filesTodo {
+		if i == "-" {
+			i = inputName
+		}
+		if _, ok := files[i]; ok {
+			fmt.Fprintln(os.Stderr, "duplicate file")
+			os.Exit(1)
+		}
+		fd := new(fileDep)
+		files[i] = fd
+		main.AddDependency(fd)
+	}
 	for len(filesTodo) > 0 {
 		name := filesTodo[0]
 		filesTodo = filesTodo[1:]
@@ -98,7 +127,11 @@ func main() {
 				os.Exit(1)
 			}
 		}
-		fd := files[name]
+		fd, ok := files[name]
+		if !ok {
+			fd = new(fileDep)
+			files[name] = fd
+		}
 		p := parser.New(parser.NewReaderTokeniser(f))
 		var j jsParser
 		p.TokeniserState(j.inputElement)
@@ -165,7 +198,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
 		os.Exit(1)
 	}
-	main := files[inputName]
 	if _, err = main.WriteTo(f); err != nil {
 		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
 		os.Exit(1)
