@@ -10,7 +10,7 @@ const {pageLoad, offer, include} = (function() {
 		return function(url) {
 			const aURL = toURL(url);
 			if (included.has(aURL)) {
-				return included.get(aURL);
+				return Promise.resolve(included.get(aURL));
 			}
 			const p = new Promise((successFn, errorFn) => {
 				const elm = document.createElement("script");
@@ -30,6 +30,7 @@ const {pageLoad, offer, include} = (function() {
 			return p;
 		}
 	      }()),
+	      includeNow = (url, fn) => () => included.set(url, fn()),
 	      pageLoad = (document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn)))`
 	loaderFoot = `;
 	return {pageLoad, offer, include};

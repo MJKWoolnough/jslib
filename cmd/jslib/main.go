@@ -52,7 +52,7 @@ func (f *fileDep) WriteTo(w io.Writer) (int64, error) {
 	if f.buf == nil {
 		return n, nil
 	}
-	m, err := io.WriteString(w, "\n		.then(included.set.bind(included, toURL(")
+	m, err := io.WriteString(w, "\n		.then(includeNow(toURL(")
 	n += int64(m)
 	if err != nil {
 		return n, err
@@ -166,7 +166,7 @@ func main() {
 					}
 				}
 			case PhraseOffer:
-				ph.Data = []parser.Token{{Data: escape(name) + "), "}}
+				ph.Data = []parser.Token{{Data: escape(name) + "), () => "}}
 			case PhraseNormal:
 			default:
 				continue Loop
