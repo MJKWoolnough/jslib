@@ -26,7 +26,7 @@ func (j *jsParser) start(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
 			return parser.Phrase{
 				Type: PhraseUseStrict,
 				Data: p.Get(),
-			}, j.base
+			}, j.needOffer
 		}
 		p.Err = ErrInvalidUseStrict
 		return p.Error()
