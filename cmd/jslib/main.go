@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"strconv"
 
 	"vimagination.zapto.org/memio"
@@ -152,7 +153,7 @@ func main() {
 				for _, t := range ph.Data {
 					switch t.Type {
 					case TokenStringLiteral:
-						str := unescape(t.Data)
+						str := path.Join(path.Dir(name), unescape(t.Data))
 						gd, ok := files[str]
 						if !ok {
 							gd = new(fileDep)
