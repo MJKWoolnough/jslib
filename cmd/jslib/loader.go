@@ -30,10 +30,10 @@ const {pageLoad, offer, include} = (function() {
 			return p;
 		}
 	      }()),
-	      includeNow = (url, fn) => () => included.set(url, fn()),
-	      pageLoad = (document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn)))`
-	loaderFoot = `;
-	return {pageLoad, offer, include};
+	      pageLoad = (document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn))),
+	      includeNow = (url, fn) => () => included.set(url, fn());
+	return {pageLoad: pageLoad`
+	loaderFoot = `, offer: offer, include: include};
       }());
 `
 )
