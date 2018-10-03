@@ -17,11 +17,30 @@ offer((function() {
 			const success = new Pipe(),
 			      error = new Pipe();
 			fn(success.send, error.send);
-			this.then = (successFn, errorFn) => {
-				success.receive(successFn);
-				error.receive(errorFn);
-				return this;
-			};
+			this.then = (successFn, errorFn) => new Subscription((sFn, eFn) => {
+				if (successFn instanceof Function) {
+					success.receive((...data) => {
+						try {
+							sFn(successFn(...data));
+						} catch (e) {
+							eFn(e);
+						}
+					});
+				} else {
+					success.receive(sFn);
+				}
+				if (errorFn instanceof Function) {
+					error.receive((...data) => {
+						try {
+							errorFn(...data);
+						} catch (e) {
+							eFn(e);
+						}
+					});
+				} else {
+					error.receive(eFn);
+				}
+			});
 		}
 		catch(errorFn) {
 			return this.then(null, errorFn);
