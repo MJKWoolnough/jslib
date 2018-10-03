@@ -203,7 +203,7 @@ offer((async function() {
 		} else if (allowXH) {
 			return connectXH(path);
 		}
-		return Promise.reject("no connecion available");
+		return Promise.reject(new Error("no connecion available"));
 	      };
 	return Object.freeze({RPC});
 }()));
