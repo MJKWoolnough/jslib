@@ -163,7 +163,7 @@ offer((async function() {
 			if (allowXH) {
 				return connectXH(path);
 			}
-			return Promise.reject(new Error("error connecting to WebSocket"));
+			return Promise.reject(e);
 		});
 	      },
 	      connectXH = function(path) {
