@@ -19,9 +19,9 @@ offer((function() {
 			}
 			if (typeof properties === "object") {
 				Object.keys(properties).forEach(k => {
-					let prop = properties[k];
+					const prop = properties[k];
 					if (prop !== undefined) {
-						if (k.substr(0, 2) === "on" && typeof prop === "function") {
+						if (k.substr(0, 2) === "on" && prop instanceof Function) {
 							elem.addEventListener(k.substr(2), prop.bind(elem));
 						} else if (k === "class") {
 							elem.classList.add(...prop.split(" "));
@@ -97,19 +97,7 @@ offer((function() {
 					}
 					layers.push(df);
 				}
-				return container.appendChild(createHTML(
-					"div",
-					{},
-					createHTML(
-						"span",
-						{
-							"class": "closer",
-
-							"onclick": closer.bind(null, closerFn)
-						},
-						"X"
-					)
-				));
+				return container.appendChild(createHTML("div", createHTML("span", {"class": "closer", "onclick": closer.bind(null, closerFn)}, "X")));
 			},
 			"removeLayer": closer,
 			"loading": function(p, loadDiv) {
@@ -118,15 +106,7 @@ offer((function() {
 				}
 				loading = true;
 				container.appendChild(loadDiv);
-				return new Promise(
-					(successFn, errorFn) => p.then((...args) => {
-						closeLoadingLayer();
-						successFn(...args);
-					}, (...args) => {
-						closeLoadingLayer();
-						errorFn(...args);
-					})
-				);
+				return p.finally(closeLoadingLayer);
 			}
 		});
 	      };
