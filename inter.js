@@ -12,6 +12,7 @@ offer((function() {
 			};
 		}
 	};
+	const spread = Symbol(spread);
 	class Subscription {
 		constructor(fn) {
 			const success = new Pipe(),
@@ -21,7 +22,12 @@ offer((function() {
 				if (successFn instanceof Function) {
 					success.receive((...data) => {
 						try {
-							sFn(successFn(...data));
+							const ret = successFn(...data);
+							if (ret instanceof Array && ret.hasOwnProperty(spread)) {
+								sFn(...ret);
+							} else {
+								sFn(ret);
+							}
 						} catch (e) {
 							eFn(e);
 						}
@@ -46,7 +52,11 @@ offer((function() {
 			return this.then(null, errorFn);
 		}
 		finally(afterFn) {
-			return this.then(afterFn, afterFn);
+			const aFn = (...data) => {
+				afterFn();
+				return Object.defineProperty(data, spread, {});
+			};
+			return this.then(aFn, aFn);
 		}
 	};
 	return Object.freeze({Pipe, Subscription});
