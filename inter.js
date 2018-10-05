@@ -38,7 +38,10 @@ offer((function() {
 				if (errorFn instanceof Function) {
 					error.receive((...data) => {
 						try {
-							errorFn(...data);
+							const ret = errorFn(...data);
+							if (ret instanceof Array && ret.hasOwnProperty(spread)) {
+								eFn(...ret);
+							}
 						} catch (e) {
 							eFn(e);
 						}
