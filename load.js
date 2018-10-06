@@ -1,14 +1,7 @@
 "use strict";
 const {pageLoad, offer, include} = (function() {
 	const urlRe = /[^(@]*[(@](.+?):[0-9]+:[0-9]+[)\n]/g,
-	      getStackFiles = function() {
-		try {
-			0();
-		} catch(e) {
-			return e.stack.replace(urlRe, "$1\n").split("\n");
-		}
-	      },
-	      toURL = url => (new URL(url, (document.currentScript ? document.currentScript.src : getStackFiles()[3]).match(/.*\//))).href,
+	      toURL = url => (new URL(url, (document.currentScript ? document.currentScript.src : new Error().stack.replace(urlRe, "$1\n").split("\n")[2]).match(/.*\//))).href,
 	      included = new Map(),
 	      offer = obj => document.currentScript.dispatchEvent(new CustomEvent("executed", {"detail": obj})),
 	      include = function(url) {
