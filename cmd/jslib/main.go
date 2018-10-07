@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 
 	"vimagination.zapto.org/memio"
@@ -53,7 +54,7 @@ func (f *fileDep) WriteTo(w io.Writer) (int64, error) {
 	if f.buf == nil {
 		return n, nil
 	}
-	m, err := io.WriteString(w, "\n		.then(includeNow(toURL(")
+	m, err := io.WriteString(w, "\n		.then(offerNow(toURL(")
 	n += int64(m)
 	if err != nil {
 		return n, err
@@ -84,13 +85,15 @@ func (i *Inputs) String() string {
 
 func main() {
 	var (
-		inputName, output string
-		filesTodo         Inputs
+		inputName, output, base string
+		filesTodo               Inputs
+		err                     error
 	)
 
 	flag.Var(&filesTodo, "i", "input file")
 	flag.StringVar(&inputName, "n", "-", "input file name when using stdin")
 	flag.StringVar(&output, "o", "-", "input file")
+	flag.StringVar(&base, "b", "", "js base dir")
 	flag.Parse()
 
 	if len(filesTodo) == 0 {
@@ -98,6 +101,19 @@ func main() {
 	}
 	if output == "" {
 		output = "-"
+	}
+	if base == "" {
+		if output == "-" {
+			base = "./"
+		} else {
+			base = path.Dir(output)
+		}
+	}
+	base, err = filepath.Abs(base)
+	base += "/"
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error getting absolute path for base: %s\n", err)
+		os.Exit(1)
 	}
 	var main fileDep
 	files := make(map[string]*fileDep, len(os.Args))
@@ -167,7 +183,17 @@ func main() {
 					}
 				}
 			case PhraseOffer:
-				ph.Data = []parser.Token{{Data: escape(name) + "), () => "}}
+				afp, err := filepath.Abs(filepath.FromSlash(name))
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "error getting absolute path: %s\n", err)
+					os.Exit(1)
+				}
+				fp, err := filepath.Rel(base, afp)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "error generating relative path: %s\n", err)
+					os.Exit(1)
+				}
+				ph.Data = []parser.Token{{Data: escape(filepath.ToSlash(fp)) + "), () => "}}
 			case PhraseNormal:
 			default:
 				continue Loop
@@ -194,7 +220,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	_, err := f.WriteString(loaderHead)
+	_, err = f.WriteString(loaderHead)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
 		os.Exit(1)
