@@ -37,31 +37,29 @@ offer((async function() {
 			xh.send(props.hasOwnProperty("data") ? props["data"] : null);
 		});
 	      },
+	      urlRe = /[^(@]*[(@](.+?):[0-9]+:[0-9]+[)\n]/g,
+	      toURL = url => (new URL(url, (document.currentScript ? document.currentScript.src : new Error().stack.replace(urlRe, "$1\n").split("\n")[2]).match(/.*\//))).href.replace(/^http/, "ws"),
 	      WS = function(path) {
-			const url = (function() {
-				const a = document.createElement("a");
-				a.setAttribute("href", path);
-				return a.href.replace(/^http/, "ws");
-			}());
-			return new Promise((successFn, errorFn) => {
-				const ws = new WebSocket(url);
-				ws.addEventListener("open", () => successFn(Object.freeze({
-					close: ws.close.bind(ws),
-					send: ws.send.bind(ws),
-					when: new Subscription((successFn, errorFn) => {
-						ws.addEventListener("message", successFn);
-						ws.addEventListener("error", errorFn);
-						ws.addEventListener("close", errorFn);
-					}).then,
-					get type() {
-						return ws.type;
-					},
-					set type(t) {
-						ws.type = t;
-					},
-				})));
-				ws.addEventListener("error", errorFn);
-			});
+		const url = toURL(path);
+		return new Promise((successFn, errorFn) => {
+			const ws = new WebSocket(url);
+			ws.addEventListener("open", () => successFn(Object.freeze({
+				close: ws.close.bind(ws),
+				send: ws.send.bind(ws),
+				when: new Subscription((successFn, errorFn) => {
+					ws.addEventListener("message", successFn);
+					ws.addEventListener("error", errorFn);
+					ws.addEventListener("close", errorFn);
+				}).then,
+				get type() {
+					return ws.type;
+				},
+				set type(t) {
+					ws.type = t;
+				},
+			})));
+			ws.addEventListener("error", errorFn);
+		});
 	      };
 	return Object.freeze({HTTPRequest, WS});
 }()));
