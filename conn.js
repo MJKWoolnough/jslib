@@ -3,11 +3,12 @@ offer((async function() {
 	      urlRe = /[^(@]*[(@](.+?):[0-9]+:[0-9]+[)\n]/g,
 	      toURL = url => (new URL(url, (document.currentScript ? document.currentScript.src : new Error().stack.replace(urlRe, "$1\n").split("\n")[2]).match(/.*\//))).href,
 	      HTTPRequest = function(url, props = {}) {
+		const aURL = toURL(url);
 		return new Promise((successFn, errorFn) => {
 			const xh = new XMLHttpRequest();
 			xh.open(
 				props.hasOwnProperty("method") ? props["method"] : "GET",
-				toURL(url),
+				aURL,
 				true,
 				props.hasOwnProperty("user") ? props["user"] : null,
 				props.hasOwnProperty("password") ? props["password"] : null
@@ -39,10 +40,10 @@ offer((async function() {
 			xh.send(props.hasOwnProperty("data") ? props["data"] : null);
 		});
 	      },
-	      WS = function(path) {
-		const url = toURL(path).replace(/^http/, "ws");
+	      WS = function(url) {
+		const aURL = toURL(url).replace(/^http/, "ws");
 		return new Promise((successFn, errorFn) => {
-			const ws = new WebSocket(url);
+			const ws = new WebSocket(aURL);
 			ws.addEventListener("open", () => successFn(Object.freeze({
 				close: ws.close.bind(ws),
 				send: ws.send.bind(ws),
