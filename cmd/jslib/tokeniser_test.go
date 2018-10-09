@@ -305,6 +305,13 @@ func TestTokeniser(t *testing.T) {
 			},
 		},
 		{
+			"/[\\n]/g",
+			[]parser.Token{
+				{TokenRegularExpressionLiteral, "/[\\n]/g"},
+				{parser.TokenDone, ""},
+			},
+		},
+		{
 			"var a =	 /^ab[cd]*$/ig;",
 			[]parser.Token{
 				{TokenKeyword, "var"},

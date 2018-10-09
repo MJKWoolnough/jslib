@@ -267,7 +267,7 @@ func (j *jsParser) inputElement(t *parser.Tokeniser) (parser.Token, parser.Token
 
 func (j *jsParser) regexpBackslashSequence(t *parser.Tokeniser) bool {
 	t.Except("")
-	if t.Except(lineTerminators) {
+	if !t.Except(lineTerminators) {
 		if t.Peek() == -1 {
 			t.Err = io.ErrUnexpectedEOF
 		} else {
