@@ -41,13 +41,17 @@ offer((function() {
 	      },
 	      h = Array.from(document.getElementsByTagName("html")),
 	      createHTML = createElements(h.length > 0 ? h[0].namespaceURI : "http://www.w3.org/1999/xhtml"),
-	      formatText = function(text) {
+	      formatText = function(text, wrapper = null) {
 		const df = document.createDocumentFragment();
-		text.split("\n").forEach((t, n) => {
+		text.split("\n").forEach((text, n) => {
 			if (n > 0) {
-				df.appendChild(creatHTML("br"));
+				df.appendChild(createHTML("br"));
 			}
-			df.appendChild(document.createTextNode(child));
+			if (wrapper instanceof Function) {
+				df.appendChild(wrapper(text));
+			} else {
+				df.appendChild(document.createTextNode(text));
+			}
 		});
 		return df;
 	      },
