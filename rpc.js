@@ -175,7 +175,7 @@ offer((async function() {
 				"type": "application/json",
 				"repsonse": "text",
 				"data": todo.join()
-			}).then(() => this.responseText.split("\n").forEach(msg => rh.handleMessage({"data": msg})), rh.handleError);
+			}).then(responseText => responseText.split("\n").forEach(data => rh.handleMessage({data})), rh.handleError);
 			todo.splice(0, todo.length);
 			sto = -1;
 		      },
