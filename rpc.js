@@ -166,8 +166,9 @@ offer((async function() {
 			return Promise.reject(e);
 		});
 	      },
-	      connectXH = function(path) {
-		const todo = [],
+	      connectXH = async function(path) {
+		const {split} = await include("json.js"),
+		      todo = [],
 		      sto = -1,
 		      sender = function() {
 			HTTPRequest(path, {
@@ -175,7 +176,7 @@ offer((async function() {
 				"type": "application/json",
 				"repsonse": "text",
 				"data": todo.join()
-			}).then(responseText => responseText.split("\n").forEach(data => rh.handleMessage({data})), rh.handleError);
+			}).then(responseText => split(responseText).forEach(data => rh.handleMessage({data}))).catch(rh.handleError);
 			todo.splice(0, todo.length);
 			sto = -1;
 		      },
