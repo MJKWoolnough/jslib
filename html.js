@@ -21,7 +21,7 @@ offer((function() {
 				Object.keys(properties).forEach(k => {
 					const prop = properties[k];
 					if (prop !== undefined) {
-						if (k.substr(0, 2) === "on" && prop instanceof Function) {
+						if (k.startsWith("on") && prop instanceof Function) {
 							elem.addEventListener(k.substr(2), prop.bind(elem));
 						} else if (k === "class") {
 							elem.classList.add(...prop.split(" "));
