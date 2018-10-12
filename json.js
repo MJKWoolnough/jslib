@@ -172,11 +172,11 @@ offer((function() {
 		}
 		return pos;
 	      },
-	      split = function (odata) {
-		let ret = [],
-		    total = readWhitespace(odata),
+	      split = function (odata, limit = -1) {
+		const ret = [];
+		let total = readWhitespace(odata),
 		    data = odata.substring(total);
-		while(data.length > 0) {
+		while(data.length > 0 && (ret.length < limit || limit < 0)) {
 			const len = readElement(data);
 			if (len <= 0 && data.length != len) {
 				total -= len;
