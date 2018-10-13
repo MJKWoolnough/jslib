@@ -139,7 +139,7 @@ offer((async function() {
 			return true;
 		}
 	      },
-	      connectWS = function(path, allowXH) {
+	      connectWS = function(path, allowXH, xhPing) {
 		return WS(path).then(ws => {
 			const rh = new RequestHandler(ws.send),
 			      closer = function() {
@@ -161,15 +161,16 @@ offer((async function() {
 			});
 		}, e => {
 			if (allowXH) {
-				return connectXH(path);
+				return connectXH(path, xhPing);
 			}
 			return Promise.reject(e);
 		});
 	      },
-	      connectXH = async function(path) {
+	      connectXH = async function(path, xhPing) {
 		const {split} = await include("json.js"),
 		      todo = [],
 		      sto = -1,
+		      si = -1,
 		      sender = function() {
 			HTTPRequest(path, {
 				"method": "POST",
@@ -183,13 +184,21 @@ offer((async function() {
 		      rh = new RequestHandler(function(msg) {
 			todo.push(msg);
 			if (sto === -1) {
+				if (si !== -1) {
+					window.clearInterval(si);
+					si = window.setInterval(sender, xhPing);
+				}
 				sto = window.setTimeout(sender, 1);
 			}
 		      });
-		//TODO: Set up a 'ping' function for 'await' request?
 		return Promise.resolve(Object.freeze({
 			"request": rh.request.bind(rh),
-			"await": rh.await.bind(rh),
+			"await": (id, keep = false) => {
+				if (si === -1) {
+					si = window.setInterval(sender, xhPing);
+				}
+				return rh.await(id, keep)
+			},
 			"close": () => {
 				if (rh.close() && sto !== -1) {
 					window.clearTimeout(sto);
@@ -198,11 +207,11 @@ offer((async function() {
 			}
 		}));
 	      },
-	      RPC = function(path, allowWS = true, allowXH = false) {
+	      RPC = function(path, allowWS = true, allowXH = false, xhPing = 1000) {
 		if (allowWS) {
-			return connectWS(path, allowXH);
+			return connectWS(path, allowXH, xhPing);
 		} else if (allowXH) {
-			return connectXH(path);
+			return connectXH(path, xpPing);
 		}
 		return Promise.reject(new Error("no connecion available"));
 	      };
