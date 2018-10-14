@@ -194,7 +194,7 @@ offer((async function() {
 		return Promise.resolve(Object.freeze({
 			"request": rh.request.bind(rh),
 			"await": (id, keep = false) => {
-				if (si === -1) {
+				if (si === -1 && xhPing > 0) {
 					si = window.setInterval(sender, xhPing);
 				}
 				return rh.await(id, keep)
