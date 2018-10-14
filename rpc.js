@@ -211,7 +211,7 @@ offer((async function() {
 		if (allowWS) {
 			return connectWS(path, allowXH, xhPing);
 		} else if (allowXH) {
-			return connectXH(path, xpPing);
+			return connectXH(path, xhPing);
 		}
 		return Promise.reject(new Error("no connecion available"));
 	      };
