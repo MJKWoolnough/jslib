@@ -12,7 +12,7 @@ offer((function() {
 			};
 		}
 	};
-	const spread = Symbol(spread);
+	const spread = Symbol("spread");
 	class Subscription {
 		constructor(fn) {
 			const success = new Pipe(),
