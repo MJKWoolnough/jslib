@@ -176,6 +176,7 @@ offer((async function() {
 				"method": "POST",
 				"type": "application/json",
 				"repsonse": "text",
+				"headers": headerID,
 				"data": todo.join()
 			}).then(responseText => split(responseText).forEach(data => rh.handleMessage({data}))).catch(rh.handleError);
 			todo.splice(0, todo.length);
@@ -190,7 +191,8 @@ offer((async function() {
 				}
 				sto = window.setTimeout(sender, 1);
 			}
-		      });
+		      }),
+		      headerID = Object.freeze({"X-RPCID": Array.from(crypto.getRandomValues(new Uint8Array(32))).map(a => a.toString(16).padStart(2, "0")).join("")});
 		return Promise.resolve(Object.freeze({
 			"request": rh.request.bind(rh),
 			"await": (id, keep = false) => {
