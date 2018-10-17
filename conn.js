@@ -13,6 +13,9 @@ offer((async function() {
 				props.hasOwnProperty("user") ? props["user"] : null,
 				props.hasOwnProperty("password") ? props["password"] : null
 			);
+			if (props.hasOwnProperty("headers") && typeof props["headers"] == "Object") {
+				props["headers"].entries().forEach(([header, value]) => xh.setRequestHeader(header, value));
+			}
 			if (props.hasOwnProperty("type")) {
 				xh.setRequestHeader("Content-Type", props["type"]);
 			}
