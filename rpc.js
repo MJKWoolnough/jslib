@@ -1,7 +1,6 @@
 offer((async function() {
 	const {Subscription} = await include("inter.js"),
 	      {HTTPRequest, WS} = await include("conn.js"),
-	      closedErr = Object.freeze(new Error("RPC Closed")),
 	      nop = () => {},
 	      Request = class {
 		constructor() {
@@ -109,7 +108,7 @@ offer((async function() {
 		}
 		request(method, data = null) {
 			if (this.closed) {
-				return Promise.reject(closedErr);
+				return Promise.reject(new Error("RPC Closed"));
 			}
 			this.sender(JSON.stringify({
 				"method": method,
@@ -120,7 +119,7 @@ offer((async function() {
 		}
 		await(id, keep = false) {
 			if (this.closed) {
-				return Promise.reject(closedErr);
+				return Promise.reject(new Error("RPC Closed"));
 			}
 			if (id >= 0) {
 				return Promise.reject(new Error("await IDs must be < 0"))
@@ -135,7 +134,7 @@ offer((async function() {
 				return false;
 			}
 			this.closed = true;
-			this.requests.forEach(r => r.error(closedErr));
+			this.requests.forEach(r => r.error(new Error("RPC Closed")));
 			return true;
 		}
 	      },
