@@ -50,10 +50,11 @@ offer((async function() {
 			ws.addEventListener("open", () => successFn(Object.freeze({
 				close: ws.close.bind(ws),
 				send: ws.send.bind(ws),
-				when: new Subscription((successFn, errorFn) => {
-					ws.addEventListener("message", successFn);
-					ws.addEventListener("error", errorFn);
-					ws.addEventListener("close", errorFn);
+				when: new Subscription((sFn, eFn) => {
+					ws.removeEventListener("error", errorFn);
+					ws.addEventListener("message", sFn);
+					ws.addEventListener("error", eFn);
+					ws.addEventListener("close", eFn);
 				}).then,
 				get type() {
 					return ws.type;
