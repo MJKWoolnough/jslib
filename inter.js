@@ -12,15 +12,23 @@ offer((function() {
 			};
 		}
 	};
-	const spread = Symbol("spread");
+	const spread = Symbol("spread"),
+	      subs = new WeakMap();
 	class Subscription {
 		constructor(fn) {
 			const success = new Pipe(),
 			      error = new Pipe();
 			fn(success.send, error.send);
-			this.then = (successFn, errorFn) => new Subscription((sFn, eFn) => {
+			subs.set([success.receive, error.receive]);
+		}
+		then(successFn, errorFn) {
+			if (!subs.has(this)) {
+				throw new TypeError("method not called on valid Subscription object");
+			}
+			const [success, error] = subs.get(this);
+			return new Subscription((sFn, eFn) => {
 				if (successFn instanceof Function) {
-					success.receive((...data) => {
+					success((...data) => {
 						try {
 							const ret = successFn(...data);
 							if (ret instanceof Array && ret.hasOwnProperty(spread)) {
@@ -33,10 +41,10 @@ offer((function() {
 						}
 					});
 				} else {
-					success.receive(sFn);
+					success(sFn);
 				}
 				if (errorFn instanceof Function) {
-					error.receive((...data) => {
+					error((...data) => {
 						try {
 							const ret = errorFn(...data);
 							if (ret instanceof Array && ret.hasOwnProperty(spread)) {
@@ -47,7 +55,7 @@ offer((function() {
 						}
 					});
 				} else {
-					error.receive(eFn);
+					error(eFn);
 				}
 			});
 		}
