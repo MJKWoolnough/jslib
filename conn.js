@@ -50,15 +50,12 @@ offer((async function() {
 			ws.addEventListener("open", () => successFn(Object.freeze({
 				close: ws.close.bind(ws),
 				send: ws.send.bind(ws),
-				when: (function() {
-					const sub = new Subscription((sFn, eFn) => {
-						ws.removeEventListener("error", errorFn);
-						ws.addEventListener("message", sFn);
-						ws.addEventListener("error", eFn);
-						ws.addEventListener("close", eFn);
-					});
-					return sub.then.bind(sub);
-				}()),
+				when: Subscription.prototype.then.bind(new Subscription((sFn, eFn) => {
+					ws.removeEventListener("error", errorFn);
+					ws.addEventListener("message", sFn);
+					ws.addEventListener("error", eFn);
+					ws.addEventListener("close", eFn);
+				})),
 				get type() {
 					return ws.type;
 				},
