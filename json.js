@@ -174,12 +174,15 @@ offer((function() {
 	      },
 	      split = function (odata, limit = -1) {
 		const ret = [];
-		let total = readWhitespace(odata),
-		    data = odata.substring(total);
+		let total = 0,
+		    data = odata;
 		while(data.length > 0 && (ret.length < limit || limit < 0)) {
-			const len = readElement(data);
-			if (len <= 0 && data.length != len) {
-				total -= len;
+			const len = readElement(data)
+			if (len <= 0) {
+				if (-len === readWhitespace(data)) {
+					break;
+				}
+				total -= len - ws;
 				const obj = ret.length,
 				      oline = odata.substring(0, total).replace(/[^\n]/g, "").length,
 				      sline = odata.substring(total-len, total).replace(/[^\n]/g, "").length,
@@ -187,10 +190,10 @@ offer((function() {
 				      schar = -len - (sline === 0 ? 0 : odata.substring(total-len, total).lastIndexOf("\n"));
 				throw new SyntaxError(`split: invalid JSON at ${oline}:${ochar} (${obj}:${sline}:${schar})`);
 			}
+			const oTotal = total;
 			total += len;
-			ret.push(data.substring(0, len));
+			ret.push(odata.substring(oTotal, total));
 			data = data.substring(len);
-			data = data.substring(readWhitespace(data));
 		}
 		return ret;
 	      },
