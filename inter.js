@@ -19,7 +19,7 @@ offer((function() {
 			const success = new Pipe(),
 			      error = new Pipe();
 			fn(success.send, error.send);
-			subs.set([success.receive, error.receive]);
+			subs.set(this, [success.receive, error.receive]);
 		}
 		then(successFn, errorFn) {
 			if (!subs.has(this)) {
