@@ -60,14 +60,14 @@ offer((function() {
 			});
 		}
 		catch(errorFn) {
-			return this.then(null, errorFn);
+			return Subscription.prototype.then.call(this, null, errorFn);
 		}
 		finally(afterFn) {
 			const aFn = (...data) => {
 				afterFn();
 				return Object.defineProperty(data, spread, {});
 			};
-			return this.then(aFn, aFn);
+			return Subscription.prototype.then.call(this, aFn, aFn);
 		}
 	};
 	return Object.freeze({Pipe, Subscription});
