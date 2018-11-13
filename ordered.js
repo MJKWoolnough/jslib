@@ -1,14 +1,14 @@
 "use strict"
 offer((function() {
 	const objects = new WeakMap(),
-	      check = function(method, object, item) {
+	      check = function(object, method, ...args) {
 		if (!objects.has(object)) {
 			throw new TypeError("invalid Ordered object");
 		}
 		if (!(html in item && item.html instanceof Node)) {
 			throw new TypeError("invalid item object");
 		}
-		method(objects.get(object), item);
+		method(objects.get(object), ...args);
 	      },
 	      add = function(o, item) {
 		const {lessFn, parentNode, list} = o,
@@ -43,6 +43,15 @@ offer((function() {
 		const {list} = o;
 		list.splice(list.indexOf(item), 1);
 		return add(o, item);
+	      },
+	      get = function(o, num) {
+		return o.list[num]
+	      },
+	      length = function(o) {
+		return o.list.length;
+	      },
+	      indexOf = function(o, elm) {
+		return o.list.indexOf(elm);
 	      };
 	class Ordered {
 		constructor(lessFn, parentNode) {
@@ -56,13 +65,22 @@ offer((function() {
 			objects.set(this, Object.freeze({lessFn, parentNode, list}));
 		}
 		add(item) {
-			return check(add, this, item);
+			return check(this, add, item);
 		}
 		remove(item) {
-			return check(remove, this, item);
+			return check(this, remove, item);
 		}
 		update(item) {
-			return check(update, this, item);
+			return check(this, update, item);
+		}
+		get(num) {
+			return check(this, get, num);
+		}
+		get length() {
+			return check(this, length);
+		}
+		indexOf(elm) {
+			return check(this, indexOf);
 		}
 	}
 	return {Ordered};
