@@ -1,87 +1,125 @@
 "use strict"
 offer((function() {
-	const objects = new WeakMap(),
-	      check = function(object, method, ...args) {
-		if (!objects.has(object)) {
-			throw new TypeError("invalid Ordered object");
+	const isIndex = key => Number.isInteger(key) && key >= 0,
+	      defaultSort = new Intl.Collator().compare,
+	      fns = {
+		set: function(target, property, value) {
+			const d = data.get(target);
+			if (!isIndex(property) || d.jdi) {
+				target[property] = value;
+				return true;
+			}
+			data.validateItem(value);
+			const o = target.indexOf(value);
+			if (o >= 0) {
+				if (d.sortFn(value, target[o]) === 0) {
+					if (!target[o][d.field].isSameNode(value[d.field])) {
+						d.parentNode.replaceChild(value[d.field], target[o][d.field]);
+					}
+					target[o] = value;
+					return true;
+				}
+				d.parentNode.removeChild(target[o][d.field]);
+				target.splice(o, 1);
+			}
+			let pos = 0;
+			for (; pos < target.length; pos++) {
+				
+			}
+			return true;
+		},
+		deleteProperty: function(target, property) {
+			const d = data.get(target);
+			if (!isIndex(property) || d.jdi) {
+				delete target[property];
+				return true;
+			}
+			d.parentNode.removeChild(target[property][d.field]);
+			for (let i = property; i < target.length - 1; i++) {
+				target[i] = target[i+1];
+			}
+			delete target[target.length-1];
+			return true;
 		}
-		if (!(html in item && item.html instanceof Node)) {
-			throw new TypeError("invalid item object");
-		}
-		method(objects.get(object), ...args);
 	      },
-	      add = function(o, item) {
-		const {lessFn, parentNode, list} = o,
-		      i = list.indexOf(item)
-		if (i >= 0) {
+	      reset = function(arr, d) {
+		while(d.parentNode.hasChildNodes()) {
+			d.parentNode.removeChild(d.parentNode.lastChild);
+		}
+		arr.forEach(e => d.parentNode.appendChild(e[d.field]));
+	      },
+	      dataMap = new WeakMap(),
+	      data = class {
+		constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
+			this.parentNode = parentNode;
+			this.sortFn = sortFn;
+			this.fieldName = fieldName;
+			this.reverse = false;
+			this.jdi = false;
+		}
+		justDoIt(fn) {
+			this.jdi = true;
+			fn();
+			this.jdi = false;
+		}
+		validateItem(item) {
+			if (!item[this.fieldName]) {
+				throw new TypeError("invalid item object");
+			}
+		}
+		static get(arr) {
+			if (dataMap.has(arr)) {
+				return dataMap.get(arr);
+			}
+			throw new TypeError("invalid SortHTML");
+		}
+	      },
+	      sortHTML = function(parentNode, sortFn = defaultSort, fieldName = "html") {
+		const arr = new SortHTML();
+		dataMap.set(arr, Object.freeze(new data(parentNode, sortFn, fieldName)));
+		return new Proxy(arr, fns);
+	      },
+	      SortHTML = class SortHTML extends Array {
+		constructor() {
+			super();
+		}
+		reverse() {
+			const d = data.get(this);
+			d.reverse = true;
+			d.jdi = true;
+			super.reverse();
+			d.jdi = false;
+			reset(this, d);
+		}
+		shift() {
+			const d = data.get(this);
+			d.jdi = true;
+			const i = super.shift();
+			d.jdi = false;
+			d.parentNode.removeChild(d.parentNode.firstChild);
 			return i;
 		}
-		let pos = 0;
-		for(; pos < list.length; pos++) {
-			if (lessFn(item, list[pos])) {
-				break;
-			}
+		sort(sortFn) {
+			const d = data.get(this);
+			d.sortFn = sortFn;
+			d.jdi = true;
+			super.sort(sortFn);
+			d.jdi = false;
+			reset(this, d);
 		}
-		if (pos === list.length) {
-			parentNode.appendChild(item.html);
-		} else {
-			parentNode.insertBefore(item.html, list[pos].html);
+		splice(start, deleteCount = Infinity, ...items) {
+			//TODO
 		}
-		list.splice(pos, 0, item);
-		return pos;
-	      },
-	      remove = function(o, item) {
-		const {parentNode, list} = o,
-		      pos = list.indexOf(item);
-		if (pos >= 0) {
-			parentNode.removeChild(item.html);
-			list.splice(pos, 1);
-		}
-		return pos;
-	      },
-	      update = function(o, item) {
-		const {list} = o;
-		list.splice(list.indexOf(item), 1);
-		return add(o, item);
-	      },
-	      get = function(o, num) {
-		return o.list[num]
-	      },
-	      length = function(o) {
-		return o.list.length;
-	      },
-	      indexOf = function(o, elm) {
-		return o.list.indexOf(elm);
-	      };
-	class Ordered {
-		constructor(lessFn, parentNode) {
-			if (!(lessFn instanceof Function)) {
-				throw TypeError("first argument to Ordered constructor needs to be a sorting function");
-			}
-			if (!(parentNode instanceof Node)) {
-				throw TypeError("second argument to Ordered constructor must be a Node object");
-			}
-			const list = [];
-			objects.set(this, Object.freeze({lessFn, parentNode, list}));
-		}
-		add(item) {
-			return check(this, add, item);
-		}
-		remove(item) {
-			return check(this, remove, item);
+		unshift(item, ...items) {
+			this.push(item);
+			items.forEach(i => this.push(i));
+			return this.length;
 		}
 		update(item) {
-			return check(this, update, item);
+			
 		}
-		get(num) {
-			return check(this, get, num);
-		}
-		get length() {
-			return check(this, length);
-		}
-		indexOf(elm) {
-			return check(this, indexOf);
-		}
-	}
-	return {Ordered};
+		get html() {return data.get(this).parentNode;}
+		static get [Symbol.species]() {return Array;}
+	      };
+	return {sortHTML};
 }()));
