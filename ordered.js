@@ -24,8 +24,14 @@ offer((function() {
 			}
 			let pos = 0;
 			for (; pos < target.length; pos++) {
-				
+				if ((d.sortFn(value, target[pos]) >= 0) === d.reverse) {
+					d.parentNode.insertBefore(value[d.field], target[pos][d.field]);
+					target.splice(pos, 0, value);
+					return true;
+				}
 			}
+			d.parentNode.appendChild(value[d.field]);
+			target.push(value);
 			return true;
 		},
 		deleteProperty: function(target, property) {
