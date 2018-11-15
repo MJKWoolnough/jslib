@@ -81,9 +81,12 @@ offer((function() {
 		}
 	      },
 	      sortHTML = function(parentNode, sortFn = defaultSort, fieldName = "html") {
-		const arr = new SortHTML();
-		dataMap.set(arr, Object.freeze(new data(parentNode, sortFn, fieldName)));
-		return new Proxy(arr, fns);
+		const arr = new SortHTML(),
+		      p = new Proxy(arr, fns),
+		      d = Object.freeze(new data(parentNode, sortFn, fieldName));
+		dataMap.set(arr, d);
+		dataMap.set(p, d);
+		return p;
 	      },
 	      SortHTML = class SortHTML extends Array {
 		constructor() {
