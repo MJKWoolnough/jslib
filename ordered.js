@@ -117,7 +117,16 @@ offer((function() {
 			reset(this, d);
 		}
 		splice(start, deleteCount = Infinity, ...items) {
-			//TODO
+			if (deleteCount > this.length - start) {
+				deleteCount = this.length - start;
+			}
+			const ret = [];
+			for (let i = 0; i < deleteCount; i++) {
+				ret.push(this[start+i]);
+				delete this[start+i];
+			}
+			items.forEach(i => this.push(i));
+			return ret;
 		}
 		unshift(item, ...items) {
 			this.push(item);
