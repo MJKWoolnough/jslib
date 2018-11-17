@@ -133,9 +133,6 @@ offer((function() {
 			items.forEach(i => this.push(i));
 			return this.length;
 		}
-		update(item) {
-			
-		}
 		get html() {return data.get(this).parentNode;}
 		static get [Symbol.species]() {return Array;}
 	      };
