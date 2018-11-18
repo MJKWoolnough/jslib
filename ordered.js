@@ -120,11 +120,13 @@ offer((function() {
 			if (deleteCount > this.length - start) {
 				deleteCount = this.length - start;
 			}
-			const ret = [];
+			const d = data.get(this);
 			for (let i = 0; i < deleteCount; i++) {
-				ret.push(this[start+i]);
-				delete this[start+i];
+				d.parentNode.removeChild(this[start+i][d.field]);
 			}
+			d.jdi = true;
+			const ret = super.splice(start, deleteCount);
+			d.jdi = false;
 			items.forEach(i => this.push(i));
 			return ret;
 		}
