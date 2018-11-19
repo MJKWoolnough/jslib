@@ -63,11 +63,6 @@ offer((function() {
 			this.reverse = false;
 			this.jdi = false;
 		}
-		justDoIt(fn) {
-			this.jdi = true;
-			fn();
-			this.jdi = false;
-		}
 		validateItem(item) {
 			if (!item[this.fieldName]) {
 				throw new TypeError("invalid item object");
