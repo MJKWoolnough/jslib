@@ -9,28 +9,28 @@ offer((function() {
 				target[property] = value;
 				return true;
 			}
-			data.validateItem(value);
+			d.validateItem(value);
 			const o = target.indexOf(value);
 			if (o >= 0) {
 				if (d.sortFn(value, target[o]) === 0) {
-					if (!target[o][d.field].isSameNode(value[d.field])) {
-						d.parentNode.replaceChild(value[d.field], target[o][d.field]);
+					if (!target[o][d.fieldName].isSameNode(value[d.fieldName])) {
+						d.parentNode.replaceChild(value[d.fieldName], target[o][d.fieldName]);
 					}
 					target[o] = value;
 					return true;
 				}
-				d.parentNode.removeChild(target[o][d.field]);
+				d.parentNode.removeChild(target[o][d.fieldName]);
 				target.splice(o, 1);
 			}
 			let pos = 0;
 			for (; pos < target.length; pos++) {
 				if ((d.sortFn(value, target[pos]) >= 0) === d.reverse) {
-					d.parentNode.insertBefore(value[d.field], target[pos][d.field]);
+					d.parentNode.insertBefore(value[d.fieldName], target[pos][d.fieldName]);
 					target.splice(pos, 0, value);
 					return true;
 				}
 			}
-			d.parentNode.appendChild(value[d.field]);
+			d.parentNode.appendChild(value[d.fieldName]);
 			target.push(value);
 			return true;
 		},
@@ -40,7 +40,7 @@ offer((function() {
 				delete target[property];
 				return true;
 			}
-			d.parentNode.removeChild(target[property][d.field]);
+			d.parentNode.removeChild(target[property][d.fieldName]);
 			for (let i = property; i < target.length - 1; i++) {
 				target[i] = target[i+1];
 			}
@@ -52,7 +52,7 @@ offer((function() {
 		while(d.parentNode.hasChildNodes()) {
 			d.parentNode.removeChild(d.parentNode.lastChild);
 		}
-		arr.forEach(e => d.parentNode.appendChild(e[d.field]));
+		arr.forEach(e => d.parentNode.appendChild(e[d.fieldName]));
 	      },
 	      dataMap = new WeakMap(),
 	      data = class {
@@ -78,7 +78,7 @@ offer((function() {
 	      sortHTML = function(parentNode, sortFn = defaultSort, fieldName = "html") {
 		const arr = new SortHTML(),
 		      p = new Proxy(arr, fns),
-		      d = Object.freeze(new data(parentNode, sortFn, fieldName));
+		      d = new data(parentNode, sortFn, fieldName);
 		dataMap.set(arr, d);
 		dataMap.set(p, d);
 		return p;
@@ -117,7 +117,7 @@ offer((function() {
 			}
 			const d = data.get(this);
 			for (let i = 0; i < deleteCount; i++) {
-				d.parentNode.removeChild(this[start+i][d.field]);
+				d.parentNode.removeChild(this[start+i][d.fieldName]);
 			}
 			d.jdi = true;
 			const ret = super.splice(start, deleteCount);
