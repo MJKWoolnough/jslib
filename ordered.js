@@ -1,6 +1,6 @@
 "use strict"
 offer((function() {
-	const isIndex = key => Number.isInteger(key) && key >= 0,
+	const isIndex = key => parseInt(key).toString() === key && key >= 0,
 	      defaultSort = new Intl.Collator().compare,
 	      fns = {
 		set: function(target, property, value) {
