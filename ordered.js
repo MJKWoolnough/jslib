@@ -35,7 +35,7 @@ offer((function() {
 				}
 			}
 			d.parentNode.appendChild(value[d.fieldName]);
-			target.push(value);
+			target[target.length] = value;
 			return true;
 		},
 		deleteProperty: function(target, property) {
@@ -86,6 +86,12 @@ offer((function() {
 		constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
 			super();
 			Object.defineProperty(this, dataSymbol, {value: new data(parentNode, sortFn, fieldName)});
+		}
+		push(item, ...items) {
+			const l = this.length;
+			this[0] = item;
+			items.forEach(i => this[0] = i);
+			return this.length;
 		}
 		reverse() {
 			const d = data.get(this);
