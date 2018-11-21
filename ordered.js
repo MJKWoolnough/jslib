@@ -42,10 +42,11 @@ offer((function() {
 				return true;
 			}
 			d.parentNode.removeChild(target[property][d.fieldName]);
-			for (let i = property; i < target.length - 1; i++) {
+			for (let i = parseInt(property); i < target.length - 1; i++) {
 				target[i] = target[i+1];
 			}
 			delete target[target.length-1];
+			target.length--;
 			return true;
 		}
 	      },
