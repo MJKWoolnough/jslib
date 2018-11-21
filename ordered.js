@@ -27,7 +27,10 @@ offer((function() {
 			for (; pos < target.length; pos++) {
 				if ((d.sortFn(value, target[pos]) >= 0) === d.reverse) {
 					d.parentNode.insertBefore(value[d.fieldName], target[pos][d.fieldName]);
-					target.splice(pos, 0, value);
+					for (let i = target.length; i > pos; i--) {
+						target[i] = target[i-1];
+					}
+					target[pos] = value;
 					return true;
 				}
 			}
