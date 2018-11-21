@@ -2,6 +2,7 @@
 offer((function() {
 	const isIndex = key => parseInt(key).toString() === key && key >= 0,
 	      defaultSort = new Intl.Collator().compare,
+	      dataSymbol = Symbol("data"),
 	      fns = {
 		set: function(target, property, value) {
 			const d = data.get(target);
@@ -54,7 +55,6 @@ offer((function() {
 		}
 		arr.forEach(e => d.parentNode.appendChild(e[d.fieldName]));
 	      },
-	      dataMap = new WeakMap(),
 	      data = class {
 		constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
 			this.parentNode = parentNode;
@@ -69,23 +69,19 @@ offer((function() {
 			}
 		}
 		static get(arr) {
-			if (dataMap.has(arr)) {
-				return dataMap.get(arr);
+			if (arr.hasOwnProperty(dataSymbol)) {
+				return arr[dataSymbol];
 			}
 			throw new TypeError("invalid SortHTML");
 		}
 	      },
 	      sortHTML = function(parentNode, sortFn = defaultSort, fieldName = "html") {
-		const arr = new SortHTML(),
-		      p = new Proxy(arr, fns),
-		      d = new data(parentNode, sortFn, fieldName);
-		dataMap.set(arr, d);
-		dataMap.set(p, d);
-		return p;
+		return new Proxy(new SortHTML(parentNode, sortFn, fieldName), fns);
 	      },
 	      SortHTML = class SortHTML extends Array {
-		constructor() {
+		constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
 			super();
+			Object.defineProperty(this, dataSymbol, {value: new data(parentNode, sortFn, fieldName)});
 		}
 		reverse() {
 			const d = data.get(this);
