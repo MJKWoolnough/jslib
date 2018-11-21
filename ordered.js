@@ -88,7 +88,6 @@ offer((function() {
 			Object.defineProperty(this, dataSymbol, {value: new data(parentNode, sortFn, fieldName)});
 		}
 		push(item, ...items) {
-			const l = this.length;
 			this[0] = item;
 			items.forEach(i => this[0] = i);
 			return this.length;
