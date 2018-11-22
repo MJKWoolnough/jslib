@@ -1,57 +1,61 @@
 "use strict"
 offer((function() {
 	const isIndex = key => parseInt(key).toString() === key && key >= 0,
+	      sameSort = (arr, index, sortFn) => (index === 0 || sortFn(arr[index-1], arr[index]) !== 1) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) !== -1),
 	      defaultSort = new Intl.Collator().compare,
 	      dataSymbol = Symbol("data"),
-	      fns = {
-		set: function(target, property, value) {
-			const d = data.get(target);
-			if (!isIndex(property) || d.jdi) {
-				target[property] = value;
-				return true;
-			}
-			d.validateItem(value);
-			const o = target.indexOf(value);
-			if (o >= 0) {
-				if (d.sortFn(value, target[o]) === 0) {
-					if (!target[o][d.fieldName].isSameNode(value[d.fieldName])) {
-						d.parentNode.replaceChild(value[d.fieldName], target[o][d.fieldName]);
-					}
-					target[o] = value;
-					return true;
-				}
-				d.parentNode.removeChild(target[o][d.fieldName]);
-				target.splice(o, 1);
-			}
-			let pos = 0;
-			for (; pos < target.length; pos++) {
-				if ((d.sortFn(value, target[pos]) >= 0) === d.reverse) {
-					d.parentNode.insertBefore(value[d.fieldName], target[pos][d.fieldName]);
-					for (let i = target.length; i > pos; i--) {
-						target[i] = target[i-1];
-					}
-					target[pos] = value;
-					return true;
-				}
-			}
-			d.parentNode.appendChild(value[d.fieldName]);
-			target[target.length] = value;
-			return true;
-		},
-		deleteProperty: function(target, property) {
-			const d = data.get(target);
-			if (!isIndex(property) || d.jdi) {
-				delete target[property];
-				return true;
-			}
-			d.parentNode.removeChild(target[property][d.fieldName]);
-			for (let i = parseInt(property); i < target.length - 1; i++) {
-				target[i] = target[i+1];
-			}
-			delete target[target.length-1];
-			target.length--;
+	      set =  function(target, property, value) {
+		const d = data.get(target),
+		if (!isIndex(property) || d.jdi) {
+			target[property] = value;
 			return true;
 		}
+		d.validateItem(value);
+		const index = parseInt(property);
+		if (index < target.length) {
+			if (target[index] === value && sameSort(target, index, d.sortFn)) {
+				return true;
+			}
+			remove(target, property);
+		}
+		const oldPos = target.indexOf(value);
+		if (oldPos >= 0) {
+			if (sameSort(target, oldPos, d.sortFn)) {
+				return true;
+			}
+			remove(target, oldPos);
+		}
+		let pos = 0;
+		for (; pos < target.length; pos++) {
+			if ((d.sortFn(value, target[pos]) >= 0) === d.reverse) {
+				d.parentNode.insertBefore(value[d.fieldName], target[pos][d.fieldName]);
+				for (let i = target.length; i > pos; i--) {
+					target[i] = target[i-1];
+				}
+				target[pos] = value;
+				return true;
+			}
+		}
+		d.parentNode.appendChild(value[d.fieldName]);
+		target[target.length] = value;
+		return true;
+	      },
+	      deleteProperty = function(target, property) {
+		const d = data.get(target);
+		if (!isIndex(property) || d.jdi) {
+			delete target[property];
+			return true;
+		}
+		remove(target, parseInt(property));
+	      },
+	      remove = function(target, index) {
+		d.parentNode.removeChild(target[index][d.fieldName]);
+		for (let i = index; i < target.length - 1; i++) {
+			target[i] = target[i+1];
+		}
+		delete target[target.length-1];
+		target.length--;
+		return true;
 	      },
 	      reset = function(arr, d) {
 		while(d.parentNode.hasChildNodes()) {
@@ -59,6 +63,7 @@ offer((function() {
 		}
 		arr.forEach(e => d.parentNode.appendChild(e[d.fieldName]));
 	      },
+	      fns = {set, deleteProperty},
 	      data = class {
 		constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
 			this.parentNode = parentNode;
