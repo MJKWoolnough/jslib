@@ -5,18 +5,20 @@ offer((function() {
 	      defaultSort = new Intl.Collator().compare,
 	      dataSymbol = Symbol("data"),
 	      set =  function(target, property, value) {
-		const d = data.get(target),
+		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
 			target[property] = value;
 			return true;
 		}
-		d.validateItem(value);
+		if (!value[d.fieldName]) {
+			throw new TypeError("invalid item object");
+		}
 		const index = parseInt(property);
 		if (index < target.length) {
 			if (target[index] === value && sameSort(target, index, d.sortFn)) {
 				return true;
 			}
-			remove(target, property);
+			remove(target, index);
 		}
 		const oldPos = target.indexOf(value);
 		if (oldPos >= 0) {
@@ -41,7 +43,7 @@ offer((function() {
 		return true;
 	      },
 	      deleteProperty = function(target, property) {
-		const d = data.get(target);
+		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
 			delete target[property];
 			return true;
@@ -64,25 +66,11 @@ offer((function() {
 		arr.forEach(e => d.parentNode.appendChild(e[d.fieldName]));
 	      },
 	      fns = {set, deleteProperty},
-	      data = class {
-		constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
-			this.parentNode = parentNode;
-			this.sortFn = sortFn;
-			this.fieldName = fieldName;
-			this.reverse = false;
-			this.jdi = false;
+	      getData = function(arr) {
+		if (arr.hasOwnProperty(dataSymbol)) {
+			return arr[dataSymbol];
 		}
-		validateItem(item) {
-			if (!item[this.fieldName]) {
-				throw new TypeError("invalid item object");
-			}
-		}
-		static get(arr) {
-			if (arr.hasOwnProperty(dataSymbol)) {
-				return arr[dataSymbol];
-			}
-			throw new TypeError("invalid SortHTML");
-		}
+		throw new TypeError("invalid SortHTML");
 	      },
 	      sortHTML = function(parentNode, sortFn = defaultSort, fieldName = "html") {
 		return new Proxy(new SortHTML(parentNode, sortFn, fieldName), fns);
@@ -90,7 +78,7 @@ offer((function() {
 	      SortHTML = class SortHTML extends Array {
 		constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
 			super();
-			Object.defineProperty(this, dataSymbol, {value: new data(parentNode, sortFn, fieldName)});
+			Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, fieldName, reverse: false, jdi: false}});
 		}
 		push(item, ...items) {
 			this[0] = item;
@@ -98,7 +86,7 @@ offer((function() {
 			return this.length;
 		}
 		reverse() {
-			const d = data.get(this);
+			const d = getData(this);
 			d.reverse = true;
 			d.jdi = true;
 			super.reverse();
@@ -106,7 +94,7 @@ offer((function() {
 			reset(this, d);
 		}
 		shift() {
-			const d = data.get(this);
+			const d = getData(this);
 			d.jdi = true;
 			const i = super.shift();
 			d.jdi = false;
@@ -114,7 +102,7 @@ offer((function() {
 			return i;
 		}
 		sort(sortFn) {
-			const d = data.get(this);
+			const d = getData(this);
 			d.sortFn = sortFn;
 			d.jdi = true;
 			super.sort(sortFn);
@@ -125,7 +113,7 @@ offer((function() {
 			if (deleteCount > this.length - start) {
 				deleteCount = this.length - start;
 			}
-			const d = data.get(this);
+			const d = getData(this);
 			for (let i = 0; i < deleteCount; i++) {
 				d.parentNode.removeChild(this[start+i][d.fieldName]);
 			}
@@ -140,7 +128,7 @@ offer((function() {
 			items.forEach(i => this.push(i));
 			return this.length;
 		}
-		get html() {return data.get(this).parentNode;}
+		get html() {return getData(this).parentNode;}
 		static get [Symbol.species]() {return Array;}
 	      };
 	return {sortHTML};
