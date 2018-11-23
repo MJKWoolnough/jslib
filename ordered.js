@@ -18,14 +18,14 @@ offer((function() {
 			if (target[index] === value && sameSort(target, index, d.sortFn)) {
 				return true;
 			}
-			remove(target, index);
+			remove(target, index, d);
 		}
 		const oldPos = target.indexOf(value);
 		if (oldPos >= 0) {
 			if (sameSort(target, oldPos, d.sortFn)) {
 				return true;
 			}
-			remove(target, oldPos);
+			remove(target, oldPos, d);
 		}
 		let pos = 0;
 		for (; pos < target.length; pos++) {
@@ -48,10 +48,10 @@ offer((function() {
 			delete target[property];
 			return true;
 		}
-		remove(target, parseInt(property));
+		remove(target, parseInt(property), d);
 	      },
-	      remove = function(target, index) {
-		d.parentNode.removeChild(target[index][d.fieldName]);
+	      remove = function(target, index, data) {
+		data.parentNode.removeChild(target[index][data.fieldName]);
 		for (let i = index; i < target.length - 1; i++) {
 			target[i] = target[i+1];
 		}
