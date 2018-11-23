@@ -49,6 +49,7 @@ offer((function() {
 			return true;
 		}
 		remove(target, parseInt(property), d);
+		return true;
 	      },
 	      remove = function(target, index, data) {
 		data.parentNode.removeChild(target[index][data.fieldName]);
@@ -79,11 +80,6 @@ offer((function() {
 		constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
 			super();
 			Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, fieldName, reverse: false, jdi: false}});
-		}
-		push(item, ...items) {
-			this[0] = item;
-			items.forEach(i => this[0] = i);
-			return this.length;
 		}
 		reverse() {
 			const d = getData(this);
