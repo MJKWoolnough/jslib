@@ -1,7 +1,7 @@
 "use strict"
 offer((function() {
 	const isIndex = key => parseInt(key).toString() === key && key >= 0,
-	      sameSort = (arr, index, sortFn) => (index === 0 || sortFn(arr[index-1], arr[index]) !== 1) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) !== -1),
+	      sameSort = (arr, index, sortFn) => (index === 0 || sortFn(arr[index-1], arr[index]) !== -1) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) !== -1),
 	      defaultSort = new Intl.Collator().compare,
 	      dataSymbol = Symbol("data"),
 	      set =  function(target, property, value) {
