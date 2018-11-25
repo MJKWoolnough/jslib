@@ -81,6 +81,11 @@ offer((function() {
 			super();
 			Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, fieldName, reverse: false, jdi: false}});
 		}
+		push(element, ...elements) {
+			this[this.length] = element;
+			elements.forEach(e => this.push(e));
+			return this.length;
+		}
 		reverse() {
 			const d = getData(this);
 			d.reverse = true;
