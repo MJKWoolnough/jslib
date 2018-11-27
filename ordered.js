@@ -1,7 +1,7 @@
 "use strict"
 offer((function() {
 	const isIndex = key => parseInt(key).toString() === key && key >= 0,
-	      sameSort = (arr, index, sortFn) => (index === 0 || sortFn(arr[index-1], arr[index]) >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) >= 0),
+	      sameSort = (arr, index, sortFn, reverse) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
 	      defaultSort = new Intl.Collator().compare,
 	      dataSymbol = Symbol("data"),
 	      set =  function(target, property, value) {
@@ -15,21 +15,21 @@ offer((function() {
 		}
 		const index = parseInt(property);
 		if (index < target.length) {
-			if (target[index] === value && sameSort(target, index, d.sortFn)) {
+			if (target[index] === value && sameSort(target, index, d.sortFn, d.reverse)) {
 				return true;
 			}
 			remove(target, index, d);
 		}
 		const oldPos = target.indexOf(value);
 		if (oldPos >= 0) {
-			if (sameSort(target, oldPos, d.sortFn)) {
+			if (sameSort(target, oldPos, d.sortFn, d.reverse)) {
 				return true;
 			}
 			remove(target, oldPos, d);
 		}
 		let pos = 0;
 		for (; pos < target.length; pos++) {
-			if ((d.sortFn(value, target[pos]) >= 0) === d.reverse) {
+			if ((d.sortFn(value, target[pos]) * d.reverse <= 0)) {
 				d.parentNode.insertBefore(value[d.fieldName], target[pos][d.fieldName]);
 				for (let i = target.length; i > pos; i--) {
 					target[i] = target[i-1];
@@ -79,7 +79,7 @@ offer((function() {
 	      SortHTML = class SortHTML extends Array {
 		constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
 			super();
-			Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, fieldName, reverse: false, jdi: false}});
+			Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, fieldName, reverse: 1, jdi: false}});
 		}
 		push(element, ...elements) {
 			this[this.length] = element;
@@ -88,7 +88,7 @@ offer((function() {
 		}
 		reverse() {
 			const d = getData(this);
-			d.reverse = true;
+			d.reverse *= -1;
 			d.jdi = true;
 			super.reverse();
 			d.jdi = false;
