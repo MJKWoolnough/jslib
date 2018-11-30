@@ -4,53 +4,6 @@ offer((function() {
 	      sameSort = (arr, index, sortFn, reverse) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
 	      defaultSort = new Intl.Collator().compare,
 	      dataSymbol = Symbol("data"),
-	      set =  function(target, property, value) {
-		const d = getData(target);
-		if (!isIndex(property) || d.jdi) {
-			target[property] = value;
-			return true;
-		}
-		if (!value[d.fieldName]) {
-			throw new TypeError("invalid item object");
-		}
-		const index = parseInt(property);
-		if (index < target.length) {
-			if (target[index] === value && sameSort(target, index, d.sortFn, d.reverse)) {
-				return true;
-			}
-			remove(target, index, d);
-		}
-		const oldPos = target.indexOf(value);
-		if (oldPos >= 0) {
-			if (sameSort(target, oldPos, d.sortFn, d.reverse)) {
-				return true;
-			}
-			remove(target, oldPos, d);
-		}
-		let pos = 0;
-		for (; pos < target.length; pos++) {
-			if ((d.sortFn(value, target[pos]) * d.reverse <= 0)) {
-				d.parentNode.insertBefore(value[d.fieldName], target[pos][d.fieldName]);
-				for (let i = target.length; i > pos; i--) {
-					target[i] = target[i-1];
-				}
-				target[pos] = value;
-				return true;
-			}
-		}
-		d.parentNode.appendChild(value[d.fieldName]);
-		target[target.length] = value;
-		return true;
-	      },
-	      deleteProperty = function(target, property) {
-		const d = getData(target);
-		if (!isIndex(property) || d.jdi) {
-			delete target[property];
-			return true;
-		}
-		remove(target, parseInt(property), d);
-		return true;
-	      },
 	      remove = function(target, index, data) {
 		data.parentNode.removeChild(target[index][data.fieldName]);
 		for (let i = index; i < target.length - 1; i++) {
@@ -66,7 +19,55 @@ offer((function() {
 		}
 		arr.forEach(e => d.parentNode.appendChild(e[d.fieldName]));
 	      },
-	      fns = {set, deleteProperty},
+	      fns = {
+		set: function(target, property, value) {
+			const d = getData(target);
+			if (!isIndex(property) || d.jdi) {
+				target[property] = value;
+				return true;
+			}
+			if (!value[d.fieldName]) {
+				throw new TypeError("invalid item object");
+			}
+			const index = parseInt(property);
+			if (index < target.length) {
+				if (target[index] === value && sameSort(target, index, d.sortFn, d.reverse)) {
+					return true;
+				}
+				remove(target, index, d);
+			}
+			const oldPos = target.indexOf(value);
+			if (oldPos >= 0) {
+				if (sameSort(target, oldPos, d.sortFn, d.reverse)) {
+					return true;
+				}
+				remove(target, oldPos, d);
+			}
+			let pos = 0;
+			for (; pos < target.length; pos++) {
+				if ((d.sortFn(value, target[pos]) * d.reverse <= 0)) {
+					d.parentNode.insertBefore(value[d.fieldName], target[pos][d.fieldName]);
+					for (let i = target.length; i > pos; i--) {
+						target[i] = target[i-1];
+					}
+					target[pos] = value;
+					return true;
+				}
+			}
+			d.parentNode.appendChild(value[d.fieldName]);
+			target[target.length] = value;
+			return true;
+		},
+		deleteProperty: function(target, property) {
+			const d = getData(target);
+			if (!isIndex(property) || d.jdi) {
+				delete target[property];
+				return true;
+			}
+			remove(target, parseInt(property), d);
+			return true;
+		}
+	      },
 	      getData = function(arr) {
 		if (arr.hasOwnProperty(dataSymbol)) {
 			return arr[dataSymbol];
