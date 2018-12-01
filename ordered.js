@@ -26,7 +26,7 @@ offer((function() {
 				target[property] = value;
 				return true;
 			}
-			if (!value[d.fieldName]) {
+			if (!(value instanceof Object && value[d.fieldName] instanceof Node)) {
 				throw new TypeError("invalid item object");
 			}
 			const index = parseInt(property);
