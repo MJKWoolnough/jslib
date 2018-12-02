@@ -130,6 +130,13 @@ offer((function() {
 			items.forEach(i => this.push(i));
 			return this.length;
 		}
+		update() {
+			const d = getData(this);
+			d.jdi = true;
+			super.sort(d.sortFn);
+			d.jdi = false;
+			reset(this, d);
+		}
 		get html() {return getData(this).parentNode;}
 		static get [Symbol.species]() {return Array;}
 	      };
