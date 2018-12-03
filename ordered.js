@@ -14,10 +14,17 @@ offer((function() {
 		return true;
 	      },
 	      reset = function(arr, d) {
-		while(d.parentNode.hasChildNodes()) {
-			d.parentNode.removeChild(d.parentNode.lastChild);
+		let nextSibling = arr[arr.length-1][d.fieldName];
+		if (nextSibling !== d.parentNode.lastChild) {
+			d.parentNode.appendChild(nextSibling);
 		}
-		arr.forEach(e => d.parentNode.appendChild(e[d.fieldName]));
+		for (let i = arr.length - 2; i >= 0; i--) {
+			const thisNode = arr[i][d.fieldName];
+			if (nextSibling.previousSibling !== thisNode) {
+				d.parentNode.insertBefore(thisNode, nextSibling);
+			}
+			nextSibling = thisNode;
+		}
 	      },
 	      fns = {
 		set: function(target, property, value) {
@@ -90,10 +97,12 @@ offer((function() {
 		reverse() {
 			const d = getData(this);
 			d.reverse *= -1;
-			d.jdi = true;
-			super.reverse();
-			d.jdi = false;
-			reset(this, d);
+			if (arr.length > 1) {
+				d.jdi = true;
+				super.reverse();
+				d.jdi = false;
+				reset(this, d);
+			}
 		}
 		shift() {
 			const d = getData(this);
@@ -106,10 +115,12 @@ offer((function() {
 		sort(sortFn) {
 			const d = getData(this);
 			d.sortFn = sortFn;
-			d.jdi = true;
-			super.sort(sortFn);
-			d.jdi = false;
-			reset(this, d);
+			if (arr.length > 1) {
+				d.jdi = true;
+				super.sort(sortFn);
+				d.jdi = false;
+				reset(this, d);
+			}
 		}
 		splice(start, deleteCount = Infinity, ...items) {
 			if (deleteCount > this.length - start) {
