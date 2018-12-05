@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 offer((function() {
 	const isIndex = key => parseInt(key).toString() === key && key >= 0,
 	      sameSort = (arr, index, sortFn, reverse) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
