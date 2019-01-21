@@ -97,7 +97,7 @@ offer((function() {
 		reverse() {
 			const d = getData(this);
 			d.reverse *= -1;
-			if (arr.length > 1) {
+			if (this.length > 1) {
 				d.jdi = true;
 				super.reverse();
 				d.jdi = false;
