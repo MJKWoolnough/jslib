@@ -159,7 +159,7 @@ offer((async function() {
 				req.success(data["result"]);
 			}
 			if (!req.subscribed()) {
-				this.requests.delete(id)
+				this.requests.delete(id);
 			}
 		}
 		handleError(e) {
@@ -200,7 +200,7 @@ offer((async function() {
 				return Promise.reject(new Error("RPC Closed"));
 			}
 			if (id >= 0) {
-				return Promise.reject(new Error("await IDs must be < 0"))
+				return Promise.reject(new Error("await IDs must be < 0"));
 			}
 			if (keep) {
 				return this.getRequest(id).getSubscription();

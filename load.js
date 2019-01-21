@@ -12,7 +12,7 @@ const {pageLoad, offer, include} = (function() {
 		const p = new Promise((successFn, errorFn) => {
 			const elm = document.createElement("script");
 			elm.setAttribute("src", aURL);
-			elm.setAttribute("type", "application/javascript")
+			elm.setAttribute("type", "application/javascript");
 			elm.addEventListener("error", () => {
 				document.head.removeChild(elm);
 				errorFn(new URIError("error including: " + aURL));

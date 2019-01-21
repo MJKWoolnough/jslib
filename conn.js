@@ -1,3 +1,4 @@
+"use strict";
 offer((async function() {
 	const {Subscription} = await include("inter.js"),
 	      urlRe = /[^(@]*[(@](.+?):[0-9]+:[0-9]+[)\n]/g,
@@ -13,7 +14,7 @@ offer((async function() {
 				props.hasOwnProperty("user") ? props["user"] : null,
 				props.hasOwnProperty("password") ? props["password"] : null
 			);
-			if (props.hasOwnProperty("headers") && typeof props["headers"] == "Object") {
+			if (props.hasOwnProperty("headers") && typeof props["headers"] == "object") {
 				props["headers"].entries().forEach(([header, value]) => xh.setRequestHeader(header, value));
 			}
 			if (props.hasOwnProperty("type")) {
@@ -28,7 +29,7 @@ offer((async function() {
 							break;
 						case "json":
 							successFn.call(xh, JSON.parse(xh.responseText));
-							break
+							break;
 						default:
 							successFn.call(xh, xh.response);
 						}

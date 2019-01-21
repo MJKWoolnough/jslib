@@ -177,7 +177,7 @@ offer((function() {
 		let total = 0,
 		    data = odata;
 		while(data.length > 0 && (ret.length < limit || limit < 0)) {
-			const len = readElement(data)
+			const len = readElement(data);
 			if (len <= 0) {
 				if (-len === readWhitespace(data)) {
 					break;

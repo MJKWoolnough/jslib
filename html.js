@@ -26,7 +26,7 @@ offer((function() {
 						} else if (k === "class") {
 							elem.classList.add(...prop.split(" "));
 						} else {
-							elem.setAttribute(k, prop)
+							elem.setAttribute(k, prop);
 						}
 					}
 				});

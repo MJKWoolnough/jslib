@@ -1,3 +1,4 @@
+"use strict";
 offer((function() {
 	class Pipe {
 		constructor(fn) {
@@ -11,7 +12,7 @@ offer((function() {
 				}
 			};
 		}
-	};
+	}
 	const spread = Symbol("spread"),
 	      subs = new WeakMap();
 	class Subscription {
@@ -69,6 +70,6 @@ offer((function() {
 			};
 			return Subscription.prototype.then.call(this, aFn, aFn);
 		}
-	};
+	}
 	return Object.freeze({Pipe, Subscription});
 }()));
