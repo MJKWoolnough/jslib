@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/memio"
 	"vimagination.zapto.org/parser"
 )
@@ -150,9 +151,8 @@ func main() {
 			files[name] = fd
 		}
 		p := parser.New(parser.NewReaderTokeniser(f))
-		var j jsParser
-		p.TokeniserState(j.inputElement)
-		p.PhraserState(j.start)
+		javascript.SetTokeniser(&p.Tokeniser)
+		p.PhraserState(new(jsPhraser).start)
 	Loop:
 		for {
 			ph, err := p.GetPhrase()
@@ -168,7 +168,7 @@ func main() {
 			case PhraseInclude:
 				for _, t := range ph.Data {
 					switch t.Type {
-					case TokenStringLiteral:
+					case javascript.TokenStringLiteral:
 						str := path.Join(path.Dir(name), unescape(t.Data))
 						gd, ok := files[str]
 						if !ok {
@@ -200,7 +200,7 @@ func main() {
 			}
 			for _, t := range ph.Data {
 				fd.buf.WriteString(t.Data)
-				if t.Type == TokenLineTerminator {
+				if t.Type == javascript.TokenLineTerminator {
 					fd.buf.WriteString("		")
 				}
 			}
