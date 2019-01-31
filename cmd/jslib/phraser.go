@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"vimagination.zapto.org/errors"
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/parser"
@@ -140,8 +138,6 @@ func (j *jsPhraser) end(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
 			}
 			p.Except()
 		default:
-			fmt.Println(p.Get())
-			fmt.Println(p.Peek())
 			p.Err = ErrNeedOffer
 			return p.Error()
 		}
