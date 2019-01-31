@@ -1,4 +1,4 @@
-package main
+package checker
 
 import (
 	"vimagination.zapto.org/errors"
@@ -16,6 +16,12 @@ const (
 )
 
 type jsPhraser uint
+
+func SetPhraser(p *parser.Parser) *parser.Parser {
+	javascript.SetTokeniser(&p.Tokeniser)
+	p.PhraserState(new(jsPhraser).start)
+	return p
+}
 
 func (j *jsPhraser) start(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
 	p.AcceptRun(javascript.TokenWhitespace, javascript.TokenLineTerminator, javascript.TokenSingleLineComment, javascript.TokenMultiLineComment)

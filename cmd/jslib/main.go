@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"vimagination.zapto.org/javascript"
+	"vimagination.zapto.org/jslib/checker"
 	"vimagination.zapto.org/memio"
 	"vimagination.zapto.org/parser"
 )
@@ -152,7 +153,7 @@ func main() {
 		}
 		p := parser.New(parser.NewReaderTokeniser(f))
 		javascript.SetTokeniser(&p.Tokeniser)
-		p.PhraserState(new(jsPhraser).start)
+		checker.SetPhraser(&p)
 	Loop:
 		for {
 			ph, err := p.GetPhrase()
@@ -165,7 +166,7 @@ func main() {
 			switch ph.Type {
 			case parser.PhraseDone:
 				break Loop
-			case PhraseInclude:
+			case checker.PhraseInclude:
 				for _, t := range ph.Data {
 					switch t.Type {
 					case javascript.TokenStringLiteral:
@@ -182,7 +183,7 @@ func main() {
 						}
 					}
 				}
-			case PhraseOffer:
+			case checker.PhraseOffer:
 				afp, err := filepath.Abs(filepath.FromSlash(name))
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "error getting absolute path: %s\n", err)
@@ -194,7 +195,7 @@ func main() {
 					os.Exit(1)
 				}
 				ph.Data = []parser.Token{{Data: escape(filepath.ToSlash(fp)) + "), () => "}}
-			case PhraseNormal:
+			case checker.PhraseNormal:
 			default:
 				continue Loop
 			}
