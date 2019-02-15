@@ -29,7 +29,7 @@ offer((function() {
 							return -pos;
 						}
 					}
-				} else if (escapes.includes(c)) {
+				} else if (!escapes.includes(c)) {
 					return -pos;
 				}
 			}
