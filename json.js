@@ -179,7 +179,8 @@ offer((function() {
 		while(data.length > 0 && (ret.length < limit || limit < 0)) {
 			const len = readElement(data);
 			if (len <= 0) {
-				if (-len === readWhitespace(data)) {
+				const ws = readWhitespace(data);
+				if (-len === ws) {
 					break;
 				}
 				total -= len - ws;
