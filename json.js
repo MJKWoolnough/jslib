@@ -126,7 +126,7 @@ offer((function() {
 			pos++;
 			break;
 		default:
-			if (digits.indexOf(data.charAt(pos)) < 0) {
+			if (!digits.includes(data.charAt(pos))) {
 				return -pos;
 			}
 		}
@@ -176,7 +176,7 @@ offer((function() {
 		const ret = [];
 		let total = 0,
 		    data = odata;
-		while(data.length > 0 && (ret.length < limit || limit < 0)) {
+		while(data.length > 0 && limit !== 0) {
 			const len = readElement(data);
 			if (len <= 0) {
 				const ws = readWhitespace(data);
@@ -195,6 +195,7 @@ offer((function() {
 			total += len;
 			ret.push(odata.substring(oTotal, total));
 			data = data.substring(len);
+			limit--;
 		}
 		return ret;
 	      },
