@@ -4,7 +4,7 @@ const isIndex = key => parseInt(key).toString() === key && key >= 0,
       sameSort = (arr, index, sortFn, reverse) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
       defaultSort = new Intl.Collator().compare,
       dataSymbol = Symbol("data"),
-      remove = function(target, index, data) {
+      remove = (target, index, data) => {
 	data.parentNode.removeChild(target[index][data.fieldName]);
 	for (let i = index; i < target.length - 1; i++) {
 		target[i] = target[i+1];
@@ -13,7 +13,7 @@ const isIndex = key => parseInt(key).toString() === key && key >= 0,
 	target.length--;
 	return true;
       },
-      reset = function(arr, d) {
+      reset = (arr, d) => {
 	let nextSibling = arr[arr.length-1][d.fieldName];
 	if (nextSibling !== d.parentNode.lastChild) {
 		d.parentNode.appendChild(nextSibling);
@@ -27,7 +27,7 @@ const isIndex = key => parseInt(key).toString() === key && key >= 0,
 	}
       },
       fns = {
-	set: function(target, property, value) {
+	set: (target, property, value) => {
 		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
 			target[property] = value;
@@ -65,7 +65,7 @@ const isIndex = key => parseInt(key).toString() === key && key >= 0,
 		target[target.length] = value;
 		return true;
 	},
-	deleteProperty: function(target, property) {
+	deleteProperty: (target, property) => {
 		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
 			delete target[property];
@@ -75,13 +75,13 @@ const isIndex = key => parseInt(key).toString() === key && key >= 0,
 		return true;
 	}
       },
-      getData = function(arr) {
+      getData = arr => {
 	if (arr.hasOwnProperty(dataSymbol)) {
 		return arr[dataSymbol];
 	}
 	throw new TypeError("invalid SortHTML");
       },
-      sortHTML = function(parentNode, sortFn = defaultSort, fieldName = "html") {
+      sortHTML = (parentNode, sortFn = defaultSort, fieldName = "html") => {
 	return new Proxy(new SortHTML(parentNode, sortFn, fieldName), fns);
       },
       SortHTML = class SortHTML extends Array {

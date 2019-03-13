@@ -6,7 +6,7 @@ const whitespace = "\t\r\n ",
       digits = "0123456789",
       exp = "eE",
       pm = "+-",
-      readWhitespace = function(data) {
+      readWhitespace = data => {
 	for (let pos = 0; pos < data.length; pos++) {
 		if (!whitespace.includes(data.charAt(pos))) {
 			return pos;
@@ -14,7 +14,7 @@ const whitespace = "\t\r\n ",
 	}
 	return data.length;
       },
-      readString = function(data) {
+      readString = data => {
 	for (let pos = 1; pos < data.length; pos++) {
 		switch (data.charAt(pos)) {
 		case "\"":
@@ -36,7 +36,7 @@ const whitespace = "\t\r\n ",
 	}
 	return -data.length;
       },
-      readElement = function(data) {
+      readElement = data => {
 	let pos = readWhitespace(data);
 	switch (data.charAt(pos)) {
 	case "\"":
@@ -172,7 +172,7 @@ const whitespace = "\t\r\n ",
 	}
 	return pos;
       },
-      split = function (odata, limit = -1) {
+      split = (odata, limit = -1) => {
 	const ret = [];
 	let total = 0,
 	    data = odata;

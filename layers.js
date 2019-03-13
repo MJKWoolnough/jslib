@@ -2,9 +2,9 @@
 
 import {clearElement, createHTML} from './html.js';
 
-const layers = function(container, loader) {
+const layers = (container, loader) => {
 	const layers = [],
-	      closer = function(closerFn) {
+	      closer = closerFn => {
 		clearElement(container);
 		const elm = layers.pop();
 		if (elm !== undefined) {
@@ -16,7 +16,7 @@ const layers = function(container, loader) {
 			closerFn();
 		}
 	      },
-	      keyPress = function(e) {
+	      keyPress = e => {
 		if (loading) {
 			return false;
 		}
@@ -25,7 +25,7 @@ const layers = function(container, loader) {
 			closer();
 		}
 	      },
-	      closeLoadingLayer = function() {
+	      closeLoadingLayer = () => {
 		loading = false;
 		container.removeChild(container.lastChild);
 	      },
@@ -46,7 +46,7 @@ const layers = function(container, loader) {
 			return container.appendChild(createHTML("div", createHTML("span", {"class": "closer", "onclick": closer.bind(null, closerFn)}, "X")));
 		},
 		"removeLayer": closer,
-		"loading": function(p, loadDiv) {
+		"loading": (p, loadDiv) => {
 			if (loadDiv === undefined) {
 				loadDiv = defaultLoader;
 			}

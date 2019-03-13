@@ -3,10 +3,10 @@ import {Subscription} from './inter.js';
 import {HTTPRequest, WS} from './conn.js';
 
 const nop = () => {},
-      connectWS = function(path, allowXH, xhPing) {
+      connectWS = (path, allowXH, xhPing) => {
 	return WS(path).then(ws => {
 		const rh = new RequestHandler(ws.send),
-		      closer = function() {
+		      closer = () => {
 			if (rh.close()) {
 				ws.close();
 			}
@@ -30,12 +30,12 @@ const nop = () => {},
 		return Promise.reject(e);
 	});
       },
-      connectXH = async function(path, xhPing) {
+      connectXH = async (path, xhPing) => {
 	const {split} = await import("./json.js"),
 	      todo = [],
 	      sto = -1,
 	      si = -1,
-	      sender = function() {
+	      sender = () => {
 		HTTPRequest(path, {
 			"method": "POST",
 			"type": "application/json",
@@ -46,7 +46,7 @@ const nop = () => {},
 		todo.splice(0, todo.length);
 		sto = -1;
 	      },
-	      rh = new RequestHandler(function(msg) {
+	      rh = new RequestHandler(msg => {
 		todo.push(msg);
 		if (sto === -1) {
 			if (si !== -1) {
@@ -73,7 +73,7 @@ const nop = () => {},
 		}
 	}));
       },
-      RPC = function(path, allowWS = true, allowXH = false, xhPing = 1000) {
+      RPC = (path, allowWS = true, allowXH = false, xhPing = 1000) => {
 	if (allowWS) {
 		return connectWS(path, allowXH, xhPing);
 	} else if (allowXH) {
