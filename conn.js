@@ -2,13 +2,11 @@
 
 import {Subscription} from './inter.js';
 
-const urlRe = /[^(@]*[(@](.+?):[0-9]+:[0-9]+[)\n]/g,
-      toURL = url => (new URL(url, (document.currentScript ? document.currentScript.src : new Error().stack.replace(urlRe, "$1\n").split("\n")[3]).match(/.*\//))).href,
-      HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
+const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
 	xh.open(
 		props.hasOwnProperty("method") ? props["method"] : "GET",
-		toURL(url),
+		url,
 		true,
 		props.hasOwnProperty("user") ? props["user"] : null,
 		props.hasOwnProperty("password") ? props["password"] : null
@@ -43,7 +41,7 @@ const urlRe = /[^(@]*[(@](.+?):[0-9]+:[0-9]+[)\n]/g,
 	xh.send(props.hasOwnProperty("data") ? props["data"] : null);
       }),
       WS = url => new Promise((successFn, errorFn) => {
-		const ws = new WebSocket(toURL(url));
+		const ws = new WebSocket(url);
 		ws.addEventListener("open", () => successFn(Object.freeze({
 			close: ws.close.bind(ws),
 			send: ws.send.bind(ws),
