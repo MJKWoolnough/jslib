@@ -11,7 +11,9 @@ const childrenArr = (elem, children) => {
 		}
 	}
       },
-      createElements = namespace => (element, properties, children) => {
+      h = Array.from(document.getElementsByTagName("html"));
+
+export const createElements = namespace => (element, properties, children) => {
 	const elem = typeof element === "string" ? document.createElementNS(namespace, element) : element instanceof Node ? element : document.createDocumentFragment();
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node))) {
 		[properties, children] = [children, properties];
@@ -37,7 +39,6 @@ const childrenArr = (elem, children) => {
 	}
 	return elem;
       },
-      h = Array.from(document.getElementsByTagName("html")),
       createHTML = createElements(h.length > 0 ? h[0].namespaceURI : "http://www.w3.org/1999/xhtml"),
       formatText = (text, wrapper = null) => {
 	const df = document.createDocumentFragment();
@@ -58,5 +59,3 @@ const childrenArr = (elem, children) => {
 		elem.removeChild(elem.lastChild);
 	}
       };
-
-export {createElements, createHTML, formatText, clearElement};

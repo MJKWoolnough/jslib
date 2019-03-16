@@ -171,8 +171,9 @@ const whitespace = "\t\r\n ",
 		}
 	}
 	return pos;
-      },
-      split = (odata, limit = -1) => {
+      };
+
+export const split = (odata, limit = -1) => {
 	const ret = [];
 	let total = 0,
 	    data = odata;
@@ -201,5 +202,3 @@ const whitespace = "\t\r\n ",
       },
       parse = data => split(data).map(d => JSON.parse(d)),
       stringify = (...objs) => objs.map(o => JSON.stringify(o)).reduce((a, v) => a + v);
-
-export {split, parse, stringify};

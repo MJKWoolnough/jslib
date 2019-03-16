@@ -2,7 +2,7 @@
 
 import {clearElement, createHTML} from './html.js';
 
-const layers = (container, loader) => {
+export const layers = (container, loader) => {
 	const layers = [],
 	      closer = closerFn => {
 		clearElement(container);
@@ -56,5 +56,3 @@ const layers = (container, loader) => {
 		}
 	});
       };
-
-export {layers};

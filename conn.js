@@ -2,7 +2,7 @@
 
 import {Subscription} from './inter.js';
 
-const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
+export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
 	xh.open(
 		props.hasOwnProperty("method") ? props["method"] : "GET",
@@ -60,5 +60,3 @@ const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
 		})));
 		ws.addEventListener("error", errorFn);
       });
-
-export {HTTPRequest, WS};

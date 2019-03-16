@@ -1,10 +1,10 @@
 "use strict";
 
-import {RequestHandler} from './rpc_shared.js';
+import RequestHandler from './rpc_shared.js';
 import {HTTPRequest} from './conn.js';
 import {split} from './json.js';
 
-const RPC = (path, xhPing = 1000) => {
+export default (path, xhPing = 1000) => {
 	const todo = [],
 	      sto = -1,
 	      si = -1,
@@ -45,6 +45,4 @@ const RPC = (path, xhPing = 1000) => {
 			}
 		}
 	}));
-      };
-
-export {RPC};
+};

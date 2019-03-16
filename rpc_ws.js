@@ -1,9 +1,9 @@
 "use strict";
 
-import {RequestHandler} from './rpc_shared.js';
+import RequestHandler from './rpc_shared.js';
 import {WS} from './conn.js';
 
-const RPC = path => WS(path).then(ws => {
+export default path => WS(path).then(ws => {
 	const rh = new RequestHandler(ws.send),
 	      closer = () => {
 		if (rh.close()) {
@@ -22,6 +22,4 @@ const RPC = path => WS(path).then(ws => {
 			}
 		}
 	});
-      });
-
-export {RPC};
+});

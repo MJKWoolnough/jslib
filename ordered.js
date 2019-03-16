@@ -81,9 +81,6 @@ const isIndex = key => parseInt(key).toString() === key && key >= 0,
 	}
 	throw new TypeError("invalid SortHTML");
       },
-      sortHTML = (parentNode, sortFn = defaultSort, fieldName = "html") => {
-	return new Proxy(new SortHTML(parentNode, sortFn, fieldName), fns);
-      },
       SortHTML = class SortHTML extends Array {
 	constructor(parentNode, sortFn = defaultSort, fieldName = "html") {
 		super();
@@ -152,4 +149,7 @@ const isIndex = key => parseInt(key).toString() === key && key >= 0,
 	static get [Symbol.species]() {return Array;}
       };
 
-export {sortHTML};
+
+export default (parentNode, sortFn = defaultSort, fieldName = "html") => {
+	return new Proxy(new SortHTML(parentNode, sortFn, fieldName), fns);
+};

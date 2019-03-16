@@ -66,7 +66,7 @@ class AwaitRequest {
 	}
 }
 
-class RequestHandler {
+export default class RequestHandler {
 	constructor(sender) {
 		this.closed = false;
 		this.nextID = 0;
@@ -143,5 +143,3 @@ class RequestHandler {
 		return true;
 	}
 }
-
-export {RequestHandler};

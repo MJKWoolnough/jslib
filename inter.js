@@ -1,6 +1,6 @@
 "use strict";
 
-class Pipe {
+export class Pipe {
 	constructor(fn) {
 		const out = [];
 		this.send = (...data) => out.forEach(o => o(...data));
@@ -13,9 +13,11 @@ class Pipe {
 		};
 	}
 }
+
 const spread = Symbol("spread"),
       subs = new WeakMap();
-class Subscription {
+
+export class Subscription {
 	constructor(fn) {
 		const success = new Pipe(),
 		      error = new Pipe();
@@ -71,5 +73,3 @@ class Subscription {
 		return Subscription.prototype.then.call(this, aFn, aFn);
 	}
 }
-
-export {Pipe, Subscription};
