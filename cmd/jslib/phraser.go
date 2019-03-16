@@ -17,6 +17,7 @@ const (
 	PhraseImportAll
 	PhraseDynamicImport
 	PhraseExport
+	PhraseExportNamed
 	PhraseExportDefine
 	PhraseExportFrom
 	PhraseExportAllFrom
@@ -37,46 +38,44 @@ func SetPhraser(p *parser.Parser) *parser.Parser {
 
 func (j *jsPhraser) start(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
 	for {
-		switch p.ExceptRun(javascript.TokenPunctuator, javascript.TokenRightBracePunctuator, javascript.Keyword, javascript.Identifier, javascript.TokenPunctuator) {
+		switch p.ExceptRun(javascript.TokenPunctuator, javascript.TokenRightBracePunctuator, javascript.TokenKeyword, javascript.TokenIdentifier, javascript.TokenPunctuator) {
 		case javascript.TokenPunctuator:
 			switch p.Peek().Data {
 			case "(", "[", "{":
 				(*j)++
 			case ")", "]":
 				(*j)--
+			case ".":
+				p.Except() // ignore next identifier (incase it is ref'ing a field named 'include'
 			}
 		case javascript.TokenRightBracePunctuator:
 			(*j)--
-		case javascript.Keyword:
+		case javascript.TokenKeyword:
 			if *j == 0 {
 				switch p.Peek().Data {
 				case "import":
-					return j.normal(), j.importKeyword
+					return j.normal(p), j.importKeyword
 				case "export":
-					return j.normal(), j.exportKeyword
+					return j.normal(p), j.exportKeyword
 				}
 			}
-		case javascript.Identifier:
+		case javascript.TokenIdentifier:
 			switch p.Peek().Data {
 			case "include": // include()
-				return j.normal(), j.includeIdent
+				return j.normal(p), j.includeIdent
 			case "window": // window.include()
 				p.Except()
 				p.AcceptRun(javascript.TokenWhitespace, javascript.TokenLineTerminator)
 				if tk := p.Peek(); tk.Type == javascript.TokenPunctuator && tk.Data == "." {
 					p.Except()
 					p.AcceptRun(javascript.TokenWhitespace, javascript.TokenLineTerminator)
-					if tk = p.Peek(); tk.Type == javascript.Identifier && tk.Data == "include" {
-						return j.normal(), j.includeIdent
+					if tk = p.Peek(); tk.Type == javascript.TokenIdentifier && tk.Data == "include" {
+						return j.normal(p), j.includeIdent
 					}
 				}
 			}
-		case javascript.TokenPunctuator:
-			if p.Peek().Data == "." {
-				p.Except() // ignore next identifier (incase it is ref'ing a field named 'include'
-			}
 		case parser.TokenDone:
-			return j.normal(), (*parser.Parser).Done
+			return j.normal(p), (*parser.Parser).Done
 		case parser.TokenError:
 			return p.Error()
 		}
@@ -84,7 +83,7 @@ func (j *jsPhraser) start(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
 	}
 }
 
-func (j *jsPhraser) normal() parser.Phrase {
+func (j *jsPhraser) normal(p *parser.Parser) parser.Phrase {
 	return parser.Phrase{
 		Type: PhraseNormal,
 		Data: p.Get(),
@@ -104,7 +103,7 @@ func (j *jsPhraser) importKeyword(p *parser.Parser) (parser.Phrase, parser.Phras
 			Type: PhraseImportSideEffect,
 			Data: p.Get(),
 		}, j.start
-	} else if tk.Type == javascript.Identifier { // import defaultExport
+	} else if tk.Type == javascript.TokenIdentifier { // import defaultExport
 		p.Except()
 		p.AcceptRun(javascript.TokenWhitespace, javascript.TokenLineTerminator)
 		tk = p.Peek()
@@ -149,7 +148,7 @@ func (j *jsPhraser) importKeyword(p *parser.Parser) (parser.Phrase, parser.Phras
 			p.Except()
 			p.AcceptRun(javascript.TokenWhitespace, javascript.TokenLineTerminator)
 			tk = p.Peek()
-			if tk.Type == javascript.Identifier && tk.Type == "as" {
+			if tk.Type == javascript.TokenIdentifier && tk.Data == "as" {
 				p.Except()
 				if p.AcceptRun(javascript.TokenWhitespace, javascript.TokenLineTerminator) != javascript.TokenIdentifier {
 					p.Err = ErrMalformedImport
@@ -199,7 +198,7 @@ func (j *jsPhraser) importDynamic(p *parser.Parser) (parser.Phrase, parser.Phras
 		return j.start(p)
 	}
 	p.AcceptRun(javascript.TokenWhitespace, javascript.TokenLineTerminator)
-	tk = p.Peek()
+	tk := p.Peek()
 	if tk.Type != javascript.TokenPunctuator || tk.Data != ")" {
 		return j.start(p)
 	}
@@ -227,7 +226,7 @@ func (j *jsPhraser) exportKeyword(p *parser.Parser) (parser.Phrase, parser.Phras
 				p.Except()
 				p.AcceptRun(javascript.TokenWhitespace, javascript.TokenLineTerminator)
 				tk = p.Peek()
-				if tk.Type == javascript.Identifier && tk.Type == "as" {
+				if tk.Type == javascript.TokenIdentifier && tk.Data == "as" {
 					p.Except()
 					if p.AcceptRun(javascript.TokenWhitespace, javascript.TokenLineTerminator) != javascript.TokenIdentifier {
 						p.Err = ErrMalformedExport
@@ -271,7 +270,7 @@ func (j *jsPhraser) exportKeyword(p *parser.Parser) (parser.Phrase, parser.Phras
 			Type: typ,
 			Data: p.Get(),
 		}, j.start
-	case javascript.Keyword:
+	case javascript.TokenKeyword:
 		switch tk.Data {
 		case "const", "var":
 			return parser.Phrase{
@@ -284,7 +283,7 @@ func (j *jsPhraser) exportKeyword(p *parser.Parser) (parser.Phrase, parser.Phras
 				Data: p.Get(),
 			}, j.expression
 		}
-	case javascript.Identifier:
+	case javascript.TokenIdentifier:
 		switch tk.Data {
 		case "let":
 			return parser.Phrase{
@@ -338,7 +337,6 @@ func (j *jsPhraser) defines(p *parser.Parser) (parser.Phrase, parser.PhraseFunc)
 }
 
 var (
-	ErrInvalidImport   errors.Error = "import needs to be at the top level"
 	ErrMalformedImport errors.Error = "malformed import"
 	ErrMalformedExport errors.Error = "malformed export"
 )
