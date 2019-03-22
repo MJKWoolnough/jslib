@@ -1,7 +1,7 @@
 "use strict";
 
 export class Pipe {
-	constructor(fn) {
+	constructor() {
 		const out = [];
 		this.send = (...data) => out.forEach(o => o(...data));
 		this.receive = fn => {
