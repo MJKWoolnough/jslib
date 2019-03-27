@@ -5,9 +5,9 @@ import {HTTPRequest} from './conn.js';
 import {split} from './json.js';
 
 export default (path, xhPing = 1000) => {
+	let sto = -1,
+	    si = -1;
 	const todo = [],
-	      sto = -1,
-	      si = -1,
 	      sender = () => {
 		HTTPRequest(path, {
 			"method": "POST",
