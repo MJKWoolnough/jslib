@@ -12,7 +12,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		props.hasOwnProperty("password") ? props["password"] : null
 	);
 	if (props.hasOwnProperty("headers") && typeof props["headers"] == "object") {
-		props["headers"].entries().forEach(([header, value]) => xh.setRequestHeader(header, value));
+		Object.entries(props["headers"]).forEach(([header, value]) => xh.setRequestHeader(header, value));
 	}
 	if (props.hasOwnProperty("type")) {
 		xh.setRequestHeader("Content-Type", props["type"]);
