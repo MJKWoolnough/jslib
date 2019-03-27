@@ -12,4 +12,5 @@ export default function(path, allowWS = true, allowXH = false, xhPing = 1000) {
 	} else if (allowXH) {
 		return rpcXH(path, xhPing);
 	}
+	return Promise.reject(new Error("no type allowed"));
 };
