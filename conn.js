@@ -51,11 +51,11 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 				ws.addEventListener("error", eFn);
 				ws.addEventListener("close", eFn);
 			})),
-			get type() {
-				return ws.type;
+			get binaryType() {
+				return ws.binaryType;
 			},
-			set type(t) {
-				ws.type = t;
+			set binaryType(t) {
+				ws.binaryType = t;
 			},
 		})));
 		ws.addEventListener("error", errorFn);
