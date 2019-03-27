@@ -12,7 +12,7 @@ export default (path, xhPing = 1000) => {
 		HTTPRequest(path, {
 			"method": "POST",
 			"type": "application/json",
-			"repsonse": "text",
+			"response": "text",
 			"headers": headerID,
 			"data": todo.join()
 		}).then(responseText => split(responseText).forEach(data => rh.handleMessage({data}))).catch(rh.handleError);
