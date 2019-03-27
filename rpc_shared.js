@@ -30,7 +30,7 @@ class AwaitRequest {
 	}
 	getPromise() {
 		if (this.promise === null) {
-			this.promise =  new Promise((successFn, errorFn) => {
+			this.promise = new Promise((successFn, errorFn) => {
 				this.promiseSuccess = successFn;
 				this.promiseError = errorFn;
 			});
