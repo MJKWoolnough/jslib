@@ -1,7 +1,6 @@
 "use strict";
 
 import {Subscription} from './inter.js';
-import {HTTPRequest, WS} from './conn.js';
 
 const nop = () => {};
 
@@ -16,6 +15,9 @@ class Request {
 			this.error = errorFn;
 		});
 	}
+	getSubscription() {
+		throw new Error();
+	}
 	subscribed() {
 		return false;
 	}
@@ -23,13 +25,12 @@ class Request {
 
 class AwaitRequest {
 	constructor() {
-		this.clearPromise()
-		this.subscription = null;
+		this.clearPromise();
 		this.subscriptionSuccess = nop;
 		this.subscriptionError = nop;
 	}
 	getPromise() {
-		if (this.promise === null) {
+		if (this.promise === undefined) {
 			this.promise = new Promise((successFn, errorFn) => {
 				this.promiseSuccess = successFn;
 				this.promiseError = errorFn;
@@ -38,7 +39,7 @@ class AwaitRequest {
 		return this.promise;
 	}
 	getSubscription() {
-		if (this.subscription === null) {
+		if (this.subscription === undefined) {
 			this.subscription = new Subscription((successFn, errorFn) => {
 				this.subscriptionSuccess = successFn;
 				this.subscriptionError = errorFn;
@@ -47,17 +48,21 @@ class AwaitRequest {
 		return this.subscription;
 	}
 	clearPromise() {
-		this.promise = null;
+		this.promise = undefined;
 		this.promiseSuccess = nop;
 		this.promiseError = nop;
 	}
 	success(data) {
-		this.promiseSuccess(data);
+		if (this.promiseSuccess !== undefined) {
+			this.promiseSuccess(data);
+		}
 		this.clearPromise();
 		this.subscriptionSuccess(data);
 	}
 	error(e) {
-		this.promiseError(e);
+		if (this.promiseError !== undefined) {
+			this.promiseError(e);
+		}
 		this.clearPromise();
 		this.subscriptionError(e);
 	}
@@ -74,12 +79,15 @@ export default class RequestHandler {
 		this.sender = sender;
 	}
 	handleMessage(e) {
-		const data = JSON.parse(e.data),
+		const data = e.data !== undefined ? JSON.parse(e.data) : "",
 		      id = parseInt(data["id"]);
 		if (!this.requests.has(id)) {
 			return;
 		}
 		const req = this.requests.get(id);
+		if (req === undefined) {
+			throw Error("request " + id + " undefined");
+		}
 		if (data["error"] !== undefined && data["error"] !== null) {
 			req.error(new Error(data["error"]));
 		} else {
@@ -105,13 +113,17 @@ export default class RequestHandler {
 	}
 	getRequest(id) {
 		if (this.requests.has(id)) {
-			return this.requests.get(id);
+			const r = this.requests.get(id);
+			if (r === undefined) {
+				throw Error("request " + id + " undefined");
+			}
+			return r;
 		}
 		const r = id >= 0 ? new Request() : new AwaitRequest();
 		this.requests.set(id, r);
 		return r;
 	}
-	request(method, data = null) {
+	request(method, data) {
 		if (this.closed) {
 			return Promise.reject(new Error("RPC Closed"));
 		}

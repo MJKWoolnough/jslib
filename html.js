@@ -3,12 +3,10 @@
 const childrenArr = (elem, children) => {
 	if (typeof children === "string") {
 		elem.appendChild(document.createTextNode(children));
-	} else if (children) {
-		if (children.hasOwnProperty("length")) {
-			Array.from(children).forEach(c => childrenArr(elem, c));
-		} else if(children instanceof Node) {
-			elem.appendChild(children);
-		}
+	} else if (Array.isArray(children)) {
+		children.forEach((c) => childrenArr(elem, c));
+	} else if (children instanceof Node) {
+		elem.appendChild(children);
 	}
       },
       h = Array.from(document.getElementsByTagName("html"));
@@ -19,28 +17,30 @@ export const createElements = namespace => (element, properties, children) => {
 		[properties, children] = [children, properties];
 	}
 	if (typeof properties === "object") {
-		Object.keys(properties).forEach(k => {
-			const prop = properties[k];
-			if (prop !== undefined) {
-				if (k.startsWith("on") && prop instanceof Function) {
-					elem.addEventListener(k.substr(2), prop.bind(elem));
-				} else if (k === "class") {
-					elem.classList.add(...prop.split(" "));
-				} else {
-					elem.setAttribute(k, prop);
-				}
+		Object.entries(properties).forEach(([k, prop]) => {
+			if (prop === undefined) {
+			} else if (k.startsWith("on") && prop instanceof Function) {
+				elem.addEventListener(k.substr(2), prop.bind(elem));
+			} else if (k === "class" && elem instanceof Element) {
+				elem.classList.add(...prop.split(" "));
+			} else if (elem instanceof Element) {
+				elem.setAttribute(k, prop);
+			} else {
+				const attr = document.createAttributeNS(namespace, k);
+				attr.value = prop;
+				elem.appendChild(attr);
 			}
 		});
 	}
 	if (typeof children === "string") {
 		elem.textContent = children;
-	} else {
+	} else if (children && typeof children !== "object") {
 		childrenArr(elem, children);
 	}
 	return elem;
       },
-      createHTML = createElements(h.length > 0 ? h[0].namespaceURI : "http://www.w3.org/1999/xhtml"),
-      formatText = (text, wrapper = null) => {
+      createHTML = createElements(h.length > 0 && h[0].namespaceURI !== null ? h[0].namespaceURI : "http://www.w3.org/1999/xhtml"),
+      formatText = (text, wrapper) => {
 	const df = document.createDocumentFragment();
 	text.split("\n").forEach((text, n) => {
 		if (n > 0) {
@@ -54,8 +54,8 @@ export const createElements = namespace => (element, properties, children) => {
 	});
 	return df;
       },
-      clearElement = elem => {
-	while (elem.hasChildNodes()) {
+      clearElement = (elem) => {
+	while (elem.lastChild !== null) {
 		elem.removeChild(elem.lastChild);
 	}
       };

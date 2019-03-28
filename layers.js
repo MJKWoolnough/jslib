@@ -2,7 +2,7 @@
 
 import {clearElement, createHTML} from './html.js';
 
-export const layers = (container, loader) => {
+export default (container, loader) => {
 	const layers = [],
 	      closer = closerFn => {
 		clearElement(container);
@@ -20,14 +20,15 @@ export const layers = (container, loader) => {
 		if (loading) {
 			return false;
 		}
-		e = e || window.event;
 		if (e.keyCode === 27) {
 			closer();
 		}
 	      },
 	      closeLoadingLayer = () => {
 		loading = false;
-		container.removeChild(container.lastChild);
+		if (container.lastChild) {
+			container.removeChild(container.lastChild);
+		}
 	      },
 	      defaultLoader = loader ? loader : createHTML("div", {"class": "loading"});
 	let loading = false;
@@ -38,7 +39,7 @@ export const layers = (container, loader) => {
 			}
 			if (container.hasChildNodes()) {
 				const df = document.createDocumentFragment();
-				while (container.hasChildNodes()) {
+				while (container.firstChild !== null) {
 					df.appendChild(container.firstChild);
 				}
 				layers.push(df);
@@ -55,4 +56,4 @@ export const layers = (container, loader) => {
 			return p.finally(closeLoadingLayer);
 		}
 	});
-      };
+}

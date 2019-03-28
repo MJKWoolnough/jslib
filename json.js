@@ -51,7 +51,7 @@ const whitespace = "\t\r\n ",
 		if (data.charAt(pos) === "}") {
 			return pos + 1;
 		}
-		while(pos < data.length) {
+		while (pos < data.length) {
 			pos += readWhitespace(data.substring(pos));
 			const j = readString(data.substring(pos));
 			if (j < 0) {
@@ -137,7 +137,7 @@ const whitespace = "\t\r\n ",
 			return -pos;
 		}
 		pos++;
-		for(; pos < data.length; pos++) {
+		for (; pos < data.length; pos++) {
 			if (!digits.includes(data.charAt(pos))) {
 				break;
 			}
@@ -172,12 +172,11 @@ const whitespace = "\t\r\n ",
 	}
 	return pos;
       };
-
 export const split = (odata, limit = -1) => {
 	const ret = [];
 	let total = 0,
 	    data = odata;
-	while(data.length > 0 && limit !== 0) {
+	while (data.length > 0 && limit !== 0) {
 		const len = readElement(data);
 		if (len <= 0) {
 			const ws = readWhitespace(data);

@@ -10,7 +10,7 @@ export class Pipe {
 			} else if (fn !== null && fn !== undefined) {
 				throw new TypeError("pipe.receive requires function type");
 			}
-		};
+		}
 	}
 }
 
@@ -22,13 +22,14 @@ export class Subscription {
 		const success = new Pipe(),
 		      error = new Pipe();
 		fn(success.send, error.send);
-		subs.set(this, [success.receive, error.receive]);
+		subs.set(this, {success: success.receive, error: error.receive});
 	}
 	then(successFn, errorFn) {
-		if (!subs.has(this)) {
+		const rfn = subs.get(this);
+		if (rfn === undefined) {
 			throw new TypeError("method not called on valid Subscription object");
 		}
-		const [success, error] = subs.get(this);
+		const {success, error} = rfn;
 		return new Subscription((sFn, eFn) => {
 			if (successFn instanceof Function) {
 				success((...data) => {
@@ -63,7 +64,7 @@ export class Subscription {
 		});
 	}
 	catch(errorFn) {
-		return Subscription.prototype.then.call(this, null, errorFn);
+		return Subscription.prototype.then.call(this, undefined, errorFn);
 	}
 	finally(afterFn) {
 		const aFn = (...data) => {
