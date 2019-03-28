@@ -17,9 +17,8 @@ export const createElements = namespace => (element, properties, children) => {
 		[properties, children] = [children, properties];
 	}
 	if (typeof properties === "object") {
-		Object.entries(properties).forEach(([k, prop]) => {
-			if (prop === undefined) {
-			} else if (k.startsWith("on") && prop instanceof Function) {
+		Object.entries(properties).filter(([k, prop]) => prop !== undefined).forEach(([k, prop]) => {
+			if (k.startsWith("on") && prop instanceof Function) {
 				elem.addEventListener(k.substr(2), prop.bind(elem));
 			} else if (k === "class" && elem instanceof Element) {
 				elem.classList.add(...prop.split(" "));
@@ -54,7 +53,7 @@ export const createElements = namespace => (element, properties, children) => {
 	});
 	return df;
       },
-      clearElement = (elem) => {
+      clearElement = elem => {
 	while (elem.lastChild !== null) {
 		elem.removeChild(elem.lastChild);
 	}
