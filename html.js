@@ -33,7 +33,7 @@ export const createElements = namespace => (element, properties, children) => {
 	}
 	if (typeof children === "string") {
 		elem.textContent = children;
-	} else if (children && typeof children !== "object") {
+	} else if (children && (children instanceof Array || children instanceof Node)) {
 		childrenArr(elem, children);
 	}
 	return elem;
