@@ -38,6 +38,9 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 	if (props["onprogress"] !== undefined) {
 		xh.upload.addEventListener("progress", props["onprogress"]);
 	}
+	if (props["overrideMime"] !== undefined) {
+		xh.overrideMimeType(props["overrideMime"]);
+	}
 	xh.send(props.hasOwnProperty("data") ? props["data"] : null);
       }),
       WS = url => new Promise((successFn, errorFn) => {
