@@ -38,8 +38,16 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 	if (props["onprogress"] !== undefined) {
 		xh.upload.addEventListener("progress", props["onprogress"]);
 	}
-	if (props["overrideMime"] !== undefined) {
-		xh.overrideMimeType(props["overrideMime"]);
+	switch (props["response"]) {
+	case "text":
+		xh.overrideMimeType("text/plain");
+		break;
+	case "json":
+		xh.overrideMimeType("application/json");
+		break;
+	case "xml":
+		xh.overrideMimeType("text/xml");
+		break;
 	}
 	xh.send(props.hasOwnProperty("data") ? props["data"] : null);
       }),
