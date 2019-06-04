@@ -57,4 +57,5 @@ export const createElements = namespace => (element, properties, children) => {
 	while (elem.lastChild !== null) {
 		elem.removeChild(elem.lastChild);
 	}
+	return elem;
       };
