@@ -16,18 +16,14 @@ export const createElements = (namespace: string) => (element: Node | string, pr
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node))) {
 		[properties, children] = [children, properties];
 	}
-	if (typeof properties === "object") {
+	if (typeof properties === "object" && elem instanceof Element) {
 		Object.entries(properties).filter(([k, prop]) => prop !== undefined).forEach(([k, prop]) => {
 			if (k.startsWith("on") && prop instanceof Function) {
 				elem.addEventListener(k.substr(2), prop.bind(elem));
-			} else if (k === "class" && elem instanceof Element) {
+			} else if (k === "class") {
 				elem.classList.add(...prop.split(" "));
-			} else if (elem instanceof Element) {
-				elem.setAttribute(k, prop);
 			} else {
-				const attr = document.createAttributeNS(namespace, k);
-				attr.value = prop;
-				elem.appendChild(attr);
+				elem.setAttribute(k, prop);
 			}
 		});
 	}
