@@ -11,7 +11,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		props["user"] !== undefined ? props["user"] : null,
 		props["password"] !== undefined ? props["password"] : null
 	);
-	if (props.hasOwnProperty("headers") && typeof props["headers"] == "object") {
+	if (props.hasOwnProperty("headers") && typeof props["headers"] === "object") {
 		Object.entries(props["headers"]).forEach(([header, value]) => xh.setRequestHeader(header, value));
 	}
 	if (props["type"] !== undefined) {
