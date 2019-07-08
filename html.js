@@ -36,16 +36,13 @@ export const createElements = namespace => (element, properties, children) => {
       },
       createHTML = createElements(h.length > 0 && h[0].namespaceURI !== null ? h[0].namespaceURI : "http://www.w3.org/1999/xhtml"),
       formatText = (text, wrapper) => {
-	const df = document.createDocumentFragment();
+	const df = document.createDocumentFragment(),
+	      fn = wrapper instanceof Function ? wrapper : document.createTextNode.bind(document);
 	text.split("\n").forEach((text, n) => {
 		if (n > 0) {
 			df.appendChild(createHTML("br"));
 		}
-		if (wrapper instanceof Function) {
-			df.appendChild(wrapper(text));
-		} else {
-			df.appendChild(document.createTextNode(text));
-		}
+		df.appendChild(fn(text));
 	});
 	return df;
       },
