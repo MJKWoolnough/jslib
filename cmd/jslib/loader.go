@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/parser"
@@ -27,7 +28,7 @@ func offer(url string, body []javascript.StatementListItem) {
 											Literal: &javascript.Token{
 												Token: parser.Token{
 													Type: javascript.TokenStringLiteral,
-													Data: fmt.Sprintf("%q", url),
+													Data: strconv.Quote(url),
 												},
 											},
 										},
