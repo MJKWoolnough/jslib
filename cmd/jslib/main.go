@@ -3,20 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 
+	"vimagination.zapto.org/errors"
 	"vimagination.zapto.org/javascript"
-	"vimagination.zapto.org/jslib/checker"
-	"vimagination.zapto.org/memio"
 	"vimagination.zapto.org/parser"
 )
 
 type fileDep struct {
-	buf        memio.Buffer
+	buf        []javascript.StatementListItem
+	url        string
 	Requires   []*fileDep
 	RequiredBy []*fileDep
 	written    bool
@@ -40,38 +38,17 @@ func (f *fileDep) checkDependency(g *fileDep) bool {
 	return true
 }
 
-func (f *fileDep) WriteTo(w io.Writer) (int64, error) {
+func (f *fileDep) add() {
 	if f.written {
-		return 0, nil
+		return
 	}
 	f.written = true
-	var n int64
 	for _, r := range f.Requires {
-		m, err := r.WriteTo(w)
-		n += m
-		if err != nil {
-			return n, err
-		}
+		r.add()
 	}
-	if f.buf == nil {
-		return n, nil
+	if f.buf != nil {
+		offer(f.url, f.buf)
 	}
-	m, err := io.WriteString(w, "\n		.then(offerNow(toURL(")
-	n += int64(m)
-	if err != nil {
-		return n, err
-	}
-	m, err = w.Write(f.buf)
-	n += int64(m)
-	if err != nil {
-		return n, err
-	}
-	m, err = io.WriteString(w, ")")
-	n += int64(m)
-	if err != nil {
-		return n, err
-	}
-	return n, err
 }
 
 type Inputs []string
@@ -86,6 +63,13 @@ func (i *Inputs) String() string {
 }
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	var (
 		inputName, output, base string
 		filesTodo               Inputs
@@ -114,8 +98,7 @@ func main() {
 	base, err = filepath.Abs(base)
 	base += "/"
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error getting absolute path for base: %s\n", err)
-		os.Exit(1)
+		return errors.WithContext("error getting absolute path for base: %s\n", err)
 	}
 	var main fileDep
 	files := make(map[string]*fileDep, len(os.Args))
@@ -124,10 +107,11 @@ func main() {
 			i = inputName
 		}
 		if _, ok := files[i]; ok {
-			fmt.Fprintln(os.Stderr, "duplicate file")
-			os.Exit(1)
+			return errors.Error("duplicate file")
 		}
-		fd := new(fileDep)
+		fd := &fileDep{
+			url: i,
+		}
 		files[i] = fd
 		main.AddDependency(fd)
 	}
@@ -142,8 +126,7 @@ func main() {
 			var err error
 			f, err = os.Open(name)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "error opening file %q: %s\n", name, err)
-				os.Exit(1)
+				return errors.WithContext(fmt.Sprintf("error opening file %q: ", name), err)
 			}
 		}
 		fd, ok := files[name]
@@ -151,63 +134,22 @@ func main() {
 			fd = new(fileDep)
 			files[name] = fd
 		}
-		p := parser.New(parser.NewReaderTokeniser(f))
-		javascript.SetTokeniser(&p.Tokeniser)
-		checker.SetPhraser(&p)
-	Loop:
-		for {
-			ph, err := p.GetPhrase()
-			if err == io.EOF {
-				break
-			} else if err != nil {
-				fmt.Fprintf(os.Stderr, "error parsing file %q: %s\n", name, err)
-				os.Exit(1)
+		p, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
+		if err != nil {
+			return errors.WithContext(fmt.Sprintf("error parsing file %q: ", name), err)
+		}
+		statementList := make([]javascript.StatementListItem, 0, len(p.ModuleListItems)+1)
+		for n := range p.ModuleListItems {
+			if p.ModuleListItems[n].ImportDeclaration != nil {
+			} else if p.ModuleListItems[n].ExportDeclaration != nil {
+			} else if p.ModuleListItems[n].StatementListItem != nil {
 			}
-			switch ph.Type {
-			case parser.PhraseDone:
-				break Loop
-			case checker.PhraseInclude:
-				for _, t := range ph.Data {
-					switch t.Type {
-					case javascript.TokenStringLiteral:
-						str := path.Join(path.Dir(name), unescape(t.Data))
-						gd, ok := files[str]
-						if !ok {
-							gd = new(fileDep)
-							files[str] = gd
-							filesTodo = append(filesTodo, str)
-						}
-						if !fd.AddDependency(gd) {
-							fmt.Fprintf(os.Stderr, "circular reference with %s and %s\n", name, str)
-							os.Exit(1)
-						}
-					}
-				}
-			case checker.PhraseOffer:
-				afp, err := filepath.Abs(filepath.FromSlash(name))
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "error getting absolute path: %s\n", err)
-					os.Exit(1)
-				}
-				fp, err := filepath.Rel(base, afp)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "error generating relative path: %s\n", err)
-					os.Exit(1)
-				}
-				ph.Data = []parser.Token{{Data: escape(filepath.ToSlash(fp)) + "), () => "}}
-			case checker.PhraseNormal:
-			default:
-				continue Loop
-			}
-			for _, t := range ph.Data {
-				fd.buf.WriteString(t.Data)
-				if t.Type == javascript.TokenLineTerminator {
-					fd.buf.WriteString("		")
-				}
-			}
+			fd.buf = statementList
 		}
 		f.Close()
 	}
+
+	main.add()
 
 	var f *os.File
 
@@ -217,34 +159,14 @@ func main() {
 		var err error
 		f, err = os.Create(output)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "error creating file %q: %s\n", output, err)
-			os.Exit(1)
+			return errors.WithContext(fmt.Sprintf("error creating file %q: ", output), err)
 		}
 	}
-	_, err = f.WriteString(loaderHead)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
-		os.Exit(1)
-	}
-	if _, err = main.WriteTo(f); err != nil {
-		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
-		os.Exit(1)
-	}
-	if _, err = f.WriteString(loaderFoot); err != nil {
-		fmt.Fprintf(os.Stderr, "error writing to file: %s\n", err)
-		os.Exit(1)
+	if _, err := fmt.Fprintf(f, "%+s", loader); err != nil {
+		return errors.WithContext("error writing file: ", err)
 	}
 	if err = f.Close(); err != nil {
-		fmt.Fprintf(os.Stderr, "error closing file: %s\n", err)
-		os.Exit(1)
+		return errors.WithContext("error closing file: ", err)
 	}
-}
-
-func escape(str string) string {
-	return strconv.Quote(str)
-}
-
-func unescape(str string) string {
-	str, _ = strconv.Unquote(str)
-	return str
+	return nil
 }
