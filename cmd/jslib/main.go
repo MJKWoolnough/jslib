@@ -141,6 +141,120 @@ func run() error {
 		statementList := make([]javascript.StatementListItem, 0, len(p.ModuleListItems)+1)
 		for n := range p.ModuleListItems {
 			if p.ModuleListItems[n].ImportDeclaration != nil {
+				id := p.ModuleListItems[n].ImportDeclaration
+				loc, _ := javascript.Unquote(id.ModuleSpecifier.Data) // TODO: make relative path
+				gd, ok := files[loc]
+				if !ok {
+					gd = &fileDep{
+						url: loc,
+					}
+					files[loc] = gd
+					filesTodo = append(filesTodo, loc)
+				}
+				if !fd.AddDependency(gd) {
+					return fmt.Errorf("circular reference with %s and %s\n", name, loc)
+				}
+				if id.ImportClause == nil {
+					continue
+				}
+				obp := new(javascript.ObjectBindingPattern)
+				if id.ImportedDefaultBinding != nil {
+					obp.BindingPropertyList = append(obp.BindingPropertyList, javascript.BindingProperty{
+						PropertyName: &javascript.PropertyName{
+							LiteralPropertyName: &javascript.Token{
+								Token: parser.Token{
+									Type: javascript.TokenIdentifier,
+									Data: "default",
+								},
+							},
+						},
+						BindingElement: &javascript.BindingElement{
+							SingleNameBinding: id.ImportedDefaultBinding,
+						},
+					})
+				}
+				if id.NameSpaceImport != nil {
+					obp.BindingRestProperty = id.NameSpaceImport
+				} else if id.NamedImports != nil {
+					for _, is := range id.NamedImports.ImportList {
+						if is.IdentifierName != nil {
+							obp.BindingPropertyList = append(obp.BindingPropertyList, javascript.BindingProperty{
+								PropertyName: &javascript.PropertyName{
+									LiteralPropertyName: is.IdentifierName,
+								},
+								BindingElement: &javascript.BindingElement{
+									SingleNameBinding: is.ImportedBinding,
+								},
+							})
+						} else {
+							obp.BindingPropertyList = append(obp.BindingPropertyList, javascript.BindingProperty{
+								SingleNameBinding: is.ImportedBinding,
+							})
+						}
+					}
+				}
+				lb := javascript.LexicalBinding{
+					ObjectBindingPattern: obp,
+					Initializer: &javascript.AssignmentExpression{
+						ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
+							CallExpression: &javascript.CallExpression{
+								MemberExpression: &javascript.MemberExpression{
+									PrimaryExpression: &javascript.PrimaryExpression{
+										IdentifierReference: &javascript.Token{
+											Token: parser.Token{
+												Type: javascript.TokenIdentifier,
+												Data: "include",
+											},
+										},
+									},
+								},
+								Arguments: &javascript.Arguments{
+									ArgumentList: []javascript.AssignmentExpression{
+										{
+											ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
+												NewExpression: &javascript.NewExpression{
+													MemberExpression: javascript.MemberExpression{
+														PrimaryExpression: &javascript.PrimaryExpression{
+															Literal: id.FromClause.ModuleSpecifier, //TODO: change to relative path
+														},
+													},
+												},
+											}).ConditionalExpression,
+										},
+										{
+											ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
+												NewExpression: &javascript.NewExpression{
+													MemberExpression: javascript.MemberExpression{
+														PrimaryExpression: &javascript.PrimaryExpression{
+															Literal: &javascript.Token{
+																Token: parser.Token{
+																	Type: javascript.TokenBooleanLiteral,
+																	Data: "true",
+																},
+															},
+														},
+													},
+												},
+											}).ConditionalExpression,
+										},
+									},
+								},
+							},
+						}).ConditionalExpression,
+					},
+				}
+				if l := len(statementList); l == 0 || statementList[l-1].Declaration == nil || statementList[l-1].Declaration.LexicalDeclaration == nil || statementList[l-1].Declaration.LexicalDeclaration.LetOrConst != javascript.Const {
+					statementList = append(statementList, javascript.StatementListItem{
+						Declaration: &javascript.Declaration{
+							LexicalDeclaration: &javascript.LexicalDeclaration{
+								LetOrConst:  javascript.Const,
+								BindingList: []javascript.LexicalBinding{lb},
+							},
+						},
+					})
+				} else {
+					statementList[l-1].Declaration.LexicalDeclaration.BindingList = append(statementList[l-1].Declaration.LexicalDeclaration.BindingList, lb)
+				}
 			} else if p.ModuleListItems[n].ExportDeclaration != nil {
 			} else if p.ModuleListItems[n].StatementListItem != nil {
 			}
