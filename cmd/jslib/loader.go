@@ -35,14 +35,20 @@ func offer(url string, body []javascript.StatementListItem) {
 									},
 								},
 							}),
-							javascript.AssignmentExpression{
-								ArrowFunction: &javascript.ArrowFunction{
-									CoverParenthesizedExpressionAndArrowParameterList: new(javascript.CoverParenthesizedExpressionAndArrowParameterList),
-									FunctionBody: &javascript.Block{
-										StatementList: body,
+							wrapLHS(&javascript.LeftHandSideExpression{
+								NewExpression: &javascript.NewExpression{
+									MemberExpression: javascript.MemberExpression{
+										PrimaryExpression: &javascript.PrimaryExpression{
+											FunctionExpression: &javascript.FunctionDeclaration{
+												Type: javascript.FunctionGenerator,
+												FunctionBody: javascript.Block{
+													StatementList: body,
+												},
+											},
+										},
 									},
 								},
-							},
+							}),
 						},
 					},
 				},
@@ -76,7 +82,7 @@ func init() {
 		}},
 		"pageLoad": {value: document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn))}
 	});
-	return ([url, fn]) => included.set(toURL(url), fn());
+	return ([url, fn]) => included.set(toURL(url), Object.defineProperties({}, Object.fromEntries(fn())));
 })());`))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error parsing javascript loader: ", err)
