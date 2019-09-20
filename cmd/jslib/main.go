@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"unsafe"
 
 	"vimagination.zapto.org/errors"
 	"vimagination.zapto.org/javascript"
@@ -140,6 +141,7 @@ func run() error {
 		}
 		statementList := make([]javascript.StatementListItem, 0, len(p.ModuleListItems)+1)
 		for n := range p.ModuleListItems {
+			// TODO: search for dynamic import + include calls
 			if p.ModuleListItems[n].ImportDeclaration != nil {
 				id := p.ModuleListItems[n].ImportDeclaration
 				loc, _ := javascript.Unquote(id.ModuleSpecifier.Data) // TODO: make relative path
@@ -256,10 +258,103 @@ func run() error {
 					statementList[l-1].Declaration.LexicalDeclaration.BindingList = append(statementList[l-1].Declaration.LexicalDeclaration.BindingList, lb)
 				}
 			} else if p.ModuleListItems[n].ExportDeclaration != nil {
+				ed := p.ModuleListItems[n].ExportDeclaration
+				if ed.FromClause != nil || ed.ExportClause != nil {
+					var loc string
+					if ed.FromClause != nil {
+						loc, _ = javascript.Unquote(ed.FromClause.ModuleSpecifier.Data) // TODO: make relative path
+						gd, ok := files[loc]
+						if !ok {
+							gd = &fileDep{
+								url: loc,
+							}
+							files[loc] = gd
+							filesTodo = append(filesTodo, loc)
+						}
+					}
+					if ed.ExportClause != nil {
+						mappings := make(map[string]string, len(ed.ExportClause.ExportList))
+						for _, e := range ed.ExportClause.ExportList {
+							if e.EIdentifierName != nil {
+								mappings[e.IdentifierName.Data] = e.EIdentifierName.Data
+							} else {
+								mappings[e.IdentifierName.Data] = e.IdentifierName.Data
+							}
+						}
+						if loc != "" {
+							statementList = append(statementList, exportXFrom(loc, mappings))
+						} else {
+							statementList = append(statementList, exportVar(mappings))
+						}
+					} else {
+						statementList = append(statementList, exportFrom(loc))
+					}
+				} else if ed.VariableStatement != nil || ed.Declaration != nil {
+					if ed.VariableStatement != nil {
+						statementList = append(statementList, javascript.StatementListItem{
+							Statement: &javascript.Statement{
+								VariableStatement: ed.VariableStatement,
+							},
+						})
+					} else {
+						statementList = append(statementList, javascript.StatementListItem{Declaration: ed.Declaration})
+					}
+					ex := exportConst
+					mappings := make(map[string]string)
+					if ed.Declaration.FunctionDeclaration != nil {
+						mappings[ed.Declaration.FunctionDeclaration.BindingIdentifier.Data] = ed.Declaration.FunctionDeclaration.BindingIdentifier.Data
+					} else if ed.Declaration.ClassDeclaration != nil {
+						mappings[ed.Declaration.ClassDeclaration.BindingIdentifier.Data] = ed.Declaration.ClassDeclaration.BindingIdentifier.Data
+					} else {
+						var lb []javascript.LexicalBinding
+						if ed.Declaration.LexicalDeclaration != nil {
+							if ed.Declaration.LexicalDeclaration.LetOrConst == javascript.Let {
+								ex = exportVar
+							}
+							lb = ed.Declaration.LexicalDeclaration.BindingList
+						} else {
+							ex = exportVar
+							lb = *(*[]javascript.LexicalBinding)(unsafe.Pointer(&ed.VariableStatement.VariableDeclarationList))
+						}
+						for _, l := range lb {
+							if l.BindingIdentifier != nil {
+								mappings[l.BindingIdentifier.Data] = l.BindingIdentifier.Data
+							} else if l.ArrayBindingPattern != nil {
+								searchArrayBinding(l.ArrayBindingPattern, mappings)
+							} else if l.ObjectBindingPattern != nil {
+								searchObjectBinding(l.ObjectBindingPattern, mappings)
+							}
+						}
+					}
+					statementList = append(statementList, ex(mappings))
+				} else if ed.DefaultFunction != nil {
+					statementList = append(statementList, exportDefault(wrapLHS(&javascript.LeftHandSideExpression{
+						NewExpression: &javascript.NewExpression{
+							MemberExpression: javascript.MemberExpression{
+								PrimaryExpression: &javascript.PrimaryExpression{
+									FunctionExpression: ed.DefaultFunction,
+								},
+							},
+						},
+					})))
+				} else if ed.DefaultClass != nil {
+					statementList = append(statementList, exportDefault(wrapLHS(&javascript.LeftHandSideExpression{
+						NewExpression: &javascript.NewExpression{
+							MemberExpression: javascript.MemberExpression{
+								PrimaryExpression: &javascript.PrimaryExpression{
+									ClassExpression: ed.DefaultClass,
+								},
+							},
+						},
+					})))
+				} else if ed.DefaultAssignmentExpression != nil {
+					statementList = append(statementList, exportDefault(*ed.DefaultAssignmentExpression))
+				}
 			} else if p.ModuleListItems[n].StatementListItem != nil {
+				statementList = append(statementList, *p.ModuleListItems[n].StatementListItem)
 			}
-			fd.buf = statementList
 		}
+		fd.buf = statementList
 		f.Close()
 	}
 
@@ -283,4 +378,44 @@ func run() error {
 		return errors.WithContext("error closing file: ", err)
 	}
 	return nil
+}
+
+func searchArrayBinding(ab *javascript.ArrayBindingPattern, mappings map[string]string) {
+	for _, a := range ab.BindingElementList {
+		if a.SingleNameBinding != nil {
+			mappings[a.SingleNameBinding.Data] = a.SingleNameBinding.Data
+		} else if a.ArrayBindingPattern != nil {
+			searchArrayBinding(a.ArrayBindingPattern, mappings)
+		} else if a.ObjectBindingPattern != nil {
+			searchObjectBinding(a.ObjectBindingPattern, mappings)
+		}
+	}
+	if ab.BindingRestElement != nil {
+		if ab.BindingRestElement.SingleNameBinding != nil {
+			mappings[ab.BindingRestElement.SingleNameBinding.Data] = ab.BindingRestElement.SingleNameBinding.Data
+		} else if ab.BindingRestElement.ArrayBindingPattern != nil {
+			searchArrayBinding(ab.BindingRestElement.ArrayBindingPattern, mappings)
+		} else if ab.BindingRestElement.ObjectBindingPattern != nil {
+			searchObjectBinding(ab.BindingRestElement.ObjectBindingPattern, mappings)
+		}
+	}
+}
+
+func searchObjectBinding(ob *javascript.ObjectBindingPattern, mappings map[string]string) {
+	for _, o := range ob.BindingPropertyList {
+		if o.SingleNameBinding != nil {
+			mappings[o.SingleNameBinding.Data] = o.SingleNameBinding.Data
+		} else if o.BindingElement != nil {
+			if o.BindingElement.SingleNameBinding != nil {
+				mappings[o.BindingElement.SingleNameBinding.Data] = o.BindingElement.SingleNameBinding.Data
+			} else if o.BindingElement.ArrayBindingPattern != nil {
+				searchArrayBinding(o.BindingElement.ArrayBindingPattern, mappings)
+			} else if o.BindingElement.ObjectBindingPattern != nil {
+				searchObjectBinding(o.BindingElement.ObjectBindingPattern, mappings)
+			}
+		}
+	}
+	if ob.BindingRestProperty != nil {
+		mappings[ob.BindingRestProperty.Data] = ob.BindingRestProperty.Data
+	}
 }
