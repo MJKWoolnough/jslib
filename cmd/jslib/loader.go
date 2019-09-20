@@ -447,32 +447,6 @@ func exportDefault(ae javascript.AssignmentExpression) javascript.StatementListI
 									},
 									AssignmentExpression: &ae,
 								},
-								{
-									PropertyName: &javascript.PropertyName{
-										LiteralPropertyName: &javascript.Token{
-											Token: parser.Token{
-												Type: javascript.TokenStringLiteral,
-												Data: "\"enumerable\"",
-											},
-										},
-									},
-									AssignmentExpression: &javascript.AssignmentExpression{
-										ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-											NewExpression: &javascript.NewExpression{
-												MemberExpression: javascript.MemberExpression{
-													PrimaryExpression: &javascript.PrimaryExpression{
-														Literal: &javascript.Token{
-															Token: parser.Token{
-																Type: javascript.TokenBooleanLiteral,
-																Data: "true",
-															},
-														},
-													},
-												},
-											},
-										}).ConditionalExpression,
-									},
-								},
 							},
 						},
 					},
@@ -509,32 +483,6 @@ func exportConst(mappings map[string]string) javascript.StatementListItem {
 															Token: parser.Token{
 																Type: javascript.TokenIdentifier,
 																Data: m,
-															},
-														},
-													},
-												},
-											},
-										}).ConditionalExpression,
-									},
-								},
-								{
-									PropertyName: &javascript.PropertyName{
-										LiteralPropertyName: &javascript.Token{
-											Token: parser.Token{
-												Type: javascript.TokenStringLiteral,
-												Data: "\"enumerable\"",
-											},
-										},
-									},
-									AssignmentExpression: &javascript.AssignmentExpression{
-										ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-											NewExpression: &javascript.NewExpression{
-												MemberExpression: javascript.MemberExpression{
-													PrimaryExpression: &javascript.PrimaryExpression{
-														Literal: &javascript.Token{
-															Token: parser.Token{
-																Type: javascript.TokenBooleanLiteral,
-																Data: "true",
 															},
 														},
 													},
@@ -593,32 +541,6 @@ func exportVar(mappings map[string]string) javascript.StatementListItem {
 										},
 									},
 								},
-								{
-									PropertyName: &javascript.PropertyName{
-										LiteralPropertyName: &javascript.Token{
-											Token: parser.Token{
-												Type: javascript.TokenStringLiteral,
-												Data: "\"enumerable\"",
-											},
-										},
-									},
-									AssignmentExpression: &javascript.AssignmentExpression{
-										ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-											NewExpression: &javascript.NewExpression{
-												MemberExpression: javascript.MemberExpression{
-													PrimaryExpression: &javascript.PrimaryExpression{
-														Literal: &javascript.Token{
-															Token: parser.Token{
-																Type: javascript.TokenBooleanLiteral,
-																Data: "true",
-															},
-														},
-													},
-												},
-											},
-										}).ConditionalExpression,
-									},
-								},
 							},
 						},
 					},
@@ -654,7 +576,7 @@ func init() {
 		}},
 		"pageLoad": {value: document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn))}
 	});
-	return ([url, fn]) => included.set(toURL(url), Object.defineProperties({}, Object.fromEntries(fn())));
+	return ([url, fn]) => included.set(toURL(url), Object.defineProperties({}, Object.fromEntries(Array.from(fn()).map(e => {e[1]["enumerable"] = true;return e;}))));
 })());`))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error parsing javascript loader: ", err)
