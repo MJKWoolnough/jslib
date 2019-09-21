@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"unsafe"
 
 	"vimagination.zapto.org/errors"
@@ -97,21 +98,33 @@ func run() error {
 		}
 	}
 	base, err = filepath.Abs(base)
-	base += "/"
 	if err != nil {
 		return errors.WithContext("error getting absolute path for base: %s\n", err)
 	}
 	var main fileDep
 	files := make(map[string]*fileDep, len(os.Args))
-	for _, i := range filesTodo {
+	for n, i := range filesTodo {
 		if i == "-" {
 			i = inputName
+		}
+		i, err = filepath.Abs(i)
+		if err != nil {
+			return errors.WithContext("error getting absolute path: ", err)
+		}
+		if filesTodo[n] == "-" {
+			inputName = i
+		} else {
+			filesTodo[n] = i
 		}
 		if _, ok := files[i]; ok {
 			return errors.Error("duplicate file")
 		}
+		url, err := filepath.Rel(base, i)
+		if err != nil {
+			return errors.WithContext("error getting relative path: ", err)
+		}
 		fd := &fileDep{
-			url: i,
+			url: filepath.ToSlash(url),
 		}
 		files[i] = fd
 		main.AddDependency(fd)
@@ -136,6 +149,7 @@ func run() error {
 			files[name] = fd
 		}
 		p, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
+		f.Close()
 		if err != nil {
 			return errors.WithContext(fmt.Sprintf("error parsing file %q: ", name), err)
 		}
@@ -144,11 +158,16 @@ func run() error {
 			// TODO: search for dynamic import + include calls
 			if p.ModuleListItems[n].ImportDeclaration != nil {
 				id := p.ModuleListItems[n].ImportDeclaration
-				loc, _ := javascript.Unquote(id.ModuleSpecifier.Data) // TODO: make relative path
+				loc, err := javascript.Unquote(id.ModuleSpecifier.Data)
+				if err != nil {
+					return errors.WithContext("error unquoting import url: ", err)
+				}
+				loc = filepath.Join(filepath.Dir(name), loc)
 				gd, ok := files[loc]
 				if !ok {
+					url, _ := filepath.Rel(base, loc)
 					gd = &fileDep{
-						url: loc,
+						url: filepath.ToSlash(url),
 					}
 					files[loc] = gd
 					filesTodo = append(filesTodo, loc)
@@ -217,7 +236,12 @@ func run() error {
 												NewExpression: &javascript.NewExpression{
 													MemberExpression: javascript.MemberExpression{
 														PrimaryExpression: &javascript.PrimaryExpression{
-															Literal: id.FromClause.ModuleSpecifier, //TODO: change to relative path
+															Literal: &javascript.Token{
+																Token: parser.Token{
+																	Type: javascript.TokenStringLiteral,
+																	Data: strconv.Quote(gd.url),
+																},
+															},
 														},
 													},
 												},
@@ -260,16 +284,22 @@ func run() error {
 			} else if p.ModuleListItems[n].ExportDeclaration != nil {
 				ed := p.ModuleListItems[n].ExportDeclaration
 				if ed.FromClause != nil || ed.ExportClause != nil {
-					var loc string
+					var url string
 					if ed.FromClause != nil {
-						loc, _ = javascript.Unquote(ed.FromClause.ModuleSpecifier.Data) // TODO: make relative path
+						loc, _ := javascript.Unquote(ed.FromClause.ModuleSpecifier.Data)
+						loc = filepath.Join(filepath.Dir(name), loc)
 						gd, ok := files[loc]
 						if !ok {
+							url, _ := filepath.Rel(base, loc)
 							gd = &fileDep{
-								url: loc,
+								url: filepath.ToSlash(url),
 							}
 							files[loc] = gd
 							filesTodo = append(filesTodo, loc)
+						}
+						url = gd.url
+						if !fd.AddDependency(gd) {
+							return fmt.Errorf("circular reference with %s and %s\n", name, loc)
 						}
 					}
 					if ed.ExportClause != nil {
@@ -281,13 +311,13 @@ func run() error {
 								mappings[e.IdentifierName.Data] = e.IdentifierName.Data
 							}
 						}
-						if loc != "" {
-							statementList = append(statementList, exportXFrom(loc, mappings))
+						if url != "" {
+							statementList = append(statementList, exportXFrom(url, mappings))
 						} else {
 							statementList = append(statementList, exportVar(mappings))
 						}
 					} else {
-						statementList = append(statementList, exportFrom(loc))
+						statementList = append(statementList, exportFrom(url))
 					}
 				} else if ed.VariableStatement != nil || ed.Declaration != nil {
 					if ed.VariableStatement != nil {
@@ -355,7 +385,6 @@ func run() error {
 			}
 		}
 		fd.buf = statementList
-		f.Close()
 	}
 
 	main.add()
