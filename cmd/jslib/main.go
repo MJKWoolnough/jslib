@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"unsafe"
 
@@ -129,6 +130,7 @@ func run() error {
 		files[i] = fd
 		main.AddDependency(fd)
 	}
+	imports := make([]*string, 0, 100)
 	for len(filesTodo) > 0 {
 		name := filesTodo[0]
 		filesTodo = filesTodo[1:]
@@ -155,7 +157,27 @@ func run() error {
 		}
 		statementList := make([]javascript.StatementListItem, 0, len(p.ModuleListItems)+1)
 		for n := range p.ModuleListItems {
-			// TODO: search for dynamic import + include calls
+			for _, im := range searchReplace(reflect.ValueOf(&p.ModuleListItems[n]), imports[:0]) {
+				loc, err := javascript.Unquote(*im)
+				if err != nil {
+					return errors.WithContext("error unquoting import url: ", err)
+				}
+				loc = filepath.Join(filepath.Dir(name), loc)
+				gd, ok := files[loc]
+				if !ok {
+					url, _ := filepath.Rel(base, loc)
+					gd = &fileDep{
+						url: filepath.ToSlash(url),
+					}
+					files[loc] = gd
+					filesTodo = append(filesTodo, loc)
+				}
+				if !fd.AddDependency(gd) {
+					return fmt.Errorf("circular reference with %s and %s\n", name, loc)
+				}
+				u := strconv.Quote(gd.url)
+				*im = u
+			}
 			if p.ModuleListItems[n].ImportDeclaration != nil {
 				id := p.ModuleListItems[n].ImportDeclaration
 				loc, err := javascript.Unquote(id.ModuleSpecifier.Data)
@@ -447,4 +469,47 @@ func searchObjectBinding(ob *javascript.ObjectBindingPattern, mappings map[strin
 	if ob.BindingRestProperty != nil {
 		mappings[ob.BindingRestProperty.Data] = ob.BindingRestProperty.Data
 	}
+}
+
+var callExpression = reflect.TypeOf(&javascript.CallExpression{})
+
+func searchReplace(v reflect.Value, imports []*string) []*string {
+	if v.Type() == callExpression {
+		ce := v.Interface().(*javascript.CallExpression)
+		var ae *javascript.AssignmentExpression
+		if ce.MemberExpression != nil && ce.Arguments != nil && len(ce.Arguments.ArgumentList) == 1 && ce.Arguments.SpreadArgument == nil {
+			if ce.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference.Data == "include" || ce.MemberExpression.MemberExpression != nil && ce.MemberExpression.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.MemberExpression.PrimaryExpression.IdentifierReference.Data == "window" && (ce.MemberExpression.IdentifierName != nil && ce.MemberExpression.IdentifierName.Data == "include" || ce.MemberExpression.Expression != nil && ce.MemberExpression.Expression.Expressions[len(ce.MemberExpression.Expression.Expressions)-1].AssignmentExpression != nil && *aeAsString(ce.MemberExpression.Expression.Expressions[len(ce.MemberExpression.Expression.Expressions)-1].AssignmentExpression) == "\"include\"") {
+				ae = ce.Arguments.ArgumentList[0].AssignmentExpression
+			}
+		} else if ce.ImportCall != nil {
+			ae = ce.ImportCall
+		}
+		if ae != nil {
+			if str := aeAsString(ae); str != nil {
+				return append(imports, str)
+			}
+		}
+	}
+	switch v.Kind() {
+	case reflect.Ptr:
+		if !v.IsZero() {
+			return searchReplace(v.Elem(), imports)
+		}
+	case reflect.Slice:
+		for i := 0; i < v.Len(); i++ {
+			imports = searchReplace(v.Index(i), imports)
+		}
+	case reflect.Struct:
+		for i := 0; i < v.NumField()-1; i++ {
+			imports = searchReplace(v.Field(i), imports)
+		}
+	}
+	return imports
+}
+
+func aeAsString(ae *javascript.AssignmentExpression) *string {
+	if ae != nil && ae.ConditionalExpression != nil && ae.ConditionalExpression.True == nil && ae.ConditionalExpression.LogicalORExpression.LogicalORExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.LogicalANDExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseORExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseXORExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.BitwiseANDExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.EqualityExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.RelationalExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.ShiftExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.AdditiveExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.MultiplicativeExpression == nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.ExponentiationExpression == nil && len(ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.UnaryExpression.UnaryOperators) == 0 && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.UnaryExpression.UpdateExpression.LeftHandSideExpression != nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.UnaryExpression.UpdateExpression.UpdateOperator == 0 && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.UnaryExpression.UpdateExpression.LeftHandSideExpression.NewExpression != nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.UnaryExpression.UpdateExpression.LeftHandSideExpression.NewExpression.MemberExpression.PrimaryExpression != nil && ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.UnaryExpression.UpdateExpression.LeftHandSideExpression.NewExpression.MemberExpression.PrimaryExpression.Literal != nil {
+		return &ae.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.UnaryExpression.UpdateExpression.LeftHandSideExpression.NewExpression.MemberExpression.PrimaryExpression.Literal.Data
+	}
+	return nil
 }
