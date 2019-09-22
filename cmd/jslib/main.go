@@ -482,7 +482,32 @@ func searchReplace(v reflect.Value, imports []*string) []*string {
 				ae = ce.Arguments.ArgumentList[0].AssignmentExpression
 			}
 		} else if ce.ImportCall != nil {
-			ae = ce.ImportCall
+			*ce = javascript.CallExpression{
+				MemberExpression: &javascript.MemberExpression {
+					MemberExpression: &javascript.MemberExpression {
+						PrimaryExpression: &javascript.PrimaryExpression {
+							IdentifierReference: &javascript.Token {
+								Token: parser.Token {
+									Type: javascript.TokenIdentifier,
+									Data: "window",
+								},
+							},
+						},
+					},
+					IdentifierName: &javascript.Token {
+						Token: parser.Token {
+							Type: javascript.TokenIdentifier,
+							Data: "include",
+						},
+					},
+				},
+				Arguments: &javascript.Arguments{
+					ArgumentList: []javascript.AssignmentExpression{
+						*ce.ImportCall,
+					},
+				},
+			}
+			ae = ce.Arguments.ArgumentList[0].AssignmentExpression
 		}
 		if ae != nil {
 			if str := aeAsString(ae); str != nil {
