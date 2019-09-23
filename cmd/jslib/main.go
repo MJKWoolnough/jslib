@@ -483,19 +483,19 @@ func searchReplace(v reflect.Value, imports []*string) []*string {
 			}
 		} else if ce.ImportCall != nil {
 			*ce = javascript.CallExpression{
-				MemberExpression: &javascript.MemberExpression {
-					MemberExpression: &javascript.MemberExpression {
-						PrimaryExpression: &javascript.PrimaryExpression {
-							IdentifierReference: &javascript.Token {
-								Token: parser.Token {
+				MemberExpression: &javascript.MemberExpression{
+					MemberExpression: &javascript.MemberExpression{
+						PrimaryExpression: &javascript.PrimaryExpression{
+							IdentifierReference: &javascript.Token{
+								Token: parser.Token{
 									Type: javascript.TokenIdentifier,
 									Data: "window",
 								},
 							},
 						},
 					},
-					IdentifierName: &javascript.Token {
-						Token: parser.Token {
+					IdentifierName: &javascript.Token{
+						Token: parser.Token{
 							Type: javascript.TokenIdentifier,
 							Data: "include",
 						},
