@@ -38,3 +38,11 @@ func (d *dep) Process(al *javascript.ArrayLiteral) {
 		al.ElementList = append(al.ElementList, offer(d.URL, d.Structure))
 	}
 }
+
+func newDep(url string) *dep {
+	return &dep{
+		URL:        url,
+		requires:   make(map[string]*dep),
+		requiredBy: make(map[string]*dep),
+	}
+}

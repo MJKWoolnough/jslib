@@ -22,11 +22,7 @@ type config struct {
 func (c *config) NewFile(url string) *dep {
 	d, ok := c.files[url]
 	if !ok {
-		d = &dep{
-			URL:        url,
-			requires:   make(map[string]*dep),
-			requiredBy: make(map[string]*dep),
-		}
+		d = newDep(url)
 		c.files[url] = d
 		c.filesToDo = append(c.filesToDo, url)
 	}
@@ -37,7 +33,7 @@ type option func(c *config)
 
 func File(url string) option {
 	return func(c *config) {
-		c.filesToDo = append(c.filesToDo, url)
+		c.NewFile(url)
 	}
 }
 
@@ -68,7 +64,10 @@ func Loader(os ...option) (*javascript.Module, error) {
 	for _, o := range os {
 		o(&c)
 	}
-	var base dep
+	base := newDep("")
+	for _, d := range c.files {
+		base.Add(d)
+	}
 	for len(c.filesToDo) > 0 {
 		file := c.filesToDo[0]
 		c.filesToDo = c.filesToDo[1:]
@@ -308,6 +307,7 @@ func (c *config) processExport(d *dep, ed *javascript.ExportDeclaration) error {
 }
 
 func (c *config) processStatement(d *dep, sl javascript.StatementListItem) error {
+	d.Structure = append(d.Structure, sl)
 	return nil
 }
 
