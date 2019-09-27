@@ -77,16 +77,7 @@ func Loader(os ...option) (*javascript.Module, error) {
 		} else if err != nil {
 			return nil, err
 		}
-		d, ok := c.files[file]
-		if !ok {
-			d = &dep{
-				URL:        file,
-				requires:   make(map[string]*dep),
-				requiredBy: make(map[string]*dep),
-				Structure:  make([]javascript.StatementListItem, 0, len(m.ModuleListItems)),
-			}
-			c.files[file] = d
-		}
+		d, _ := c.files[file]
 		for n := range m.ModuleListItems {
 			var err error
 			if m.ModuleListItems[n].ImportDeclaration != nil {
