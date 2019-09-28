@@ -298,6 +298,17 @@ func (c *config) processExport(d *dep, ed *javascript.ExportDeclaration) error {
 }
 
 func (c *config) processStatement(d *dep, sl javascript.StatementListItem) error {
+	c.searchReplace(d, reflect.ValueOf(&sl))
+	if len(d.Structure) > 0 {
+		last := d.Structure[len(d.Structure)-1]
+		if sl.Declaration != nil && last.Declaration != nil && sl.Declaration.LexicalDeclaration != nil && last.Declaration.LexicalDeclaration != nil && sl.Declaration.LexicalDeclaration.LetOrConst == last.Declaration.LexicalDeclaration.LetOrConst {
+			last.Declaration.LexicalDeclaration.BindingList = append(last.Declaration.LexicalDeclaration.BindingList, sl.Declaration.LexicalDeclaration.BindingList...)
+			return nil
+		} else if sl.Statement != nil && last.Statement != nil && sl.Statement.VariableStatement != nil && last.Statement.VariableStatement != nil {
+			last.Statement.VariableStatement.VariableDeclarationList = append(last.Statement.VariableStatement.VariableDeclarationList, sl.Statement.VariableStatement.VariableDeclarationList...)
+			return nil
+		}
+	}
 	d.Structure = append(d.Structure, sl)
 	return nil
 }
