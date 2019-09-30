@@ -1,4 +1,4 @@
-package jslib
+package jslib // import "vimagination.zapto.org/jslib"
 
 import (
 	"errors"
