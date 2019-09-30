@@ -143,56 +143,42 @@ func (c *config) processImport(d *dep, id *javascript.ImportDeclaration) error {
 	lb := javascript.LexicalBinding{
 		ObjectBindingPattern: obp,
 		Initializer: &javascript.AssignmentExpression{
-			ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-				CallExpression: &javascript.CallExpression{
-					MemberExpression: &javascript.MemberExpression{
-						PrimaryExpression: &javascript.PrimaryExpression{
-							IdentifierReference: &javascript.Token{
-								Token: parser.Token{
-									Type: javascript.TokenIdentifier,
-									Data: "include",
-								},
-							},
-						},
-					},
-					Arguments: &javascript.Arguments{
-						ArgumentList: []javascript.AssignmentExpression{
-							{
-								ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-									NewExpression: &javascript.NewExpression{
-										MemberExpression: javascript.MemberExpression{
-											PrimaryExpression: &javascript.PrimaryExpression{
-												Literal: &javascript.Token{
-													Token: parser.Token{
-														Type: javascript.TokenStringLiteral,
-														Data: strconv.Quote(url),
-													},
-												},
-											},
-										},
-									},
-								}).ConditionalExpression,
-							},
-							{
-								ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-									NewExpression: &javascript.NewExpression{
-										MemberExpression: javascript.MemberExpression{
-											PrimaryExpression: &javascript.PrimaryExpression{
-												Literal: &javascript.Token{
-													Token: parser.Token{
-														Type: javascript.TokenBooleanLiteral,
-														Data: "true",
-													},
-												},
-											},
-										},
-									},
-								}).ConditionalExpression,
+			ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+				MemberExpression: &javascript.MemberExpression{
+					PrimaryExpression: &javascript.PrimaryExpression{
+						IdentifierReference: &javascript.Token{
+							Token: parser.Token{
+								Type: javascript.TokenIdentifier,
+								Data: "include",
 							},
 						},
 					},
 				},
-			}).ConditionalExpression,
+				Arguments: &javascript.Arguments{
+					ArgumentList: []javascript.AssignmentExpression{
+						{
+							ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+								Literal: &javascript.Token{
+									Token: parser.Token{
+										Type: javascript.TokenStringLiteral,
+										Data: strconv.Quote(url),
+									},
+								},
+							}),
+						},
+						{
+							ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+								Literal: &javascript.Token{
+									Token: parser.Token{
+										Type: javascript.TokenBooleanLiteral,
+										Data: "true",
+									},
+								},
+							}),
+						},
+					},
+				},
+			}),
 		},
 	}
 	return c.processStatement(d, javascript.StatementListItem{
@@ -272,25 +258,17 @@ func (c *config) processExport(d *dep, ed *javascript.ExportDeclaration) error {
 		}
 		c.processStatement(d, ex(mappings))
 	} else if ed.DefaultFunction != nil {
-		c.processStatement(d, exportDefault(wrapLHS(&javascript.LeftHandSideExpression{
-			NewExpression: &javascript.NewExpression{
-				MemberExpression: javascript.MemberExpression{
-					PrimaryExpression: &javascript.PrimaryExpression{
-						FunctionExpression: ed.DefaultFunction,
-					},
-				},
-			},
-		})))
+		c.processStatement(d, exportDefault(javascript.AssignmentExpression{
+			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+				FunctionExpression: ed.DefaultFunction,
+			}),
+		}))
 	} else if ed.DefaultClass != nil {
-		c.processStatement(d, exportDefault(wrapLHS(&javascript.LeftHandSideExpression{
-			NewExpression: &javascript.NewExpression{
-				MemberExpression: javascript.MemberExpression{
-					PrimaryExpression: &javascript.PrimaryExpression{
-						ClassExpression: ed.DefaultClass,
-					},
-				},
-			},
-		})))
+		c.processStatement(d, exportDefault(javascript.AssignmentExpression{
+			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+				ClassExpression: ed.DefaultClass,
+			}),
+		}))
 	} else if ed.DefaultAssignmentExpression != nil {
 		c.processStatement(d, exportDefault(*ed.DefaultAssignmentExpression))
 	}

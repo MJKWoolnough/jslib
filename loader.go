@@ -13,90 +13,66 @@ var (
 )
 
 func offer(url string, body []javascript.StatementListItem) javascript.AssignmentExpression {
-	return wrapLHS(&javascript.LeftHandSideExpression{
-		NewExpression: &javascript.NewExpression{
-			MemberExpression: javascript.MemberExpression{
-				PrimaryExpression: &javascript.PrimaryExpression{
-					ArrayLiteral: &javascript.ArrayLiteral{
-						ElementList: []javascript.AssignmentExpression{
-							wrapLHS(&javascript.LeftHandSideExpression{
-								NewExpression: &javascript.NewExpression{
-									MemberExpression: javascript.MemberExpression{
-										PrimaryExpression: &javascript.PrimaryExpression{
-											Literal: &javascript.Token{
-												Token: parser.Token{
-													Type: javascript.TokenStringLiteral,
-													Data: strconv.Quote(url),
-												},
-											},
-										},
-									},
+	return javascript.AssignmentExpression{
+		ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+			ArrayLiteral: &javascript.ArrayLiteral{
+				ElementList: []javascript.AssignmentExpression{
+					{
+						ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+							Literal: &javascript.Token{
+								Token: parser.Token{
+									Type: javascript.TokenStringLiteral,
+									Data: strconv.Quote(url),
 								},
-							}),
-							wrapLHS(&javascript.LeftHandSideExpression{
-								NewExpression: &javascript.NewExpression{
-									MemberExpression: javascript.MemberExpression{
-										PrimaryExpression: &javascript.PrimaryExpression{
-											FunctionExpression: &javascript.FunctionDeclaration{
-												Type: javascript.FunctionGenerator,
-												FunctionBody: javascript.Block{
-													StatementList: body,
-												},
-											},
-										},
-									},
+							},
+						}),
+					},
+					{
+						ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+							FunctionExpression: &javascript.FunctionDeclaration{
+								Type: javascript.FunctionGenerator,
+								FunctionBody: javascript.Block{
+									StatementList: body,
 								},
-							}),
-						},
+							},
+						}),
 					},
 				},
 			},
-		},
-	})
+		}),
+	}
 }
 
-func makeElements(mappings map[string]javascript.AssignmentExpression) *javascript.AssignmentExpression {
+func makeElements(mappings map[string]*javascript.ConditionalExpression) *javascript.AssignmentExpression {
 	elements := make([]javascript.AssignmentExpression, 0, len(mappings))
 	for n, m := range mappings {
-		elements = append(elements, wrapLHS(&javascript.LeftHandSideExpression{
-			NewExpression: &javascript.NewExpression{
-				MemberExpression: javascript.MemberExpression{
-					PrimaryExpression: &javascript.PrimaryExpression{
-						ArrayLiteral: &javascript.ArrayLiteral{
-							ElementList: []javascript.AssignmentExpression{
-								wrapLHS(&javascript.LeftHandSideExpression{
-									NewExpression: &javascript.NewExpression{
-										MemberExpression: javascript.MemberExpression{
-											PrimaryExpression: &javascript.PrimaryExpression{
-												Literal: &javascript.Token{
-													Token: parser.Token{
-														Type: javascript.TokenStringLiteral,
-														Data: strconv.Quote(n),
-													},
-												},
-											},
-										},
+		elements = append(elements, javascript.AssignmentExpression{
+			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+				ArrayLiteral: &javascript.ArrayLiteral{
+					ElementList: []javascript.AssignmentExpression{
+						{
+							ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+								Literal: &javascript.Token{
+									Token: parser.Token{
+										Type: javascript.TokenStringLiteral,
+										Data: strconv.Quote(n),
 									},
-								}),
-								m,
-							},
+								},
+							}),
+						},
+						{
+							ConditionalExpression: m,
 						},
 					},
 				},
-			},
-		}))
+			}),
+		})
 	}
 	var arr javascript.AssignmentExpression
 	if len(mappings) > 1 {
-		arr = wrapLHS(&javascript.LeftHandSideExpression{
-			NewExpression: &javascript.NewExpression{
-				MemberExpression: javascript.MemberExpression{
-					PrimaryExpression: &javascript.PrimaryExpression{
-						ArrayLiteral: &javascript.ArrayLiteral{
-							ElementList: elements,
-						},
-					},
-				},
+		arr.ConditionalExpression = javascript.WrapConditional(&javascript.PrimaryExpression{
+			ArrayLiteral: &javascript.ArrayLiteral{
+				ElementList: elements,
 			},
 		})
 	} else {
@@ -106,69 +82,59 @@ func makeElements(mappings map[string]javascript.AssignmentExpression) *javascri
 }
 
 func exportFrom(url string) javascript.StatementListItem {
-	ce := wrapLHS(&javascript.LeftHandSideExpression{
+	ce := javascript.WrapConditional(&javascript.CallExpression{
 		CallExpression: &javascript.CallExpression{
 			CallExpression: &javascript.CallExpression{
-				CallExpression: &javascript.CallExpression{
+				MemberExpression: &javascript.MemberExpression{
 					MemberExpression: &javascript.MemberExpression{
-						MemberExpression: &javascript.MemberExpression{
-							PrimaryExpression: &javascript.PrimaryExpression{
-								IdentifierReference: &javascript.Token{
-									Token: parser.Token{
-										Type: javascript.TokenIdentifier,
-										Data: "Object",
-									},
+						PrimaryExpression: &javascript.PrimaryExpression{
+							IdentifierReference: &javascript.Token{
+								Token: parser.Token{
+									Type: javascript.TokenIdentifier,
+									Data: "Object",
 								},
 							},
 						},
-						IdentifierName: &javascript.Token{
-							Token: parser.Token{
-								Type: javascript.TokenIdentifier,
-								Data: "getOwnPropertyDescriptors",
-							},
+					},
+					IdentifierName: &javascript.Token{
+						Token: parser.Token{
+							Type: javascript.TokenIdentifier,
+							Data: "getOwnPropertyDescriptors",
 						},
 					},
-					Arguments: &javascript.Arguments{
-						ArgumentList: []javascript.AssignmentExpression{
-							wrapLHS(&javascript.LeftHandSideExpression{
-								CallExpression: &javascript.CallExpression{
-									MemberExpression: &javascript.MemberExpression{
-										PrimaryExpression: &javascript.PrimaryExpression{
-											IdentifierReference: &javascript.Token{
-												Token: parser.Token{
-													Type: javascript.TokenIdentifier,
-													Data: "include",
-												},
+				},
+				Arguments: &javascript.Arguments{
+					ArgumentList: []javascript.AssignmentExpression{
+						{
+							ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+								MemberExpression: &javascript.MemberExpression{
+									PrimaryExpression: &javascript.PrimaryExpression{
+										IdentifierReference: &javascript.Token{
+											Token: parser.Token{
+												Type: javascript.TokenIdentifier,
+												Data: "include",
 											},
 										},
 									},
-									Arguments: &javascript.Arguments{
-										ArgumentList: []javascript.AssignmentExpression{
-											wrapLHS(&javascript.LeftHandSideExpression{
-												NewExpression: &javascript.NewExpression{
-													MemberExpression: javascript.MemberExpression{
-														PrimaryExpression: &javascript.PrimaryExpression{
-															Literal: &javascript.Token{
-																Token: parser.Token{
-																	Type: javascript.TokenStringLiteral,
-																	Data: strconv.Quote(url),
-																},
-															},
-														},
+								},
+								Arguments: &javascript.Arguments{
+									ArgumentList: []javascript.AssignmentExpression{
+										{
+											ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+												Literal: &javascript.Token{
+													Token: parser.Token{
+														Type: javascript.TokenStringLiteral,
+														Data: strconv.Quote(url),
 													},
 												},
 											}),
-											wrapLHS(&javascript.LeftHandSideExpression{
-												NewExpression: &javascript.NewExpression{
-													MemberExpression: javascript.MemberExpression{
-														PrimaryExpression: &javascript.PrimaryExpression{
-															Literal: &javascript.Token{
-																Token: parser.Token{
-																	Type: javascript.TokenBooleanLiteral,
-																	Data: "true",
-																},
-															},
-														},
+										},
+										{
+											ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+												Literal: &javascript.Token{
+													Token: parser.Token{
+														Type: javascript.TokenBooleanLiteral,
+														Data: "true",
 													},
 												},
 											}),
@@ -179,70 +145,58 @@ func exportFrom(url string) javascript.StatementListItem {
 						},
 					},
 				},
-				IdentifierName: &javascript.Token{
-					Token: parser.Token{
-						Type: javascript.TokenIdentifier,
-						Data: "filter",
-					},
+			},
+			IdentifierName: &javascript.Token{
+				Token: parser.Token{
+					Type: javascript.TokenIdentifier,
+					Data: "filter",
 				},
 			},
-			Arguments: &javascript.Arguments{
-				ArgumentList: []javascript.AssignmentExpression{
-					{
-						ArrowFunction: &javascript.ArrowFunction{
-							CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
-								ArrayBindingPattern: &javascript.ArrayBindingPattern{
-									BindingElementList: []javascript.BindingElement{
-										{
-											SingleNameBinding: &javascript.Token{
-												Token: parser.Token{
-													Type: javascript.TokenIdentifier,
-													Data: "key",
-												},
+		},
+		Arguments: &javascript.Arguments{
+			ArgumentList: []javascript.AssignmentExpression{
+				{
+					ArrowFunction: &javascript.ArrowFunction{
+						CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
+							ArrayBindingPattern: &javascript.ArrayBindingPattern{
+								BindingElementList: []javascript.BindingElement{
+									{
+										SingleNameBinding: &javascript.Token{
+											Token: parser.Token{
+												Type: javascript.TokenIdentifier,
+												Data: "key",
 											},
 										},
 									},
 								},
 							},
 						},
-						AssignmentExpression: &javascript.AssignmentExpression{
-							ConditionalExpression: &javascript.ConditionalExpression{
-								LogicalORExpression: javascript.LogicalORExpression{
-									LogicalANDExpression: javascript.LogicalANDExpression{
-										BitwiseORExpression: javascript.BitwiseORExpression{
-											BitwiseXORExpression: javascript.BitwiseXORExpression{
-												BitwiseANDExpression: javascript.BitwiseANDExpression{
-													EqualityExpression: javascript.EqualityExpression{
-														EqualityExpression: &wrapLHS(&javascript.LeftHandSideExpression{
-															NewExpression: &javascript.NewExpression{
-																MemberExpression: javascript.MemberExpression{
-																	PrimaryExpression: &javascript.PrimaryExpression{
-																		IdentifierReference: &javascript.Token{
-																			Token: parser.Token{
-																				Type: javascript.TokenIdentifier,
-																				Data: "key",
-																			},
-																		},
-																	},
-																},
+					},
+					AssignmentExpression: &javascript.AssignmentExpression{
+						ConditionalExpression: &javascript.ConditionalExpression{
+							LogicalORExpression: javascript.LogicalORExpression{
+								LogicalANDExpression: javascript.LogicalANDExpression{
+									BitwiseORExpression: javascript.BitwiseORExpression{
+										BitwiseXORExpression: javascript.BitwiseXORExpression{
+											BitwiseANDExpression: javascript.BitwiseANDExpression{
+												EqualityExpression: javascript.EqualityExpression{
+													EqualityExpression: &javascript.WrapConditional(&javascript.PrimaryExpression{
+														IdentifierReference: &javascript.Token{
+															Token: parser.Token{
+																Type: javascript.TokenIdentifier,
+																Data: "key",
 															},
-														}).ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression,
-														EqualityOperator: javascript.EqualityStrictNotEqual,
-														RelationalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-															NewExpression: &javascript.NewExpression{
-																MemberExpression: javascript.MemberExpression{
-																	PrimaryExpression: &javascript.PrimaryExpression{
-																		Literal: &javascript.Token{
-																			Token: parser.Token{
-																				Type: javascript.TokenStringLiteral,
-																				Data: "\"default\"",
-																			},
-																		},
-																	},
-																},
+														},
+													}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression,
+													EqualityOperator: javascript.EqualityStrictNotEqual,
+													RelationalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+														Literal: &javascript.Token{
+															Token: parser.Token{
+																Type: javascript.TokenStringLiteral,
+																Data: "\"default\"",
 															},
-														}).ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression,
-													},
+														},
+													}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression,
 												},
 											},
 										},
@@ -260,9 +214,11 @@ func exportFrom(url string) javascript.StatementListItem {
 			ExpressionStatement: &javascript.Expression{
 				Expressions: []javascript.AssignmentExpression{
 					{
-						Yield:                true,
-						Delegate:             true,
-						AssignmentExpression: &ce,
+						Yield:    true,
+						Delegate: true,
+						AssignmentExpression: &javascript.AssignmentExpression{
+							ConditionalExpression: ce,
+						},
 					},
 				},
 			},
@@ -271,38 +227,30 @@ func exportFrom(url string) javascript.StatementListItem {
 }
 
 func exportXFrom(url string, mappings map[string]string) javascript.StatementListItem {
-	elements := make(map[string]javascript.AssignmentExpression, len(mappings))
+	elements := make(map[string]*javascript.ConditionalExpression, len(mappings))
 	for n, m := range mappings {
-		elements[n] = wrapLHS(&javascript.LeftHandSideExpression{
-			NewExpression: &javascript.NewExpression{
-				MemberExpression: javascript.MemberExpression{
-					MemberExpression: &javascript.MemberExpression{
-						PrimaryExpression: &javascript.PrimaryExpression{
-							IdentifierReference: &javascript.Token{
-								Token: parser.Token{
-									Type: javascript.TokenIdentifier,
-									Data: "im",
-								},
-							},
+		elements[n] = javascript.WrapConditional(javascript.MemberExpression{
+			MemberExpression: &javascript.MemberExpression{
+				PrimaryExpression: &javascript.PrimaryExpression{
+					IdentifierReference: &javascript.Token{
+						Token: parser.Token{
+							Type: javascript.TokenIdentifier,
+							Data: "im",
 						},
 					},
-					Expression: &javascript.Expression{
-						Expressions: []javascript.AssignmentExpression{
-							wrapLHS(&javascript.LeftHandSideExpression{
-								NewExpression: &javascript.NewExpression{
-									MemberExpression: javascript.MemberExpression{
-										PrimaryExpression: &javascript.PrimaryExpression{
-											Literal: &javascript.Token{
-												Token: parser.Token{
-													Type: javascript.TokenStringLiteral,
-													Data: strconv.Quote(m),
-												},
-											},
-										},
-									},
+				},
+			},
+			Expression: &javascript.Expression{
+				Expressions: []javascript.AssignmentExpression{
+					{
+						ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+							Literal: &javascript.Token{
+								Token: parser.Token{
+									Type: javascript.TokenStringLiteral,
+									Data: strconv.Quote(m),
 								},
-							}),
-						},
+							},
+						}),
 					},
 				},
 			},
@@ -325,67 +273,57 @@ func exportXFrom(url string, mappings map[string]string) javascript.StatementLis
 											},
 										},
 										Initializer: &javascript.AssignmentExpression{
-											ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-												CallExpression: &javascript.CallExpression{
+											ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+												MemberExpression: &javascript.MemberExpression{
 													MemberExpression: &javascript.MemberExpression{
-														MemberExpression: &javascript.MemberExpression{
-															PrimaryExpression: &javascript.PrimaryExpression{
-																IdentifierReference: &javascript.Token{
-																	Token: parser.Token{
-																		Type: javascript.TokenIdentifier,
-																		Data: "Object",
-																	},
+														PrimaryExpression: &javascript.PrimaryExpression{
+															IdentifierReference: &javascript.Token{
+																Token: parser.Token{
+																	Type: javascript.TokenIdentifier,
+																	Data: "Object",
 																},
 															},
 														},
-														IdentifierName: &javascript.Token{
-															Token: parser.Token{
-																Type: javascript.TokenIdentifier,
-																Data: "getOwnPropertyDescriptors",
-															},
+													},
+													IdentifierName: &javascript.Token{
+														Token: parser.Token{
+															Type: javascript.TokenIdentifier,
+															Data: "getOwnPropertyDescriptors",
 														},
 													},
-													Arguments: &javascript.Arguments{
-														ArgumentList: []javascript.AssignmentExpression{
-															wrapLHS(&javascript.LeftHandSideExpression{
-																CallExpression: &javascript.CallExpression{
-																	MemberExpression: &javascript.MemberExpression{
-																		PrimaryExpression: &javascript.PrimaryExpression{
-																			IdentifierReference: &javascript.Token{
-																				Token: parser.Token{
-																					Type: javascript.TokenIdentifier,
-																					Data: "include",
-																				},
+												},
+												Arguments: &javascript.Arguments{
+													ArgumentList: []javascript.AssignmentExpression{
+														{
+															ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+																MemberExpression: &javascript.MemberExpression{
+																	PrimaryExpression: &javascript.PrimaryExpression{
+																		IdentifierReference: &javascript.Token{
+																			Token: parser.Token{
+																				Type: javascript.TokenIdentifier,
+																				Data: "include",
 																			},
 																		},
 																	},
-																	Arguments: &javascript.Arguments{
-																		ArgumentList: []javascript.AssignmentExpression{
-																			wrapLHS(&javascript.LeftHandSideExpression{
-																				NewExpression: &javascript.NewExpression{
-																					MemberExpression: javascript.MemberExpression{
-																						PrimaryExpression: &javascript.PrimaryExpression{
-																							IdentifierReference: &javascript.Token{
-																								Token: parser.Token{
-																									Type: javascript.TokenIdentifier,
-																									Data: strconv.Quote(url),
-																								},
-																							},
-																						},
+																},
+																Arguments: &javascript.Arguments{
+																	ArgumentList: []javascript.AssignmentExpression{
+																		{
+																			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																				IdentifierReference: &javascript.Token{
+																					Token: parser.Token{
+																						Type: javascript.TokenIdentifier,
+																						Data: strconv.Quote(url),
 																					},
 																				},
 																			}),
-																			wrapLHS(&javascript.LeftHandSideExpression{
-																				NewExpression: &javascript.NewExpression{
-																					MemberExpression: javascript.MemberExpression{
-																						PrimaryExpression: &javascript.PrimaryExpression{
-																							Literal: &javascript.Token{
-																								Token: parser.Token{
-																									Type: javascript.TokenBooleanLiteral,
-																									Data: "true",
-																								},
-																							},
-																						},
+																		},
+																		{
+																			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																				Literal: &javascript.Token{
+																					Token: parser.Token{
+																						Type: javascript.TokenBooleanLiteral,
+																						Data: "true",
 																					},
 																				},
 																			}),
@@ -396,7 +334,7 @@ func exportXFrom(url string, mappings map[string]string) javascript.StatementLis
 														},
 													},
 												},
-											}).ConditionalExpression,
+											}),
 										},
 									},
 								},
@@ -410,7 +348,7 @@ func exportXFrom(url string, mappings map[string]string) javascript.StatementLis
 	}
 }
 
-func yield(elements map[string]javascript.AssignmentExpression) javascript.StatementListItem {
+func yield(elements map[string]*javascript.ConditionalExpression) javascript.StatementListItem {
 	return javascript.StatementListItem{
 		Statement: &javascript.Statement{
 			ExpressionStatement: &javascript.Expression{
@@ -427,26 +365,20 @@ func yield(elements map[string]javascript.AssignmentExpression) javascript.State
 }
 
 func exportDefault(ae javascript.AssignmentExpression) javascript.StatementListItem {
-	return yield(map[string]javascript.AssignmentExpression{
-		"default": wrapLHS(&javascript.LeftHandSideExpression{
-			NewExpression: &javascript.NewExpression{
-				MemberExpression: javascript.MemberExpression{
-					PrimaryExpression: &javascript.PrimaryExpression{
-						ObjectLiteral: &javascript.ObjectLiteral{
-							PropertyDefinitionList: []javascript.PropertyDefinition{
-								{
-									PropertyName: &javascript.PropertyName{
-										LiteralPropertyName: &javascript.Token{
-											Token: parser.Token{
-												Type: javascript.TokenStringLiteral,
-												Data: "\"value\"",
-											},
-										},
-									},
-									AssignmentExpression: &ae,
+	return yield(map[string]*javascript.ConditionalExpression{
+		"default": javascript.WrapConditional(&javascript.PrimaryExpression{
+			ObjectLiteral: &javascript.ObjectLiteral{
+				PropertyDefinitionList: []javascript.PropertyDefinition{
+					{
+						PropertyName: &javascript.PropertyName{
+							LiteralPropertyName: &javascript.Token{
+								Token: parser.Token{
+									Type: javascript.TokenStringLiteral,
+									Data: "\"value\"",
 								},
 							},
 						},
+						AssignmentExpression: &ae,
 					},
 				},
 			},
@@ -455,41 +387,29 @@ func exportDefault(ae javascript.AssignmentExpression) javascript.StatementListI
 }
 
 func exportConst(mappings map[string]string) javascript.StatementListItem {
-	elements := make(map[string]javascript.AssignmentExpression, len(mappings))
+	elements := make(map[string]*javascript.ConditionalExpression, len(mappings))
 	for n, m := range mappings {
-		elements[n] = wrapLHS(&javascript.LeftHandSideExpression{
-			NewExpression: &javascript.NewExpression{
-				MemberExpression: javascript.MemberExpression{
-					PrimaryExpression: &javascript.PrimaryExpression{
-						ObjectLiteral: &javascript.ObjectLiteral{
-							PropertyDefinitionList: []javascript.PropertyDefinition{
-								{
-									PropertyName: &javascript.PropertyName{
-										LiteralPropertyName: &javascript.Token{
-											Token: parser.Token{
-												Type: javascript.TokenStringLiteral,
-												Data: "\"value\"",
-											},
-										},
-									},
-									AssignmentExpression: &javascript.AssignmentExpression{
-										ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-											NewExpression: &javascript.NewExpression{
-												MemberExpression: javascript.MemberExpression{
-													PrimaryExpression: &javascript.PrimaryExpression{
-														IdentifierReference: &javascript.Token{
-															Token: parser.Token{
-																Type: javascript.TokenIdentifier,
-																Data: m,
-															},
-														},
-													},
-												},
-											},
-										}).ConditionalExpression,
-									},
+		elements[n] = javascript.WrapConditional(&javascript.PrimaryExpression{
+			ObjectLiteral: &javascript.ObjectLiteral{
+				PropertyDefinitionList: []javascript.PropertyDefinition{
+					{
+						PropertyName: &javascript.PropertyName{
+							LiteralPropertyName: &javascript.Token{
+								Token: parser.Token{
+									Type: javascript.TokenStringLiteral,
+									Data: "\"value\"",
 								},
 							},
+						},
+						AssignmentExpression: &javascript.AssignmentExpression{
+							ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+								IdentifierReference: &javascript.Token{
+									Token: parser.Token{
+										Type: javascript.TokenIdentifier,
+										Data: m,
+									},
+								},
+							}),
 						},
 					},
 				},
@@ -500,44 +420,32 @@ func exportConst(mappings map[string]string) javascript.StatementListItem {
 }
 
 func exportVar(mappings map[string]string) javascript.StatementListItem {
-	elements := make(map[string]javascript.AssignmentExpression, len(mappings))
+	elements := make(map[string]*javascript.ConditionalExpression, len(mappings))
 	for n, m := range mappings {
-		elements[n] = wrapLHS(&javascript.LeftHandSideExpression{
-			NewExpression: &javascript.NewExpression{
-				MemberExpression: javascript.MemberExpression{
-					PrimaryExpression: &javascript.PrimaryExpression{
-						ObjectLiteral: &javascript.ObjectLiteral{
-							PropertyDefinitionList: []javascript.PropertyDefinition{
-								{
-									PropertyName: &javascript.PropertyName{
-										LiteralPropertyName: &javascript.Token{
+		elements[n] = javascript.WrapConditional(&javascript.PrimaryExpression{
+			ObjectLiteral: &javascript.ObjectLiteral{
+				PropertyDefinitionList: []javascript.PropertyDefinition{
+					{
+						PropertyName: &javascript.PropertyName{
+							LiteralPropertyName: &javascript.Token{
+								Token: parser.Token{
+									Type: javascript.TokenStringLiteral,
+									Data: "\"get\"",
+								},
+							},
+						},
+						AssignmentExpression: &javascript.AssignmentExpression{
+							ArrowFunction: &javascript.ArrowFunction{
+								CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
+								AssignmentExpression: &javascript.AssignmentExpression{
+									ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+										IdentifierReference: &javascript.Token{
 											Token: parser.Token{
-												Type: javascript.TokenStringLiteral,
-												Data: "\"get\"",
+												Type: javascript.TokenIdentifier,
+												Data: m,
 											},
 										},
-									},
-									AssignmentExpression: &javascript.AssignmentExpression{
-										ArrowFunction: &javascript.ArrowFunction{
-											CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
-											AssignmentExpression: &javascript.AssignmentExpression{
-												ConditionalExpression: wrapLHS(&javascript.LeftHandSideExpression{
-													NewExpression: &javascript.NewExpression{
-														MemberExpression: javascript.MemberExpression{
-															PrimaryExpression: &javascript.PrimaryExpression{
-																IdentifierReference: &javascript.Token{
-																	Token: parser.Token{
-																		Type: javascript.TokenIdentifier,
-																		Data: m,
-																	},
-																},
-															},
-														},
-													},
-												}).ConditionalExpression,
-											},
-										},
-									},
+									}),
 								},
 							},
 						},
@@ -547,12 +455,6 @@ func exportVar(mappings map[string]string) javascript.StatementListItem {
 		})
 	}
 	return yield(elements)
-}
-
-func wrapLHS(lhs *javascript.LeftHandSideExpression) javascript.AssignmentExpression {
-	a := javascript.AssignmentExpression{ConditionalExpression: new(javascript.ConditionalExpression)}
-	a.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.UnaryExpression.UpdateExpression.LeftHandSideExpression = lhs
-	return a
 }
 
 func makeLoader() *javascript.Module {
