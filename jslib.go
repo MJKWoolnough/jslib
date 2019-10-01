@@ -297,37 +297,39 @@ func (c *config) searchReplace(d *dep, v reflect.Value) error {
 	if v.Type() == callExpression {
 		ce := v.Interface().(*javascript.CallExpression)
 		var ae *javascript.AssignmentExpression
-		if ce.MemberExpression != nil && ce.Arguments != nil && len(ce.Arguments.ArgumentList) == 1 && ce.Arguments.SpreadArgument == nil {
-			if ce.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference.Data == "include" || ce.MemberExpression.MemberExpression != nil && ce.MemberExpression.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.MemberExpression.PrimaryExpression.IdentifierReference.Data == "window" && (ce.MemberExpression.IdentifierName != nil && ce.MemberExpression.IdentifierName.Data == "include" || ce.MemberExpression.Expression != nil && ce.MemberExpression.Expression.Expressions[len(ce.MemberExpression.Expression.Expressions)-1].AssignmentExpression != nil && *aeAsString(ce.MemberExpression.Expression.Expressions[len(ce.MemberExpression.Expression.Expressions)-1].AssignmentExpression) == "\"include\"") {
-				ae = ce.Arguments.ArgumentList[0].AssignmentExpression
-			}
-		} else if ce.ImportCall != nil {
-			*ce = javascript.CallExpression{
-				MemberExpression: &javascript.MemberExpression{
+		if ce != nil {
+			if ce.MemberExpression != nil && ce.Arguments != nil && len(ce.Arguments.ArgumentList) == 1 && ce.Arguments.SpreadArgument == nil {
+				if ce.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference.Data == "include" || ce.MemberExpression.MemberExpression != nil && ce.MemberExpression.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.MemberExpression.PrimaryExpression.IdentifierReference.Data == "window" && (ce.MemberExpression.IdentifierName != nil && ce.MemberExpression.IdentifierName.Data == "include" || ce.MemberExpression.Expression != nil && ce.MemberExpression.Expression.Expressions[len(ce.MemberExpression.Expression.Expressions)-1].AssignmentExpression != nil && *aeAsString(ce.MemberExpression.Expression.Expressions[len(ce.MemberExpression.Expression.Expressions)-1].AssignmentExpression) == "\"include\"") {
+					ae = ce.Arguments.ArgumentList[0].AssignmentExpression
+				}
+			} else if ce.ImportCall != nil {
+				*ce = javascript.CallExpression{
 					MemberExpression: &javascript.MemberExpression{
-						PrimaryExpression: &javascript.PrimaryExpression{
-							IdentifierReference: &javascript.Token{
-								Token: parser.Token{
-									Type: javascript.TokenIdentifier,
-									Data: "window",
+						MemberExpression: &javascript.MemberExpression{
+							PrimaryExpression: &javascript.PrimaryExpression{
+								IdentifierReference: &javascript.Token{
+									Token: parser.Token{
+										Type: javascript.TokenIdentifier,
+										Data: "window",
+									},
 								},
 							},
 						},
-					},
-					IdentifierName: &javascript.Token{
-						Token: parser.Token{
-							Type: javascript.TokenIdentifier,
-							Data: "include",
+						IdentifierName: &javascript.Token{
+							Token: parser.Token{
+								Type: javascript.TokenIdentifier,
+								Data: "include",
+							},
 						},
 					},
-				},
-				Arguments: &javascript.Arguments{
-					ArgumentList: []javascript.AssignmentExpression{
-						*ce.ImportCall,
+					Arguments: &javascript.Arguments{
+						ArgumentList: []javascript.AssignmentExpression{
+							*ce.ImportCall,
+						},
 					},
-				},
+				}
+				ae = ce.Arguments.ArgumentList[0].AssignmentExpression
 			}
-			ae = ce.Arguments.ArgumentList[0].AssignmentExpression
 		}
 		if ae != nil {
 			if str := aeAsString(ae); str != nil {
