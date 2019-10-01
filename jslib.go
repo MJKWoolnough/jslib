@@ -348,11 +348,15 @@ func (c *config) searchReplace(d *dep, v reflect.Value) error {
 		}
 	case reflect.Slice:
 		for i := 0; i < v.Len(); i++ {
-			return c.searchReplace(d, v.Index(i))
+			if err := c.searchReplace(d, v.Index(i)); err != nil {
+				return err
+			}
 		}
 	case reflect.Struct:
 		for i := 0; i < v.NumField()-1; i++ {
-			return c.searchReplace(d, v.Field(i))
+			if err := c.searchReplace(d, v.Field(i)); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
