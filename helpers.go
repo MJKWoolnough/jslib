@@ -7,11 +7,6 @@ import (
 	"vimagination.zapto.org/parser"
 )
 
-var (
-	loader *javascript.Module
-	array  *javascript.ArrayLiteral
-)
-
 func offer(url string, body []javascript.StatementListItem) javascript.AssignmentExpression {
 	return javascript.AssignmentExpression{
 		ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
