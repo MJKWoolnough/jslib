@@ -303,6 +303,7 @@ func (c *config) searchReplace(d *dep, v reflect.Value) error {
 					ae = ce.Arguments.ArgumentList[0].AssignmentExpression
 				}
 			} else if ce.ImportCall != nil {
+				ae = ce.ImportCall
 				*ce = javascript.CallExpression{
 					MemberExpression: &javascript.MemberExpression{
 						MemberExpression: &javascript.MemberExpression{
@@ -324,11 +325,10 @@ func (c *config) searchReplace(d *dep, v reflect.Value) error {
 					},
 					Arguments: &javascript.Arguments{
 						ArgumentList: []javascript.AssignmentExpression{
-							*ce.ImportCall,
+							*ae,
 						},
 					},
 				}
-				ae = ce.Arguments.ArgumentList[0].AssignmentExpression
 			}
 		}
 		if ae != nil {
