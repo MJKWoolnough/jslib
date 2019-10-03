@@ -282,9 +282,38 @@ func (c *config) processStatement(d *dep, sl javascript.StatementListItem) error
 		if sl.Declaration != nil && last.Declaration != nil && sl.Declaration.LexicalDeclaration != nil && last.Declaration.LexicalDeclaration != nil && sl.Declaration.LexicalDeclaration.LetOrConst == last.Declaration.LexicalDeclaration.LetOrConst {
 			last.Declaration.LexicalDeclaration.BindingList = append(last.Declaration.LexicalDeclaration.BindingList, sl.Declaration.LexicalDeclaration.BindingList...)
 			return nil
-		} else if sl.Statement != nil && last.Statement != nil && sl.Statement.VariableStatement != nil && last.Statement.VariableStatement != nil {
-			last.Statement.VariableStatement.VariableDeclarationList = append(last.Statement.VariableStatement.VariableDeclarationList, sl.Statement.VariableStatement.VariableDeclarationList...)
-			return nil
+		} else if sl.Statement != nil && last.Statement != nil {
+			if sl.Statement.VariableStatement != nil && last.Statement.VariableStatement != nil {
+				last.Statement.VariableStatement.VariableDeclarationList = append(last.Statement.VariableStatement.VariableDeclarationList, sl.Statement.VariableStatement.VariableDeclarationList...)
+				return nil
+			} else if sl.Statement.ExpressionStatement != nil && last.Statement.ExpressionStatement != nil {
+				sle := len(sl.Statement.ExpressionStatement.Expressions) - 1
+				le := len(last.Statement.ExpressionStatement.Expressions) - 1
+				if sl.Statement.ExpressionStatement.Expressions[sle].Yield == true && last.Statement.ExpressionStatement.Expressions[le].Yield == true {
+					var arr *javascript.ArrayLiteral
+					if !last.Statement.ExpressionStatement.Expressions[le].Delegate {
+						last.Statement.ExpressionStatement.Expressions[le].Delegate = true
+						arr = &javascript.ArrayLiteral{
+							ElementList: []javascript.AssignmentExpression{
+								*last.Statement.ExpressionStatement.Expressions[le].AssignmentExpression,
+							},
+						}
+						last.Statement.ExpressionStatement.Expressions[le].AssignmentExpression = &javascript.AssignmentExpression{
+							ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+								ArrayLiteral: arr,
+							}),
+						}
+					} else {
+						arr = javascript.UnwrapConditional(last.Statement.ExpressionStatement.Expressions[le].AssignmentExpression.ConditionalExpression).(*javascript.PrimaryExpression).ArrayLiteral
+					}
+					if sl.Statement.ExpressionStatement.Expressions[sle].Delegate {
+						arr.ElementList = append(arr.ElementList, javascript.UnwrapConditional(sl.Statement.ExpressionStatement.Expressions[sle].AssignmentExpression.ConditionalExpression).(*javascript.PrimaryExpression).ArrayLiteral.ElementList...)
+					} else {
+						arr.ElementList = append(arr.ElementList, sl.Statement.ExpressionStatement.Expressions[sle])
+					}
+					return nil
+				}
+			}
 		}
 	}
 	d.Structure = append(d.Structure, sl)
