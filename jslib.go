@@ -29,15 +29,15 @@ func (c *config) NewFile(url string) *dep {
 	return d
 }
 
-type option func(c *config)
+type Option func(c *config)
 
-func File(url string) option {
+func File(url string) Option {
 	return func(c *config) {
 		c.NewFile(url)
 	}
 }
 
-func LoadFromOS() option {
+func LoadFromOS() Option {
 	return Get(osLoad)
 }
 
@@ -51,13 +51,13 @@ func osLoad(url string) (*javascript.Module, error) {
 	return m, err
 }
 
-func Get(getter func(string) (*javascript.Module, error)) option {
+func Get(getter func(string) (*javascript.Module, error)) Option {
 	return func(c *config) {
 		c.loader = getter
 	}
 }
 
-func Loader(os ...option) (*javascript.Module, error) {
+func Loader(os ...Option) (*javascript.Module, error) {
 	c := config{
 		files: make(map[string]*dep),
 	}
