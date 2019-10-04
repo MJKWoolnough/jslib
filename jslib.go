@@ -99,7 +99,7 @@ func Loader(os ...Option) (*javascript.Module, error) {
 
 func (c *config) processImport(d *dep, id *javascript.ImportDeclaration) error {
 	url, _ := javascript.Unquote(id.FromClause.ModuleSpecifier.Data)
-	e := c.NewFile(url)
+	e := c.NewFile(d.RelTo(url))
 	if !d.Add(e) {
 		return ErrCircular
 	}
@@ -196,7 +196,7 @@ func (c *config) processExport(d *dep, ed *javascript.ExportDeclaration) error {
 		var url string
 		if ed.FromClause != nil {
 			loc, _ := javascript.Unquote(ed.FromClause.ModuleSpecifier.Data)
-			e := c.NewFile(loc)
+			e := c.NewFile(d.RelTo(loc))
 			if !d.Add(e) {
 				return ErrCircular
 			}
@@ -363,7 +363,7 @@ func (c *config) searchReplace(d *dep, v reflect.Value) error {
 		if ae != nil {
 			if str := aeAsString(ae); str != nil {
 				url, _ := javascript.Unquote(*str)
-				e := c.NewFile(url)
+				e := c.NewFile(d.RelTo(url))
 				if !d.Add(e) {
 					return ErrCircular
 				}

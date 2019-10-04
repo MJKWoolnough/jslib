@@ -14,10 +14,14 @@ type dep struct {
 	written    bool
 }
 
-func (d *dep) Add(e *dep) bool {
-	if len(e.URL) == 0 || e.URL[0] == '/' {
-		e.URL = path.Join(path.Dir(d.URL), e.URL)
+func (d *dep) RelTo(url string) string {
+	if len(url) > 0 && url[0] == '/' {
+		return url
 	}
+	return path.Join(path.Dir(d.URL), url)
+}
+
+func (d *dep) Add(e *dep) bool {
 	if _, ok := d.requires[e.URL]; ok {
 		return false
 	}
