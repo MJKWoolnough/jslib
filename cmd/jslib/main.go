@@ -33,20 +33,16 @@ func main() {
 
 func run() error {
 	var (
-		inputName, output, base string
-		filesTodo               Inputs
-		err                     error
+		output, base string
+		filesTodo    Inputs
+		err          error
 	)
 
 	flag.Var(&filesTodo, "i", "input file")
-	flag.StringVar(&inputName, "n", "-", "input file name when using stdin")
 	flag.StringVar(&output, "o", "-", "input file")
 	flag.StringVar(&base, "b", "", "js base dir")
 	flag.Parse()
 
-	if len(filesTodo) == 0 {
-		filesTodo = append(filesTodo, "-")
-	}
 	if output == "" {
 		output = "-"
 	}
