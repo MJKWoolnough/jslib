@@ -309,7 +309,7 @@ func (c *config) processStatement(d *dep, sl javascript.StatementListItem) error
 					if sl.Statement.ExpressionStatement.Expressions[sle].Delegate {
 						arr.ElementList = append(arr.ElementList, javascript.UnwrapConditional(sl.Statement.ExpressionStatement.Expressions[sle].AssignmentExpression.ConditionalExpression).(*javascript.PrimaryExpression).ArrayLiteral.ElementList...)
 					} else {
-						arr.ElementList = append(arr.ElementList, sl.Statement.ExpressionStatement.Expressions[sle])
+						arr.ElementList = append(arr.ElementList, *sl.Statement.ExpressionStatement.Expressions[sle].AssignmentExpression)
 					}
 					return nil
 				}
