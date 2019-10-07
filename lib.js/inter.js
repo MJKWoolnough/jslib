@@ -22,14 +22,14 @@ export class Subscription {
 		const success = new Pipe(),
 		      error = new Pipe();
 		fn(success.send, error.send);
-		subs.set(this, {success: success.receive, error: error.receive});
+		subs.set(this, [success.receive, error.receive]);
 	}
 	then(successFn, errorFn) {
 		const rfn = subs.get(this);
 		if (rfn === undefined) {
 			throw new TypeError("method not called on valid Subscription object");
 		}
-		const {success, error} = rfn;
+		const [success, error] = rfn;
 		return new Subscription((sFn, eFn) => {
 			if (successFn instanceof Function) {
 				success((...data) => {
