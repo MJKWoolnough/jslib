@@ -3,3 +3,4 @@ Object.defineProperties(window, {
 	"include": {value: (url: string) => import(url)}
 });
 
+export {};
