@@ -105,6 +105,9 @@ func (c *config) processImport(d *dep, id *javascript.ImportDeclaration) error {
 	}
 	url = e.URL
 	obp := new(javascript.ObjectBindingPattern)
+	if id.ImportClause == nil {
+		return nil
+	}
 	if id.ImportedDefaultBinding != nil {
 		obp.BindingPropertyList = append(obp.BindingPropertyList, javascript.BindingProperty{
 			PropertyName: &javascript.PropertyName{
