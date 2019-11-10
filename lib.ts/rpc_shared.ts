@@ -176,7 +176,7 @@ export default class RequestHandler {
 
 export type RPCType = {
 	request: (method: string, data?: any) => Promise<any>;
-	await: (id: number, keep: boolean) => Subscription | Promise<any>;
+	await: (id: number, keep?: boolean) => Subscription | Promise<any>;
 	close: () => void;
 }
 
