@@ -29,14 +29,18 @@ func (c *config) NewFile(url string) *dep {
 	return d
 }
 
+// Option is an configuration option that changes how the jslib packer operates
 type Option func(c *config)
 
+// File adds a file for packer to parse and pack
 func File(url string) Option {
 	return func(c *config) {
 		c.NewFile(url)
 	}
 }
 
+// LoadFromOS assumes that the layout of the files to pack are layed out the
+// same on both the filesystem and the web system
 func LoadFromOS() Option {
 	return Get(osLoad)
 }
@@ -51,12 +55,14 @@ func osLoad(url string) (*javascript.Module, error) {
 	return m, err
 }
 
+// Get provides the user a way to choose what data is loaded for a given URL
 func Get(getter func(string) (*javascript.Module, error)) Option {
 	return func(c *config) {
 		c.loader = getter
 	}
 }
 
+// Loader creates a jslib loader with packed dependencies
 func Loader(os ...Option) (*javascript.Module, error) {
 	c := config{
 		files: make(map[string]*dep),
