@@ -1,6 +1,12 @@
 import {clearElement, createHTML} from './html.js';
 
-export default (container: Node, loader?: Node) => {
+export type LayerType = {
+	addLayer: (closerFn: () => void) => HTMLElement;
+	removeLayer: (closeFn?: () => void) => void;
+	loading: (p: Promise<any>, loadDiv?: Node) => Promise<any>;
+}
+
+export default (container: Node, loader?: Node): LayerType => {
 	const layers: Node[] = [],
 	      closer = (closerFn?: () => void) => {
 		clearElement(container);
@@ -53,5 +59,5 @@ export default (container: Node, loader?: Node) => {
 			container.appendChild(loadDiv);
 			return p.finally(closeLoadingLayer);
 		}
-	});
+	}) as LayerType;
 }
