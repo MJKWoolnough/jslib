@@ -1,12 +1,12 @@
 import {clearElement, createHTML} from './html.js';
 
 export type LayerType = {
-	addLayer: (closerFn: () => void) => HTMLElement;
+	addLayer: (closerFn?: () => void) => HTMLElement;
 	removeLayer: (closeFn?: () => void) => void;
 	loading: (p: Promise<any>, loadDiv?: Node) => Promise<any>;
 }
 
-export default (container: Node, loader?: Node): LayerType => {
+export default (container: Node, loader?: Node): Readonly<LayerType> => {
 	const layers: Node[] = [],
 	      closer = (closerFn?: () => void) => {
 		clearElement(container);
@@ -37,7 +37,7 @@ export default (container: Node, loader?: Node): LayerType => {
 	      defaultLoader: Node = loader ? loader : createHTML("div", {"class": "loading"});
 	let loading = false;
 	return Object.freeze({
-		"addLayer": (closerFn: () => void) => {
+		"addLayer": (closerFn?: () => void) => {
 			if (layers.length === 0) {
 				window.addEventListener("keypress", keyPress);
 			}
@@ -48,7 +48,7 @@ export default (container: Node, loader?: Node): LayerType => {
 				}
 				layers.push(df);
 			}
-			return container.appendChild(createHTML("div", createHTML("span", {"class": "closer", "onclick": closer.bind(null, closerFn)}, "X")));
+			return container.appendChild(createHTML("div", createHTML("span", {"class": "closer", "onclick": closer.bind(null, closerFn ? closerFn : () => {})}, "X")));
 		},
 		"removeLayer": closer,
 		"loading": (p: Promise<any>, loadDiv?: Node) => {
