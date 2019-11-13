@@ -2,7 +2,7 @@ import RequestHandler, {RPCType} from './rpc_shared.js';
 import {HTTPRequest} from './conn.js';
 import {split} from './json.js';
 
-export default (path: string, xhPing = 1000): Promise<RPCType> => {
+export default (path: string, xhPing = 1000): Promise<Readonly<RPCType>> => {
 	let sto = -1,
 	    si = -1;
 	const todo: string[]  = [],
