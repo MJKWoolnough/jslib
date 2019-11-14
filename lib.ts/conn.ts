@@ -68,8 +68,12 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 			when: Subscription.prototype.then.bind(new Subscription((sFn, eFn) => {
 				ws.removeEventListener("error", errorFn);
 				ws.addEventListener("message", sFn);
-				ws.addEventListener("error", eFn);
-				ws.addEventListener("close", eFn);
+				ws.addEventListener("error", (e: Event) => eFn((e as ErrorEvent).error));
+				ws.addEventListener("close", (e: CloseEvent) => {
+					if (!e.wasClean) {
+						eFn(new Error(e.reason));
+					}
+				});
 			})),
 			get binaryType() {
 				return ws.binaryType;
@@ -84,6 +88,6 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 interface WSConn {
 	close: (code?: number, reason?: string) => void;
 	send: (data: string | ArrayBuffer | Blob | ArrayBufferView) => any;
-	when: (successFn?: (event: MessageEvent) => void, errorFn?: (event: Event) => void) => Subscription;
+	when: (successFn?: (event: MessageEvent) => void, errorFn?: (event: Event) => void) => Subscription<any>;
 	binaryType: BinaryType;
 }

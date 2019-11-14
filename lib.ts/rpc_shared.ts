@@ -17,7 +17,7 @@ class Request {
 			this.error = errorFn;
 		});
 	}
-	getSubscription(): Subscription {
+	getSubscription(): Subscription<any> {
 		throw new Error();
 	}
 	subscribed() {
@@ -26,7 +26,7 @@ class Request {
 }
 
 class AwaitRequest {
-	subscription?: Subscription;
+	subscription?: Subscription<any>;
 	subscriptionSuccess: promiseFn;
 	subscriptionError: promiseFn;
 	promise?: Promise<any>;
@@ -152,7 +152,7 @@ export default class RequestHandler {
 		}));
 		return this.getRequest(this.nextID++).getPromise();
 	}
-	await(id: number, keep = false): Subscription | Promise<any> {
+	await(id: number, keep = false): Subscription<any> | Promise<any> {
 		if (this.closed) {
 			return Promise.reject(new Error("RPC Closed"));
 		}
@@ -176,7 +176,7 @@ export default class RequestHandler {
 
 export type RPCType = {
 	request: (method: string, data?: any) => Promise<any>;
-	await: (id: number, keep?: boolean) => Subscription | Promise<any>;
+	await: (id: number, keep?: boolean) => Subscription<any> | Promise<any>;
 	close: () => void;
 }
 

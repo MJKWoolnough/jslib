@@ -1,14 +1,10 @@
-type sendFn = (...data: any[]) => void;
-type receiveFn = (...data: any[]) => void;
-type receiveFns = (fn: receiveFn) => void;
-
-export class Pipe {
-	send: sendFn;
-	receive: receiveFns;
+export class Pipe<T> {
+	send: (...data: T[]) => void;
+	receive: (fn: (...data: T[]) => void) => void;
 	constructor() {
-		const out: sendFn[] = [];
-		this.send = (...data) => out.forEach(o => o(...data));
-		this.receive = (fn: receiveFn) => {
+		const out: ((...data: T[]) => void)[] = [];
+		this.send = (...data: T[]) => out.forEach(o => o(...data));
+		this.receive = (fn: (...data: T[]) => void) => {
 			if (fn instanceof Function) {
 				out.push(fn);
 			} else if (fn !== null && fn !== undefined) {
@@ -19,14 +15,14 @@ export class Pipe {
 }
 
 const spread = Symbol("spread"),
-      subs = new WeakMap<Subscription, [receiveFn, receiveFn]>();
+      subs = new WeakMap<Subscription<any>, [(fn: (...data: any[]) => void) => void, (fn: (...data: Error[]) => void) => void]>();
 
 type promiseFn = (...data: any) => any;
 
-export class Subscription {
-	constructor(fn: (successFn: sendFn, errorFn: sendFn) => void) {
-		const success = new Pipe(),
-		      error = new Pipe();
+export class Subscription<T> {
+	constructor(fn: (successFn: (...data: T[]) => void, errorFn: (...data: Error[]) => void) => void) {
+		const success = new Pipe<T>(),
+		      error = new Pipe<Error>();
 		fn(success.send, error.send);
 		subs.set(this, [success.receive, error.receive]);
 	}
@@ -69,7 +65,7 @@ export class Subscription {
 			}
 		});
 	}
-	catch(errorFn: promiseFn) {
+	catch(errorFn: (...data: Error[]) => any) {
 		return Subscription.prototype.then.call(this, undefined, errorFn);
 	}
 	finally(afterFn: () => void) {
