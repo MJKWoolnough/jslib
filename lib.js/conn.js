@@ -59,8 +59,12 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		when: Subscription.prototype.then.bind(new Subscription((sFn, eFn) => {
 			ws.removeEventListener("error", errorFn);
 			ws.addEventListener("message", sFn);
-			ws.addEventListener("error", eFn);
-			ws.addEventListener("close", eFn);
+			ws.addEventListener("error", e => eFn(e.error));
+			ws.addEventListener("close", e => {
+				if (!e.wasClean) {
+					eFn(new Error(e.reason));
+				}
+			});
 		})),
 		get binaryType() {
 			return ws.binaryType;
