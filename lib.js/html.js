@@ -8,8 +8,7 @@ const childrenArr = (elem, children) => {
 	} else if (children instanceof Node) {
 		elem.appendChild(children);
 	}
-      },
-      h = Array.from(document.getElementsByTagName("html"));
+      };
 
 export const createElements = namespace => (element, properties, children) => {
 	const elem = typeof element === "string" ? document.createElementNS(namespace, element) : element instanceof Node ? element : document.createDocumentFragment();
@@ -34,7 +33,8 @@ export const createElements = namespace => (element, properties, children) => {
 	}
 	return elem;
       },
-      createHTML = createElements(h.length > 0 && h[0].namespaceURI !== null ? h[0].namespaceURI : "http://www.w3.org/1999/xhtml"),
+      createHTML = createElements("http://www.w3.org/1999/xhtml"),
+      createSVG = createElements("http://www.w3.org/2000/svg"),
       formatText = (text, wrapper) => {
 	const df = document.createDocumentFragment(),
 	      fn = wrapper instanceof Function ? wrapper : document.createTextNode.bind(document);
