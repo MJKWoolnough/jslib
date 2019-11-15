@@ -3,7 +3,7 @@
 export class Pipe {
 	constructor() {
 		const out = [];
-		this.send = (...data) => out.forEach(o => o(...data));
+		this.send = data => out.forEach(o => o(data));
 		this.receive = fn => {
 			if (fn instanceof Function) {
 				out.push(fn);
@@ -14,8 +14,7 @@ export class Pipe {
 	}
 }
 
-const spread = Symbol("spread"),
-      subs = new WeakMap();
+const subs = new WeakMap();
 
 export class Subscription {
 	constructor(fn) {
@@ -32,14 +31,9 @@ export class Subscription {
 		const [success, error] = rfn;
 		return new Subscription((sFn, eFn) => {
 			if (successFn instanceof Function) {
-				success((...data) => {
+				success(data => {
 					try {
-						const ret = successFn(...data);
-						if (ret instanceof Array && ret.hasOwnProperty(spread)) {
-							sFn(...ret);
-						} else {
-							sFn(ret);
-						}
+						sFn(successFn(data));
 					} catch (e) {
 						eFn(e);
 					}
@@ -48,12 +42,9 @@ export class Subscription {
 				success(sFn);
 			}
 			if (errorFn instanceof Function) {
-				error((...data) => {
+				error(data => {
 					try {
-						const ret = errorFn(...data);
-						if (ret instanceof Array && ret.hasOwnProperty(spread)) {
-							eFn(...ret);
-						}
+						eFn(errorFn(data));
 					} catch (e) {
 						eFn(e);
 					}
@@ -64,13 +55,13 @@ export class Subscription {
 		});
 	}
 	catch(errorFn) {
-		return Subscription.prototype.then.call(this, undefined, errorFn);
+		return this.then(undefined, errorFn);
 	}
 	finally(afterFn) {
-		const aFn = (...data) => {
+		const aFn = data => {
 			afterFn();
-			return Object.defineProperty(data, spread, {});
+			data;
 		};
-		return Subscription.prototype.then.call(this, aFn, aFn);
+		return this(aFn, aFn);
 	}
 }

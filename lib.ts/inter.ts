@@ -1,9 +1,9 @@
 export class Pipe<T> {
-	send: (...data: T[]) => void;
-	receive: (fn: (...data: T[]) => void) => void;
+	send: (data: T) => void;
+	receive: (fn: (data: T) => void) => void;
 	constructor() {
-		const out: ((...data: T[]) => void)[] = [];
-		this.send = (...data: T[]) => out.forEach(o => o(...data));
+		const out: ((data: T) => void)[] = [];
+		this.send = (data: T) => out.forEach(o => o(data));
 		this.receive = (fn: (...data: T[]) => void) => {
 			if (fn instanceof Function) {
 				out.push(fn);
@@ -14,34 +14,26 @@ export class Pipe<T> {
 	}
 }
 
-const spread = Symbol("spread"),
-      subs = new WeakMap<Subscription<any>, [(fn: (...data: any[]) => void) => void, (fn: (...data: Error[]) => void) => void]>();
-
-type promiseFn = (...data: any) => any;
+const subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void]>();
 
 export class Subscription<T> {
-	constructor(fn: (successFn: (...data: T[]) => void, errorFn: (...data: Error[]) => void) => void) {
+	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void) => void) {
 		const success = new Pipe<T>(),
-		      error = new Pipe<Error>();
+		      error = new Pipe<any>();
 		fn(success.send, error.send);
 		subs.set(this, [success.receive, error.receive]);
 	}
-	then(successFn?: promiseFn, errorFn?: promiseFn) {
+	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | undefined | null, errorFn?: ((data: any) => TResult2) | undefined | null) {
 		const rfn = subs.get(this);
 		if (rfn === undefined) {
 			throw new TypeError("method not called on valid Subscription object");
 		}
 		const [success, error] = rfn;
-		return new Subscription((sFn, eFn) => {
+		return new Subscription<TResult1>((sFn: (data: TResult1) => void, eFn: (data: any) => void) => {
 			if (successFn instanceof Function) {
-				success((...data: any[]) => {
+				success((data: T) => {
 					try {
-						const ret = successFn(...data);
-						if (ret instanceof Array && ret.hasOwnProperty(spread)) {
-							sFn(...ret);
-						} else {
-							sFn(ret);
-						}
+						sFn(successFn(data));
 					} catch (e) {
 						eFn(e);
 					}
@@ -50,12 +42,9 @@ export class Subscription<T> {
 				success(sFn);
 			}
 			if (errorFn instanceof Function) {
-				error((...data: any[]) => {
+				error((data: any) => {
 					try {
-						const ret = errorFn(...data);
-						if (ret instanceof Array && ret.hasOwnProperty(spread)) {
-							eFn(...ret);
-						}
+						eFn(errorFn(data));
 					} catch (e) {
 						eFn(e);
 					}
@@ -65,14 +54,16 @@ export class Subscription<T> {
 			}
 		});
 	}
-	catch(errorFn: (...data: Error[]) => any) {
-		return Subscription.prototype.then.call(this, undefined, errorFn);
+	catch<TResult = never>(errorFn: ((data: any) => TResult) | undefined | null): Subscription<T | TResult> {
+		return this.then(undefined, errorFn);
 	}
-	finally(afterFn: () => void) {
-		const aFn = (...data: any[]) => {
-			afterFn();
-			return Object.defineProperty(data, spread, {});
+	finally(afterFn?: () => void | undefined | null): Subscription<T> {
+		const aFn = (data: T) => {
+			if (afterFn) {
+				afterFn()
+			}
+			return data;
 		};
-		return Subscription.prototype.then.call(this, aFn, aFn);
+		return this.then(aFn, aFn);
 	}
 }
