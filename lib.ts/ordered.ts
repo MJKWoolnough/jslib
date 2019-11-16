@@ -11,7 +11,7 @@ interface data {
 }
 
 const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(key) >= 0,
-	sameSort = (arr: any[], index: number, sortFn: sortFunc, reverse: number) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
+      sameSort = (arr: any[], index: number, sortFn: sortFunc, reverse: number) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
       defaultSort = new Intl.Collator().compare,
       dataSymbol = Symbol("data"),
       remove = (target: any[], index: number, data: any) => {
@@ -24,7 +24,7 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 	return true;
       },
       fns = {
-	set: (target: SortHTML, property: string, value: any) => {
+	set: <T extends Item>(target: SortHTML<T>, property: string, value: any) => {
 		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
 			target[parseInt(property)] = value;
@@ -50,7 +50,7 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 		let pos = 0;
 		for (; pos < target.length; pos++) {
 			if ((d.sortFn(value, target[pos]) * d.reverse <= 0)) {
-				d.parentNode.insertBefore(value[d.fieldName], target[pos][d.fieldName]);
+				d.parentNode.insertBefore(value[d.fieldName], target[pos].html);
 				for (let i = target.length; i > pos; i--) {
 					target[i] = target[i-1];
 				}
@@ -62,7 +62,7 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 		target[target.length] = value;
 		return true;
 	},
-	deleteProperty: (target: SortHTML, property: string) => {
+	deleteProperty: <T extends Item>(target: SortHTML<T>, property: string) => {
 		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
 			delete target[parseInt(property)];
@@ -72,33 +72,37 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 		return true;
 	}
       },
-      reset = (arr: SortHTML, d: data) => {
-	let nextSibling = arr[arr.length-1][d.fieldName];
+      reset = <T extends Item>(arr: SortHTML<T>, d: data) => {
+	let nextSibling = arr[arr.length-1].html;
 	if (nextSibling !== d.parentNode.lastChild) {
 		d.parentNode.appendChild(nextSibling);
 	}
 	for (let i = arr.length - 2; i >= 0; i--) {
-		const thisNode = arr[i][d.fieldName];
+		const thisNode = arr[i].html;
 		if (nextSibling.previousSibling !== thisNode) {
 			d.parentNode.insertBefore(thisNode, nextSibling);
 		}
 		nextSibling = thisNode;
 	}
       },
-      getData = (arr: SortHTML) => {
+      getData = <T>(arr: SortHTML<Item>) => {
 	if (arr.hasOwnProperty(dataSymbol)) {
 		return arr[dataSymbol];
 	}
 	throw new TypeError("invalid SortHTML");
       };
 
-class SortHTML extends Array {
+type Item = {
+	html: Node;
+}
+
+class SortHTML<T extends Item> extends Array<T> {
 	[dataSymbol]: data;
-	constructor(parentNode: Node, sortFn: sortFunc = defaultSort, fieldName = "html") {
+	constructor(parentNode: Node, sortFn: sortFunc = defaultSort) {
 		super();
-		Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, fieldName, reverse: 1, jdi: false}});
+		Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, reverse: 1, jdi: false}});
 	}
-	push(element: Node, ...elements: Node[]) {
+	push(element: T, ...elements: T[]) {
 		this[this.length] = element;
 		elements.forEach(e => this.push(e));
 		return this.length;
@@ -135,13 +139,13 @@ class SortHTML extends Array {
 		}
 		return this;
 	}
-	splice(start: number, deleteCount = Infinity, ...items: Node[]) {
+	splice(start: number, deleteCount = Infinity, ...items: T[]) {
 		if (deleteCount > this.length - start) {
 			deleteCount = this.length - start;
 		}
 		const d = getData(this);
 		for (let i = 0; i < deleteCount; i++) {
-			d.parentNode.removeChild(this[start+i][d.fieldName]);
+			d.parentNode.removeChild(this[start+i].html);
 		}
 		d.jdi = true;
 		const ret = super.splice(start, deleteCount);
@@ -149,7 +153,7 @@ class SortHTML extends Array {
 		items.forEach(i => this.push(i));
 		return ret;
 	}
-	unshift(item: Node, ...items: Node[]) {
+	unshift(item: T, ...items: T[]) {
 		this.push(item);
 		items.forEach(i => this.push(i));
 		return this.length;
@@ -161,8 +165,8 @@ class SortHTML extends Array {
 		d.jdi = false;
 		reset(this, d);
 	}
-	get html() {return getData(this).parentNode;}
+	get html():Node {return getData(this).parentNode;}
 	static get [Symbol.species]() {return Array;}
 }
 
-export default (parentNode: Node, sortFn: sortFunc = defaultSort, fieldName = "html") => new Proxy(new SortHTML(parentNode, sortFn, fieldName), fns);
+export default <T extends Item>(parentNode: Node, sortFn: sortFunc = defaultSort) => new Proxy(new SortHTML<T>(parentNode, sortFn), fns);
