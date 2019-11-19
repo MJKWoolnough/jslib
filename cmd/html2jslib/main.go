@@ -29,6 +29,7 @@ func run() error {
 	)
 	flag.StringVar(&input, "i", "-", "input file")
 	flag.StringVar(&ch, "c", "createHTML", "createHTML function name")
+	flag.Parse()
 	if input == "-" {
 		f = os.Stdin
 	} else {
