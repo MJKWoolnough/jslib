@@ -29,11 +29,12 @@ var (
 
 func run() error {
 	var (
-		input string
-		f     *os.File
-		err   error
+		input, output string
+		f, o          *os.File
+		err           error
 	)
 	flag.StringVar(&input, "i", "-", "input file")
+	flag.StringVar(&output, "o", "-", "output file")
 	flag.StringVar(&ch, "c", "createHTML", "createHTML function name")
 	flag.BoolVar(&pe, "e", false, "process on* attrs as javascript")
 	flag.Parse()
@@ -85,15 +86,23 @@ func run() error {
 			}
 		}
 	}
-	if len(elements[0].children) == 1 {
-		_, err = elements[0].children[0].WriteTo(os.Stdout)
+	if output == "-" {
+		o = os.Stdout
 	} else {
-		_, err = elements[0].WriteTo(os.Stdout)
+		o, err = os.Create(output)
+		if err != nil {
+			return err
+		}
+	}
+	if len(elements[0].children) == 1 {
+		_, err = elements[0].children[0].WriteTo(o)
+	} else {
+		_, err = elements[0].WriteTo(o)
 	}
 	if err != nil {
 		return err
 	}
-	fmt.Println(";")
+	o.Write([]byte{';'})
 	return nil
 }
 
