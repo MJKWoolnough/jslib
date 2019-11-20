@@ -8,7 +8,10 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 
+	"vimagination.zapto.org/javascript"
+	"vimagination.zapto.org/parser"
 	"vimagination.zapto.org/rwcount"
 )
 
@@ -19,7 +22,10 @@ func main() {
 	}
 }
 
-var ch string
+var (
+	ch string
+	pe bool
+)
 
 func run() error {
 	var (
@@ -29,6 +35,7 @@ func run() error {
 	)
 	flag.StringVar(&input, "i", "-", "input file")
 	flag.StringVar(&ch, "c", "createHTML", "createHTML function name")
+	flag.BoolVar(&pe, "e", false, "process on* attrs as javascript")
 	flag.Parse()
 	if input == "-" {
 		f = os.Stdin
@@ -79,9 +86,12 @@ func run() error {
 		}
 	}
 	if len(elements[0].children) == 1 {
-		elements[0].children[0].WriteTo(os.Stdout)
+		_, err = elements[0].children[0].WriteTo(os.Stdout)
 	} else {
-		elements[0].WriteTo(os.Stdout)
+		_, err = elements[0].WriteTo(os.Stdout)
+	}
+	if err != nil {
+		return err
 	}
 	fmt.Println(";")
 	return nil
@@ -103,7 +113,11 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 	}
 	if len(e.attrs) == 1 {
 		for k, v := range e.attrs {
-			fmt.Fprintf(&sw, ", {%q: %q}", k, v)
+			fmt.Fprint(&sw, ", {")
+			if err := printAttr(&sw, k, v); err != nil {
+				return sw.Count, err
+			}
+			fmt.Fprint(&sw, "}")
 		}
 	} else if len(e.attrs) > 1 {
 		fmt.Fprint(&ip, ", {\n")
@@ -114,7 +128,9 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 			} else {
 				f = true
 			}
-			fmt.Fprintf(&ip, "%q: %q", k, v)
+			if err := printAttr(&ip, k, v); err != nil {
+				return sw.Count, err
+			}
 		}
 		fmt.Fprint(&sw, "\n}")
 	}
@@ -136,6 +152,19 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 	}
 	fmt.Fprint(&sw, ")")
 	return sw.Count, sw.Err
+}
+
+func printAttr(w io.Writer, key, value string) error {
+	if pe && strings.HasPrefix(key, "on") {
+		s, err := javascript.ParseScript(parser.NewStringTokeniser("function handler(event){" + value + "}"))
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(w, "%q: %s", key, s)
+	} else {
+		fmt.Fprintf(w, "%q: %q", key, value)
+	}
+	return nil
 }
 
 type text string
