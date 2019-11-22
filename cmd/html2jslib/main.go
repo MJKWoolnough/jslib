@@ -166,13 +166,11 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 func printAttr(w io.Writer, key, value string) error {
 	if pe && strings.HasPrefix(key, "on") {
 		s, err := javascript.ParseScript(parser.NewStringTokeniser("function handler(event){" + value + "}"))
-		if err != nil {
-			return err
+		if err == nil {
+			fmt.Fprintf(w, "%q: %s", key, s)
 		}
-		fmt.Fprintf(w, "%q: %s", key, s)
-	} else {
-		fmt.Fprintf(w, "%q: %q", key, value)
 	}
+	fmt.Fprintf(w, "%q: %q", key, value)
 	return nil
 }
 
