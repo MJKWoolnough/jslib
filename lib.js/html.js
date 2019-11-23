@@ -18,7 +18,7 @@ export const createElements = namespace => (element, properties, children) => {
 	if (typeof properties === "object" && elem instanceof Element) {
 		Object.entries(properties).filter(([k, prop]) => prop !== undefined).forEach(([k, prop]) => {
 			if (k.startsWith("on") && prop instanceof Function) {
-				elem.addEventListener(k.substr(2), prop.bind(elem));
+				elem.addEventListener(k.substr(2), prop.prototype ? prop.bind(elem) : prop);
 			} else if (k === "class") {
 				elem.classList.add(...prop.split(" "));
 			} else {
