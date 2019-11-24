@@ -85,14 +85,14 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 		nextSibling = thisNode;
 	}
       },
-      getData = <T>(arr: SortHTML<Item>) => {
+      getData = <T extends Item>(arr: SortHTML<T>) => {
 	if (arr.hasOwnProperty(dataSymbol)) {
 		return arr[dataSymbol];
 	}
 	throw new TypeError("invalid SortHTML");
       };
 
-type Item = {
+interface Item {
 	html: Node;
 }
 
@@ -169,4 +169,8 @@ class SortHTML<T extends Item> extends Array<T> {
 	static get [Symbol.species]() {return Array;}
 }
 
-export default <T extends Item>(parentNode: Node, sortFn: sortFunc = defaultSort) => new Proxy(new SortHTML<T>(parentNode, sortFn), fns);
+export default <T extends Item>(parentNode: Node, sortFn: sortFunc = defaultSort) => new Proxy(new SortHTML<T>(parentNode, sortFn) as SortHTMLType<T>, fns);
+export interface SortHTMLType<T extends Item> extends Array<T> {
+	html: Node;
+	update(): void;
+}
