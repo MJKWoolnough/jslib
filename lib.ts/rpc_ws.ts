@@ -1,8 +1,8 @@
 import RequestHandler, {RPCType} from './rpc_shared.js';
 import {WS} from './conn.js';
 
-export default (path: string): Promise<Readonly<RPCType>> => WS(path).then(ws => {
-	const rh = new RequestHandler(ws.send),
+export default (path: string, version = "1.0"): Promise<Readonly<RPCType>> => WS(path).then(ws => {
+	const rh = new RequestHandler(ws.send, version),
 	      closer = () => {
 		if (rh.close()) {
 			ws.close();

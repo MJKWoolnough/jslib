@@ -1,10 +1,10 @@
 import rpcWS from './rpc_ws.js';
 import rpcXH from './rpc_xh.js';
 
-export default (path: string, allowWS = true, allowXH = false, xhPing = 1000) => {
+export default (path: string, allowWS = true, allowXH = false, xhPing = 1000, version = "1.0") => {
 	if (allowWS) {
 		if (!allowXH) {
-			return rpcWS(path);
+			return rpcWS(path, version);
 		}
 		return rpcWS(path).catch(() => rpcXH(path, xhPing));
 	} else if (allowXH) {

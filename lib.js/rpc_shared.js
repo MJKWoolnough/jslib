@@ -72,11 +72,12 @@ class AwaitRequest {
 }
 
 export default class RequestHandler {
-	constructor(sender) {
+	constructor(sender, version) {
 		this.closed = false;
 		this.nextID = 0;
 		this.requests = new Map();
 		this.sender = sender;
+		this.version = version;
 	}
 	handleMessage(e) {
 		const data = e.data !== undefined ? JSON.parse(e.data) : "",
@@ -127,11 +128,20 @@ export default class RequestHandler {
 		if (this.closed) {
 			return Promise.reject(new Error("RPC Closed"));
 		}
-		this.sender(JSON.stringify({
-			"method": method,
-			"id": this.nextID,
-			"params": [data]
-		}));
+		if (version === "2.0") {
+			this.sender(JSON.stringify({
+				"jsonrpc": "2.0",
+				"method": method,
+				"id": this.nextID,
+				"params": data
+			}));
+		} else {
+			this.sender(JSON.stringify({
+				"method": method,
+				"id": this.nextID,
+				"params": [data]
+			}));
+		}
 		return this.getRequest(this.nextID++).getPromise();
 	}
 	await(id, keep = false) {

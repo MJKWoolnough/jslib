@@ -3,8 +3,8 @@
 import RequestHandler from './rpc_shared.js';
 import {WS} from './conn.js';
 
-export default path => WS(path).then(ws => {
-	const rh = new RequestHandler(ws.send),
+export default (path, version = "1.0") => WS(path).then(ws => {
+	const rh = new RequestHandler(ws.send, version),
 	      closer = () => {
 		if (rh.close()) {
 			ws.close();
