@@ -90,8 +90,8 @@ export default class RequestHandler {
 	nextID: number
 	requests: Map<number, Request | AwaitRequest>
 	sender: (data: string) => void;
-	version: string;
-	constructor(sender: (data: string) => void, version = "1.0") {
+	version: number;
+	constructor(sender: (data: string) => void, version = 1) {
 		this.closed = false;
 		this.nextID = 0;
 		this.requests = new Map();
@@ -147,18 +147,24 @@ export default class RequestHandler {
 		if (this.closed) {
 			return Promise.reject(new Error("RPC Closed"));
 		}
-		if (this.version === "2.0") {
+		if (this.version === 2) {
 			this.sender(JSON.stringify({
 				"jsonrpc": "2.0",
 				"method": method,
 				"id": this.nextID,
 				"params": data
 			}));
-		} else {
+		} else if (this.version === 1) {
 			this.sender(JSON.stringify({
 				"method": method,
 				"id": this.nextID,
 				"params": [data]
+			}));
+		} else {
+			this.sender(JSON.stringify({
+				"method": method,
+				"id": this.nextID,
+				"params": data
 			}));
 		}
 		return this.getRequest(this.nextID++).getPromise();
