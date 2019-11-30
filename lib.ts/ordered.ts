@@ -5,7 +5,6 @@ type sortFunc = (i: any, j: any) => number;
 interface data {
 	parentNode: Node;
 	sortFn: sortFunc;
-	fieldName: string;
 	reverse: number;
 	jdi: boolean;
 }
@@ -14,8 +13,8 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
       sameSort = (arr: any[], index: number, sortFn: sortFunc, reverse: number) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
       defaultSort = new Intl.Collator().compare,
       dataSymbol = Symbol("data"),
-      remove = (target: any[], index: number, data: any) => {
-	data.parentNode.removeChild(target[index][data.fieldName]);
+      remove = <T extends Item>(target: SortHTML<T>, index: number, data: any) => {
+	data.parentNode.removeChild(target[index].html);
 	for (let i = index; i < target.length - 1; i++) {
 		target[i] = target[i+1];
 	}
@@ -30,7 +29,7 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 			target[parseInt(property)] = value;
 			return true;
 		}
-		if (!(value instanceof Object && value[d.fieldName] instanceof Node)) {
+		if (!(value instanceof Object && value.html instanceof Node)) {
 			throw new TypeError("invalid item object");
 		}
 		const index = parseInt(property);
@@ -50,7 +49,7 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 		let pos = 0;
 		for (; pos < target.length; pos++) {
 			if ((d.sortFn(value, target[pos]) * d.reverse <= 0)) {
-				d.parentNode.insertBefore(value[d.fieldName], target[pos].html);
+				d.parentNode.insertBefore(value.html, target[pos].html);
 				for (let i = target.length; i > pos; i--) {
 					target[i] = target[i-1];
 				}
@@ -58,7 +57,7 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 				return true;
 			}
 		}
-		d.parentNode.appendChild(value[d.fieldName]);
+		d.parentNode.appendChild(value.html);
 		target[target.length] = value;
 		return true;
 	},
