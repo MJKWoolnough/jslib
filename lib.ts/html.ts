@@ -21,7 +21,7 @@ interface cElements {
 }
 
 interface cElement {
-	(element: null, children?: Children): Node;
+	(element: null | DocumentFragment, children?: Children): Node;
 	<T extends Node>(element: T, properties?: Props, children?: Children): T;
 	<T extends Node>(element: T, children?: Children, properties?: Props): T;
 	(element: string, properties?: Props, children?: Children): Node;
