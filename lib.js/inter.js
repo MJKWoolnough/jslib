@@ -19,17 +19,18 @@ const subs = new WeakMap();
 export class Subscription {
 	constructor(fn) {
 		const success = new Pipe(),
-		      error = new Pipe();
-		fn(success.send, error.send);
-		subs.set(this, [success.receive, error.receive]);
+		      error = new Pipe(),
+		      cancel = new Pipe();
+		fn(success.send, error.send, cancel.reveive);
+		subs.set(this, [success.receive, error.receive, cancel.send]);
 	}
 	then(successFn, errorFn) {
 		const rfn = subs.get(this);
 		if (rfn === undefined) {
 			throw new TypeError("method not called on valid Subscription object");
 		}
-		const [success, error] = rfn;
-		return new Subscription((sFn, eFn) => {
+		const [success, error, cancel] = rfn;
+		return new Subscription((sFn, eFn, cFn) => {
 			if (successFn instanceof Function) {
 				success(data => {
 					try {
@@ -52,7 +53,16 @@ export class Subscription {
 			} else {
 				error(eFn);
 			}
+			cFn(cancel);
 		});
+	}
+	cancel() {
+		const rfn = subs.get(this);
+		if (rfn === undefined) {
+			throw new TypeError("method not called on valid Subscription object");
+		}
+		const [,, cancel] = rfn;
+		cancel();
 	}
 	catch(errorFn) {
 		return this.then(undefined, errorFn);

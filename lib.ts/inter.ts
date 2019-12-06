@@ -14,22 +14,23 @@ export class Pipe<T> {
 	}
 }
 
-const subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void]>();
+const subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void, (data: void) => void]>();
 
 export class Subscription<T> {
-	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void) => void) {
+	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: (data: void) => void) => void) => void) {
 		const success = new Pipe<T>(),
-		      error = new Pipe<any>();
-		fn(success.send, error.send);
-		subs.set(this, [success.receive, error.receive]);
+		      error = new Pipe<any>(),
+		      cancel = new Pipe<void>();
+		fn(success.send, error.send, cancel.receive);
+		subs.set(this, [success.receive, error.receive, cancel.send]);
 	}
 	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | undefined | null, errorFn?: ((data: any) => TResult2) | undefined | null) {
 		const rfn = subs.get(this);
 		if (rfn === undefined) {
 			throw new TypeError("method not called on valid Subscription object");
 		}
-		const [success, error] = rfn;
-		return new Subscription<TResult1>((sFn: (data: TResult1) => void, eFn: (data: any) => void) => {
+		const [success, error, cancel] = rfn;
+		return new Subscription<TResult1>((sFn: (data: TResult1) => void, eFn: (data: any) => void, cFn: (data: (data: void) => void) => void) => {
 			if (successFn instanceof Function) {
 				success((data: T) => {
 					try {
@@ -52,7 +53,16 @@ export class Subscription<T> {
 			} else {
 				error(eFn);
 			}
+			cFn(cancel);
 		});
+	}
+	cancel() {
+		const rfn = subs.get(this);
+		if (rfn === undefined) {
+			throw new TypeError("method not called on valid Subscription object");
+		}
+		const [,, cancel] = rfn;
+		cancel();
 	}
 	catch<TResult = never>(errorFn: ((data: any) => TResult) | undefined | null): Subscription<T | TResult> {
 		return this.then(undefined, errorFn);
