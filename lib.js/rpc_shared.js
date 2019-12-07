@@ -26,8 +26,7 @@ class Request {
 class AwaitRequest {
 	constructor() {
 		this.clearPromise();
-		this.subscriptionSuccess = nop;
-		this.subscriptionError = nop;
+		this.subscriptions = new Set();
 	}
 	getPromise() {
 		if (this.promise === undefined) {
@@ -39,13 +38,11 @@ class AwaitRequest {
 		return this.promise;
 	}
 	getSubscription() {
-		if (this.subscription === undefined) {
-			this.subscription = new Subscription((successFn, errorFn) => {
-				this.subscriptionSuccess = successFn;
-				this.subscriptionError = errorFn;
-			});
-		}
-		return this.subscription;
+		return new Subscription((successFn, errorFn, cancelFn) => {
+			const fns = [successFn, errorFn];
+			this.subscriptions.add(fns);
+			cancelFn(() => this.subscriptions.delete(fns));
+		});
 	}
 	clearPromise() {
 		this.promise = undefined;
@@ -57,17 +54,17 @@ class AwaitRequest {
 			this.promiseSuccess(data);
 		}
 		this.clearPromise();
-		this.subscriptionSuccess(data);
+		this.subscriptions.forEach(([sFn]) => sFn(data));
 	}
 	error(e) {
 		if (this.promiseError !== undefined) {
 			this.promiseError(e);
 		}
 		this.clearPromise();
-		this.subscriptionError(e);
+		this.subscriptions.forEach(([, eFn]) => eFn(e));
 	}
 	subscribed() {
-		return this.subscription !== null;
+		return this.subscriptions.count > 0;
 	}
 }
 
