@@ -79,4 +79,9 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 		elem.removeChild(elem.lastChild);
 	}
 	return elem;
+      },
+      text2HTML = (text: string): Node[] => {
+	const d = createHTML("div");
+	d.innerHTML = text;
+	return Array.from(d.children).map(c => d.removeChild(c));
       };
