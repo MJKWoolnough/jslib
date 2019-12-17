@@ -55,5 +55,5 @@ export const createElements = namespace => (element, properties, children) => {
       text2HTML = text => {
 	const d = createHTML("div");
 	d.innerHTML = text;
-	return Array.from(d.children).map(c => d.removeChild(c));
+	return Array.from(d.childNodes).map(c => d.removeChild(c));
       };
