@@ -48,7 +48,9 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 			if (k.startsWith("on") && prop instanceof Function) {
 				elem.addEventListener(k.substr(2), prop.prototype ? prop.bind(elem) : prop);
 			} else if (k === "class") {
-				elem.classList.add(...prop.split(" "));
+				if (prop) {
+					elem.classList.add(...prop.split(" "));
+				}
 			} else {
 				elem.setAttribute(k, prop);
 			}
