@@ -57,6 +57,12 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 	case "xml":
 		xh.overrideMimeType("text/xml");
 		break;
+	case "document":
+		xh.responseType = "document";
+		break;
+	case "blob":
+		xh.responseType = "blob";
+		break;
 	}
 	xh.send(props.hasOwnProperty("data") ? props["data"] : null);
       }),
