@@ -1,6 +1,9 @@
 "use strict";
 
-const isIndex = key => parseInt(key).toString() === key && parseInt(key) >= 0,
+const isIndex = key => {
+	const i = parseInt(key)
+	return parseInt(i) >= 0 && i.toString() === key;
+      },
       sameSort = (arr, index, sortFn, reverse) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
       defaultSort = new Intl.Collator().compare,
       dataSymbol = Symbol("data"),
@@ -30,7 +33,7 @@ const isIndex = key => parseInt(key).toString() === key && parseInt(key) >= 0,
 	set: (target, property, value) => {
 		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
-			target[parseInt(property)] = value;
+			target[property] = value;
 			return true;
 		}
 		if (!(value instanceof Object && value.html instanceof Node)) {
@@ -68,7 +71,7 @@ const isIndex = key => parseInt(key).toString() === key && parseInt(key) >= 0,
 	deleteProperty: (target, property) => {
 		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
-			delete target[parseInt(property)];
+			delete target[property];
 			return true;
 		}
 		remove(target, parseInt(property), d);

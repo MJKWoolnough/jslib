@@ -9,11 +9,14 @@ interface data {
 	jdi: boolean;
 }
 
-const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(key) >= 0,
+const isIndex = (key: string) => {
+	const i = parseInt(key);
+	return i >= 0 && i.toString() === key
+      },
       sameSort = (arr: any[], index: number, sortFn: sortFunc, reverse: number) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
       defaultSort = new Intl.Collator().compare,
       dataSymbol = Symbol("data"),
-      remove = <T extends Item>(target: SortHTML<T>, index: number, data: any) => {
+      remove = <T extends Item>(target: SortHTML<T>, index: number, data: data) => {
 	data.parentNode.removeChild(target[index].html);
 	for (let i = index; i < target.length - 1; i++) {
 		target[i] = target[i+1];
@@ -23,10 +26,10 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 	return true;
       },
       fns = {
-	set: <T extends Item>(target: SortHTML<T>, property: string, value: any) => {
+	set: <T extends Item>(target: SortHTML<T>, property: string, value: T) => {
 		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
-			target[parseInt(property)] = value;
+			target[property as unknown as number] = value;
 			return true;
 		}
 		if (!(value instanceof Object && value.html instanceof Node)) {
@@ -64,7 +67,7 @@ const isIndex = (key: string) => parseInt(key).toString() === key && parseInt(ke
 	deleteProperty: <T extends Item>(target: SortHTML<T>, property: string) => {
 		const d = getData(target);
 		if (!isIndex(property) || d.jdi) {
-			delete target[parseInt(property)];
+			delete target[property as unknown as number];
 			return true;
 		}
 		remove(target, parseInt(property), d);
