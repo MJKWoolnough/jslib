@@ -10,9 +10,9 @@ const childrenArr = (elem: Node, children: NestedChildren | string | Node) => {
 	}
       };
 
-type Props = Record<string, string | Function>;
+export type Props = Record<string, string | Function>;
 
-type Children = NestedChildren | string | Node;
+export type Children = NestedChildren | string | Node;
 
 interface cElements {
 	(namespace: string): cElement;
