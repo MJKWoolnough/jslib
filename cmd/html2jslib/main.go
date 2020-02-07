@@ -168,10 +168,10 @@ func printAttr(w io.Writer, key, value string) error {
 		s, err := javascript.ParseScript(parser.NewStringTokeniser("function handler(event){" + value + "}"))
 		if err == nil {
 			fmt.Fprintf(w, "%q: %s", key, s)
+			return nil
 		}
-	} else {
-		fmt.Fprintf(w, "%q: %q", key, value)
 	}
+	fmt.Fprintf(w, "%q: %q", key, value)
 	return nil
 }
 
