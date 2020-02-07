@@ -23,8 +23,8 @@ func main() {
 }
 
 var (
-	ch string
-	pe bool
+	ch      string
+	pe, dom bool
 )
 
 func run() error {
@@ -37,6 +37,7 @@ func run() error {
 	flag.StringVar(&output, "o", "-", "output file")
 	flag.StringVar(&ch, "c", "createHTML", "createHTML function name")
 	flag.BoolVar(&pe, "e", false, "process on* attrs as javascript")
+	flag.BoolVar(&dom, "d", false, "assume dom.js is imported")
 	flag.Parse()
 	if input == "-" {
 		f = os.Stdin
@@ -70,7 +71,7 @@ func run() error {
 		switch t := t.(type) {
 		case xml.StartElement:
 			elements = append(elements, &element{
-				name:  strconv.Quote(t.Name.Local),
+				name:  t.Name.Local,
 				attrs: make(map[string]string),
 			})
 			elements[len(elements)-2].children = append(elements[len(elements)-2].children, elements[len(elements)-1])
@@ -114,22 +115,41 @@ type element struct {
 
 func (e *element) WriteTo(w io.Writer) (int64, error) {
 	sw := rwcount.Writer{Writer: w}
-	fmt.Fprintf(&sw, "%s(%s", ch, e.name)
+	if dom {
+		fmt.Fprintf(&sw, "%s(", e.name)
+	} else {
+		fmt.Fprintf(&sw, "%s(%q", ch, e.name)
+	}
 	ip := indentPrinter{&sw}
+	first := true
 	if len(e.children) == 1 && isText(e.children[0]) {
-		fmt.Fprint(&sw, ", ")
+		if dom {
+			first = false
+		} else {
+			fmt.Fprint(&sw, ", ")
+		}
 		e.children[0].WriteTo(&sw)
 	}
 	if len(e.attrs) == 1 {
 		for k, v := range e.attrs {
-			fmt.Fprint(&sw, ", {")
+			if dom && first {
+				fmt.Fprint(&sw, "{")
+				first = false
+			} else {
+				fmt.Fprint(&sw, ", {")
+			}
 			if err := printAttr(&sw, k, v); err != nil {
 				return sw.Count, err
 			}
 			fmt.Fprint(&sw, "}")
 		}
 	} else if len(e.attrs) > 1 {
-		fmt.Fprint(&ip, ", {\n")
+		if dom && first {
+			fmt.Fprint(&ip, "{\n")
+			first = false
+		} else {
+			fmt.Fprint(&ip, ", {\n")
+		}
 		var f bool
 		for k, v := range e.attrs {
 			if f {
@@ -144,10 +164,16 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 		fmt.Fprint(&sw, "\n}")
 	}
 	if len(e.children) == 1 && !isText(e.children[0]) {
-		fmt.Fprint(&sw, ", ")
+		if !dom || !first {
+			fmt.Fprint(&sw, ", ")
+		}
 		e.children[0].WriteTo(&sw)
 	} else if len(e.children) > 1 {
-		fmt.Fprint(&ip, ", [\n")
+		if dom && first {
+			fmt.Fprint(&ip, "[\n")
+		} else {
+			fmt.Fprint(&ip, ", [\n")
+		}
 		var f bool
 		for _, c := range e.children {
 			if f {
