@@ -169,8 +169,9 @@ func printAttr(w io.Writer, key, value string) error {
 		if err == nil {
 			fmt.Fprintf(w, "%q: %s", key, s)
 		}
+	} else {
+		fmt.Fprintf(w, "%q: %q", key, value)
 	}
-	fmt.Fprintf(w, "%q: %q", key, value)
 	return nil
 }
 
