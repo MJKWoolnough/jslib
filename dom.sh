@@ -12,7 +12,7 @@ if [ "$1" = "lib" ]; then
 fi;
 
 (
-	echo -e "import {createHTML, Children, Props} from 'html.js';\n";
+	echo -e "import {createHTML, Children, Props} from './html.js';\n";
 	echo -n "export const ";
 	first=true;
 	for tag in $tags; do
@@ -27,7 +27,7 @@ fi;
 ) > lib.ts/dom.ts;
 
 (
-	echo -e "import {createHTML} from 'html.js';\n";
+	echo -e "import {createHTML} from './html.js';\n";
 	echo -n "export const [";
 	first=true;
 	for tag in $tags; do
