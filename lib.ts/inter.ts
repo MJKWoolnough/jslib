@@ -4,7 +4,7 @@ export class Pipe<T> {
 	constructor() {
 		const out: ((data: T) => void)[] = [];
 		this.send = (data: T) => out.forEach(o => o(data));
-		this.receive = (fn: (...data: T[]) => void) => {
+		this.receive = (fn: (data: T) => void) => {
 			if (fn instanceof Function) {
 				out.push(fn);
 			} else if (fn !== null && fn !== undefined) {
