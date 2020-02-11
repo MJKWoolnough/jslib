@@ -14,7 +14,7 @@ const isIndex = (key: string) => {
 	return i >= 0 && i.toString() === key
       },
       sameSort = (arr: any[], index: number, sortFn: sortFunc, reverse: number) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
-      defaultSort = new Intl.Collator().compare,
+      stringSort = new Intl.Collator().compare,
       dataSymbol = Symbol("data"),
       remove = <T extends Item>(target: SortHTML<T>, index: number, data: data) => {
 	data.parentNode.removeChild(target[index].html);
@@ -100,7 +100,7 @@ interface Item {
 
 class SortHTML<T extends Item> extends Array<T> {
 	[dataSymbol]: data;
-	constructor(parentNode: Node, sortFn: sortFunc = defaultSort) {
+	constructor(parentNode: Node, sortFn: sortFunc = stringSort) {
 		super();
 		Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, reverse: 1, jdi: false}});
 	}
@@ -171,7 +171,8 @@ class SortHTML<T extends Item> extends Array<T> {
 	static get [Symbol.species]() {return Array;}
 }
 
-export default <T extends Item>(parentNode: Node, sortFn: sortFunc = defaultSort) => new Proxy(new SortHTML<T>(parentNode, sortFn) as SortHTMLType<T>, fns);
+export default <T extends Item>(parentNode: Node, sortFn: sortFunc = stringSort) => new Proxy(new SortHTML<T>(parentNode, sortFn) as SortHTMLType<T>, fns);
+export {stringSort};
 export interface SortHTMLType<T extends Item> extends Array<T> {
 	html: Node;
 	update(): void;

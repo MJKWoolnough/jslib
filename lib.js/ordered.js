@@ -5,7 +5,7 @@ const isIndex = key => {
 	return parseInt(i) >= 0 && i.toString() === key;
       },
       sameSort = (arr, index, sortFn, reverse) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
-      defaultSort = new Intl.Collator().compare,
+      stringSort = new Intl.Collator().compare,
       dataSymbol = Symbol("data"),
       remove = (target, index, data) => {
 	data.parentNode.removeChild(target[index].html);
@@ -86,7 +86,7 @@ const isIndex = key => {
       };
 
 class SortHTML extends Array {
-	constructor(parentNode, sortFn = defaultSort) {
+	constructor(parentNode, sortFn = stringSort) {
 		super();
 		Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, reverse: 1, jdi: false}});
 	}
@@ -157,4 +157,5 @@ class SortHTML extends Array {
 	static get [Symbol.species]() {return Array;}
 }
 
-export default (parentNode, sortFn = defaultSort) =>  new Proxy(new SortHTML(parentNode, sortFn), fns);
+export default (parentNode, sortFn = stringSort) =>  new Proxy(new SortHTML(parentNode, sortFn), fns);
+export {stringSort};
