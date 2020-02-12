@@ -192,8 +192,8 @@ export interface RPCType {
 	close: () => void;
 }
 
-interface Await {
+export interface Await {
 	(id: number): Promise<any>;
-	(id: number, keep?: false): Promise<any>;
-	(id: number, keep?: true): Subscription<any>;
+	(id: number, keep: false): Promise<any>;
+	(id: number, keep: true): Subscription<any>;
 }
