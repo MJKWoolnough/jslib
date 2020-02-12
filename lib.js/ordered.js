@@ -84,7 +84,8 @@ const isIndex = key => {
 	}
 	throw new TypeError("invalid SortHTML");
       },
-      sortHTML = (parentNode, sortFn = stringSort) =>  new Proxy(new SortHTML(parentNode, sortFn), fns);
+      sortHTML = (parentNode, sortFn = stringSort) =>  new Proxy(new SortHTML(parentNode, sortFn), fns),
+      noSort = () => 0;
 
 class SortHTML extends Array {
 	constructor(parentNode, sortFn = stringSort) {
@@ -180,4 +181,4 @@ class SortHTML extends Array {
 	static get [Symbol.species]() {return Array;}
 }
 
-export {sortHTML, stringSort};
+export {sortHTML, stringSort, noSort};
