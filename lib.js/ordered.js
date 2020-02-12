@@ -113,7 +113,7 @@ class SortHTML extends Array {
 		const i = super.shift();
 		d.jdi = false;
 		if (d.parentNode.firstChild) {
-			d.parentNode.removeChild(d.parentNode.firstChild);
+			d.parentNode.removeChild(i.html);
 		}
 		return i;
 	}
@@ -137,14 +137,36 @@ class SortHTML extends Array {
 			d.parentNode.removeChild(this[start+i].html);
 		}
 		d.jdi = true;
-		const ret = super.splice(start, deleteCount);
+		const ret = super.splice(start, deleteCount, ...items);
 		d.jdi = false;
-		items.forEach(i => this.push(i));
+		if (items.length > 0) {
+			if (start === 0) {
+				if (d.parentNode.childNodes.length === 0) {
+					items.forEach(i => d.parentNode.appendChild(i.html));
+				} else {
+					const f = d.parentNode.firstChild;
+					items.forEach(i => d.parentNode.insertBefore(i.html, f));
+				}
+			} else if (start >= this.length - items.length) {
+				items.forEach(i => d.parentNode.appendChild(i.html));
+			} else {
+				const f = this[start].html;
+				items.forEach(i => d.parentNode.insertBefore(i.html, f));
+			}
+		}
 		return ret;
 	}
 	unshift(item, ...items) {
-		this.push(item);
-		items.forEach(i => this.push(i));
+		const d = getData(this);
+		d.jdi = true;
+		super.unshift(item, ...items);
+		d.jdi = false;
+		if (d.parentNode.childNodes.length === 0) {
+			[item, ...items].forEach(i => d.parentNode.appendChild(i.html));
+		} else {
+			const f = d.parentNode.firstChild;
+			[item, ...items].forEach(i => d.parentNode.insertBefore(i.html, f));
+		}
 		return this.length;
 	}
 	update() {
