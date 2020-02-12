@@ -95,7 +95,7 @@ const isIndex = (key: string) => {
 	}
 	throw new TypeError("invalid SortHTML");
       },
-      sortHTML = <T extends Item>(parentNode: Node, sortFn: sortFunc = stringSort) => new Proxy(new SortHTML<T>(parentNode, sortFn), fns),
+      sortHTML = <T extends Item>(parentNode: Node, sortFn: sortFunc = stringSort) => new Proxy(new SortHTML<T>(parentNode, sortFn), fns) as SortHTML<T>,
       noSort = () => 0;
 
 interface Item {
