@@ -1,4 +1,4 @@
-import RequestHandler, {RPCType} from './rpc_shared.js';
+import RequestHandler, {RPCType, Await} from './rpc_shared.js';
 import {HTTPRequest} from './conn.js';
 import {split} from './json.js';
 
@@ -30,12 +30,12 @@ export default (path: string, xhPing = 1000): Promise<Readonly<RPCType>> => {
 	      headerID = Object.freeze({"X-RPCID": Array.from(crypto.getRandomValues(new Uint8Array(32))).map(a => a.toString(16).padStart(2, "0")).join("")});
 	return Promise.resolve(Object.freeze({
 		"request": rh.request.bind(rh),
-		"await": (id: number, keep = false) => {
+		"await": ((id: number, keep: boolean = false) => {
 			if (si === -1 && xhPing > 0) {
 				si = window.setInterval(sender, xhPing);
 			}
 			return rh.await(id, keep);
-		},
+		}) as Await,
 		"close": (): void => {
 			if (rh.close() && sto !== -1) {
 				window.clearTimeout(sto);

@@ -1,4 +1,4 @@
-import RequestHandler, {RPCType} from './rpc_shared.js';
+import RequestHandler, {RPCType, Await} from './rpc_shared.js';
 import {WS} from './conn.js';
 
 export default (path: string, version = 1): Promise<Readonly<RPCType>> => WS(path).then(ws => {
@@ -12,7 +12,7 @@ export default (path: string, version = 1): Promise<Readonly<RPCType>> => WS(pat
 	window.addEventListener("beforeunload", closer);
 	return Object.freeze({
 		"request": rh.request.bind(rh),
-		"await": rh.await.bind(rh),
+		"await": rh.await.bind(rh) as Await,
 		"close": (...data: any) => {
 			if (rh.close()) {
 				ws.close(...data);
