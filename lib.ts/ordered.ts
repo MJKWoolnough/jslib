@@ -199,7 +199,3 @@ class SortHTML<T extends Item> extends Array<T> {
 }
 
 export {sortHTML, stringSort, noSort};
-export interface SortHTMLType<T extends Item> extends Array<T> {
-	html: Node;
-	update(): void;
-}
