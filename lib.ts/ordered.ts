@@ -26,16 +26,16 @@ const isIndex = (key: string) => {
 	return true;
       },
       fns = {
-	set: <T extends Item>(target: SortHTML<T>, property: string, value: T) => {
+	set: <T extends Item>(target: SortHTML<T>, property: string | number | Symbol, value: T) => {
 		const d = getData(target);
-		if (!isIndex(property) || d.jdi) {
-			target[property as unknown as number] = value;
+		if (d.jdi || property instanceof Symbol || typeof property === "number" && property < 0 || property > target.length || typeof property === "string" && !isIndex(property)) {
+			target[property as number] = value;
 			return true;
 		}
 		if (!(value instanceof Object && value.html instanceof Node)) {
 			throw new TypeError("invalid item object");
 		}
-		const index = parseInt(property);
+		const index = typeof property === "string" ? parseInt(property) : property;
 		if (index < target.length) {
 			if (target[index] === value && sameSort(target, index, d.sortFn, d.reverse)) {
 				return true;
@@ -64,13 +64,15 @@ const isIndex = (key: string) => {
 		target[target.length] = value;
 		return true;
 	},
-	deleteProperty: <T extends Item>(target: SortHTML<T>, property: string) => {
+	deleteProperty: <T extends Item>(target: SortHTML<T>, property: string | number | Symbol) => {
 		const d = getData(target);
-		if (!isIndex(property) || d.jdi) {
-			delete target[property as unknown as number];
-			return true;
+		if (d.jdi || property instanceof Symbol || typeof property === "number" && property < 0 || property > target.length || typeof property === "string" && !isIndex(property)) {
+			delete target[property as number];
+		} else if (typeof property === "string") {
+			remove(target, parseInt(property as string), d);
+		} else {
+			remove(target, property, d);
 		}
-		remove(target, parseInt(property), d);
 		return true;
 	}
       },

@@ -32,14 +32,14 @@ const isIndex = key => {
       fns = {
 	set: (target, property, value) => {
 		const d = getData(target);
-		if (!isIndex(property) || d.jdi) {
+		if (d.jdi || property instanceof Symbol || typeof property === "number" && property < 0 || property > target.length || typeof property === "string" && !isIndex(property)) {
 			target[property] = value;
 			return true;
 		}
 		if (!(value instanceof Object && value.html instanceof Node)) {
 			throw new TypeError("invalid item object");
 		}
-		const index = parseInt(property);
+		const index = typeof property === "string" ? parseInt(property) : property;
 		if (index < target.length) {
 			if (target[index] === value && sameSort(target, index, d.sortFn, d.reverse)) {
 				return true;
@@ -70,11 +70,13 @@ const isIndex = key => {
 	},
 	deleteProperty: (target, property) => {
 		const d = getData(target);
-		if (!isIndex(property) || d.jdi) {
+		if (d.jdi || property instanceof Symbol || typeof property === "number" && property < 0 || property > target.length || typeof property === "string" && !isIndex(property)) {
 			delete target[property];
-			return true;
+		} else if (typeof property === "string") {
+			remove(target, parseInt(property), d);
+		} else {
+			remove(target, property, d);
 		}
-		remove(target, parseInt(property), d);
 		return true;
 	}
       },
