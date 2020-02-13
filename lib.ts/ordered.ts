@@ -28,7 +28,7 @@ const isIndex = (key: string) => {
       fns = {
 	set: <T extends Item>(target: SortHTML<T>, property: string | number | Symbol, value: T) => {
 		const d = getData(target);
-		if (d.jdi || property instanceof Symbol || typeof property === "number" && property < 0 || property > target.length || typeof property === "string" && !isIndex(property)) {
+		if (d.jdi || property instanceof Symbol || typeof property === "string" && !isIndex(property)) {
 			target[property as number] = value;
 			return true;
 		}

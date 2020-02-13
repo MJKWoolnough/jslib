@@ -32,7 +32,7 @@ const isIndex = key => {
       fns = {
 	set: (target, property, value) => {
 		const d = getData(target);
-		if (d.jdi || property instanceof Symbol || typeof property === "number" && property < 0 || property > target.length || typeof property === "string" && !isIndex(property)) {
+		if (d.jdi || property instanceof Symbol || typeof property === "string" && !isIndex(property)) {
 			target[property] = value;
 			return true;
 		}
