@@ -96,7 +96,7 @@ class SortHTML extends Array {
 	}
 	push(element, ...elements) {
 		this[this.length] = element;
-		elements.forEach(e => this.push(e));
+		elements.forEach(e => this[this.length] = e);
 		return this.length;
 	}
 	reverse() {
