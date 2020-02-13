@@ -1,201 +1,396 @@
 "use strict";
 
-type sortFunc = (i: any, j: any) => number;
-
-interface data {
-	parentNode: Node;
-	sortFn: sortFunc;
-	reverse: number;
-	jdi: boolean;
-}
-
-const isIndex = (key: string) => {
-	const i = parseInt(key);
-	return i >= 0 && i.toString() === key
-      },
-      sameSort = (arr: any[], index: number, sortFn: sortFunc, reverse: number) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
-      stringSort = new Intl.Collator().compare,
-      dataSymbol = Symbol("data"),
-      remove = <T extends Item>(target: SortHTML<T>, index: number, data: data) => {
-	data.parentNode.removeChild(target[index].html);
-	for (let i = index; i < target.length - 1; i++) {
-		target[i] = target[i+1];
-	}
-	delete target[target.length-1];
-	target.length--;
-	return true;
-      },
-      fns = {
-	set: <T extends Item>(target: SortHTML<T>, property: string | number | Symbol, value: T) => {
-		const d = getData(target);
-		if (d.jdi || property instanceof Symbol || typeof property === "string" && !isIndex(property)) {
-			target[property as number] = value;
-			return true;
-		}
-		if (!(value instanceof Object && value.html instanceof Node)) {
-			throw new TypeError("invalid item object");
-		}
-		const index = typeof property === "string" ? parseInt(property) : property;
-		if (index < target.length && index >= 0) {
-			if (target[index] === value && sameSort(target, index, d.sortFn, d.reverse)) {
-				return true;
-			}
-			remove(target, index, d);
-		}
-		const oldPos = target.indexOf(value);
-		if (oldPos >= 0) {
-			if (sameSort(target, oldPos, d.sortFn, d.reverse)) {
-				return true;
-			}
-			remove(target, oldPos, d);
-		}
-		let pos = 0;
-		for (; pos < target.length; pos++) {
-			if ((d.sortFn(value, target[pos]) * d.reverse <= 0)) {
-				d.parentNode.insertBefore(value.html, target[pos].html);
-				for (let i = target.length; i > pos; i--) {
-					target[i] = target[i-1];
-				}
-				target[pos] = value;
-				return true;
-			}
-		}
-		d.parentNode.appendChild(value.html);
-		target[target.length] = value;
-		return true;
-	},
-	deleteProperty: <T extends Item>(target: SortHTML<T>, property: string | number | Symbol) => {
-		const d = getData(target);
-		if (d.jdi || property instanceof Symbol || typeof property === "number" && property < 0 || property > target.length || typeof property === "string" && !isIndex(property)) {
-			delete target[property as number];
-		} else if (typeof property === "string") {
-			remove(target, parseInt(property as string), d);
-		} else {
-			remove(target, property, d);
-		}
-		return true;
-	}
-      },
-      reset = <T extends Item>(arr: SortHTML<T>, d: data) => {
-	let nextSibling = arr[arr.length-1].html;
-	if (nextSibling !== d.parentNode.lastChild) {
-		d.parentNode.appendChild(nextSibling);
-	}
-	for (let i = arr.length - 2; i >= 0; i--) {
-		const thisNode = arr[i].html;
-		if (nextSibling.previousSibling !== thisNode) {
-			d.parentNode.insertBefore(thisNode, nextSibling);
-		}
-		nextSibling = thisNode;
-	}
-      },
-      getData = <T extends Item>(arr: SortHTML<T>) => {
-	if (arr.hasOwnProperty(dataSymbol)) {
-		return arr[dataSymbol];
-	}
-	throw new TypeError("invalid SortHTML");
-      },
-      sortHTML = <T extends Item>(parentNode: Node, sortFn: sortFunc = stringSort) => new Proxy(new SortHTML<T>(parentNode, sortFn), fns) as SortHTML<T>,
-      noSort = () => 0;
+type sortFunc<T extends Item> = (a: T, b: T) => number;
 
 interface Item {
 	html: Node;
 }
 
-class SortHTML<T extends Item> extends Array<T> {
-	[dataSymbol]: data;
-	constructor(parentNode: Node, sortFn: sortFunc = stringSort) {
-		super();
-		Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, reverse: 1, jdi: false}});
+type ItemNode<T> = {
+	prev: ItemNode<T> | null;
+	next: ItemNode<T> | null;
+	item: T;
+}
+
+type Root<T extends Item> = {
+	prev: ItemNode<T> | null;
+	next: ItemNode<T> | null;
+	sortFn: sortFunc<T>;
+	parentNode: Node;
+	length: number;
+	reverse: number;
+}
+
+type Callback<T extends Item, U> = (element: T, index: number, array: SortHTML<T>) => U;
+
+export const noSort = () => 0,
+stringSort = new Intl.Collator().compare;
+
+const data = new WeakMap<SortHTML<any>, Root<any>>(),
+      sortNodes = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
+	// TODO
+      };
+
+export class SortHTML<T extends Item> {
+	constructor(parentNode: Node, sortFn: sortFunc<T> = noSort) {
+		data.set(this, {prev: null, next: null, sortFn, parentNode, length: 0, reverse: 1});
+	}
+	get html() {
+		return data.get(this)!.parentNode;
+	}
+	get length() {
+		return data.get(this)!.length;
+	}
+	getItem(index: number) {
+		const root = data.get(this)!;
+		if (index < root.length) {
+			let curr = root.next, pos = 0;
+			while (curr !== null) {
+				if (pos === index) {
+					return curr.item;
+				}
+				pos++;
+				curr = curr.next;
+			}
+		}
+		return undefined;
+	}
+	setItem(index: number, item: T) {
+		const root = data.get(this)!;
+		if (index < root.length) {
+			let curr = root.next, pos = 0;
+			while (curr !== null) {
+				if (pos === index) {
+					root.parentNode.removeChild(curr.item.html);
+					curr.item = item;
+					sortNodes(root, curr);
+				}
+				pos++;
+				curr = curr.next;
+			}
+		}
+	}
+	entries() {
+		const root = data.get(this)!,
+		      entries: [number, T][] = [];
+		let curr = root.next, pos = 0;
+		while (curr !== null) {
+			entries.push([pos, curr.item]);
+			pos++;
+			curr = curr.next;
+		}
+		return entries;
+	}
+	every(callback: Callback<T, any>, thisArg?: any) {
+		const root = data.get(this)!
+		let curr = root.next, index = 0;
+		while (curr !== null) {
+			if (!callback.call(thisArg, curr.item, index, this)) {
+				return false;
+			}
+			index++;
+			curr = curr.next;
+		}
+		return true;
+	}
+	filter(callback: Callback<T, any>, thisArg?: any) {
+		const filter: T[] = [];
+		this.every((item: T, index: number, arr: SortHTML<T>) => {
+			if (callback.call(thisArg, item, index, this)) {
+				arr.push(item);
+			}
+			return true;
+		});
+		return filter;
+	}
+	find(callback: Callback<T, any>, thisArg?: any) {
+		let found: T | undefined;
+		this.every((item: T, index: number, arr: SortHTML<T>) => {
+			if (callback.call(thisArg, item, index, this)) {
+				found = item;
+				return false;
+			}
+			return true;
+		});
+		return found;
+	}
+	findIndex(callback: Callback<T, any>, thisArg?: any) {
+		let found = -1;
+		this.every((item: T, index: number, arr: SortHTML<T>) => {
+			if (callback.call(thisArg, item, index, this)) {
+				found = index;
+				return false;
+			}
+			return true;
+		});
+		return found;
+	}
+	flatMap<U>(callback: Callback<T, U>, thisArg?: any): U[]{
+		return this.map(callback, thisArg).flat();
+	}
+	forEach(callback: Callback<T, void>, thisArg?: any) {
+		const root = data.get(this)!;
+		let curr = root.next, pos = 0;
+		while (curr !== null) {
+			callback.call(thisArg, curr.item, pos++, this);
+			pos++;
+			curr = curr.next;
+		}
+	}
+	includes(valueToFind: T, fromIndex?: number) {
+		const root = data.get(this)!;
+		let curr = root.next;
+		if (fromIndex !== undefined) {
+			for (let i = 0; i < fromIndex; i++) {
+				if (curr === null) {
+					return false;
+				}
+				curr = curr.next;
+			}
+		}
+		while(curr !== null) {
+			if (Object.is(valueToFind, curr.item)) {
+				return true;
+			}
+			curr = curr.next;
+		}
+		return false;
+	}
+	indexOf(searchElement: T, fromIndex?: number) {
+		const root = data.get(this)!;
+		let curr = root.next, pos = 0;
+		if (fromIndex !== undefined) {
+			for (let i = 0; i < fromIndex; i++) {
+				if (curr === null) {
+					return -1;
+				}
+				curr = curr.next;
+				pos++;
+			}
+		}
+		while(curr !== null) {
+			if (Object.is(searchElement, curr.item)) {
+				return pos;
+			}
+			curr = curr.next;
+			pos++;
+		}
+		return -1;
+	}
+	keys() {
+		return Array.from({length: this.length}, (_, n) => n);
+	}
+	lastIndexOf(searchElement: T, fromIndex?: number) {
+		const root = data.get(this)!;
+		let curr = root.prev, pos = root.length - 1;
+		if (fromIndex !== undefined) {
+			for (let i = 0; i < fromIndex; i++) {
+				if (curr === null) {
+					return -1;
+				}
+				curr = curr.prev;
+				pos--;
+			}
+		}
+		while(curr !== null) {
+			if (Object.is(searchElement, curr.item)) {
+				return pos;
+			}
+			curr = curr.prev;
+			pos--;
+		}
+		return -1;
+	}
+	map<U>(callback: Callback<T, U>, thisArg?: any): U[] {
+		const map: U[] = [];
+		this.every((item: T, index: number, arr: SortHTML<T>) => {
+			map.push(callback.call(thisArg, item, index, this));
+			return true;
+		});
+		return map;
+	}
+	pop() {
+		const root = data.get(this)!;
+		if (root.prev === null) {
+			return undefined;
+		}
+		const last = root.prev;
+		root.prev = last.prev;
+		if (last.prev === null) {
+			root.next = null;
+		} else {
+			last.prev.next = null;
+		}
+		root.length--;
+		root.parentNode.removeChild(last.item.html);
+		return last.item;
 	}
 	push(element: T, ...elements: T[]) {
-		this[this.length] = element;
-		elements.forEach(e => this[this.length] = e);
-		return this.length;
+		const root = data.get(this)!;
+		[element, ...elements].forEach(item => {
+			if (root.prev === null) {
+				root.prev = root.next = {prev: null, next: null, item};
+			} else {
+				sortNodes(root, root.prev = root.prev.next = {prev: root.prev, next: null, item});
+			}
+			root.length++;
+		});
+		return root.length;
 	}
 	reverse() {
-		const d = getData(this);
-		d.reverse *= -1;
-		if (this.length > 1) {
-			d.jdi = true;
-			super.reverse();
-			d.jdi = false;
-			reset(this, d);
+		const root = data.get(this)!;
+		[root.prev, root.next] = [root.next, root.prev];
+		let curr = root.next;
+		while (curr !== null) {
+			[curr.next, curr.prev] = [curr.prev, curr.next];
+			root.parentNode.appendChild(curr.item.html);
+			curr = curr.next;
 		}
+		root.reverse *= -1;
 		return this;
 	}
 	shift() {
-		const d = getData(this);
-		d.jdi = true;
-		const i = super.shift() as T;
-		d.jdi = false;
-		if (d.parentNode.firstChild) {
-			d.parentNode.removeChild(i.html);
+		const root = data.get(this)!;
+		if (root.next === null) {
+			return undefined;
 		}
-		return i;
+		const first = root.next;
+		root.next = first.next;
+		if (first.next === null) {
+			root.prev = null;
+		} else {
+			first.next.prev = null;
+		}
+		root.length--;
+		root.parentNode.removeChild(first.item.html);
+		return first;
 	}
-	sort(sortFn: sortFunc) {
-		const d = getData(this);
-		d.sortFn = sortFn;
-		if (this.length > 1) {
-			d.jdi = true;
-			super.sort(sortFn);
-			d.jdi = false;
-			reset(this, d);
+	slice(begin?: number, end?: number) {
+		const root = data.get(this)!;
+		if (begin === undefined) {
+			begin = 0;
+		} else if (begin > root.length) {
+			return [];
+		} else if (begin < 0) {
+			begin += root.length;
+			if (begin < 0) {
+				begin = 0;
+			}
+		}
+		if (end === undefined) {
+			end = root.length;
+		} else if (end < 0) {
+			end += root.length;
+		} else if (end > root.length) {
+			end = root.length;
+		}
+		if (end <= begin) {
+			return [];
+		}
+		let curr = root.next, pos = 0;
+		for (let i = 0; i < begin; i++) {
+			curr = curr!.next;
+		}
+		const slice: T[] = [];
+		for (let i = begin; i < end; i++) {
+			slice.push(curr!.item);
+			curr = curr!.next;
+		}
+		return slice;
+	}
+	some(callback: Callback<T, any>, thisArg?: any) {
+		return !this.every((item: T, index: number, arr: SortHTML<T>) => !callback.call(thisArg, item, index, this));
+	}
+	sort(compareFunction?: sortFunc<T>) {
+		const root = data.get(this)!;
+		if (compareFunction) {
+			root.sortFn = compareFunction;
+		}
+		if (root.length > 0) {
+			let curr = root.next;
+			while (curr !== null) {
+				const next = curr.next;
+				curr.prev = root.prev;
+				curr.next = null;
+				sortNodes(root, root.prev = curr);
+				root.prev.next = curr = next;
+			}
 		}
 		return this;
 	}
-	splice(start: number, deleteCount = Infinity, ...items: T[]) {
-		const l = this.length;
-		if (deleteCount > l - start) {
-			deleteCount = l - start;
+	splice(start: number, deleteCount?: number, ...items: T[]) {
+		const root = data.get(this)!;
+		if (root.length === 0) {
+			return [];
 		}
-		const d = getData(this);
-		for (let i = 0; i < deleteCount; i++) {
-			d.parentNode.removeChild(this[start+i].html);
-		}
-		d.jdi = true;
-		const ret = super.splice(start, deleteCount, ...items);
-		d.jdi = false;
-		if (items.length > 0) {
-			if (start === 0) {
-				if (d.parentNode.childNodes.length === 0) {
-					items.forEach(i => d.parentNode.appendChild(i.html));
-				} else {
-					const f = d.parentNode.firstChild;
-					items.forEach(i => d.parentNode.insertBefore(i.html, f));
-				}
-			} else if (start >= this.length - items.length) {
-				items.forEach(i => d.parentNode.appendChild(i.html));
-			} else {
-				const f = this[start].html;
-				items.forEach(i => d.parentNode.insertBefore(i.html, f));
+		if (start < 0) {
+			start += root.length;
+			if (start < 0) {
+				start = 0;
 			}
 		}
-		return ret;
-	}
-	unshift(item: T, ...items: T[]) {
-		const d = getData(this);
-		d.jdi = true;
-		super.unshift(item, ...items);
-		d.jdi = false;
-		if (d.parentNode.childNodes.length === 0) {
-			[item, ...items].forEach(i => d.parentNode.appendChild(i.html));
-		} else {
-			const f = d.parentNode.firstChild;
-			[item, ...items].forEach(i => d.parentNode.insertBefore(i.html, f));
+		if (deleteCount === undefined || start + deleteCount > root.length) {
+			deleteCount = root.length - start;
 		}
-		return this.length;
+		let curr = root.next, pos = 0;
+		for (let i = 0; i < start; i++) {
+			curr = curr!.next;
+		}
+		const slice: T[] = [];
+		let adder = curr!.prev;
+		for (let i = 0; i < deleteCount; i++) {
+			const next = curr!.next;
+			root.parentNode.removeChild(curr!.item.html);
+			if (curr!.prev) {
+				curr!.prev.next = curr!.next;
+			} else {
+				root.next = curr!.next;
+			}
+			if (curr!.next) {
+				curr!.next.prev = curr!.prev;
+			} else {
+				root.prev = curr!.prev;
+			}
+			curr = next;
+		}
+		items.forEach(item => {
+			if (adder) {
+				if (adder.next) {
+					adder = adder.next.prev = adder.next = {prev: adder, next: adder.next, item}
+				} else {
+					adder = adder.next = root.prev = {prev: adder, next: null, item};
+				}
+			} else {
+				if (root.next) {
+					adder = root.next = root.next.prev = {prev: null, next: root.next, item};
+				} else {
+					adder = root.next = root.prev = {prev: null, next: null, item};
+				}
+			}
+			root.length++;
+		});
+		return [this.getItem(1)];
 	}
-	update() {
-		const d = getData(this);
-		d.jdi = true;
-		super.sort(d.sortFn);
-		d.jdi = false;
-		reset(this, d);
+	unshift(element: T, ...elements: T[]) {
+		const root = data.get(this)!;
+		[element, ...elements].reverse().forEach(item => {
+			if (root.next === null) {
+				root.next = root.prev = {prev: null, next: null, item};
+			} else {
+				sortNodes(root, root.next = root.next.prev = {prev: null, next: root.next, item});
+			}
+			root.length++;
+		});
+		return root.length;
 	}
-	get html():Node {return getData(this).parentNode;}
-	static get [Symbol.species]() {return Array;}
+	values() {
+		const root = data.get(this)!,
+		      values: T[] = [];
+		let curr = root.next;
+		while (curr !== null) {
+			values.push(curr.item);
+			curr = curr.next;
+		}
+		return values;
+	}
 }
-
-export {sortHTML, stringSort, noSort};
