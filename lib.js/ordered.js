@@ -40,7 +40,7 @@ const isIndex = key => {
 			throw new TypeError("invalid item object");
 		}
 		const index = typeof property === "string" ? parseInt(property) : property;
-		if (index < target.length) {
+		if (index < target.length && index >= 0) {
 			if (target[index] === value && sameSort(target, index, d.sortFn, d.reverse)) {
 				return true;
 			}
