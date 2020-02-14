@@ -295,7 +295,7 @@ export class SortHTML<T extends Item> {
 			curr = curr.next;
 		}
 		root.reverse *= -1;
-		return this.slice();
+		return this;
 	}
 	shift(): T | undefined {
 		const root = data.get(this)!,
