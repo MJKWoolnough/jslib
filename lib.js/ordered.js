@@ -1,186 +1,375 @@
 "use strict";
 
-const isIndex = key => {
-	const i = parseInt(key)
-	return parseInt(i) >= 0 && i.toString() === key;
-      },
-      sameSort = (arr, index, sortFn, reverse) => (index === 0 || sortFn(arr[index-1], arr[index]) * reverse >= 0) && (index === arr.length - 1 || sortFn(arr[index], arr[index+1]) * reverse >= 0),
-      stringSort = new Intl.Collator().compare,
-      dataSymbol = Symbol("data"),
-      remove = (target, index, data) => {
-	data.parentNode.removeChild(target[index].html);
-	for (let i = index; i < target.length - 1; i++) {
-		target[i] = target[i+1];
-	}
-	delete target[target.length-1];
-	target.length--;
-	return true;
-      },
-      reset = (arr, d) => {
-	let nextSibling = arr[arr.length-1].html;
-	if (nextSibling !== d.parentNode.lastChild) {
-		d.parentNode.appendChild(nextSibling);
-	}
-	for (let i = arr.length - 2; i >= 0; i--) {
-		const thisNode = arr[i].html;
-		if (nextSibling.previousSibling !== thisNode) {
-			d.parentNode.insertBefore(thisNode, nextSibling);
-		}
-		nextSibling = thisNode;
-	}
-      },
-      fns = {
-	set: (target, property, value) => {
-		const d = getData(target);
-		if (d.jdi || property instanceof Symbol || typeof property === "string" && !isIndex(property)) {
-			target[property] = value;
-			return true;
-		}
-		if (!(value instanceof Object && value.html instanceof Node)) {
-			throw new TypeError("invalid item object");
-		}
-		const index = typeof property === "string" ? parseInt(property) : property;
-		if (index < target.length && index >= 0) {
-			if (target[index] === value && sameSort(target, index, d.sortFn, d.reverse)) {
-				return true;
-			}
-			remove(target, index, d);
-		}
-		const oldPos = target.indexOf(value);
-		if (oldPos >= 0) {
-			if (sameSort(target, oldPos, d.sortFn, d.reverse)) {
-				return true;
-			}
-			remove(target, oldPos, d);
-		}
-		let pos = 0;
-		for (; pos < target.length; pos++) {
-			if ((d.sortFn(value, target[pos]) * d.reverse <= 0)) {
-				d.parentNode.insertBefore(value.html, target[pos].html);
-				for (let i = target.length; i > pos; i--) {
-					target[i] = target[i-1];
-				}
-				target[pos] = value;
-				return true;
-			}
-		}
-		d.parentNode.appendChild(value.html);
-		target[target.length] = value;
-		return true;
-	},
-	deleteProperty: (target, property) => {
-		const d = getData(target);
-		if (d.jdi || property instanceof Symbol || typeof property === "number" && property < 0 || property > target.length || typeof property === "string" && !isIndex(property)) {
-			delete target[property];
-		} else if (typeof property === "string") {
-			remove(target, parseInt(property), d);
-		} else {
-			remove(target, property, d);
-		}
-		return true;
-	}
-      },
-      getData = arr => {
-	if (arr.hasOwnProperty(dataSymbol)) {
-		return arr[dataSymbol];
-	}
-	throw new TypeError("invalid SortHTML");
-      },
-      sortHTML = (parentNode, sortFn = stringSort) =>  new Proxy(new SortHTML(parentNode, sortFn), fns),
-      noSort = () => 0;
+export const noSort = () => 0,
+stringSort = new Intl.Collator().compare;
 
-class SortHTML extends Array {
-	constructor(parentNode, sortFn = stringSort) {
-		super();
-		Object.defineProperty(this, dataSymbol, {value: {parentNode, sortFn, reverse: 1, jdi: false}});
+const data = new WeakMap(),
+      sortNodes = (root, node) => {
+	while (node.prev && root.sortFn(node.item, node.prev.item) < 0) {
+		const pp = node.prev.prev;
+		node.prev.next = node.next;
+		node.next = node.prev;
+		node.prev.prev = node;
+		node.prev = pp;
+	}
+	while (node.next && root.sortFn(node.item, node.next.item) > 0) {
+		const nn = node.next.next;
+		node.next.prev = node.prev;
+		node.prev = node.next;
+		node.next.next = node;
+		node.next = nn;
+	}
+	if (node.next) {
+		root.parentNode.insertBefore(node.item.html, node.next.item.html);
+	} else {
+		root.parentNode.appendChild(node.item.html);
+		root.prev = node;
+	}
+	if (!node.prev) {
+		root.next = node;
+	}
+      },
+      getNode = (root, index) => {
+	if (index < 0) {
+		let curr = root.prev, pos = index;
+		while (curr) {
+			if (pos === 0) {
+				return curr;
+			}
+			pos++;
+			curr = curr.prev;
+		}
+	} else if (index < root.length) {
+		let curr = root.next, pos = index;
+		while (curr) {
+			if (pos === 0) {
+				return curr;
+			}
+			pos--;
+			curr = curr.next;
+		}
+	}
+	return null;
+      },
+      removeNode = (root, node) => {
+	if (node.prev) {
+		node.prev.next = node.next;
+	} else {
+		root.next = node.next;
+	}
+	if (node.next) {
+		node.next.prev = node.prev;
+	} else {
+		root.prev = node.prev;
+	}
+	root.parentNode.removeChild(node.item.html);
+	root.length--;
+      };
+
+export class SortHTML {
+	constructor(parentNode, sortFn = noSort) {
+		data.set(this, {prev: null, next: null, sortFn, parentNode, length: 0, reverse: 1});
+	}
+	get html() {
+		return data.get(this).parentNode;
+	}
+	get length() {
+		return data.get(this).length;
+	}
+	getItem(index) {
+		const node = getNode(data.get(this), index);
+		if (node) {
+			return node.item;
+		}
+		return undefined;
+	}
+	setItem(index, item) {
+		const root = data.get(this);
+		if (index < root.length) {
+			const node = getNode(root, index);
+			root.parentNode.removeChild(node.item.html);
+			node.item = item;
+			sortNodes(root, node);
+		} else {
+			this.push(item);
+		}
+	}
+	*entries() {
+		const root = data.get(this);
+		let curr = root.next, pos = 0;
+		while (curr) {
+			yield([pos, curr.item]);
+			pos++;
+			curr = curr.next;
+		}
+	}
+	every(callback, thisArg) {
+		const root = data.get(this);
+		let curr = root.next, index = 0;
+		while (curr) {
+			if (!callback.call(thisArg, curr.item, index, this)) {
+				return false;
+			}
+			index++;
+			curr = curr.next;
+		}
+		return true;
+	}
+	filter(callback, thisArg) {
+		const filter = [];
+		this.every((item, index, arr) => {
+			if (callback.call(thisArg, item, index, this)) {
+				arr.push(item);
+			}
+			return true;
+		});
+		return filter;
+	}
+	find(callback, thisArg) {
+		let found;
+		this.every((item, index, arr) => {
+			if (callback.call(thisArg, item, index, this)) {
+				found = item;
+				return false;
+			}
+			return true;
+		});
+		return found;
+	}
+	findIndex(callback, thisArg) {
+		let found = -1;
+		this.every((item, index, arr) => {
+			if (callback.call(thisArg, item, index, this)) {
+				found = index;
+				return false;
+			}
+			return true;
+		});
+		return found;
+	}
+	flatMap(callback, thisArg) {
+		return this.map(callback, thisArg).flat();
+	}
+	forEach(callback, thisArg) {
+		const root = data.get(this);
+		let curr = root.next, pos = 0;
+		while (curr) {
+			callback.call(thisArg, curr.item, pos++, this);
+			pos++;
+			curr = curr.next;
+		}
+	}
+	includes(valueToFind, fromIndex) {
+		const root = data.get(this);
+		let curr = fromIndex === undefined ? root.next : getNode(root, fromIndex);
+		while(curr) {
+			if (Object.is(valueToFind, curr.item)) {
+				return true;
+			}
+			curr = curr.next;
+		}
+		return false;
+	}
+	indexOf(searchElement, fromIndex) {
+		const root = data.get(this);
+		let curr = fromIndex === undefined ? root.next : getNode(root, fromIndex),
+		    pos = fromIndex === undefined ? 0 : fromIndex;
+		while(curr) {
+			if (Object.is(searchElement, curr.item)) {
+				return pos;
+			}
+			curr = curr.next;
+			pos++;
+		}
+		return -1;
+	}
+	*keys() {
+		const root = data.get(this);
+		for (let i = 0; i < root.length; i++) {
+			yield i;
+		}
+	}
+	lastIndexOf(searchElement, fromIndex) {
+		const root = data.get(this);
+		let curr = fromIndex === undefined ? root.prev : getNode(root, fromIndex),
+		    pos = fromIndex === undefined ? root.length - 1 : fromIndex;
+		while(curr) {
+			if (Object.is(searchElement, curr.item)) {
+				return pos;
+			}
+			curr = curr.prev;
+			pos--;
+		}
+		return -1;
+	}
+	map(callback, thisArg) {
+		const map = [];
+		this.every((item, index, arr) => {
+			map.push(callback.call(thisArg, item, index, this));
+			return true;
+		});
+		return map;
+	}
+	pop() {
+		const root = data.get(this),
+		      last = root.prev;
+		if (last) {
+			removeNode(root, last);
+			return last.item;
+		}
+		return undefined;
 	}
 	push(element, ...elements) {
-		this[this.length] = element;
-		elements.forEach(e => this[this.length] = e);
-		return this.length;
+		const root = data.get(this);
+		[element, ...elements].forEach(item => {
+			if (root.prev) {
+				sortNodes(root, root.prev = root.prev.next = {prev: root.prev, next: null, item});
+			} else {
+				root.prev = root.next = {prev: null, next: null, item};
+				root.parentNode.appendChild(item.html);
+			}
+			root.length++;
+		});
+		return root.length;
+	}
+	reduce(callbackfn, initialValue) {
+		const root = data.get(this);
+		let curr = root.next, pos = 0;
+		while(curr) {
+			if (initialValue === undefined) {
+				initialValue = curr.item;
+			} else {
+				initialValue = callbackfn(initialValue, curr.item, pos, this);
+			}
+			curr = curr.next;
+			pos++;
+		}
+		return initialValue;
+	}
+	reduceRight(callbackfn, initialValue) {
+		const root = data.get(this);
+		let curr = root.prev, pos = root.length;
+		while(curr) {
+			pos--;
+			if (initialValue === undefined) {
+				initialValue = curr.item;
+			} else {
+				initialValue = callbackfn(initialValue, curr.item, pos, this);
+			}
+			curr = curr.prev;
+		}
+		return initialValue;
 	}
 	reverse() {
-		const d = getData(this);
-		d.reverse *= -1;
-		if (this.length > 1) {
-			d.jdi = true;
-			super.reverse();
-			d.jdi = false;
-			reset(this, d);
+		const root = data.get(this);
+		[root.prev, root.next] = [root.next, root.prev];
+		let curr = root.next;
+		while (curr) {
+			[curr.next, curr.prev] = [curr.prev, curr.next];
+			root.parentNode.appendChild(curr.item.html);
+			curr = curr.next;
 		}
-		return this;
+		root.reverse *= -1;
+		return this.slice();
 	}
 	shift() {
-		const d = getData(this);
-		d.jdi = true;
-		const i = super.shift();
-		d.jdi = false;
-		if (d.parentNode.firstChild) {
-			d.parentNode.removeChild(i.html);
+		const root = data.get(this),
+		      first = root.next;
+		if (first) {
+			removeNode(root, first);
+			return first.item;
 		}
-		return i;
+		return undefined;
 	}
-	sort(sortFn) {
-		const d = getData(this);
-		d.sortFn = sortFn;
-		if (this.length > 1) {
-			d.jdi = true;
-			super.sort(sortFn);
-			d.jdi = false;
-			reset(this, d);
+	slice(begin, end) {
+		const root = data.get(this),
+		      slice = [];
+		if (end === undefined) {
+			end = root.length;
+		} else if (end < 0) {
+			end += root.length;
+		}
+		let curr = begin === undefined ? root.next : getNode(root, begin),
+		    pos = begin === undefined ? 0 : begin;
+		while (curr && pos < end) {
+			slice.push(curr.item);
+			pos++;
+			curr = curr.next;
+		}
+		return slice;
+	}
+	some(callback, thisArg) {
+		return !this.every((item, index, arr) => !callback.call(thisArg, item, index, this));
+	}
+	sort(compareFunction) {
+		const root = data.get(this);
+		if (compareFunction) {
+			root.sortFn = compareFunction;
+		}
+		if (root.length > 0) {
+			let curr = root.next;
+			while (curr) {
+				const next = curr.next;
+				curr.prev = root.prev;
+				curr.next = null;
+				sortNodes(root, root.prev = curr);
+				root.prev.next = curr = next;
+			}
 		}
 		return this;
 	}
-	splice(start, deleteCount = Infinity, ...items) {
-		if (deleteCount > this.length - start) {
-			deleteCount = this.length - start;
-		}
-		const d = getData(this);
-		for (let i = 0; i < deleteCount; i++) {
-			d.parentNode.removeChild(this[start+i].html);
-		}
-		d.jdi = true;
-		const ret = super.splice(start, deleteCount, ...items);
-		d.jdi = false;
-		if (items.length > 0) {
-			if (start === 0) {
-				if (d.parentNode.childNodes.length === 0) {
-					items.forEach(i => d.parentNode.appendChild(i.html));
-				} else {
-					const f = d.parentNode.firstChild;
-					items.forEach(i => d.parentNode.insertBefore(i.html, f));
-				}
-			} else if (start >= this.length - items.length) {
-				items.forEach(i => d.parentNode.appendChild(i.html));
-			} else {
-				const f = this[start].html;
-				items.forEach(i => d.parentNode.insertBefore(i.html, f));
+	splice(start, deleteCount, ...items) {
+		const root = data.get(this), removed = [];
+		let startNode = getNode(root, start),
+		    addFrom = startNode ? startNode.prev : null;
+		if (startNode && deleteCount) {
+			let curr = startNode.next;
+			while (curr && deleteCount > 0) {
+				removed.push(curr.item);
+				removeNode(root, curr);
+				deleteCount--;
+				curr = curr.next;
 			}
 		}
-		return ret;
+		items.forEach(item => {
+			if (addFrom) {
+				if (addFrom.next) {
+					sortNodes(root, addFrom = addFrom.next.prev = addFrom.next = {prev: addFrom, next: addFrom.next, item})
+				} else {
+					sortNodes(root, addFrom = addFrom.next = root.prev = {prev: addFrom, next: null, item});
+				}
+			} else {
+				if (root.next) {
+					sortNodes(root, addFrom = root.next = root.next.prev = {prev: null, next: root.next, item});
+				} else {
+					sortNodes(root, addFrom = root.next = root.prev = {prev: null, next: null, item});
+				}
+			}
+			root.length++;
+		});
+		return removed;
 	}
-	unshift(item, ...items) {
-		const d = getData(this);
-		d.jdi = true;
-		super.unshift(item, ...items);
-		d.jdi = false;
-		if (d.parentNode.childNodes.length === 0) {
-			[item, ...items].forEach(i => d.parentNode.appendChild(i.html));
-		} else {
-			const f = d.parentNode.firstChild;
-			[item, ...items].forEach(i => d.parentNode.insertBefore(i.html, f));
+	unshift(element, ...elements) {
+		const root = data.get(this);
+		[element, ...elements].reverse().forEach(item => {
+			if (root.next) {
+				sortNodes(root, root.next = root.next.prev = {prev: null, next: root.next, item});
+			} else {
+				root.next = root.prev = {prev: null, next: null, item};
+			}
+			root.length++;
+		});
+		return root.length;
+	}
+	*values() {
+		const root = data.get(this);
+		let curr = root.next;
+		while (curr) {
+			yield curr.item;
+			curr = curr.next;
 		}
-		return this.length;
 	}
-	update() {
-		const d = getData(this);
-		d.jdi = true;
-		super.sort(d.sortFn);
-		d.jdi = false;
-		reset(this, d);
+	[Symbol.iterator]() {
+		return this.values();
 	}
-	get html() {return getData(this).parentNode;}
-	static get [Symbol.species]() {return Array;}
 }
-
-export {sortHTML, stringSort, noSort};
