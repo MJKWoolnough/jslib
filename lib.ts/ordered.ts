@@ -28,14 +28,14 @@ stringSort = new Intl.Collator().compare;
 
 const data = new WeakMap<SortHTML<any>, Root<any>>(),
       sortNodes = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
-	while (node.prev && root.sortFn(node.item, node.prev.item) < 0) {
+	while (node.prev && root.sortFn(node.item, node.prev.item) * root.reverse < 0) {
 		const pp = node.prev.prev;
 		node.prev.next = node.next;
 		node.next = node.prev;
 		node.prev.prev = node;
 		node.prev = pp;
 	}
-	while (node.next && root.sortFn(node.item, node.next.item) > 0) {
+	while (node.next && root.sortFn(node.item, node.next.item) * root.reverse > 0) {
 		const nn = node.next.next;
 		node.next.prev = node.prev;
 		node.prev = node.next;
@@ -289,12 +289,12 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!;
 		[root.prev, root.next] = [root.next, root.prev];
 		let curr = root.next;
+		root.reverse *= -1;
 		while (curr) {
 			[curr.next, curr.prev] = [curr.prev, curr.next];
 			root.parentNode.appendChild(curr.item.html);
 			curr = curr.next;
 		}
-		root.reverse *= -1;
 		return this;
 	}
 	shift(): T | undefined {
@@ -330,6 +330,7 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!;
 		if (compareFunction) {
 			root.sortFn = compareFunction;
+			root.reverse = 1;
 		}
 		if (root.length > 0) {
 			let curr = root.next;
