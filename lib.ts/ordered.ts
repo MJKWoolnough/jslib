@@ -332,14 +332,16 @@ export class SortHTML<T extends Item> {
 			root.sortFn = compareFunction;
 			root.reverse = 1;
 		}
-		if (root.length > 0) {
-			let curr = root.next;
+		if (root.next) {
+			let curr = root.next.next;
+			root.prev = root.next;
+			root.next.next = null;
 			while (curr) {
 				const next = curr.next;
 				curr.prev = root.prev;
 				curr.next = null;
-				sortNodes(root, root.prev = curr);
-				root.prev.next = curr = next;
+				sortNodes(root, curr.prev.next = root.prev = curr);
+				curr = next;
 			}
 		}
 		return this;
