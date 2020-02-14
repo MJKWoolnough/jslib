@@ -28,7 +28,29 @@ stringSort = new Intl.Collator().compare;
 
 const data = new WeakMap<SortHTML<any>, Root<any>>(),
       sortNodes = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
-	// TODO
+	while (node.prev && root.sortFn(node.item, node.prev.item) < 0) {
+		const pp = node.prev.prev;
+		node.prev.next = node.next;
+		node.next = node.prev;
+		node.prev.prev = node;
+		node.prev = pp;
+	}
+	while (node.next && root.sortFn(node.item, node.next.item) > 0) {
+		const nn = node.next.next;
+		node.next.prev = node.prev;
+		node.prev = node.next;
+		node.next.next = node;
+		node.next = nn;
+	}
+	if (node.next) {
+		root.parentNode.insertBefore(node.item.html, node.next.item.html);
+	} else {
+		root.parentNode.appendChild(node.item.html);
+		root.prev = node;
+	}
+	if (!node.prev) {
+		root.next = node;
+	}
       },
       getNode = <T extends Item>(root: Root<T>, index: number) => {
 	if (index < 0) {
