@@ -29,6 +29,42 @@ stringSort = new Intl.Collator().compare;
 const data = new WeakMap<SortHTML<any>, Root<any>>(),
       sortNodes = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
 	// TODO
+      },
+      getNode = <T extends Item>(root: Root<T>, index: number) => {
+	if (index < 0) {
+		let curr = root.prev, pos = index;
+		while (curr) {
+			if (pos === 0) {
+				return curr;
+			}
+			pos++;
+			curr = curr.prev;
+		}
+	} else if (index < root.length) {
+		let curr = root.next, pos = index;
+		while (curr) {
+			if (pos === 0) {
+				return curr;
+			}
+			pos--;
+			curr = curr.next;
+		}
+	}
+	return null;
+      },
+      removeNode = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
+	if (node.prev) {
+		node.prev.next = node.next;
+	} else {
+		root.next = node.next;
+	}
+	if (node.next) {
+		node.next.prev = node.prev;
+	} else {
+		root.prev = node.prev;
+	}
+	root.parentNode.removeChild(node.item.html);
+	root.length--;
       };
 
 export class SortHTML<T extends Item> {
@@ -42,32 +78,21 @@ export class SortHTML<T extends Item> {
 		return data.get(this)!.length;
 	}
 	getItem(index: number) {
-		const root = data.get(this)!;
-		if (index < root.length) {
-			let curr = root.next, pos = 0;
-			while (curr !== null) {
-				if (pos === index) {
-					return curr.item;
-				}
-				pos++;
-				curr = curr.next;
-			}
+		const node = getNode(data.get(this)!, index);
+		if (node) {
+			return node.item;
 		}
 		return undefined;
 	}
 	setItem(index: number, item: T) {
 		const root = data.get(this)!;
 		if (index < root.length) {
-			let curr = root.next, pos = 0;
-			while (curr !== null) {
-				if (pos === index) {
-					root.parentNode.removeChild(curr.item.html);
-					curr.item = item;
-					sortNodes(root, curr);
-				}
-				pos++;
-				curr = curr.next;
-			}
+			const node = getNode(root, index)!;
+			root.parentNode.removeChild(node.item.html);
+			node.item = item;
+			sortNodes(root, node);
+		} else {
+			this.push(item);
 		}
 	}
 	entries() {
@@ -139,15 +164,7 @@ export class SortHTML<T extends Item> {
 	}
 	includes(valueToFind: T, fromIndex?: number) {
 		const root = data.get(this)!;
-		let curr = root.next;
-		if (fromIndex !== undefined) {
-			for (let i = 0; i < fromIndex; i++) {
-				if (curr === null) {
-					return false;
-				}
-				curr = curr.next;
-			}
-		}
+		let curr = fromIndex === undefined ? root.next : getNode(root, fromIndex);
 		while(curr !== null) {
 			if (Object.is(valueToFind, curr.item)) {
 				return true;
@@ -158,16 +175,8 @@ export class SortHTML<T extends Item> {
 	}
 	indexOf(searchElement: T, fromIndex?: number) {
 		const root = data.get(this)!;
-		let curr = root.next, pos = 0;
-		if (fromIndex !== undefined) {
-			for (let i = 0; i < fromIndex; i++) {
-				if (curr === null) {
-					return -1;
-				}
-				curr = curr.next;
-				pos++;
-			}
-		}
+		let curr = fromIndex === undefined ? root.next : getNode(root, fromIndex),
+		    pos = fromIndex === undefined ? 0 : fromIndex;
 		while(curr !== null) {
 			if (Object.is(searchElement, curr.item)) {
 				return pos;
@@ -182,16 +191,8 @@ export class SortHTML<T extends Item> {
 	}
 	lastIndexOf(searchElement: T, fromIndex?: number) {
 		const root = data.get(this)!;
-		let curr = root.prev, pos = root.length - 1;
-		if (fromIndex !== undefined) {
-			for (let i = 0; i < fromIndex; i++) {
-				if (curr === null) {
-					return -1;
-				}
-				curr = curr.prev;
-				pos--;
-			}
-		}
+		let curr = fromIndex === undefined ? root.prev : getNode(root, fromIndex),
+		    pos = fromIndex === undefined ? root.length - 1 : fromIndex;
 		while(curr !== null) {
 			if (Object.is(searchElement, curr.item)) {
 				return pos;
@@ -210,19 +211,12 @@ export class SortHTML<T extends Item> {
 		return map;
 	}
 	pop() {
-		const root = data.get(this)!;
-		if (root.prev === null) {
+		const root = data.get(this)!,
+		      last = root.prev;
+		if (last === null) {
 			return undefined;
 		}
-		const last = root.prev;
-		root.prev = last.prev;
-		if (last.prev === null) {
-			root.next = null;
-		} else {
-			last.prev.next = null;
-		}
-		root.length--;
-		root.parentNode.removeChild(last.item.html);
+		removeNode(root, last);
 		return last.item;
 	}
 	push(element: T, ...elements: T[]) {
@@ -230,6 +224,7 @@ export class SortHTML<T extends Item> {
 		[element, ...elements].forEach(item => {
 			if (root.prev === null) {
 				root.prev = root.next = {prev: null, next: null, item};
+				root.parentNode.appendChild(item.html);
 			} else {
 				sortNodes(root, root.prev = root.prev.next = {prev: root.prev, next: null, item});
 			}
@@ -250,51 +245,28 @@ export class SortHTML<T extends Item> {
 		return this;
 	}
 	shift() {
-		const root = data.get(this)!;
-		if (root.next === null) {
+		const root = data.get(this)!,
+		      first = root.next;
+		if (first === null) {
 			return undefined;
 		}
-		const first = root.next;
-		root.next = first.next;
-		if (first.next === null) {
-			root.prev = null;
-		} else {
-			first.next.prev = null;
-		}
-		root.length--;
-		root.parentNode.removeChild(first.item.html);
+		removeNode(root, first);
 		return first;
 	}
 	slice(begin?: number, end?: number) {
-		const root = data.get(this)!;
-		if (begin === undefined) {
-			begin = 0;
-		} else if (begin > root.length) {
-			return [];
-		} else if (begin < 0) {
-			begin += root.length;
-			if (begin < 0) {
-				begin = 0;
-			}
-		}
+		const root = data.get(this)!,
+		      slice: T[] = [];
 		if (end === undefined) {
 			end = root.length;
 		} else if (end < 0) {
 			end += root.length;
-		} else if (end > root.length) {
-			end = root.length;
 		}
-		if (end <= begin) {
-			return [];
-		}
-		let curr = root.next, pos = 0;
-		for (let i = 0; i < begin; i++) {
-			curr = curr!.next;
-		}
-		const slice: T[] = [];
-		for (let i = begin; i < end; i++) {
-			slice.push(curr!.item);
-			curr = curr!.next;
+		let curr = begin === undefined ? root.next : getNode(root, begin),
+		    pos = begin === undefined ? 0 : begin;
+		while (curr !== null && pos < end) {
+			slice.push(curr.item);
+			pos--;
+			curr = curr.next;
 		}
 		return slice;
 	}
@@ -320,51 +292,28 @@ export class SortHTML<T extends Item> {
 	}
 	splice(start: number, deleteCount?: number, ...items: T[]) {
 		const root = data.get(this)!;
-		if (root.length === 0) {
-			return [];
-		}
-		if (start < 0) {
-			start += root.length;
-			if (start < 0) {
-				start = 0;
+		let startNode = getNode(root, start),
+		    addFrom = startNode ? startNode.prev : null;
+		if (startNode !== null && deleteCount !== undefined) {
+			let curr = startNode.next;
+			while (curr !== null && deleteCount > 0) {
+				removeNode(root, curr);
+				deleteCount--;
+				curr = curr.next;
 			}
-		}
-		if (deleteCount === undefined || start + deleteCount > root.length) {
-			deleteCount = root.length - start;
-		}
-		let curr = root.next, pos = 0;
-		for (let i = 0; i < start; i++) {
-			curr = curr!.next;
-		}
-		const slice: T[] = [];
-		let adder = curr!.prev;
-		for (let i = 0; i < deleteCount; i++) {
-			const next = curr!.next;
-			root.parentNode.removeChild(curr!.item.html);
-			if (curr!.prev) {
-				curr!.prev.next = curr!.next;
-			} else {
-				root.next = curr!.next;
-			}
-			if (curr!.next) {
-				curr!.next.prev = curr!.prev;
-			} else {
-				root.prev = curr!.prev;
-			}
-			curr = next;
 		}
 		items.forEach(item => {
-			if (adder) {
-				if (adder.next) {
-					adder = adder.next.prev = adder.next = {prev: adder, next: adder.next, item}
+			if (addFrom) {
+				if (addFrom.next) {
+					sortNodes(root, addFrom = addFrom.next.prev = addFrom.next = {prev: addFrom, next: addFrom.next, item})
 				} else {
-					adder = adder.next = root.prev = {prev: adder, next: null, item};
+					sortNodes(root, addFrom = addFrom.next = root.prev = {prev: addFrom, next: null, item});
 				}
 			} else {
 				if (root.next) {
-					adder = root.next = root.next.prev = {prev: null, next: root.next, item};
+					sortNodes(root, addFrom = root.next = root.next.prev = {prev: null, next: root.next, item});
 				} else {
-					adder = root.next = root.prev = {prev: null, next: null, item};
+					sortNodes(root, addFrom = root.next = root.prev = {prev: null, next: null, item});
 				}
 			}
 			root.length++;
