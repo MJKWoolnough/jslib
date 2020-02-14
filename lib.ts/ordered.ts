@@ -127,7 +127,7 @@ export class SortHTML<T extends Item> {
 		}
 	}
 	every(callback: Callback<T, any, this>, thisArg?: any) {
-		const root = data.get(this)!
+		const root = data.get(this)!;
 		let curr = root.next, index = 0;
 		while (curr) {
 			if (!callback.call(thisArg, curr.item, index, this)) {
@@ -137,9 +137,6 @@ export class SortHTML<T extends Item> {
 			curr = curr.next;
 		}
 		return true;
-	}
-	fill(value: T, start?: number, end?: number): this {
-		throw new Error("");
 	}
 	filter(callback: Callback<T, any, this>, thisArg?: any) {
 		const filter: T[] = [];
@@ -173,10 +170,7 @@ export class SortHTML<T extends Item> {
 		});
 		return found;
 	}
-	flat(depth?: number) {
-		return this.slice();
-	}
-	flatMap<U>(callback: Callback<T, U, this>, thisArg?: any): U[]{
+	flatMap<U>(callback: Callback<T, U, this>, thisArg?: any): U[] {
 		return this.map(callback, thisArg).flat();
 	}
 	forEach(callback: Callback<T, void, this>, thisArg?: any) {
@@ -211,9 +205,6 @@ export class SortHTML<T extends Item> {
 			pos++;
 		}
 		return -1;
-	}
-	join(seperator?: string): string {
-		return "";
 	}
 	*keys() {
 		const root = data.get(this)!;
