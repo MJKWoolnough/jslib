@@ -93,13 +93,13 @@ export class SortHTML<T extends Item> {
 	constructor(parentNode: Node, sortFn: sortFunc<T> = noSort) {
 		data.set(this, {prev: null, next: null, sortFn, parentNode, length: 0, reverse: 1});
 	}
-	get html() {
+	get html(): Node {
 		return data.get(this)!.parentNode;
 	}
 	get length(): number {
 		return data.get(this)!.length;
 	}
-	getItem(index: number) {
+	getItem(index: number): T | undefined {
 		const node = getNode(data.get(this)!, index);
 		if (node) {
 			return node.item;
