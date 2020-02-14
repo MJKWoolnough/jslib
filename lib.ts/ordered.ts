@@ -99,7 +99,7 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!,
 		      entries: [number, T][] = [];
 		let curr = root.next, pos = 0;
-		while (curr !== null) {
+		while (curr) {
 			entries.push([pos, curr.item]);
 			pos++;
 			curr = curr.next;
@@ -109,7 +109,7 @@ export class SortHTML<T extends Item> {
 	every(callback: Callback<T, any>, thisArg?: any) {
 		const root = data.get(this)!
 		let curr = root.next, index = 0;
-		while (curr !== null) {
+		while (curr) {
 			if (!callback.call(thisArg, curr.item, index, this)) {
 				return false;
 			}
@@ -156,7 +156,7 @@ export class SortHTML<T extends Item> {
 	forEach(callback: Callback<T, void>, thisArg?: any) {
 		const root = data.get(this)!;
 		let curr = root.next, pos = 0;
-		while (curr !== null) {
+		while (curr) {
 			callback.call(thisArg, curr.item, pos++, this);
 			pos++;
 			curr = curr.next;
@@ -165,7 +165,7 @@ export class SortHTML<T extends Item> {
 	includes(valueToFind: T, fromIndex?: number) {
 		const root = data.get(this)!;
 		let curr = fromIndex === undefined ? root.next : getNode(root, fromIndex);
-		while(curr !== null) {
+		while(curr) {
 			if (Object.is(valueToFind, curr.item)) {
 				return true;
 			}
@@ -177,7 +177,7 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!;
 		let curr = fromIndex === undefined ? root.next : getNode(root, fromIndex),
 		    pos = fromIndex === undefined ? 0 : fromIndex;
-		while(curr !== null) {
+		while(curr) {
 			if (Object.is(searchElement, curr.item)) {
 				return pos;
 			}
@@ -193,7 +193,7 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!;
 		let curr = fromIndex === undefined ? root.prev : getNode(root, fromIndex),
 		    pos = fromIndex === undefined ? root.length - 1 : fromIndex;
-		while(curr !== null) {
+		while(curr) {
 			if (Object.is(searchElement, curr.item)) {
 				return pos;
 			}
@@ -213,20 +213,20 @@ export class SortHTML<T extends Item> {
 	pop() {
 		const root = data.get(this)!,
 		      last = root.prev;
-		if (last === null) {
-			return undefined;
+		if (last) {
+			removeNode(root, last);
+			return last.item;
 		}
-		removeNode(root, last);
-		return last.item;
+		return undefined;
 	}
 	push(element: T, ...elements: T[]) {
 		const root = data.get(this)!;
 		[element, ...elements].forEach(item => {
-			if (root.prev === null) {
+			if (root.prev) {
+				sortNodes(root, root.prev = root.prev.next = {prev: root.prev, next: null, item});
+			} else {
 				root.prev = root.next = {prev: null, next: null, item};
 				root.parentNode.appendChild(item.html);
-			} else {
-				sortNodes(root, root.prev = root.prev.next = {prev: root.prev, next: null, item});
 			}
 			root.length++;
 		});
@@ -236,7 +236,7 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!;
 		[root.prev, root.next] = [root.next, root.prev];
 		let curr = root.next;
-		while (curr !== null) {
+		while (curr) {
 			[curr.next, curr.prev] = [curr.prev, curr.next];
 			root.parentNode.appendChild(curr.item.html);
 			curr = curr.next;
@@ -247,11 +247,11 @@ export class SortHTML<T extends Item> {
 	shift() {
 		const root = data.get(this)!,
 		      first = root.next;
-		if (first === null) {
-			return undefined;
+		if (first) {
+			removeNode(root, first);
+			return first;
 		}
-		removeNode(root, first);
-		return first;
+		return undefined;
 	}
 	slice(begin?: number, end?: number) {
 		const root = data.get(this)!,
@@ -263,9 +263,9 @@ export class SortHTML<T extends Item> {
 		}
 		let curr = begin === undefined ? root.next : getNode(root, begin),
 		    pos = begin === undefined ? 0 : begin;
-		while (curr !== null && pos < end) {
+		while (curr && pos < end) {
 			slice.push(curr.item);
-			pos--;
+			pos++;
 			curr = curr.next;
 		}
 		return slice;
@@ -280,7 +280,7 @@ export class SortHTML<T extends Item> {
 		}
 		if (root.length > 0) {
 			let curr = root.next;
-			while (curr !== null) {
+			while (curr) {
 				const next = curr.next;
 				curr.prev = root.prev;
 				curr.next = null;
@@ -294,9 +294,9 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!;
 		let startNode = getNode(root, start),
 		    addFrom = startNode ? startNode.prev : null;
-		if (startNode !== null && deleteCount !== undefined) {
+		if (startNode && deleteCount) {
 			let curr = startNode.next;
-			while (curr !== null && deleteCount > 0) {
+			while (curr && deleteCount > 0) {
 				removeNode(root, curr);
 				deleteCount--;
 				curr = curr.next;
@@ -323,10 +323,10 @@ export class SortHTML<T extends Item> {
 	unshift(element: T, ...elements: T[]) {
 		const root = data.get(this)!;
 		[element, ...elements].reverse().forEach(item => {
-			if (root.next === null) {
-				root.next = root.prev = {prev: null, next: null, item};
-			} else {
+			if (root.next) {
 				sortNodes(root, root.next = root.next.prev = {prev: null, next: root.next, item});
+			} else {
+				root.next = root.prev = {prev: null, next: null, item};
 			}
 			root.length++;
 		});
@@ -336,7 +336,7 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!,
 		      values: T[] = [];
 		let curr = root.next;
-		while (curr !== null) {
+		while (curr) {
 			values.push(curr.item);
 			curr = curr.next;
 		}
