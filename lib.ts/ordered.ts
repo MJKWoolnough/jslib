@@ -127,59 +127,44 @@ export class SortHTML<T extends Item> {
 		}
 	}
 	every(callback: Callback<T, any, this>, thisArg?: any) {
-		const root = data.get(this)!;
-		let curr = root.first, index = 0;
-		while (curr) {
-			if (!callback.call(thisArg, curr.item, index, this)) {
+		for (const [index, item] of this.entries()) {
+			if (!callback.call(thisArg, item, index, this)) {
 				return false;
 			}
-			index++;
-			curr = curr.next;
 		}
 		return true;
 	}
 	filter(callback: Callback<T, any, this>, thisArg?: any) {
 		const filter: T[] = [];
-		this.every((item: T, index: number, arr: SortHTML<T>) => {
+		for (const [index, item] of this.entries()) {
 			if (callback.call(thisArg, item, index, this)) {
-				arr.push(item);
+				filter.push(item);
 			}
-			return true;
-		});
+		}
 		return filter;
 	}
 	find(callback: Callback<T, any, this>, thisArg?: any) {
-		let found: T | undefined;
-		this.every((item: T, index: number, arr: SortHTML<T>) => {
+		for (const [index, item] of this.entries()) {
 			if (callback.call(thisArg, item, index, this)) {
-				found = item;
-				return false;
+				return item;
 			}
-			return true;
-		});
-		return found;
+		}
+		return undefined;
 	}
 	findIndex(callback: Callback<T, any, this>, thisArg?: any) {
-		let found = -1;
-		this.every((item: T, index: number, arr: SortHTML<T>) => {
+		for (const [index, item] of this.entries()) {
 			if (callback.call(thisArg, item, index, this)) {
-				found = index;
-				return false;
+				return index;
 			}
-			return true;
-		});
-		return found;
+		}
+		return -1;
 	}
 	flatMap<U>(callback: Callback<T, U, this>, thisArg?: any): U[] {
 		return this.map(callback, thisArg).flat();
 	}
 	forEach(callback: Callback<T, void, this>, thisArg?: any) {
-		const root = data.get(this)!;
-		let curr = root.first, pos = 0;
-		while (curr) {
-			callback.call(thisArg, curr.item, pos++, this);
-			pos++;
-			curr = curr.next;
+		for (const [index, item] of this.entries()) {
+			callback.call(thisArg, item, index, this);
 		}
 	}
 	includes(valueToFind: T, fromIndex?: number) {
@@ -227,10 +212,9 @@ export class SortHTML<T extends Item> {
 	}
 	map<U>(callback: Callback<T, U, this>, thisArg?: any): U[] {
 		const map: U[] = [];
-		this.every((item: T, index: number, arr: SortHTML<T>) => {
+		for (const [index, item] of this.entries()) {
 			map.push(callback.call(thisArg, item, index, this));
-			return true;
-		});
+		}
 		return map;
 	}
 	pop(): T | undefined {
@@ -255,18 +239,14 @@ export class SortHTML<T extends Item> {
 		});
 		return root.length;
 	}
-	reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: this) => T, initialValue?: T): T | undefined;
-	reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: this) => U, initialValue: U): U | undefined {
-		const root = data.get(this)!;
-		let curr = root.first, pos = 0;
-		while(curr) {
+	reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: this) => U, initialValue: U): U;
+	reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: this) => T, initialValue?: T): T | undefined {
+		for (const [index, item] of this.entries()) {
 			if (initialValue === undefined) {
-				initialValue = curr.item;
+				initialValue = item;
 			} else {
-				initialValue = callbackfn(initialValue, curr.item, pos, this);
+				initialValue = callbackfn(initialValue, item, index, this);
 			}
-			curr = curr.next;
-			pos++;
 		}
 		return initialValue;
 	}
@@ -324,7 +304,12 @@ export class SortHTML<T extends Item> {
 		return slice;
 	}
 	some(callback: Callback<T, any, this>, thisArg?: any) {
-		return !this.every((item: T, index: number, arr: SortHTML<T>) => !callback.call(thisArg, item, index, this));
+		for (const [index, item] of this.entries()) {
+			if (callback.call(thisArg, item, index, this)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	sort(compareFunction?: sortFunc<T>) {
 		const root = data.get(this)!;

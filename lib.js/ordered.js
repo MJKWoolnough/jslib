@@ -104,59 +104,44 @@ export class SortHTML {
 		}
 	}
 	every(callback, thisArg) {
-		const root = data.get(this);
-		let curr = root.first, index = 0;
-		while (curr) {
-			if (!callback.call(thisArg, curr.item, index, this)) {
+		for (const [index, item] of this.entries()) {
+			if (!callback.call(thisArg, item, index, this)) {
 				return false;
 			}
-			index++;
-			curr = curr.next;
 		}
 		return true;
 	}
 	filter(callback, thisArg) {
 		const filter = [];
-		this.every((item, index, arr) => {
+		for (const [index, item] of this.entries()) {
 			if (callback.call(thisArg, item, index, this)) {
-				arr.push(item);
+				filter.push(item);
 			}
-			return true;
-		});
+		}
 		return filter;
 	}
 	find(callback, thisArg) {
-		let found;
-		this.every((item, index, arr) => {
+		for (const [index, item] of this.entries()) {
 			if (callback.call(thisArg, item, index, this)) {
-				found = item;
-				return false;
+				return item;
 			}
-			return true;
-		});
-		return found;
+		}
+		return undefined;
 	}
 	findIndex(callback, thisArg) {
-		let found = -1;
-		this.every((item, index, arr) => {
+		for (const [index, item] of this.entries()) {
 			if (callback.call(thisArg, item, index, this)) {
-				found = index;
-				return false;
+				return index;
 			}
-			return true;
-		});
-		return found;
+		}
+		return -1;
 	}
 	flatMap(callback, thisArg) {
 		return this.map(callback, thisArg).flat();
 	}
 	forEach(callback, thisArg) {
-		const root = data.get(this);
-		let curr = root.first, pos = 0;
-		while (curr) {
-			callback.call(thisArg, curr.item, pos++, this);
-			pos++;
-			curr = curr.next;
+		for (const [index, item] of this.entries()) {
+			callback.call(thisArg, item, index, this);
 		}
 	}
 	includes(valueToFind, fromIndex) {
@@ -204,10 +189,9 @@ export class SortHTML {
 	}
 	map(callback, thisArg) {
 		const map = [];
-		this.every((item, index, arr) => {
+		for (const [index, item] of this.entries()) {
 			map.push(callback.call(thisArg, item, index, this));
-			return true;
-		});
+		}
 		return map;
 	}
 	pop() {
@@ -233,16 +217,12 @@ export class SortHTML {
 		return root.length;
 	}
 	reduce(callbackfn, initialValue) {
-		const root = data.get(this);
-		let curr = root.first, pos = 0;
-		while(curr) {
+		for (const [index, item] of this.entries()) {
 			if (initialValue === undefined) {
-				initialValue = curr.item;
+				initialValue = item;
 			} else {
-				initialValue = callbackfn(initialValue, curr.item, pos, this);
+				initialValue = callbackfn(initialValue, item, index, this);
 			}
-			curr = curr.next;
-			pos++;
 		}
 		return initialValue;
 	}
@@ -299,7 +279,12 @@ export class SortHTML {
 		return slice;
 	}
 	some(callback, thisArg) {
-		return !this.every((item, index, arr) => !callback.call(thisArg, item, index, this));
+		for (const [index, item] of this.entries()) {
+			if (callback.call(thisArg, item, index, this)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	sort(compareFunction) {
 		const root = data.get(this);
