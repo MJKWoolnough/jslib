@@ -314,18 +314,15 @@ export class SortHTML {
 	}
 	splice(start, deleteCount, ...items) {
 		const root = data.get(this), removed = [];
-		let [startNode] = getNode(root, start),
-		    addFrom = startNode ? startNode.prev : null;
-		if (startNode && deleteCount) {
-			let curr = startNode.next;
-			while (curr && deleteCount > 0) {
-				removed.push(curr.item);
-				removeNode(root, curr);
-				deleteCount--;
-				curr = curr.next;
-			}
+		let [curr] = getNode(root, start),
+		    adder = curr ? curr.prev : null;
+		while (curr && deleteCount > 0) {
+			removed.push(curr.item);
+			removeNode(root, curr);
+			deleteCount--;
+			curr = curr.next;
 		}
-		items.forEach(item => addFrom = addItemAfter(root, addFrom, item));
+		items.forEach(item => adder = addItemAfter(root, adder, item));
 		return removed;
 	}
 	unshift(element, ...elements) {
