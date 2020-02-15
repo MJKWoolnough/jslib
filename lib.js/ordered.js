@@ -51,6 +51,25 @@ const data = new WeakMap(),
 	}
 	return [null, 0];
       },
+      addItemAfter = (root, after, item) => {
+	const node = {prev: after, next: after ? after.next: root.first, item};
+	if (after) {
+		if (after.next) {
+			after.next.prev = node;
+		} else {
+			root.last = node;
+		}
+		after.next = node;
+	} else {
+		if (!root.last) {
+			root.last = node;
+		}
+		root.first = node;
+	}
+	root.length++;
+	sortNodes(root, node);
+	return node;
+      },
       removeNode = (root, node) => {
 	if (node.prev) {
 		node.prev.next = node.next;
@@ -91,7 +110,7 @@ export class SortHTML {
 			node.item = item;
 			sortNodes(root, node);
 		} else {
-			this.push(item);
+			addItemAfter(root, root.last, item);
 		}
 		return item;
 	}
@@ -200,15 +219,8 @@ export class SortHTML {
 	}
 	push(element, ...elements) {
 		const root = data.get(this);
-		[element, ...elements].forEach(item => {
-			if (root.last) {
-				sortNodes(root, root.last = root.last.next = {prev: root.last, next: null, item});
-			} else {
-				root.last = root.first = {prev: null, next: null, item};
-				root.parentNode.appendChild(item.html);
-			}
-			root.length++;
-		});
+		addItemAfter(root, root.last, element);
+		elements.forEach(item => addItemAfter(root, root.last, item));
 		return root.length;
 	}
 	reduce(callbackfn, initialValue) {
@@ -313,34 +325,13 @@ export class SortHTML {
 				curr = curr.next;
 			}
 		}
-		items.forEach(item => {
-			if (addFrom) {
-				if (addFrom.next) {
-					sortNodes(root, addFrom = addFrom.next.prev = addFrom.next = {prev: addFrom, next: addFrom.next, item})
-				} else {
-					sortNodes(root, addFrom = addFrom.next = root.last = {prev: addFrom, next: null, item});
-				}
-			} else {
-				if (root.first) {
-					sortNodes(root, addFrom = root.first = root.first.prev = {prev: null, next: root.first, item});
-				} else {
-					sortNodes(root, addFrom = root.first = root.last = {prev: null, next: null, item});
-				}
-			}
-			root.length++;
-		});
+		items.forEach(item => addFrom = addItemAfter(root, addFrom, item));
 		return removed;
 	}
 	unshift(element, ...elements) {
 		const root = data.get(this);
-		[element, ...elements].reverse().forEach(item => {
-			if (root.first) {
-				sortNodes(root, root.first = root.first.prev = {prev: null, next: root.first, item});
-			} else {
-				root.first = root.last = {prev: null, next: null, item};
-			}
-			root.length++;
-		});
+		let adder = addItemAfter(root, null, element);
+		elements.forEach(item => adder = addItemAfter(root, adder, item));
 		return root.length;
 	}
 	*values() {
