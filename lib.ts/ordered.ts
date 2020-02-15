@@ -52,12 +52,12 @@ const data = new WeakMap<SortHTML<any>, Root<any>>(),
 		root.first = node;
 	}
       },
-      getNode = <T extends Item>(root: Root<T>, index: number) => {
+      getNode = <T extends Item>(root: Root<T>, index: number): [ItemNode<T> | null, number] => {
 	if (index < 0) {
 		let curr = root.last, pos = index;
 		while (curr) {
 			if (pos === 0) {
-				return curr;
+				return [curr, pos];
 			}
 			pos++;
 			curr = curr.prev;
@@ -66,13 +66,13 @@ const data = new WeakMap<SortHTML<any>, Root<any>>(),
 		let curr = root.first, pos = index;
 		while (curr) {
 			if (pos === 0) {
-				return curr;
+				return [curr, pos];
 			}
 			pos--;
 			curr = curr.next;
 		}
 	}
-	return null;
+	return [null, 0];
       },
       removeNode = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
 	if (node.prev) {
@@ -100,26 +100,26 @@ export class SortHTML<T extends Item> {
 		return data.get(this)!.length;
 	}
 	getItem(index: number): T | undefined {
-		const node = getNode(data.get(this)!, index);
+		const [node] = getNode(data.get(this)!, index);
 		if (node) {
 			return node.item;
 		}
 		return undefined;
 	}
 	setItem(index: number, item: T) {
-		const root = data.get(this)!;
-		if (index < root.length) {
-			const node = getNode(root, index)!;
+		const root = data.get(this)!,
+		      [node] = getNode(root, index);
+		if (node) {
 			root.parentNode.removeChild(node.item.html);
 			node.item = item;
 			sortNodes(root, node);
 		} else {
 			this.push(item);
 		}
+		return item;
 	}
 	*entries(): IterableIterator<[number, T]> {
-		const root = data.get(this)!;
-		let curr = root.first, pos = 0;
+		let curr = data.get(this)!.first, pos = 0;
 		while (curr) {
 			yield([pos, curr.item]);
 			pos++;
@@ -167,9 +167,8 @@ export class SortHTML<T extends Item> {
 			callback.call(thisArg, item, index, this);
 		}
 	}
-	includes(valueToFind: T, fromIndex?: number) {
-		const root = data.get(this)!;
-		let curr = fromIndex === undefined ? root.first : getNode(root, fromIndex);
+	includes(valueToFind: T, fromIndex: number = 0) {
+		let [curr] = getNode(data.get(this)!, fromIndex);
 		while(curr) {
 			if (Object.is(valueToFind, curr.item)) {
 				return true;
@@ -178,10 +177,8 @@ export class SortHTML<T extends Item> {
 		}
 		return false;
 	}
-	indexOf(searchElement: T, fromIndex?: number) {
-		const root = data.get(this)!;
-		let curr = fromIndex === undefined ? root.first : getNode(root, fromIndex),
-		    pos = fromIndex === undefined ? 0 : fromIndex;
+	indexOf(searchElement: T, fromIndex: number = 0) {
+		let [curr, pos] = getNode(data.get(this)!, fromIndex);
 		while(curr) {
 			if (Object.is(searchElement, curr.item)) {
 				return pos;
@@ -197,10 +194,8 @@ export class SortHTML<T extends Item> {
 			yield i;
 		}
 	}
-	lastIndexOf(searchElement: T, fromIndex?: number): number {
-		const root = data.get(this)!;
-		let curr = fromIndex === undefined ? root.last : getNode(root, fromIndex),
-		    pos = fromIndex === undefined ? root.length - 1 : fromIndex;
+	lastIndexOf(searchElement: T, fromIndex: number = 0): number {
+		let [curr, pos] = getNode(data.get(this)!, fromIndex);
 		while(curr) {
 			if (Object.is(searchElement, curr.item)) {
 				return pos;
@@ -286,7 +281,7 @@ export class SortHTML<T extends Item> {
 		}
 		return undefined;
 	}
-	slice(begin?: number, end?: number) {
+	slice(begin: number = 0, end?: number) {
 		const root = data.get(this)!,
 		      slice: T[] = [];
 		if (end === undefined) {
@@ -294,8 +289,7 @@ export class SortHTML<T extends Item> {
 		} else if (end < 0) {
 			end += root.length;
 		}
-		let curr = begin === undefined ? root.first : getNode(root, begin),
-		    pos = begin === undefined ? 0 : begin;
+		let [curr, pos] = getNode(root, begin);
 		while (curr && pos < end) {
 			slice.push(curr.item);
 			pos++;
@@ -333,7 +327,7 @@ export class SortHTML<T extends Item> {
 	}
 	splice(start: number, deleteCount?: number, ...items: T[]): T[] {
 		const root = data.get(this)!, removed: T[] = [];
-		let startNode = getNode(root, start),
+		let [startNode] = getNode(root, start),
 		    addFrom = startNode ? startNode.prev : null;
 		if (startNode && deleteCount) {
 			let curr = startNode.next;
@@ -375,8 +369,7 @@ export class SortHTML<T extends Item> {
 		return root.length;
 	}
 	*values() {
-		const root = data.get(this)!;
-		let curr = root.first;
+		let curr = data.get(this)!.first;
 		while (curr) {
 			yield curr.item;
 			curr = curr.next;
