@@ -6,18 +6,22 @@ stringSort = new Intl.Collator().compare;
 const data = new WeakMap(),
       sortNodes = (root, node) => {
 	while (node.prev.item && root.sortFn(node.item, node.prev.item) * root.order < 0) {
-		const pp = node.prev.prev;
+		node.next.prev = node.prev;
 		node.prev.next = node.next;
 		node.next = node.prev;
+		const pp = node.prev.prev;
 		node.prev.prev = node;
 		node.prev = pp;
+		pp.next = node;
 	}
 	while (node.next.item && root.sortFn(node.item, node.next.item) * root.order > 0) {
-		const nn = node.next.next;
 		node.next.prev = node.prev;
+		node.prev.next = node.next;
 		node.prev = node.next;
+		const nn = node.next.next;
 		node.next.next = node;
 		node.next = nn;
+		nn.prev = node;
 	}
 	if (node.next.item) {
 		root.parentNode.insertBefore(node.item.html, node.next.item.html);
