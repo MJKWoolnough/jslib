@@ -283,7 +283,7 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!;
 		if (compareFunction) {
 			root.sortFn = compareFunction;
-			root.reverse = 1;
+			root.order = 1;
 		}
 		let curr = root.next;
 		root.next = root.prev = root;
