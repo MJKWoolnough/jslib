@@ -7,18 +7,25 @@ interface Item {
 }
 
 type ItemNode<T> = {
-	prev: ItemNode<T> | null;
-	next: ItemNode<T> | null;
+	prev: ItemOrRoot<T>;
+	next: ItemOrRoot<T>;
 	item: T;
 }
 
 type Root<T extends Item> = {
-	first: ItemNode<T> | null;
-	last: ItemNode<T> | null;
+	prev: ItemOrRoot<T>;
+	next: ItemOrRoot<T>;
+	item: undefined;
 	sortFn: sortFunc<T>;
 	parentNode: Node;
 	length: number;
 	reverse: number;
+}
+
+interface ItemOrRoot<T> {
+	prev: ItemOrRoot<T>;
+	next: ItemOrRoot<T>;
+	item: T | undefined;
 }
 
 type Callback<T extends Item, U, thisType> = (element: T, index: number, array: thisType) => U;
@@ -28,88 +35,64 @@ stringSort = new Intl.Collator().compare;
 
 const data = new WeakMap<SortHTML<any>, Root<any>>(),
       sortNodes = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
-	while (node.prev && root.sortFn(node.item, node.prev.item) * root.reverse < 0) {
+	while (node.prev.item && root.sortFn(node.item, node.prev.item) * root.reverse < 0) {
 		const pp = node.prev.prev;
 		node.prev.next = node.next;
 		node.next = node.prev;
 		node.prev.prev = node;
 		node.prev = pp;
 	}
-	while (node.next && root.sortFn(node.item, node.next.item) * root.reverse > 0) {
+	while (node.next.item && root.sortFn(node.item, node.next.item) * root.reverse > 0) {
 		const nn = node.next.next;
 		node.next.prev = node.prev;
 		node.prev = node.next;
 		node.next.next = node;
 		node.next = nn;
 	}
-	if (node.next) {
+	if (node.next.item) {
 		root.parentNode.insertBefore(node.item.html, node.next.item.html);
 	} else {
 		root.parentNode.appendChild(node.item.html);
-		root.last = node;
 	}
-	if (!node.prev) {
-		root.first = node;
-	}
+	return node;
       },
-      getNode = <T extends Item>(root: Root<T>, index: number): [ItemNode<T> | null, number] => {
+      getNode = <T extends Item>(root: Root<T>, index: number): [ItemOrRoot<T>, number] => {
 	if (index < 0) {
-		for (let curr = root.last, pos = index; curr; pos++, curr = curr.prev) {
+		for (let curr = root.prev, pos = index; curr.item; pos++, curr = curr.prev) {
 			if (pos === 0) {
 				return [curr, pos];
 			}
 		}
 	} else if (index < root.length) {
-		for (let curr = root.first, pos = index; curr; pos--, curr = curr.next) {
+		for (let curr = root.next, pos = index; curr.item; pos--, curr = curr.next) {
 			if (pos === 0) {
 				return [curr, pos];
 			}
 		}
 	}
-	return [null, 0];
+	return [root, -1];
       },
-      addItemAfter = <T extends Item>(root: Root<T>, after: ItemNode<T> | null, item: T) => {
-	const node = {prev: after, next: after ? after.next: root.first, item};
-	if (after) {
-		if (after.next) {
-			after.next.prev = node;
-		} else {
-			root.last = node;
-		}
-		after.next = node;
-	} else {
-		if (!root.last) {
-			root.last = node;
-		}
-		root.first = node;
-	}
+      addItemAfter = <T extends Item>(root: Root<T>, after: ItemOrRoot<T>, item: T) => {
 	root.length++;
-	sortNodes(root, node);
-	return node;
+	return sortNodes(root, after.next = after.next.prev = {prev: after, next: after.next, item});
       },
       removeNode = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
-	if (node.prev) {
-		node.prev.next = node.next;
-	} else {
-		root.first = node.next;
-	}
-	if (node.next) {
-		node.next.prev = node.prev;
-	} else {
-		root.last = node.prev;
-	}
+	node.prev.next = node.next;
+	node.next.prev = node.prev;
 	root.parentNode.removeChild(node.item.html);
 	root.length--;
       },
       entries = function* <T extends Item>(s: SortHTML<T>, start = 1, direction = 1): IterableIterator<[number, T]> {
-	for (let [curr, pos] = getNode(data.get(s)!, start); curr; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
+	for (let [curr, pos] = getNode(data.get(s)!, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
 	}
       };
 
 export class SortHTML<T extends Item> {
 	constructor(parentNode: Node, sortFn: sortFunc<T> = noSort) {
-		data.set(this, {first: null, last: null, sortFn, parentNode, length: 0, reverse: 1});
+		const root = {sortFn, parentNode, length: 0, reverse: 1} as Root<T>;
+		root.prev = root.next = root;
+		data.set(this, root);
 	}
 	get html(): Node {
 		return data.get(this)!.parentNode;
@@ -117,22 +100,19 @@ export class SortHTML<T extends Item> {
 	get length(): number {
 		return data.get(this)!.length;
 	}
-	getItem(index: number): T | undefined {
+	getItem(index: number) {
 		const [node] = getNode(data.get(this)!, index);
-		if (node) {
-			return node.item;
-		}
-		return undefined;
+		return node.item;
 	}
 	setItem(index: number, item: T) {
 		const root = data.get(this)!,
 		      [node] = getNode(root, index);
-		if (node) {
+		if (node.item) {
 			root.parentNode.removeChild(node.item.html);
 			node.item = item;
 			sortNodes(root, node);
 		} else {
-			addItemAfter(root, root.last, item);
+			addItemAfter(root, root.prev, item);
 		}
 		return item;
 	}
@@ -156,7 +136,7 @@ export class SortHTML<T extends Item> {
 		}
 		return filter;
 	}
-	find(callback: Callback<T, any, this>, thisArg?: any) {
+	find(callback: Callback<T, any, this>, thisArg?: any): T | undefined {
 		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
@@ -164,7 +144,7 @@ export class SortHTML<T extends Item> {
 		}
 		return undefined;
 	}
-	findIndex(callback: Callback<T, any, this>, thisArg?: any) {
+	findIndex(callback: Callback<T, any, this>, thisArg?: any): number {
 		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return index;
@@ -188,7 +168,7 @@ export class SortHTML<T extends Item> {
 		}
 		return false;
 	}
-	indexOf(searchElement: T, fromIndex: number = 0) {
+	indexOf(searchElement: T, fromIndex: number = 0): number {
 		for (const [index, item] of entries(this, fromIndex)) {
 			if (Object.is(searchElement, item)) {
 				return index;
@@ -219,17 +199,16 @@ export class SortHTML<T extends Item> {
 	}
 	pop(): T | undefined {
 		const root = data.get(this)!,
-		      last = root.last;
-		if (last) {
+		      last = root.prev;
+		if (last.item) {
 			removeNode(root, last);
-			return last.item;
 		}
-		return undefined;
+		return last.item;
 	}
-	push(element: T, ...elements: T[]): number {
-		const root = data.get(this)!;
-		addItemAfter(root, root.last, element);
-		elements.forEach(item => addItemAfter(root, root.last, item));
+	push(element: T, ...elements: T[]) {
+		const root: Root<T> = data.get(this)!;
+		addItemAfter(root, root.prev, element);
+		elements.forEach(item => addItemAfter(root, root.prev, item));
 		return root.length;
 	}
 	reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: this) => U, initialValue: U): U;
@@ -256,9 +235,9 @@ export class SortHTML<T extends Item> {
 	}
 	reverse() {
 		const root = data.get(this)!;
-		[root.last, root.first] = [root.first, root.last];
+		[root.prev, root.next] = [root.next, root.prev];
 		root.reverse *= -1;
-		for (let curr = root.first; curr; curr = curr.next) {
+		for (let curr = root.prev; curr.item; curr = curr.next) {
 			[curr.next, curr.prev] = [curr.prev, curr.next];
 			root.parentNode.appendChild(curr.item.html);
 		}
@@ -266,12 +245,11 @@ export class SortHTML<T extends Item> {
 	}
 	shift(): T | undefined {
 		const root = data.get(this)!,
-		      first = root.first;
-		if (first) {
+		      first = root.prev;
+		if (first.item) {
 			removeNode(root, first);
-			return first.item;
 		}
-		return undefined;
+		return first.item;
 	}
 	slice(begin: number = 0, end?: number) {
 		const root = data.get(this)!,
@@ -303,25 +281,22 @@ export class SortHTML<T extends Item> {
 			root.sortFn = compareFunction;
 			root.reverse = 1;
 		}
-		if (root.first) {
-			let curr = root.first.next;
-			root.last = root.first;
-			root.first.next = null;
-			while (curr) {
-				const next = curr.next;
-				curr.prev = root.last;
-				curr.next = null;
-				sortNodes(root, curr.prev.next = root.last = curr);
-				curr = next;
-			}
+		let curr = root.next;
+		root.next = root.prev = root;
+		while (curr.item) {
+			const next = curr.next;
+			curr.prev = root.prev;
+			curr.next = root;
+			sortNodes(root, root.prev = root.prev.next = curr);
+			curr = next;
 		}
 		return this;
 	}
 	splice(start: number, deleteCount: number = 0, ...items: T[]): T[] {
 		const root = data.get(this)!, removed: T[] = [];
 		let [curr] = getNode(root, start),
-		    adder = curr ? curr.prev : null;
-		for (; curr && deleteCount > 0; deleteCount--, curr = curr.next) {
+		    adder = curr.prev;
+		for (; curr.item && deleteCount > 0; deleteCount--, curr = curr.next) {
 			removed.push(curr.item);
 			removeNode(root, curr);
 		}
@@ -330,12 +305,12 @@ export class SortHTML<T extends Item> {
 	}
 	unshift(element: T, ...elements: T[]): number {
 		const root = data.get(this)!;
-		let adder = addItemAfter(root, null, element);
+		let adder = addItemAfter(root, root, element);
 		elements.forEach(item => adder = addItemAfter(root, adder, item));
 		return root.length;
 	}
-	*values() {
-		for (let curr = data.get(this)!.first; curr; curr = curr.next) {
+	*values(): IterableIterator<T> {
+		for (let curr = data.get(this)!.prev; curr.item; curr = curr.next) {
 			yield curr.item;
 		}
 	}
