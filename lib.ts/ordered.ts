@@ -108,7 +108,7 @@ export class SortHTML<T extends Item> {
 		const [node] = getNode(data.get(this)!, index);
 		return node.item;
 	}
-	setItem(index: number, item: T) {
+	setItem(index: number, item: T): T | undefined {
 		const root = data.get(this)!,
 		      [node] = getNode(root, index);
 		if (node.item) {
@@ -120,8 +120,8 @@ export class SortHTML<T extends Item> {
 		}
 		return item;
 	}
-	*entries(): IterableIterator<[number, T]> {
-		yield *entries(this);
+	*entries() {
+		yield *entries<T>(this);
 	}
 	every(callback: Callback<T, any, this>, thisArg?: any) {
 		for (const [index, item] of entries(this)) {
@@ -140,23 +140,23 @@ export class SortHTML<T extends Item> {
 		}
 		return filter;
 	}
-	find(callback: Callback<T, any, this>, thisArg?: any): T | undefined {
-		for (const [index, item] of entries(this)) {
+	find(callback: Callback<T, any, this>, thisArg?: any) {
+		for (const [index, item] of entries<T>(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
 			}
 		}
 		return undefined;
 	}
-	findIndex(callback: Callback<T, any, this>, thisArg?: any): number {
-		for (const [index, item] of entries(this)) {
+	findIndex(callback: Callback<T, any, this>, thisArg?: any) {
+		for (const [index, item] of entries<T>(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return index;
 			}
 		}
 		return -1;
 	}
-	flatMap<U>(callback: Callback<T, U, this>, thisArg?: any): U[] {
+	flatMap<U>(callback: Callback<T, U, this>, thisArg?: any) {
 		return this.map(callback, thisArg).flat();
 	}
 	forEach(callback: Callback<T, void, this>, thisArg?: any) {
@@ -172,8 +172,8 @@ export class SortHTML<T extends Item> {
 		}
 		return false;
 	}
-	indexOf(searchElement: T, fromIndex: number = 0): number {
-		for (const [index, item] of entries(this, fromIndex)) {
+	indexOf(searchElement: T, fromIndex: number = 0) {
+		for (const [index, item] of entries<T>(this, fromIndex)) {
 			if (Object.is(searchElement, item)) {
 				return index;
 			}
@@ -186,15 +186,15 @@ export class SortHTML<T extends Item> {
 			yield i;
 		}
 	}
-	lastIndexOf(searchElement: T, fromIndex: number = 0): number {
-		for (const [index, item] of entries(this, fromIndex, -1)) {
+	lastIndexOf(searchElement: T, fromIndex: number = 0) {
+		for (const [index, item] of entries<T>(this, fromIndex, -1)) {
 			if (Object.is(searchElement, item)) {
 				return index;
 			}
 		}
 		return -1;
 	}
-	map<U>(callback: Callback<T, U, this>, thisArg?: any): U[] {
+	map<U>(callback: Callback<T, U, this>, thisArg?: any) {
 		const map: U[] = [];
 		for (const [index, item] of entries(this)) {
 			map.push(callback.call(thisArg, item, index, this));
@@ -296,7 +296,7 @@ export class SortHTML<T extends Item> {
 		}
 		return this;
 	}
-	splice(start: number, deleteCount: number = 0, ...items: T[]): T[] {
+	splice(start: number, deleteCount: number = 0, ...items: T[]) {
 		const root = data.get(this)!, removed: T[] = [];
 		let [curr] = getNode(root, start),
 		    adder = curr.prev;
