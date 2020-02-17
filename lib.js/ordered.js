@@ -323,10 +323,8 @@ export class SortHTML {
 		return root.length;
 	}
 	*values() {
-		let curr = data.get(this).first;
-		while (curr) {
+		for (let curr = data.get(this).first; curr; curr = curr.next) {
 			yield curr.item;
-			curr = curr.next;
 		}
 	}
 	*[Symbol.iterator]() {
