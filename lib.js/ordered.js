@@ -31,22 +31,16 @@ const data = new WeakMap(),
       },
       getNode = (root, index) => {
 	if (index < 0) {
-		let curr = root.last, pos = index;
-		while (curr) {
+		for (let curr = root.last, pos = index; curr; pos++, curr = curr.prev) {
 			if (pos === 0) {
 				return [curr, pos];
 			}
-			pos++;
-			curr = curr.prev;
 		}
 	} else if (index < root.length) {
-		let curr = root.first, pos = index;
-		while (curr) {
+		for (let curr = root.first, pos = index; curr; pos--, curr = curr.next) {
 			if (pos === 0) {
 				return [curr, pos];
 			}
-			pos--;
-			curr = curr.next;
 		}
 	}
 	return [null, 0];
@@ -85,11 +79,8 @@ const data = new WeakMap(),
 	root.length--;
       },
       entries = function* (s, start = 1, direction = 1) {
-	let [curr, pos] = getNode(data.get(s), start);
-	while (curr) {
+	for (let [curr, pos] = getNode(data.get(s), start); curr; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
-		pos += direction;
-		curr = direction === 1 ? curr.next : curr.prev;
 	}
       };
 
@@ -241,12 +232,10 @@ export class SortHTML {
 	reverse() {
 		const root = data.get(this);
 		[root.last, root.first] = [root.first, root.last];
-		let curr = root.first;
 		root.reverse *= -1;
-		while (curr) {
+		for (let curr = root.first; curr; curr = curr.next) {
 			[curr.next, curr.prev] = [curr.prev, curr.next];
 			root.parentNode.appendChild(curr.item.html);
-			curr = curr.next;
 		}
 		return this;
 	}
@@ -307,11 +296,9 @@ export class SortHTML {
 		const root = data.get(this), removed = [];
 		let [curr] = getNode(root, start),
 		    adder = curr ? curr.prev : null;
-		while (curr && deleteCount > 0) {
+		for (; curr && deleteCount > 0; deleteCount--, curr = curr.next) {
 			removed.push(curr.item);
 			removeNode(root, curr);
-			deleteCount--;
-			curr = curr.next;
 		}
 		items.forEach(item => adder = addItemAfter(root, adder, item));
 		return removed;
