@@ -5,14 +5,14 @@ stringSort = new Intl.Collator().compare;
 
 const data = new WeakMap(),
       sortNodes = (root, node) => {
-	while (node.prev.item && root.sortFn(node.item, node.prev.item) * root.reverse < 0) {
+	while (node.prev.item && root.sortFn(node.item, node.prev.item) * root.order < 0) {
 		const pp = node.prev.prev;
 		node.prev.next = node.next;
 		node.next = node.prev;
 		node.prev.prev = node;
 		node.prev = pp;
 	}
-	while (node.next.item && root.sortFn(node.item, node.next.item) * root.reverse > 0) {
+	while (node.next.item && root.sortFn(node.item, node.next.item) * root.order > 0) {
 		const nn = node.next.next;
 		node.next.prev = node.prev;
 		node.prev = node.next;
@@ -60,7 +60,7 @@ const data = new WeakMap(),
 
 export class SortHTML {
 	constructor(parentNode, sortFn = noSort) {
-		const root = {sortFn, parentNode, length: 0, reverse: 1};
+		const root = {sortFn, parentNode, length: 0, order: 1};
 		root.prev = root.next = root;
 		data.set(this, root);
 	}
@@ -204,7 +204,7 @@ export class SortHTML {
 	reverse() {
 		const root = data.get(this);
 		[root.prev, root.next] = [root.next, root.prev];
-		root.reverse *= -1;
+		root.order *= -1;
 		for (let curr = root.prev; curr.item; curr = curr.next) {
 			[curr.next, curr.prev] = [curr.prev, curr.next];
 			root.parentNode.appendChild(curr.item.html);
