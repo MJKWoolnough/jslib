@@ -83,6 +83,14 @@ const data = new WeakMap(),
 	}
 	root.parentNode.removeChild(node.item.html);
 	root.length--;
+      },
+      entries = function* (s, start = 1, direction = 1) {
+	let [curr, pos] = getNode(data.get(s), start);
+	while (curr) {
+		yield [pos, curr.item];
+		pos += direction;
+		curr = direction === 1 ? curr.next : curr.prev;
+	}
       };
 
 export class SortHTML {
@@ -115,15 +123,10 @@ export class SortHTML {
 		return item;
 	}
 	*entries() {
-		let curr = data.get(this).first, pos = 0;
-		while (curr) {
-			yield([pos, curr.item]);
-			pos++;
-			curr = curr.next;
-		}
+		yield *entries(this);
 	}
 	every(callback, thisArg) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (!callback.call(thisArg, item, index, this)) {
 				return false;
 			}
@@ -132,7 +135,7 @@ export class SortHTML {
 	}
 	filter(callback, thisArg) {
 		const filter = [];
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				filter.push(item);
 			}
@@ -140,7 +143,7 @@ export class SortHTML {
 		return filter;
 	}
 	find(callback, thisArg) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
 			}
@@ -148,7 +151,7 @@ export class SortHTML {
 		return undefined;
 	}
 	findIndex(callback, thisArg) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return index;
 			}
@@ -159,28 +162,23 @@ export class SortHTML {
 		return this.map(callback, thisArg).flat();
 	}
 	forEach(callback, thisArg) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			callback.call(thisArg, item, index, this);
 		}
 	}
 	includes(valueToFind, fromIndex = 0) {
-		let [curr] = getNode(data.get(this), fromIndex);
-		while(curr) {
-			if (Object.is(valueToFind, curr.item)) {
+		for (const [_, item] of entries(this, fromIndex)) {
+			if (Object.is(valueToFind, item)) {
 				return true;
 			}
-			curr = curr.next;
 		}
 		return false;
 	}
-	indexOf(searchElement, fromIndex) {
-		let [curr, pos] = getNode(data.get(this), fromIndex);
-		while(curr) {
-			if (Object.is(searchElement, curr.item)) {
-				return pos;
+	indexOf(searchElement, fromIndex = 0) {
+		for (const [index, item] of entries(this, fromIndex)) {
+			if (Object.is(searchElement, item)) {
+				return index;
 			}
-			curr = curr.next;
-			pos++;
 		}
 		return -1;
 	}
@@ -191,19 +189,16 @@ export class SortHTML {
 		}
 	}
 	lastIndexOf(searchElement, fromIndex = 0) {
-		let [curr, pos] = getNode(data.get(this), fromIndex);
-		while(curr) {
-			if (Object.is(searchElement, curr.item)) {
-				return pos;
+		for (const [index, item] of entries(this, fromIndex, -1)) {
+			if (Object.is(searchElement, item)) {
+				return index;
 			}
-			curr = curr.prev;
-			pos--;
 		}
 		return -1;
 	}
 	map(callback, thisArg) {
 		const map = [];
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			map.push(callback.call(thisArg, item, index, this));
 		}
 		return map;
@@ -224,7 +219,7 @@ export class SortHTML {
 		return root.length;
 	}
 	reduce(callbackfn, initialValue) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (initialValue === undefined) {
 				initialValue = item;
 			} else {
@@ -234,16 +229,12 @@ export class SortHTML {
 		return initialValue;
 	}
 	reduceRight(callbackfn, initialValue) {
-		const root = data.get(this);
-		let curr = root.last, pos = root.length;
-		while(curr) {
-			pos--;
+		for (const [index, item] of entries(this, 0, -1)) {
 			if (initialValue === undefined) {
-				initialValue = curr.item;
+				initialValue = item;
 			} else {
-				initialValue = callbackfn(initialValue, curr.item, pos, this);
+				initialValue = callbackfn(initialValue, item, index, this);
 			}
-			curr = curr.prev;
 		}
 		return initialValue;
 	}
@@ -276,16 +267,16 @@ export class SortHTML {
 		} else if (end < 0) {
 			end += root.length;
 		}
-		let [curr, pos] = getNode(root, begin);
-		while (curr && pos < end) {
-			slice.push(curr.item);
-			pos++;
-			curr = curr.next;
+		for (const [index, item] of entries(this, begin)) {
+			if (index >= end) {
+				break;
+			}
+			slice.push(item);
 		}
 		return slice;
 	}
 	some(callback, thisArg) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return true;
 			}
@@ -312,7 +303,7 @@ export class SortHTML {
 		}
 		return this;
 	}
-	splice(start, deleteCount, ...items) {
+	splice(start, deleteCount = 0, ...items) {
 		const root = data.get(this), removed = [];
 		let [curr] = getNode(root, start),
 		    adder = curr ? curr.prev : null;

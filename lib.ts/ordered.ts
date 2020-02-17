@@ -106,6 +106,14 @@ const data = new WeakMap<SortHTML<any>, Root<any>>(),
 	}
 	root.parentNode.removeChild(node.item.html);
 	root.length--;
+      },
+      entries = function* <T extends Item>(s: SortHTML<T>, start = 1, direction = 1): IterableIterator<[number, T]> {
+	let [curr, pos] = getNode(data.get(s)!, start);
+	while (curr) {
+		yield [pos, curr.item];
+		pos += direction;
+		curr = direction === 1 ? curr.next : curr.prev;
+	}
       };
 
 export class SortHTML<T extends Item> {
@@ -138,15 +146,10 @@ export class SortHTML<T extends Item> {
 		return item;
 	}
 	*entries(): IterableIterator<[number, T]> {
-		let curr = data.get(this)!.first, pos = 0;
-		while (curr) {
-			yield([pos, curr.item]);
-			pos++;
-			curr = curr.next;
-		}
+		yield *entries(this);
 	}
 	every(callback: Callback<T, any, this>, thisArg?: any) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (!callback.call(thisArg, item, index, this)) {
 				return false;
 			}
@@ -155,7 +158,7 @@ export class SortHTML<T extends Item> {
 	}
 	filter(callback: Callback<T, any, this>, thisArg?: any) {
 		const filter: T[] = [];
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				filter.push(item);
 			}
@@ -163,7 +166,7 @@ export class SortHTML<T extends Item> {
 		return filter;
 	}
 	find(callback: Callback<T, any, this>, thisArg?: any) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
 			}
@@ -171,7 +174,7 @@ export class SortHTML<T extends Item> {
 		return undefined;
 	}
 	findIndex(callback: Callback<T, any, this>, thisArg?: any) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return index;
 			}
@@ -182,28 +185,23 @@ export class SortHTML<T extends Item> {
 		return this.map(callback, thisArg).flat();
 	}
 	forEach(callback: Callback<T, void, this>, thisArg?: any) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			callback.call(thisArg, item, index, this);
 		}
 	}
 	includes(valueToFind: T, fromIndex: number = 0) {
-		let [curr] = getNode(data.get(this)!, fromIndex);
-		while(curr) {
-			if (Object.is(valueToFind, curr.item)) {
+		for (const [_, item] of entries(this, fromIndex)) {
+			if (Object.is(valueToFind, item)) {
 				return true;
 			}
-			curr = curr.next;
 		}
 		return false;
 	}
 	indexOf(searchElement: T, fromIndex: number = 0) {
-		let [curr, pos] = getNode(data.get(this)!, fromIndex);
-		while(curr) {
-			if (Object.is(searchElement, curr.item)) {
-				return pos;
+		for (const [index, item] of entries(this, fromIndex)) {
+			if (Object.is(searchElement, item)) {
+				return index;
 			}
-			curr = curr.next;
-			pos++;
 		}
 		return -1;
 	}
@@ -214,19 +212,16 @@ export class SortHTML<T extends Item> {
 		}
 	}
 	lastIndexOf(searchElement: T, fromIndex: number = 0): number {
-		let [curr, pos] = getNode(data.get(this)!, fromIndex);
-		while(curr) {
-			if (Object.is(searchElement, curr.item)) {
-				return pos;
+		for (const [index, item] of entries(this, fromIndex, -1)) {
+			if (Object.is(searchElement, item)) {
+				return index;
 			}
-			curr = curr.prev;
-			pos--;
 		}
 		return -1;
 	}
 	map<U>(callback: Callback<T, U, this>, thisArg?: any): U[] {
 		const map: U[] = [];
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			map.push(callback.call(thisArg, item, index, this));
 		}
 		return map;
@@ -248,7 +243,7 @@ export class SortHTML<T extends Item> {
 	}
 	reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: this) => U, initialValue: U): U;
 	reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: this) => T, initialValue?: T): T | undefined {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (initialValue === undefined) {
 				initialValue = item;
 			} else {
@@ -257,18 +252,14 @@ export class SortHTML<T extends Item> {
 		}
 		return initialValue;
 	}
-	reduceRight(callbackfn: (accumulator: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T;
-	reduceRight<U>(callbackfn: (accumulator: U, currentValue: T, index: number, array: this) => U, initialValue: U): U {
-		const root = data.get(this)!;
-		let curr = root.last, pos = root.length;
-		while(curr) {
-			pos--;
+	reduceRight<U>(callbackfn: (accumulator: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
+	reduceRight(callbackfn: (accumulator: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
+		for (const [index, item] of entries(this, 0, -1)) {
 			if (initialValue === undefined) {
-				initialValue = curr.item;
+				initialValue = item;
 			} else {
-				initialValue = callbackfn(initialValue, curr.item, pos, this);
+				initialValue = callbackfn(initialValue, item, index, this);
 			}
-			curr = curr.prev;
 		}
 		return initialValue;
 	}
@@ -301,16 +292,16 @@ export class SortHTML<T extends Item> {
 		} else if (end < 0) {
 			end += root.length;
 		}
-		let [curr, pos] = getNode(root, begin);
-		while (curr && pos < end) {
-			slice.push(curr.item);
-			pos++;
-			curr = curr.next;
+		for (const [index, item] of entries(this, begin)) {
+			if (index >= end) {
+				break;
+			}
+			slice.push(item);
 		}
 		return slice;
 	}
 	some(callback: Callback<T, any, this>, thisArg?: any) {
-		for (const [index, item] of this.entries()) {
+		for (const [index, item] of entries(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return true;
 			}
