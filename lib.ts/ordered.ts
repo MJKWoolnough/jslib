@@ -354,7 +354,7 @@ export class SortHTML<T extends Item> {
 			curr = curr.next;
 		}
 	}
-	[Symbol.iterator]() {
-		return this.values();
+	*[Symbol.iterator]() {
+		yield* this.values();
 	}
 }
