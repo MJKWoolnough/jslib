@@ -280,7 +280,7 @@ export class SortHTML {
 		return root.length;
 	}
 	*values() {
-		for (let curr = data.get(this).prev; curr.item; curr = curr.next) {
+		for (let curr = data.get(this).next; curr.item; curr = curr.next) {
 			yield curr.item;
 		}
 	}

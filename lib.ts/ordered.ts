@@ -314,7 +314,7 @@ export class SortHTML<T extends Item> {
 		return root.length;
 	}
 	*values(): IterableIterator<T> {
-		for (let curr = data.get(this)!.prev; curr.item; curr = curr.next) {
+		for (let curr = data.get(this)!.next; curr.item; curr = curr.next) {
 			yield curr.item;
 		}
 	}
