@@ -241,7 +241,7 @@ export class SortHTML<T extends Item> {
 		const root = data.get(this)!;
 		[root.prev, root.next] = [root.next, root.prev];
 		root.order *= -1;
-		for (let curr = root.prev; curr.item; curr = curr.next) {
+		for (let curr = root.next; curr.item; curr = curr.next) {
 			[curr.next, curr.prev] = [curr.prev, curr.next];
 			root.parentNode.appendChild(curr.item.html);
 		}
