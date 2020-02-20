@@ -108,7 +108,7 @@ export class SortHTML<T extends Item> {
 		const [node] = getNode(data.get(this)!, index);
 		return node.item;
 	}
-	setItem(index: number, item: T): T | undefined {
+	setItem(index: number, item: T): T {
 		const root = data.get(this)!,
 		      [node] = getNode(root, index);
 		if (node.item) {
