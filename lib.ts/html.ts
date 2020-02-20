@@ -1,6 +1,10 @@
 interface NestedChildren extends Array<NestedChildren | string | Node>{}
 
-const childrenArr = (elem: Node, children: NestedChildren | string | Node) => {
+export type Children = NestedChildren | string | Node;
+
+export type Props = Record<string, string | Function>;
+
+const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
 		elem.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
@@ -10,9 +14,6 @@ const childrenArr = (elem: Node, children: NestedChildren | string | Node) => {
 	}
       };
 
-export type Props = Record<string, string | Function>;
-
-export type Children = NestedChildren | string | Node;
 
 interface cElements {
 	(namespace: string): cElement;
