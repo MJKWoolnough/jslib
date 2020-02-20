@@ -1,5 +1,3 @@
-"use strict";
-
 import {Subscription} from './inter.js';
 
 export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {

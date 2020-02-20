@@ -1,5 +1,3 @@
-"use strict";
-
 const childrenArr = (elem, children) => {
 	if (typeof children === "string") {
 		elem.appendChild(document.createTextNode(children));

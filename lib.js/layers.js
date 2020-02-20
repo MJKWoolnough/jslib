@@ -1,5 +1,3 @@
-"use strict";
-
 import {clearElement, createHTML} from './html.js';
 
 export default (container, loader) => {

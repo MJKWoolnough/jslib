@@ -1,5 +1,3 @@
-"use strict";
-
 import {Subscription} from './inter.js';
 
 const nop = () => {};

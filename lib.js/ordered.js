@@ -1,5 +1,3 @@
-"use strict";
-
 export const noSort = () => 0,
 stringSort = new Intl.Collator().compare;
 

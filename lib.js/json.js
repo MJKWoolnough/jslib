@@ -1,5 +1,3 @@
-"use strict";
-
 const whitespace = "\t\r\n ",
       escapes = "\"\\/bfnrt",
       hexDigits = "0123456789abcdefABCDEF",

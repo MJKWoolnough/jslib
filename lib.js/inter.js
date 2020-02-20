@@ -1,5 +1,3 @@
-"use strict";
-
 export class Pipe {
 	constructor() {
 		const out = [];

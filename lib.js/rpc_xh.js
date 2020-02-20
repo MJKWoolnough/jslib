@@ -1,5 +1,3 @@
-"use strict";
-
 import RequestHandler from './rpc_shared.js';
 import {HTTPRequest} from './conn.js';
 import {split} from './json.js';

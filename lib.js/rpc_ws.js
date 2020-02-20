@@ -1,5 +1,3 @@
-"use strict";
-
 import RequestHandler from './rpc_shared.js';
 import {WS} from './conn.js';
 

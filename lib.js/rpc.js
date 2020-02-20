@@ -1,5 +1,3 @@
-"use strict";
-
 import rpcWS from './rpc_ws.js';
 import rpcXH from './rpc_xh.js';
 
