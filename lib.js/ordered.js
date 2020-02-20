@@ -135,7 +135,7 @@ export class SortHTML {
 		}
 	}
 	includes(valueToFind, fromIndex = 0) {
-		for (const [_, item] of entries(this, fromIndex)) {
+		for (const [, item] of entries(this, fromIndex)) {
 			if (Object.is(valueToFind, item)) {
 				return true;
 			}
