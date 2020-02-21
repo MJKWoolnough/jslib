@@ -7,7 +7,6 @@ import (
 	"path"
 	"path/filepath"
 
-	"vimagination.zapto.org/errors"
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/jslib"
 	"vimagination.zapto.org/parser"
@@ -55,35 +54,35 @@ func run() error {
 	}
 	base, err = filepath.Abs(base)
 	if err != nil {
-		return errors.WithContext("error getting absolute path for base: %s\n", err)
+		return fmt.Errorf("error getting absolute path for base: %w\n", err)
 	}
 	args := make([]jslib.Option, 1, len(filesTodo)+1)
 	args[0] = jslib.Get(func(url string) (*javascript.Module, error) {
 		f, err := os.Open(filepath.Join(base, filepath.FromSlash(url)))
 		if err != nil {
-			return nil, errors.WithContext("error opening url: ", err)
+			return nil, fmt.Errorf("error opening url: %w", err)
 		}
 		m, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
 		f.Close()
 		if err != nil {
-			return nil, errors.WithContext("error parsing javascript module: ", err)
+			return nil, fmt.Errorf("error parsing javascript module: %w", err)
 		}
 		return m, nil
 	})
 	for _, f := range filesTodo {
 		fn, err := filepath.Abs(f)
 		if err != nil {
-			return errors.WithContext("error getting absolute filename: ", err)
+			return fmt.Errorf("error getting absolute filename: %w", err)
 		}
 		fn, err = filepath.Rel(base, fn)
 		if err != nil {
-			return errors.WithContext("error getting relative filename: ", err)
+			return fmt.Errorf("error getting relative filename: %w", err)
 		}
 		args = append(args, jslib.File(filepath.ToSlash(fn)))
 	}
 	m, err := jslib.Loader(args...)
 	if err != nil {
-		return errors.WithContext("error generating output: ", err)
+		return fmt.Errorf("error generating output: %w", err)
 	}
 	var of *os.File
 	if output == "-" {
@@ -91,12 +90,15 @@ func run() error {
 	} else {
 		of, err = os.Create(output)
 		if err != nil {
-			return errors.WithContext("error creating output file: ", err)
+			return fmt.Errorf("error creating output file: %w", err)
 		}
 	}
 	_, err = fmt.Fprintf(of, "%+s\n", m)
 	if err != nil {
-		return errors.WithContext("error writing to output: ", err)
+		return fmt.Errorf("error writing to output: %w", err)
 	}
-	return errors.WithContext("error closing output: ", of.Close())
+	if err := of.Close(); err != nil {
+		return fmt.Errorf("error closing output: %w", err)
+	}
+	return nil
 }
