@@ -54,7 +54,7 @@ const data = new WeakMap(),
 	root.parentNode.removeChild(node.item.html);
 	root.length--;
       },
-      entries = function* (s, start = 1, direction = 1) {
+      entries = function* (s, start = 0, direction = 1) {
 	for (let [curr, pos] = getNode(data.get(s), start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
 	}
