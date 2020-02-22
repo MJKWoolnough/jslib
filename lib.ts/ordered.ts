@@ -88,7 +88,6 @@ const data = new WeakMap<SortHTML<any>, Root<any>>(),
       },
       entries = function* <T extends Item>(s: SortHTML<T>, start = 0, direction = 1): IterableIterator<[number, T]> {
 	for (let [curr, pos] = getNode(data.get(s)!, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
-		console.log(1);
 		yield [pos, curr.item];
 	}
       };
