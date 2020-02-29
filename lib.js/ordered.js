@@ -63,8 +63,7 @@ const data = new WeakMap(),
 export class SortHTML {
 	constructor(parentNode, sortFn = noSort) {
 		const root = {sortFn, parentNode, length: 0, order: 1};
-		root.prev = root.next = root;
-		data.set(this, root);
+		data.set(this, root.prev = root.next = root);
 	}
 	get html() {
 		return data.get(this).parentNode;
