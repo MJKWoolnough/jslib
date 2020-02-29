@@ -1,5 +1,11 @@
-import {div} from './dom.js';
+import {div, style} from './dom.js';
 import {SortHTML} from './ordered.js';
+
+declare const pageLoad: Promise<void>;
+pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.windowsWindow {
+	background-color: #fff;
+	border: 1px solid #000;
+}`)));
 
 const sorter = (a: Taskbar | Window | Desktop, b: Taskbar | Window | Desktop) => {
 	if (a instanceof Desktop) {
@@ -57,8 +63,18 @@ class Window {
 	html: Node;
 	shell: Shell;
 	constructor(shell: Shell, options: WindowOptions) {
-		this.html = options.html;
 		this.shell = shell;
+		let width: string, height: string;
+		if (options.size) {
+			width = options.size.width.toString() + "px";
+			height = options.size.height.toString() + "px";
+		} else {
+			width = "50%";
+			height = "50%";
+		}
+		this.html = div({"class": "windowsWindow", "style": `position: absolute; top: 0; left: 0; width: ${width}; height: ${height};`}, [
+			div({"class": "windowsWindowContent"}, options.html),
+		]);
 	}
 }
 
@@ -95,24 +111,48 @@ export class Shell {
 	get html() {
 		return this.list.html;
 	}
+	newWindow(options: WindowOptions) {
+		const w = new Window(this, options);
+		this.list.push(w);
+		if (options.showOnTaskbar) {
+			// add to taskbar
+		}
+	}
 }
 
 export type TaskbarOptions = {
 	onTop?: boolean;
 	hiding?: boolean;
 	side?: Side;
+	resizeable?: boolean;
+	moveable?: boolean;
+	size?: number;
 };
 
 export type ShellOptions = {
 	showTaskbar?: boolean;
 	taskbarOptions?: TaskbarOptions,
 	desktop?: Node;
-	resolution?: {
-		width: number;
-		height: number;
-	};
+	resolution?: Size;
+}
+
+export type Size = {
+	width: number;
+	height: number;
 }
 
 export type WindowOptions = {
 	html: Node;
+	showTitle?: boolean;
+	title?: string;
+	showClose?: boolean;
+	showMaximise?: boolean;
+	showMaximize?: boolean;
+	showMinimise?: boolean;
+	showMinimize?: boolean;
+	resizeable?: boolean;
+	size?: Size;
+	maximised?: boolean;
+	maximized?: boolean;
+	showOnTaskbar?: boolean;
 }
