@@ -14,7 +14,7 @@ const sorter = (a: Taskbar | Window | Desktop, b: Taskbar | Window | Desktop) =>
 	return 0;
 };
 
-enum Side {
+export enum Side {
 	Bottom,
 	Left,
 	Right,
