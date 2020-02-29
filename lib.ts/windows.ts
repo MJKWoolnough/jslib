@@ -36,9 +36,6 @@ class Taskbar {
 		}
 		let style = "position: absolute;";
 		switch (this.side) {
-		case Side.Bottom:
-			style += "left: 0; right: 0; bottom: 0";
-			break;
 		case Side.Top:
 			style += "left: 0; right: 0, top: 0";
 			break;
@@ -48,6 +45,9 @@ class Taskbar {
 		case Side.Right:
 			style += "right: 0; top: 0; bottom: 0;";
 			break;
+		case Side.Bottom:
+		default:
+			style += "left: 0; right: 0; bottom: 0";
 		}
 		this.html = div({"class": "windowsTaskbar", "style": style}, "Taskbar");
 	}
