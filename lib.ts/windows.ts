@@ -1,6 +1,5 @@
 import {createHTML, clearElement} from './html.js';
 import {button, div, span, style, ul, li} from './dom.js';
-import {SortHTML} from './ordered.js';
 
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
@@ -144,11 +143,8 @@ interface noTaskbarDetails extends windowDetails {
 }
 
 class NoTaskbar {
-	list = new SortHTML(ul({"class": "windowsNoTaskbar"}));
+	html = ul({"class": "windowsNoTaskbar"});
 	windows = new Map<number, noTaskbarDetails>();
-	get html() {
-		return this.list.html;
-	}
 	addWindow(id: number, details: windowDetails) {
 		this.windows.set(id, details);
 	}
@@ -169,17 +165,18 @@ class NoTaskbar {
 				window.onRestore();
 			}})
 		      ]);
-		if (!this.list.some(i => {
-			if (i.html.childNodes.length === 0) {
-				i.html.appendChild(children);
-				(i.html as HTMLLIElement).classList.remove("hidden");
-				(i.html as HTMLLIElement).setAttribute("title", window.title);
-				window.item = i.html as HTMLLIElement;
+		if (!Array.from(this.html.childNodes).some((h: ChildNode) => {
+			if (h.childNodes.length === 0) {
+				const li = h as HTMLLIElement;
+				li.appendChild(children);
+				li.classList.remove("hidden");
+				li.setAttribute("title", window.title);
+				window.item = li;
 				return true;
 			}
 			return false;
 		})) {
-			this.list.push({html: window.item = li({"class": "windowsWindowTitlebar", "title": window.title}, children)});
+			window.item = this.html.appendChild(li({"class": "windowsWindowTitlebar", "title": window.title}, children));
 		}
 	}
 	removeWindow(id: number) {
