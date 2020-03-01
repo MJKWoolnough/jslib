@@ -172,8 +172,9 @@ class NoTaskbar {
 		if (!this.list.some(i => {
 			if (i.html.childNodes.length === 0) {
 				i.html.appendChild(children);
+				(i.html as HTMLLIElement).classList.remove("hidden");
 				(i.html as HTMLLIElement).setAttribute("title", window.title);
-				window.item = i.html as HTMLLIElement
+				window.item = i.html as HTMLLIElement;
 				return true;
 			}
 			return false;
@@ -186,6 +187,7 @@ class NoTaskbar {
 		if (window) {
 			if (window.item) {
 				window.item.classList.remove("hidden");
+				window.item.classList.add("hidden");
 				clearElement(window.item);
 			}
 			this.windows.delete(id);
