@@ -1,10 +1,49 @@
-import {div, style} from './dom.js';
+import {button, div, span, style} from './dom.js';
 import {SortHTML} from './ordered.js';
 
 declare const pageLoad: Promise<void>;
-pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.windowsWindow {
+pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.windowsShell {
+	overflow: hidden;
+}
+
+.windowsWindow {
+	--window-width: 50%;
+	--window-height: 50%;
+	--window-top: 0;
+	--window-left: 0;
+	position: absolute;
 	background-color: #fff;
 	border: 1px solid #000;
+	width: var(--window-width);
+	height: var(--window-height);
+	top: var(--window-top);
+	left: var(--window-left);
+	z-index: 0;
+}
+
+.windowsWindow.minimised {
+	display: none;
+}
+
+.windowsWindow.maximised {
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: auto;
+	height: auto;
+}
+
+.windowsWindowTitlebar {
+	background-color: #aaa;
+	user-select: none;
+	overflow: hidden;
+}
+
+.windowsWindowTitlebarClose, .windowsWindowTitlebarMaximise, .windowsWindowTitlebarMinimise {
+	padding: 0;
+	border-width: 2px;
+	float: right;
 }`)));
 
 const sorter = (a: Taskbar | Window | Desktop, b: Taskbar | Window | Desktop) => {
@@ -31,7 +70,7 @@ class Taskbar {
 	onTop: boolean = true;
 	hiding: boolean = false;
 	side: Side = Side.Bottom;
-	html: Node;
+	html: HTMLDivElement;
 	constructor(options: TaskbarOptions | undefined) {
 		if (options) {
 			this.onTop = options.onTop !== undefined;
@@ -60,7 +99,7 @@ class Taskbar {
 }
 
 class Window {
-	html: Node;
+	html: HTMLDivElement;
 	shell: Shell;
 	constructor(shell: Shell, options: WindowOptions) {
 		this.shell = shell;
@@ -72,14 +111,41 @@ class Window {
 			width = "50%";
 			height = "50%";
 		}
-		this.html = div({"class": "windowsWindow", "style": `position: absolute; top: 0; left: 0; width: ${width}; height: ${height};`}, [
-			div({"class": "windowsWindowContent"}, options.html),
-		]);
+		const parts: HTMLElement[] = [];
+		if (options.showTitlebar) {
+			const titlebar: HTMLElement[] = [],
+			      controls: HTMLButtonElement[] = [];
+			if (options.title) {
+				titlebar.push(span(options.title));
+			}
+			if (options.showClose) {
+				controls.push(button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": () => {
+					this.shell.removeWindow(this);
+				}}));
+			}
+			if (options.showMaximise || options.showMaximize) {
+				controls.push(button("🗖", {"class": "windowsWindowTitlebarMaximise", "onclick": () => {
+					// 🗗
+					this.html.classList.toggle("maximised");
+				}}));
+			}
+			if (options.showMinimise || options.showMinimize) {
+				controls.push(button("🗕", {"class": "windowsWindowTitlebarMinimise", "onclick": () => {
+					this.html.classList.toggle("minimised");
+				}}));
+			}
+			if (controls.length > 0) {
+				titlebar.push(...controls);
+			}
+			parts.push(div({"class": "windowsWindowTitlebar"}, titlebar));
+		}
+		parts.push(div({"class": "windowsWindowContent"}, options.html));
+		this.html = div({"class": "windowsWindow", "--window-width": width, "--window-height": height, "--window-top": "0", "--window-left": "0"}, parts);
 	}
 }
 
 class Desktop {
-	html: Node;
+	html: HTMLDivElement;
 	constructor(html: Node) {
 		this.html = div({"class": "windowsDesktop", "style": "position: absolute; top: 0; bottom: 0; left: 0; right: 0;"}, html);
 	}
@@ -118,6 +184,13 @@ export class Shell {
 			// add to taskbar
 		}
 	}
+	removeWindow(w: Window) {
+		const pos = this.list.indexOf(w);
+		if (pos >= 0) {
+			this.list.splice(pos, 1);
+
+		}
+	}
 }
 
 export type TaskbarOptions = {
@@ -143,7 +216,7 @@ export type Size = {
 
 export type WindowOptions = {
 	html: Node;
-	showTitle?: boolean;
+	showTitlebar?: boolean;
 	title?: string;
 	showClose?: boolean;
 	showMaximise?: boolean;
