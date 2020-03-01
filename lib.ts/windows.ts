@@ -97,6 +97,8 @@ class Taskbar {
 	}
 }
 
+const noPropagation = (e: Event) => e.stopPropagation();
+
 class Window {
 	html: HTMLDivElement;
 	shell: Shell;
@@ -125,7 +127,7 @@ class Window {
 			if (options.showClose) {
 				controls.push(button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": () => {
 					this.shell.removeWindow(this);
-				}}));
+				}, "onmousedown": noPropagation}));
 			}
 			if (options.showMaximise || options.showMaximize) {
 				const max = options.maximised || options.maximized,
@@ -136,7 +138,7 @@ class Window {
 						this.innerText = "🗖";
 					}
 				      };
-				controls.push(button(max ? "🗗" : "🗖", {"class": "windowsWindowTitlebarMaximise" + (max ? " maximised" : ""), "onclick": maxFn}));
+				controls.push(button(max ? "🗗" : "🗖", {"class": "windowsWindowTitlebarMaximise" + (max ? " maximised" : ""), "onclick": maxFn, "onmousedown": noPropagation}));
 				tbobj["ondblclick"] = maxFn.bind(controls[controls.length-1]);
 			}
 			if (options.showMinimise || options.showMinimize) {
@@ -145,7 +147,7 @@ class Window {
 					if (shell.list.childNodes.length > 1) {
 						shell.list.insertBefore(this.html, shell.list.firstChild);
 					}
-				}}));
+				}, "onmousedown": noPropagation}));
 			}
 			if (controls.length > 0) {
 				titlebar.push(...controls);
