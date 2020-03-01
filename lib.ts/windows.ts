@@ -135,6 +135,9 @@ class Window {
 			if (options.showMinimise || options.showMinimize) {
 				controls.push(button("🗕", {"class": "windowsWindowTitlebarMinimise", "onclick": () => {
 					this.html.classList.toggle("minimised");
+					if (shell.list.childNodes.length > 1) {
+						shell.list.insertBefore(this.html, shell.list.firstChild);
+					}
 				}}));
 			}
 			if (controls.length > 0) {
@@ -174,7 +177,7 @@ export class Shell {
 				height = options.resolution.height.toString() + "px";
 			}
 		}
-		this.list = div();;
+		this.list = div();
 		children.push(this.list);
 		if (options && options.showTaskbar) {
 			this.taskbar = new Taskbar(options.taskbarOptions)
