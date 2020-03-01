@@ -1,5 +1,4 @@
 import {button, div, span, style} from './dom.js';
-import {SortHTML} from './ordered.js';
 
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.windowsShell {
@@ -44,20 +43,20 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.wind
 	padding: 0;
 	border-width: 2px;
 	float: right;
-}`)));
+}
 
-const sorter = (a: Taskbar | Window | Desktop, b: Taskbar | Window | Desktop) => {
-	if (a instanceof Desktop) {
-		return -1;
-	} else if (b instanceof Desktop) {
-		return 1;
-	} else if (a instanceof Taskbar) {
-		return a.onTop ? 1 : -1;
-	} else if (b instanceof Taskbar) {
-		return b.onTop ? -1 : 1;
-	}
-	return 0;
-};
+.windowsWindowFocusGrabber {
+	position: absolute;
+	background-color: RGBA(0, 0, 0, 0.1);
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom :0;
+}
+
+.windowsWindow:last-child > .windowsWindowFocusGrabber {
+	display: none;
+}`)));
 
 export enum Side {
 	Bottom,
@@ -144,6 +143,9 @@ class Window {
 			parts.push(div({"class": "windowsWindowTitlebar", "onmousedown": shell.windowMove.bind(shell, this)}, titlebar));
 		}
 		parts.push(div({"class": "windowsWindowContent"}, options.html));
+		parts.push(div({"class": "windowsWindowFocusGrabber", "onmousedown": () => {
+			shell.list.appendChild(this.html);
+		}}));
 		this.html = div({"class": "windowsWindow", "--window-width": width, "--window-height": height, "--window-top": "0px", "--window-left": "0px"}, parts);
 	}
 }
@@ -156,45 +158,39 @@ class Desktop {
 }
 
 export class Shell {
-	list: SortHTML<Desktop | Taskbar | Window>;
+	html: HTMLDivElement;
+	list: HTMLDivElement;
 	taskbar?: Taskbar;
 	movingWindow = false;
 	constructor(options?: ShellOptions) {
-		let width: string, height: string;
-		if (options && options.resolution) {
-			width = options.resolution.width.toString() + "px";
-			height = options.resolution.height.toString() + "px";
-		} else {
-			width = "100%";
-			height = "100%";
-		}
-		this.list = new SortHTML<Desktop | Taskbar | Window>(div({"class": "windowsShell", "style": `position: relative; width: ${width}; height: ${height};`}), sorter);
+		const children: Node[] = [];
+		let width = "100%", height = "100%";
 		if (options) {
 			if (options.desktop) {
-				this.list.push(new Desktop(options.desktop));
+				children.push(new Desktop(options.desktop).html);
 			}
-			if (options.showTaskbar) {
-				this.taskbar = new Taskbar(options.taskbarOptions)
-				this.list.push(this.taskbar);
+			if (options.resolution) {
+				width = options.resolution.width.toString() + "px";
+				height = options.resolution.height.toString() + "px";
 			}
 		}
-	}
-	get html() {
-		return this.list.html;
+		this.list = div();;
+		children.push(this.list);
+		if (options && options.showTaskbar) {
+			this.taskbar = new Taskbar(options.taskbarOptions)
+			children.push(this.taskbar.html);
+		}
+		this.html = div({"class": "windowsShell", "style": `position: relative; width: ${width}; height: ${height};`}, children);
 	}
 	newWindow(options: WindowOptions) {
 		const w = new Window(this, options);
-		this.list.push(w);
+		this.list.appendChild(w.html);
 		if (options.showOnTaskbar || options.showMinimise || options.showMinimize) {
 			// add to taskbar
 		}
 	}
 	removeWindow(w: Window) {
-		const pos = this.list.indexOf(w);
-		if (pos >= 0) {
-			this.list.splice(pos, 1);
-
-		}
+		this.list.removeChild(w.html);
 	}
 	windowMove(w: Window, e: MouseEvent) {
 		if (this.movingWindow) {
@@ -210,12 +206,12 @@ export class Shell {
 			w.html.style.setProperty("--window-top", y + "px");
 		      },
 		      mouseUp = () => {
-			this.list.html.removeEventListener("mousemove", mouseMove);
-			this.list.html.removeEventListener("mouseup", mouseUp);
+			this.html.removeEventListener("mousemove", mouseMove);
+			this.html.removeEventListener("mouseup", mouseUp);
 			this.movingWindow = false;
 		      };
-		this.list.html.addEventListener("mousemove", mouseMove);
-		this.list.html.addEventListener("mouseup", mouseUp);
+		this.html.addEventListener("mousemove", mouseMove);
+		this.html.addEventListener("mouseup", mouseUp);
 	}
 }
 
