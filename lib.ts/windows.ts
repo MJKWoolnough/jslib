@@ -111,7 +111,8 @@ class Window {
 			width = "50%";
 			height = "50%";
 		}
-		const parts: HTMLElement[] = [];
+		const parts: HTMLElement[] = [],
+		      self = this;
 		if (options.showTitlebar) {
 			const titlebar: HTMLElement[] = [],
 			      controls: HTMLButtonElement[] = [];
@@ -124,9 +125,12 @@ class Window {
 				}}));
 			}
 			if (options.showMaximise || options.showMaximize) {
-				controls.push(button("🗖", {"class": "windowsWindowTitlebarMaximise", "onclick": () => {
-					// 🗗
-					this.html.classList.toggle("maximised");
+				controls.push(button("🗖", {"class": "windowsWindowTitlebarMaximise", "onclick": function(this: HTMLButtonElement) {
+					if (self.html.classList.toggle("maximised")) {
+						this.innerText = "🗗";
+					} else {
+						this.innerText = "🗖";
+					}
 				}}));
 			}
 			if (options.showMinimise || options.showMinimize) {
