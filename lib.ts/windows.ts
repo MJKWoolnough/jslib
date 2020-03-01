@@ -114,7 +114,11 @@ class Window {
 		      self = this;
 		if (options.showTitlebar) {
 			const titlebar: HTMLElement[] = [],
-			      controls: HTMLButtonElement[] = [];
+			      controls: HTMLButtonElement[] = [],
+			      tbobj: Record<string, string | Function> = {
+				"class": "windowsWindowTitlebar",
+				"onmousedown": shell.windowMove.bind(shell, this)
+			      };
 			if (options.title) {
 				titlebar.push(span(options.title));
 			}
@@ -124,13 +128,16 @@ class Window {
 				}}));
 			}
 			if (options.showMaximise || options.showMaximize) {
-				controls.push(button("🗖", {"class": "windowsWindowTitlebarMaximise", "onclick": function(this: HTMLButtonElement) {
+				const max = options.maximised || options.maximized,
+				      maxFn = function(this: HTMLButtonElement) {
 					if (self.html.classList.toggle("maximised")) {
 						this.innerText = "🗗";
 					} else {
 						this.innerText = "🗖";
 					}
-				}}));
+				      };
+				controls.push(button(max ? "🗗" : "🗖", {"class": "windowsWindowTitlebarMaximise" + (max ? " maximised" : ""), "onclick": maxFn}));
+				tbobj["ondblclick"] = maxFn.bind(controls[controls.length-1]);
 			}
 			if (options.showMinimise || options.showMinimize) {
 				controls.push(button("🗕", {"class": "windowsWindowTitlebarMinimise", "onclick": () => {
@@ -143,7 +150,7 @@ class Window {
 			if (controls.length > 0) {
 				titlebar.push(...controls);
 			}
-			parts.push(div({"class": "windowsWindowTitlebar", "onmousedown": shell.windowMove.bind(shell, this)}, titlebar));
+			parts.push(div(tbobj, titlebar));
 		}
 		parts.push(div({"class": "windowsWindowContent"}, options.html));
 		parts.push(div({"class": "windowsWindowFocusGrabber", "onmousedown": () => {
