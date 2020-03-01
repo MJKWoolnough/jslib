@@ -42,9 +42,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	background-color: #aaa;
 	user-select: none;
 	overflow: hidden;
+	height: calc(1em + 4px);
 }
 
-.windowsWindowTitlebarClose, .windowsWindowTitlebarMaximise, .windowsWindowTitlebarMinimise {
+.windowsWindowTitlebar > button {
 	padding: 0;
 	border-width: 2px;
 	float: right;
@@ -76,7 +77,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 
 }
 
-.windowsNoTaskbar > li:not(:empty) {
+.windowsNoTaskbar > li {
 	transform: scaleY(-1);
 	border: 1px solid #000;
 }
