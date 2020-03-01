@@ -298,11 +298,10 @@ export class Shell {
 			if (options.taskbarOptions && options.taskbarOptions.onTop) {
 				children.push(this.taskbar.html);
 			} else {
-				children.splice(1, 0, this.taskbar.html);
 			}
 		} else {
 			this.taskbar = new NoTaskbar();
-			children.push(this.taskbar.html);
+			children.splice(1, 0, this.taskbar.html);
 		}
 		this.html = div({"class": "windowsShell", "style": `position: relative; width: ${width}; height: ${height};`}, children);
 	}
