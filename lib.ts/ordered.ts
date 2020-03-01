@@ -12,12 +12,12 @@ type ItemNode<T> = {
 	item: T;
 }
 
-type Root<T extends Item> = {
+type Root<T extends Item, H extends Node = Node> = {
 	prev: ItemOrRoot<T>;
 	next: ItemOrRoot<T>;
 	item: undefined;
 	sortFn: sortFunc<T>;
-	parentNode: Node;
+	parentNode: H;
 	length: number;
 	order: number;
 }
@@ -33,7 +33,7 @@ type Callback<T extends Item, U, thisType> = (element: T, index: number, array: 
 export const noSort = () => 0,
 stringSort = new Intl.Collator().compare;
 
-const data = new WeakMap<SortHTML<any>, Root<any>>(),
+const data = new WeakMap<SortHTML<any, Node>, Root<any>>(),
       sortNodes = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
 	while (node.prev.item && root.sortFn(node.item, node.prev.item) * root.order < 0) {
 		node.next.prev = node.prev;
@@ -86,19 +86,19 @@ const data = new WeakMap<SortHTML<any>, Root<any>>(),
 	root.parentNode.removeChild(node.item.html);
 	root.length--;
       },
-      entries = function* <T extends Item>(s: SortHTML<T>, start = 0, direction = 1): IterableIterator<[number, T]> {
+      entries = function* <T extends Item>(s: SortHTML<T, Node>, start = 0, direction = 1): IterableIterator<[number, T]> {
 	for (let [curr, pos] = getNode(data.get(s)!, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
 	}
       };
 
-export class SortHTML<T extends Item> {
-	constructor(parentNode: Node, sortFn: sortFunc<T> = noSort) {
-		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T>;
+export class SortHTML<T extends Item, H extends Node = Node> {
+	constructor(parentNode: H, sortFn: sortFunc<T> = noSort) {
+		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>;
 		data.set(this, root.prev = root.next = root);
 	}
-	get html(): Node {
-		return data.get(this)!.parentNode;
+	get html() {
+		return data.get(this)!.parentNode as H;
 	}
 	get length(): number {
 		return data.get(this)!.length;
