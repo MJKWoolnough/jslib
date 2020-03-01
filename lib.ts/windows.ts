@@ -1,7 +1,10 @@
-import {button, div, span, style} from './dom.js';
+import {createHTML, clearElement} from './html.js';
+import {button, div, span, style, ul, li} from './dom.js';
+import {SortHTML} from './ordered.js';
 
 declare const pageLoad: Promise<void>;
-pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.windowsShell {
+pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
+.windowsShell {
 	overflow: hidden;
 }
 
@@ -17,6 +20,9 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.wind
 	height: var(--window-height);
 	top: var(--window-top);
 	left: var(--window-left);
+	list-style: none;
+	padding: 0;
+	user-select: contain;
 	z-index: 0;
 }
 
@@ -51,12 +57,35 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.wind
 	top: 0;
 	left: 0;
 	right: 0;
-	bottom :0;
+	bottom: 0;
 }
 
 .windowsWindow:last-child > .windowsWindowFocusGrabber {
 	display: none;
-}`)));
+}
+
+.windowsNoTaskbar {
+	list-style: none;
+	padding: 0;
+	display: grid;
+	grid-gap: 5px;
+	grid-template-columns: repeat(auto-fit, 200px);
+	position: absolute;
+	bottom: 0;
+	transform: scaleY(-1);
+	width: 100%;
+
+}
+
+.windowsNoTaskbar > li:not(:empty) {
+	transform: scaleY(-1);
+	border: 1px solid #000;
+}
+
+.windowsNoTaskbar > li.hidden {
+	visibility: hidden;
+}
+`)));
 
 export enum Side {
 	Bottom,
@@ -95,12 +124,79 @@ class Taskbar {
 		}
 		this.html = div({"class": "windowsTaskbar", "style": style}, "Taskbar");
 	}
+	addWindow(id: number, details: windowDetails) {
+	}
+	minimiseWindow(id: number) {
+	}
+	removeWindow(id: number) {
+	}
+}
+
+type windowDetails = {
+	title: string;
+	onMinimise: () => void;
+	onRestore: () => void;
+	onClose?: () => void;
+}
+
+interface noTaskbarDetails extends windowDetails {
+	item?: HTMLLIElement;
+}
+
+class NoTaskbar {
+	list = new SortHTML(ul({"class": "windowsNoTaskbar"}));
+	windows = new Map<number, noTaskbarDetails>();
+	get html() {
+		return this.list.html;
+	}
+	addWindow(id: number, details: windowDetails) {
+		this.windows.set(id, details);
+	}
+	minimiseWindow(id: number) {
+		const window = this.windows.get(id)!;
+		if (window.item) {
+			window.item.classList.remove("hidden");
+			return;
+		}
+		const children = createHTML(null, [
+			span(window.title),
+			window.onClose ? button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": () => {
+				this.removeWindow(id);
+				window.onClose!();
+			}}): [],
+			button("🗗", {"class": "windowsWindowTitlebarMaximise", "onclick": () => {
+				window.item!.classList.add("hidden");
+				window.onRestore();
+			}})
+		      ]);
+		if (!this.list.some(i => {
+			if (i.html.childNodes.length === 0) {
+				i.html.appendChild(children);
+				window.item = i.html as HTMLLIElement
+				return true;
+			}
+			return false;
+		})) {
+			this.list.push({html: window.item = li({"class": "windowsWindowTitlebar"}, children)});
+		}
+	}
+	removeWindow(id: number) {
+		const window = this.windows.get(id);
+		if (window) {
+			if (window.item) {
+				window.item.classList.remove("hidden");
+				clearElement(window.item);
+			}
+			this.windows.delete(id);
+		}
+	}
 }
 
 const noPropagation = (e: Event) => e.stopPropagation();
+let windowID = 0;
 
 class Window {
-	html: HTMLDivElement;
+	html: HTMLLIElement;
 	shell: Shell;
 	constructor(shell: Shell, options: WindowOptions) {
 		this.shell = shell;
@@ -120,12 +216,14 @@ class Window {
 			      tbobj: Record<string, string | Function> = {
 				"class": "windowsWindowTitlebar",
 				"onmousedown": shell.windowMove.bind(shell, this)
-			      };
+			      },
+			      thisID = ++windowID;
 			if (options.title) {
 				titlebar.push(span(options.title));
 			}
 			if (options.showClose) {
 				controls.push(button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": () => {
+					shell.taskbar.removeWindow(thisID);
 					this.shell.removeWindow(this);
 				}, "onmousedown": noPropagation}));
 			}
@@ -142,8 +240,15 @@ class Window {
 				tbobj["ondblclick"] = maxFn.bind(controls[controls.length-1]);
 			}
 			if (options.showMinimise || options.showMinimize) {
+				shell.taskbar.addWindow(thisID, Object.assign({"title": options.title || "", "onMinimise": () => {}, "onRestore": () => {
+					this.html.classList.remove("minimised");
+					shell.list.appendChild(this.html);
+				}}, options.showClose ? {"onClose": () => {
+					this.shell.removeWindow(this);
+				}} : {}));
 				controls.push(button("🗕", {"class": "windowsWindowTitlebarMinimise", "onclick": () => {
-					this.html.classList.toggle("minimised");
+					shell.taskbar.minimiseWindow(thisID);
+					this.html.classList.add("minimised");
 					if (shell.list.childNodes.length > 1) {
 						shell.list.insertBefore(this.html, shell.list.firstChild);
 					}
@@ -158,7 +263,7 @@ class Window {
 		parts.push(div({"class": "windowsWindowFocusGrabber", "onmousedown": () => {
 			shell.list.appendChild(this.html);
 		}}));
-		this.html = div({"class": "windowsWindow", "--window-width": width, "--window-height": height, "--window-top": "0px", "--window-left": "0px"}, parts);
+		this.html = li({"class": "windowsWindow", "--window-width": width, "--window-height": height, "--window-top": "0px", "--window-left": "0px"}, parts);
 	}
 }
 
@@ -171,8 +276,8 @@ class Desktop {
 
 export class Shell {
 	html: HTMLDivElement;
-	list: HTMLDivElement;
-	taskbar?: Taskbar;
+	list: HTMLUListElement;
+	taskbar: Taskbar | NoTaskbar;
 	movingWindow = false;
 	constructor(options?: ShellOptions) {
 		const children: Node[] = [];
@@ -186,10 +291,17 @@ export class Shell {
 				height = options.resolution.height.toString() + "px";
 			}
 		}
-		this.list = div();
+		this.list = ul();
 		children.push(this.list);
 		if (options && options.showTaskbar) {
 			this.taskbar = new Taskbar(options.taskbarOptions)
+			if (options.taskbarOptions && options.taskbarOptions.onTop) {
+				children.push(this.taskbar.html);
+			} else {
+				children.splice(1, 0, this.taskbar.html);
+			}
+		} else {
+			this.taskbar = new NoTaskbar();
 			children.push(this.taskbar.html);
 		}
 		this.html = div({"class": "windowsShell", "style": `position: relative; width: ${width}; height: ${height};`}, children);
