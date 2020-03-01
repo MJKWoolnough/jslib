@@ -172,7 +172,7 @@ class NoTaskbar {
 		if (!this.list.some(i => {
 			if (i.html.childNodes.length === 0) {
 				i.html.appendChild(children);
-				i.html.setAttribute("title", window.title);
+				(i.html as HTMLLIElement).setAttribute("title", window.title);
 				window.item = i.html as HTMLLIElement
 				return true;
 			}
