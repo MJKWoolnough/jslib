@@ -298,7 +298,7 @@ class Window {
 		}
 	}
 	onFocus() {
-		this.shell.windows.appendChild(this.html);
+		this.shell.focusWindow(this);
 	}
 	onExit() {
 		if (!this.onClose) {
