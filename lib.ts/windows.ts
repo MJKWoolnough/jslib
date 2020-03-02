@@ -4,7 +4,12 @@ import {button, div, span, style, ul, li} from './dom.js';
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 .windowsShell {
+	--shell-width: 100%;
+	--shell-height: 100%;
+	position: relative;
 	overflow: hidden;
+	width: var(--shell-width);
+	height: var(--shell-height);
 }
 
 .windowsDesktop {
@@ -322,15 +327,14 @@ class shellData {
 	dragging = false;
 	nextID = 0;
 	constructor(options?: ShellOptions) {
-		const children: Node[] = [];
-		let width = "100%", height = "100%";
+		const children: Node[] = [], params: Record<string, string> = {"class": "windowsShell"};
 		if (options) {
 			if (options.desktop) {
 				children.push(div({"class": "windowsDesktop"}, options.desktop));
 			}
 			if (options.resolution) {
-				width = options.resolution.width.toString() + "px";
-				height = options.resolution.height.toString() + "px";
+				params["--shell-width"] = options.resolution.width.toString() + "px";
+				params["--shell-height"] = options.resolution.height.toString() + "px";
 			}
 			if (options.taskbar) {
 				this.taskbar = options.taskbar;
@@ -345,7 +349,7 @@ class shellData {
 		} else {
 			children.push(this.taskbar.html, this.windows);
 		}
-		this.html = div({"class": "windowsShell", "style": `position: relative; width: ${width}; height: ${height};`}, children);
+		this.html = div(params, children);
 	}
 	windowMove(w: Window, e: MouseEvent) {
 		if (this.dragging) {
