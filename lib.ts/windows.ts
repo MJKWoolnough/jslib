@@ -173,7 +173,7 @@ export class Taskbar {
 				w.onFocus();
 			}
 		}}, [
-			img({"src": w.icon}),
+			w.icon ? img({"src": w.icon}) : [],
 			span(w.title)
 		]))});
 	}
@@ -203,7 +203,7 @@ class NoTaskbar {
 			return;
 		}
 		const children = createHTML(null, [
-			img({"src": w.icon}),
+			w.icon ? img({"src": w.icon}) : [],
 			span(w.title),
 			w.onClose ? button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": w.onExit.bind(w)}) : [],
 			button("🗗", {"class": "windowsWindowTitlebarMaximise", "onclick": this.restoreWindow.bind(this, w)}),
@@ -264,6 +264,8 @@ class Window {
 		      self = this;
 		if (options.icon) {
 			this.icon = options.icon;
+		} else if (options.icon === "") {
+			this.icon = "";
 		}
 		if (options.showTitlebar) {
 			const controls: HTMLButtonElement[] = [],
@@ -290,7 +292,7 @@ class Window {
 				controls.push(button("🗕", {"class": "windowsWindowTitlebarMinimise", "onclick": this.onMinimiseToggle.bind(this), "onmousedown": noPropagation}));
 			}
 			parts.push(div(tbobj, [
-				img({"src": this.icon}),
+				this.icon ? img({"src": this.icon}) : [],
 				span(title),
 				controls
 			]));
