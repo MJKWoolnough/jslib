@@ -166,6 +166,7 @@ export class Taskbar {
 		}}, span(w.title)))});
 	}
 	minimiseWindow(w: Window) {}
+	restoreWindow(w: Window) {}
 	removeWindow(w: Window) {
 		this.html.removeChild(this.windows.get(w)!.item!);
 	}
@@ -193,10 +194,7 @@ class NoTaskbar {
 		const children = createHTML(null, [
 			span(w.title),
 			w.onClose ? button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": w.onExit.bind(w)}) : [],
-			button("🗗", {"class": "windowsWindowTitlebarMaximise", "onclick": () => {
-				window.item!.classList.add("hidden");
-				w.onMinimiseToggle();
-			}})
+			button("🗗", {"class": "windowsWindowTitlebarMaximise", "onclick": this.restoreWindow.bind(this, w)}),
 		      ]);
 		if (!Array.from(this.html.childNodes).some((h: ChildNode) => {
 			if (h.childNodes.length === 0) {
@@ -209,8 +207,12 @@ class NoTaskbar {
 			}
 			return false;
 		})) {
-			window.item = this.html.appendChild(li({"class": "windowsWindowTitlebar", "title": w.title}, children));
+			window.item = this.html.appendChild(li({"class": "windowsWindowTitlebar", "title": w.title, "ondblclick": this.restoreWindow.bind(this, w)}, children));
 		}
+	}
+	restoreWindow(w: Window) {
+		this.windows.get(w)!.item!.classList.add("hidden");
+		w.onMinimiseToggle();
 	}
 	removeWindow(w: Window) {
 		const window = this.windows.get(w);
