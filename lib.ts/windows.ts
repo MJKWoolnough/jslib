@@ -85,6 +85,29 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 .windowsNoTaskbar > li.hidden {
 	visibility: hidden;
 }
+
+.windowsTaskbarBottom {
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: calc(1em + 8px);
+	border-top: 1px solid #aaa;
+	overflow-y: scroll;
+}
+
+.windowsTaskbar {
+	position: absolute;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.windowsTaskbar > li {
+	float: left;
+	margin-right: 2px;
+	padding: 2px;
+	border: 1px solid #000;
+}
 `)));
 
 export enum Side {
@@ -98,54 +121,58 @@ class Taskbar {
 	onTop: boolean = true;
 	hiding: boolean = false;
 	side: Side = Side.Bottom;
-	html: HTMLDivElement;
+	windows = new Map<number, windowDetails>();
+	html: HTMLUListElement;
 	constructor(options: TaskbarOptions | undefined) {
+		let classes = "windowsTaskbar";
 		if (options) {
 			this.onTop = options.onTop !== undefined;
-			this.hiding = !!options.hiding;
+			if (!!options.hiding) {
+				classes += " hiding";
+			}
 			if (options.side) {
 				this.side = options.side;
 			}
 		}
 		let style = "position: absolute;";
+
 		switch (this.side) {
 		case Side.Top:
-			style += "left: 0; right: 0, top: 0";
+			classes += " windowsTaskbarTop";
 			break;
 		case Side.Left:
-			style += "left: 0; top: 0; bottom: 0;";
+			classes += " windowsTaskbarLeft";
 			break;
 		case Side.Right:
-			style += "right: 0; top: 0; bottom: 0;";
+			classes += " windowsTaskbarRight";
 			break;
 		case Side.Bottom:
 		default:
-			style += "left: 0; right: 0; bottom: 0";
+			classes += " windowsTaskbarBottom";
 		}
-		this.html = div({"class": "windowsTaskbar", "style": style}, "Taskbar");
+		this.html = ul({"class": classes});
 	}
 	addWindow(id: number, details: windowDetails) {
+		details.item = this.html.appendChild(li({"onclick": details.onToggle}, span(details.title)));
+		this.windows.set(id, details);
 	}
 	minimiseWindow(id: number) {
 	}
 	removeWindow(id: number) {
+		this.html.removeChild(this.windows.get(id)!.item!);
 	}
 }
 
 type windowDetails = {
 	title: string;
-	onMinimise: () => void;
-	onRestore: () => void;
+	onToggle: () => void;
 	onClose?: () => void;
-}
-
-interface noTaskbarDetails extends windowDetails {
 	item?: HTMLLIElement;
 }
 
 class NoTaskbar {
 	html = ul({"class": "windowsNoTaskbar"});
-	windows = new Map<number, noTaskbarDetails>();
+	windows = new Map<number, windowDetails>();
 	addWindow(id: number, details: windowDetails) {
 		this.windows.set(id, details);
 	}
@@ -163,7 +190,7 @@ class NoTaskbar {
 			}}): [],
 			button("🗗", {"class": "windowsWindowTitlebarMaximise", "onclick": () => {
 				window.item!.classList.add("hidden");
-				window.onRestore();
+				window.onToggle();
 			}})
 		      ]);
 		if (!Array.from(this.html.childNodes).some((h: ChildNode) => {
@@ -241,9 +268,10 @@ class Window {
 				tbobj["ondblclick"] = maxFn.bind(controls[controls.length-1]);
 			}
 			if (options.showMinimise || options.showMinimize) {
-				shell.taskbar.addWindow(thisID, Object.assign({"title": options.title || "", "onMinimise": () => {}, "onRestore": () => {
-					this.html.classList.remove("minimised");
-					shell.list.appendChild(this.html);
+				shell.taskbar.addWindow(thisID, Object.assign({"title": options.title || "", "onToggle": () => {
+					if (this.html.classList.toggle("minimised")) {
+						shell.list.appendChild(this.html);
+					}
 				}}, options.showClose ? {"onClose": () => {
 					this.shell.removeWindow(this);
 				}} : {}));
@@ -299,6 +327,7 @@ export class Shell {
 			if (options.taskbarOptions && options.taskbarOptions.onTop) {
 				children.push(this.taskbar.html);
 			} else {
+				children.splice(1, 0, this.taskbar.html);
 			}
 		} else {
 			this.taskbar = new NoTaskbar();
