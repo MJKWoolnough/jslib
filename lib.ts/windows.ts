@@ -166,7 +166,6 @@ export class Taskbar {
 		}}, span(w.title)))});
 	}
 	minimiseWindow(w: Window) {}
-	restoreWindow(w: Window) {}
 	removeWindow(w: Window) {
 		this.html.removeChild(this.windows.get(w)!.item!);
 	}
@@ -389,7 +388,7 @@ class shellData {
 	}
 	minimiseWindow(w: Window) {
 		w.html.classList.add("minimised");
-		if (this.windows.childNodes.length > 1) {
+		if (this.windows.childNodes.length > 1 && this.windows.firstChild !== w.html) {
 			this.windows.insertBefore(w.html, this.windows.firstChild);
 		}
 		this.taskbar.minimiseWindow(w);
@@ -412,12 +411,6 @@ export class Shell {
 	}
 	addWindow(title: string, content: Node, options?: WindowOptions) {
 		return shells.get(this)!.addWindow(title, content, options);
-	}
-	setWindowMinimise(id: number, minimised = true) {
-
-	}
-	setWindowMaximise(id: number, maximised = true) {
-
 	}
 	removeWindow(id: number) {
 		const shellData = shells.get(this)!,
