@@ -235,7 +235,7 @@ class Window {
 	onClose?: () => Promise<boolean>;
 	title: string;
 	maximiseButton ?: HTMLButtonElement;
-	constructor(shell: shellData, title: string, content: Node, options: WindowOptions) {
+	constructor(shell: shellData, title: string, content: HTMLDivElement, options: WindowOptions) {
 		this.shell = shell;
 		this.title = title;
 		let width: string, height: string;
@@ -278,7 +278,7 @@ class Window {
 				controls
 			]));
 		}
-		parts.push(div({"class": "windowsWindowContent"}, content));
+		parts.push(content);
 		parts.push(div({"class": "windowsWindowFocusGrabber", "onmousedown": this.onFocus.bind(this)}));
 		this.html = li({"class": "windowsWindow", "--window-width": width, "--window-height": height, "--window-top": "0px", "--window-left": "0px"}, parts);
 	}
@@ -323,10 +323,9 @@ export type ShellOptions = {
 class shellData {
 	html: HTMLDivElement;
 	windows = ul();
-	windowData = new Map<number, Window>();
+	windowData = new WeakMap<HTMLDivElement, Window>();
 	taskbar: Taskbar | NoTaskbar;
 	dragging = false;
-	nextID = 0;
 	constructor(options?: ShellOptions) {
 		const children: Node[] = [], params: Record<string, string> = {"class": "windowsShell"};
 		if (options) {
@@ -373,14 +372,15 @@ class shellData {
 		this.html.addEventListener("mousemove", mouseMove);
 		this.html.addEventListener("mouseup", mouseUp);
 	}
-	addWindow(title: string, content: Node, options?: WindowOptions) {
-		const nextID = ++this.nextID,
+	addWindow(title: string, options?: WindowOptions) {
+		const content = div({"class": "windowWindowsContent"}),
 		      w = new Window(this, title, content, options || {});
 		this.windows.appendChild(w.html);
 		if (options && (options.showOnTaskbar || options.showMinimise || options.showMinimize)) {
 			this.taskbar.addWindow(w);
 		}
-		return nextID;
+		this.windowData.set(content, w);
+		return content;
 	}
 	removeWindow(w: Window) {
 		this.taskbar.removeWindow(w);
@@ -409,12 +409,12 @@ export class Shell {
 	get html() {
 		return shells.get(this)!.html;
 	}
-	addWindow(title: string, content: Node, options?: WindowOptions) {
-		return shells.get(this)!.addWindow(title, content, options);
+	addWindow(title: string, options?: WindowOptions) {
+		return shells.get(this)!.addWindow(title, options);
 	}
-	removeWindow(id: number) {
+	removeWindow(w: HTMLDivElement) {
 		const shellData = shells.get(this)!,
-		      window = shellData.windowData.get(id);
+		      window = shellData.windowData.get(w);
 		if (window) {
 			shellData.removeWindow(window);
 		}
