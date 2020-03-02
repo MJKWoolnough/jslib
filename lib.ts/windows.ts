@@ -273,7 +273,6 @@ class Window {
 			      thisID = ++windowID;
 			if (options.showClose) {
 				controls.push(button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": () => {
-					shell.taskbar.removeWindow(this);
 					shell.removeWindow(this);
 				}, "onmousedown": noPropagation}));
 				this.onClose = closeTrue;
