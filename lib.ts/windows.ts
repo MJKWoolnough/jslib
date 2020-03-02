@@ -1,5 +1,5 @@
 import {createHTML, clearElement} from './html.js';
-import {button, div, span, style, ul, li} from './dom.js';
+import {button, div, img, span, style, ul, li} from './dom.js';
 
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
@@ -56,6 +56,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	user-select: none;
 	overflow: hidden;
 	height: calc(1em + 4px);
+}
+
+.windowsWindowTitlebar > img {
+	height: calc(1em);
 }
 
 .windowsWindowTitlebar > button {
@@ -121,6 +125,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	padding: 2px;
 	border: 1px solid #000;
 }
+
+.windowsTaskbar > li > img {
+	height: 1em;
+}
 `)));
 
 export enum Side {
@@ -163,7 +171,10 @@ export class Taskbar {
 			} else {
 				w.onFocus();
 			}
-		}}, span(w.title)))});
+		}}, [
+			img({"src": w.icon}),
+			span(w.title)
+		]))});
 	}
 	minimiseWindow(w: Window) {}
 	removeWindow(w: Window) {
@@ -191,6 +202,7 @@ class NoTaskbar {
 			return;
 		}
 		const children = createHTML(null, [
+			img({"src": w.icon}),
 			span(w.title),
 			w.onClose ? button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": w.onExit.bind(w)}) : [],
 			button("🗗", {"class": "windowsWindowTitlebarMaximise", "onclick": this.restoreWindow.bind(this, w)}),
@@ -226,13 +238,14 @@ class NoTaskbar {
 	}
 }
 
-const noPropagation = (e: Event) => e.stopPropagation(), closeTrue = () => Promise.resolve(true);
+const noPropagation = (e: Event) => e.stopPropagation(), closeTrue = () => Promise.resolve(true), noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";
 let windowID = 0;
 
 class Window {
 	html: HTMLLIElement;
 	shell: shellData;
 	onClose?: () => Promise<boolean>;
+	icon = noIcon;
 	title: string;
 	maximiseButton ?: HTMLButtonElement;
 	constructor(shell: shellData, title: string, content: HTMLDivElement, options: WindowOptions) {
@@ -248,6 +261,9 @@ class Window {
 		}
 		const parts: HTMLElement[] = [],
 		      self = this;
+		if (options.icon) {
+			this.icon = options.icon;
+		}
 		if (options.showTitlebar) {
 			const controls: HTMLButtonElement[] = [],
 			      tbobj: Record<string, string | Function> = {
@@ -274,6 +290,7 @@ class Window {
 				controls.push(button("🗕", {"class": "windowsWindowTitlebarMinimise", "onclick": this.onMinimiseToggle.bind(this), "onmousedown": noPropagation}));
 			}
 			parts.push(div(tbobj, [
+				img({"src": this.icon}),
 				span(title),
 				controls
 			]));
@@ -428,6 +445,7 @@ export type Size = {
 
 export type WindowOptions = {
 	showTitlebar?: boolean;
+	icon?: string;
 	title?: string;
 	showClose?: boolean;
 	showMaximise?: boolean;
