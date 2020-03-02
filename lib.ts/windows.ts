@@ -7,6 +7,14 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	overflow: hidden;
 }
 
+.windowsDesktop {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
 .windowsWindow {
 	--window-width: 50%;
 	--window-height: 50%;
@@ -117,26 +125,13 @@ export enum Side {
 	Top,
 }
 
-class Taskbar {
-	onTop: boolean = true;
-	hiding: boolean = false;
-	side: Side = Side.Bottom;
-	windows = new Map<number, windowDetails>();
+export class Taskbar {
 	html: HTMLUListElement;
-	constructor(options: TaskbarOptions | undefined) {
+	windows = new Map<Window, windowDetails>();
+	onTop: boolean;
+	constructor(side: Side, stayOnTop = false, autoHide = false) {
 		let classes = "windowsTaskbar";
-		if (options) {
-			this.onTop = options.onTop !== undefined;
-			if (!!options.hiding) {
-				classes += " hiding";
-			}
-			if (options.side) {
-				this.side = options.side;
-			}
-		}
-		let style = "position: absolute;";
-
-		switch (this.side) {
+		switch (side) {
 		case Side.Top:
 			classes += " windowsTaskbarTop";
 			break;
@@ -150,47 +145,52 @@ class Taskbar {
 		default:
 			classes += " windowsTaskbarBottom";
 		}
+		if (autoHide) {
+			classes += " windowsTaskbarAutohide";
+		}
+		this.onTop = stayOnTop
 		this.html = ul({"class": classes});
 	}
-	addWindow(id: number, details: windowDetails) {
-		details.item = this.html.appendChild(li({"onclick": details.onToggle}, span(details.title)));
-		this.windows.set(id, details);
+	addWindow(w: Window) {
+		this.windows.set(w, {item: this.html.appendChild(li({"onclick": () => {
+			if (!w.html.nextElementSibling || w.html.classList.contains("minimised")) {
+				w.onMinimiseToggle()
+			} else {
+				w.onFocus();
+			}
+		}}, span(w.title)))});
 	}
-	minimiseWindow(id: number) {
-	}
-	removeWindow(id: number) {
-		this.html.removeChild(this.windows.get(id)!.item!);
+	minimiseWindow(w: Window) {}
+	removeWindow(w: Window) {
+		this.html.removeChild(this.windows.get(w)!.item!);
 	}
 }
 
 type windowDetails = {
-	title: string;
-	onToggle: () => void;
-	onClose?: () => void;
 	item?: HTMLLIElement;
 }
 
 class NoTaskbar {
 	html = ul({"class": "windowsNoTaskbar"});
-	windows = new Map<number, windowDetails>();
-	addWindow(id: number, details: windowDetails) {
-		this.windows.set(id, details);
+	windows = new Map<Window, windowDetails>();
+	get onTop() {
+		return false;
 	}
-	minimiseWindow(id: number) {
-		const window = this.windows.get(id)!;
+	addWindow(window: Window) {
+		this.windows.set(window, {});
+	}
+	minimiseWindow(w: Window) {
+		const window = this.windows.get(w)!;
 		if (window.item) {
 			window.item.classList.remove("hidden");
 			return;
 		}
 		const children = createHTML(null, [
-			span(window.title),
-			window.onClose ? button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": () => {
-				this.removeWindow(id);
-				window.onClose!();
-			}}): [],
+			span(w.title),
+			w.onClose ? button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": w.onExit.bind(w)}) : [],
 			button("🗗", {"class": "windowsWindowTitlebarMaximise", "onclick": () => {
 				window.item!.classList.add("hidden");
-				window.onToggle();
+				w.onMinimiseToggle();
 			}})
 		      ]);
 		if (!Array.from(this.html.childNodes).some((h: ChildNode) => {
@@ -198,36 +198,40 @@ class NoTaskbar {
 				const li = h as HTMLLIElement;
 				li.appendChild(children);
 				li.classList.remove("hidden");
-				li.setAttribute("title", window.title);
+				li.setAttribute("title", w.title);
 				window.item = li;
 				return true;
 			}
 			return false;
 		})) {
-			window.item = this.html.appendChild(li({"class": "windowsWindowTitlebar", "title": window.title}, children));
+			window.item = this.html.appendChild(li({"class": "windowsWindowTitlebar", "title": w.title}, children));
 		}
 	}
-	removeWindow(id: number) {
-		const window = this.windows.get(id);
+	removeWindow(w: Window) {
+		const window = this.windows.get(w);
 		if (window) {
 			if (window.item) {
 				window.item.classList.remove("hidden");
 				window.item.classList.add("hidden");
 				clearElement(window.item);
 			}
-			this.windows.delete(id);
+			this.windows.delete(w);
 		}
 	}
 }
 
-const noPropagation = (e: Event) => e.stopPropagation();
+const noPropagation = (e: Event) => e.stopPropagation(), closeTrue = () => Promise.resolve(true);
 let windowID = 0;
 
 class Window {
 	html: HTMLLIElement;
-	shell: Shell;
-	constructor(shell: Shell, options: WindowOptions) {
+	shell: shellData;
+	onClose?: () => Promise<boolean>;
+	title: string;
+	maximiseButton ?: HTMLButtonElement;
+	constructor(shell: shellData, title: string, content: Node, options: WindowOptions) {
 		this.shell = shell;
+		this.title = title;
 		let width: string, height: string;
 		if (options.size) {
 			width = options.size.width.toString() + "px";
@@ -239,117 +243,115 @@ class Window {
 		const parts: HTMLElement[] = [],
 		      self = this;
 		if (options.showTitlebar) {
-			const titlebar: HTMLElement[] = [],
-			      controls: HTMLButtonElement[] = [],
+			const controls: HTMLButtonElement[] = [],
 			      tbobj: Record<string, string | Function> = {
 				"class": "windowsWindowTitlebar",
 				"onmousedown": shell.windowMove.bind(shell, this)
 			      },
 			      thisID = ++windowID;
-			if (options.title) {
-				titlebar.push(span(options.title));
-			}
 			if (options.showClose) {
 				controls.push(button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": () => {
-					shell.taskbar.removeWindow(thisID);
-					this.shell.removeWindow(this);
+					shell.taskbar.removeWindow(this);
+					shell.removeWindow(this);
 				}, "onmousedown": noPropagation}));
+				this.onClose = closeTrue;
+			}
+			if (options.onClose) {
+				this.onClose = options.onClose;
 			}
 			if (options.showMaximise || options.showMaximize) {
-				const max = options.maximised || options.maximized,
-				      maxFn = function(this: HTMLButtonElement) {
-					if (self.html.classList.toggle("maximised")) {
-						this.innerText = "🗗";
-					} else {
-						this.innerText = "🗖";
-					}
-				      };
-				controls.push(button(max ? "🗗" : "🗖", {"class": "windowsWindowTitlebarMaximise" + (max ? " maximised" : ""), "onclick": maxFn, "onmousedown": noPropagation}));
-				tbobj["ondblclick"] = maxFn.bind(controls[controls.length-1]);
+				const max = options.maximised || options.maximized;
+				controls.push(this.maximiseButton = button(max ? "🗗" : "🗖", {"class": "windowsWindowTitlebarMaximise" + (max ? " maximised" : ""), "onclick": this.onMaximiseToggle.bind(this), "onmousedown": noPropagation}));
+				tbobj["ondblclick"] = this.onMaximiseToggle.bind(this);
 			}
 			if (options.showMinimise || options.showMinimize) {
-				shell.taskbar.addWindow(thisID, Object.assign({"title": options.title || "", "onToggle": () => {
-					if (this.html.classList.toggle("minimised")) {
-						shell.list.appendChild(this.html);
-					}
-				}}, options.showClose ? {"onClose": () => {
-					this.shell.removeWindow(this);
-				}} : {}));
-				controls.push(button("🗕", {"class": "windowsWindowTitlebarMinimise", "onclick": () => {
-					shell.taskbar.minimiseWindow(thisID);
-					this.html.classList.add("minimised");
-					if (shell.list.childNodes.length > 1) {
-						shell.list.insertBefore(this.html, shell.list.firstChild);
-					}
-				}, "onmousedown": noPropagation}));
+				controls.push(button("🗕", {"class": "windowsWindowTitlebarMinimise", "onclick": this.onMinimiseToggle.bind(this), "onmousedown": noPropagation}));
 			}
-			if (controls.length > 0) {
-				titlebar.push(...controls);
-			}
-			parts.push(div(tbobj, titlebar));
+			parts.push(div(tbobj, [
+				span(title),
+				controls
+			]));
 		}
-		parts.push(div({"class": "windowsWindowContent"}, options.html));
-		parts.push(div({"class": "windowsWindowFocusGrabber", "onmousedown": () => {
-			shell.list.appendChild(this.html);
-		}}));
+		parts.push(div({"class": "windowsWindowContent"}, content));
+		parts.push(div({"class": "windowsWindowFocusGrabber", "onmousedown": this.onFocus.bind(this)}));
 		this.html = li({"class": "windowsWindow", "--window-width": width, "--window-height": height, "--window-top": "0px", "--window-left": "0px"}, parts);
 	}
-}
-
-class Desktop {
-	html: HTMLDivElement;
-	constructor(html: Node) {
-		this.html = div({"class": "windowsDesktop", "style": "position: absolute; top: 0; bottom: 0; left: 0; right: 0;"}, html);
+	onMinimiseToggle() {
+		if (this.html.classList.toggle("minimised")) {
+			this.shell.minimiseWindow(this);
+		} else {
+			this.shell.focusWindow(this);
+		}
+	}
+	onMaximiseToggle() {
+		if (this.maximiseButton) {
+			if (this.html.classList.toggle("maximised")) {
+				this.maximiseButton.innerText = "🗗";
+			} else {
+				this.maximiseButton.innerText = "🗖";
+			}
+		}
+	}
+	onFocus() {
+		this.shell.windows.appendChild(this.html);
+	}
+	onExit() {
+		if (!this.onClose) {
+			this.shell.removeWindow(this);
+			return;
+		}
+		this.onClose().then(b => {
+			if (b) {
+				this.shell.removeWindow(this);
+			}
+		});
 	}
 }
 
-export class Shell {
+export type ShellOptions = {
+	desktop?: Node;
+	taskbar?: Taskbar;
+	resolution: Size;
+}
+
+class shellData {
 	html: HTMLDivElement;
-	list: HTMLUListElement;
+	windows = ul();
+	windowData = new Map<number, Window>();
 	taskbar: Taskbar | NoTaskbar;
-	movingWindow = false;
+	dragging = false;
+	nextID = 0;
 	constructor(options?: ShellOptions) {
 		const children: Node[] = [];
 		let width = "100%", height = "100%";
 		if (options) {
 			if (options.desktop) {
-				children.push(new Desktop(options.desktop).html);
+				children.push(div({"class": "windowsDesktop"}, options.desktop));
 			}
 			if (options.resolution) {
 				width = options.resolution.width.toString() + "px";
 				height = options.resolution.height.toString() + "px";
 			}
-		}
-		this.list = ul();
-		children.push(this.list);
-		if (options && options.showTaskbar) {
-			this.taskbar = new Taskbar(options.taskbarOptions)
-			if (options.taskbarOptions && options.taskbarOptions.onTop) {
-				children.push(this.taskbar.html);
+			if (options.taskbar) {
+				this.taskbar = options.taskbar;
 			} else {
-				children.splice(1, 0, this.taskbar.html);
+				this.taskbar = new NoTaskbar();
 			}
 		} else {
 			this.taskbar = new NoTaskbar();
-			children.splice(1, 0, this.taskbar.html);
+		}
+		if (this.taskbar.onTop) {
+			children.push(this.windows, this.taskbar.html);
+		} else {
+			children.push(this.taskbar.html, this.windows);
 		}
 		this.html = div({"class": "windowsShell", "style": `position: relative; width: ${width}; height: ${height};`}, children);
 	}
-	newWindow(options: WindowOptions) {
-		const w = new Window(this, options);
-		this.list.appendChild(w.html);
-		if (options.showOnTaskbar || options.showMinimise || options.showMinimize) {
-			// add to taskbar
-		}
-	}
-	removeWindow(w: Window) {
-		this.list.removeChild(w.html);
-	}
 	windowMove(w: Window, e: MouseEvent) {
-		if (this.movingWindow) {
+		if (this.dragging) {
 			return;
 		}
-		this.movingWindow = true;
+		this.dragging = true;
 		const grabX = e.clientX - parseInt(w.html.style.getPropertyValue("--window-left").slice(0, -2)),
 		      grabY = e.clientY - parseInt(w.html.style.getPropertyValue("--window-top").slice(0, -2)),
 		      mouseMove = (e: MouseEvent) => {
@@ -361,27 +363,63 @@ export class Shell {
 		      mouseUp = () => {
 			this.html.removeEventListener("mousemove", mouseMove);
 			this.html.removeEventListener("mouseup", mouseUp);
-			this.movingWindow = false;
+			this.dragging = false;
 		      };
 		this.html.addEventListener("mousemove", mouseMove);
 		this.html.addEventListener("mouseup", mouseUp);
 	}
+	addWindow(title: string, content: Node, options?: WindowOptions) {
+		const nextID = ++this.nextID,
+		      w = new Window(this, title, content, options || {});
+		this.windows.appendChild(w.html);
+		if (options && (options.showOnTaskbar || options.showMinimise || options.showMinimize)) {
+			this.taskbar.addWindow(w);
+		}
+		return nextID;
+	}
+	removeWindow(w: Window) {
+		this.taskbar.removeWindow(w);
+		this.windows.removeChild(w.html);
+	}
+	minimiseWindow(w: Window) {
+		w.html.classList.add("minimised");
+		if (this.windows.childNodes.length > 1) {
+			this.windows.insertBefore(w.html, this.windows.firstChild);
+		}
+		this.taskbar.minimiseWindow(w);
+	}
+	focusWindow(w: Window) {
+		if (this.windows.childNodes.length > 1) {
+			this.windows.appendChild(w.html);
+		}
+	}
 }
 
-export type TaskbarOptions = {
-	onTop?: boolean;
-	hiding?: boolean;
-	side?: Side;
-	resizeable?: boolean;
-	moveable?: boolean;
-	size?: number;
-};
+const shells = new Map<Shell, shellData>();
 
-export type ShellOptions = {
-	showTaskbar?: boolean;
-	taskbarOptions?: TaskbarOptions,
-	desktop?: Node;
-	resolution?: Size;
+export class Shell {
+	constructor(options?: ShellOptions) {
+		shells.set(this, new shellData(options))
+	}
+	get html() {
+		return shells.get(this)!.html;
+	}
+	addWindow(title: string, content: Node, options?: WindowOptions) {
+		return shells.get(this)!.addWindow(title, content, options);
+	}
+	setWindowMinimise(id: number, minimised = true) {
+
+	}
+	setWindowMaximise(id: number, maximised = true) {
+
+	}
+	removeWindow(id: number) {
+		const shellData = shells.get(this)!,
+		      window = shellData.windowData.get(id);
+		if (window) {
+			shellData.removeWindow(window);
+		}
+	}
 }
 
 export type Size = {
@@ -390,7 +428,6 @@ export type Size = {
 }
 
 export type WindowOptions = {
-	html: Node;
 	showTitlebar?: boolean;
 	title?: string;
 	showClose?: boolean;
@@ -403,4 +440,5 @@ export type WindowOptions = {
 	maximised?: boolean;
 	maximized?: boolean;
 	showOnTaskbar?: boolean;
+	onClose?: () => Promise<boolean>;
 }
