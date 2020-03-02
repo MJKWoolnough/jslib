@@ -117,6 +117,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	list-style: none;
 	padding: 0;
 	margin: 0;
+	user-select: none;
 }
 
 .windowsTaskbar > li {
