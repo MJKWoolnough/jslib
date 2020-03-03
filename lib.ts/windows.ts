@@ -310,10 +310,19 @@ class Window {
 	constructor(shell: shellData, title: string, content: HTMLDivElement, options: WindowOptions) {
 		this.shell = shell;
 		this.title = title;
-		let width = "50%", height = "50%";
+		const params: Record<string, string> = {
+			"class": "windowsWindow"
+		};
 		if (options.size) {
-			width = options.size.width.toString() + "px";
-			height = options.size.height.toString() + "px";
+			params["--window-width"] = options.size.width.toString() + "px";
+			params["--window-height"] = options.size.height.toString() + "px";
+		}
+		if (options.position) {
+			params["--window-left"] = options.position.x.toString() + "px";
+			params["--window-top"] = options.position.y.toString() + "px";
+		} else {
+			params["--window-left"] = "0px";
+			params["--window-top"] = "0px";
 		}
 		const parts: HTMLElement[] = [],
 		      self = this;
@@ -352,7 +361,7 @@ class Window {
 		}
 		parts.push(content);
 		parts.push(div({"class": "windowsWindowFocusGrabber", "onmousedown": this.onFocus.bind(this)}));
-		this.html = li({"class": "windowsWindow", "--window-width": width, "--window-height": height, "--window-top": "0px", "--window-left": "0px"}, parts);
+		this.html = li(params, parts);
 	}
 	onMinimiseToggle() {
 		if (this.html.classList.toggle("minimised")) {
@@ -492,6 +501,11 @@ export type Size = {
 	height: number;
 }
 
+export type Position = {
+	x: number;
+	y: number;
+}
+
 export type WindowOptions = {
 	showTitlebar?: boolean;
 	icon?: string;
@@ -503,6 +517,7 @@ export type WindowOptions = {
 	showMinimize?: boolean;
 	resizeable?: boolean;
 	size?: Size;
+	position?: Position;
 	maximised?: boolean;
 	maximized?: boolean;
 	showOnTaskbar?: boolean;
