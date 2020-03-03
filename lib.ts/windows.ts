@@ -133,6 +133,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	border: 1px solid #000;
 }
 
+.windowsTaskbarBottom.windowsTaskbarAutohide:not(:hover) {
+	bottom: calc(-1em - 7px);
+}
+
 .windowsTaskbar > li > img {
 	height: 1em;
 }
@@ -201,6 +205,9 @@ export class Taskbar {
 	}
 	get html() {
 		return taskbars.get(this)!.html;
+	}
+	get onTop() {
+		return taskbars.get(this)!.onTop;
 	}
 	addWindow(w: Window) {
 		const self = taskbars.get(this)!;
