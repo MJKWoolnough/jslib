@@ -277,13 +277,10 @@ class Window {
 	constructor(shell: shellData, title: string, content: HTMLDivElement, options: WindowOptions) {
 		this.shell = shell;
 		this.title = title;
-		let width: string, height: string;
+		let width = "50%", height = "50%";
 		if (options.size) {
 			width = options.size.width.toString() + "px";
 			height = options.size.height.toString() + "px";
-		} else {
-			width = "50%";
-			height = "50%";
 		}
 		const parts: HTMLElement[] = [],
 		      self = this;
