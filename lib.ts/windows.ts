@@ -161,10 +161,19 @@ export enum Side {
 	Top,
 }
 
-export class Taskbar {
+const shells = new WeakMap<Shell, shellData>(),
+      taskbars = new WeakMap<Taskbar, taskbarData>(),
+      noPropagation = (e: Event) => e.stopPropagation(),
+      closeTrue = () => Promise.resolve(true),
+      noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";
+
+type taskbarData = {
 	html: HTMLUListElement;
-	windows = new Map<Window, windowDetails>();
+	windows: Map<Window, windowDetails>;
 	onTop: boolean;
+};
+
+export class Taskbar {
 	constructor(side: Side, stayOnTop = false, autoHide = false) {
 		let classes = "windowsTaskbar";
 		switch (side) {
@@ -184,11 +193,18 @@ export class Taskbar {
 		if (autoHide) {
 			classes += " windowsTaskbarAutohide";
 		}
-		this.onTop = stayOnTop
-		this.html = ul({"class": classes});
+		taskbars.set(this, {
+			html: ul({"class": classes}),
+			windows: new Map<Window, windowDetails>(),
+			onTop: stayOnTop
+		});
+	}
+	get html() {
+		return taskbars.get(this)!.html;
 	}
 	addWindow(w: Window) {
-		this.windows.set(w, {item: this.html.appendChild(li({"onclick": () => {
+		const self = taskbars.get(this)!;
+		self.windows.set(w, {item: self.html.appendChild(li({"onclick": () => {
 			if (!w.html.nextElementSibling || w.html.classList.contains("minimised")) {
 				w.onMinimiseToggle()
 			} else {
@@ -201,7 +217,8 @@ export class Taskbar {
 	}
 	minimiseWindow(w: Window) {}
 	removeWindow(w: Window) {
-		this.html.removeChild(this.windows.get(w)!.item!);
+		const self = taskbars.get(this)!;
+		self.html.removeChild(self.windows.get(w)!.item!);
 	}
 }
 
@@ -260,11 +277,6 @@ class NoTaskbar {
 		}
 	}
 }
-
-const shells = new Map<Shell, shellData>(),
-	noPropagation = (e: Event) => e.stopPropagation(),
-	closeTrue = () => Promise.resolve(true),
-	noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";
 
 class Window {
 	html: HTMLLIElement;
