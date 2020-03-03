@@ -118,6 +118,15 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	overflow-y: scroll;
 }
 
+.windowsTaskbarTop {
+	top: 0;
+	left: 0;
+	right: 0;
+	height: calc(1em + 8px);
+	border-bottom: 1px solid #aaa;
+	overflow-y: scroll;
+}
+
 .windowsTaskbar {
 	position: absolute;
 	list-style: none;
@@ -134,7 +143,11 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 }
 
 .windowsTaskbarBottom.windowsTaskbarAutohide:not(:hover) {
-	bottom: calc(-1em - 7px);
+	bottom: calc(-1em - 8px);
+}
+
+.windowsTaskbarTop.windowsTaskbarAutohide:not(:hover) {
+	top: calc(-1em - 8px);
 }
 
 .windowsTaskbar > li > img {
