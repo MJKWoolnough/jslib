@@ -175,8 +175,8 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 
 export enum Side {
 	Bottom,
-	Left,
-	Right,
+//	Left,
+//	Right,
 	Top,
 }
 
@@ -199,12 +199,12 @@ export class Taskbar {
 		case Side.Top:
 			classes += " windowsTaskbarTop";
 			break;
-		case Side.Left:
+/*		case Side.Left:
 			classes += " windowsTaskbarLeft";
 			break;
 		case Side.Right:
 			classes += " windowsTaskbarRight";
-			break;
+			break;*/
 		case Side.Bottom:
 		default:
 			classes += " windowsTaskbarBottom";
