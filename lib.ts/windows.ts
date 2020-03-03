@@ -144,10 +144,12 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 
 .windowsTaskbarBottom.windowsTaskbarAutohide:not(:hover) {
 	bottom: calc(-1em - 8px);
+	border-top-width: 3px;
 }
 
 .windowsTaskbarTop.windowsTaskbarAutohide:not(:hover) {
 	top: calc(-1em - 8px);
+	border-bottom-width: 3px;
 }
 
 .windowsTaskbar > li > img {
