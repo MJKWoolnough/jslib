@@ -334,11 +334,7 @@ class Window {
 	}
 	onMaximiseToggle() {
 		if (this.maximiseButton) {
-			if (this.html.classList.toggle("maximised")) {
-				this.maximiseButton.innerText = "🗗";
-			} else {
-				this.maximiseButton.innerText = "🗖";
-			}
+			this.html.classList.toggle("maximised");
 		}
 	}
 	onFocus() {
