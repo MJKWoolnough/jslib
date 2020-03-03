@@ -265,7 +265,6 @@ const shells = new Map<Shell, shellData>(),
 	noPropagation = (e: Event) => e.stopPropagation(),
 	closeTrue = () => Promise.resolve(true),
 	noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";
-let windowID = 0;
 
 class Window {
 	html: HTMLLIElement;
@@ -294,8 +293,7 @@ class Window {
 			      tbobj: Record<string, string | Function> = {
 				"class": "windowsWindowTitlebar",
 				"onmousedown": shell.windowMove.bind(shell, this)
-			      },
-			      thisID = ++windowID;
+			      };
 			if (options.showClose) {
 				controls.push(button({"class": "windowsWindowTitlebarClose", "onclick": () => {
 					shell.removeWindow(this);
