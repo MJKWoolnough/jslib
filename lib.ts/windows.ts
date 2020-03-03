@@ -66,6 +66,12 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	padding: 0;
 	border-width: 2px;
 	float: right;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-color: #eee;
+	background-size: 1em 1em;
+	width: calc(1em + 8px);
+	height: calc(1em + 8px);
 }
 
 .windowsWindowFocusGrabber {
@@ -129,6 +135,22 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 
 .windowsTaskbar > li > img {
 	height: 1em;
+}
+
+.windowsWindowTitlebarClose {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAS0lEQVR4AbXUMQoAIBTDUO9/6Tq5h2A+uNU3SP2nmr3z6+4kOgpOYAMBgYEgzgiUYBzlmETVeKwH+/dTqK9NUuzg6zXLoV9fvhHFXORcm2UE7mcvAAAAAElFTkSuQmCC);
+}
+
+.windowsWindowTitlebarMinimise {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGklEQVR4AWMY+mAUjIJRMAr+U4KHgIFDBgAAtIAv0S+OoIsAAAAASUVORK5CYII=);
+}
+
+.windowsWindowTitlebarMaximise {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAIElEQVR4AWMY2eA/JXioGkgmoMjAUQNHDRw1kCI8ZAAAn3lVqxSpx3UAAAAASUVORK5CYII=);
+}
+
+.maximised .windowsWindowTitlebarMaximise {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAALElEQVR4AWNABqPgPyl4gAwkEgwdAykPM/obSCQYGgaiYxolk1EDScJDFgAAUOdXqbMbROIAAAAASUVORK5CYII=);
 }
 `)));
 
@@ -205,8 +227,8 @@ class NoTaskbar {
 		const children = createHTML(null, [
 			w.icon ? img({"src": w.icon}) : [],
 			span(w.title),
-			w.onClose ? button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": w.onExit.bind(w)}) : [],
-			button("🗗", {"class": "windowsWindowTitlebarMaximise", "onclick": this.restoreWindow.bind(this, w)}),
+			w.onClose ? button({"class": "windowsWindowTitlebarClose", "onclick": w.onExit.bind(w)}) : [],
+			button({"class": "windowsWindowTitlebarMaximise", "onclick": this.restoreWindow.bind(this, w)}),
 		      ]);
 		if (!Array.from(this.html.childNodes).some((h: ChildNode) => {
 			if (h.childNodes.length === 0) {
@@ -239,7 +261,10 @@ class NoTaskbar {
 	}
 }
 
-const noPropagation = (e: Event) => e.stopPropagation(), closeTrue = () => Promise.resolve(true), noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";
+const shells = new Map<Shell, shellData>(),
+	noPropagation = (e: Event) => e.stopPropagation(),
+	closeTrue = () => Promise.resolve(true),
+	noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";
 let windowID = 0;
 
 class Window {
@@ -275,7 +300,7 @@ class Window {
 			      },
 			      thisID = ++windowID;
 			if (options.showClose) {
-				controls.push(button("🗙", {"class": "windowsWindowTitlebarClose", "onclick": () => {
+				controls.push(button({"class": "windowsWindowTitlebarClose", "onclick": () => {
 					shell.removeWindow(this);
 				}, "onmousedown": noPropagation}));
 				this.onClose = closeTrue;
@@ -284,12 +309,11 @@ class Window {
 				this.onClose = options.onClose;
 			}
 			if (options.showMaximise || options.showMaximize) {
-				const max = options.maximised || options.maximized;
-				controls.push(this.maximiseButton = button(max ? "🗗" : "🗖", {"class": "windowsWindowTitlebarMaximise" + (max ? " maximised" : ""), "onclick": this.onMaximiseToggle.bind(this), "onmousedown": noPropagation}));
+				controls.push(this.maximiseButton = button({"class": "windowsWindowTitlebarMaximise" + (options.maximised || options.maximized ? " maximised" : ""), "onclick": this.onMaximiseToggle.bind(this), "onmousedown": noPropagation}));
 				tbobj["ondblclick"] = this.onMaximiseToggle.bind(this);
 			}
 			if (options.showMinimise || options.showMinimize) {
-				controls.push(button("🗕", {"class": "windowsWindowTitlebarMinimise", "onclick": this.onMinimiseToggle.bind(this), "onmousedown": noPropagation}));
+				controls.push(button({"class": "windowsWindowTitlebarMinimise", "onclick": this.onMinimiseToggle.bind(this), "onmousedown": noPropagation}));
 			}
 			parts.push(div(tbobj, [
 				this.icon ? img({"src": this.icon}) : [],
@@ -418,8 +442,6 @@ class shellData {
 		}
 	}
 }
-
-const shells = new Map<Shell, shellData>();
 
 export class Shell {
 	constructor(options?: ShellOptions) {
