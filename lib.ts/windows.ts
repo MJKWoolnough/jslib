@@ -679,6 +679,11 @@ export class Shell {
 		const shellData = shells.get(this)!;
 		return shellData.addDialog(shellData.getWindow(w), options);
 	}
+	resizeWindow(w: HTMLDivElement, size: Size) {
+		const window = shells.get(this)!.getWindow(w);
+		window.html.style.setProperty("--window-width", `${size.width}px`);
+		window.html.style.setProperty("--window-height", `${size.height}px`);
+	}
 	removeWindow(w: HTMLDivElement) {
 		const shellData = shells.get(this)!,
 		      window = shellData.getWindow(w);
