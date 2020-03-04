@@ -38,6 +38,91 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	z-index: 0;
 }
 
+.windowsWindow.resizable {
+	padding: 1px;
+	border-width: 0;
+}
+
+.windowsResizer {
+	position: absolute;
+	border-color: #000;
+	border-style: solid;
+	border-width: 0;
+	z-index: -1;
+}
+
+.windowsResizerTopLeft {
+	top: -2px;
+	left: -2px;
+	width: 10px;
+	height: 10px;
+	cursor: nwse-resize;
+	border-left-width: 3px;
+	border-top-width: 3px;
+}
+
+.windowsResizerTop {
+	top: -2px;
+	left: 8px;
+	right: 8px;
+	border-top-width: 3px;
+	cursor: ns-resize;
+}
+
+.windowsResizerTopRight {
+	top: -2px;
+	right: -2px;
+	width: 10px;
+	height: 10px;
+	border-top-width: 3px;
+	border-right-width: 3px;
+	cursor: nesw-resize;
+}
+
+.windowsResizerRight {
+	top: 8px;
+	right: -2px;
+	bottom: 8px;
+	border-right-width: 3px;
+	cursor: ew-resize;
+}
+
+.windowsResizerBottomRight {
+	bottom: -2px;
+	right: -2px;
+	width: 10px;
+	height: 10px;
+	border-right-width: 3px;
+	border-bottom-width: 3px;
+	cursor: nwse-resize;
+}
+
+.windowsResizerBottom {
+	bottom: -2px;
+	left: 8px;
+	right: 8px;
+	border-bottom-width: 3px;
+	cursor: ns-resize;
+}
+
+.windowsResizerBottomLeft {
+	bottom: -2px;
+	left: -2px;
+	width: 10px;
+	height: 10px;
+	border-left-width: 3px;
+	border-bottom-width: 3px;
+	cursor: nesw-resize;
+}
+
+.windowsResizerLeft {
+	top: 8px;
+	left: -2px;
+	bottom: 8px;
+	border-left-width: 3px;
+	cursor: ew-resize;
+}
+
 .windowsWindow.minimised {
 	display: none;
 }
