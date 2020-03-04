@@ -563,8 +563,52 @@ class shellData {
 			this.windows.appendChild(w.html);
 		}
 	}
-	resizeWindow(w: Window, direction: number) {
-
+	resizeWindow(w: Window, direction: number, e: MouseEvent) {
+		if (this.dragging) {
+			return;
+		}
+		this.dragging = true;
+		const windowLeft = parseInt(w.html.style.getPropertyValue("--window-left").slice(0, -2)),
+		      windowTop = parseInt(w.html.style.getPropertyValue("--window-top").slice(0, -2)),
+		      windowWidth = w.html.offsetWidth,
+		      windowHeight = w.html.offsetHeight,
+		      grabX = e.clientX,
+		      grabY = e.clientY,
+		      mouseMove = (e: MouseEvent) => {
+			const dx = e.clientX - grabX,
+			      dy = e.clientY - grabY;
+			switch (direction) {
+				case 0:
+				case 1:
+				case 2:
+					w.html.style.setProperty("--window-top", `${windowTop + dy}px`);
+					w.html.style.setProperty("--window-height", `${windowHeight - dy}px`);
+				break;
+				case 4:
+				case 5:
+				case 6:
+					w.html.style.setProperty("--window-height", `${windowHeight + dy}px`);
+			}
+			switch (direction) {
+				case 0:
+				case 7:
+				case 6:
+					w.html.style.setProperty("--window-width", `${windowWidth + dx}px`);
+				break;
+				case 2:
+				case 3:
+				case 4:
+					w.html.style.setProperty("--window-left", `${windowLeft + dx}px`);
+					w.html.style.setProperty("--window-width", `${windowWidth - dx}px`);
+			}
+		      },
+		      mouseUp = () => {
+			this.html.removeEventListener("mousemove", mouseMove);
+			this.html.removeEventListener("mouseup", mouseUp);
+			this.dragging = false;
+		      };
+		this.html.addEventListener("mousemove", mouseMove);
+		this.html.addEventListener("mouseup", mouseUp);
 	}
 }
 
