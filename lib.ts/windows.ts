@@ -392,6 +392,8 @@ class Window {
 	icon = noIcon;
 	title: string;
 	maximiseButton?: HTMLButtonElement;
+	parent: Window | null = null;
+	child: Window | null = null;
 	constructor(shell: shellData, title: string, content: HTMLDivElement, options: WindowOptions) {
 		this.shell = shell;
 		this.title = title;
@@ -547,8 +549,33 @@ class shellData {
 		this.windowData.set(content, w);
 		return content;
 	}
+	addDialog(w: Window, options?: DialogOptions) {
+		while (w.child) {
+			w = w.child;
+		}
+		const content = div({"class": "windowWindowsContent"}),
+		      d = new Window(this, (options && options.title) || "", content, options ? {
+			showTitlebar: options.showTitlebar,
+			icon: options.icon,
+			showClose: options.showClose,
+			size: options.size,
+			position: options.position,
+			onClose: options.onClose
+		      } : {});
+		d.html.classList.add("windowsDialog");
+		this.windows.appendChild(d.html);
+		this.windowData.set(content, d);
+		w.child = d;
+		d.parent = w;
+		return content;
+	}
 	removeWindow(w: Window) {
-		this.taskbar.removeWindow(w);
+		if (w.parent) {
+			w.parent.child = null;
+		}
+		if (w.parent === null) {
+			this.taskbar.removeWindow(w);
+		}
 		this.windows.removeChild(w.html);
 	}
 	minimiseWindow(w: Window) {
@@ -560,6 +587,9 @@ class shellData {
 	}
 	focusWindow(w: Window) {
 		if (this.windows.childNodes.length > 1) {
+			while (w.child) {
+				w = w.child;
+			}
 			this.windows.appendChild(w.html);
 		}
 	}
@@ -638,12 +668,25 @@ export class Shell {
 	addWindow(title: string, options?: WindowOptions) {
 		return shells.get(this)!.addWindow(title, options);
 	}
+	addDialog(w: HTMLDivElement, options?: DialogOptions) {
+		const shellData = shells.get(this)!,
+		      window = shellData.windowData.get(w);
+		if (window) {
+			return shellData.addDialog(window, options);
+		}
+		throw new Error("invalid Window");
+	}
 	removeWindow(w: HTMLDivElement) {
 		const shellData = shells.get(this)!,
 		      window = shellData.windowData.get(w);
 		if (window) {
-			shellData.removeWindow(window);
+			if (window.child) {
+				shellData.focusWindow(window.child);
+			} else {
+				shellData.removeWindow(window);
+			}
 		}
+		throw new Error("invalid Window");
 	}
 }
 
@@ -660,7 +703,6 @@ export type Position = {
 export type WindowOptions = {
 	showTitlebar?: boolean;
 	icon?: string;
-	title?: string;
 	showClose?: boolean;
 	showMaximise?: boolean;
 	showMaximize?: boolean;
@@ -672,5 +714,15 @@ export type WindowOptions = {
 	maximised?: boolean;
 	maximized?: boolean;
 	showOnTaskbar?: boolean;
+	onClose?: () => Promise<boolean>;
+}
+
+export type DialogOptions = {
+	showTitlebar?: boolean;
+	title?: string;
+	icon?: string;
+	showClose?: boolean;
+	size?: Size;
+	position?: Position;
 	onClose?: () => Promise<boolean>;
 }
