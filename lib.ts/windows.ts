@@ -656,6 +656,13 @@ class shellData {
 		this.html.addEventListener("mousemove", mouseMove);
 		this.html.addEventListener("mouseup", mouseUp);
 	}
+	getWindow(w: HTMLDivElement) {
+		const window = this.windowData.get(w);
+		if (window) {
+			return window;
+		}
+		throw new Error("invalid Window");
+	}
 }
 
 export class Shell {
@@ -669,24 +676,17 @@ export class Shell {
 		return shells.get(this)!.addWindow(title, options);
 	}
 	addDialog(w: HTMLDivElement, options?: DialogOptions) {
-		const shellData = shells.get(this)!,
-		      window = shellData.windowData.get(w);
-		if (window) {
-			return shellData.addDialog(window, options);
-		}
-		throw new Error("invalid Window");
+		const shellData = shells.get(this)!;
+		return shellData.addDialog(shellData.getWindow(w), options);
 	}
 	removeWindow(w: HTMLDivElement) {
 		const shellData = shells.get(this)!,
-		      window = shellData.windowData.get(w);
-		if (window) {
-			if (window.child) {
-				shellData.focusWindow(window.child);
-			} else {
-				shellData.removeWindow(window);
-			}
+		      window = shellData.getWindow(w);
+		if (window.child) {
+			shellData.focusWindow(window.child);
+		} else {
+			shellData.removeWindow(window);
 		}
-		throw new Error("invalid Window");
 	}
 }
 
