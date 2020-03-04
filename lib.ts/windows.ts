@@ -580,26 +580,42 @@ class shellData {
 			switch (direction) {
 				case 0:
 				case 1:
-				case 2:
-					w.html.style.setProperty("--window-top", `${windowTop + dy}px`);
-					w.html.style.setProperty("--window-height", `${windowHeight - dy}px`);
+				case 2: {
+					const height = windowHeight - dy;
+					if (height > 100) {
+						w.html.style.setProperty("--window-top", `${windowTop + dy}px`);
+						w.html.style.setProperty("--window-height", `${height}px`);
+					}
+				}
 				break;
 				case 4:
 				case 5:
-				case 6:
-					w.html.style.setProperty("--window-height", `${windowHeight + dy}px`);
+				case 6: {
+					const height = windowHeight + dy;
+					if (height > 100) {
+						w.html.style.setProperty("--window-height", `${height}px`);
+					}
+				}
 			}
 			switch (direction) {
 				case 0:
 				case 7:
-				case 6:
-					w.html.style.setProperty("--window-width", `${windowWidth + dx}px`);
+				case 6: {
+					const width = windowWidth + dx;
+					if (width > 100) {
+						w.html.style.setProperty("--window-width", `${width}px`);
+					}
+				}
 				break;
 				case 2:
 				case 3:
-				case 4:
-					w.html.style.setProperty("--window-left", `${windowLeft + dx}px`);
-					w.html.style.setProperty("--window-width", `${windowWidth - dx}px`);
+				case 4: {
+					const width = windowWidth - dx;
+					if (width > 100) {
+						w.html.style.setProperty("--window-left", `${windowLeft + dx}px`);
+						w.html.style.setProperty("--window-width", `${windowWidth - dx}px`);
+					}
+				}
 			}
 		      },
 		      mouseUp = () => {
