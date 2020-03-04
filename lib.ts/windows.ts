@@ -306,13 +306,18 @@ class Window {
 	onClose?: () => Promise<boolean>;
 	icon = noIcon;
 	title: string;
-	maximiseButton ?: HTMLButtonElement;
+	maximiseButton?: HTMLButtonElement;
 	constructor(shell: shellData, title: string, content: HTMLDivElement, options: WindowOptions) {
 		this.shell = shell;
 		this.title = title;
 		const params: Record<string, string> = {
 			"class": "windowsWindow"
-		};
+		      },
+		      parts: HTMLElement[] = [];
+		if (options.resizeable) {
+			params["class"] += " resizable";
+			parts.push(..."TopRight Top TopLeft Left BottomLeft Bottom BottomRight Right".split(" ").map((d, n) => div({"class": `windowsResizer windowsResizer${d}`, "onmousedown": shell.resizeWindow.bind(shell, this, n)})));
+		}
 		if (options.size) {
 			params["--window-width"] = options.size.width.toString() + "px";
 			params["--window-height"] = options.size.height.toString() + "px";
@@ -324,8 +329,6 @@ class Window {
 			params["--window-left"] = "0px";
 			params["--window-top"] = "0px";
 		}
-		const parts: HTMLElement[] = [],
-		      self = this;
 		if (options.icon) {
 			this.icon = options.icon;
 		} else if (options.icon === "") {
@@ -474,6 +477,9 @@ class shellData {
 		if (this.windows.childNodes.length > 1) {
 			this.windows.appendChild(w.html);
 		}
+	}
+	resizeWindow(w: Window, direction: number) {
+
 	}
 }
 
