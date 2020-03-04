@@ -570,6 +570,10 @@ class shellData {
 		return content;
 	}
 	removeWindow(w: Window) {
+		if (w.child) {
+			this.focusWindow(w.child);
+			return;
+		}
 		if (w.parent) {
 			w.parent.child = null;
 		}
@@ -690,13 +694,8 @@ export class Shell {
 		window.html.style.setProperty("--window-height", `${size.height}px`);
 	}
 	removeWindow(w: HTMLDivElement) {
-		const shellData = shells.get(this)!,
-		      window = shellData.getWindow(w);
-		if (window.child) {
-			shellData.focusWindow(window.child);
-		} else {
-			shellData.removeWindow(window);
-		}
+		const shellData = shells.get(this)!;
+		shellData.removeWindow(shellData.getWindow(w));
 	}
 }
 
