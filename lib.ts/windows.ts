@@ -269,7 +269,11 @@ const shells = new WeakMap<Shell, shellData>(),
       taskbars = new WeakMap<Taskbar, taskbarData>(),
       noPropagation = (e: Event) => e.stopPropagation(),
       closeTrue = () => Promise.resolve(true),
-      noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";
+      noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==",
+      windowWidth = "--window-width",
+      windowHeight = "--window-height",
+      windowTop = "--window-top",
+      windowLeft = "--window-left";
 
 type taskbarData = {
 	html: HTMLUListElement;
@@ -406,15 +410,15 @@ class Window {
 			parts.push(..."TopRight Top TopLeft Left BottomLeft Bottom BottomRight Right".split(" ").map((d, n) => div({"class": `windowsResizer windowsResizer${d}`, "onmousedown": shell.resizeWindow.bind(shell, this, n)})));
 		}
 		if (options.size) {
-			params["--window-width"] = options.size.width.toString() + "px";
-			params["--window-height"] = options.size.height.toString() + "px";
+			params[windowWidth] = options.size.width.toString() + "px";
+			params[windowHeight] = options.size.height.toString() + "px";
 		}
 		if (options.position) {
-			params["--window-left"] = options.position.x.toString() + "px";
-			params["--window-top"] = options.position.y.toString() + "px";
+			params[windowLeft] = options.position.x.toString() + "px";
+			params[windowTop] = options.position.y.toString() + "px";
 		} else {
-			params["--window-left"] = "0px";
-			params["--window-top"] = "0px";
+			params[windowLeft] = "0px";
+			params[windowTop] = "0px";
 		}
 		if (options.icon) {
 			this.icon = options.icon;
@@ -523,13 +527,13 @@ class shellData {
 			return;
 		}
 		this.dragging = true;
-		const grabX = e.clientX - parseInt(w.html.style.getPropertyValue("--window-left").slice(0, -2)),
-		      grabY = e.clientY - parseInt(w.html.style.getPropertyValue("--window-top").slice(0, -2)),
+		const grabX = e.clientX - parseInt(w.html.style.getPropertyValue(windowLeft).slice(0, -2)),
+		      grabY = e.clientY - parseInt(w.html.style.getPropertyValue(windowTop).slice(0, -2)),
 		      mouseMove = (e: MouseEvent) => {
 			const x = e.clientX - grabX,
 			      y = e.clientY - grabY;
-			w.html.style.setProperty("--window-left", x + "px");
-			w.html.style.setProperty("--window-top", y + "px");
+			w.html.style.setProperty(windowLeft, x + "px");
+			w.html.style.setProperty(windowTop, y + "px");
 		      },
 		      mouseUp = () => {
 			this.html.removeEventListener("mousemove", mouseMove);
@@ -602,10 +606,10 @@ class shellData {
 			return;
 		}
 		this.dragging = true;
-		const windowLeft = parseInt(w.html.style.getPropertyValue("--window-left").slice(0, -2)),
-		      windowTop = parseInt(w.html.style.getPropertyValue("--window-top").slice(0, -2)),
-		      windowWidth = w.html.offsetWidth,
-		      windowHeight = w.html.offsetHeight,
+		const originalLeft = parseInt(w.html.style.getPropertyValue(windowLeft).slice(0, -2)),
+		      originalTop = parseInt(w.html.style.getPropertyValue(windowTop).slice(0, -2)),
+		      originalWidth = w.html.offsetWidth,
+		      originalHeight = w.html.offsetHeight,
 		      grabX = e.clientX,
 		      grabY = e.clientY,
 		      mouseMove = (e: MouseEvent) => {
@@ -615,19 +619,19 @@ class shellData {
 				case 0:
 				case 1:
 				case 2: {
-					const height = windowHeight - dy;
+					const height = originalHeight - dy;
 					if (height > 100) {
-						w.html.style.setProperty("--window-top", `${windowTop + dy}px`);
-						w.html.style.setProperty("--window-height", `${height}px`);
+						w.html.style.setProperty(windowTop, `${originalTop + dy}px`);
+						w.html.style.setProperty(windowHeight, `${height}px`);
 					}
 				}
 				break;
 				case 4:
 				case 5:
 				case 6: {
-					const height = windowHeight + dy;
+					const height = originalHeight + dy;
 					if (height > 100) {
-						w.html.style.setProperty("--window-height", `${height}px`);
+						w.html.style.setProperty(windowHeight, `${height}px`);
 					}
 				}
 			}
@@ -635,19 +639,19 @@ class shellData {
 				case 0:
 				case 7:
 				case 6: {
-					const width = windowWidth + dx;
+					const width = originalWidth + dx;
 					if (width > 100) {
-						w.html.style.setProperty("--window-width", `${width}px`);
+						w.html.style.setProperty(windowWidth, `${width}px`);
 					}
 				}
 				break;
 				case 2:
 				case 3:
 				case 4: {
-					const width = windowWidth - dx;
+					const width = originalWidth - dx;
 					if (width > 100) {
-						w.html.style.setProperty("--window-left", `${windowLeft + dx}px`);
-						w.html.style.setProperty("--window-width", `${windowWidth - dx}px`);
+						w.html.style.setProperty(windowLeft, `${windowLeft + dx}px`);
+						w.html.style.setProperty(windowWidth, `${originalWidth - dx}px`);
 					}
 				}
 			}
@@ -685,13 +689,13 @@ export class Shell {
 	}
 	moveWindow(w: HTMLDivElement, pos: Position) {
 		const window = shells.get(this)!.getWindow(w);
-		window.html.style.setProperty("--window-left", `${pos.x}px`);
-		window.html.style.setProperty("--window-top", `${pos.y}px`);
+		window.html.style.setProperty(windowLeft, `${pos.x}px`);
+		window.html.style.setProperty(windowTop, `${pos.y}px`);
 	}
 	resizeWindow(w: HTMLDivElement, size: Size) {
 		const window = shells.get(this)!.getWindow(w);
-		window.html.style.setProperty("--window-width", `${size.width}px`);
-		window.html.style.setProperty("--window-height", `${size.height}px`);
+		window.html.style.setProperty(windowWidth, `${size.width}px`);
+		window.html.style.setProperty(windowHeight, `${size.height}px`);
 	}
 	removeWindow(w: HTMLDivElement) {
 		const shellData = shells.get(this)!;
