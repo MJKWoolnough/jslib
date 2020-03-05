@@ -127,7 +127,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	cursor: ew-resize;
 }
 
-.windowsWindow.minimised {
+.windowsMinimised {
 	display: none;
 }
 
@@ -327,7 +327,7 @@ export class Taskbar {
 	addWindow(w: Window) {
 		const self = taskbars.get(this)!;
 		self.windows.set(w, {item: self.html.appendChild(li({"onclick": () => {
-			if (!w.html.nextElementSibling || w.html.classList.contains("minimised")) {
+			if (!w.html.nextElementSibling || w.html.classList.contains("windowsMinimised")) {
 				w.onMinimiseToggle()
 			} else {
 				w.onFocus();
@@ -469,7 +469,7 @@ class Window {
 		this.html = li(params, parts);
 	}
 	onMinimiseToggle() {
-		if (this.html.classList.toggle("minimised")) {
+		if (this.html.classList.toggle("windowsMinimised")) {
 			this.shell.minimiseWindow(this);
 		} else {
 			this.shell.focusWindow(this);
@@ -598,7 +598,7 @@ class shellData {
 		this.windows.removeChild(w.html);
 	}
 	minimiseWindow(w: Window) {
-		w.html.classList.add("minimised");
+		w.html.classList.add("windowsMinimised");
 		if (this.windows.childNodes.length > 1 && this.windows.firstChild !== w.html) {
 			this.windows.insertBefore(w.html, this.windows.firstChild);
 		}
