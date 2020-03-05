@@ -172,6 +172,13 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	bottom: 0;
 }
 
+.resizable .windowsWindowFocusGrabber {
+	top: -2px;
+	left: -2px;
+	right: -2px;
+	bottom: -2px;
+}
+
 .windowsWindow:last-child > .windowsWindowFocusGrabber {
 	display: none;
 }
