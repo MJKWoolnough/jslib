@@ -765,13 +765,13 @@ export class Shell {
 		}
 		const self = this,
 		      data = input({"value": defaultValue || ""});
-		return new Promise<string|undefined>(resolve => createHTML(this.addDialog(w, {
+		return new Promise<string|null>(resolve => createHTML(this.addDialog(w, {
 			"title": title,
 			"showTitlebar": true,
 			"icon": icon,
 			"showClose": true,
 			"onClose": () => {
-				resolve();
+				resolve(null);
 				return Promise.resolve(true);
 			}
 		}), {"class": "windowsPrompt"}, [
@@ -784,7 +784,7 @@ export class Shell {
 				}}),
 				button("Cancel", {"onclick": function(this: HTMLButtonElement) {
 					self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
-					resolve();
+					resolve(null);
 				}})
 			])
 		]));
