@@ -570,12 +570,12 @@ class shellData {
 		}
 		const content = div({"class": "windowWindowsContent"}),
 		      d = new Window(this, (options && options.title) || "", content, options ? {
-			showTitlebar: options.showTitlebar,
-			icon: options.icon,
-			showClose: options.showClose,
-			size: options.size,
-			position: options.position,
-			onClose: options.onClose
+			"showTitlebar": options.showTitlebar,
+			"icon": options.icon,
+			"showClose": options.showClose,
+			"size": options.size,
+			"position": options.position,
+			"onClose": options.onClose
 		      } : {});
 		d.html.classList.add("windowsDialog");
 		this.windows.appendChild(d.html);
@@ -699,6 +699,28 @@ export class Shell {
 	addDialog(w: HTMLDivElement, options?: DialogOptions) {
 		const shellData = shells.get(this)!;
 		return shellData.addDialog(shellData.getWindow(w), options);
+	}
+	alert(w: HTMLDivElement, title: string, message: string, icon?: string) {
+		if (icon === undefined) {
+			icon = noIcon;
+		}
+		const self = this;
+		return new Promise<boolean>(resolve => createHTML(this.addDialog(w, {
+			"title": title,
+			"showTitlebar": true,
+			"icon": icon,
+			"showClose": true,
+			"onClose": () => {
+				resolve(false);
+				return Promise.resolve(true);
+			}
+		}), {"class": "windowsAlert"}, [
+			div(message),
+			div({"style": "text-align: center"}, button("Ok", {"onclick": function (this: HTMLButtonElement) {
+				self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
+				resolve(true);
+			}}))
+		]));
 	}
 	moveWindow(w: HTMLDivElement, pos: Position) {
 		const window = shells.get(this)!.getWindow(w);
