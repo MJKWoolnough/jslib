@@ -705,16 +705,16 @@ export class Shell {
 	addWindow(title: string, options?: WindowOptions) {
 		return shells.get(this)!.addWindow(title, options);
 	}
-	addDialog(w: HTMLDivElement, options?: DialogOptions) {
+	addDialog(parent: HTMLDivElement, options?: DialogOptions) {
 		const shellData = shells.get(this)!;
-		return shellData.addDialog(shellData.getWindow(w), options);
+		return shellData.addDialog(shellData.getWindow(parent), options);
 	}
-	alert(w: HTMLDivElement, title: string, message: string, icon?: string) {
+	alert(parent: HTMLDivElement, title: string, message: string, icon?: string) {
 		if (icon === undefined) {
 			icon = noIcon;
 		}
 		const self = this;
-		return new Promise<boolean>(resolve => createHTML(this.addDialog(w, {
+		return new Promise<boolean>(resolve => createHTML(this.addDialog(parent, {
 			"title": title,
 			"showTitlebar": true,
 			"icon": icon,
@@ -731,12 +731,12 @@ export class Shell {
 			}}))
 		]));
 	}
-	confirm(w: HTMLDivElement, title: string, message: string, icon?: string) {
+	confirm(parent: HTMLDivElement, title: string, message: string, icon?: string) {
 		if (icon === undefined) {
 			icon = noIcon;
 		}
 		const self = this;
-		return new Promise<boolean>(resolve => createHTML(this.addDialog(w, {
+		return new Promise<boolean>(resolve => createHTML(this.addDialog(parent, {
 			"title": title,
 			"showTitlebar": true,
 			"icon": icon,
@@ -759,13 +759,13 @@ export class Shell {
 			])
 		]));
 	}
-	prompt(w: HTMLDivElement, title: string, message: string, defaultValue?: string, icon?: string) {
+	prompt(parent: HTMLDivElement, title: string, message: string, defaultValue?: string, icon?: string) {
 		if (icon === undefined) {
 			icon = noIcon;
 		}
 		const self = this,
 		      data = input({"value": defaultValue || ""});
-		return new Promise<string|null>(resolve => createHTML(this.addDialog(w, {
+		return new Promise<string|null>(resolve => createHTML(this.addDialog(parent, {
 			"title": title,
 			"showTitlebar": true,
 			"icon": icon,
