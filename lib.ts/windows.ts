@@ -570,15 +570,22 @@ class shellData {
 		while (w.child) {
 			w = w.child;
 		}
-		const content = div({"class": "windowWindowsContent"}),
-		      d = new Window(this, (options && options.title) || "", content, options ? {
+		const dOptions = options ? {
 			"showTitlebar": options.showTitlebar,
 			"icon": options.icon,
 			"showClose": options.showClose,
 			"size": options.size,
 			"position": options.position,
 			"onClose": options.onClose
-		      } : {});
+		      } : {};
+		if (options === undefined || options.position === undefined) {
+			dOptions["position"] = {
+				"x": parseInt(w.html.style.getPropertyValue(windowLeft).slice(0, -2)),
+				"y": parseInt(w.html.style.getPropertyValue(windowTop).slice(0, -2))
+			};
+		}
+		const content = div({"class": "windowWindowsContent"}),
+		      d = new Window(this, (options && options.title) || "", content, dOptions);
 		d.html.classList.add("windowsDialog");
 		this.windows.appendChild(d.html);
 		this.windowData.set(content, d);
