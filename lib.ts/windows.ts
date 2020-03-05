@@ -12,6 +12,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	height: var(--shell-height);
 }
 
+.windowsDragging {
+	user-select: none;
+}
+
 .windowsDesktop {
 	position: absolute;
 	top: 0;
@@ -606,6 +610,7 @@ class shellData {
 			return;
 		}
 		this.dragging = true;
+		this.html.classList.add("windowsDragging");
 		const originalLeft = parseInt(w.html.style.getPropertyValue(windowLeft).slice(0, -2)),
 		      originalTop = parseInt(w.html.style.getPropertyValue(windowTop).slice(0, -2)),
 		      originalWidth = w.html.offsetWidth,
@@ -637,9 +642,8 @@ class shellData {
 			}
 			switch (direction) {
 				case 0:
-				case 6:
-				case 7: {
-					console.log(1);
+				case 7:
+				case 6: {
 					const width = originalWidth + dx;
 					if (width > 100) {
 						w.html.style.setProperty(windowWidth, `${width}px`);
@@ -661,6 +665,7 @@ class shellData {
 			this.html.removeEventListener("mousemove", mouseMove);
 			this.html.removeEventListener("mouseup", mouseUp);
 			this.dragging = false;
+			this.html.classList.remove("windowsDragging");
 		      };
 		this.html.addEventListener("mousemove", mouseMove);
 		this.html.addEventListener("mouseup", mouseUp);
