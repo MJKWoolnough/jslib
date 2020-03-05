@@ -443,13 +443,8 @@ class Window {
 				"onmousedown": shell.windowMove.bind(shell, this)
 			      };
 			if (options.showClose) {
-				controls.push(button({"class": "windowsWindowTitlebarClose", "onclick": () => {
-					shell.removeWindow(this);
-				}, "onmousedown": noPropagation}));
+				controls.push(button({"class": "windowsWindowTitlebarClose", "onclick": this.onExit.bind(this), "onmousedown": noPropagation}));
 				this.onClose = closeTrue;
-			}
-			if (options.onClose) {
-				this.onClose = options.onClose;
 			}
 			if (options.showMaximise || options.showMaximize) {
 				controls.push(this.maximiseButton = button({"class": "windowsWindowTitlebarMaximise" + (options.maximised || options.maximized ? " windowsMaximised" : ""), "onclick": this.onMaximiseToggle.bind(this), "onmousedown": noPropagation}));
@@ -463,6 +458,9 @@ class Window {
 				span(title),
 				controls
 			]));
+		}
+		if (options.onClose) {
+			this.onClose = options.onClose;
 		}
 		parts.push(content);
 		parts.push(div({"class": "windowsWindowFocusGrabber", "onmousedown": this.onFocus.bind(this)}));
