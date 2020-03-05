@@ -637,8 +637,9 @@ class shellData {
 			}
 			switch (direction) {
 				case 0:
-				case 7:
-				case 6: {
+				case 6:
+				case 7: {
+					console.log(1);
 					const width = originalWidth + dx;
 					if (width > 100) {
 						w.html.style.setProperty(windowWidth, `${width}px`);
@@ -650,7 +651,7 @@ class shellData {
 				case 4: {
 					const width = originalWidth - dx;
 					if (width > 100) {
-						w.html.style.setProperty(windowLeft, `${windowLeft + dx}px`);
+						w.html.style.setProperty(windowLeft, `${originalLeft + dx}px`);
 						w.html.style.setProperty(windowWidth, `${originalWidth - dx}px`);
 					}
 				}
