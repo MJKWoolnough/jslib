@@ -42,7 +42,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	z-index: 0;
 }
 
-.windowsWindow.resizable {
+.windowsWindow.windowsResizable {
 	padding: 1px;
 	border-width: 0;
 }
@@ -131,7 +131,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	display: none;
 }
 
-.windowsWindow.maximised {
+.windowsMaximised {
 	top: 0;
 	left: 0;
 	right: 0;
@@ -172,7 +172,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	bottom: 0;
 }
 
-.resizable .windowsWindowFocusGrabber {
+.windowsResizable .windowsWindowFocusGrabber {
 	top: -2px;
 	left: -2px;
 	right: -2px;
@@ -264,7 +264,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAIElEQVR4AWMY2eA/JXioGkgmoMjAUQNHDRw1kCI8ZAAAn3lVqxSpx3UAAAAASUVORK5CYII=);
 }
 
-.maximised .windowsWindowTitlebarMaximise {
+.windowsMaximised .windowsWindowTitlebarMaximise {
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAALElEQVR4AWNABqPgPyl4gAwkEgwdAykPM/obSCQYGgaiYxolk1EDScJDFgAAUOdXqbMbROIAAAAASUVORK5CYII=);
 }
 `)));
@@ -417,7 +417,7 @@ class Window {
 		      },
 		      parts: HTMLElement[] = [];
 		if (options.resizeable) {
-			params["class"] += " resizable";
+			params["class"] += " windowsResizable";
 			parts.push(..."TopRight Top TopLeft Left BottomLeft Bottom BottomRight Right".split(" ").map((d, n) => div({"class": `windowsResizer windowsResizer${d}`, "onmousedown": shell.resizeWindow.bind(shell, this, n)})));
 		}
 		if (options.size) {
@@ -452,7 +452,7 @@ class Window {
 				this.onClose = options.onClose;
 			}
 			if (options.showMaximise || options.showMaximize) {
-				controls.push(this.maximiseButton = button({"class": "windowsWindowTitlebarMaximise" + (options.maximised || options.maximized ? " maximised" : ""), "onclick": this.onMaximiseToggle.bind(this), "onmousedown": noPropagation}));
+				controls.push(this.maximiseButton = button({"class": "windowsWindowTitlebarMaximise" + (options.maximised || options.maximized ? " windowsMaximised" : ""), "onclick": this.onMaximiseToggle.bind(this), "onmousedown": noPropagation}));
 				tbobj["ondblclick"] = this.onMaximiseToggle.bind(this);
 			}
 			if (options.showMinimise || options.showMinimize) {
@@ -477,7 +477,7 @@ class Window {
 	}
 	onMaximiseToggle() {
 		if (this.maximiseButton) {
-			this.html.classList.toggle("maximised");
+			this.html.classList.toggle("windowsMaximised");
 		}
 	}
 	onFocus() {
