@@ -1,5 +1,5 @@
 import {createHTML, clearElement} from './html.js';
-import {button, div, img, span, style, ul, li} from './dom.js';
+import {button, div, img, input, span, style, ul, li} from './dom.js';
 
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
@@ -720,6 +720,36 @@ export class Shell {
 				self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
 				resolve(true);
 			}}))
+		]));
+	}
+	prompt(w: HTMLDivElement, title: string, message: string, defaultValue?: string, icon?: string) {
+		if (icon === undefined) {
+			icon = noIcon;
+		}
+		const self = this,
+		      data = input({"value": defaultValue || ""});
+		return new Promise<string|undefined>(resolve => createHTML(this.addDialog(w, {
+			"title": title,
+			"showTitlebar": true,
+			"icon": icon,
+			"showClose": true,
+			"onClose": () => {
+				resolve();
+				return Promise.resolve(true);
+			}
+		}), {"class": "windowsInput"}, [
+			div(message),
+			data,
+			div({"style": "text-align: center"}, [
+				button("Ok", {"onclick": function (this: HTMLButtonElement) {
+					self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
+					resolve(data.value);
+				}}),
+				button("Cancel", {"onclick": function(this: HTMLButtonElement) {
+					self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
+					resolve();
+				}})
+			])
 		]));
 	}
 	moveWindow(w: HTMLDivElement, pos: Position) {
