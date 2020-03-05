@@ -720,6 +720,34 @@ export class Shell {
 			}}))
 		]));
 	}
+	confirm(w: HTMLDivElement, title: string, message: string, icon?: string) {
+		if (icon === undefined) {
+			icon = noIcon;
+		}
+		const self = this;
+		return new Promise<boolean>(resolve => createHTML(this.addDialog(w, {
+			"title": title,
+			"showTitlebar": true,
+			"icon": icon,
+			"showClose": true,
+			"onClose": () => {
+				resolve(false);
+				return Promise.resolve(true);
+			}
+		}), {"class": "windowsConfirm"}, [
+			div(message),
+			div({"style": "text-align: center"}, [
+				button("Ok", {"onclick": function (this: HTMLButtonElement) {
+					self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
+					resolve(true);
+				}}),
+				button("Cancel", {"onclick": function(this: HTMLButtonElement) {
+					self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
+					resolve(false);
+				}})
+			])
+		]));
+	}
 	prompt(w: HTMLDivElement, title: string, message: string, defaultValue?: string, icon?: string) {
 		if (icon === undefined) {
 			icon = noIcon;
