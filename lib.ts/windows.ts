@@ -25,8 +25,8 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 }
 
 .windowsWindow {
-	--window-width: 50%;
-	--window-height: 50%;
+	--window-width: auto;
+	--window-height: auto;
 	--window-top: 0;
 	--window-left: 0;
 	position: absolute;
