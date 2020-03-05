@@ -267,6 +267,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 .windowsMaximised .windowsWindowTitlebarMaximise {
 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAALElEQVR4AWNABqPgPyl4gAwkEgwdAykPM/obSCQYGgaiYxolk1EDScJDFgAAUOdXqbMbROIAAAAASUVORK5CYII=);
 }
+
+.windowsAlert div:last-child, .windowsConfirm div:last-child, .windowsPrompt div:last-child {
+	text-align: center;
+}
 `)));
 
 export enum Side {
@@ -714,7 +718,7 @@ export class Shell {
 			}
 		}), {"class": "windowsAlert"}, [
 			div(message),
-			div({"style": "text-align: center"}, button("Ok", {"onclick": function (this: HTMLButtonElement) {
+			div(button("Ok", {"onclick": function (this: HTMLButtonElement) {
 				self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
 				resolve(true);
 			}}))
@@ -736,7 +740,7 @@ export class Shell {
 			}
 		}), {"class": "windowsConfirm"}, [
 			div(message),
-			div({"style": "text-align: center"}, [
+			div([
 				button("Ok", {"onclick": function (this: HTMLButtonElement) {
 					self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
 					resolve(true);
@@ -763,10 +767,10 @@ export class Shell {
 				resolve();
 				return Promise.resolve(true);
 			}
-		}), {"class": "windowsInput"}, [
+		}), {"class": "windowsPrompt"}, [
 			div(message),
 			data,
-			div({"style": "text-align: center"}, [
+			div([
 				button("Ok", {"onclick": function (this: HTMLButtonElement) {
 					self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
 					resolve(data.value);
