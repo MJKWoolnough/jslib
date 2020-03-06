@@ -211,7 +211,6 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	right: 0;
 	height: calc(1em + 8px);
 	border-top: 1px solid #aaa;
-	overflow-y: scroll;
 }
 
 .windowsTaskbarTop {
@@ -220,7 +219,22 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	right: 0;
 	height: calc(1em + 8px);
 	border-bottom: 1px solid #aaa;
-	overflow-y: scroll;
+}
+
+.windowsTaskbarLeft {
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: calc(10em);
+	border-right: 1px solid #aaa;
+}
+
+.windowsTaskbarRight {
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: calc(10em);
+	border-left: 1px solid #aaa;
 }
 
 .windowsTaskbar {
@@ -229,10 +243,18 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	padding: 0;
 	margin: 0;
 	user-select: none;
+	overflow-y: auto;
 }
 
-.windowsTaskbar > li {
+.windowsTaskbarTop > li, .windowsTaskbarBottom > li {
 	float: left;
+	width: 9em;
+	margin-right: 2px;
+	padding: 2px;
+	border: 1px solid #000;
+}
+
+.windowsTaskbarLeft > li, .windowsTaskbarRight > li {
 	margin-right: 2px;
 	padding: 2px;
 	border: 1px solid #000;
@@ -246,6 +268,16 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 .windowsTaskbarTop.windowsTaskbarAutohide:not(:hover) {
 	top: calc(-1em - 8px);
 	border-bottom-width: 3px;
+}
+
+.windowsTaskbarLeft.windowsTaskbarAutohide:not(:hover) {
+	left: -10em;
+	border-right-width: 3px;
+}
+
+.windowsTaskbarRight.windowsTaskbarAutohide:not(:hover) {
+	right: -10em;
+	border-left-width: 3px;
 }
 
 .windowsTaskbar > li > img {
@@ -275,8 +307,8 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 
 export enum Side {
 	Bottom,
-//	Left,
-//	Right,
+	Left,
+	Right,
 	Top,
 }
 
@@ -303,12 +335,12 @@ export class Taskbar {
 		case Side.Top:
 			classes += " windowsTaskbarTop";
 			break;
-/*		case Side.Left:
+		case Side.Left:
 			classes += " windowsTaskbarLeft";
 			break;
 		case Side.Right:
 			classes += " windowsTaskbarRight";
-			break;*/
+			break;
 		case Side.Bottom:
 		default:
 			classes += " windowsTaskbarBottom";
