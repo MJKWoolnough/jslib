@@ -598,9 +598,11 @@ class shellData {
 		this.windowData.set(content, w);
 		return content;
 	}
-	addDialog(w: Window, options?: DialogOptions) {
-		while (w.child) {
-			w = w.child;
+	addDialog(w: Window | null, options?: DialogOptions) {
+		if (w) {
+			while (w.child) {
+				w = w.child;
+			}
 		}
 		const dOptions = options ? {
 			"showTitlebar": options.showTitlebar,
@@ -610,7 +612,7 @@ class shellData {
 			"position": options.position,
 			"onClose": options.onClose
 		      } : {};
-		if (options === undefined || options.position === undefined) {
+		if (w && (options === undefined || options.position === undefined)) {
 			dOptions["position"] = {
 				"x": parseInt(w.html.style.getPropertyValue(windowLeft).slice(0, -2)),
 				"y": parseInt(w.html.style.getPropertyValue(windowTop).slice(0, -2))
@@ -621,8 +623,10 @@ class shellData {
 		d.html.classList.add("windowsDialog");
 		this.windows.appendChild(d.html);
 		this.windowData.set(content, d);
-		w.child = d;
-		d.parent = w;
+		if (w) {
+			w.child = d;
+			d.parent = w;
+		}
 		return content;
 	}
 	removeWindow(w: Window) {
@@ -737,11 +741,11 @@ export class Shell {
 	addWindow(title: string, options?: WindowOptions) {
 		return shells.get(this)!.addWindow(title, options);
 	}
-	addDialog(parent: HTMLDivElement, options?: DialogOptions) {
+	addDialog(parent: HTMLDivElement | null, options?: DialogOptions) {
 		const shellData = shells.get(this)!;
-		return shellData.addDialog(shellData.getWindow(parent), options);
+		return shellData.addDialog(parent ? shellData.getWindow(parent) : null, options);
 	}
-	alert(parent: HTMLDivElement, title: string, message: string, icon?: string) {
+	alert(parent: HTMLDivElement | null, title: string, message: string, icon?: string) {
 		if (icon === undefined) {
 			icon = noIcon;
 		}
@@ -763,7 +767,7 @@ export class Shell {
 			}}))
 		]));
 	}
-	confirm(parent: HTMLDivElement, title: string, message: string, icon?: string) {
+	confirm(parent: HTMLDivElement | null, title: string, message: string, icon?: string) {
 		if (icon === undefined) {
 			icon = noIcon;
 		}
@@ -791,7 +795,7 @@ export class Shell {
 			])
 		]));
 	}
-	prompt(parent: HTMLDivElement, title: string, message: string, defaultValue?: string, icon?: string) {
+	prompt(parent: HTMLDivElement | null, title: string, message: string, defaultValue?: string, icon?: string) {
 		if (icon === undefined) {
 			icon = noIcon;
 		}

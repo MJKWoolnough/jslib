@@ -277,8 +277,10 @@ class shellData {
 		return content;
 	}
 	addDialog(w, options) {
-		while (w.child) {
-			w = w.child;
+		if (w) {
+			while (w.child) {
+				w = w.child;
+			}
 		}
 		const dOptions = options ? {
 			"showTitlebar": options.showTitlebar,
@@ -288,7 +290,7 @@ class shellData {
 			"position": options.position,
 			"onClose": options.onClose
 		      } : {};
-		if (options === undefined || options.position === undefined) {
+		if (w && (options === undefined || options.position === undefined)) {
 			dOptions["position"] = {
 				"x": parseInt(w.html.style.getPropertyValue(windowLeft).slice(0, -2)),
 				"y": parseInt(w.html.style.getPropertyValue(windowTop).slice(0, -2))
@@ -299,8 +301,10 @@ class shellData {
 		d.html.classList.add("windowsDialog");
 		this.windows.appendChild(d.html);
 		this.windowData.set(content, d);
-		w.child = d;
-		d.parent = w;
+		if (w) {
+			w.child = d;
+			d.parent = w;
+		}
 		return content;
 	}
 	removeWindow(w) {
@@ -417,7 +421,7 @@ export class Shell {
 	}
 	addDialog(parent, options) {
 		const shellData = shells.get(this);
-		return shellData.addDialog(shellData.getWindow(parent), options);
+		return shellData.addDialog(parent ? shellData.getWindow(parent) : null, options);
 	}
 	alert(parent, title, message, icon) {
 		if (icon === undefined) {
