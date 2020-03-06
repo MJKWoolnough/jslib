@@ -75,8 +75,10 @@ export class Taskbar {
 }
 
 class NoTaskbar {
-	html = ul({"class": "windowsNoTaskbar"});
-	windows = new Map();
+	constructor() {
+		this.html = ul({"class": "windowsNoTaskbar"});
+		this.windows = new Map();
+	}
 	get onTop() {
 		return false;
 	}
