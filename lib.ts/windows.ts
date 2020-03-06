@@ -533,7 +533,7 @@ class Window {
 export type ShellOptions = {
 	desktop?: Node;
 	taskbar?: Taskbar;
-	resolution: Size;
+	resolution?: Size;
 }
 
 class shellData {
