@@ -463,9 +463,6 @@ class Window {
 		if (options.position) {
 			params[windowLeft] = options.position.x.toString() + "px";
 			params[windowTop] = options.position.y.toString() + "px";
-		} else {
-			params[windowLeft] = "0px";
-			params[windowTop] = "0px";
 		}
 		if (options.icon) {
 			this.icon = options.icon;
