@@ -4,12 +4,10 @@ import {button, div, img, input, span, style, ul, li} from './dom.js';
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 .windowsShell {
-	--shell-width: 100%;
-	--shell-height: 100%;
 	position: relative;
 	overflow: hidden;
-	width: var(--shell-width);
-	height: var(--shell-height);
+	width: var(--shell-width, 100%);
+	height: var(--shell-height, 100%);
 }
 
 .windowsDragging {
@@ -25,17 +23,13 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 }
 
 .windowsWindow {
-	--window-width: auto;
-	--window-height: auto;
-	--window-top: 0;
-	--window-left: 0;
 	position: absolute;
 	background-color: #fff;
 	border: 1px solid #000;
-	width: var(--window-width);
-	height: var(--window-height);
-	top: var(--window-top);
-	left: var(--window-left);
+	width: var(--window-width, auto);
+	height: var(--window-height, auto);
+	top: var(--window-top, 0);
+	left: var(--window-left, 0);
 	list-style: none;
 	padding: 0;
 	user-select: contain;
