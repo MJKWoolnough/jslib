@@ -572,8 +572,8 @@ class shellData {
 			return;
 		}
 		this.dragging = true;
-		const grabX = e.clientX - parseInt(w.html.style.getPropertyValue(windowLeft).slice(0, -2)),
-		      grabY = e.clientY - parseInt(w.html.style.getPropertyValue(windowTop).slice(0, -2)),
+		const grabX = e.clientX - w.html.offsetLeft,
+		      grabY = e.clientY - w.html.offsetTop,
 		      mouseMove = (e: MouseEvent) => {
 			const x = e.clientX - grabX,
 			      y = e.clientY - grabY;
@@ -614,8 +614,8 @@ class shellData {
 		      } : {};
 		if (w && (options === undefined || options.position === undefined)) {
 			dOptions["position"] = {
-				"x": parseInt(w.html.style.getPropertyValue(windowLeft).slice(0, -2)),
-				"y": parseInt(w.html.style.getPropertyValue(windowTop).slice(0, -2))
+				"x": w.html.offsetLeft,
+				"y": w.html.offsetTop
 			};
 		}
 		const content = div({"class": "windowWindowsContent"}),
@@ -663,8 +663,8 @@ class shellData {
 		}
 		this.dragging = true;
 		this.html.classList.add("windowsDragging");
-		const originalLeft = parseInt(w.html.style.getPropertyValue(windowLeft).slice(0, -2)),
-		      originalTop = parseInt(w.html.style.getPropertyValue(windowTop).slice(0, -2)),
+		const originalLeft = w.html.offsetLeft,
+		      originalTop = w.html.offsetTop,
 		      originalWidth = w.html.offsetWidth,
 		      originalHeight = w.html.offsetHeight,
 		      grabX = e.clientX,
