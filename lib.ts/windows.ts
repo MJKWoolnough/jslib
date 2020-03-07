@@ -36,6 +36,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	z-index: 0;
 }
 
+.windowsWindowContent {
+	overflow: hidden;
+}
+
 .windowsWindow.windowsResizable {
 	padding: 1px;
 	border-width: 0;
@@ -580,7 +584,7 @@ class shellData {
 		this.html.addEventListener("mouseup", mouseUp);
 	}
 	addWindow(title: string, options?: WindowOptions) {
-		const content = div({"class": "windowWindowsContent"}),
+		const content = div({"class": "windowsWindowContent"}),
 		      w = new Window(this, title, content, options || {});
 		this.windows.appendChild(w.html);
 		if (options && (options.showOnTaskbar || options.showMinimise || options.showMinimize)) {
@@ -609,7 +613,7 @@ class shellData {
 				"y": w.html.offsetTop
 			};
 		}
-		const content = div({"class": "windowWindowsContent"}),
+		const content = div({"class": "windowsWindowContent"}),
 		      d = new Window(this, (options && options.title) || "", content, dOptions);
 		d.html.classList.add("windowsDialog");
 		this.windows.appendChild(d.html);
