@@ -10,7 +10,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	height: var(--shell-height, 100%);
 }
 
-.windowsDragging {
+.windowsMoving, .windowsResizing {
 	user-select: none;
 }
 
@@ -567,6 +567,7 @@ class shellData {
 			return;
 		}
 		this.dragging = true;
+		this.html.classList.add("windowsMoving");
 		const grabX = e.clientX - w.html.offsetLeft,
 		      grabY = e.clientY - w.html.offsetTop,
 		      mouseMove = (e: MouseEvent) => {
@@ -579,6 +580,7 @@ class shellData {
 			this.html.removeEventListener("mousemove", mouseMove);
 			this.html.removeEventListener("mouseup", mouseUp);
 			this.dragging = false;
+			this.html.classList.remove("windowsMoving");
 		      };
 		this.html.addEventListener("mousemove", mouseMove);
 		this.html.addEventListener("mouseup", mouseUp);
@@ -657,7 +659,7 @@ class shellData {
 			return;
 		}
 		this.dragging = true;
-		this.html.classList.add("windowsDragging");
+		this.html.classList.add("windowsResizing");
 		const originalLeft = w.html.offsetLeft,
 		      originalTop = w.html.offsetTop,
 		      originalWidth = w.html.offsetWidth,
@@ -712,7 +714,7 @@ class shellData {
 			this.html.removeEventListener("mousemove", mouseMove);
 			this.html.removeEventListener("mouseup", mouseUp);
 			this.dragging = false;
-			this.html.classList.remove("windowsDragging");
+			this.html.classList.remove("windowsResizing");
 		      };
 		this.html.addEventListener("mousemove", mouseMove);
 		this.html.addEventListener("mouseup", mouseUp);
