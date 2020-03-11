@@ -5,10 +5,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, ".wind
 
 export const Side = (() => {
 	const arr = [];
-	arr[arr["Bottom"] = 0] = "Bottom";
-	arr[arr["Left"] = 1] = "Left";
-	arr[arr["Right"] = 2] = "Right";
-	arr[arr["Top"] = 3] = "Top";
+	arr[arr[0] = "Bottom"] = 0;
+	arr[arr[1] = "Left"] = 1;
+	arr[arr[2] = "Right"] = 2;
+	arr[arr[3] = "Top"] = 3;
 	return Object.freeze(arr);
 })();
 
