@@ -240,13 +240,13 @@ func (c *config) processExport(d *dep, ed *javascript.ExportDeclaration) error {
 		}
 		ex := exportConst
 		mappings := make(map[string]string)
-		if ed.Declaration.FunctionDeclaration != nil {
+		if ed.Declaration != nil && ed.Declaration.FunctionDeclaration != nil {
 			mappings[ed.Declaration.FunctionDeclaration.BindingIdentifier.Data] = ed.Declaration.FunctionDeclaration.BindingIdentifier.Data
-		} else if ed.Declaration.ClassDeclaration != nil {
+		} else if ed.Declaration != nil && ed.Declaration.ClassDeclaration != nil {
 			mappings[ed.Declaration.ClassDeclaration.BindingIdentifier.Data] = ed.Declaration.ClassDeclaration.BindingIdentifier.Data
 		} else {
 			var lb []javascript.LexicalBinding
-			if ed.Declaration.LexicalDeclaration != nil {
+			if ed.Declaration != nil && ed.Declaration.LexicalDeclaration != nil {
 				if ed.Declaration.LexicalDeclaration.LetOrConst == javascript.Let {
 					ex = exportVar
 				}
