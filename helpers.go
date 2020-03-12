@@ -169,7 +169,7 @@ func exportFrom(url string) javascript.StatementListItem {
 					},
 					AssignmentExpression: &javascript.AssignmentExpression{
 						ConditionalExpression: &javascript.ConditionalExpression{
-							LogicalORExpression: javascript.LogicalORExpression{
+							LogicalORExpression: &javascript.LogicalORExpression{
 								LogicalANDExpression: javascript.LogicalANDExpression{
 									BitwiseORExpression: javascript.BitwiseORExpression{
 										BitwiseXORExpression: javascript.BitwiseXORExpression{

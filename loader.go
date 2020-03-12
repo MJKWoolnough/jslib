@@ -13,7 +13,7 @@ func makeLoader() *javascript.Module {
 					ExpressionStatement: &javascript.Expression{
 						Expressions: []javascript.AssignmentExpression{{
 							ConditionalExpression: &javascript.ConditionalExpression{
-								LogicalORExpression: javascript.LogicalORExpression{
+								LogicalORExpression: &javascript.LogicalORExpression{
 									LogicalANDExpression: javascript.LogicalANDExpression{
 										BitwiseORExpression: javascript.BitwiseORExpression{
 											BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -44,7 +44,7 @@ func makeLoader() *javascript.Module {
 																							Arguments: &javascript.Arguments{
 																								ArgumentList: []javascript.AssignmentExpression{{
 																									ConditionalExpression: &javascript.ConditionalExpression{
-																										LogicalORExpression: javascript.LogicalORExpression{
+																										LogicalORExpression: &javascript.LogicalORExpression{
 																											LogicalANDExpression: javascript.LogicalANDExpression{
 																												BitwiseORExpression: javascript.BitwiseORExpression{
 																													BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -71,7 +71,7 @@ func makeLoader() *javascript.Module {
 																																																	ExpressionStatement: &javascript.Expression{
 																																																		Expressions: []javascript.AssignmentExpression{{
 																																																			ConditionalExpression: &javascript.ConditionalExpression{
-																																																				LogicalORExpression: javascript.LogicalORExpression{
+																																																				LogicalORExpression: &javascript.LogicalORExpression{
 																																																					LogicalANDExpression: javascript.LogicalANDExpression{
 																																																						BitwiseORExpression: javascript.BitwiseORExpression{
 																																																							BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -129,7 +129,7 @@ func makeLoader() *javascript.Module {
 																																																			},
 																																																			Initializer: &javascript.AssignmentExpression{
 																																																				ConditionalExpression: &javascript.ConditionalExpression{
-																																																					LogicalORExpression: javascript.LogicalORExpression{
+																																																					LogicalORExpression: &javascript.LogicalORExpression{
 																																																						LogicalANDExpression: javascript.LogicalANDExpression{
 																																																							BitwiseORExpression: javascript.BitwiseORExpression{
 																																																								BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -188,7 +188,7 @@ func makeLoader() *javascript.Module {
 																																																					},
 																																																					AssignmentExpression: &javascript.AssignmentExpression{
 																																																						ConditionalExpression: &javascript.ConditionalExpression{
-																																																							LogicalORExpression: javascript.LogicalORExpression{
+																																																							LogicalORExpression: &javascript.LogicalORExpression{
 																																																								LogicalANDExpression: javascript.LogicalANDExpression{
 																																																									BitwiseORExpression: javascript.BitwiseORExpression{
 																																																										BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -209,7 +209,7 @@ func makeLoader() *javascript.Module {
 																																																																									CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
 																																																																										Expressions: []javascript.AssignmentExpression{{
 																																																																											ConditionalExpression: &javascript.ConditionalExpression{
-																																																																												LogicalORExpression: javascript.LogicalORExpression{
+																																																																												LogicalORExpression: &javascript.LogicalORExpression{
 																																																																													LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																														BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																															BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -238,7 +238,7 @@ func makeLoader() *javascript.Module {
 																																																																																												Arguments: &javascript.Arguments{
 																																																																																													ArgumentList: []javascript.AssignmentExpression{{
 																																																																																														ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																															LogicalORExpression: javascript.LogicalORExpression{
+																																																																																															LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																	BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																		BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -281,7 +281,7 @@ func makeLoader() *javascript.Module {
 																																																																																														},
 																																																																																													}, {
 																																																																																														ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																															LogicalORExpression: javascript.LogicalORExpression{
+																																																																																															LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																	BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																		BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -302,7 +302,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																	CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
 																																																																																																																		Expressions: []javascript.AssignmentExpression{{
 																																																																																																																			ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																				LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																				LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																					LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																						BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																							BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -352,7 +352,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																				},
 																																																																																																																				True: &javascript.AssignmentExpression{
 																																																																																																																					ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																						LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																						LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																							LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																								BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																									BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -412,7 +412,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																				},
 																																																																																																																				False: &javascript.AssignmentExpression{
 																																																																																																																					ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																						LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																						LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																							LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																								BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																									BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -462,7 +462,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																								Arguments: &javascript.Arguments{
 																																																																																																																																									ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																																										ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																											LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																											LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																												LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																													BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																														BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -505,7 +505,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																										},
 																																																																																																																																									}, {
 																																																																																																																																										ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																											LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																											LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																												LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																													BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																														BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -560,7 +560,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																						Arguments: &javascript.Arguments{
 																																																																																																																																							ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																																								ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																									LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																									LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																										LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																											BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																												BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -608,7 +608,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																					Expression: &javascript.Expression{
 																																																																																																																																						Expressions: []javascript.AssignmentExpression{{
 																																																																																																																																							ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																								LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																								LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																									LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																										BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																											BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -685,7 +685,7 @@ func makeLoader() *javascript.Module {
 																																																																																																														Arguments: &javascript.Arguments{
 																																																																																																															ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																	LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																	LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																		LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																			BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																				BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -805,7 +805,7 @@ func makeLoader() *javascript.Module {
 																																																			},
 																																																			Initializer: &javascript.AssignmentExpression{
 																																																				ConditionalExpression: &javascript.ConditionalExpression{
-																																																					LogicalORExpression: javascript.LogicalORExpression{
+																																																					LogicalORExpression: &javascript.LogicalORExpression{
 																																																						LogicalANDExpression: javascript.LogicalANDExpression{
 																																																							BitwiseORExpression: javascript.BitwiseORExpression{
 																																																								BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -859,7 +859,7 @@ func makeLoader() *javascript.Module {
 																																																	ExpressionStatement: &javascript.Expression{
 																																																		Expressions: []javascript.AssignmentExpression{{
 																																																			ConditionalExpression: &javascript.ConditionalExpression{
-																																																				LogicalORExpression: javascript.LogicalORExpression{
+																																																				LogicalORExpression: &javascript.LogicalORExpression{
 																																																					LogicalANDExpression: javascript.LogicalANDExpression{
 																																																						BitwiseORExpression: javascript.BitwiseORExpression{
 																																																							BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -895,7 +895,7 @@ func makeLoader() *javascript.Module {
 																																																																			Arguments: &javascript.Arguments{
 																																																																				ArgumentList: []javascript.AssignmentExpression{{
 																																																																					ConditionalExpression: &javascript.ConditionalExpression{
-																																																																						LogicalORExpression: javascript.LogicalORExpression{
+																																																																						LogicalORExpression: &javascript.LogicalORExpression{
 																																																																							LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																								BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																									BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -938,7 +938,7 @@ func makeLoader() *javascript.Module {
 																																																																					},
 																																																																				}, {
 																																																																					ConditionalExpression: &javascript.ConditionalExpression{
-																																																																						LogicalORExpression: javascript.LogicalORExpression{
+																																																																						LogicalORExpression: &javascript.LogicalORExpression{
 																																																																							LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																								BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																									BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -967,7 +967,7 @@ func makeLoader() *javascript.Module {
 																																																																																									},
 																																																																																									AssignmentExpression: &javascript.AssignmentExpression{
 																																																																																										ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																											LogicalORExpression: javascript.LogicalORExpression{
+																																																																																											LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																												LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																													BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																														BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -999,7 +999,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
 																																																																																																																	Expressions: []javascript.AssignmentExpression{{
 																																																																																																																		ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																			LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																			LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																				LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																					BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																						BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1042,7 +1042,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																		},
 																																																																																																																	}, {
 																																																																																																																		ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																			LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																			LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																				LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																					BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																						BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1100,7 +1100,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																					},
 																																																																																																																					Initializer: &javascript.AssignmentExpression{
 																																																																																																																						ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																							LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																							LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																								LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																									BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																										BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1128,7 +1128,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																						Arguments: &javascript.Arguments{
 																																																																																																																																							ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																																								ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																									LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																									LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																										LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																											BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																												BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1199,7 +1199,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																				Expression: javascript.Expression{
 																																																																																																																					Expressions: []javascript.AssignmentExpression{{
 																																																																																																																						ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																							LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																							LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																								LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																									BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																										BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1235,7 +1235,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																						Arguments: &javascript.Arguments{
 																																																																																																																																							ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																																								ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																									LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																									LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																										LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																											BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																												BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1306,7 +1306,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																									Expression: javascript.Expression{
 																																																																																																																										Expressions: []javascript.AssignmentExpression{{
 																																																																																																																											ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																												LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																												LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																													LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																														BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																															BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1358,7 +1358,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																													ExpressionStatement: &javascript.Expression{
 																																																																																																																														Expressions: []javascript.AssignmentExpression{{
 																																																																																																																															ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																	LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																		BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																			BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1394,7 +1394,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																															Arguments: &javascript.Arguments{
 																																																																																																																																																ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																																																	ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																																		LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																																		LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																																			LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																																				BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																																					BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1470,7 +1470,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																								ExpressionStatement: &javascript.Expression{
 																																																																																																																									Expressions: []javascript.AssignmentExpression{{
 																																																																																																																										ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																											LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																											LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																												LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																													BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																														BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1506,7 +1506,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																										Arguments: &javascript.Arguments{
 																																																																																																																																											ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																																												ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																													LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																													LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																														LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																															BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																																BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1542,7 +1542,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																																												Arguments: &javascript.Arguments{
 																																																																																																																																																													ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																																																														ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																																															LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																																															LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																																																LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																																																	BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																																																		BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1637,7 +1637,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																			ExpressionStatement: &javascript.Expression{
 																																																																																																																				Expressions: []javascript.AssignmentExpression{{
 																																																																																																																					ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																						LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																						LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																							LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																								BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																									BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1654,7 +1654,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																				CallExpression: &javascript.CallExpression{
 																																																																																																																																					ImportCall: &javascript.AssignmentExpression{
 																																																																																																																																						ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																							LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																							LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																								LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																									BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																										BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1754,7 +1754,7 @@ func makeLoader() *javascript.Module {
 																																																																																									},
 																																																																																									AssignmentExpression: &javascript.AssignmentExpression{
 																																																																																										ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																											LogicalORExpression: javascript.LogicalORExpression{
+																																																																																											LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																												LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																													BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																														BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1783,7 +1783,7 @@ func makeLoader() *javascript.Module {
 																																																																																																														},
 																																																																																																														AssignmentExpression: &javascript.AssignmentExpression{
 																																																																																																															ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																	LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																		BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																			BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1864,7 +1864,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																},
 																																																																																																																True: &javascript.AssignmentExpression{
 																																																																																																																	ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																		LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																		LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																			LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																				BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																					BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1917,7 +1917,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																},
 																																																																																																																False: &javascript.AssignmentExpression{
 																																																																																																																	ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																		LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																		LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																			LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																				BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																					BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1954,7 +1954,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																					},
 																																																																																																																																					AssignmentExpression: &javascript.AssignmentExpression{
 																																																																																																																																						ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																							LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																							LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																								LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																									BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																										BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -1990,7 +1990,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																																						Arguments: &javascript.Arguments{
 																																																																																																																																																							ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																																																								ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																																									LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																																									LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																																										LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																																											BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																																												BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2033,7 +2033,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																																								},
 																																																																																																																																																							}, {
 																																																																																																																																																								ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																																									LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																																									LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																																										LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																																											BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																																												BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2193,7 +2193,7 @@ func makeLoader() *javascript.Module {
 																																																				CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
 																																																					Expressions: []javascript.AssignmentExpression{{
 																																																						ConditionalExpression: &javascript.ConditionalExpression{
-																																																							LogicalORExpression: javascript.LogicalORExpression{
+																																																							LogicalORExpression: &javascript.LogicalORExpression{
 																																																								LogicalANDExpression: javascript.LogicalANDExpression{
 																																																									BitwiseORExpression: javascript.BitwiseORExpression{
 																																																										BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2213,7 +2213,7 @@ func makeLoader() *javascript.Module {
 																																																																								ArrayLiteral: &javascript.ArrayLiteral{
 																																																																									ElementList: []javascript.AssignmentExpression{{
 																																																																										ConditionalExpression: &javascript.ConditionalExpression{
-																																																																											LogicalORExpression: javascript.LogicalORExpression{
+																																																																											LogicalORExpression: &javascript.LogicalORExpression{
 																																																																												LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																													BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																														BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2256,7 +2256,7 @@ func makeLoader() *javascript.Module {
 																																																																										},
 																																																																									}, {
 																																																																										ConditionalExpression: &javascript.ConditionalExpression{
-																																																																											LogicalORExpression: javascript.LogicalORExpression{
+																																																																											LogicalORExpression: &javascript.LogicalORExpression{
 																																																																												LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																													BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																														BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2323,7 +2323,7 @@ func makeLoader() *javascript.Module {
 																																																				},
 																																																				AssignmentExpression: &javascript.AssignmentExpression{
 																																																					ConditionalExpression: &javascript.ConditionalExpression{
-																																																						LogicalORExpression: javascript.LogicalORExpression{
+																																																						LogicalORExpression: &javascript.LogicalORExpression{
 																																																							LogicalANDExpression: javascript.LogicalANDExpression{
 																																																								BitwiseORExpression: javascript.BitwiseORExpression{
 																																																									BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2359,7 +2359,7 @@ func makeLoader() *javascript.Module {
 																																																																					Arguments: &javascript.Arguments{
 																																																																						ArgumentList: []javascript.AssignmentExpression{{
 																																																																							ConditionalExpression: &javascript.ConditionalExpression{
-																																																																								LogicalORExpression: javascript.LogicalORExpression{
+																																																																								LogicalORExpression: &javascript.LogicalORExpression{
 																																																																									LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																										BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																											BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2387,7 +2387,7 @@ func makeLoader() *javascript.Module {
 																																																																																							Arguments: &javascript.Arguments{
 																																																																																								ArgumentList: []javascript.AssignmentExpression{{
 																																																																																									ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																										LogicalORExpression: javascript.LogicalORExpression{
+																																																																																										LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																											LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																												BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																													BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2449,7 +2449,7 @@ func makeLoader() *javascript.Module {
 																																																																							},
 																																																																						}, {
 																																																																							ConditionalExpression: &javascript.ConditionalExpression{
-																																																																								LogicalORExpression: javascript.LogicalORExpression{
+																																																																								LogicalORExpression: &javascript.LogicalORExpression{
 																																																																									LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																										BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																											BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2485,7 +2485,7 @@ func makeLoader() *javascript.Module {
 																																																																																							Arguments: &javascript.Arguments{
 																																																																																								ArgumentList: []javascript.AssignmentExpression{{
 																																																																																									ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																										LogicalORExpression: javascript.LogicalORExpression{
+																																																																																										LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																											LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																												BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																													BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2523,7 +2523,7 @@ func makeLoader() *javascript.Module {
 																																																																																									},
 																																																																																								}, {
 																																																																																									ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																										LogicalORExpression: javascript.LogicalORExpression{
+																																																																																										LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																											LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																												BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																													BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2559,7 +2559,7 @@ func makeLoader() *javascript.Module {
 																																																																																																									Arguments: &javascript.Arguments{
 																																																																																																										ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																											ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																												LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																												LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																													LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																														BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																															BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2597,7 +2597,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																													Arguments: &javascript.Arguments{
 																																																																																																																														ArgumentList: []javascript.AssignmentExpression{{
 																																																																																																																															ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																	LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																		BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																			BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2681,7 +2681,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																							Expression: &javascript.Expression{
 																																																																																																																																								Expressions: []javascript.AssignmentExpression{{
 																																																																																																																																									ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																										LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																										LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																											LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																												BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																													BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2729,7 +2729,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																						Expression: &javascript.Expression{
 																																																																																																																																							Expressions: []javascript.AssignmentExpression{{
 																																																																																																																																								ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																									LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																									LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																										LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																											BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																												BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2779,7 +2779,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																			AssignmentOperator: 1,
 																																																																																																																																			AssignmentExpression: &javascript.AssignmentExpression{
 																																																																																																																																				ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																					LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																					LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																						LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																							BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																								BitwiseXORExpression: javascript.BitwiseXORExpression{
@@ -2831,7 +2831,7 @@ func makeLoader() *javascript.Module {
 																																																																																																																																	ExpressionStatement: &javascript.Expression{
 																																																																																																																																		Expressions: []javascript.AssignmentExpression{{
 																																																																																																																																			ConditionalExpression: &javascript.ConditionalExpression{
-																																																																																																																																				LogicalORExpression: javascript.LogicalORExpression{
+																																																																																																																																				LogicalORExpression: &javascript.LogicalORExpression{
 																																																																																																																																					LogicalANDExpression: javascript.LogicalANDExpression{
 																																																																																																																																						BitwiseORExpression: javascript.BitwiseORExpression{
 																																																																																																																																							BitwiseXORExpression: javascript.BitwiseXORExpression{
