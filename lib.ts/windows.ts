@@ -1,4 +1,4 @@
-import {createHTML, clearElement} from './html.js';
+import {createHTML, clearElement, autoFocus} from './html.js';
 import {button, div, img, input, span, style, ul, li} from './dom.js';
 
 declare const pageLoad: Promise<void>;
@@ -758,10 +758,10 @@ export class Shell {
 			}
 		}), {"class": "windowsAlert"}, [
 			div(message),
-			div(button("Ok", {"onclick": function (this: HTMLButtonElement) {
+			div(autoFocus(button("Ok", {"onclick": function (this: HTMLButtonElement) {
 				self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
 				resolve(true);
-			}}))
+			}})))
 		]));
 	}
 	confirm(parent: HTMLDivElement | null, title: string, message: string, icon?: string) {
@@ -781,10 +781,10 @@ export class Shell {
 		}), {"class": "windowsConfirm"}, [
 			div(message),
 			div([
-				button("Ok", {"onclick": function (this: HTMLButtonElement) {
+				autoFocus(button("Ok", {"onclick": function (this: HTMLButtonElement) {
 					self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
 					resolve(true);
-				}}),
+				}})),
 				button("Cancel", {"onclick": function(this: HTMLButtonElement) {
 					self.removeWindow(this.parentNode!.parentNode as HTMLDivElement);
 					resolve(false);
@@ -797,7 +797,7 @@ export class Shell {
 			icon = noIcon;
 		}
 		const self = this,
-		      data = input({"value": defaultValue || ""});
+		      data = autoFocus(input({"value": defaultValue || ""}));
 		return new Promise<string|null>(resolve => createHTML(this.addDialog(parent, {
 			"title": title,
 			"showTitlebar": true,

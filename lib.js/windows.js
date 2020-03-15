@@ -1,4 +1,4 @@
-import {createHTML, clearElement} from './html.js';
+import {createHTML, clearElement, autoFocus} from './html.js';
 import {button, div, img, input, span, style, ul, li} from './dom.js';
 
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, ".windowsShell{position:relative;overflow:hidden;width:var(--shell-width,100%);height:var(--shell-height,100%)}.windowsMoving,.windowsResizing{user-select:none}.windowsDesktop{position:absolute;top:0;bottom:0;left:0;right:0}.windowsWindow{position:absolute;background-color:#fff;border:1px solid #000;width:var(--window-width,auto);height:var(--window-height,auto);top:var(--window-top,0);left:var(--window-left,0);list-style:none;padding:0;user-select:contain;z-index:0}.windowsWindowContent{overflow:hidden}.windowsWindow.windowsResizable{padding:1px;border-width:0}.windowsResizer{position:absolute;border-color:#000;border-style:solid;border-width:0;z-index:-1}.windowsResizerTopLeft{top:-2px;left:-2px;width:10px;height:10px;cursor:nwse-resize;border-left-width:3px;border-top-width:3px}.windowsResizerTop{top:-2px;left:8px;right:8px;border-top-width:3px;cursor:ns-resize}.windowsResizerTopRight{top:-2px;right:-2px;width:10px;height:10px;border-top-width:3px;border-right-width:3px;cursor:nesw-resize}.windowsResizerRight{top:8px;right:-2px;bottom:8px;border-right-width:3px;cursor:ew-resize}.windowsResizerBottomRight{bottom:-2px;right:-2px;width:10px;height:10px;border-right-width:3px;border-bottom-width:3px;cursor:nwse-resize}.windowsResizerBottom{bottom:-2px;left:8px;right:8px;border-bottom-width:3px;cursor:ns-resize}.windowsResizerBottomLeft{bottom:-2px;left:-2px;width:10px;height:10px;border-left-width:3px;border-bottom-width:3px;cursor:nesw-resize}.windowsResizerLeft{top:8px;left:-2px;bottom:8px;border-left-width:3px;cursor:ew-resize}.windowsMinimised{display:none}.windowsMaximised{top:0;left:0;right:0;bottom:0;width:auto;height:auto}.windowsWindowTitlebar{background-color:#aaa;user-select:none;overflow:hidden;height:calc(1em + 4px)}.windowsWindowTitlebar>img{height:calc(1em)}.windowsWindowTitlebar>button{padding:0;border-width:2px;float:right;background-repeat:no-repeat;background-position:center;background-color:#eee;background-size:1em 1em;width:calc(1em + 8px);height:calc(1em + 8px)}.windowsWindowFocusGrabber{position:absolute;background-color:rgba(0,0,0,0.1);top:0;left:0;right:0;bottom:0}.windowsResizable .windowsWindowFocusGrabber{top:-2px;left:-2px;right:-2px;bottom:-2px}.windowsWindow:last-child>.windowsWindowFocusGrabber{display:none}.windowsNoTaskbar{list-style:none;padding:0;display:grid;grid-gap:5px;grid-template-columns:repeat(auto-fit,200px);position:absolute;bottom:0;transform:scaleY(-1);width:100%}.windowsNoTaskbar>li{transform:scaleY(-1);border:1px solid #000}.windowsNoTaskbar>li.hidden{visibility:hidden}.windowsTaskbarBottom{bottom:0;left:0;right:0;height:calc(1em + 8px);border-top:1px solid #aaa}.windowsTaskbarTop{top:0;left:0;right:0;height:calc(1em + 8px);border-bottom:1px solid #aaa}.windowsTaskbarLeft{top:0;left:0;bottom:0;width:calc(10em);border-right:1px solid #aaa}.windowsTaskbarRight{top:0;right:0;bottom:0;width:calc(10em);border-left:1px solid #aaa}.windowsTaskbar{position:absolute;list-style:none;padding:0;margin:0;user-select:none;overflow-y:auto}.windowsTaskbarTop>li,.windowsTaskbarBottom>li{float:left;width:9em;margin-right:2px;padding:2px;border:1px solid #000}.windowsTaskbarLeft>li,.windowsTaskbarRight>li{margin-right:2px;padding:2px;border:1px solid #000}.windowsTaskbarBottom.windowsTaskbarAutohide:not(:hover){bottom:calc(-1em - 8px);border-top-width:3px}.windowsTaskbarTop.windowsTaskbarAutohide:not(:hover){top:calc(-1em - 8px);border-bottom-width:3px}.windowsTaskbarLeft.windowsTaskbarAutohide:not(:hover){left:-10em;border-right-width:3px}.windowsTaskbarRight.windowsTaskbarAutohide:not(:hover){right:-10em;border-left-width:3px}.windowsTaskbar>li>img{height:1em}.windowsWindowTitlebarClose{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAS0lEQVR4AbXUMQoAIBTDUO9/6Tq5h2A+uNU3SP2nmr3z6+4kOgpOYAMBgYEgzgiUYBzlmETVeKwH+/dTqK9NUuzg6zXLoV9fvhHFXORcm2UE7mcvAAAAAElFTkSuQmCC)}.windowsWindowTitlebarMinimise{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGklEQVR4AWMY+mAUjIJRMAr+U4KHgIFDBgAAtIAv0S+OoIsAAAAASUVORK5CYII=)}.windowsWindowTitlebarMaximise{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAIElEQVR4AWMY2eA/JXioGkgmoMjAUQNHDRw1kCI8ZAAAn3lVqxSpx3UAAAAASUVORK5CYII=)}.windowsMaximised .windowsWindowTitlebarMaximise{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAALElEQVR4AWNABqPgPyl4gAwkEgwdAykPM/obSCQYGgaiYxolk1EDScJDFgAAUOdXqbMbROIAAAAASUVORK5CYII=)}.windowsAlert div:last-child,.windowsConfirm div:last-child,.windowsPrompt div:last-child{text-align:center}")));
@@ -438,10 +438,10 @@ export class Shell {
 			}
 		}), {"class": "windowsAlert"}, [
 			div(message),
-			div(button("Ok", {"onclick": function () {
+			div(autoFocus(button("Ok", {"onclick": function () {
 				self.removeWindow(this.parentNode.parentNode);
 				resolve(true);
-			}}))
+			}})))
 		]));
 	}
 	confirm(parent, title, message, icon) {
@@ -461,10 +461,10 @@ export class Shell {
 		}), {"class": "windowsConfirm"}, [
 			div(message),
 			div([
-				button("Ok", {"onclick": function () {
+				autoFocus(button("Ok", {"onclick": function () {
 					self.removeWindow(this.parentNode.parentNode);
 					resolve(true);
-				}}),
+				}})),
 				button("Cancel", {"onclick": function() {
 					self.removeWindow(this.parentNode.parentNode);
 					resolve(false);
@@ -477,7 +477,7 @@ export class Shell {
 			icon = noIcon;
 		}
 		const self = this,
-		      data = input({"value": defaultValue || ""});
+		      data = autoFocus(input({"value": defaultValue || ""}));
 		return new Promise(resolve => createHTML(this.addDialog(parent, {
 			"title": title,
 			"showTitlebar": true,
