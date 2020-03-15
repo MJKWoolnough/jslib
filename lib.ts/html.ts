@@ -89,4 +89,8 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	const d = createHTML("div");
 	d.innerHTML = text;
 	return Array.from(d.childNodes).map(c => d.removeChild(c));
+      },
+      autoFocus = <T extends HTMLElement>(node: T) => {
+	window.setTimeout(() => node.focus(), 0);
+	return node;
       };

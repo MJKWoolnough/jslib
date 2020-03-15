@@ -56,4 +56,8 @@ export const createElements = namespace => (element, properties, children) => {
 	const d = createHTML("div");
 	d.innerHTML = text;
 	return Array.from(d.childNodes).map(c => d.removeChild(c));
+      },
+      autoFocus = node => {
+	window.setTimeout(() => node.focus(), 0);
+	return node;
       };
