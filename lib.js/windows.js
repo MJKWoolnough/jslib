@@ -516,4 +516,15 @@ export class Shell {
 		const shellData = shells.get(this);
 		shellData.removeWindow(shellData.getWindow(w));
 	}
+	closeWindow(w) {
+		const p = w.previousElementSibling;
+		if (p) {
+			const closer = p.getElementsByClassName("windowsWindowTitlebarClose");
+			if (closer instanceof HTMLButtonElement) {
+				closer.click();
+				return;
+			}
+		}
+		this.removeWindow(w);
+	}
 }
