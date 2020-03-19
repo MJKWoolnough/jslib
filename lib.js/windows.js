@@ -15,7 +15,6 @@ export const Side = (() => {
 const shells = new WeakMap(),
       taskbars = new WeakMap(),
       noPropagation = e => e.stopPropagation(),
-      closeTrue = () => Promise.resolve(true),
       noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==",
       windowWidth = "--window-width",
       windowHeight = "--window-height",
@@ -94,7 +93,7 @@ class NoTaskbar {
 		const children = createHTML(null, [
 			w.icon ? img({"src": w.icon}) : [],
 			span(w.title),
-			w.onClose ? button({"class": "windowsWindowTitlebarClose", "onclick": w.onExit.bind(w)}) : [],
+			w.closer ? button({"class": "windowsWindowTitlebarClose", "onclick": w.onExit.bind(w)}) : [],
 			button({"class": "windowsWindowTitlebarMaximise", "onclick": this.restoreWindow.bind(this, w)}),
 		      ]);
 		if (!Array.from(this.html.childNodes).some(li => {
@@ -133,7 +132,9 @@ class Window {
 		this.parent = null;
 		this.child = null;
 		this.shell = shell;
+		this.closer = false;
 		this.title = title;
+		this.content = content;
 		const params = {
 			"class": "windowsWindow"
 		      },
@@ -163,7 +164,7 @@ class Window {
 			      };
 			if (options.showClose) {
 				controls.push(button({"class": "windowsWindowTitlebarClose", "onclick": this.onExit.bind(this), "onmousedown": noPropagation}));
-				this.onClose = closeTrue;
+				this.closer = true;
 			}
 			if (options.showMaximise || options.showMaximize) {
 				controls.push(this.maximiseButton = button({"class": "windowsWindowTitlebarMaximise" + (options.maximised || options.maximized ? " windowsMaximised" : ""), "onclick": this.onMaximiseToggle.bind(this), "onmousedown": noPropagation}));
@@ -201,15 +202,9 @@ class Window {
 		this.shell.focusWindow(this);
 	}
 	onExit() {
-		if (!this.onClose) {
+		if (this.content.dispatchEvent(new CustomEvent("close", {"cancelable": true}))) {
 			this.shell.removeWindow(this);
-			return;
 		}
-		this.onClose().then(b => {
-			if (b) {
-				this.shell.removeWindow(this);
-			}
-		});
 	}
 }
 
@@ -287,7 +282,6 @@ class shellData {
 			"showClose": options.showClose,
 			"size": options.size,
 			"position": options.position,
-			"onClose": options.onClose
 		      } : {};
 		if (w && (options === undefined || options.position === undefined)) {
 			dOptions["position"] = {
@@ -432,11 +426,7 @@ export class Shell {
 			"showTitlebar": true,
 			"icon": icon,
 			"showClose": true,
-			"onClose": () => {
-				resolve(false);
-				return Promise.resolve(true);
-			}
-		}), {"class": "windowsAlert"}, [
+		}), {"class": "windowsAlert", "onclose": () => resolve(false)}, [
 			div(message),
 			div(autoFocus(button("Ok", {"onclick": function () {
 				self.removeWindow(this.parentNode.parentNode);
@@ -454,11 +444,7 @@ export class Shell {
 			"showTitlebar": true,
 			"icon": icon,
 			"showClose": true,
-			"onClose": () => {
-				resolve(false);
-				return Promise.resolve(true);
-			}
-		}), {"class": "windowsConfirm"}, [
+		}), {"class": "windowsConfirm", "onclose": () => resolve(false)}, [
 			div(message),
 			div([
 				autoFocus(button("Ok", {"onclick": function () {
@@ -483,11 +469,7 @@ export class Shell {
 			"showTitlebar": true,
 			"icon": icon,
 			"showClose": true,
-			"onClose": () => {
-				resolve(null);
-				return Promise.resolve(true);
-			}
-		}), {"class": "windowsPrompt"}, [
+		}), {"class": "windowsPrompt", "onclose": () => resolve(null)}, [
 			div(message),
 			data,
 			div([
