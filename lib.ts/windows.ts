@@ -301,6 +301,37 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 .windowsAlert div:last-child, .windowsConfirm div:last-child, .windowsPrompt div:last-child {
 	text-align: center;
 }
+
+.windowsTaskbarContextMenu {
+	position: absolute;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background-color: #fff;
+	color: #000;
+	border: 1px solid #000;
+	top: var(--taskbar-y);
+	left: var(--taskbar-x);
+}
+
+.windowsTaskbarContextMenu li:hover {
+	background-color: #ddd;
+}
+
+.windowsTaskbarContextMenu li:not(:first-child) {
+	border-top: 1px solid #ddd;
+}
+
+.windowsTaskbarBottom ~ .windowsTaskbarContextMenu {
+	top: auto;
+	bottom: calc(100% - var(--taskbar-y));
+}
+
+.windowsTaskbarRight ~ .windowsTaskbarContextMenu {
+	left: auto;
+	right: calc(100% - var(--taskbar-x));
+}
+
 `)));
 
 export enum Side {
@@ -365,6 +396,20 @@ export class Taskbar {
 			} else {
 				w.onFocus();
 			}
+		}, "oncontextmenu": (e: MouseEvent) => {
+			e.preventDefault();
+			self.html.parentNode!.appendChild(autoFocus(ul({"class": "windowsTaskbarContextMenu", "tabindex": "-1", "--taskbar-x": e.clientX + "px", "--taskbar-y": e.clientY + "px", "onblur": function(this: HTMLUListElement) {
+				self.html.parentNode!.removeChild(this);
+			}},[
+				li(w.html.classList.contains("windowsMinimised") ? "Restore" : "Minimise", {"onclick": function(this: HTMLLIElement) {
+					(this.parentNode as HTMLUListElement).blur();
+					w.onMinimiseToggle();
+				}}),
+				li("Close", {"onclick": function(this: HTMLLIElement) {
+					(this.parentNode as HTMLUListElement).blur();
+					w.onExit();
+				}}),
+			])));
 		}}, [
 			w.icon ? img({"src": w.icon}) : [],
 			span(w.title)
