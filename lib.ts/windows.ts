@@ -372,8 +372,11 @@ export class Taskbar {
 	}
 	minimiseWindow(w: Window) {}
 	removeWindow(w: Window) {
-		const self = taskbars.get(this)!;
-		self.html.removeChild(self.windows.get(w)!.item!);
+		const self = taskbars.get(this)!,
+		      window = self.windows.get(w);
+		if (window) {
+			self.html.removeChild(window.item!);
+		}
 	}
 }
 
