@@ -318,6 +318,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	background-color: #ddd;
 }
 
+.windowsTaskbarContextMenu li:first-letter {
+	text-decoration: underline;
+}
+
 .windowsTaskbarContextMenu li:not(:first-child) {
 	border-top: 1px solid #ddd;
 }
@@ -400,7 +404,17 @@ export class Taskbar {
 			e.preventDefault();
 			self.html.parentNode!.appendChild(autoFocus(ul({"class": "windowsTaskbarContextMenu", "tabindex": "-1", "--taskbar-x": e.clientX + "px", "--taskbar-y": e.clientY + "px", "onblur": function(this: HTMLUListElement) {
 				self.html.parentNode!.removeChild(this);
-			}},[
+			}, "onkeypress": function(this: HTMLUListElement, e: KeyboardEvent) {
+				if ((e.key === "m" && !w.html.classList.contains("windowsMinimised")) || (e.key === "r" && w.html.classList.contains("windowsMinimised"))) {
+					w.onMinimiseToggle();
+				} else if (e.key === "c") {
+					w.onExit();
+				} else {
+					return;
+				}
+				this.blur();
+				e.preventDefault();
+			}}, [
 				li(w.html.classList.contains("windowsMinimised") ? "Restore" : "Minimise", {"onclick": function(this: HTMLLIElement) {
 					(this.parentNode as HTMLUListElement).blur();
 					w.onMinimiseToggle();
