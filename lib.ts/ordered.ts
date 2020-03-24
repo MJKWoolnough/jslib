@@ -3,7 +3,7 @@
 type sortFunc<T extends Item> = (a: T, b: T) => number;
 
 interface Item {
-	html: Node;
+	node: Node;
 }
 
 type ItemNode<T> = {
@@ -33,7 +33,7 @@ type Callback<T extends Item, U, thisType> = (element: T, index: number, array: 
 export const noSort = () => 0,
 stringSort = new Intl.Collator().compare;
 
-const data = new WeakMap<SortHTML<any, Node>, Root<any>>(),
+const data = new WeakMap<SortNode<any, Node>, Root<any>>(),
       sortNodes = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
 	while (node.prev.item && root.sortFn(node.item, node.prev.item) * root.order < 0) {
 		node.next.prev = node.prev;
@@ -54,9 +54,9 @@ const data = new WeakMap<SortHTML<any, Node>, Root<any>>(),
 		nn.prev = node;
 	}
 	if (node.next.item) {
-		root.parentNode.insertBefore(node.item.html, node.next.item.html);
+		root.parentNode.insertBefore(node.item.node, node.next.item.node);
 	} else {
-		root.parentNode.appendChild(node.item.html);
+		root.parentNode.appendChild(node.item.node);
 	}
 	return node;
       },
@@ -83,21 +83,21 @@ const data = new WeakMap<SortHTML<any, Node>, Root<any>>(),
       removeNode = <T extends Item>(root: Root<T>, node: ItemNode<T>) => {
 	node.prev.next = node.next;
 	node.next.prev = node.prev;
-	root.parentNode.removeChild(node.item.html);
+	root.parentNode.removeChild(node.item.node);
 	root.length--;
       },
-      entries = function* <T extends Item>(s: SortHTML<T, Node>, start = 0, direction = 1): IterableIterator<[number, T]> {
+      entries = function* <T extends Item>(s: SortNode<T, Node>, start = 0, direction = 1): IterableIterator<[number, T]> {
 	for (let [curr, pos] = getNode(data.get(s)!, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
 	}
       };
 
-export class SortHTML<T extends Item, H extends Node = Node> {
+export class SortNode<T extends Item, H extends Node = Node> {
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort) {
 		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>;
 		data.set(this, root.prev = root.next = root);
 	}
-	get html() {
+	get node() {
 		return data.get(this)!.parentNode as H;
 	}
 	get length(): number {
@@ -111,7 +111,7 @@ export class SortHTML<T extends Item, H extends Node = Node> {
 		const root = data.get(this)!,
 		      [node] = getNode(root, index);
 		if (node.item) {
-			root.parentNode.removeChild(node.item.html);
+			root.parentNode.removeChild(node.item.node);
 			node.item = item;
 			sortNodes(root, node);
 		} else {
@@ -242,7 +242,7 @@ export class SortHTML<T extends Item, H extends Node = Node> {
 		root.order *= -1;
 		for (let curr = root.next; curr.item; curr = curr.next) {
 			[curr.next, curr.prev] = [curr.prev, curr.next];
-			root.parentNode.appendChild(curr.item.html);
+			root.parentNode.appendChild(curr.item.node);
 		}
 		return this;
 	}

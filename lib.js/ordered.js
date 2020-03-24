@@ -22,9 +22,9 @@ const data = new WeakMap(),
 		nn.prev = node;
 	}
 	if (node.next.item) {
-		root.parentNode.insertBefore(node.item.html, node.next.item.html);
+		root.parentNode.insertBefore(node.item.node, node.next.item.node);
 	} else {
-		root.parentNode.appendChild(node.item.html);
+		root.parentNode.appendChild(node.item.node);
 	}
 	return node;
       },
@@ -51,7 +51,7 @@ const data = new WeakMap(),
       removeNode = (root, node) => {
 	node.prev.next = node.next;
 	node.next.prev = node.prev;
-	root.parentNode.removeChild(node.item.html);
+	root.parentNode.removeChild(node.item.node);
 	root.length--;
       },
       entries = function* (s, start = 0, direction = 1) {
@@ -60,12 +60,12 @@ const data = new WeakMap(),
 	}
       };
 
-export class SortHTML {
+export class SortNode {
 	constructor(parentNode, sortFn = noSort) {
 		const root = {sortFn, parentNode, length: 0, order: 1};
 		data.set(this, root.prev = root.next = root);
 	}
-	get html() {
+	get node() {
 		return data.get(this).parentNode;
 	}
 	get length() {
@@ -79,7 +79,7 @@ export class SortHTML {
 		const root = data.get(this),
 		      [node] = getNode(root, index);
 		if (node.item) {
-			root.parentNode.removeChild(node.item.html);
+			root.parentNode.removeChild(node.item.node);
 			node.item = item;
 			sortNodes(root, node);
 		} else {
@@ -208,7 +208,7 @@ export class SortHTML {
 		root.order *= -1;
 		for (let curr = root.next; curr.item; curr = curr.next) {
 			[curr.next, curr.prev] = [curr.prev, curr.next];
-			root.parentNode.appendChild(curr.item.html);
+			root.parentNode.appendChild(curr.item.node);
 		}
 		return this;
 	}
