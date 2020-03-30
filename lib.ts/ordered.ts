@@ -119,6 +119,13 @@ export class SortNode<T extends Item, H extends Node = Node> {
 		}
 		return item;
 	}
+	concat(...items: ConcatArray<T>[]): T[];
+	concat(...items: (T | ConcatArray<T>)[]): T[] {
+		return Array.from(this.values()).concat(...items);
+	}
+	copyWithin(target: number, start?: number, end?: number): this {
+		throw new Error("invalid");
+	}
 	*entries() {
 		yield *entries<T>(this);
 	}
@@ -129,6 +136,9 @@ export class SortNode<T extends Item, H extends Node = Node> {
 			}
 		}
 		return true;
+	}
+	fill(value: T, start?: number, end?: number): this {
+		throw new Error("invalid");
 	}
 	filter(callback: Callback<T, any, this>, thisArg?: any) {
 		const filter: T[] = [];
@@ -155,6 +165,9 @@ export class SortNode<T extends Item, H extends Node = Node> {
 		}
 		return -1;
 	}
+	flat(depth?: number) {
+		return Array.from(this.values()).flat(depth);
+	}
 	flatMap<U>(callback: Callback<T, U, this>, thisArg?: any) {
 		return this.map(callback, thisArg).flat();
 	}
@@ -178,6 +191,9 @@ export class SortNode<T extends Item, H extends Node = Node> {
 			}
 		}
 		return -1;
+	}
+	join(separator?: string) {
+		return Array.from(this.values()).join(separator);
 	}
 	*keys() {
 		const root = data.get(this)!;
@@ -319,5 +335,17 @@ export class SortNode<T extends Item, H extends Node = Node> {
 	}
 	*[Symbol.iterator]() {
 		yield* this.values();
+	}
+	[Symbol.unscopables]() {
+		return {
+			"copyWithin": true,
+			"entries": true,
+			"fill": true,
+			"find": true,
+			"findIndex": true,
+			"includes": true,
+			"keys": true,
+			"values": true
+		}
 	}
 }

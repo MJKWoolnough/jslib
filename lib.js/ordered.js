@@ -87,6 +87,12 @@ export class SortNode {
 		}
 		return item;
 	}
+	concat(...items) {
+		return Array.from(this.values()).concat(...items);
+	}
+	copyWithin(target, start, end) {
+		throw new Error("invalid");
+	}
 	*entries() {
 		yield *entries(this);
 	}
@@ -97,6 +103,9 @@ export class SortNode {
 			}
 		}
 		return true;
+	}
+	fill(value, start, end) {
+		throw new Error("invalid");
 	}
 	filter(callback, thisArg) {
 		const filter = [];
@@ -123,6 +132,9 @@ export class SortNode {
 		}
 		return -1;
 	}
+	flat(depth) {
+		return Array.from(this.values()).flat(depth);
+	}
 	flatMap(callback, thisArg) {
 		return this.map(callback, thisArg).flat();
 	}
@@ -146,6 +158,9 @@ export class SortNode {
 			}
 		}
 		return -1;
+	}
+	join(separator) {
+		return Array.from(this.values()).join(separator);
 	}
 	*keys() {
 		const root = data.get(this);
@@ -285,5 +300,17 @@ export class SortNode {
 	}
 	*[Symbol.iterator]() {
 		yield* this.values();
+	}
+	[Symbol.unscopables]() {
+		return {
+			"copyWithin": true,
+			"entries": true,
+			"fill": true,
+			"find": true,
+			"findIndex": true,
+			"includes": true,
+			"keys": true,
+			"values": true
+		}
 	}
 }
