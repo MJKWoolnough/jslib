@@ -92,12 +92,12 @@ const data = new WeakMap<SortNode<any, Node>, Root<any>>(),
 	}
       };
 
-export class SortNode<T extends Item, H extends Node = Node> {
+export class SortNode<T extends Item, H extends Node = Node> implements Array<T> {
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort) {
 		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>;
 		data.set(this, root.prev = root.next = root);
 	}
-	get node() {
+	get node(): H {
 		return data.get(this)!.parentNode as H;
 	}
 	get length(): number {
@@ -126,10 +126,10 @@ export class SortNode<T extends Item, H extends Node = Node> {
 	copyWithin(target: number, start?: number, end?: number): this {
 		throw new Error("invalid");
 	}
-	*entries() {
+	*entries(): IterableIterator<[number, T]> {
 		yield *entries<T>(this);
 	}
-	every(callback: Callback<T, any, this>, thisArg?: any) {
+	every(callback: Callback<T, unknown, this>, thisArg?: any) {
 		for (const [index, item] of entries(this)) {
 			if (!callback.call(thisArg, item, index, this)) {
 				return false;
@@ -149,7 +149,7 @@ export class SortNode<T extends Item, H extends Node = Node> {
 		}
 		return filter;
 	}
-	find(callback: Callback<T, any, this>, thisArg?: any) {
+	find(callback: Callback<T, any, this>, thisArg?: any): T | undefined {
 		for (const [index, item] of entries<T>(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
@@ -157,7 +157,7 @@ export class SortNode<T extends Item, H extends Node = Node> {
 		}
 		return undefined;
 	}
-	findIndex(callback: Callback<T, any, this>, thisArg?: any) {
+	findIndex(callback: Callback<T, any, this>, thisArg?: any): number {
 		for (const [index, item] of entries<T>(this)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return index;
@@ -184,7 +184,7 @@ export class SortNode<T extends Item, H extends Node = Node> {
 		}
 		return false;
 	}
-	indexOf(searchElement: T, fromIndex: number = 0) {
+	indexOf(searchElement: T, fromIndex: number = 0): number {
 		for (const [index, item] of entries<T>(this, fromIndex)) {
 			if (Object.is(searchElement, item)) {
 				return index;
@@ -201,7 +201,7 @@ export class SortNode<T extends Item, H extends Node = Node> {
 			yield i;
 		}
 	}
-	lastIndexOf(searchElement: T, fromIndex: number = 0) {
+	lastIndexOf(searchElement: T, fromIndex: number = 0): number {
 		for (const [index, item] of entries<T>(this, fromIndex, -1)) {
 			if (Object.is(searchElement, item)) {
 				return index;
@@ -230,8 +230,9 @@ export class SortNode<T extends Item, H extends Node = Node> {
 		elements.forEach(item => addItemAfter(root, root.prev, item));
 		return root.length;
 	}
-	reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: this) => U, initialValue: U): U;
-	reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, array: this) => T, initialValue?: T): T | undefined {
+	reduce<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
+	reduce(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T): T;
+	reduce(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
 		for (const [index, item] of entries(this)) {
 			if (initialValue === undefined) {
 				initialValue = item;
@@ -241,8 +242,9 @@ export class SortNode<T extends Item, H extends Node = Node> {
 		}
 		return initialValue;
 	}
-	reduceRight<U>(callbackfn: (accumulator: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
-	reduceRight(callbackfn: (accumulator: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
+	reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
+	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T): T;
+	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
 		for (const [index, item] of entries(this, 0, -1)) {
 			if (initialValue === undefined) {
 				initialValue = item;
@@ -348,4 +350,5 @@ export class SortNode<T extends Item, H extends Node = Node> {
 			"values": true
 		}
 	}
+	[n: number]: T;
 }
