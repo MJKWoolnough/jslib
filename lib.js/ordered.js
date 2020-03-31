@@ -58,34 +58,55 @@ const data = new WeakMap(),
 	for (let [curr, pos] = getNode(data.get(s), start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
 	}
+      },
+      pIFn = (name, fn) => {
+	if (typeof name === "number") {
+		return fn(name);
+	} else if (typeof name === "string") {
+		const index = parseInt(name);
+		if (index.toString() === name) {
+			return fn(index);
+		}
+	}
+      },
+      proxyObj = {
+	has:(target, name) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+	get:(target, name) => pIFn(name, index => getNode(data.get(target), index)[0].item) || target[name],
+	set:(target, name, value) => pIFn(name, index => {
+		const root = data.get(target),
+		      [node] = getNode(root, index);
+		if (node.item) {
+			root.parentNode.removeChild(node.item.node);
+			node.item = value;
+			sortNodes(root, node);
+		} else {
+			addItemAfter(root, root.prev, value);
+		}
+		return true;
+	}) || false,
+	deleteProperty: (target, name) => pIFn(name, index => {
+		const root = data.get(target),
+		      [node] = getNode(root, index);
+		if (node.item) {
+			removeNode(root, node);
+			return true;
+		}
+	}) || delete target[name]
       };
 
 export class SortNode {
 	constructor(parentNode, sortFn = noSort) {
-		const root = {sortFn, parentNode, length: 0, order: 1};
+		const root = {sortFn, parentNode, length: 0, order: 1},
+		      p = new Proxy(this, proxyObj);
 		data.set(this, root.prev = root.next = root);
+		data.set(p, root);
+		return p;
 	}
 	get node() {
 		return data.get(this).parentNode;
 	}
 	get length() {
 		return data.get(this).length;
-	}
-	getItem(index) {
-		const [node] = getNode(data.get(this), index);
-		return node.item;
-	}
-	setItem(index, item) {
-		const root = data.get(this),
-		      [node] = getNode(root, index);
-		if (node.item) {
-			root.parentNode.removeChild(node.item.node);
-			node.item = item;
-			sortNodes(root, node);
-		} else {
-			addItemAfter(root, root.prev, item);
-		}
-		return item;
 	}
 	concat(...items) {
 		return Array.from(this.values()).concat(...items);

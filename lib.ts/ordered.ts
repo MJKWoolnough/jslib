@@ -90,34 +90,55 @@ const data = new WeakMap<SortNode<any, Node>, Root<any>>(),
 	for (let [curr, pos] = getNode(data.get(s)!, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
 	}
+      },
+      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
+	if (typeof name === "number") {
+		return fn(name);
+	} else if (typeof name === "string") {
+		const index = parseInt(name);
+		if (index.toString() === name) {
+			return fn(index);
+		}
+	}
+      },
+      proxyObj = {
+	has: <T extends Item>(target: SortNode<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+	get: <T extends Item>(target: SortNode<T>, name: PropertyKey) => pIFn(name, index => getNode(data.get(target)!, index)[0].item) || (target as any)[name],
+	set: <T extends Item>(target: SortNode<T>, name: PropertyKey, value: T) => pIFn(name, index => {
+		const root = data.get(target)!,
+		      [node] = getNode(root, index);
+		if (node.item) {
+			root.parentNode.removeChild(node.item.node);
+			node.item = value;
+			sortNodes(root, node);
+		} else {
+			addItemAfter(root, root.prev, value);
+		}
+		return true;
+	}) || false,
+	deleteProperty: <T extends Item>(target: SortNode<T>, name: PropertyKey) => pIFn(name, index => {
+		const root = data.get(target)!,
+		      [node] = getNode(root, index);
+		if (node.item) {
+			removeNode(root, node);
+			return true;
+		}
+	}) || delete (target as any)[name]
       };
 
 export class SortNode<T extends Item, H extends Node = Node> implements Array<T> {
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort) {
-		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>;
+		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>,
+		      p = new Proxy<SortNode<T, H>>(this, proxyObj);
 		data.set(this, root.prev = root.next = root);
+		data.set(p, root);
+		return p;
 	}
 	get node(): H {
 		return data.get(this)!.parentNode as H;
 	}
 	get length(): number {
 		return data.get(this)!.length;
-	}
-	getItem(index: number): T {
-		const [node] = getNode(data.get(this)!, index);
-		return node.item;
-	}
-	setItem(index: number, item: T): T {
-		const root = data.get(this)!,
-		      [node] = getNode(root, index);
-		if (node.item) {
-			root.parentNode.removeChild(node.item.node);
-			node.item = item;
-			sortNodes(root, node);
-		} else {
-			addItemAfter(root, root.prev, item);
-		}
-		return item;
 	}
 	concat(...items: ConcatArray<T>[]): T[];
 	concat(...items: (T | ConcatArray<T>)[]): T[] {
