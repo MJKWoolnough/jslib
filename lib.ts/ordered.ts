@@ -171,13 +171,15 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 		return filter;
 	}
 	filterRemove(callback: Callback<T, any, this>, thisArg?: any) {
-		const root = data.get(this)!;
+		const root = data.get(this)!,
+		      filtered: T[] = [];
 		for (let curr = root.next, i = 0; curr.item; curr = curr.next, i++) {
 			if (callback.call(thisArg, curr.item, i, this)) {
 				removeNode(root, curr);
+				filtered.push(curr.item);
 			}
 		}
-		return this;
+		return filtered;
 	}
 	find(callback: Callback<T, any, this>, thisArg?: any): T | undefined {
 		for (const [index, item] of entries<T>(this)) {
