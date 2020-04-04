@@ -170,6 +170,15 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 		}
 		return filter;
 	}
+	filterRemove(callback: Callback<T, any, this>, thisArg?: any) {
+		const root = data.get(this)!;
+		for (let curr = root.next, i = 0; curr.item; curr = curr.next, i++) {
+			if (callback.call(thisArg, curr.item, i, this)) {
+				removeNode(root, curr);
+			}
+		}
+		return this;
+	}
 	find(callback: Callback<T, any, this>, thisArg?: any): T | undefined {
 		for (const [index, item] of entries<T>(this)) {
 			if (callback.call(thisArg, item, index, this)) {
