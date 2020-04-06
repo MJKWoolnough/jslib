@@ -176,12 +176,11 @@ export class SortNode {
 			callback.call(thisArg, item, index, this);
 		}
 	}
-	static from(node, itemFn) {
+	static from(node, itemFn = noItemFn) {
 		const s = new SortNode(node),
-		      root = data.get(s),
-		      fn = itemFn || noItemFn;
+		      root = data.get(s);
 		Array.from(node.childNodes).forEach(c => {
-			const item = fn(c);
+			const item = itemFn(c);
 			if (item) {
 				root.prev = root.prev.next = {prev: root.prev, next: root, item};
 			}
