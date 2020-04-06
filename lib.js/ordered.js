@@ -92,7 +92,8 @@ const data = new WeakMap(),
 			return true;
 		}
 	}) || delete target[name]
-      };
+      },
+      noItemFn = node => ({node});
 
 export class SortNode {
 	constructor(parentNode, sortFn = noSort) {
@@ -174,6 +175,18 @@ export class SortNode {
 		for (const [index, item] of entries(this)) {
 			callback.call(thisArg, item, index, this);
 		}
+	}
+	static from(node, itemFn) {
+		const s = new SortNode(node),
+		      root = data.get(s),
+		      fn = itemFn || noItemFn;
+		Array.from(node.childNodes).forEach(c => {
+			const item = fn(c);
+			if (item) {
+				root.prev = root.prev.next = {prev: root.prev, next: root, item};
+			}
+		});
+		return s;
 	}
 	includes(valueToFind, fromIndex = 0) {
 		for (const [, item] of entries(this, fromIndex)) {
