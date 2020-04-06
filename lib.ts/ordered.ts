@@ -124,7 +124,8 @@ const data = new WeakMap<SortNode<any, Node>, Root<any>>(),
 			return true;
 		}
 	}) || delete (target as any)[name]
-      };
+      },
+      noItemFn = (node: Node) => ({node});
 
 export class SortNode<T extends Item, H extends Node = Node> implements Array<T> {
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort) {
@@ -207,6 +208,19 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 		for (const [index, item] of entries(this)) {
 			callback.call(thisArg, item, index, this);
 		}
+	}
+	static from<T = Item, H extends Node = Node>(node: H): SortNode<Item, H>;
+	static from<T extends Item = Item, H extends Node = Node>(node: H, itemFn?: (node: Node) => T|undefined): SortNode<T, H> {
+		const s = new SortNode<T, H>(node),
+		      root = data.get(s)!,
+		      fn = itemFn || noItemFn;
+		Array.from(node.childNodes).forEach(c => {
+			const item = fn(c);
+			if (item) {
+				root.prev = root.prev.next = {prev: root.prev, next: root, item};
+			}
+		});
+		return s;
 	}
 	includes(valueToFind: T, fromIndex: number = 0) {
 		for (const [, item] of entries(this, fromIndex)) {
