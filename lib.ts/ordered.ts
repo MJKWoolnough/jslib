@@ -218,6 +218,7 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 			const item = itemFn(c);
 			if (item) {
 				root.prev = root.prev.next = {prev: root.prev, next: root, item};
+				root.length++;
 			}
 		});
 		return s;
