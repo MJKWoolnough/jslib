@@ -1,96 +1,121 @@
-interface NestedChildren extends Array<NestedChildren | string | Node>{}
+import {createHTML, Children, Props} from './html.js';
 
-export type Children = NestedChildren | string | Node;
-
-export type Props = Record<string, string | Function>;
-
-const childrenArr = (elem: Node, children: Children) => {
-	if (typeof children === "string") {
-		elem.appendChild(document.createTextNode(children));
-	} else if (Array.isArray(children)) {
-			children.forEach((c:NestedChildren | string | Node) => childrenArr(elem, c));
-	} else if(children instanceof Node) {
-		elem.appendChild(children);
-	}
-      };
-
-
-interface cElements {
-	(namespace: string): cElement;
-	(namespace: "http://www.w3.org/1999/xhtml"): cHTML;
-	(namespace: "http://www.w3.org/2000/svg"): cSVG;
-}
-
-interface cElement {
-	(element: null | DocumentFragment, children?: Children): Node;
-	<T extends Node>(element: T, properties?: Props, children?: Children): T;
-	<T extends Node>(element: T, children?: Children, properties?: Props): T;
-	(element: string, properties?: Props, children?: Children): Node;
-	(element: string, children?: Children, properties?: Props): Node;
-};
-
-interface cHTML extends cElement {
-	<K extends keyof HTMLElementTagNameMap>(element: K, properties?: Props, children?: Children): HTMLElementTagNameMap[K];
-	<K extends keyof HTMLElementTagNameMap>(element: K, children?: Children, properties?: Props): HTMLElementTagNameMap[K];
-};
-
-interface cSVG extends cElement {
-	<K extends keyof SVGElementTagNameMap>(element: K, properties?: Props, children?: Children): SVGElementTagNameMap[K];
-	<K extends keyof SVGElementTagNameMap>(element: K, children?: Children, properties?: Props): SVGElementTagNameMap[K];
-};
-
-export const createElements: cElements = (namespace: string) => (element: Node | string | null, properties?: Props | Children, children?: Props | Children) => {
-	const elem: Node = typeof element === "string" ? document.createElementNS(namespace, element) : element instanceof Node ? element : document.createDocumentFragment();
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node))) {
-		[properties, children] = [children, properties];
-	}
-	if (typeof properties === "object" && elem instanceof Element) {
-		Object.entries(properties).filter(([k, prop]) => prop !== undefined).forEach(([k, prop]) => {
-			if (k.startsWith("on") && prop instanceof Function) {
-				elem.addEventListener(k.substr(2), prop.prototype ? prop.bind(elem) : prop);
-			} else if (k === "class") {
-				if (prop) {
-					elem.classList.add(...prop.split(" "));
-				}
-			} else if (k.startsWith("--") && elem instanceof HTMLElement) {
-				elem.style.setProperty(k, prop);
-			} else {
-				elem.setAttribute(k, prop);
-			}
-		});
-	}
-	if (typeof children === "string") {
-		elem.textContent = children;
-	} else if (children && (children instanceof Array || children instanceof Node)) {
-		childrenArr(elem, children);
-	}
-	return elem;
-      },
-      createHTML = createElements("http://www.w3.org/1999/xhtml"),
-      createSVG = createElements("http://www.w3.org/2000/svg"),
-      formatText = (text: string, wrapper?: (text: string) => Node) => {
-	const df = document.createDocumentFragment(),
-	      fn = wrapper instanceof Function ? wrapper : document.createTextNode.bind(document);
-	text.split("\n").forEach((text, n) => {
-		if (n > 0) {
-			df.appendChild(createHTML("br"));
-		}
-		df.appendChild(fn(text));
-	});
-	return df;
-      },
-      clearElement = (elem: Node) => {
-	while (elem.lastChild !== null) {
-		elem.removeChild(elem.lastChild);
-	}
-	return elem;
-      },
-      text2HTML = (text: string): Node[] => {
-	const d = createHTML("div");
-	d.innerHTML = text;
-	return Array.from(d.childNodes).map(c => d.removeChild(c));
-      },
-      autoFocus = <T extends HTMLElement>(node: T) => {
-	window.setTimeout(() => node.focus(), 0);
-	return node;
-      };
+export const a = createHTML.bind(null, "a") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["a"],
+abbr = createHTML.bind(null, "abbr") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["abbr"],
+address = createHTML.bind(null, "address") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["address"],
+applet = createHTML.bind(null, "applet") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["applet"],
+area = createHTML.bind(null, "area") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["area"],
+article = createHTML.bind(null, "article") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["article"],
+aside = createHTML.bind(null, "aside") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["aside"],
+audio = createHTML.bind(null, "audio") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["audio"],
+b = createHTML.bind(null, "b") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["b"],
+base = createHTML.bind(null, "base") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["base"],
+basefont = createHTML.bind(null, "basefont") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["basefont"],
+bdi = createHTML.bind(null, "bdi") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["bdi"],
+bdo = createHTML.bind(null, "bdo") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["bdo"],
+blockquote = createHTML.bind(null, "blockquote") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["blockquote"],
+body = createHTML.bind(null, "body") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["body"],
+br = createHTML.bind(null, "br") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["br"],
+button = createHTML.bind(null, "button") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["button"],
+canvas = createHTML.bind(null, "canvas") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["canvas"],
+caption = createHTML.bind(null, "caption") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["caption"],
+cite = createHTML.bind(null, "cite") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["cite"],
+code = createHTML.bind(null, "code") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["code"],
+col = createHTML.bind(null, "col") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["col"],
+colgroup = createHTML.bind(null, "colgroup") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["colgroup"],
+data = createHTML.bind(null, "data") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["data"],
+datalist = createHTML.bind(null, "datalist") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["datalist"],
+dd = createHTML.bind(null, "dd") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["dd"],
+del = createHTML.bind(null, "del") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["del"],
+details = createHTML.bind(null, "details") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["details"],
+dfn = createHTML.bind(null, "dfn") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["dfn"],
+dialog = createHTML.bind(null, "dialog") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["dialog"],
+dir = createHTML.bind(null, "dir") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["dir"],
+div = createHTML.bind(null, "div") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["div"],
+dl = createHTML.bind(null, "dl") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["dl"],
+dt = createHTML.bind(null, "dt") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["dt"],
+em = createHTML.bind(null, "em") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["em"],
+embed = createHTML.bind(null, "embed") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["embed"],
+fieldset = createHTML.bind(null, "fieldset") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["fieldset"],
+figcaption = createHTML.bind(null, "figcaption") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["figcaption"],
+figure = createHTML.bind(null, "figure") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["figure"],
+font = createHTML.bind(null, "font") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["font"],
+footer = createHTML.bind(null, "footer") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["footer"],
+form = createHTML.bind(null, "form") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["form"],
+frame = createHTML.bind(null, "frame") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["frame"],
+frameset = createHTML.bind(null, "frameset") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["frameset"],
+h1 = createHTML.bind(null, "h1") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["h1"],
+h2 = createHTML.bind(null, "h2") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["h2"],
+h3 = createHTML.bind(null, "h3") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["h3"],
+h4 = createHTML.bind(null, "h4") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["h4"],
+h5 = createHTML.bind(null, "h5") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["h5"],
+h6 = createHTML.bind(null, "h6") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["h6"],
+head = createHTML.bind(null, "head") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["head"],
+header = createHTML.bind(null, "header") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["header"],
+hgroup = createHTML.bind(null, "hgroup") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["hgroup"],
+hr = createHTML.bind(null, "hr") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["hr"],
+html = createHTML.bind(null, "html") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["html"],
+i = createHTML.bind(null, "i") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["i"],
+iframe = createHTML.bind(null, "iframe") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["iframe"],
+img = createHTML.bind(null, "img") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["img"],
+input = createHTML.bind(null, "input") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["input"],
+ins = createHTML.bind(null, "ins") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["ins"],
+kbd = createHTML.bind(null, "kbd") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["kbd"],
+label = createHTML.bind(null, "label") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["label"],
+legend = createHTML.bind(null, "legend") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["legend"],
+li = createHTML.bind(null, "li") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["li"],
+link = createHTML.bind(null, "link") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["link"],
+main = createHTML.bind(null, "main") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["main"],
+map = createHTML.bind(null, "map") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["map"],
+mark = createHTML.bind(null, "mark") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["mark"],
+marquee = createHTML.bind(null, "marquee") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["marquee"],
+menu = createHTML.bind(null, "menu") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["menu"],
+meta = createHTML.bind(null, "meta") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["meta"],
+meter = createHTML.bind(null, "meter") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["meter"],
+nav = createHTML.bind(null, "nav") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["nav"],
+noscript = createHTML.bind(null, "noscript") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["noscript"],
+object = createHTML.bind(null, "object") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["object"],
+ol = createHTML.bind(null, "ol") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["ol"],
+optgroup = createHTML.bind(null, "optgroup") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["optgroup"],
+option = createHTML.bind(null, "option") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["option"],
+output = createHTML.bind(null, "output") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["output"],
+p = createHTML.bind(null, "p") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["p"],
+param = createHTML.bind(null, "param") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["param"],
+picture = createHTML.bind(null, "picture") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["picture"],
+pre = createHTML.bind(null, "pre") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["pre"],
+progress = createHTML.bind(null, "progress") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["progress"],
+q = createHTML.bind(null, "q") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["q"],
+rp = createHTML.bind(null, "rp") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["rp"],
+rt = createHTML.bind(null, "rt") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["rt"],
+ruby = createHTML.bind(null, "ruby") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["ruby"],
+s = createHTML.bind(null, "s") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["s"],
+samp = createHTML.bind(null, "samp") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["samp"],
+script = createHTML.bind(null, "script") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["script"],
+section = createHTML.bind(null, "section") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["section"],
+select = createHTML.bind(null, "select") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["select"],
+slot = createHTML.bind(null, "slot") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["slot"],
+small = createHTML.bind(null, "small") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["small"],
+source = createHTML.bind(null, "source") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["source"],
+span = createHTML.bind(null, "span") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["span"],
+strong = createHTML.bind(null, "strong") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["strong"],
+style = createHTML.bind(null, "style") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["style"],
+sub = createHTML.bind(null, "sub") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["sub"],
+summary = createHTML.bind(null, "summary") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["summary"],
+sup = createHTML.bind(null, "sup") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["sup"],
+table = createHTML.bind(null, "table") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["table"],
+tbody = createHTML.bind(null, "tbody") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["tbody"],
+td = createHTML.bind(null, "td") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["td"],
+template = createHTML.bind(null, "template") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["template"],
+textarea = createHTML.bind(null, "textarea") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["textarea"],
+tfoot = createHTML.bind(null, "tfoot") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["tfoot"],
+th = createHTML.bind(null, "th") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["th"],
+thead = createHTML.bind(null, "thead") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["thead"],
+time = createHTML.bind(null, "time") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["time"],
+title = createHTML.bind(null, "title") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["title"],
+tr = createHTML.bind(null, "tr") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["tr"],
+track = createHTML.bind(null, "track") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["track"],
+u = createHTML.bind(null, "u") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["u"],
+ul = createHTML.bind(null, "ul") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["ul"],
+vare = createHTML.bind(null, "var") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["var"],
+video = createHTML.bind(null, "video") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["video"],
+wbr = createHTML.bind(null, "wbr") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["wbr"];

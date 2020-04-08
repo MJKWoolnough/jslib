@@ -1,3 +1,63 @@
-import {createHTML} from './html.js';
+const childrenArr = (elem, children) => {
+	if (typeof children === "string") {
+		elem.appendChild(document.createTextNode(children));
+	} else if (Array.isArray(children)) {
+		children.forEach((c) => childrenArr(elem, c));
+	} else if (children instanceof Node) {
+		elem.appendChild(children);
+	}
+      };
 
-export const [a, abbr, address, applet, area, article, aside, audio, b, base, basefont, bdi, bdo, blockquote, body, br, button, canvas, caption, cite, code, col, colgroup, data, datalist, dd, del, details, dfn, dialog, dir, div, dl, dt, em, embed, fieldset, figcaption, figure, font, footer, form, frame, frameset, h1, h2, h3, h4, h5, h6, head, header, hgroup, hr, html, i, iframe, img, input, ins, kbd, label, legend, li, link, main, map, mark, marquee, menu, meta, meter, nav, noscript, object, ol, optgroup, option, output, p, param, picture, pre, progress, q, rp, rt, ruby, s, samp, script, section, select, slot, small, source, span, strong, style, sub, summary, sup, table, tbody, td, template, textarea, tfoot, th, thead, time, title, tr, track, u, ul, vare, video, wbr] = "a abbr address applet area article aside audio b base basefont bdi bdo blockquote body br button canvas caption cite code col colgroup data datalist dd del details dfn dialog dir div dl dt em embed fieldset figcaption figure font footer form frame frameset h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd label legend li link main map mark marquee menu meta meter nav noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script section select slot small source span strong style sub summary sup table tbody td template textarea tfoot th thead time title tr track u ul var video wbr".split(" ").map(e => createHTML.bind(null, e));
+export const createElements = namespace => (element, properties, children) => {
+	const elem = typeof element === "string" ? document.createElementNS(namespace, element) : element instanceof Node ? element : document.createDocumentFragment();
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node))) {
+		[properties, children] = [children, properties];
+	}
+	if (typeof properties === "object" && elem instanceof Element) {
+		Object.entries(properties).filter(([k, prop]) => prop !== undefined).forEach(([k, prop]) => {
+			if (k.startsWith("on") && prop instanceof Function) {
+				elem.addEventListener(k.substr(2), prop.prototype ? prop.bind(elem) : prop);
+			} else if (k === "class") {
+				if (prop) {
+					elem.classList.add(...prop.split(" "));
+				}
+			} else {
+				elem.setAttribute(k, prop);
+			}
+		});
+	}
+	if (typeof children === "string") {
+		elem.textContent = children;
+	} else if (children && (children instanceof Array || children instanceof Node)) {
+		childrenArr(elem, children);
+	}
+	return elem;
+      },
+      createHTML = createElements("http://www.w3.org/1999/xhtml"),
+      createSVG = createElements("http://www.w3.org/2000/svg"),
+      formatText = (text, wrapper) => {
+	const df = document.createDocumentFragment(),
+	      fn = wrapper instanceof Function ? wrapper : document.createTextNode.bind(document);
+	text.split("\n").forEach((text, n) => {
+		if (n > 0) {
+			df.appendChild(createHTML("br"));
+		}
+		df.appendChild(fn(text));
+	});
+	return df;
+      },
+      clearElement = elem => {
+	while (elem.lastChild !== null) {
+		elem.removeChild(elem.lastChild);
+	}
+	return elem;
+      },
+      text2HTML = text => {
+	const d = createHTML("div");
+	d.innerHTML = text;
+	return Array.from(d.childNodes).map(c => d.removeChild(c));
+      },
+      autoFocus = node => {
+	window.setTimeout(() => node.focus(), 0);
+	return node;
+      };
