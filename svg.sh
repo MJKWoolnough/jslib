@@ -4,16 +4,16 @@
 tags="a circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata path pattern polygon polyline radialGradient rect script stop style svg switch symbol text textPath title tspan use view";
 
 if [ -n "$1" ]; then
-	sed '/\["'${1/\//\\\/}'dom.js"/Q';
-	echo "}], [\"${1}dom.js\", () => {";
-	echo "	const {createHTML} = include(\"$1svg.js\", true);";
+	sed '/\["'${1/\//\\\/}'svg.js"/Q';
+	echo "}], [\"${1}svg.js\", () => {";
+	echo "	const {createHTML} = include(\"$1dom.js\", true);";
 	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^switch$/, \"switche\"), {\"value\": createSVG.bind(null, e)}]);";
 	sed -n '/^}]/,$p';
 	exit 0;
 fi;
 
 (
-	echo -e "import {createSVG, Children, Props} from './html.js';\n";
+	echo -e "import {createSVG, Children, Props} from './dom.js';\n";
 	echo -n "export const ";
 	first=true;
 	for tag in $tags; do
@@ -28,7 +28,7 @@ fi;
 ) > lib.ts/svg.ts;
 
 (
-	echo -e "import {createSVG} from './html.js';\n";
+	echo -e "import {createSVG} from './dom.js';\n";
 	echo -n "export const [";
 	first=true;
 	for tag in $tags; do

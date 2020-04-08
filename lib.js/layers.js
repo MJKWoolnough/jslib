@@ -1,4 +1,4 @@
-import {clearElement, createHTML} from './html.js';
+import {clearElement, createHTML} from './dom.js';
 
 export default (container, loader) => {
 	const layers = [],

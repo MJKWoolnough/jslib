@@ -1,4 +1,4 @@
-import {createHTML, Children, Props} from './html.js';
+import {createHTML, Children, Props} from './dom.js';
 
 export const a = createHTML.bind(null, "a") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["a"],
 abbr = createHTML.bind(null, "abbr") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["abbr"],

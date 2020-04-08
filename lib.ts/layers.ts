@@ -1,4 +1,4 @@
-import {clearElement, createHTML} from './html.js';
+import {clearElement, createHTML} from './dom.js';
 
 export type LayerType = {
 	addLayer: (closerFn?: () => void) => HTMLElement;

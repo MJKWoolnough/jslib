@@ -1,4 +1,4 @@
-import {createSVG, Children, Props} from './html.js';
+import {createSVG, Children, Props} from './dom.js';
 
 export const a = createSVG.bind(null, "a") as (properties?: Props | Children, children?: Props | Children) => SVGElementTagNameMap["a"],
 circle = createSVG.bind(null, "circle") as (properties?: Props | Children, children?: Props | Children) => SVGElementTagNameMap["circle"],
