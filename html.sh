@@ -7,7 +7,7 @@ if [ -n "$1" ]; then
 	sed '/\["'${1/\//\\\/}'html.js"/Q';
 	echo "}], [\"${1}html.js\", () => {";
 	echo "	const {createHTML} = include(\"$1dom.js\", true);";
-	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^var$/, \"vare\"), {\"value\": createHTML.bind(null, e)}]).splice(0, 0, [\"createHTML\", {\"value\": createHTML}]);";
+	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^var$/, \"vare\"), {\"value\": createHTML.bind(null, e)}]).concat([[\"createHTML\", {\"value\": createHTML}]]);";
 	sed -n '/^}]/,$p';
 	exit 0;
 fi;

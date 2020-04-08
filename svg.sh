@@ -7,7 +7,7 @@ if [ -n "$1" ]; then
 	sed '/\["'${1/\//\\\/}'svg.js"/Q';
 	echo "}], [\"${1}svg.js\", () => {";
 	echo "	const {createSVG} = include(\"$1dom.js\", true);";
-	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^switch$/, \"switche\"), {\"value\": createSVG.bind(null, e)}]).splice(0, 0, [\"createSVG\", {\"value\": createSVG}]);";
+	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^switch$/, \"switche\"), {\"value\": createSVG.bind(null, e)}]).concat([[\"createSVG\", {\"value\": createSVG}]]);";
 	sed -n '/^}]/,$p';
 	exit 0;
 fi;
