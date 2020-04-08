@@ -1,5 +1,5 @@
-import {createHTML, clearElement, autoFocus} from './html.js';
-import {button, div, img, input, span, style, ul, li} from './dom.js';
+import {createHTML, clearElement, autoFocus} from './dom.js';
+import {button, div, img, input, span, style, ul, li} from './html.js';
 
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
