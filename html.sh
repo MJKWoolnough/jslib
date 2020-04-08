@@ -5,7 +5,7 @@ tags="a abbr address applet area article aside audio b base basefont bdi bdo blo
 
 if [ -n "$1" ]; then
 	sed '/\["'${1/\//\\\/}'html.js"/Q';
-	echo "}], [\"${1}dom.js\", () => {";
+	echo "}], [\"${1}html.js\", () => {";
 	echo "	const {createHTML} = include(\"$1dom.js\", true);";
 	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^var$/, \"vare\"), {\"value\": createHTML.bind(null, e)}]);";
 	sed -n '/^}]/,$p';
