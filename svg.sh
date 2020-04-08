@@ -6,14 +6,15 @@ tags="a circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTrans
 if [ -n "$1" ]; then
 	sed '/\["'${1/\//\\\/}'svg.js"/Q';
 	echo "}], [\"${1}svg.js\", () => {";
-	echo "	const {createHTML} = include(\"$1dom.js\", true);";
-	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^switch$/, \"switche\"), {\"value\": createSVG.bind(null, e)}]);";
+	echo "	const {createSVG} = include(\"$1dom.js\", true);";
+	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^switch$/, \"switche\"), {\"value\": createSVG.bind(null, e)}]).splice(0, 0, [\"createSVG\", {\"value\": createSVG}]);";
 	sed -n '/^}]/,$p';
 	exit 0;
 fi;
 
 (
 	echo -e "import {createSVG, Children, Props} from './dom.js';\n";
+	echo -e "export {createSVG};\n";
 	echo -n "export const ";
 	first=true;
 	for tag in $tags; do
@@ -29,6 +30,7 @@ fi;
 
 (
 	echo -e "import {createSVG} from './dom.js';\n";
+	echo -e "export {createSVG};\n";
 	echo -n "export const [";
 	first=true;
 	for tag in $tags; do

@@ -1,5 +1,7 @@
 import {createSVG, Children, Props} from './dom.js';
 
+export {createSVG};
+
 export const a = createSVG.bind(null, "a") as (properties?: Props | Children, children?: Props | Children) => SVGElementTagNameMap["a"],
 circle = createSVG.bind(null, "circle") as (properties?: Props | Children, children?: Props | Children) => SVGElementTagNameMap["circle"],
 clipPath = createSVG.bind(null, "clipPath") as (properties?: Props | Children, children?: Props | Children) => SVGElementTagNameMap["clipPath"],

@@ -1,5 +1,7 @@
 import {createHTML, Children, Props} from './dom.js';
 
+export {createHTML};
+
 export const a = createHTML.bind(null, "a") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["a"],
 abbr = createHTML.bind(null, "abbr") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["abbr"],
 address = createHTML.bind(null, "address") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap["address"],

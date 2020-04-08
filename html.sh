@@ -7,13 +7,14 @@ if [ -n "$1" ]; then
 	sed '/\["'${1/\//\\\/}'html.js"/Q';
 	echo "}], [\"${1}html.js\", () => {";
 	echo "	const {createHTML} = include(\"$1dom.js\", true);";
-	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^var$/, \"vare\"), {\"value\": createHTML.bind(null, e)}]);";
+	echo "	return \"$tags\".split(\" \").map(e => [e.replace(/^var$/, \"vare\"), {\"value\": createHTML.bind(null, e)}]).splice(0, 0, [\"createHTML\", {\"value\": createHTML}]);";
 	sed -n '/^}]/,$p';
 	exit 0;
 fi;
 
 (
 	echo -e "import {createHTML, Children, Props} from './dom.js';\n";
+	echo -e "export {createHTML};\n";
 	echo -n "export const ";
 	first=true;
 	for tag in $tags; do
@@ -29,6 +30,7 @@ fi;
 
 (
 	echo -e "import {createHTML} from './dom.js';\n";
+	echo -e "export {createHTML};\n";
 	echo -n "export const [";
 	first=true;
 	for tag in $tags; do
