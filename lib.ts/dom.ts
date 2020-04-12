@@ -52,7 +52,7 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 				if (prop) {
 					elem.classList.add(...prop.split(" "));
 				}
-			} else if (k.startsWith("--") && elem instanceof HTMLElement) {
+			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				elem.style.setProperty(k, prop);
 			} else {
 				elem.setAttribute(k, prop);
@@ -79,7 +79,7 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	});
 	return df;
       },
-      clearElement = (elem: Node) => {
+      clearElement = <T extends Node>(elem: T) => {
 	while (elem.lastChild !== null) {
 		elem.removeChild(elem.lastChild);
 	}

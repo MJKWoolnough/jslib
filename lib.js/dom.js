@@ -21,6 +21,8 @@ export const createElements = namespace => (element, properties, children) => {
 				if (prop) {
 					elem.classList.add(...prop.split(" "));
 				}
+			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
+				elem.style.setProperty(k, prop);
 			} else {
 				elem.setAttribute(k, prop);
 			}
