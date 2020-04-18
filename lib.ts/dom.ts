@@ -90,7 +90,7 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	d.innerHTML = text;
 	return Array.from(d.childNodes).map(c => d.removeChild(c));
       },
-      autoFocus = <T extends HTMLElement>(node: T) => {
+      autoFocus = <T extends HTMLElement | SVGElement>(node: T) => {
 	window.setTimeout(() => node.focus(), 0);
 	return node;
       };
