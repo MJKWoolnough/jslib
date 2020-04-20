@@ -303,40 +303,15 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	text-align: center;
 }
 
-.windowsTaskbarContextMenu {
-	position: absolute;
-	list-style: none;
-	margin: 0;
-	padding: 0;
+.contextMenu {
 	background-color: #fff;
 	color: #000;
 	border: 1px solid #000;
-	top: var(--taskbar-y);
-	left: var(--taskbar-x);
 }
 
-.windowsTaskbarContextMenu li:hover {
-	background-color: #ddd;
-}
-
-.windowsTaskbarContextMenu li:first-letter {
-	text-decoration: underline;
-}
-
-.windowsTaskbarContextMenu li:not(:first-child) {
+.contextMenu li:not(:first-child) {
 	border-top: 1px solid #ddd;
 }
-
-.windowsTaskbarBottom ~ .windowsTaskbarContextMenu {
-	top: auto;
-	bottom: calc(100% - var(--taskbar-y));
-}
-
-.windowsTaskbarRight ~ .windowsTaskbarContextMenu {
-	left: auto;
-	right: calc(100% - var(--taskbar-x));
-}
-
 `)));
 
 export enum Side {
