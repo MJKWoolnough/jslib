@@ -70,13 +70,15 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
       },
       list2HTML = (ctx: Ctx, list: List): HTMLUListElement => {
 	let open: HTMLUListElement | null = null;
-	const l = ul({"class": "contextMenu", "oncontextremove": () => {
+	const closeFn = () => {
 		if (open) {
 			ctx.container.removeChild(open);
+			open = null;
 		}
-	      }}, list.map(e => {
+	      },
+	      l = ul({"class": "contextMenu", "oncontextremove": closeFn}, list.map(e => {
 		if (IsItem(e)) {
-			return li({"onclick": () => ctx.resolve(e.action())}, e.name);
+			return li({"onclick": () => ctx.resolve(e.action()), "onmouseover": () => setTO(ctx, closeFn)}, e.name);
 		}
 		const openFn = function(this: HTMLLIElement) {
 			if (open) {
@@ -91,7 +93,9 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 		return li({
 			"class": "contextSubMenu",
 			"onclick": openFn,
-			"onmouseover": () => setTO(ctx, openFn),
+			"onmouseover": function(this: HTMLLIElement) {
+				setTO(ctx, openFn.bind(this))
+			},
 			"onmouseout": () => clearTO(ctx),
 		}, span(e.name));
       	}));
