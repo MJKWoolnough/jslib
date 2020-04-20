@@ -1,4 +1,4 @@
-import {autoFocus} from './dom.js';
+import {autoFocus, createHTML} from './dom.js';
 import {li, span, style, ul} from './html.js';
 
 declare const pageLoad: Promise<void>;
@@ -14,7 +14,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	outline: none;
 }
 
-.contextMenu li:hover {
+.contextMenu li:hover, .contextSelected {
 	background-color: #aaa;
 }
 
@@ -45,7 +45,9 @@ type Coords = [[number, number], [number, number]];
 
 type List = (Item | Menu)[];
 
-const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== undefined,
+const mousedownEvent = new CustomEvent("mousedown"),
+      closeEvent = new CustomEvent("contextremove"),
+      IsItem = (item: Item | Menu): item is Item => (item as Item).action !== undefined,
       setTO = (ctx: Ctx, fn: () => any) => {
 	clearTO(ctx);
 	ctx.timeout = window.setTimeout(() => {
@@ -77,21 +79,70 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 	ctx.focus = list;
 	autoFocus(list);
       },
-      list2HTML = (ctx: Ctx, list: List): HTMLUListElement => {
-	let open: HTMLUListElement | null = null;
+      list2HTML = (ctx: Ctx, list: List, last?: HTMLUListElement): HTMLUListElement => {
+	let open: HTMLUListElement | null = null,
+	    selected = -1;
 	const closeFn = () => {
 		if (open) {
 			ctx.container.removeChild(open);
 			open = null;
 		}
 	      },
-	      l = ul({"class": "contextMenu", "oncontextremove": closeFn, "tabindex": "-1", "onblur": function(this: HTMLUListElement) {
-		if (ctx.focus === this) {
+	      l = ul();
+	createHTML(l, {"class": "contextMenu", "oncontextremove": closeFn, "tabindex": "-1", "onkeyup": (e: KeyboardEvent) => {
+		switch (e.key) {
+		case "ArrowDown":
+			if (selected >= 0) {
+				(l.childNodes[selected] as HTMLLIElement).classList.remove("contextSelected");
+			}
+			selected++;
+			if (selected >= l.childNodes.length) {
+				selected = 0;
+			}
+			(l.childNodes[selected] as HTMLLIElement).classList.add("contextSelected");
+			break;
+		case "ArrowUp":
+			if (selected >= 0) {
+				(l.childNodes[selected] as HTMLLIElement).classList.remove("contextSelected");
+			}
+			selected--;
+			if (selected < 0) {
+				selected = l.childNodes.length - 1;
+			}
+			(l.childNodes[selected] as HTMLLIElement).classList.add("contextSelected");
+			break;
+		case "ArrowRight":
+			if (selected >= 0 && (l.childNodes[selected] as HTMLLIElement).classList.contains("contextSubMenu")) {
+				(l.childNodes[selected] as HTMLLIElement).dispatchEvent(mousedownEvent);
+			}
+			break;
+		case "Enter":
+			if (selected >= 0) {
+				(l.childNodes[selected] as HTMLLIElement).dispatchEvent(mousedownEvent);
+			}
+			break;
+		case "ArrowLeft":
+			if (last) {
+				ctx.focus = last;
+				last.focus();
+			}
+			break;
+		case "Escape":
+			if (last) {
+				ctx.focus = last;
+				last.focus();
+			} else {
+				l.blur();
+			}
+			break;
+		}
+	      }, "onblur": () => {
+		if (ctx.focus === l) {
 			window.setTimeout(() => ctx.resolve(undefined), 0);
 		}
-	      }}, list.map(e => {
+	      }, "onfocus": closeFn}, list.map(e => {
 		if (IsItem(e)) {
-			return li({"onclick": () => ctx.resolve(e.action()), "onmouseover": () => {
+			return li({"onmousedown": () => ctx.resolve(e.action()), "onmouseover": () => {
 				setTO(ctx, closeFn);
 				ctx.focus = l;
 				l.focus();
@@ -106,7 +157,7 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 			open = childMenu;
 			placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
 		      },
-		      childMenu = list2HTML(ctx, e.list);
+		      childMenu = list2HTML(ctx, e.list, l);
 		return li({
 			"class": "contextSubMenu",
 			"onmousedown": openFn,
@@ -125,8 +176,7 @@ place = (container: Element, coords: [number, number], list: List, delay: number
 		container.removeChild(root);
 		resolve(data);
 	      }, delay: delay, timeout: -1},
-	      root = list2HTML(ctx, list),
-	      closeEvent = new CustomEvent("contextremove");
+	      root = list2HTML(ctx, list);
 	new MutationObserver((mutations: MutationRecord[], o: MutationObserver) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 		if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
 			n.dispatchEvent(closeEvent);
