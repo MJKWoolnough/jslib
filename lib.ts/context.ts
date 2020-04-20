@@ -51,9 +51,6 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 		ctx.timeout = -1;
 	}
       },
-      getCoords = (ctx: Ctx, li: HTMLLIElement) => {
-	return [[0, 0], [0, 0]] as Coords
-      },
       placeList = (ctx: Ctx, coords: Coords, list: HTMLUListElement) => {
 	clearTO(ctx);
 	list.style.setProperty("top", "0");
@@ -84,8 +81,10 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 			if (open) {
 				ctx.container.removeChild(open);
 			}
+			const parentLeft = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("left").slice(0, -2)),
+			      parentTop = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("top").slice(0, -2));
 			open = childMenu;
-			placeList(ctx, getCoords(ctx, this), childMenu)
+			placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
 		      },
 		      childMenu = list2HTML(ctx, e.list);
 		return li({
