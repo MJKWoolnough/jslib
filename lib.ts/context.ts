@@ -40,7 +40,10 @@ type List = (Item | Menu)[];
 const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== undefined,
       setTO = (ctx: Ctx, fn: () => any) => {
 	clearTO(ctx);
-	ctx.timeout = window.setTimeout(fn, ctx.delay);
+	ctx.timeout = window.setTimeout(() => {
+		ctx.timeout = -1;
+		fn()
+	}, ctx.delay);
       },
       clearTO = (ctx: Ctx) => {
 	if (ctx.timeout !== -1) {
