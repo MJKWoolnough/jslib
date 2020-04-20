@@ -1,5 +1,6 @@
 import {createHTML, clearElement, autoFocus} from './dom.js';
 import {button, div, img, input, span, style, ul, li} from './html.js';
+import {item, place} from './context.js';
 
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
@@ -402,28 +403,10 @@ export class Taskbar {
 			}
 		}, "oncontextmenu": (e: MouseEvent) => {
 			e.preventDefault();
-			self.html.parentNode!.appendChild(autoFocus(ul({"class": "windowsTaskbarContextMenu", "tabindex": "-1", "--taskbar-x": e.clientX + "px", "--taskbar-y": e.clientY + "px", "onblur": function(this: HTMLUListElement) {
-				self.html.parentNode!.removeChild(this);
-			}, "onkeypress": function(this: HTMLUListElement, e: KeyboardEvent) {
-				if ((e.key === "m" && !w.html.classList.contains("windowsMinimised")) || (e.key === "r" && w.html.classList.contains("windowsMinimised"))) {
-					w.onMinimiseToggle();
-				} else if (e.key === "c") {
-					w.onExit();
-				} else {
-					return;
-				}
-				this.blur();
-				e.preventDefault();
-			}}, [
-				li(w.html.classList.contains("windowsMinimised") ? "Restore" : "Minimise", {"onclick": function(this: HTMLLIElement) {
-					(this.parentNode as HTMLUListElement).blur();
-					w.onMinimiseToggle();
-				}}),
-				li("Close", {"onclick": function(this: HTMLLIElement) {
-					(this.parentNode as HTMLUListElement).blur();
-					w.onExit();
-				}}),
-			])));
+			place(self.html.parentNode as HTMLDivElement, [e.clientX, e.clientY], [
+				item(w.html.classList.contains("windowsMinimised") ? "&Restore" : "&Minimise", () => w.onMinimiseToggle()),
+				item("&Close", () => w.onExit())
+			]);
 		}}, [
 			w.icon ? img({"src": w.icon}) : [],
 			span(w.title)
