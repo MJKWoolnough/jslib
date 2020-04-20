@@ -27,7 +27,7 @@ type Menu = {
 }
 
 type Ctx = {
-	container: Node;
+	container: Element;
 	resolve: (a: any) => any;
 	delay: number;
 	timeout: number;
@@ -53,7 +53,19 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
       },
       placeList = (ctx: Ctx, coords: Coords, list: HTMLUListElement) => {
 	clearTO(ctx);
+	list.style.setProperty("top", "0");
+	list.style.setProperty("left", "0");
 	ctx.container.appendChild(list);
+	if (coords[0][0] + list.clientWidth <= ctx.container.clientWidth) {
+		list.style.setProperty("left", coords[0][0] + "px");
+	} else {
+		list.style.setProperty("left", (coords[1][0] - list.clientWidth) + "px");
+	}
+	if (coords[0][1] + list.clientHeight <= ctx.container.clientHeight) {
+		list.style.setProperty("top", coords[0][1] + "px");
+	} else {
+		list.style.setProperty("top", (coords[1][1] - list.clientHeight) + "px");
+	}
       },
       list2HTML = (ctx: Ctx, list: List): HTMLUListElement => {
 	let open: HTMLUListElement | null = null;
@@ -84,7 +96,7 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
       };
 
 export const item = (name: string, action: () => any) => ({name, action}), menu = (name: string, list: List) => ({name, list}),
-place = (container: Node, coords: [number, number], list: List, delay: number = 0) => new Promise(resolve => {
+place = (container: Element, coords: [number, number], list: List, delay: number = 0) => new Promise(resolve => {
 	const ctx: Ctx = {container, resolve: (data: any) => {
 		container.removeChild(root);
 		resolve(data);
