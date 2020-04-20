@@ -17,6 +17,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 .contextMenu li:hover {
 	background-color: #aaa;
 }
+
+.contextSubMenu:after {
+	content: "»";
+}
 `)));
 
 type Item = {
