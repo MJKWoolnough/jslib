@@ -8,6 +8,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	color: #000;
 	list-style: none;
 	padding-left: 0;
+	margin: 0;
 	user-select: none;
 }
 
