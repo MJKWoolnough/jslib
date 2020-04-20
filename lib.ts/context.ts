@@ -21,6 +21,10 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 .contextSubMenu:after {
 	content: "»";
 }
+
+.contextMenu span {
+	text-decoration: underline;
+}
 `)));
 
 type Item = {
@@ -88,8 +92,9 @@ const mousedownEvent = new CustomEvent("mousedown"),
 			open = null;
 		}
 	      },
+	      keys = new Map<string, number[]>(),
 	      l = ul();
-	createHTML(l, {"class": "contextMenu", "oncontextremove": closeFn, "tabindex": "-1", "onkeyup": (e: KeyboardEvent) => {
+	createHTML(l, {"class": "contextMenu", "oncontextremove": closeFn, "tabindex": "-1", "onkeydown": (e: KeyboardEvent) => {
 		switch (e.key) {
 		case "ArrowDown":
 			if (selected >= 0) {
@@ -135,18 +140,60 @@ const mousedownEvent = new CustomEvent("mousedown"),
 				l.blur();
 			}
 			break;
+		default:
+			const i = keys.get(e.key.toLowerCase());
+			if (!i) {
+				return;
+			}
+			e.preventDefault();
+			e.stopPropagation();
+			e.stopImmediatePropagation();
+			if (selected >= 0) {
+				(l.childNodes[selected] as HTMLLIElement).classList.remove("contextSelected");
+			}
+			if (i.length === 1) {
+				selected = i[0];
+				(l.childNodes[selected] as HTMLLIElement).dispatchEvent(mousedownEvent);
+			} else {
+				if (!i.some(j => {
+					if (j > selected) {
+						selected = j;
+						return true;
+					}
+					return false;
+				})) {
+					selected = i[0];
+				};
+			}
+			(l.childNodes[selected] as HTMLLIElement).classList.add("contextSelected");
+			return false;
 		}
 	      }, "onblur": () => {
 		if (ctx.focus === l) {
 			window.setTimeout(() => ctx.resolve(undefined), 0);
 		}
-	      }, "onfocus": closeFn}, list.map(e => {
+	      }, "onfocus": closeFn}, list.map((e, n) => {
+		let name: (string | HTMLSpanElement)[] = [e.name],
+		    ampPos = (name[0] as string).indexOf("&"),
+		    nextChar = (name[0] as string).charAt(ampPos + 1).toLowerCase();
+		if (ampPos >= 0 && nextChar !== " " && nextChar !== "") {
+			name = [
+				(name[0] as string).slice(0, ampPos),
+				span((name[0] as string).charAt(ampPos + 1)),
+				(name[0] as string).slice(ampPos+2)
+			];
+			if (keys.has(nextChar)) {
+				keys.get(nextChar)!.push(n);
+			} else {
+				keys.set(nextChar, [n]);
+			}
+		}
 		if (IsItem(e)) {
 			return li({"onmousedown": () => ctx.resolve(e.action()), "onmouseover": () => {
 				setTO(ctx, closeFn);
 				ctx.focus = l;
 				l.focus();
-			}}, e.name);
+			}}, name);
 		}
 		const openFn = function(this: HTMLLIElement) {
 			if (open) {
@@ -165,7 +212,7 @@ const mousedownEvent = new CustomEvent("mousedown"),
 				setTO(ctx, openFn.bind(this))
 			},
 			"onmouseout": () => clearTO(ctx),
-		}, span(e.name));
+		}, name);
 	      }));
 	return l;
       };
