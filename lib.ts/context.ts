@@ -1,3 +1,4 @@
+import {autoFocus} from './dom.js';
 import {li, span, style, ul} from './html.js';
 
 declare const pageLoad: Promise<void>;
@@ -10,6 +11,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	padding-left: 0;
 	margin: 0;
 	user-select: none;
+	outline: none;
 }
 
 .contextMenu li:hover {
@@ -32,6 +34,7 @@ type Ctx = {
 	resolve: (a: any) => any;
 	delay: number;
 	timeout: number;
+	focus?: HTMLUListElement;
 }
 
 type Coords = [[number, number], [number, number]];
@@ -67,6 +70,8 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 	} else {
 		list.style.setProperty("top", (coords[1][1] - list.clientHeight) + "px");
 	}
+	ctx.focus = list;
+	autoFocus(list);
       },
       list2HTML = (ctx: Ctx, list: List): HTMLUListElement => {
 	let open: HTMLUListElement | null = null;
@@ -76,9 +81,17 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 			open = null;
 		}
 	      },
-	      l = ul({"class": "contextMenu", "oncontextremove": closeFn}, list.map(e => {
+	      l = ul({"class": "contextMenu", "oncontextremove": closeFn, "tabindex": "-1", "onblur": function(this: HTMLUListElement) {
+		if (ctx.focus === this) {
+			window.setTimeout(() => ctx.resolve(undefined), 0);
+		}
+	      }}, list.map(e => {
 		if (IsItem(e)) {
-			return li({"onclick": () => ctx.resolve(e.action()), "onmouseover": () => setTO(ctx, closeFn)}, e.name);
+			return li({"onclick": () => ctx.resolve(e.action()), "onmouseover": () => {
+				setTO(ctx, closeFn);
+				ctx.focus = l;
+				l.focus();
+			}}, e.name);
 		}
 		const openFn = function(this: HTMLLIElement) {
 			if (open) {
@@ -92,13 +105,13 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 		      childMenu = list2HTML(ctx, e.list);
 		return li({
 			"class": "contextSubMenu",
-			"onclick": openFn,
+			"onmousedown": openFn,
 			"onmouseover": function(this: HTMLLIElement) {
 				setTO(ctx, openFn.bind(this))
 			},
 			"onmouseout": () => clearTO(ctx),
 		}, span(e.name));
-      	}));
+	      }));
 	return l;
       };
 
@@ -113,10 +126,6 @@ place = (container: Element, coords: [number, number], list: List, delay: number
 	new MutationObserver((mutations: MutationRecord[], o: MutationObserver) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 		if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
 			n.dispatchEvent(closeEvent);
-		}
-		if (n === root) {
-			o.disconnect();
-			resolve(undefined);
 		}
 	}))).observe(container, {"childList": true, "subtree": true});
 	placeList(ctx, [coords, coords], root)
