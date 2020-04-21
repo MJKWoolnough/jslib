@@ -41,8 +41,8 @@ const mousedownEvent = new CustomEvent("mousedown"),
 	let open = null,
 	    selected = -1;
 	const closeFn = () => {
-		if (open) {
-			ctx.container.removeChild(open);
+		if (open && open.parentNode) {
+			open.parentNode.removeChild(open);
 			open = null;
 		}
 	      },
@@ -150,9 +150,7 @@ const mousedownEvent = new CustomEvent("mousedown"),
 			}}, name);
 		}
 		const openFn = function() {
-			if (open) {
-				ctx.container.removeChild(open);
-			}
+			closeFn();
 			const parentLeft = parseInt(this.parentNode.style.getPropertyValue("left").slice(0, -2)),
 			      parentTop = parseInt(this.parentNode.style.getPropertyValue("top").slice(0, -2));
 			open = childMenu;
@@ -174,7 +172,9 @@ const mousedownEvent = new CustomEvent("mousedown"),
 export const item = (name, action) => ({name, action}), menu = (name, list) => ({name, list}),
 place = (container, coords, list, delay = 0) => new Promise(resolve => {
 	const ctx = {container, resolve: data => {
-		container.removeChild(root);
+		if (root.parentNode) {
+			root.parentNode.removeChild(root);
+		}
 		resolve(data);
 	      }, delay: delay, timeout: -1},
 	      root = list2HTML(ctx, list);

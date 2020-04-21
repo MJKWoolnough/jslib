@@ -87,8 +87,8 @@ const mousedownEvent = new CustomEvent("mousedown"),
 	let open: HTMLUListElement | null = null,
 	    selected = -1;
 	const closeFn = () => {
-		if (open) {
-			ctx.container.removeChild(open);
+		if (open && open.parentNode) {
+			open.parentNode.removeChild(open);
 			open = null;
 		}
 	      },
@@ -196,9 +196,7 @@ const mousedownEvent = new CustomEvent("mousedown"),
 			}}, name);
 		}
 		const openFn = function(this: HTMLLIElement) {
-			if (open) {
-				ctx.container.removeChild(open);
-			}
+			closeFn();
 			const parentLeft = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("left").slice(0, -2)),
 			      parentTop = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("top").slice(0, -2));
 			open = childMenu;
@@ -220,7 +218,9 @@ const mousedownEvent = new CustomEvent("mousedown"),
 export const item = (name: string, action: () => any) => ({name, action}), menu = (name: string, list: List) => ({name, list}),
 place = (container: Element, coords: [number, number], list: List, delay: number = 0) => new Promise(resolve => {
 	const ctx: Ctx = {container, resolve: (data: any) => {
-		container.removeChild(root);
+		if (root.parentNode) {
+			root.parentNode.removeChild(root);
+		}
 		resolve(data);
 	      }, delay: delay, timeout: -1},
 	      root = list2HTML(ctx, list);
