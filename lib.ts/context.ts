@@ -14,7 +14,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 	outline: none;
 }
 
-.contextMenu li:hover, .contextSelected {
+.contextMenu li:not(.contextDisabled):hover, .contextSelected {
 	background-color: #aaa;
 }
 
@@ -25,15 +25,22 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 .contextMenu span {
 	text-decoration: underline;
 }
+
+.contextDisabled {
+	color: #aaa;
+}
 `)));
 
-type Item = {
+type i = {
 	name: string;
+	disabled?: boolean;
+}
+
+type Item = i & {
 	action: () => any;
 }
 
-type Menu = {
-	name: string;
+type Menu = i & {
 	list: List;
 }
 
@@ -104,13 +111,18 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			if (selected >= 0) {
 				(l.childNodes[selected] as HTMLLIElement).classList.remove("contextSelected");
 			}
-			selected += mode;
-			if (selected < 0) {
-				selected = l.childNodes.length - 1;
-			} else if (selected >= l.childNodes.length) {
-				selected = 0;
+			for (let a = 0; a < list.length; a++) {
+				selected += mode;
+				if (selected < 0) {
+					selected = l.childNodes.length - 1;
+				} else if (selected >= l.childNodes.length) {
+					selected = 0;
+				}
+				if (!(l.childNodes[selected] as HTMLLIElement).classList.contains("contextDisabled")) {
+					(l.childNodes[selected] as HTMLLIElement).classList.add("contextSelected");
+					break;
+				}
 			}
-			(l.childNodes[selected] as HTMLLIElement).classList.add("contextSelected");
 			break;
 		case "ArrowRight":
 			if (selected < 0 || !(l.childNodes[selected] as HTMLLIElement).classList.contains("contextSubMenu")) {
@@ -173,14 +185,18 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				span((name[0] as string).charAt(ampPos + 1)),
 				(name[0] as string).slice(ampPos+2)
 			];
-			if (keys.has(nextChar)) {
-				keys.get(nextChar)!.push(n);
-			} else {
-				keys.set(nextChar, [n]);
+			if (!e.disabled) {
+				if (keys.has(nextChar)) {
+					keys.get(nextChar)!.push(n);
+				} else {
+					keys.set(nextChar, [n]);
+				}
 			}
 		}
 		let params: Record<string, string | Function>;
-		if (IsItem(e)) {
+		if (e.disabled) {
+			params = {"class": "contextDisabled" + (IsItem(e) ? "" : " contextSubMenu")};
+		} else if (IsItem(e)) {
 			params = {
 				"onmousedown": () => ctx.resolve(e.action()),
 				"onmouseover": () => {

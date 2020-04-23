@@ -1,7 +1,7 @@
 import {autoFocus, createHTML} from './dom.js';
 import {li, span, style, ul} from './html.js';
 
-pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}`)));
+pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}.contextDisabled{color:#aaa}`)));
 
 const mousedownEvent = new MouseEvent("mousedown"),
       keydownEvent = new KeyboardEvent("keydown", {"key": "ArrowDown"}),
@@ -58,13 +58,18 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			if (selected >= 0) {
 				l.childNodes[selected].classList.remove("contextSelected");
 			}
-			selected += mode;
-			if (selected < 0) {
-				selected = l.childNodes.length - 1;
-			} else if (selected >= l.childNodes.length) {
-				selected = 0;
+			for (let a = 0; a < list.length; a++) {
+				selected += mode;
+				if (selected < 0) {
+					selected = l.childNodes.length - 1;
+				} else if (selected >= l.childNodes.length) {
+					selected = 0;
+				}
+				if (!l.childNodes[selected].classList.contains("contextDisabled")) {
+					l.childNodes[selected].classList.add("contextSelected");
+					break;
+				}
 			}
-			l.childNodes[selected].classList.add("contextSelected");
 			break;
 		case "ArrowRight":
 			if (selected < 0 || !l.childNodes[selected].classList.contains("contextSubMenu")) {
@@ -127,14 +132,18 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				span(name[0].charAt(ampPos + 1)),
 				name[0].slice(ampPos+2)
 			];
-			if (keys.has(nextChar)) {
-				keys.get(nextChar).push(n);
-			} else {
-				keys.set(nextChar, [n]);
+			if (!e.disabled) {
+				if (keys.has(nextChar)) {
+					keys.get(nextChar).push(n);
+				} else {
+					keys.set(nextChar, [n]);
+				}
 			}
 		}
 		let params;
-		if (IsItem(e)) {
+		if (e.disabled) {
+			params = {"class": "contextDisabled" + (IsItem(e) ? "" : " contextSubMenu")};
+		} else if (IsItem(e)) {
 			params = {
 				"onmousedown": () => ctx.resolve(e.action()),
 				"onmouseover": () => {
