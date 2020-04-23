@@ -102,7 +102,13 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	      },
 	      keys = new Map<string, number[]>(),
 	      l = ul();
-	return createHTML(l, {"class": "contextMenu", "oncontextremove": closeFn, "tabindex": "-1", "onkeydown": (e: KeyboardEvent) => {
+	return createHTML(l, {"class": "contextMenu", "oncontextremove": () => {
+		closeFn();
+		if (selected >= 0) {
+			(l.childNodes[selected] as HTMLLIElement).classList.remove("contextSelected");
+			selected = -1;
+		}
+	}, "tabindex": "-1", "onkeydown": (e: KeyboardEvent) => {
 		let mode: -1 | 1 = -1;
 		switch (e.key) {
 		case "ArrowDown":

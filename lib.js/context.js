@@ -49,7 +49,13 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	      },
 	      keys = new Map(),
 	      l = ul();
-	return createHTML(l, {"class": "contextMenu", "oncontextremove": closeFn, "tabindex": "-1", "onkeydown": e => {
+	return createHTML(l, {"class": "contextMenu", "oncontextremove": () => {
+		if (selected >= 0) {
+			l.childNodes[selected].classList.remove("contextSelected");
+			selected = -1;
+		}
+		closeFn();
+	}, "tabindex": "-1", "onkeydown": e => {
 		let mode = -1;
 		switch (e.key) {
 		case "ArrowDown":
