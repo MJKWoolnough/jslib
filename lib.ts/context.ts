@@ -179,32 +179,35 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				keys.set(nextChar, [n]);
 			}
 		}
+		let params: Record<string, string | Function>;
 		if (IsItem(e)) {
-			return li({"onmousedown": () => ctx.resolve(e.action()), "onmouseover": () => {
+			params = {"onmousedown": () => ctx.resolve(e.action()), "onmouseover": () => {
 				setTO(ctx, closeFn);
 				ctx.focus = l;
 				l.focus();
-			}}, name);
+			}};
+		} else {
+			const openFn = function(this: HTMLLIElement, e: MouseEvent) {
+				closeFn();
+				const parentLeft = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("left").slice(0, -2)),
+				      parentTop = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("top").slice(0, -2));
+				open = childMenu;
+				placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
+				if (!e.isTrusted) {
+					childMenu.dispatchEvent(keydownEvent);
+				}
+			      },
+			      childMenu = list2HTML(ctx, e.list, l);
+			params = {
+				"class": "contextSubMenu",
+				"onmousedown": openFn,
+				"onmouseover": function(this: HTMLLIElement, e: MouseEvent) {
+					setTO(ctx, openFn.bind(this, e))
+				},
+				"onmouseout": () => clearTO(ctx),
+			};
 		}
-		const openFn = function(this: HTMLLIElement, e: MouseEvent) {
-			closeFn();
-			const parentLeft = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("left").slice(0, -2)),
-			      parentTop = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("top").slice(0, -2));
-			open = childMenu;
-			placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
-			if (!e.isTrusted) {
-				childMenu.dispatchEvent(keydownEvent);
-			}
-		      },
-		      childMenu = list2HTML(ctx, e.list, l);
-		return li({
-			"class": "contextSubMenu",
-			"onmousedown": openFn,
-			"onmouseover": function(this: HTMLLIElement, e: MouseEvent) {
-				setTO(ctx, openFn.bind(this, e))
-			},
-			"onmouseout": () => clearTO(ctx),
-		}, name);
+		return li(params, name);
 	}));
       };
 

@@ -133,32 +133,35 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				keys.set(nextChar, [n]);
 			}
 		}
+		let params;
 		if (IsItem(e)) {
-			return li({"onmousedown": () => ctx.resolve(e.action()), "onmouseover": () => {
+			params = {"onmousedown": () => ctx.resolve(e.action()), "onmouseover": () => {
 				setTO(ctx, closeFn);
 				ctx.focus = l;
 				l.focus();
-			}}, name);
+			}};
+		} else {
+			const openFn = function(e) {
+				closeFn();
+				const parentLeft = parseInt(this.parentNode.style.getPropertyValue("left").slice(0, -2)),
+				      parentTop = parseInt(this.parentNode.style.getPropertyValue("top").slice(0, -2));
+				open = childMenu;
+				placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
+				if (!e.isTrusted) {
+					childMenu.dispatchEvent(keydownEvent);
+				}
+			      },
+			      childMenu = list2HTML(ctx, e.list, l);
+			params = {
+				"class": "contextSubMenu",
+				"onmousedown": openFn,
+				"onmouseover": function(e) {
+					setTO(ctx, openFn.bind(this, e))
+				},
+				"onmouseout": () => clearTO(ctx),
+			};
 		}
-		const openFn = function(e) {
-			closeFn();
-			const parentLeft = parseInt(this.parentNode.style.getPropertyValue("left").slice(0, -2)),
-			      parentTop = parseInt(this.parentNode.style.getPropertyValue("top").slice(0, -2));
-			open = childMenu;
-			placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
-			if (!e.isTrusted) {
-				childMenu.dispatchEvent(keydownEvent);
-			}
-		      },
-		      childMenu = list2HTML(ctx, e.list, l);
-		return li({
-			"class": "contextSubMenu",
-			"onmousedown": openFn,
-			"onmouseover": function(e) {
-				setTO(ctx, openFn.bind(this, e))
-			},
-			"onmouseout": () => clearTO(ctx),
-		}, name);
+		return li(params, name);
 	}));
       };
 
