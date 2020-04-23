@@ -49,7 +49,8 @@ type Coords = [[number, number], [number, number]];
 
 type List = (Item | Menu)[];
 
-const mousedownEvent = new CustomEvent("mousedown"),
+const mousedownEvent = new MouseEvent("mousedown"),
+      keydownEvent = new KeyboardEvent("keydown", {"key": "ArrowDown"}),
       closeEvent = new CustomEvent("contextremove"),
       IsItem = (item: Item | Menu): item is Item => (item as Item).action !== undefined,
       setTO = (ctx: Ctx, fn: () => any) => {
@@ -195,19 +196,22 @@ const mousedownEvent = new CustomEvent("mousedown"),
 				l.focus();
 			}}, name);
 		}
-		const openFn = function(this: HTMLLIElement) {
+		const openFn = function(this: HTMLLIElement, e: MouseEvent) {
 			closeFn();
 			const parentLeft = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("left").slice(0, -2)),
 			      parentTop = parseInt((this.parentNode as HTMLUListElement).style.getPropertyValue("top").slice(0, -2));
 			open = childMenu;
 			placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
+			if (!e.isTrusted) {
+				childMenu.dispatchEvent(keydownEvent);
+			}
 		      },
 		      childMenu = list2HTML(ctx, e.list, l);
 		return li({
 			"class": "contextSubMenu",
 			"onmousedown": openFn,
-			"onmouseover": function(this: HTMLLIElement) {
-				setTO(ctx, openFn.bind(this))
+			"onmouseover": function(this: HTMLLIElement, e: MouseEvent) {
+				setTO(ctx, openFn.bind(this, e))
 			},
 			"onmouseout": () => clearTO(ctx),
 		}, name);

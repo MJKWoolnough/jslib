@@ -3,7 +3,8 @@ import {li, span, style, ul} from './html.js';
 
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}`)));
 
-const mousedownEvent = new CustomEvent("mousedown"),
+const mousedownEvent = new MouseEvent("mousedown"),
+      keydownEvent = new KeyboardEvent("keydown", {"key": "ArrowDown"}),
       closeEvent = new CustomEvent("contextremove"),
       IsItem = item => item.action !== undefined,
       setTO = (ctx, fn) => {
@@ -149,19 +150,22 @@ const mousedownEvent = new CustomEvent("mousedown"),
 				l.focus();
 			}}, name);
 		}
-		const openFn = function() {
+		const openFn = function(e) {
 			closeFn();
 			const parentLeft = parseInt(this.parentNode.style.getPropertyValue("left").slice(0, -2)),
 			      parentTop = parseInt(this.parentNode.style.getPropertyValue("top").slice(0, -2));
 			open = childMenu;
 			placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
+			if (!e.isTrusted) {
+				childMenu.dispatchEvent(keydownEvent);
+			}
 		      },
 		      childMenu = list2HTML(ctx, e.list, l);
 		return li({
 			"class": "contextSubMenu",
 			"onmousedown": openFn,
-			"onmouseover": function() {
-				setTO(ctx, openFn.bind(this))
+			"onmouseover": function(e) {
+				setTO(ctx, openFn.bind(this, e))
 			},
 			"onmouseout": () => clearTO(ctx),
 		}, name);
