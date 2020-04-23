@@ -181,11 +181,20 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		}
 		let params: Record<string, string | Function>;
 		if (IsItem(e)) {
-			params = {"onmousedown": () => ctx.resolve(e.action()), "onmouseover": () => {
-				setTO(ctx, closeFn);
-				ctx.focus = l;
-				l.focus();
-			}};
+			params = {
+				"onmousedown": () => ctx.resolve(e.action()),
+				"onmouseover": () => {
+					setTO(ctx, () => {
+						closeFn();
+						ctx.focus = l;
+						l.focus();
+					});
+					if (selected >= 0) {
+						(l.childNodes[selected] as HTMLLIElement).classList.remove("contextSelected");
+						selected = -1;
+					}
+				}
+			};
 		} else {
 			const openFn = function(this: HTMLLIElement, e: MouseEvent) {
 				closeFn();
@@ -203,6 +212,10 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				"onmousedown": openFn,
 				"onmouseover": function(this: HTMLLIElement, e: MouseEvent) {
 					setTO(ctx, openFn.bind(this, e))
+					if (selected >= 0) {
+						(l.childNodes[selected] as HTMLLIElement).classList.remove("contextSelected");
+						selected = -1;
+					}
 				},
 				"onmouseout": () => clearTO(ctx),
 			};

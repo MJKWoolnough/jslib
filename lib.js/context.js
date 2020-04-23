@@ -135,11 +135,20 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		}
 		let params;
 		if (IsItem(e)) {
-			params = {"onmousedown": () => ctx.resolve(e.action()), "onmouseover": () => {
-				setTO(ctx, closeFn);
-				ctx.focus = l;
-				l.focus();
-			}};
+			params = {
+				"onmousedown": () => ctx.resolve(e.action()),
+				"onmouseover": () => {
+					setTO(ctx, () => {
+						closeFn();
+						ctx.focus = l;
+						l.focus();
+					});
+					if (selected >= 0) {
+						l.childNodes[selected].classList.remove("contextSelected");
+						selected = -1;
+					}
+				}
+			};
 		} else {
 			const openFn = function(e) {
 				closeFn();
@@ -157,6 +166,10 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				"onmousedown": openFn,
 				"onmouseover": function(e) {
 					setTO(ctx, openFn.bind(this, e))
+					if (selected >= 0) {
+						l.childNodes[selected].classList.remove("contextSelected");
+						selected = -1;
+					}
 				},
 				"onmouseout": () => clearTO(ctx),
 			};
