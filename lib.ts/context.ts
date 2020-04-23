@@ -174,9 +174,9 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			window.setTimeout(() => ctx.resolve(undefined), 0);
 		}
 	      }, "onfocus": closeFn}, list.map((e, n) => {
-		let name: (string | HTMLSpanElement)[] = [e.name],
-		    ampPos = (name[0] as string).indexOf("&"),
-		    nextChar = (name[0] as string).charAt(ampPos + 1).toLowerCase();
+		let name: (string | HTMLSpanElement)[] = [e.name];
+		const ampPos = (name[0] as string).indexOf("&"),
+		      nextChar = (name[0] as string).charAt(ampPos + 1).toLowerCase();
 		if (ampPos >= 0 && nextChar !== " " && nextChar !== "") {
 			name = [
 				(name[0] as string).slice(0, ampPos),

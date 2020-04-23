@@ -128,9 +128,9 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			window.setTimeout(() => ctx.resolve(undefined), 0);
 		}
 	      }, "onfocus": closeFn}, list.map((e, n) => {
-		let name = [e.name],
-		    ampPos = name[0].indexOf("&"),
-		    nextChar = name[0].charAt(ampPos + 1).toLowerCase();
+		let name = [e.name];
+		const ampPos = name[0].indexOf("&"),
+		      nextChar = name[0].charAt(ampPos + 1).toLowerCase();
 		if (ampPos >= 0 && nextChar !== " " && nextChar !== "") {
 			name = [
 				name[0].slice(0, ampPos),
