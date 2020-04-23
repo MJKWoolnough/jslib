@@ -51,7 +51,9 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 			if (k.startsWith("on") && prop instanceof Function) {
 				elem.addEventListener(k.substr(2), prop);
 			} else if (k === "class") {
-				elem.classList.add(...(prop instanceof Array ? prop : prop.split(" ")));
+				if (prop.length > 0) {
+					elem.classList.add(...(prop instanceof Array ? prop : prop.split(" ")));
+				}
 			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				elem.style.setProperty(k, prop);
 			} else {
