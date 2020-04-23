@@ -224,19 +224,21 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	}));
       };
 
-export const item = (name: string, action: () => any) => ({name, action}), menu = (name: string, list: List) => ({name, list}),
-place = (container: Element, coords: [number, number], list: List, delay: number = 0) => new Promise(resolve => {
-	const ctx: Ctx = {container, resolve: (data: any) => {
-		if (root.parentNode) {
-			root.parentNode.removeChild(root);
-		}
-		resolve(data);
-	      }, delay: delay, timeout: -1},
-	      root = list2HTML(ctx, list);
-	new MutationObserver((mutations: MutationRecord[], o: MutationObserver) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
-		if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
-			n.dispatchEvent(closeEvent);
-		}
-	}))).observe(container, {"childList": true, "subtree": true});
-	placeList(ctx, [coords, coords], root)
-});
+export const item = (name: string, action: () => any) => ({name, action}), menu = (name: string, list: List) => ({name, list});
+export default function (container: Element, coords: [number, number], list: List, delay: number = 0) {
+	return new Promise(resolve => {
+		const ctx: Ctx = {container, resolve: (data: any) => {
+			if (root.parentNode) {
+				root.parentNode.removeChild(root);
+			}
+			resolve(data);
+		      }, delay: delay, timeout: -1},
+		      root = list2HTML(ctx, list);
+		new MutationObserver((mutations: MutationRecord[], o: MutationObserver) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
+			if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
+				n.dispatchEvent(closeEvent);
+			}
+		}))).observe(container, {"childList": true, "subtree": true});
+		placeList(ctx, [coords, coords], root)
+	});
+};
