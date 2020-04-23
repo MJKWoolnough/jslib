@@ -2,7 +2,9 @@ interface NestedChildren extends Array<NestedChildren | string | Node>{}
 
 export type Children = NestedChildren | string | Node;
 
-export type Props = Record<string, string | Function>;
+export type Props = Record<string, string | Function> & {
+	"class"?: string | string[];
+};
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -49,7 +51,9 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 			if (k.startsWith("on") && prop instanceof Function) {
 				elem.addEventListener(k.substr(2), prop);
 			} else if (k === "class") {
-				if (prop) {
+				if (prop instanceof Array) {
+					elem.classList.add(...prop);
+				} else if (prop) {
 					elem.classList.add(...prop.split(" "));
 				}
 			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
