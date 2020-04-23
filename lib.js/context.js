@@ -49,49 +49,39 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	      },
 	      keys = new Map(),
 	      l = ul();
-	createHTML(l, {"class": "contextMenu", "oncontextremove": closeFn, "tabindex": "-1", "onkeydown": e => {
+	return createHTML(l, {"class": "contextMenu", "oncontextremove": closeFn, "tabindex": "-1", "onkeydown": e => {
+		let mode = -1;
 		switch (e.key) {
 		case "ArrowDown":
-			if (selected >= 0) {
-				l.childNodes[selected].classList.remove("contextSelected");
-			}
-			selected++;
-			if (selected >= l.childNodes.length) {
-				selected = 0;
-			}
-			l.childNodes[selected].classList.add("contextSelected");
-			break;
+			mode = 1;
 		case "ArrowUp":
 			if (selected >= 0) {
 				l.childNodes[selected].classList.remove("contextSelected");
 			}
-			selected--;
+			selected += mode;
 			if (selected < 0) {
 				selected = l.childNodes.length - 1;
+			} else if (selected >= l.childNodes.length) {
+				selected = 0;
 			}
 			l.childNodes[selected].classList.add("contextSelected");
 			break;
 		case "ArrowRight":
-			if (selected >= 0 && l.childNodes[selected].classList.contains("contextSubMenu")) {
-				l.childNodes[selected].dispatchEvent(mousedownEvent);
+			if (selected < 0 || !l.childNodes[selected].classList.contains("contextSubMenu")) {
+				break;
 			}
-			break;
 		case "Enter":
 			if (selected >= 0) {
 				l.childNodes[selected].dispatchEvent(mousedownEvent);
 			}
 			break;
 		case "ArrowLeft":
-			if (last) {
-				ctx.focus = last;
-				last.focus();
-			}
-			break;
+			mode = 1;
 		case "Escape":
 			if (last) {
 				ctx.focus = last;
 				last.focus();
-			} else {
+			} else if (mode === -1) {
 				l.blur();
 			}
 			break;
@@ -169,8 +159,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			},
 			"onmouseout": () => clearTO(ctx),
 		}, name);
-	      }));
-	return l;
+	}));
       };
 
 export const item = (name, action) => ({name, action}), menu = (name, list) => ({name, list}),
