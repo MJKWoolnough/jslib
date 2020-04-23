@@ -18,11 +18,7 @@ export const createElements = namespace => (element, properties, children) => {
 			if (k.startsWith("on") && prop instanceof Function) {
 				elem.addEventListener(k.substr(2), prop);
 			} else if (k === "class") {
-				if (prop instanceof Array) {
-					elem.classList.add(...prop);
-				} else if (prop) {
-					elem.classList.add(...prop.split(" "));
-				}
+				elem.classList.add(...(prop instanceof Array ? prop : prop.split(" ")));
 			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				elem.style.setProperty(k, prop);
 			} else {
