@@ -1,4 +1,4 @@
-import {autoFocus, createHTML} from './dom.js';
+import {autoFocus, createHTML, Props} from './dom.js';
 import {li, span, style, ul} from './html.js';
 
 declare const pageLoad: Promise<void>;
@@ -33,6 +33,8 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 
 type i = {
 	name: string;
+	class?: string;
+	id?: string;
 	disabled?: boolean;
 }
 
@@ -199,9 +201,13 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				}
 			}
 		}
-		let params: Record<string, string | Function>;
+		let params: Props, classes = [];
 		if (e.disabled) {
-			params = {"class": "contextDisabled" + (IsItem(e) ? "" : " contextSubMenu")};
+			params = {};
+			classes.push("contextDisabled");
+			if (IsItem(e)) {
+				classes.push("contextSubMenu");
+			}
 		} else if (IsItem(e)) {
 			params = {
 				"onmousedown": () => ctx.resolve(e.action()),
@@ -229,8 +235,8 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				}
 			      },
 			      childMenu = list2HTML(ctx, e.list, l);
+			classes.push("contextSubMenu");
 			params = {
-				"class": "contextSubMenu",
 				"onmousedown": openFn,
 				"onmouseover": function(this: HTMLLIElement, e: MouseEvent) {
 					setTO(ctx, openFn.bind(this, e))
@@ -242,6 +248,13 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				"onmouseout": () => clearTO(ctx),
 			};
 		}
+		if (e.id) {
+			params["id"] = e.id;
+		}
+		if (e.class) {
+			classes.push(...e.class.split(" "));
+		}
+		params["class"] = classes;
 		return li(params, name);
 	}));
       };

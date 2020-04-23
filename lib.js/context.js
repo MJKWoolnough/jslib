@@ -146,9 +146,13 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				}
 			}
 		}
-		let params;
+		let params, classes = [];
 		if (e.disabled) {
-			params = {"class": "contextDisabled" + (IsItem(e) ? "" : " contextSubMenu")};
+			params = {};
+			classes.push("contextDisabled");
+			if (IsItem(e)) {
+				classes.push("contextSubMenu");
+			}
 		} else if (IsItem(e)) {
 			params = {
 				"onmousedown": () => ctx.resolve(e.action()),
@@ -176,8 +180,8 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				}
 			      },
 			      childMenu = list2HTML(ctx, e.list, l);
+			classes.push("contextSubMenu");
 			params = {
-				"class": "contextSubMenu",
 				"onmousedown": openFn,
 				"onmouseover": function(e) {
 					setTO(ctx, openFn.bind(this, e))
@@ -189,6 +193,13 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				"onmouseout": () => clearTO(ctx),
 			};
 		}
+		if (e.id) {
+			params["id"] = e.id;
+		}
+		if (e.class) {
+			classes.push(...e.class.split(" "));
+		}
+		params["class"] = classes;
 		return li(params, name);
 	}));
       };
