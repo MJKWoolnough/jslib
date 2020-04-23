@@ -19,7 +19,7 @@ export const createElements = namespace => (element, properties, children) => {
 				elem.addEventListener(k.substr(2), prop);
 			} else if (k === "class") {
 				if (prop.length > 0) {
-					elem.classList.add(...(prop instanceof Array ? prop : prop.split(" ")));
+					elem.classList.add(...(prop instanceof Array || prop instanceof DOMTokenList ? prop : prop.split(" ")));
 				}
 			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				elem.style.setProperty(k, prop);

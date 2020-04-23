@@ -3,7 +3,7 @@ interface NestedChildren extends Array<NestedChildren | string | Node>{}
 export type Children = NestedChildren | string | Node;
 
 export type Props = Record<string, string | Function> & {
-	"class"?: string | string[];
+	"class"?: string | string[] | DOMTokenList;
 };
 
 const childrenArr = (elem: Node, children: Children) => {
@@ -52,7 +52,7 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 				elem.addEventListener(k.substr(2), prop);
 			} else if (k === "class") {
 				if (prop.length > 0) {
-					elem.classList.add(...(prop instanceof Array ? prop : prop.split(" ")));
+					elem.classList.add(...(prop instanceof Array || prop instanceof DOMTokenList ? prop : prop.split(" ")));
 				}
 			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				elem.style.setProperty(k, prop);
