@@ -1,6 +1,6 @@
 import {createHTML, clearElement, autoFocus} from './dom.js';
 import {button, div, img, input, span, style, ul, li} from './html.js';
-import {item, place} from './context.js';
+import place, {item} from './context.js';
 
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
