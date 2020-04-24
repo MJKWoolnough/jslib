@@ -45,19 +45,27 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 		[properties, children] = [children, properties];
 	}
 	if (typeof properties === "object" && elem instanceof Element) {
-		Object.entries(properties).filter(([k, prop]) => prop !== undefined).forEach(([k, prop]) => {
-			if (k.startsWith("on") && prop instanceof Function) {
-				elem.addEventListener(k.substr(2), prop);
-			} else if (k === "class") {
-				if (prop.length > 0) {
-					elem.classList.add(...(prop instanceof Array || prop instanceof DOMTokenList ? prop : prop.split(" ")));
+		for (const [k, prop] of Object.entries(properties)) {
+			if (prop instanceof Function) {
+				if (k.startsWith("on")) {
+					elem.addEventListener(k.substr(2), prop);
 				}
-			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
-				elem.style.setProperty(k, prop);
+			} else if (k === "class") {
+				if (typeof prop === "string" && prop.length > 0) {
+					elem.classList.add(...prop.split(" "));
+				} else if ((prop instanceof Array || prop instanceof DOMTokenList) && prop.length > 0) {
+					elem.classList.add(...prop);
+				}
 			} else if (typeof prop === "string" || typeof prop === "number") {
-				elem.setAttribute(k, prop as string);
+				if (k.startsWith("--")) {
+					if (elem instanceof HTMLElement || elem instanceof SVGElement) {
+						elem.style.setProperty(k, prop as string);
+					}
+				} else {
+					elem.setAttribute(k, prop as string);
+				}
 			}
-		});
+		};
 	}
 	if (typeof children === "string") {
 		elem.textContent = children;
