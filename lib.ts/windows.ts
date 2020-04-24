@@ -476,12 +476,12 @@ class Window {
 			parts.push(..."TopRight Top TopLeft Left BottomLeft Bottom BottomRight Right".split(" ").map((d, n) => div({"class": `windowsResizer windowsResizer${d}`, "onmousedown": shell.resizeWindow.bind(shell, this, n)})));
 		}
 		if (options.size) {
-			params[windowWidth] = options.size.width.toString() + "px";
-			params[windowHeight] = options.size.height.toString() + "px";
+			params[windowWidth] = options.size.width + "px";
+			params[windowHeight] = options.size.height + "px";
 		}
 		if (options.position) {
-			params[windowLeft] = options.position.x.toString() + "px";
-			params[windowTop] = options.position.y.toString() + "px";
+			params[windowLeft] = options.position.x + "px";
+			params[windowTop] = options.position.y + "px";
 		}
 		if (options.icon) {
 			this.icon = options.icon;
@@ -556,8 +556,8 @@ class shellData {
 				children.push(div({"class": "windowsDesktop"}, options.desktop));
 			}
 			if (options.resolution) {
-				params["--shell-width"] = options.resolution.width.toString() + "px";
-				params["--shell-height"] = options.resolution.height.toString() + "px";
+				params["--shell-width"] = options.resolution.width + "px";
+				params["--shell-height"] = options.resolution.height + "px";
 			}
 			if (options.taskbar) {
 				this.taskbar = options.taskbar;
