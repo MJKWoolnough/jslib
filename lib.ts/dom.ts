@@ -2,7 +2,7 @@ interface NestedChildren extends Array<NestedChildren | string | Node>{}
 
 export type Children = NestedChildren | string | Node;
 
-export type Props = Record<string, string | string[] | DOMTokenList | Function>;
+export type Props = Record<string, number | string | string[] | DOMTokenList | Function>;
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -54,8 +54,8 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 				}
 			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				elem.style.setProperty(k, prop);
-			} else if (typeof prop === "string") {
-				elem.setAttribute(k, prop);
+			} else if (typeof prop === "string" || typeof prop === "number") {
+				elem.setAttribute(k, prop as string);
 			}
 		});
 	}

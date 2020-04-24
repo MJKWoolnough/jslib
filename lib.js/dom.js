@@ -23,7 +23,7 @@ export const createElements = namespace => (element, properties, children) => {
 				}
 			} else if (k.startsWith("--") && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				elem.style.setProperty(k, prop);
-			} else {
+			} else if (typeof prop === "string" || typeof prop === "number") {
 				elem.setAttribute(k, prop);
 			}
 		});
