@@ -196,15 +196,15 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		if (e.id) {
 			params["id"] = e.id;
 		}
-		if (e.class) {
-			classes.push(...e.class.split(" "));
+		if (e.classes) {
+			classes.push(...e.classes.split(" "));
 		}
 		params["class"] = classes;
 		return li(params, name);
 	}));
       };
 
-export const item = (name, action) => ({name, action}), menu = (name, list) => ({name, list});
+export const item = (name, action) => ({name, action}), menu = (name, list) => ({name, list}), disable = item => Object.assign(item, {"disabled": true}), id = (item, id) => Object.assign(item, {id}), classes = (item, classes) => Object.assign(item, {classes});
 export default function(container, coords, list, delay = 0) {
 	return new Promise(resolve => {
 		const ctx = {container, resolve: data => {

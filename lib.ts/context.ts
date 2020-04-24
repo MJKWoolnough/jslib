@@ -33,7 +33,7 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 
 type i = {
 	name: string;
-	class?: string;
+	classes?: string;
 	id?: string;
 	disabled?: boolean;
 }
@@ -251,15 +251,15 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		if (e.id) {
 			params["id"] = e.id;
 		}
-		if (e.class) {
-			classes.push(...e.class.split(" "));
+		if (e.classes) {
+			classes.push(...e.classes.split(" "));
 		}
 		params["class"] = classes;
 		return li(params, name);
 	}));
       };
 
-export const item = (name: string, action: () => any) => ({name, action}), menu = (name: string, list: List) => ({name, list});
+export const item = (name: string, action: () => any) => ({name, action}), menu = (name: string, list: List) => ({name, list}), disable = <T extends i>(item: T): T => Object.assign(item, {"disabled": true}), id = <T extends i>(item: T, id: string): T => Object.assign(item, {id}), classes = <T extends i>(item: T, classes: string): T => Object.assign(item, {classes});
 export default function (container: Element, coords: [number, number], list: List, delay: number = 0) {
 	return new Promise(resolve => {
 		const ctx: Ctx = {container, resolve: (data: any) => {
