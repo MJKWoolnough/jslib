@@ -1,522 +1,336 @@
-import {createHTML, clearElement, autoFocus} from './dom.js';
-import {button, div, img, input, span, style, ul, li} from './html.js';
-import place, {item} from './context.js';
+import {autoFocus, createHTML, DOMBind, Children, Props} from './dom.js';
+import {button, div, img, input, slot, span, style} from './html.js';
 
-pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, ".windowsShell{position:relative;overflow:hidden;width:var(--shell-width,100%);height:var(--shell-height,100%)}.windowsMoving,.windowsResizing{user-select:none}.windowsDesktop{position:absolute;top:0;bottom:0;left:0;right:0}.windowsWindow{position:absolute;background-color:#fff;border:1px solid #000;width:var(--window-width,auto);height:var(--window-height,auto);top:var(--window-top,0);left:var(--window-left,0);list-style:none;padding:0;user-select:contain;z-index:0}.windowsWindowContent{overflow:hidden}.windowsWindow.windowsResizable{padding:1px;border-width:0}.windowsResizer{position:absolute;border-color:#000;border-style:solid;border-width:0;z-index:-1}.windowsResizerTopLeft{top:-2px;left:-2px;width:10px;height:10px;cursor:nwse-resize;border-left-width:3px;border-top-width:3px}.windowsResizerTop{top:-2px;left:8px;right:8px;border-top-width:3px;cursor:ns-resize}.windowsResizerTopRight{top:-2px;right:-2px;width:10px;height:10px;border-top-width:3px;border-right-width:3px;cursor:nesw-resize}.windowsResizerRight{top:8px;right:-2px;bottom:8px;border-right-width:3px;cursor:ew-resize}.windowsResizerBottomRight{bottom:-2px;right:-2px;width:10px;height:10px;border-right-width:3px;border-bottom-width:3px;cursor:nwse-resize}.windowsResizerBottom{bottom:-2px;left:8px;right:8px;border-bottom-width:3px;cursor:ns-resize}.windowsResizerBottomLeft{bottom:-2px;left:-2px;width:10px;height:10px;border-left-width:3px;border-bottom-width:3px;cursor:nesw-resize}.windowsResizerLeft{top:8px;left:-2px;bottom:8px;border-left-width:3px;cursor:ew-resize}.windowsMinimised{display:none}.windowsMaximised{top:0;left:0;right:0;bottom:0;width:auto;height:auto}.windowsWindowTitlebar{background-color:#aaa;user-select:none;overflow:hidden;height:calc(1em + 4px)}.windowsWindowTitlebar>img{height:calc(1em)}.windowsWindowTitlebar>button{padding:0;border-width:2px;float:right;background-repeat:no-repeat;background-position:center;background-color:#eee;background-size:1em 1em;width:calc(1em + 8px);height:calc(1em + 8px)}.windowsWindowFocusGrabber{position:absolute;background-color:rgba(0,0,0,0.1);top:0;left:0;right:0;bottom:0}.windowsResizable .windowsWindowFocusGrabber{top:-2px;left:-2px;right:-2px;bottom:-2px}.windowsWindow:last-child>.windowsWindowFocusGrabber{display:none}.windowsNoTaskbar{list-style:none;padding:0;display:grid;grid-gap:5px;grid-template-columns:repeat(auto-fit,200px);position:absolute;bottom:0;transform:scaleY(-1);width:100%}.windowsNoTaskbar>li{transform:scaleY(-1);border:1px solid #000}.windowsNoTaskbar>li.hidden{visibility:hidden}.windowsTaskbarBottom{bottom:0;left:0;right:0;height:calc(1em + 8px);border-top:1px solid #aaa}.windowsTaskbarTop{top:0;left:0;right:0;height:calc(1em + 8px);border-bottom:1px solid #aaa}.windowsTaskbarLeft{top:0;left:0;bottom:0;width:calc(10em);border-right:1px solid #aaa}.windowsTaskbarRight{top:0;right:0;bottom:0;width:calc(10em);border-left:1px solid #aaa}.windowsTaskbar{position:absolute;list-style:none;padding:0;margin:0;user-select:none;overflow-y:auto}.windowsTaskbarTop>li,.windowsTaskbarBottom>li{float:left;width:9em;margin-right:2px;padding:2px;border:1px solid #000}.windowsTaskbarLeft>li,.windowsTaskbarRight>li{margin-right:2px;padding:2px;border:1px solid #000}.windowsTaskbarBottom.windowsTaskbarAutohide:not(:hover){bottom:calc(-1em - 8px);border-top-width:3px}.windowsTaskbarTop.windowsTaskbarAutohide:not(:hover){top:calc(-1em - 8px);border-bottom-width:3px}.windowsTaskbarLeft.windowsTaskbarAutohide:not(:hover){left:-10em;border-right-width:3px}.windowsTaskbarRight.windowsTaskbarAutohide:not(:hover){right:-10em;border-left-width:3px}.windowsTaskbar>li>img{height:1em}.windowsWindowTitlebarClose{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAS0lEQVR4AbXUMQoAIBTDUO9/6Tq5h2A+uNU3SP2nmr3z6+4kOgpOYAMBgYEgzgiUYBzlmETVeKwH+/dTqK9NUuzg6zXLoV9fvhHFXORcm2UE7mcvAAAAAElFTkSuQmCC)}.windowsWindowTitlebarMinimise{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGklEQVR4AWMY+mAUjIJRMAr+U4KHgIFDBgAAtIAv0S+OoIsAAAAASUVORK5CYII=)}.windowsWindowTitlebarMaximise{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAIElEQVR4AWMY2eA/JXioGkgmoMjAUQNHDRw1kCI8ZAAAn3lVqxSpx3UAAAAASUVORK5CYII=)}.windowsMaximised .windowsWindowTitlebarMaximise{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAALElEQVR4AWNABqPgPyl4gAwkEgwdAykPM/obSCQYGgaiYxolk1EDScJDFgAAUOdXqbMbROIAAAAASUVORK5CYII=)}.windowsAlert div:last-child,.windowsConfirm div:last-child,.windowsPrompt div:last-child{text-align:center}.windowsTaskbarContextMenu{background-color:#fff;color:#000;border:1px solid #000}.contextMenu li:not(:first-child){border-top:1px solid #ddd}")));
-
-export const Side = (() => {
-	const arr = [];
-	arr[arr[0] = "Bottom"] = 0;
-	arr[arr[1] = "Left"] = 1;
-	arr[arr[2] = "Right"] = 2;
-	arr[arr[3] = "Top"] = 3;
-	return Object.freeze(arr);
-})();
-
-const shells = new WeakMap(),
-      taskbars = new WeakMap(),
-      noPropagation = e => e.stopPropagation(),
-      noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==",
-      windowWidth = "--window-width",
-      windowHeight = "--window-height",
-      windowTop = "--window-top",
-      windowLeft = "--window-left";
-
-export class Taskbar {
-	constructor(side, stayOnTop = false, autoHide = false) {
-		let classes = "windowsTaskbar";
-		switch (side) {
-		case Side.Top:
-			classes += " windowsTaskbarTop";
-			break;
-		case Side.Left:
-			classes += " windowsTaskbarLeft";
-			break;
-		case Side.Right:
-			classes += " windowsTaskbarRight";
-			break;
-		case Side.Bottom:
-		default:
-			classes += " windowsTaskbarBottom";
+export class ShellElement extends HTMLElement {
+	constructor() {
+		super();
+		createHTML(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, ":host{display:block;position:relative;overflow:hidden;width:var(--shell-width,100%);height:var(--shell-height,100%)}::slotted(windows-window){--taskmanager-on:none}::slotted(windows-window:last-of-type){--overlay-on:none}"),
+			slot({"name": "desktop"}),
+			div(slot())
+		]);
+	}
+	alert(title, message, icon) {
+		if (!icon) {
+			icon = noIcon;
 		}
-		if (autoHide) {
-			classes += " windowsTaskbarAutohide";
-		}
-		taskbars.set(this, {
-			html: ul({"class": classes}),
-			windows: new Map(),
-			onTop: stayOnTop
+		return new Promise(resolve => {
+			const w = window({
+				title,
+				"hide-maximise": "true",
+				"onclose": () => resolve(false)
+			}, [
+				div(message),
+				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
+					resolve(true);
+					w.parentNode?.removeChild(w);
+				}}, "Ok")))
+			]);
+			this.appendChild(w);
 		});
 	}
-	get html() {
-		return taskbars.get(this).html;
-	}
-	get onTop() {
-		return taskbars.get(this).onTop;
-	}
-	addWindow(w) {
-		const self = taskbars.get(this);
-		self.windows.set(w, {item: self.html.appendChild(li({"onclick": () => {
-			if (!w.html.nextElementSibling || w.html.classList.contains("windowsMinimised")) {
-				w.onMinimiseToggle()
-			} else {
-				w.onFocus();
-			}
-		}, "oncontextmenu": e => {
-			e.preventDefault();
-			place(self.html.parentNode, [e.clientX, e.clientY], [
-				item(w.html.classList.contains("windowsMinimised") ? "&Restore" : "&Minimise", () => w.onMinimiseToggle()),
-				item("&Close", () => w.onExit())
+	confirm(title, message, icon) {
+		if (!icon) {
+			icon = noIcon;
+		}
+		return new Promise(resolve => {
+			const w = window({
+				title,
+				"hide-maximise": "true",
+				"onclose": () => resolve(false)
+			}, [
+				div(message),
+				div({"style": "text-align: center"}, [
+					autoFocus(button({"onclick": () => {
+						resolve(true);
+						w.parentNode?.removeChild(w);
+					}}, "Ok")),
+					button({"onclick": () => {
+						resolve(true);
+						w.parentNode?.removeChild(w);
+					}}, "Cancel")
+				])
 			]);
-		}}, [
-			w.icon ? img({"src": w.icon}) : [],
-			span(w.title)
-		]))});
+			this.appendChild(w);
+		});
 	}
-	minimiseWindow() {}
-	removeWindow(w) {
-		const self = taskbars.get(this),
-		      window = self.windows.get(w);
-		if (window) {
-			self.html.removeChild(window.item);
-		}
-	}
-}
-
-class NoTaskbar {
-	constructor() {
-		this.html = ul({"class": "windowsNoTaskbar"});
-		this.windows = new Map();
-	}
-	get onTop() {
-		return false;
-	}
-	addWindow(window) {
-		this.windows.set(window, {});
-	}
-	minimiseWindow(w) {
-		const window = this.windows.get(w);
-		if (window.item) {
-			window.item.classList.remove("hidden");
-			return;
-		}
-		const children = createHTML(null, [
-			w.icon ? img({"src": w.icon}) : [],
-			span(w.title),
-			w.closer ? button({"class": "windowsWindowTitlebarClose", "onclick": w.onExit.bind(w)}) : [],
-			button({"class": "windowsWindowTitlebarMaximise", "onclick": this.restoreWindow.bind(this, w)}),
-		      ]);
-		if (!Array.from(this.html.childNodes).some(li => {
-			if (li.childNodes.length === 0) {
-				li.appendChild(children);
-				li.classList.remove("hidden");
-				li.setAttribute("title", w.title);
-				window.item = li;
-				return true;
-			}
-			return false;
-		})) {
-			window.item = this.html.appendChild(li({"class": "windowsWindowTitlebar", "title": w.title, "ondblclick": this.restoreWindow.bind(this, w)}, children));
-		}
-	}
-	restoreWindow(w) {
-		this.windows.get(w).item.classList.add("hidden");
-		w.onMinimiseToggle();
-	}
-	removeWindow(w) {
-		const window = this.windows.get(w);
-		if (window) {
-			if (window.item) {
-				window.item.classList.remove("hidden");
-				window.item.classList.add("hidden");
-				clearElement(window.item);
-			}
-			this.windows.delete(w);
-		}
-	}
-}
-
-class Window {
-	constructor(shell, title, content, options) {
-		this.icon = noIcon;
-		this.parent = null;
-		this.child = null;
-		this.shell = shell;
-		this.closer = false;
-		this.title = title;
-		this.content = content;
-		const params = {
-			"class": "windowsWindow"
-		      },
-		      parts = [];
-		if (options.resizeable) {
-			params["class"] += " windowsResizable";
-			parts.push(..."TopRight Top TopLeft Left BottomLeft Bottom BottomRight Right".split(" ").map((d, n) => div({"class": `windowsResizer windowsResizer${d}`, "onmousedown": shell.resizeWindow.bind(shell, this, n)})));
-		}
-		if (options.size) {
-			params[windowWidth] = options.size.width + "px";
-			params[windowHeight] = options.size.height + "px";
-		}
-		if (options.position) {
-			params[windowLeft] = options.position.x + "px";
-			params[windowTop] = options.position.y + "px";
-		}
-		if (options.icon) {
-			this.icon = options.icon;
-		} else if (options.icon === "") {
-			this.icon = "";
-		}
-		if (options.showTitlebar) {
-			const controls = [],
-			      tbobj = {
-				"class": "windowsWindowTitlebar",
-				"onmousedown": shell.windowMove.bind(shell, this)
-			      };
-			if (options.showClose) {
-				controls.push(button({"class": "windowsWindowTitlebarClose", "onclick": this.onExit.bind(this), "onmousedown": noPropagation}));
-				this.closer = true;
-			}
-			if (options.showMaximise || options.showMaximize) {
-				controls.push(this.maximiseButton = button({"class": "windowsWindowTitlebarMaximise" + (options.maximised || options.maximized ? " windowsMaximised" : ""), "onclick": this.onMaximiseToggle.bind(this), "onmousedown": noPropagation}));
-				tbobj["ondblclick"] = this.onMaximiseToggle.bind(this);
-			}
-			if (options.showMinimise || options.showMinimize) {
-				controls.push(button({"class": "windowsWindowTitlebarMinimise", "onclick": this.onMinimiseToggle.bind(this), "onmousedown": noPropagation}));
-			}
-			parts.push(div(tbobj, [
-				this.icon ? img({"src": this.icon}) : [],
-				span(title),
-				controls
-			]));
-		}
-		if (options.onClose) {
-			this.onClose = options.onClose;
-		}
-		parts.push(content);
-		parts.push(div({"class": "windowsWindowFocusGrabber", "onmousedown": this.onFocus.bind(this)}));
-		this.html = li(params, parts);
-	}
-	onMinimiseToggle() {
-		if (this.html.classList.toggle("windowsMinimised")) {
-			this.shell.minimiseWindow(this);
-		} else {
-			this.shell.focusWindow(this);
-		}
-	}
-	onMaximiseToggle() {
-		if (this.maximiseButton) {
-			this.html.classList.toggle("windowsMaximised");
-		}
-	}
-	onFocus() {
-		this.shell.focusWindow(this);
-	}
-	onExit() {
-		if (this.content.dispatchEvent(new CustomEvent("close", {"cancelable": true}))) {
-			this.shell.removeWindow(this);
-		}
-	}
-}
-
-class shellData {
-	constructor(options) {
-		this.windows = ul();
-		this.windowData = new WeakMap();
-		this.dragging = false;
-		const children = [], params = {"class": "windowsShell"};
-		if (options) {
-			if (options.desktop) {
-				children.push(div({"class": "windowsDesktop"}, options.desktop));
-			}
-			if (options.resolution) {
-				params["--shell-width"] = options.resolution.width + "px";
-				params["--shell-height"] = options.resolution.height + "px";
-			}
-			if (options.taskbar) {
-				this.taskbar = options.taskbar;
-			} else {
-				this.taskbar = new NoTaskbar();
-			}
-		} else {
-			this.taskbar = new NoTaskbar();
-		}
-		if (this.taskbar.onTop) {
-			children.push(this.windows, this.taskbar.html);
-		} else {
-			children.push(this.taskbar.html, this.windows);
-		}
-		this.html = div(params, children);
-	}
-	windowMove(w, e) {
-		if (this.dragging) {
-			return;
-		}
-		this.dragging = true;
-		this.html.classList.add("windowsMoving");
-		const grabX = e.clientX - w.html.offsetLeft,
-		      grabY = e.clientY - w.html.offsetTop,
-		      mouseMove = e => {
-			const x = e.clientX - grabX,
-			      y = e.clientY - grabY;
-			w.html.style.setProperty(windowLeft, x + "px");
-			w.html.style.setProperty(windowTop, y + "px");
-		      },
-		      mouseUp = () => {
-			this.html.removeEventListener("mousemove", mouseMove);
-			this.html.removeEventListener("mouseup", mouseUp);
-			this.dragging = false;
-			this.html.classList.remove("windowsMoving");
-		      };
-		this.html.addEventListener("mousemove", mouseMove);
-		this.html.addEventListener("mouseup", mouseUp);
-	}
-	addWindow(title, options) {
-		const content = div({"class": "windowsWindowContent"}),
-		      w = new Window(this, title, content, options || {});
-		this.windows.appendChild(w.html);
-		if (options && (options.showOnTaskbar || options.showMinimise || options.showMinimize)) {
-			this.taskbar.addWindow(w);
-		}
-		this.windowData.set(content, w);
-		return content;
-	}
-	addDialog(w, options) {
-		if (w) {
-			while (w.child) {
-				w = w.child;
-			}
-		}
-		const dOptions = options ? {
-			"showTitlebar": options.showTitlebar,
-			"icon": options.icon,
-			"showClose": options.showClose,
-			"size": options.size,
-			"position": options.position,
-		      } : {};
-		if (w && (options === undefined || options.position === undefined)) {
-			dOptions["position"] = {
-				"x": w.html.offsetLeft,
-				"y": w.html.offsetTop
-			};
-		}
-		const content = div({"class": "windowsWindowContent"}),
-		      d = new Window(this, (options && options.title) || "", content, dOptions);
-		d.html.classList.add("windowsDialog");
-		this.windows.appendChild(d.html);
-		this.windowData.set(content, d);
-		if (w) {
-			w.child = d;
-			d.parent = w;
-		}
-		return content;
-	}
-	removeWindow(w) {
-		if (w.child) {
-			this.focusWindow(w.child);
-			return;
-		}
-		if (w.parent) {
-			w.parent.child = null;
-		}
-		if (w.parent === null) {
-			this.taskbar.removeWindow(w);
-		}
-		this.windows.removeChild(w.html);
-	}
-	minimiseWindow(w) {
-		w.html.classList.add("windowsMinimised");
-		if (this.windows.childNodes.length > 1 && this.windows.firstChild !== w.html) {
-			this.windows.insertBefore(w.html, this.windows.firstChild);
-		}
-		this.taskbar.minimiseWindow(w);
-	}
-	focusWindow(w) {
-		if (this.windows.childNodes.length > 1) {
-			while (w.child) {
-				w = w.child;
-			}
-			this.windows.appendChild(w.html);
-		}
-	}
-	resizeWindow(w, direction, e) {
-		if (this.dragging) {
-			return;
-		}
-		this.dragging = true;
-		this.html.classList.add("windowsResizing");
-		const originalLeft = w.html.offsetLeft,
-		      originalTop = w.html.offsetTop,
-		      originalWidth = w.html.offsetWidth,
-		      originalHeight = w.html.offsetHeight,
-		      grabX = e.clientX,
-		      grabY = e.clientY,
-		      mouseMove = e => {
-			const dx = e.clientX - grabX,
-			      dy = e.clientY - grabY;
-			switch (direction) {
-				case 0:
-				case 1:
-				case 2: {
-					const height = originalHeight - dy;
-					if (height > 100) {
-						w.html.style.setProperty(windowTop, `${originalTop + dy}px`);
-						w.html.style.setProperty(windowHeight, `${height}px`);
-					}
-				}
-				break;
-				case 4:
-				case 5:
-				case 6: {
-					const height = originalHeight + dy;
-					if (height > 100) {
-						w.html.style.setProperty(windowHeight, `${height}px`);
-					}
-				}
-			}
-			switch (direction) {
-				case 0:
-				case 7:
-				case 6: {
-					const width = originalWidth + dx;
-					if (width > 100) {
-						w.html.style.setProperty(windowWidth, `${width}px`);
-					}
-				}
-				break;
-				case 2:
-				case 3:
-				case 4: {
-					const width = originalWidth - dx;
-					if (width > 100) {
-						w.html.style.setProperty(windowLeft, `${originalLeft + dx}px`);
-						w.html.style.setProperty(windowWidth, `${originalWidth - dx}px`);
-					}
-				}
-			}
-		      },
-		      mouseUp = () => {
-			this.html.removeEventListener("mousemove", mouseMove);
-			this.html.removeEventListener("mouseup", mouseUp);
-			this.dragging = false;
-			this.html.classList.remove("windowsResizing");
-		      };
-		this.html.addEventListener("mousemove", mouseMove);
-		this.html.addEventListener("mouseup", mouseUp);
-	}
-	getWindow(w) {
-		const window = this.windowData.get(w);
-		if (window) {
-			return window;
-		}
-		throw new Error("invalid Window");
-	}
-}
-
-export class Shell {
-	constructor(options) {
-		shells.set(this, new shellData(options))
-	}
-	get html() {
-		return shells.get(this).html;
-	}
-	addWindow(title, options) {
-		return shells.get(this).addWindow(title, options);
-	}
-	addDialog(parent, options) {
-		const shellData = shells.get(this);
-		return shellData.addDialog(parent ? shellData.getWindow(parent) : null, options);
-	}
-	alert(parent, title, message, icon) {
-		if (icon === undefined) {
+	prompt(title, message, defaultValue, icon) {
+		if (!icon) {
 			icon = noIcon;
 		}
-		const self = this;
-		return new Promise(resolve => createHTML(this.addDialog(parent, {
-			"title": title,
-			"showTitlebar": true,
-			"icon": icon,
-			"showClose": true,
-		}), {"class": "windowsAlert", "onclose": () => resolve(false)}, [
-			div(message),
-			div(autoFocus(button("Ok", {"onclick": function () {
-				self.removeWindow(this.parentNode.parentNode);
-				resolve(true);
-			}})))
-		]));
-	}
-	confirm(parent, title, message, icon) {
-		if (icon === undefined) {
-			icon = noIcon;
-		}
-		const self = this;
-		return new Promise(resolve => createHTML(this.addDialog(parent, {
-			"title": title,
-			"showTitlebar": true,
-			"icon": icon,
-			"showClose": true,
-		}), {"class": "windowsConfirm", "onclose": () => resolve(false)}, [
-			div(message),
-			div([
-				autoFocus(button("Ok", {"onclick": function () {
-					self.removeWindow(this.parentNode.parentNode);
-					resolve(true);
-				}})),
-				button("Cancel", {"onclick": function() {
-					self.removeWindow(this.parentNode.parentNode);
-					resolve(false);
-				}})
-			])
-		]));
-	}
-	prompt(parent, title, message, defaultValue, icon) {
-		if (icon === undefined) {
-			icon = noIcon;
-		}
-		const self = this,
-		      data = autoFocus(input({"value": defaultValue || ""}));
-		return new Promise(resolve => createHTML(this.addDialog(parent, {
-			"title": title,
-			"showTitlebar": true,
-			"icon": icon,
-			"showClose": true,
-		}), {"class": "windowsPrompt", "onclose": () => resolve(null)}, [
-			div(message),
-			data,
-			div([
-				button("Ok", {"onclick": function () {
-					self.removeWindow(this.parentNode.parentNode);
+		return new Promise(resolve => {
+			const data = autoFocus(input({"value": defaultValue || ""})),
+			      w = window({
+				title,
+				"hide-maximise": "true",
+				"onclose": () => resolve(null)
+			}, [
+				div(message),
+				data,
+				div({"style": "text-align: center"}, button({"onclick": () => {
 					resolve(data.value);
-				}}),
-				button("Cancel", {"onclick": function() {
-					self.removeWindow(this.parentNode.parentNode);
-					resolve(null);
-				}})
-			])
-		]));
-	}
-	moveWindow(w, pos) {
-		const window = shells.get(this).getWindow(w);
-		window.html.style.setProperty(windowLeft, `${pos.x}px`);
-		window.html.style.setProperty(windowTop, `${pos.y}px`);
-	}
-	resizeWindow(w, size) {
-		const window = shells.get(this).getWindow(w);
-		window.html.style.setProperty(windowWidth, `${size.width}px`);
-		window.html.style.setProperty(windowHeight, `${size.height}px`);
-	}
-	removeWindow(w) {
-		const shellData = shells.get(this);
-		shellData.removeWindow(shellData.getWindow(w));
-	}
-	closeWindow(w) {
-		const p = w.previousElementSibling;
-		if (p) {
-			const closer = p.getElementsByClassName("windowsWindowTitlebarClose");
-			if (closer instanceof HTMLButtonElement) {
-				closer.click();
-				return;
-			}
-		}
-		this.removeWindow(w);
+					w.parentNode?.removeChild(w);
+				}}, "Ok"))
+			]);
+			this.appendChild(w);
+		});
 	}
 }
+
+export class DesktopElement extends HTMLElement {
+	constructor() {
+		super()
+		this.setAttribute("slot", "desktop");
+		createHTML(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, ":host{position: absolute;top:0;left:0;bottom:0;right:0}"),
+			slot({"slot": "desktop"})
+		]);
+	}
+}
+
+const windowData = new WeakMap(),
+      noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==",
+      resizeWindow = function(direction, {clientX, clientY}) {
+	const shell = this.parentNode;
+	if (!(shell instanceof ShellElement) || draggers.get(shell) === true) {
+		return;
+	}
+	draggers.set(shell, true);
+	this.style.setProperty("user-select", "none");
+	const originalLeft = this.offsetLeft,
+	      originalTop = this.offsetTop,
+	      originalWidth = this.offsetWidth,
+	      originalHeight = this.offsetHeight,
+	      grabX = clientX,
+	      grabY = clientY,
+	      mouseMove = ({clientX, clientY}) => {
+		const dx = clientX - grabX,
+		      dy = clientY - grabY;
+		switch (direction) {
+			case 0:
+			case 1:
+			case 2: {
+				const height = originalHeight - dy;
+				if (height > 100) {
+					this.style.setProperty("--window-top", `${originalTop + dy}px`);
+					this.style.setProperty("--window-height", `${height}px`);
+				}
+			}
+			break;
+			case 4:
+			case 5:
+			case 6: {
+				const height = originalHeight + dy;
+				if (height > 100) {
+					this.style.setProperty("--window-height", `${height}px`);
+				}
+			}
+		}
+		switch (direction) {
+			case 2:
+			case 3:
+			case 4: {
+				const width = originalWidth + dx;
+				if (width > 100) {
+					this.style.setProperty("--window-width", `${width}px`);
+				}
+			}
+			break;
+			case 0:
+			case 7:
+			case 6: {
+				const width = originalWidth - dx;
+				if (width > 100) {
+					this.style.setProperty("--window-left", `${originalLeft + dx}px`);
+					this.style.setProperty("--window-width", `${originalWidth - dx}px`);
+				}
+			}
+		}
+	      },
+	      mouseUp = () => {
+		shell.removeEventListener("mousemove", mouseMove);
+		shell.removeEventListener("mouseup", mouseUp);
+		draggers.delete(shell);
+		shell.style.removeProperty("user-select");
+	      };
+	shell.addEventListener("mousemove", mouseMove);
+	shell.addEventListener("mouseup", mouseUp);
+      },
+      draggers = new WeakMap(),
+      moveWindow = function({clientX, clientY}) {
+	const shell = this.parentNode;
+	if (!(shell instanceof ShellElement) || draggers.get(shell) === true) {
+		return;
+	}
+	draggers.set(shell, true);
+	this.style.setProperty("user-select", "none");
+	const grabX = clientX - this.offsetLeft,
+	      grabY = clientY - this.offsetTop,
+	      mouseMove = e => {
+		const x = e.clientX - grabX,
+		      y = e.clientY - grabY;
+		this.style.setProperty("--window-left", x + "px");
+		this.style.setProperty("--window-top", y + "px");
+	      },
+	      mouseUp = () => {
+		shell.removeEventListener("mousemove", mouseMove);
+		shell.removeEventListener("mouseup", mouseUp);
+		draggers.delete(shell);
+		shell.style.removeProperty("user-select");
+	      };
+	shell.addEventListener("mousemove", mouseMove);
+	shell.addEventListener("mouseup", mouseUp);
+      },
+      closeEvent = new CustomEvent("close", {"cancelable": true}),
+      childWindows = new WeakMap();
+
+export class WindowElement extends HTMLElement {
+	constructor() {
+		super()
+		const titleElement = span(),
+		      iconElement = img({"src": noIcon});
+		windowData.set(this, {titleElement, iconElement});
+		createHTML(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, ":host{position:absolute;display:block;background-color:#fff;color:#000;border:1px solid #000;width:var(--window-width,auto);height:var(--window-height,auto);min-width:100px;min-height:100px;top:var(--window-top,0);left:var(--window-left,0);list-style:none;padding:0;z-index:0}:host([maximised]){left:0;right:0;top:0;bottom:0;width:auto;height:auto}:host([resizable]){border-width:0}:host([resizable])>div:nth-child(2){display:block}:host([minimised]),:host>div:nth-child(2),:host([hide-titlebar])>div:nth-child(3),:host([hide-close])>div:nth-child(3) button:nth-of-type(1),:host([hide-maximise])>div:nth-child(3) button:nth-of-type(2),:host([hide-minimise])>div:nth-child(3) button:nth-of-type(3){display:none}:host>div:nth-child(3){white-space:nowrap;height:calc(1em + 6px);background-color:#aaa;overflow:hidden;user-select:none}:host>div:nth-child(3)>span{margin-right:calc(3em + 24px)}:host>div:nth-child(3)>img{height:1em}:host>div:nth-child(3)>div{position:absolute;right:0;top:0}:host>div:nth-child(3) button{padding:0;border-width:2px;float:right;background-repeat:no-repeat;background-position:center;background-color:#eee;background-size:1em 1em;width:calc(1em + 8px);height:calc(1em + 8px)}:host>div:nth-child(3) button:nth-of-type(1){background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAS0lEQVR4AbXUMQoAIBTDUO9/6Tq5h2A+uNU3SP2nmr3z6+4kOgpOYAMBgYEgzgiUYBzlmETVeKwH+/dTqK9NUuzg6zXLoV9fvhHFXORcm2UE7mcvAAAAAElFTkSuQmCC)}:host>div:nth-child(3) button:nth-of-type(2){background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAIElEQVR4AWMY2eA/JXioGkgmoMjAUQNHDRw1kCI8ZAAAn3lVqxSpx3UAAAAASUVORK5CYII=)}:host([maximised])>div:nth-child(3) button:nth-of-type(2){background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAALElEQVR4AWNABqPgPyl4gAwkEgwdAykPM/obSCQYGgaiYxolk1EDScJDFgAAUOdXqbMbROIAAAAASUVORK5CYII=)}:host>div:nth-child(3) button:nth-of-type(3){display:var(--taskmanager-on,block);background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGklEQVR4AWMY+mAUjIJRMAr+U4KHgIFDBgAAtIAv0S+OoIsAAAAASUVORK5CYII=)}:host>div:nth-child(4){user-select:contain}:host>div:nth-child(5){display:var(--overlay-on,block);position:absolute;background-color:rgba(0,0,0,0.1);top:0;left:0;bottom:0;right:0}:host([resizeable])>div:nth-child(5){top:var(calc(--window-resize), -2px);left:var(calc(--window-resize), -2px);bottom:var(calc(--window-resize), -2px);right:var(calc(--window-resize), -2px)}:host>div:nth-child(2)>div{position:absolute;border-color:#000;border-style:solid;border-width:0;z-index:-1}:host>div:nth-child(2)>div:nth-child(1){top:-2px;left:-2px;width:10px;height:10px;cursor:nwse-resize;border-left-width:3px;border-top-width:3px}:host>div:nth-child(2)>div:nth-child(2){top:-2px;left:8px;right:8px;border-top-width:3px;cursor:ns-resize}:host>div:nth-child(2)>div:nth-child(3){top:-2px;right:-2px;width:10px;height:10px;border-top-width:3px;border-right-width:3px;cursor:nesw-resize}:host>div:nth-child(2)>div:nth-child(4){top:8px;right:-2px;bottom:8px;border-right-width:3px;cursor:ew-resize}:host>div:nth-child(2)>div:nth-child(5){bottom:-2px;right:-2px;width:10px;height:10px;border-right-width:3px;border-bottom-width:3px;cursor:nwse-resize}:host>div:nth-child(2)>div:nth-child(6){bottom:-2px;left:8px;right:8px;border-bottom-width:3px;cursor:ns-resize}:host>div:nth-child(2)>div:nth-child(7){bottom:-2px;left:-2px;width:10px;height:10px;border-left-width:3px;border-bottom-width:3px;cursor:nesw-resize}:host>div:nth-child(2)>div:nth-child(8){top:8px;left:-2px;bottom:8px;border-left-width:3px;cursor:ew-resize}"),
+			div(Array.from({length: 8}, (_, n) => div({"onmousedown": resizeWindow.bind(this, n)}))),
+			div({"onmousedown": moveWindow.bind(this), "ondblclick": () => {
+				if (!this.hasAttribute("hide-maximise")) {
+					this.toggleAttribute("maximised");
+				}
+			      }}, [
+				iconElement,
+				titleElement,
+				div([
+					button({"onclick": () => {
+						if (this.dispatchEvent(closeEvent) && this.parentNode) {
+							this.parentNode.removeChild(this);
+						}
+					}}),
+					button({"onclick": () => this.toggleAttribute("maximised")}),
+					button({"onclick": () => this.toggleAttribute("minimised")})
+				])
+			]),
+			div(slot()),
+			div({"onclick": () => {
+				const cw = childWindows.get(this);
+				if (cw && cw.length > 0) {
+					this.parentNode?.appendChild(cw[0]);
+				} else {
+					this.parentNode?.appendChild(this);
+				}
+			}})
+		]);
+	}
+	attributeChangedCallback(name, _, newValue) {
+		const wd = windowData.get(this);
+		switch (name) {
+		case "title":
+			wd.titleElement.innerText = newValue;
+			break;
+		case "icon":
+			wd.iconElement.setAttribute("src", newValue);
+			break;
+		}
+	}
+	static get observedAttributes() {
+		return ["title", "icon"];
+	}
+	alert(title, message, icon) {
+		if (!this.parentNode) {
+			return Promise.resolve(false);
+		}
+		const shell = this.parentNode;
+		if (!icon) {
+			icon = noIcon;
+		}
+		return new Promise(resolve => {
+			const w = window({
+				title,
+				"hide-maximise": "true",
+				"onclose": () => {
+					const cw = childWindows.get(this);
+					cw.splice(cw.findIndex(c => c === w), 1);
+					resolve(false);
+				}
+			}, [
+				div(message),
+				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
+					const cw = childWindows.get(this);
+					cw.splice(cw.findIndex(c => c === w), 1);
+					resolve(true);
+					w.parentNode?.removeChild(w);
+				}}, "Ok")))
+			]);
+			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
+			shell.appendChild(w);
+		});
+	}
+	confirm(title, message, icon) {
+		if (!icon) {
+			icon = noIcon;
+		}
+		return new Promise(resolve => {
+			const w = window({
+				title,
+				"hide-maximise": "true",
+				"onclose": () => {
+					const cw = childWindows.get(this);
+					cw.splice(cw.findIndex(c => c === w), 1);
+					resolve(false);
+				}
+			}, [
+				div(message),
+				div({"style": "text-align: center"}, [
+					autoFocus(button({"onclick": () => {
+						const cw = childWindows.get(this);
+						cw.splice(cw.findIndex(c => c === w), 1);
+						resolve(true);
+						w.parentNode?.removeChild(w);
+					}}, "Ok")),
+					button({"onclick": () => {
+						const cw = childWindows.get(this);
+						cw.splice(cw.findIndex(c => c === w), 1);
+						resolve(true);
+						w.parentNode?.removeChild(w);
+					}}, "Cancel")
+				])
+			]);
+			this.appendChild(w);
+		});
+	}
+	prompt(title, message, defaultValue, icon) {
+		if (!icon) {
+			icon = noIcon;
+		}
+		return new Promise(resolve => {
+			const data = autoFocus(input({"value": defaultValue || ""})),
+			      w = window({
+				title,
+				"hide-maximise": "true",
+				"onclose": () => {
+					const cw = childWindows.get(this);
+					cw.splice(cw.findIndex(c => c === w), 1);
+					resolve(null);
+				}
+			}, [
+				div(message),
+				data,
+				div({"style": "text-align: center"}, button({"onclick": () => {
+					const cw = childWindows.get(this);
+					cw.splice(cw.findIndex(c => c === w), 1);
+					resolve(data.value);
+					w.parentNode?.removeChild(w);
+				}}, "Ok"))
+			]);
+			this.appendChild(w);
+		});
+	}
+}
+
+customElements.define("windows-shell", ShellElement);
+customElements.define("windows-desktop", DesktopElement);
+customElements.define("windows-window", WindowElement);
+
+export const shell = (props, children) => createHTML(new ShellElement(), props, children),
+desktop = (props, children) => createHTML(new DesktopElement(), props, children),
+window = (props, children) => createHTML(new WindowElement(), props, children);
