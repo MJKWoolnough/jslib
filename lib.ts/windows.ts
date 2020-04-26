@@ -459,14 +459,10 @@ export class WindowElement extends HTMLElement {
 		return ["title", "icon"];
 	}
 	alert(title: string, message: string, icon?: string) {
-		if (!this.parentNode) {
-			return Promise.resolve(false);
-		}
-		const shell = this.parentNode as ShellElement;
 		if (!icon) {
 			icon = noIcon;
 		}
-		return new Promise<boolean>(resolve => {
+		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
 				title,
 				"hide-maximise": "true",
@@ -484,19 +480,14 @@ export class WindowElement extends HTMLElement {
 					w.parentNode?.removeChild(w);
 				}}, "Ok")))
 			]);
-			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
-			shell.appendChild(w);
+			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
 	confirm(title: string, message: string, icon?: string) {
-		if (!this.parentNode) {
-			return Promise.resolve(false);
-		}
-		const shell = this.parentNode as ShellElement;
 		if (!icon) {
 			icon = noIcon;
 		}
-		return new Promise<boolean>(resolve => {
+		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
 				title,
 				"hide-maximise": "true",
@@ -522,19 +513,14 @@ export class WindowElement extends HTMLElement {
 					}}, "Cancel")
 				])
 			]);
-			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
-			shell.appendChild(w);
+			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
 	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
-		if (!this.parentNode) {
-			return Promise.resolve(false);
-		}
-		const shell = this.parentNode as ShellElement;
 		if (!icon) {
 			icon = noIcon;
 		}
-		return new Promise<string|null>(resolve => {
+		return new Promise<string|null>((resolve, reject) => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
 			      w = windows({
 				title,
@@ -554,8 +540,7 @@ export class WindowElement extends HTMLElement {
 					w.parentNode?.removeChild(w);
 				}}, "Ok"))
 			]);
-			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
-			shell.appendChild(w);
+			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
 	addWindow(w: WindowElement) {
@@ -564,6 +549,7 @@ export class WindowElement extends HTMLElement {
 		}
 		childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
 		this.parentNode.appendChild(w);
+		return true;
 	}
 }
 

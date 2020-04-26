@@ -243,14 +243,10 @@ export class WindowElement extends HTMLElement {
 		return ["title", "icon"];
 	}
 	alert(title, message, icon) {
-		if (!this.parentNode) {
-			return Promise.resolve(false);
-		}
-		const shell = this.parentNode;
 		if (!icon) {
 			icon = noIcon;
 		}
-		return new Promise(resolve => {
+		return new Promise((resolve, reject) => {
 			const w = windows({
 				title,
 				"hide-maximise": "true",
@@ -268,19 +264,14 @@ export class WindowElement extends HTMLElement {
 					w.parentNode?.removeChild(w);
 				}}, "Ok")))
 			]);
-			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
-			shell.appendChild(w);
+			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
 	confirm(title, message, icon) {
-		if (!this.parentNode) {
-			return Promise.resolve(false);
-		}
-		const shell = this.parentNode;
 		if (!icon) {
 			icon = noIcon;
 		}
-		return new Promise(resolve => {
+		return new Promise((resolve, reject) => {
 			const w = windows({
 				title,
 				"hide-maximise": "true",
@@ -306,19 +297,14 @@ export class WindowElement extends HTMLElement {
 					}}, "Cancel")
 				])
 			]);
-			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
-			shell.appendChild(w);
+			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
 	prompt(title, message, defaultValue, icon) {
-		if (!this.parentNode) {
-			return Promise.resolve(false);
-		}
-		const shell = this.parentNode;
 		if (!icon) {
 			icon = noIcon;
 		}
-		return new Promise(resolve => {
+		return new Promise((resolve, reject) => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
 			      w = windows({
 				title,
@@ -338,8 +324,7 @@ export class WindowElement extends HTMLElement {
 					w.parentNode?.removeChild(w);
 				}}, "Ok"))
 			]);
-			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
-			shell.appendChild(w);
+			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
 	addWindow(w) {
@@ -348,6 +333,7 @@ export class WindowElement extends HTMLElement {
 		}
 		childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
 		this.parentNode.appendChild(w);
+		return true;
 	}
 }
 
