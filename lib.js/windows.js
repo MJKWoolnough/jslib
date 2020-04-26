@@ -266,6 +266,10 @@ export class WindowElement extends HTMLElement {
 		});
 	}
 	confirm(title, message, icon) {
+		if (!this.parentNode) {
+			return Promise.resolve(false);
+		}
+		const shell = this.parentNode;
 		if (!icon) {
 			icon = noIcon;
 		}
@@ -296,10 +300,14 @@ export class WindowElement extends HTMLElement {
 				])
 			]);
 			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
-			this.appendChild(w);
+			shell.appendChild(w);
 		});
 	}
 	prompt(title, message, defaultValue, icon) {
+		if (!this.parentNode) {
+			return Promise.resolve(false);
+		}
+		const shell = this.parentNode;
 		if (!icon) {
 			icon = noIcon;
 		}
@@ -324,7 +332,7 @@ export class WindowElement extends HTMLElement {
 				}}, "Ok"))
 			]);
 			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
-			this.appendChild(w);
+			shell.appendChild(w);
 		});
 	}
 }
