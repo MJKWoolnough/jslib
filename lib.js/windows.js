@@ -295,6 +295,7 @@ export class WindowElement extends HTMLElement {
 					}}, "Cancel")
 				])
 			]);
+			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
 			this.appendChild(w);
 		});
 	}
@@ -322,6 +323,7 @@ export class WindowElement extends HTMLElement {
 					w.parentNode?.removeChild(w);
 				}}, "Ok"))
 			]);
+			childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
 			this.appendChild(w);
 		});
 	}
