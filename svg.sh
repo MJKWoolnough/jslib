@@ -13,7 +13,7 @@ if [ -n "$1" ]; then
 fi;
 
 (
-	echo -e "import {createSVG, Children, Props} from './dom.js';\n";
+	echo -e "import {createSVG, DOMBind} from './dom.js';\n";
 	echo -e "export {createSVG};\n";
 	echo -n "export const ";
 	first=true;
@@ -23,7 +23,7 @@ fi;
 		else
 			echo ",";
 		fi;
-		echo -n "$tag = createSVG.bind(null, \"$tag\") as (properties?: Props | Children, children?: Props | Children) => SVGElementTagNameMap[\"$tag\"]";
+		echo -n "$tag = createSVG.bind(null, \"$tag\") as DOMBind<SVGElementTagNameMap[\"$tag\"]>";
 	done | sed -e 's/^switch /switche /';
 	echo ";";
 ) > lib.ts/svg.ts;

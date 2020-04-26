@@ -13,7 +13,7 @@ if [ -n "$1" ]; then
 fi;
 
 (
-	echo -e "import {createHTML, Children, Props} from './dom.js';\n";
+	echo -e "import {createHTML, DOMBind} from './dom.js';\n";
 	echo -e "export {createHTML};\n";
 	echo -n "export const ";
 	first=true;
@@ -23,7 +23,7 @@ fi;
 		else
 			echo ",";
 		fi;
-		echo -n "$tag = createHTML.bind(null, \"$tag\") as (properties?: Props | Children, children?: Props | Children) => HTMLElementTagNameMap[\"$tag\"]";
+		echo -n "$tag = createHTML.bind(null, \"$tag\") as DOMBind<HTMLElementTagNameMap[\"$tag\"]>";
 	done | sed -e 's/^var /vare /';
 	echo ";";
 ) > lib.ts/html.ts;
