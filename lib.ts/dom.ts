@@ -25,6 +25,7 @@ interface cElement {
 	(element: null | DocumentFragment, children?: Children): Node;
 	<T extends Node>(element: T, properties?: Props, children?: Children): T;
 	<T extends Node>(element: T, children?: Children, properties?: Props): T;
+	<T extends Node>(element: T, properties?: Props | Children, children?: Props |Children): T;
 	(element: string, properties?: Props, children?: Children): Node;
 	(element: string, children?: Children, properties?: Props): Node;
 };
@@ -38,6 +39,11 @@ interface cSVG extends cElement {
 	<K extends keyof SVGElementTagNameMap>(element: K, properties?: Props, children?: Children): SVGElementTagNameMap[K];
 	<K extends keyof SVGElementTagNameMap>(element: K, children?: Children, properties?: Props): SVGElementTagNameMap[K];
 };
+
+export interface DOMBind<T extends Node> {
+	(properties?: Props, children?: Children): T;
+	(children?: Children, properties?: Props): T;
+}
 
 export const createElements: cElements = (namespace: string) => (element: Node | string | null, properties?: Props | Children, children?: Props | Children) => {
 	const elem: Node = typeof element === "string" ? document.createElementNS(namespace, element) : element instanceof Node ? element : document.createDocumentFragment();
