@@ -15,7 +15,7 @@ export class ShellElement extends HTMLElement {
 			icon = noIcon;
 		}
 		return new Promise(resolve => {
-			const w = window({
+			const w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(false)
@@ -34,7 +34,7 @@ export class ShellElement extends HTMLElement {
 			icon = noIcon;
 		}
 		return new Promise(resolve => {
-			const w = window({
+			const w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(false)
@@ -60,7 +60,7 @@ export class ShellElement extends HTMLElement {
 		}
 		return new Promise(resolve => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
-			      w = window({
+			      w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(null)
@@ -244,7 +244,7 @@ export class WindowElement extends HTMLElement {
 			icon = noIcon;
 		}
 		return new Promise(resolve => {
-			const w = window({
+			const w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -270,7 +270,7 @@ export class WindowElement extends HTMLElement {
 			icon = noIcon;
 		}
 		return new Promise(resolve => {
-			const w = window({
+			const w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -304,7 +304,7 @@ export class WindowElement extends HTMLElement {
 		}
 		return new Promise(resolve => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
-			      w = window({
+			      w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -333,4 +333,4 @@ customElements.define("windows-window", WindowElement);
 
 export const shell = (props, children) => createHTML(new ShellElement(), props, children),
 desktop = (props, children) => createHTML(new DesktopElement(), props, children),
-window = (props, children) => createHTML(new WindowElement(), props, children);
+windows = (props, children) => createHTML(new WindowElement(), props, children);

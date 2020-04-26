@@ -31,7 +31,7 @@ export class ShellElement extends HTMLElement {
 			icon = noIcon;
 		}
 		return new Promise<boolean>(resolve => {
-			const w = window({
+			const w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(false)
@@ -50,7 +50,7 @@ export class ShellElement extends HTMLElement {
 			icon = noIcon;
 		}
 		return new Promise<boolean>(resolve => {
-			const w = window({
+			const w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(false)
@@ -76,7 +76,7 @@ export class ShellElement extends HTMLElement {
 		}
 		return new Promise<string|null>(resolve => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
-			      w = window({
+			      w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(null)
@@ -460,7 +460,7 @@ export class WindowElement extends HTMLElement {
 			icon = noIcon;
 		}
 		return new Promise<boolean>(resolve => {
-			const w = window({
+			const w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -486,7 +486,7 @@ export class WindowElement extends HTMLElement {
 			icon = noIcon;
 		}
 		return new Promise<boolean>(resolve => {
-			const w = window({
+			const w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -520,7 +520,7 @@ export class WindowElement extends HTMLElement {
 		}
 		return new Promise<string|null>(resolve => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
-			      w = window({
+			      w = windows({
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -549,4 +549,4 @@ customElements.define("windows-window", WindowElement);
 
 export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new ShellElement(), props, children),
 desktop: DOMBind<DesktopElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new DesktopElement(), props, children),
-window: DOMBind<WindowElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new WindowElement(), props, children);
+windows: DOMBind<WindowElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new WindowElement(), props, children);
