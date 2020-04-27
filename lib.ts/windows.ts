@@ -104,8 +104,8 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       childOf = new Map<WindowElement, WindowElement>(),
       alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
-		"icon": icon || noIcon,
-		title,
+		"window-icon": icon || noIcon,
+		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
 	}, [
@@ -119,8 +119,8 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       }),
       confirmFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
-		"icon": icon || noIcon,
-		title,
+		"window-icon": icon || noIcon,
+		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
 	}, [
@@ -141,8 +141,8 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       promptFn = (parent: WindowElement|ShellElement, title: string, message: string, defaultValue?: string, icon?: string) => new Promise<string|null>((resolve, reject) => {
 	const data = autoFocus(input({"value": defaultValue || ""})),
 	      w = windows({
-		"icon": icon || noIcon,
-		title,
+		"window-icon": icon || noIcon,
+		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(null)
 	}, [
@@ -471,16 +471,16 @@ export class WindowElement extends HTMLElement {
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		const wd = windowData.get(this)!;
 		switch (name) {
-		case "title":
+		case "window-title":
 			wd.titleElement.innerText = newValue;
 			break;
-		case "icon":
+		case "window-icon":
 			wd.iconElement.setAttribute("src", newValue);
 			break;
 		}
 	}
 	static get observedAttributes() {
-		return ["title", "icon"];
+		return ["window-title", "window-icon"];
 	}
 	alert(title: string, message: string, icon?: string) {
 		return alertFn(this, title, message, icon);

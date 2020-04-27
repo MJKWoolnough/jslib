@@ -99,8 +99,8 @@ const windowData = new WeakMap(),
       childOf = new Map(),
       alertFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
-		"icon": icon || noIcon,
-		title,
+		"window-icon": icon || noIcon,
+		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
 	}, [
@@ -114,8 +114,8 @@ const windowData = new WeakMap(),
       }),
       confirmFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
-		"icon": icon || noIcon,
-		title,
+		"window-icon": icon || noIcon,
+		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
 	}, [
@@ -136,8 +136,8 @@ const windowData = new WeakMap(),
       promptFn = (parent, title, message, defaultValue, icon) => new Promise((resolve, reject) => {
 	const data = autoFocus(input({"value": defaultValue || ""})),
 	      w = windows({
-		"icon": icon || noIcon,
-		title,
+		"window-icon": icon || noIcon,
+		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(null)
 	}, [
@@ -255,16 +255,16 @@ export class WindowElement extends HTMLElement {
 	attributeChangedCallback(name, _, newValue) {
 		const wd = windowData.get(this);
 		switch (name) {
-		case "title":
+		case "window-title":
 			wd.titleElement.innerText = newValue;
 			break;
-		case "icon":
+		case "window-icon":
 			wd.iconElement.setAttribute("src", newValue);
 			break;
 		}
 	}
 	static get observedAttributes() {
-		return ["title", "icon"];
+		return ["window-title", "window-icon"];
 	}
 	alert(title, message, icon) {
 		return alertFn(this, title, message, icon);
