@@ -39,7 +39,7 @@ export class ShellElement extends HTMLElement {
 				div(message),
 				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
 					resolve(true);
-					w.parentNode?.removeChild(w);
+					w.remove();
 				}}, "Ok")))
 			]);
 			this.appendChild(w);
@@ -59,11 +59,11 @@ export class ShellElement extends HTMLElement {
 				div({"style": "text-align: center"}, [
 					autoFocus(button({"onclick": () => {
 						resolve(true);
-						w.parentNode?.removeChild(w);
+						w.remove();
 					}}, "Ok")),
 					button({"onclick": () => {
 						resolve(true);
-						w.parentNode?.removeChild(w);
+						w.remove();
 					}}, "Cancel")
 				])
 			]);
@@ -85,7 +85,7 @@ export class ShellElement extends HTMLElement {
 				data,
 				div({"style": "text-align: center"}, button({"onclick": () => {
 					resolve(data.value);
-					w.parentNode?.removeChild(w);
+					w.remove();
 				}}, "Ok"))
 			]);
 			this.appendChild(w);
@@ -420,7 +420,7 @@ export class WindowElement extends HTMLElement {
 				div([
 					button({"onclick": () => {
 						if (this.dispatchEvent(closeEvent) && this.parentNode) {
-							this.parentNode.removeChild(this);
+							this.remove();
 						}
 					}}),
 					button({"onclick": () => this.toggleAttribute("maximised")}),
@@ -491,7 +491,7 @@ export class WindowElement extends HTMLElement {
 					const cw = childWindows.get(this)!;
 					cw.splice(cw.findIndex(c => c === w), 1);
 					resolve(true);
-					w.parentNode?.removeChild(w);
+					w.remove();
 				}}, "Ok")))
 			]);
 			this.addWindow(w) || reject(new Error("invalid target"));
@@ -517,13 +517,13 @@ export class WindowElement extends HTMLElement {
 						const cw = childWindows.get(this)!;
 						cw.splice(cw.findIndex(c => c === w), 1);
 						resolve(true);
-						w.parentNode?.removeChild(w);
+						w.remove();
 					}}, "Ok")),
 					button({"onclick": () => {
 						const cw = childWindows.get(this)!;
 						cw.splice(cw.findIndex(c => c === w), 1);
 						resolve(true);
-						w.parentNode?.removeChild(w);
+						w.remove();
 					}}, "Cancel")
 				])
 			]);
@@ -545,7 +545,7 @@ export class WindowElement extends HTMLElement {
 				data,
 				div({"style": "text-align: center"}, button({"onclick": () => {
 					resolve(data.value);
-					w.parentNode?.removeChild(w);
+					w.remove();
 				}}, "Ok"))
 			]);
 			this.addWindow(w) || reject(new Error("invalid target"));
