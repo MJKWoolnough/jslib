@@ -439,8 +439,10 @@ export class WindowElement extends HTMLElement {
 					}
 					return;
 				}
-				focusingWindow = this;
-				this.parentNode?.appendChild(this);
+				if (this.parentNode) {
+					focusingWindow = this;
+					this.parentNode.appendChild(this);
+				}
 			}})
 		]);
 	}
