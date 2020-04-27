@@ -11,11 +11,9 @@ export class ShellElement extends HTMLElement {
 		]);
 	}
 	alert(title, message, icon) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise(resolve => {
 			const w = windows({
+				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(false)
@@ -30,11 +28,9 @@ export class ShellElement extends HTMLElement {
 		});
 	}
 	confirm(title, message, icon) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise(resolve => {
 			const w = windows({
+				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(false)
@@ -55,12 +51,10 @@ export class ShellElement extends HTMLElement {
 		});
 	}
 	prompt(title, message, defaultValue, icon) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise(resolve => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
 			      w = windows({
+				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(null)
@@ -257,11 +251,9 @@ export class WindowElement extends HTMLElement {
 		return ["title", "icon"];
 	}
 	alert(title, message, icon) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise((resolve, reject) => {
 			const w = windows({
+				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -282,11 +274,9 @@ export class WindowElement extends HTMLElement {
 		});
 	}
 	confirm(title, message, icon) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise((resolve, reject) => {
 			const w = windows({
+				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -315,12 +305,10 @@ export class WindowElement extends HTMLElement {
 		});
 	}
 	prompt(title, message, defaultValue, icon) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise((resolve, reject) => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
 			      w = windows({
+				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(null)

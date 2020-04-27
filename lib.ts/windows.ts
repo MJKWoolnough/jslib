@@ -27,11 +27,9 @@ export class ShellElement extends HTMLElement {
 		]);
 	}
 	alert(title: string, message: string, icon?: string) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise<boolean>(resolve => {
 			const w = windows({
+				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(false)
@@ -46,11 +44,9 @@ export class ShellElement extends HTMLElement {
 		});
 	}
 	confirm(title: string, message: string, icon?: string) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise<boolean>(resolve => {
 			const w = windows({
+				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(false)
@@ -71,12 +67,10 @@ export class ShellElement extends HTMLElement {
 		});
 	}
 	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise<string|null>(resolve => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
 			      w = windows({
+				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(null)
@@ -473,11 +467,9 @@ export class WindowElement extends HTMLElement {
 		return ["title", "icon"];
 	}
 	alert(title: string, message: string, icon?: string) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
+				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -498,11 +490,9 @@ export class WindowElement extends HTMLElement {
 		});
 	}
 	confirm(title: string, message: string, icon?: string) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
+				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => {
@@ -531,12 +521,10 @@ export class WindowElement extends HTMLElement {
 		});
 	}
 	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
-		if (!icon) {
-			icon = noIcon;
-		}
 		return new Promise<string|null>((resolve, reject) => {
 			const data = autoFocus(input({"value": defaultValue || ""})),
 			      w = windows({
+				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
 				"onclose": () => resolve(null),
