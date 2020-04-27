@@ -199,6 +199,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       closeEvent = new CustomEvent("close", {"cancelable": true}),
       childWindows = new Map<WindowElement, WindowElement[]>(),
       childOf = new Map<WindowElement, WindowElement>();
+let focusingWindow: WindowElement | null = null;
 
 export class WindowElement extends HTMLElement {
 	constructor() {
@@ -425,24 +426,29 @@ export class WindowElement extends HTMLElement {
 			div({"onclick": () => {
 				const cw = childWindows.get(this);
 				if (cw && cw.length > 0) {
-					if (cw.some(c => {
-						if (c.parentNode === this.parentNode) {
-							this.parentNode!.appendChild(c);
-							return true;
-						}
-						return false;
-					})) {
-						return;
+					const c = cw[cw.length-1];
+					if (c.nextSibling && this.parentNode) {
+						focusingWindow = c;
+						this.parentNode.appendChild(c);
 					}
+					return;
 				}
+				focusingWindow = this;
 				this.parentNode?.appendChild(this);
 			}})
 		]);
 	}
 	connectedCallback() {
-		childWindows.set(this, []);
+		if (focusingWindow === this) {
+			focusingWindow = null;
+		} else {
+			childWindows.set(this, []);
+		}
 	}
 	disconnectedCallback() {
+		if (focusingWindow === this) {
+			return;
+		}
 		const p = childOf.get(this);
 		if (p) {
 			childOf.delete(this);
