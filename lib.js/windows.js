@@ -16,7 +16,7 @@ export class ShellElement extends HTMLElement {
 				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => resolve(false)
+				"onremove": () => resolve(false)
 			}, [
 				div(message),
 				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
@@ -33,7 +33,7 @@ export class ShellElement extends HTMLElement {
 				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => resolve(false)
+				"onremove": () => resolve(false)
 			}, [
 				div(message),
 				div({"style": "text-align: center"}, [
@@ -57,7 +57,7 @@ export class ShellElement extends HTMLElement {
 				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => resolve(null)
+				"onremove": () => resolve(null)
 			}, [
 				div(message),
 				data,
@@ -176,6 +176,7 @@ const windowData = new WeakMap(),
 	shell.addEventListener("mouseup", mouseUp);
       },
       closeEvent = new CustomEvent("close", {"cancelable": true}),
+      removeEvent = new CustomEvent("remove", {"cancelable": false}),
       childWindows = new Map(),
       childOf = new Map();
 let focusingWindow = null;
@@ -240,6 +241,7 @@ export class WindowElement extends HTMLElement {
 		}
 		childWindows.get(this).forEach(c => c.remove());
 		childWindows.delete(this);
+		this.dispatchEvent(removeEvent);
 	}
 	attributeChangedCallback(name, _, newValue) {
 		const wd = windowData.get(this);
@@ -261,7 +263,7 @@ export class WindowElement extends HTMLElement {
 				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => {
+				"onremove": () => {
 					const cw = childWindows.get(this);
 					cw.splice(cw.findIndex(c => c === w), 1);
 					resolve(false);
@@ -284,7 +286,7 @@ export class WindowElement extends HTMLElement {
 				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => {
+				"onremove": () => {
 					const cw = childWindows.get(this);
 					cw.splice(cw.findIndex(c => c === w), 1);
 					resolve(false);
@@ -316,7 +318,7 @@ export class WindowElement extends HTMLElement {
 				"icon": icon | noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => resolve(null)
+				"onremove": () => resolve(null)
 			}, [
 				div(message),
 				data,

@@ -32,7 +32,7 @@ export class ShellElement extends HTMLElement {
 				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => resolve(false)
+				"onremove": () => resolve(false)
 			}, [
 				div(message),
 				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
@@ -49,7 +49,7 @@ export class ShellElement extends HTMLElement {
 				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => resolve(false)
+				"onremove": () => resolve(false)
 			}, [
 				div(message),
 				div({"style": "text-align: center"}, [
@@ -73,7 +73,7 @@ export class ShellElement extends HTMLElement {
 				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => resolve(null)
+				"onremove": () => resolve(null)
 			}, [
 				div(message),
 				data,
@@ -197,6 +197,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 	shell.addEventListener("mouseup", mouseUp);
       },
       closeEvent = new CustomEvent("close", {"cancelable": true}),
+      removeEvent = new CustomEvent("remove", {"cancelable": false}),
       childWindows = new Map<WindowElement, WindowElement[]>(),
       childOf = new Map<WindowElement, WindowElement>();
 let focusingWindow: WindowElement | null = null;
@@ -457,6 +458,7 @@ export class WindowElement extends HTMLElement {
 		}
 		childWindows.get(this)!.forEach(c => c.remove());
 		childWindows.delete(this);
+		this.dispatchEvent(removeEvent);
 	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		const wd = windowData.get(this)!;
@@ -478,7 +480,7 @@ export class WindowElement extends HTMLElement {
 				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => {
+				"onremove": () => {
 					const cw = childWindows.get(this)!;
 					cw.splice(cw.findIndex(c => c === w), 1);
 					resolve(false);
@@ -501,7 +503,7 @@ export class WindowElement extends HTMLElement {
 				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => {
+				"onremove": () => {
 					const cw = childWindows.get(this)!;
 					cw.splice(cw.findIndex(c => c === w), 1);
 					resolve(false);
@@ -533,7 +535,7 @@ export class WindowElement extends HTMLElement {
 				"icon": icon || noIcon,
 				title,
 				"hide-maximise": "true",
-				"onclose": () => resolve(null),
+				"onremove": () => resolve(null),
 			}, [
 				div(message),
 				data,
