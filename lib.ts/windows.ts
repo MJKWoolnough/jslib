@@ -203,7 +203,8 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 	shell.addEventListener("mouseup", mouseUp);
       },
       closeEvent = new CustomEvent("close", {"cancelable": true}),
-      childWindows = new WeakMap<WindowElement, WindowElement[]>();
+      childWindows = new Map<WindowElement, WindowElement[]>(),
+      childOf = new Map<WindowElement, WindowElement>();
 
 export class WindowElement extends HTMLElement {
 	constructor() {
@@ -444,6 +445,19 @@ export class WindowElement extends HTMLElement {
 			}})
 		]);
 	}
+	connectedCallback() {
+		childWindows.set(this, []);
+	}
+	disconnectedCallback() {
+		const p = childOf.get(this);
+		if (p) {
+			childOf.delete(this);
+			const pw = childWindows.get(p)!;
+			pw.splice(pw.indexOf(this), 1);
+		}
+		childWindows.get(this)!.forEach(c => c.remove());
+		childWindows.delete(this);
+	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		const wd = windowData.get(this)!;
 		switch (name) {
@@ -525,17 +539,11 @@ export class WindowElement extends HTMLElement {
 			      w = windows({
 				title,
 				"hide-maximise": "true",
-				"onclose": () => {
-					const cw = childWindows.get(this)!;
-					cw.splice(cw.findIndex(c => c === w), 1);
-					resolve(null);
-				}
+				"onclose": () => resolve(null),
 			}, [
 				div(message),
 				data,
 				div({"style": "text-align: center"}, button({"onclick": () => {
-					const cw = childWindows.get(this)!;
-					cw.splice(cw.findIndex(c => c === w), 1);
 					resolve(data.value);
 					w.parentNode?.removeChild(w);
 				}}, "Ok"))
@@ -547,7 +555,8 @@ export class WindowElement extends HTMLElement {
 		if (!this.parentNode) {
 			return false;
 		}
-		childWindows.set(this, (childWindows.get(this) || []).splice(0, 0, w));
+		childWindows.get(this)!.push(w);
+		childOf.set(w, this);
 		this.parentNode.appendChild(w);
 		return true;
 	}
