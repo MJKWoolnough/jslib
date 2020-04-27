@@ -5,10 +5,10 @@ const windowData = new WeakMap(),
       noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==",
       resizeWindow = function(direction, e) {
 	const shell = this.parentNode;
-	if (!(shell instanceof ShellElement) || draggers.get(shell) === true) {
+	if (dragging || !(shell instanceof ShellElement)) {
 		return;
 	}
-	draggers.set(shell, true);
+	dragging = true;
 	this.style.setProperty("user-select", "none");
 	const originalLeft = this.offsetLeft,
 	      originalTop = this.offsetTop,
@@ -63,19 +63,18 @@ const windowData = new WeakMap(),
 	      mouseUp = () => {
 		shell.removeEventListener("mousemove", mouseMove);
 		shell.removeEventListener("mouseup", mouseUp);
-		draggers.delete(shell);
 		shell.style.removeProperty("user-select");
+		dragging = false;
 	      };
 	shell.addEventListener("mousemove", mouseMove);
 	shell.addEventListener("mouseup", mouseUp);
       },
-      draggers = new WeakMap(),
       moveWindow = function(e) {
 	const shell = this.parentNode;
-	if (!(shell instanceof ShellElement) || draggers.get(shell) === true) {
+	if (dragging || !(shell instanceof ShellElement)) {
 		return;
 	}
-	draggers.set(shell, true);
+	dragging = true;
 	this.style.setProperty("user-select", "none");
 	const grabX = e.clientX - this.offsetLeft,
 	      grabY = e.clientY - this.offsetTop,
@@ -88,7 +87,7 @@ const windowData = new WeakMap(),
 	      mouseUp = () => {
 		shell.removeEventListener("mousemove", mouseMove);
 		shell.removeEventListener("mouseup", mouseUp);
-		draggers.delete(shell);
+		dragging = false;
 		shell.style.removeProperty("user-select");
 	      };
 	shell.addEventListener("mousemove", mouseMove);
@@ -151,7 +150,7 @@ const windowData = new WeakMap(),
 	]);
 	parent.addWindow(w) || reject(new Error("invalid target"));
       });
-let focusingWindow = null;
+let focusingWindow = null, dragging = false;
 
 export class ShellElement extends HTMLElement {
 	constructor() {
