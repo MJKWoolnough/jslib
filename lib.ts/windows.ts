@@ -1,103 +1,6 @@
 import {autoFocus, createHTML, DOMBind, Children, Props} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 
-export class ShellElement extends HTMLElement {
-	constructor() {
-		super();
-		createHTML(this.attachShadow({"mode": "closed"}), [
-			style({"type": "text/css"}, `
-:host {
-	display: block;
-	position: relative;
-	overflow: hidden;
-	width: var(--shell-width, 100%);
-	height: var(--shell-height, 100%);
-}
-
-::slotted(windows-window) {
-	--taskmanager-on: none;
-}
-
-::slotted(windows-window:last-of-type) {
-	--overlay-on: none; /* hack until exportpart is supported */
-}
-`),
-			slot({"name": "desktop"}),
-			div(slot())
-		]);
-	}
-	alert(title: string, message: string, icon?: string) {
-		return new Promise<boolean>(resolve => {
-			const w = windows({
-				"icon": icon || noIcon,
-				title,
-				"hide-maximise": "true",
-				"onremove": () => resolve(false)
-			}, [
-				div(message),
-				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
-					resolve(true);
-					w.remove();
-				}}, "Ok")))
-			]);
-			this.appendChild(w);
-		});
-	}
-	confirm(title: string, message: string, icon?: string) {
-		return new Promise<boolean>(resolve => {
-			const w = windows({
-				"icon": icon || noIcon,
-				title,
-				"hide-maximise": "true",
-				"onremove": () => resolve(false)
-			}, [
-				div(message),
-				div({"style": "text-align: center"}, [
-					autoFocus(button({"onclick": () => {
-						resolve(true);
-						w.remove();
-					}}, "Ok")),
-					button({"onclick": () => {
-						resolve(true);
-						w.remove();
-					}}, "Cancel")
-				])
-			]);
-			this.appendChild(w);
-		});
-	}
-	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
-		return new Promise<string|null>(resolve => {
-			const data = autoFocus(input({"value": defaultValue || ""})),
-			      w = windows({
-				"icon": icon || noIcon,
-				title,
-				"hide-maximise": "true",
-				"onremove": () => resolve(null)
-			}, [
-				div(message),
-				data,
-				div({"style": "text-align: center"}, button({"onclick": () => {
-					resolve(data.value);
-					w.remove();
-				}}, "Ok"))
-			]);
-			this.appendChild(w);
-		});
-	}
-}
-
-export class DesktopElement extends HTMLElement {
-	constructor() {
-		super()
-		this.setAttribute("slot", "desktop");
-		createHTML(this.attachShadow({"mode": "closed"}), [
-			style({"type": "text/css"}, ":host{position: absolute;top:0;left:0;bottom:0;right:0}"),
-			slot({"slot": "desktop"})
-		]);
-	}
-}
-
 type Wdata = {
 	titleElement: HTMLSpanElement;
 	iconElement: HTMLImageElement;
@@ -105,7 +8,7 @@ type Wdata = {
 
 const windowData = new WeakMap<WindowElement, Wdata>(),
       noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==",
-      resizeWindow = function(this: WindowElement, direction: number, {clientX, clientY}: MouseEvent) {
+      resizeWindow = function(this: WindowElement, direction: number, e: MouseEvent) {
 	const shell = this.parentNode;
 	if (!(shell instanceof ShellElement) || draggers.get(shell) === true) {
 		return;
@@ -116,11 +19,11 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 	      originalTop = this.offsetTop,
 	      originalWidth = this.offsetWidth,
 	      originalHeight = this.offsetHeight,
-	      grabX = clientX,
-	      grabY = clientY,
-	      mouseMove = ({clientX, clientY}: MouseEvent) => {
-		const dx = clientX - grabX,
-		      dy = clientY - grabY;
+	      grabX = e.clientX,
+	      grabY = e.clientY,
+	      mouseMove = (e: MouseEvent) => {
+		const dx = e.clientX - grabX,
+		      dy = e.clientY - grabY;
 		switch (direction) {
 			case 0:
 			case 1:
@@ -172,15 +75,15 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 	shell.addEventListener("mouseup", mouseUp);
       },
       draggers = new WeakMap<ShellElement, boolean>(),
-      moveWindow = function(this: WindowElement, {clientX, clientY}: MouseEvent) {
+      moveWindow = function(this: WindowElement, e: MouseEvent) {
 	const shell = this.parentNode;
 	if (!(shell instanceof ShellElement) || draggers.get(shell) === true) {
 		return;
 	}
 	draggers.set(shell, true);
 	this.style.setProperty("user-select", "none");
-	const grabX = clientX - this.offsetLeft,
-	      grabY = clientY - this.offsetTop,
+	const grabX = e.clientX - this.offsetLeft,
+	      grabY = e.clientY - this.offsetTop,
 	      mouseMove = (e: MouseEvent) => {
 		const x = e.clientX - grabX,
 		      y = e.clientY - grabY;
@@ -199,8 +102,112 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       closeEvent = new CustomEvent("close", {"cancelable": true}),
       removeEvent = new CustomEvent("remove", {"cancelable": false}),
       childWindows = new Map<WindowElement, WindowElement[]>(),
-      childOf = new Map<WindowElement, WindowElement>();
+      childOf = new Map<WindowElement, WindowElement>(),
+      alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
+	const w = windows({
+		"icon": icon || noIcon,
+		title,
+		"hide-maximise": "true",
+		"onremove": () => resolve(false)
+	}, [
+		div(message),
+		div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
+			resolve(true);
+			w.remove();
+		}}, "Ok")))
+	]);
+	parent.addWindow(w) || reject(new Error("invalid target"));
+      }),
+      confirmFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
+	const w = windows({
+		"icon": icon || noIcon,
+		title,
+		"hide-maximise": "true",
+		"onremove": () => resolve(false)
+	}, [
+		div(message),
+		div({"style": "text-align: center"}, [
+			autoFocus(button({"onclick": () => {
+				resolve(true);
+				w.remove();
+			}}, "Ok")),
+			button({"onclick": () => {
+				resolve(true);
+				w.remove();
+			}}, "Cancel")
+		])
+	]);
+	parent.addWindow(w) || reject(new Error("invalid target"));
+      }),
+      promptFn = (parent: WindowElement|ShellElement, title: string, message: string, defaultValue?: string, icon?: string) => new Promise<string|null>((resolve, reject) => {
+	const data = autoFocus(input({"value": defaultValue || ""})),
+	      w = windows({
+		"icon": icon || noIcon,
+		title,
+		"hide-maximise": "true",
+		"onremove": () => resolve(null)
+	}, [
+		div(message),
+		data,
+		div({"style": "text-align: center"}, button({"onclick": () => {
+			resolve(data.value);
+			w.remove();
+		}}, "Ok"))
+	]);
+	parent.addWindow(w) || reject(new Error("invalid target"));
+      });
 let focusingWindow: WindowElement | null = null;
+
+export class ShellElement extends HTMLElement {
+	constructor() {
+		super();
+		createHTML(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, `
+:host {
+	display: block;
+	position: relative;
+	overflow: hidden;
+	width: var(--shell-width, 100%);
+	height: var(--shell-height, 100%);
+}
+
+::slotted(windows-window) {
+	--taskmanager-on: none;
+}
+
+::slotted(windows-window:last-of-type) {
+	--overlay-on: none; /* hack until exportpart is supported */
+}
+`),
+			slot({"name": "desktop"}),
+			div(slot())
+		]);
+	}
+	alert(title: string, message: string, icon?: string) {
+		return alertFn(this, title, message, icon);
+	}
+	confirm(title: string, message: string, icon?: string) {
+		return confirmFn(this, title, message, icon);
+	}
+	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
+		return promptFn(this, title, message, defaultValue, icon);
+	}
+	addWindow(w: WindowElement) {
+		this.appendChild(w);
+		return true;
+	}
+}
+
+export class DesktopElement extends HTMLElement {
+	constructor() {
+		super()
+		this.setAttribute("slot", "desktop");
+		createHTML(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, ":host{position: absolute;top:0;left:0;bottom:0;right:0}"),
+			slot({"slot": "desktop"})
+		]);
+	}
+}
 
 export class WindowElement extends HTMLElement {
 	constructor() {
@@ -475,77 +482,13 @@ export class WindowElement extends HTMLElement {
 		return ["title", "icon"];
 	}
 	alert(title: string, message: string, icon?: string) {
-		return new Promise<boolean>((resolve, reject) => {
-			const w = windows({
-				"icon": icon || noIcon,
-				title,
-				"hide-maximise": "true",
-				"onremove": () => {
-					const cw = childWindows.get(this)!;
-					cw.splice(cw.findIndex(c => c === w), 1);
-					resolve(false);
-				}
-			}, [
-				div(message),
-				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
-					const cw = childWindows.get(this)!;
-					cw.splice(cw.findIndex(c => c === w), 1);
-					resolve(true);
-					w.remove();
-				}}, "Ok")))
-			]);
-			this.addWindow(w) || reject(new Error("invalid target"));
-		});
+		return alertFn(this, title, message, icon);
 	}
 	confirm(title: string, message: string, icon?: string) {
-		return new Promise<boolean>((resolve, reject) => {
-			const w = windows({
-				"icon": icon || noIcon,
-				title,
-				"hide-maximise": "true",
-				"onremove": () => {
-					const cw = childWindows.get(this)!;
-					cw.splice(cw.findIndex(c => c === w), 1);
-					resolve(false);
-				}
-			}, [
-				div(message),
-				div({"style": "text-align: center"}, [
-					autoFocus(button({"onclick": () => {
-						const cw = childWindows.get(this)!;
-						cw.splice(cw.findIndex(c => c === w), 1);
-						resolve(true);
-						w.remove();
-					}}, "Ok")),
-					button({"onclick": () => {
-						const cw = childWindows.get(this)!;
-						cw.splice(cw.findIndex(c => c === w), 1);
-						resolve(true);
-						w.remove();
-					}}, "Cancel")
-				])
-			]);
-			this.addWindow(w) || reject(new Error("invalid target"));
-		});
+		return confirmFn(this, title, message, icon);
 	}
 	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
-		return new Promise<string|null>((resolve, reject) => {
-			const data = autoFocus(input({"value": defaultValue || ""})),
-			      w = windows({
-				"icon": icon || noIcon,
-				title,
-				"hide-maximise": "true",
-				"onremove": () => resolve(null),
-			}, [
-				div(message),
-				data,
-				div({"style": "text-align: center"}, button({"onclick": () => {
-					resolve(data.value);
-					w.remove();
-				}}, "Ok"))
-			]);
-			this.addWindow(w) || reject(new Error("invalid target"));
-		});
+		return promptFn(this, title, message, defaultValue, icon);
 	}
 	addWindow(w: WindowElement) {
 		if (!this.parentNode) {
