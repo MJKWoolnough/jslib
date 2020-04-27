@@ -75,6 +75,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 	shell.addEventListener("mouseup", mouseUp);
       },
       moveWindow = function(this: WindowElement, e: MouseEvent) {
+	const shell = this.parentNode;
 	if (dragging || !(shell instanceof ShellElement)) {
 		return;
 	}
