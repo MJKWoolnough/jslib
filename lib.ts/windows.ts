@@ -211,8 +211,8 @@ export class DesktopElement extends HTMLElement {
 export class WindowElement extends HTMLElement {
 	constructor() {
 		super()
-		const titleElement = span(),
-		      iconElement = img({"src": noIcon});
+		const titleElement = span({"part": "title"}),
+		      iconElement = img({"part": "icon", "src": noIcon});
 		windowData.set(this, {titleElement, iconElement});
 		createHTML(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
@@ -412,21 +412,21 @@ export class WindowElement extends HTMLElement {
 }
 `),
 			div(Array.from({length: 8}, (_, n) => div({"onmousedown": resizeWindow.bind(this, n)}))),
-			div({"onmousedown": moveWindow.bind(this), "ondblclick": () => {
+			div({"part": "titlebar", "onmousedown": moveWindow.bind(this), "ondblclick": () => {
 				if (!this.hasAttribute("hide-maximise")) {
 					this.toggleAttribute("maximised");
 				}
 			      }}, [
 				iconElement,
 				titleElement,
-				div([
-					button({"onclick": () => {
+				div({"part": "controls"}, [
+					button({"part": "close", "onclick": () => {
 						if (this.dispatchEvent(closeEvent) && this.parentNode) {
 							this.remove();
 						}
 					}}),
-					button({"onclick": () => this.toggleAttribute("maximised")}),
-					button({"onclick": () => this.toggleAttribute("minimised")})
+					button({"part": "maximise", "onclick": () => this.toggleAttribute("maximised")}),
+					button({"part": "minimise", "onclick": () => this.toggleAttribute("minimised")})
 				])
 			]),
 			div(slot()),
