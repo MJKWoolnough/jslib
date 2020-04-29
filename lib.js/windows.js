@@ -217,14 +217,7 @@ export class WindowElement extends HTMLElement {
 				])
 			]),
 			div(slot()),
-			div({"onclick": () => {
-				const cw = childWindows.get(this);
-				if (cw && cw.length > 0) {
-					cw[cw.length-1].focus();
-					return;
-				}
-				this.focus();
-			}})
+			div({"onclick": () => this.focus()})
 		]);
 	}
 	connectedCallback() {
@@ -281,6 +274,11 @@ export class WindowElement extends HTMLElement {
 		return true;
 	}
 	focus() {
+		const cw = childWindows.get(this);
+		if (cw && cw.length > 0) {
+			cw[cw.length-1].focus();
+			return;
+		}
 		if (this.parentNode && this.nextElementSibling) {
 			focusingWindow = this;
 			this.parentNode.appendChild(this);
