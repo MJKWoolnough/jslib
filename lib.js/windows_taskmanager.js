@@ -107,11 +107,7 @@ export class ShellElement extends BaseShellElement {
 	transform: scaleY(-1);
 }
 
-:host > ul > li > img {
-	display: none;
-}
-
-:host > ul > li:empty, :host > ul > li > windows-window:not([maximised]) {
+:host > ul > li > windows-window:not([maximised]) {
 	visibility: hidden;
 }
 
