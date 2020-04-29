@@ -220,17 +220,10 @@ export class WindowElement extends HTMLElement {
 			div({"onclick": () => {
 				const cw = childWindows.get(this);
 				if (cw && cw.length > 0) {
-					const c = cw[cw.length-1];
-					if (c.nextSibling && this.parentNode) {
-						focusingWindow = c;
-						this.parentNode.appendChild(c);
-					}
+					cw[cw.length-1].focus();
 					return;
 				}
-				if (this.parentNode) {
-					focusingWindow = this;
-					this.parentNode.appendChild(this);
-				}
+				this.focus();
 			}})
 		]);
 	}
@@ -286,6 +279,13 @@ export class WindowElement extends HTMLElement {
 		childOf.set(w, this);
 		this.parentNode.appendChild(w);
 		return true;
+	}
+	focus() {
+		if (this.parentNode && this.nextElementSibling) {
+			focusingWindow = this;
+			this.parentNode.appendChild(this);
+		}
+		super.focus();
 	}
 }
 
