@@ -1,8 +1,8 @@
 import {clearElement, createHTML} from './dom.js';
 import {div, li, slot, style, ul} from './html.js';
-import {windows, desktop} from './windows.js';
+import {ShellElement as BaseShellElement, WindowElement, DesktopElement, windows, desktop} from './windows.js';
 
-export {windows, desktop};
+export {WindowElement, DesktopElement, windows, desktop};
 
 const windowObservations = {
 	"attributeFilter": ["window-icon", "window-title", "minimised"],
@@ -11,8 +11,7 @@ const windowObservations = {
       taskbarObservations = {
 	"attributeFilter": ["maximised"],
 	"attributes": true
-      },
-      closeEvent = new CustomEvent("close", {"cancelable": true});
+      };
 
 export class ShellElement extends BaseShellElement {
 	constructor() {
@@ -35,7 +34,7 @@ export class ShellElement extends BaseShellElement {
 			case "window-icon":
 				if (data.item) {
 					if (target.hasAttribute("window-icon")) {
-						data.item.firstChild.setAttribute(target.getAttribute("window-icon"));
+						data.item.firstChild.setAttribute("window-icon", target.getAttribute("window-icon"));
 					} else {
 						data.item.firstChild.removeAttribute("window-icon");
 					}
@@ -43,7 +42,7 @@ export class ShellElement extends BaseShellElement {
 				break;
 			case "window-title":
 				if (data.item) {
-					data.item.firstChild.setAttribute("window-title", target.getAttribute("window-title"));
+					data.item.firstChild.setAttribute("window-title", target.getAttribute("window-title") || "");
 				}
 				break;
 			case "minimised":
@@ -64,14 +63,14 @@ export class ShellElement extends BaseShellElement {
 					data.item = taskbar.appendChild(li());
 				}
 				const taskbarItem = windows({"window-icon": target.getAttribute("window-icon"), "window-title": target.getAttribute("window-title") || "", "hide-minimise": "", "maximised": "", "exportparts": "close, minimise, maximise, titlebar, title, controls, icon", "onclose": e => {
-					if (!target.dispatchEvent(closeEvent)) {
-						e.preventDefault();
-					} else {
+					if (target.dispatchEvent(new CustomEvent("close", {"cancelable": true}))) {
 						target.remove();
 					}
+					e.preventDefault();
 				}, "onremove": () => taskbarData.delete(taskbarItem)});
 				taskbarData.set(taskbarItem, target);
 				taskbarObserver.observe(data.item.appendChild(taskbarItem), taskbarObservations);
+				target.addEventListener("onremove", () => taskbarItem.remove());
 			break;
 			}
 		      })),
@@ -120,23 +119,25 @@ export class ShellElement extends BaseShellElement {
 			slot({"name": "desktop"}),
 			taskbar,
 			div(slot({"onslotchange": function() {
+				state = !state;
 				this.assignedElements().forEach(w => {
 					if (!(w instanceof WindowElement)) {
 						return;
 					}
-					state != state;
 					if (windowData.has(w)) {
 						windowData.get(w).state = state;
 					} else if (!w.hasAttribute("window-hide")) {
 						windowObserver.observe(w, windowObservations);
 						windowData.set(w, {item: null, state});
 					}
-					windowData.forEach((data, w) => {
-						if (data.state !== state && data.item) {
+				});
+				windowData.forEach((data, w) => {
+					if (data.state !== state) {
+						if (data.item) {
 							clearElement(data.item);
-							windowData.delete(w);
 						}
-					});
+						windowData.delete(w);
+					}
 				});
 			}}))
 		      ]);
