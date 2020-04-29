@@ -104,6 +104,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       childOf = new Map<WindowElement, WindowElement>(),
       alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
+		"window-hide": "",
 		"window-icon": icon || noIcon,
 		"window-title": title,
 		"hide-maximise": "true",
@@ -119,6 +120,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       }),
       confirmFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
+		"window-hide": "",
 		"window-icon": icon || noIcon,
 		"window-title": title,
 		"hide-maximise": "true",
@@ -141,6 +143,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       promptFn = (parent: WindowElement|ShellElement, title: string, message: string, defaultValue?: string, icon?: string) => new Promise<string|null>((resolve, reject) => {
 	const data = autoFocus(input({"value": defaultValue || ""})),
 	      w = windows({
+		"window-hide": "",
 		"window-icon": icon || noIcon,
 		"window-title": title,
 		"hide-maximise": "true",
@@ -160,6 +163,9 @@ let focusingWindow: WindowElement | null = null, dragging = false;
 export class ShellElement extends HTMLElement {
 	constructor() {
 		super();
+		if (new.target !== ShellElement) {
+			return;
+		}
 		createHTML(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
@@ -255,7 +261,8 @@ export class WindowElement extends HTMLElement {
 :host([hide-titlebar]) > div:nth-child(3),
 :host([hide-close]) > div:nth-child(3) button:nth-of-type(1),
 :host([hide-maximise]) > div:nth-child(3) button:nth-of-type(2),
-:host([hide-minimise]) > div:nth-child(3) button:nth-of-type(3) {
+:host([hide-minimise]) > div:nth-child(3) button:nth-of-type(3),
+:host([window-hide]) > div:nth-child(3) button:nth-of-type(3) {
 	display: none;
 }
 
