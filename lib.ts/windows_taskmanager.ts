@@ -38,8 +38,18 @@ export class ShellElement extends BaseShellElement {
 			let data = windowData.get(target)!;
 			switch (attributeName) {
 			case "window-icon":
+				if (data.item) {
+					if (target.hasAttribute("window-icon")) {
+						(data.item.firstChild as WindowElement).setAttribute("window-icon", target.getAttribute("window-icon")!);
+					} else {
+						(data.item.firstChild as WindowElement).removeAttribute("window-icon");
+					}
+				}
 				break;
 			case "window-title":
+				if (data.item) {
+					(data.item.firstChild as WindowElement).setAttribute("window-title", target.getAttribute("window-title") || "");
+				}
 				break;
 			case "minimised":
 				if (!target.hasAttribute("minimised")) {
