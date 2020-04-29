@@ -499,7 +499,7 @@ export class WindowElement extends HTMLElement {
 		return promptFn(this, title, message, defaultValue, icon);
 	}
 	addWindow(w: WindowElement) {
-		if (!this.parentNode) {
+		if (!this.parentNode || childOf.has(this)) {
 			return false;
 		}
 		childWindows.get(this)!.push(w);
