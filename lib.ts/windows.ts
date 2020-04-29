@@ -7,7 +7,6 @@ type Wdata = {
 }
 
 const windowData = new WeakMap<WindowElement, Wdata>(),
-      noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==",
       resizeWindow = function(this: WindowElement, direction: number, e: MouseEvent) {
 	const shell = this.parentNode;
 	if (dragging || !(shell instanceof ShellElement)) {
@@ -513,4 +512,5 @@ customElements.define("windows-window", WindowElement);
 
 export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new ShellElement(), props, children),
 desktop: DOMBind<DesktopElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new DesktopElement(), props, children),
-windows: DOMBind<WindowElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new WindowElement(), props, children);
+windows: DOMBind<WindowElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new WindowElement(), props, children),
+noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";

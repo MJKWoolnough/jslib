@@ -2,7 +2,6 @@ import {autoFocus, createHTML} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 
 const windowData = new WeakMap(),
-      noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==",
       resizeWindow = function(direction, e) {
 	const shell = this.parentNode;
 	if (dragging || !(shell instanceof ShellElement)) {
@@ -296,4 +295,5 @@ customElements.define("windows-window", WindowElement);
 
 export const shell = (props, children) => createHTML(new ShellElement(), props, children),
 desktop = (props, children) => createHTML(new DesktopElement(), props, children),
-windows = (props, children) => createHTML(new WindowElement(), props, children);
+windows = (props, children) => createHTML(new WindowElement(), props, children),
+noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";
