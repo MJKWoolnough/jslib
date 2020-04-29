@@ -23,7 +23,9 @@ export class ShellElement extends BaseShellElement {
 			if (type !== "attributes" || attributeName !== "maximised" || !(target instanceof WindowElement) || target.hasAttribute("maximised")) {
 				return;
 			}
-			this.appendChild(taskbarData.get(target)).removeAttribute("minimised");
+			const w = taskbarData.get(target);
+			w.removeAttribute("minimised");
+			w.focus();
 		      })),
 		      windowObserver = new MutationObserver(list => list.forEach(({target, type, attributeName, }) => {
 			if (type !== "attributes" || !(target instanceof WindowElement)) {
@@ -67,10 +69,14 @@ export class ShellElement extends BaseShellElement {
 						target.remove();
 					}
 					e.preventDefault();
-				}, "onremove": () => taskbarData.delete(taskbarItem)});
+				      }, "onremove": () => taskbarData.delete(taskbarItem)}),
+				      removeFn = () => {
+					taskbarItem.remove();
+					target.removeEventListener("onremove", removeFn);
+				      };
 				taskbarData.set(taskbarItem, target);
 				taskbarObserver.observe(data.item.appendChild(taskbarItem), taskbarObservations);
-				target.addEventListener("onremove", () => taskbarItem.remove());
+				target.addEventListener("onremove", removeFn);
 			break;
 			}
 		      })),
