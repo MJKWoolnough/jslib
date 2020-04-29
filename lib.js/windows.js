@@ -93,8 +93,6 @@ const windowData = new WeakMap(),
 	shell.addEventListener("mousemove", mouseMove);
 	shell.addEventListener("mouseup", mouseUp);
       },
-      closeEvent = new CustomEvent("close", {"cancelable": true}),
-      removeEvent = new CustomEvent("remove", {"cancelable": false}),
       childWindows = new Map(),
       childOf = new Map(),
       alertFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
@@ -211,7 +209,7 @@ export class WindowElement extends HTMLElement {
 				titleElement,
 				div({"part": "controls"}, [
 					button({"part": "close", "onclick": () => {
-						if (this.dispatchEvent(closeEvent) && this.parentNode) {
+						if (this.dispatchEvent(new CustomEvent("close", {"cancelable": true})) && this.parentNode) {
 							this.remove();
 						}
 					}}),
@@ -256,7 +254,7 @@ export class WindowElement extends HTMLElement {
 		}
 		childWindows.get(this).forEach(c => c.remove());
 		childWindows.delete(this);
-		this.dispatchEvent(removeEvent);
+		this.dispatchEvent(new CustomEvent("remove", {"cancelable": false}));
 	}
 	attributeChangedCallback(name, _, newValue) {
 		const wd = windowData.get(this);
