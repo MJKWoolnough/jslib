@@ -419,8 +419,8 @@ export class WindowElement extends HTMLElement {
 }
 `),
 			div(Array.from({length: 8}, (_, n) => div({"onmousedown": resizeWindow.bind(this, n)}))),
-			div({"part": "titlebar", "onmousedown": moveWindow.bind(this), "ondblclick": () => {
-				if (!this.hasAttribute("hide-maximise")) {
+			div({"part": "titlebar", "onmousedown": moveWindow.bind(this), "ondblclick": (e: Event) => {
+				if (!(e.target instanceof HTMLButtonElement) && !this.hasAttribute("hide-maximise")) {
 					this.toggleAttribute("maximised");
 				}
 			      }}, [
