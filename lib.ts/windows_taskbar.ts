@@ -128,6 +128,10 @@ export class ShellElement extends BaseShellElement {
 	height: 4em;
 	vertical-align: middle;
 }
+
+:host([hide="icon"]) > ul img, :host([hide="title"]) > ul span {
+	display: none;
+}
 `),
 			slot({"name": "desktop"}),
 			taskbar,
