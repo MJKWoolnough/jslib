@@ -112,6 +112,7 @@ export class ShellElement extends BaseShellElement {
 	overflow-y: auto;
 	overflow-x: hidden;
 	height: 100%;
+	white-space: unset;
 }
 
 :host([side="left"]) > ul > li, :host([side="right"]) > ul > li {
