@@ -54,18 +54,22 @@ export class ShellElement extends BaseShellElement {
 	position: absolute;
 	bottom: 0;
 	left: 0;
-	right: 0;
+	width: 100%;
 	height: 4em;
 	margin: 0;
-	overflow: hidden;
+	overflow-y: hidden;
+	overflow-x: auto;
 	background-color: #eee;
+	white-space: nowrap;
+	user-select: none;
 }
 
 :host > ul li {
 	border: 1px solid #000;
-	float: left;
+	display: inline-block;
 	padding: 0;
 	margin: 0;
+	overflow: hidden;
 }
 
 :host > ul img {

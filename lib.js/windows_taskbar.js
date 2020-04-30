@@ -34,7 +34,7 @@ export class ShellElement extends BaseShellElement {
 			}
 		      }));
 		createHTML(this.attachShadow({"mode": "closed"}), [
-			style({"type": "text/css"}, ":host{display:block;position:relative;overflow:hidden;width:var(--shell-width,100%);height:var(--shell-height,100%)}::slotted(windows-window:last-of-type){--overlay-on:none}:host>ul{list-style:none;padding:0;position:absolute;bottom:0;left:0;right:0;height:4em;margin:0;overflow:hidden;background-color:#eee}:host>ul li{border:1px solid #000;float:left;padding:0;margin:0}:host>ul img{height:100%}:host>ul span{display:inline-block;height:100%;vertical-align:middle}"),
+			style({"type": "text/css"}, ":host{display:block;position:relative;overflow:hidden;width:var(--shell-width,100%);height:var(--shell-height,100%)}::slotted(windows-window:last-of-type){--overlay-on:none}:host>ul{list-style:none;padding:0;position:absolute;bottom:0;left:0;width:100%;height:4em;margin:0;overflow-y:hidden;overflow-x:auto;background-color:#eee;white-space:nowrap;user-select:none}:host>ul li{border:1px solid #000;display:inline-block;padding:0;margin:0;overflow:hidden}:host>ul img{height:100%}:host>ul span{display:inline-block;height:100%;vertical-align:middle}"),
 			slot({"name": "desktop"}),
 			taskbar,
 			div(slot({"onslotchange": function() {
