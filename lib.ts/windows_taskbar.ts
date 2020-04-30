@@ -64,6 +64,42 @@ export class ShellElement extends BaseShellElement {
 	user-select: none;
 }
 
+:host([side="top"]) > ul {
+	top: 0;
+	bottom: unset;
+}
+
+:host([side="left"]) > ul {
+	top: 0;
+	width: 4em;
+}
+
+:host([side="right"]) > ul {
+	top: 0;
+	left: unset;
+	right: 0;
+	width: 4em;
+}
+
+:host ::slotted(windows-desktop) {
+	padding-bottom: 4em;
+}
+
+:host([side="top"]) ::slotted(windows-desktop) {
+	padding-top: 4em;
+	padding-bottom: 0;
+}
+
+:host([side="left"]) ::slotted(windows-desktop) {
+	padding-left: 4em;
+	padding-bottom: 0;
+}
+
+:host([side="right"]) ::slotted(windows-desktop) {
+	padding-right: 4em;
+	padding-bottom: 0;
+}
+
 :host > ul li {
 	border: 1px solid #000;
 	display: inline-block;
@@ -72,13 +108,23 @@ export class ShellElement extends BaseShellElement {
 	overflow: hidden;
 }
 
-:host > ul img {
+:host([side="left"]) > ul, :host([side="right"]) > ul {
+	overflow-y: auto;
+	overflow-x: hidden;
 	height: 100%;
+}
+
+:host([side="left"]) > ul > li, :host([side="right"]) > ul > li {
+	display: list-item;
+}
+
+:host > ul img {
+	height: 4em;
 }
 
 :host > ul span {
 	display: inline-block;
-	height: 100%;
+	height: 4em;
 	vertical-align: middle;
 }
 `),
