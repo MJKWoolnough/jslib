@@ -65,9 +65,7 @@ export class ShellElement extends BaseShellElement {
 					data.item = taskbar.appendChild(li());
 				}
 				const taskbarItem = windows({"window-icon": target.getAttribute("window-icon"), "window-title": target.getAttribute("window-title") || "", "hide-minimise": "", "maximised": "", "exportparts": "close, minimise, maximise, titlebar, title, controls, icon", "onclose": e => {
-					if (target.dispatchEvent(new CustomEvent("close", {"cancelable": true}))) {
-						target.remove();
-					}
+					target.close();
 					e.preventDefault();
 				      }, "onremove": () => taskbarData.delete(taskbarItem)}),
 				      removeFn = () => {
