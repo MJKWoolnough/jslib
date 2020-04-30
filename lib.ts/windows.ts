@@ -424,11 +424,7 @@ export class WindowElement extends HTMLElement {
 				iconElement,
 				titleElement,
 				div({"part": "controls"}, [
-					button({"part": "close", "onclick": () => {
-						if (this.dispatchEvent(new CustomEvent("close", {"cancelable": true})) && this.parentNode) {
-							this.remove();
-						}
-					}}),
+					button({"part": "close", "onclick": () => this.close()}),
 					button({"part": "maximise", "onclick": () => this.toggleAttribute("maximised")}),
 					button({"part": "minimise", "onclick": () => this.toggleAttribute("minimised")})
 				])
@@ -505,6 +501,15 @@ export class WindowElement extends HTMLElement {
 			this.parentNode.appendChild(this);
 		}
 		super.focus();
+	}
+	close() {
+		if (childWindows.has(this)) {
+			childWindows.get(this)!.focus();
+		} else if (this.dispatchEvent(new CustomEvent("close", {"cancelable": true}))) {
+			this.remove();
+			return true;
+		}
+		return false;
 	}
 }
 
