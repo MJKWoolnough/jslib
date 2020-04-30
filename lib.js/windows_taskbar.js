@@ -62,11 +62,7 @@ export class ShellElement extends BaseShellElement {
 								}) : contextItem("&Minimise", () => {
 									w.setAttribute("minimised", "");
 								}),
-								contextItem("&Close", () => {
-									if (w.dispatchEvent(new CustomEvent("close", {"cancelable": true}))) {
-										w.remove();
-									}
-								})
+								contextItem("&Close", () => w.close())
 							]);
 						      }}, [
 							img({"part": "icon", "src": w.getAttribute("window-icon") || noIcon, "title": w.getAttribute("window-title") || ""}),
