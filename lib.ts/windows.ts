@@ -97,7 +97,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 	shell.addEventListener("mousemove", mouseMove);
 	shell.addEventListener("mouseup", mouseUp);
       },
-      childWindows = new Map<WindowElement, WindowElement[]>(),
+      childWindows = new Map<WindowElement, WindowElement>(),
       childOf = new Map<WindowElement, WindowElement>(),
       alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
@@ -205,7 +205,7 @@ export class DesktopElement extends HTMLElement {
 		super()
 		this.setAttribute("slot", "desktop");
 		createHTML(this.attachShadow({"mode": "closed"}), [
-			style({"type": "text/css"}, ":host{position: absolute;top:0;left:0;bottom:0;right:0}"),
+			style({"type": "text/css"}, ":host{position:absolute;top:0;left:0;bottom:0;right:0}"),
 			slot({"slot": "desktop"})
 		]);
 	}
@@ -440,22 +440,22 @@ export class WindowElement extends HTMLElement {
 	connectedCallback() {
 		if (focusingWindow === this) {
 			focusingWindow = null;
-		} else {
-			childWindows.set(this, []);
 		}
 	}
 	disconnectedCallback() {
 		if (focusingWindow === this) {
 			return;
 		}
-		const p = childOf.get(this);
+		const p = childOf.get(this),
+		      c = childWindows.get(this);
 		if (p) {
+			childWindows.delete(p);
 			childOf.delete(this);
-			const pw = childWindows.get(p)!;
-			pw.splice(pw.indexOf(this), 1);
 		}
-		childWindows.get(this)!.forEach(c => c.remove());
-		childWindows.delete(this);
+		if (c) {
+			c.remove();
+			childWindows.delete(this);
+		}
 		this.dispatchEvent(new CustomEvent("remove", {"cancelable": false}));
 	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
@@ -482,18 +482,22 @@ export class WindowElement extends HTMLElement {
 		return promptFn(this, title, message, defaultValue, icon);
 	}
 	addWindow(w: WindowElement) {
-		if (!this.parentNode || childOf.has(this)) {
+		if (!this.parentNode) {
 			return false;
 		}
-		childWindows.get(this)!.push(w);
+		if (childWindows.has(this)) {
+			childWindows.get(this)!.addWindow(w);
+			return true;
+		}
+		childWindows.set(this, w);
 		childOf.set(w, this);
 		this.parentNode.appendChild(w);
 		return true;
 	}
 	focus() {
-		const cw = childWindows.get(this);
-		if (cw && cw.length > 0) {
-			cw[cw.length-1].focus();
+		const c = childWindows.get(this);
+		if (c) {
+			c.focus();
 			return;
 		}
 		if (this.parentNode && this.nextElementSibling) {
