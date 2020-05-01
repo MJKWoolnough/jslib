@@ -16,7 +16,7 @@ export class ShellElement extends BaseShellElement {
 		const taskbar = ul({"part": "taskbar"}),
 		      self = this,
 		      windowData = new Map<WindowElement, HTMLLIElement>(),
-		      windowObserver = new MutationObserver(list => list.forEach(({target, type, attributeName, }) => {
+		      windowObserver = new MutationObserver(list => list.forEach(({target, type, attributeName}) => {
 			if (type !== "attributes" || !(target instanceof WindowElement)) {
 				return;
 			}
