@@ -55,7 +55,7 @@ export class ShellElement extends BaseShellElement {
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	height: 4em;
+	height: var(--taskbar-size, 4em);
 	margin: 0;
 	overflow-y: hidden;
 	overflow-x: auto;
@@ -75,7 +75,7 @@ export class ShellElement extends BaseShellElement {
 
 :host([side="left"]) > ul {
 	top: 0;
-	width: 4em;
+	width: var(--taskbar-size, 4em);
 	border-width: 0 1px 0 0;
 }
 
@@ -83,26 +83,26 @@ export class ShellElement extends BaseShellElement {
 	top: 0;
 	left: unset;
 	right: 0;
-	width: 4em;
+	width: var(--taskbar-size, 4em);
 	border-width: 0 0 0 1px;
 }
 
 :host ::slotted(windows-desktop) {
-	padding-bottom: 4em;
+	padding-bottom: var(--taskbar-size, 4em);
 }
 
 :host([side="top"]) ::slotted(windows-desktop) {
-	padding-top: 4em;
+	padding-top: var(--taskbar-size, 4em);
 	padding-bottom: 0;
 }
 
 :host([side="left"]) ::slotted(windows-desktop) {
-	padding-left: 4em;
+	padding-left: var(--taskbar-size, 4em);
 	padding-bottom: 0;
 }
 
 :host([side="right"]) ::slotted(windows-desktop) {
-	padding-right: 4em;
+	padding-right: var(--taskbar-size, 4em);
 	padding-bottom: 0;
 }
 
@@ -126,12 +126,12 @@ export class ShellElement extends BaseShellElement {
 }
 
 :host > ul img {
-	height: 4em;
+	height: var(--taskbar-size, 4em);
 }
 
 :host > ul span {
 	display: inline-block;
-	height: 4em;
+	height: var(--taskbar-size, 4em);
 	vertical-align: middle;
 }
 
