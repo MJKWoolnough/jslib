@@ -62,16 +62,21 @@ export class ShellElement extends BaseShellElement {
 	background-color: #eee;
 	white-space: nowrap;
 	user-select: none;
+	border-style: solid;
+	border-color: #000;
+	border-width: 1px 0 0 0;
 }
 
 :host([side="top"]) > ul {
 	top: 0;
 	bottom: unset;
+	border-width: 0 0 1px 0;
 }
 
 :host([side="left"]) > ul {
 	top: 0;
 	width: 4em;
+	border-width: 0 1px 0 0;
 }
 
 :host([side="right"]) > ul {
@@ -79,6 +84,7 @@ export class ShellElement extends BaseShellElement {
 	left: unset;
 	right: 0;
 	width: 4em;
+	border-width: 0 0 0 1px;
 }
 
 :host ::slotted(windows-desktop) {
@@ -130,6 +136,31 @@ export class ShellElement extends BaseShellElement {
 }
 
 :host([hide="icon"]) > ul img, :host([hide="title"]) > ul span {
+	display: none;
+}
+
+:host([autohide][side="left"]) > ul:not(:hover) {
+	width: 1px;
+	height: 100%;
+	border-width: 0 5px 0 0;
+}
+
+:host([autohide][side="right"]) > ul:not(:hover) {
+	width: 1px;
+	height: 100%;
+	border-width: 0 0 0 5px;
+}
+
+:host([autohide]) > ul:not(:hover) {
+	height: 1px;
+	border-width: 5px 0 0 0;
+}
+
+:host([autohide][side="top"]) > ul:not(:hover) {
+	border-width: 0 0 5px 0;
+}
+
+:host([autohide]) > ul:not(:hover) > * {
 	display: none;
 }
 `),
