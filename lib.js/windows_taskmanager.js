@@ -20,12 +20,11 @@ export class ShellElement extends BaseShellElement {
 		const windowData = new Map(),
 		      taskbarData = new Map(),
 		      taskbarObserver = new MutationObserver(list => list.forEach(({target, type, attributeName}) => {
-			if (type !== "attributes" || attributeName !== "maximised" || !(target instanceof WindowElement) || target.hasAttribute("maximised")) {
-				return;
+			if (type === "attributes" && attributeName === "maximised" && target instanceof WindowElement && !target.hasAttribute("maximised")) {
+				const w = taskbarData.get(target);
+				w.removeAttribute("minimised");
+				w.focus();
 			}
-			const w = taskbarData.get(target);
-			w.removeAttribute("minimised");
-			w.focus();
 		      })),
 		      windowObserver = new MutationObserver(list => list.forEach(({target, type, attributeName, }) => {
 			if (type !== "attributes" || !(target instanceof WindowElement)) {
