@@ -152,7 +152,6 @@ export class ShellElement extends BaseShellElement {
 							}
 						      }, "oncontextmenu": (e: MouseEvent) => {
 							e.preventDefault();
-							      console.log(e.clientX, e.clientY);
 							contextPlace(self, [e.clientX, e.clientY], [
 								w.hasAttribute("minimised") ? contextItem("&Restore", () => {
 									w.removeAttribute("minimised");
