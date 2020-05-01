@@ -66,14 +66,12 @@ export class ShellElement extends BaseShellElement {
 						      }}, [
 							img({"part": "icon", "src": w.getAttribute("window-icon") || noIcon, "title": w.getAttribute("window-title") || ""}),
 							span({"part": "title"}, w.getAttribute("window-title") || "")
-						      ])),
-						      removeFn = () => {
+						      ]));
+						windowData.set(w, item);
+						w.addEventListener("remove", () => {
 							windowData.delete(w);
 							item.remove();
-							w.removeEventListener("remove", removeFn);
-						      };
-						windowData.set(w, item);
-						w.addEventListener("remove", removeFn);
+						}, {"once": true});
 						windowObserver.observe(w, windowObservations);
 					}
 				});
