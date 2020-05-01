@@ -125,10 +125,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 				resolve(true);
 				w.remove();
 			}}, "Ok")),
-			button({"onclick": () => {
-				resolve(true);
-				w.remove();
-			}}, "Cancel")
+			button({"onclick": () => w.remove()}, "Cancel")
 		])
 	]);
 	parent.addWindow(w) || reject(new Error("invalid target"));
