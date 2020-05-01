@@ -13,7 +13,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 		return;
 	}
 	dragging = true;
-	this.style.setProperty("user-select", "none");
+	shell.style.setProperty("user-select", "none");
 	const originalLeft = this.offsetLeft,
 	      originalTop = this.offsetTop,
 	      originalWidth = this.offsetWidth,
