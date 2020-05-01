@@ -63,15 +63,13 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 				}
 			}
 		}
-	      },
-	      mouseUp = () => {
-		shell.removeEventListener("mousemove", mouseMove);
-		shell.removeEventListener("mouseup", mouseUp);
-		shell.style.removeProperty("user-select");
-		dragging = false;
 	      };
 	shell.addEventListener("mousemove", mouseMove);
-	shell.addEventListener("mouseup", mouseUp);
+	shell.addEventListener("mouseup", () => {
+		shell.removeEventListener("mousemove", mouseMove);
+		shell.style.removeProperty("user-select");
+		dragging = false;
+	}, {"once": true});
       },
       moveWindow = function(this: WindowElement, e: MouseEvent) {
 	const shell = this.parentNode;
@@ -87,15 +85,13 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 		      y = e.clientY - grabY;
 		this.style.setProperty("--window-left", x + "px");
 		this.style.setProperty("--window-top", y + "px");
-	      },
-	      mouseUp = () => {
-		shell.removeEventListener("mousemove", mouseMove);
-		shell.removeEventListener("mouseup", mouseUp);
-		shell.style.removeProperty("user-select");
-		dragging = false;
 	      };
 	shell.addEventListener("mousemove", mouseMove);
-	shell.addEventListener("mouseup", mouseUp);
+	shell.addEventListener("mouseup", () => {
+		shell.removeEventListener("mousemove", mouseMove);
+		shell.style.removeProperty("user-select");
+		dragging = false;
+	}, {"once": true});
       },
       childWindows = new Map<WindowElement, WindowElement>(),
       childOf = new Map<WindowElement, WindowElement>(),

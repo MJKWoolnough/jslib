@@ -58,15 +58,13 @@ const windowData = new WeakMap(),
 				}
 			}
 		}
-	      },
-	      mouseUp = () => {
-		shell.removeEventListener("mousemove", mouseMove);
-		shell.removeEventListener("mouseup", mouseUp);
-		shell.style.removeProperty("user-select");
-		dragging = false;
 	      };
 	shell.addEventListener("mousemove", mouseMove);
-	shell.addEventListener("mouseup", mouseUp);
+	shell.addEventListener("mouseup", () => {
+		shell.removeEventListener("mousemove", mouseMove);
+		shell.style.removeProperty("user-select");
+		dragging = false;
+	}, {"once": true});
       },
       moveWindow = function(e) {
 	const shell = this.parentNode;
@@ -82,15 +80,13 @@ const windowData = new WeakMap(),
 		      y = e.clientY - grabY;
 		this.style.setProperty("--window-left", x + "px");
 		this.style.setProperty("--window-top", y + "px");
-	      },
-	      mouseUp = () => {
-		shell.removeEventListener("mousemove", mouseMove);
-		shell.removeEventListener("mouseup", mouseUp);
-		shell.style.removeProperty("user-select");
-		dragging = false;
 	      };
 	shell.addEventListener("mousemove", mouseMove);
-	shell.addEventListener("mouseup", mouseUp);
+	shell.addEventListener("mouseup", () => {
+		shell.removeEventListener("mousemove", mouseMove);
+		shell.style.removeProperty("user-select");
+		dragging = false;
+	}, {"once": true});
       },
       childWindows = new Map(),
       childOf = new Map(),
