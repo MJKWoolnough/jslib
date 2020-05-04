@@ -2,7 +2,7 @@ interface NestedChildren extends Array<NestedChildren | string | Node>{}
 
 export type Children = NestedChildren | string | Node;
 
-export type Props = Record<string, number | string | string[] | DOMTokenList | Function>;
+export type Props = Record<string, number | string | string[] | DOMTokenList | Function | undefined | null>;
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
