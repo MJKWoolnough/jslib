@@ -38,11 +38,11 @@ type i = {
 	disabled?: boolean;
 }
 
-type Item = i & {
+export type Item = i & {
 	action: () => any;
 }
 
-type Menu = i & {
+export type Menu = i & {
 	list: List;
 }
 
@@ -56,7 +56,7 @@ type Ctx = {
 
 type Coords = [[number, number], [number, number]];
 
-type List = (Item | Menu)[];
+export type List = (Item | Menu)[];
 
 const mousedownEvent = new MouseEvent("mousedown"),
       keydownEvent = new KeyboardEvent("keydown", {"key": "ArrowDown"}),
