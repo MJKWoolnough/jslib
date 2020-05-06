@@ -43,7 +43,7 @@ export type Item = i & {
 }
 
 export type Menu = i & {
-	list: List;
+	list: LList;
 }
 
 type Ctx = {
@@ -56,7 +56,8 @@ type Ctx = {
 
 type Coords = [[number, number], [number, number]];
 
-export type List = (Item | Menu)[];
+export type List = (Item | Menu | List)[];
+type LList = (Item | Menu)[];
 
 const mousedownEvent = new MouseEvent("mousedown"),
       keydownEvent = new KeyboardEvent("keydown", {"key": "ArrowDown"}),
@@ -85,7 +86,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	ctx.focus = list;
 	autoFocus(list);
       },
-      list2HTML = (ctx: Ctx, list: List, last?: HTMLUListElement): HTMLUListElement => {
+      list2HTML = (ctx: Ctx, list: LList, last?: HTMLUListElement): HTMLUListElement => {
 	let open: HTMLUListElement | null = null,
 	    selected = -1;
 	const closeFn = () => {
@@ -251,7 +252,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	}));
       };
 
-export const item = (name: string, action: () => any) => ({name, action}), menu = (name: string, list: List) => ({name, list}), disable = <T extends i>(item: T): T => Object.assign(item, {"disabled": true}), id = <T extends i>(item: T, id: string): T => Object.assign(item, {id}), classes = <T extends i>(item: T, classes: string): T => Object.assign(item, {classes});
+export const item = (name: string, action: () => any) => ({name, action}), menu = (name: string, list: List) => ({name, list: list.flat(Infinity)}), disable = <T extends i>(item: T): T => Object.assign(item, {"disabled": true}), id = <T extends i>(item: T, id: string): T => Object.assign(item, {id}), classes = <T extends i>(item: T, classes: string): T => Object.assign(item, {classes});
 export default function (container: Element, coords: [number, number], list: List, delay: number = 0) {
 	return new Promise(resolve => {
 		const ctx: Ctx = {container, resolve: (data: any) => {
@@ -260,7 +261,7 @@ export default function (container: Element, coords: [number, number], list: Lis
 			}
 			resolve(data);
 		      }, delay: delay, timeout: -1},
-		      root = list2HTML(ctx, list);
+		      root = list2HTML(ctx, list.flat(Infinity));
 		new MutationObserver((mutations: MutationRecord[], o: MutationObserver) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 			if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
 				n.dispatchEvent(closeEvent);

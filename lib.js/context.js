@@ -196,7 +196,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	}));
       };
 
-export const item = (name, action) => ({name, action}), menu = (name, list) => ({name, list}), disable = item => Object.assign(item, {"disabled": true}), id = (item, id) => Object.assign(item, {id}), classes = (item, classes) => Object.assign(item, {classes});
+export const item = (name, action) => ({name, action}), menu = (name, list) => ({name, list: list.flat(Infinity)}), disable = item => Object.assign(item, {"disabled": true}), id = (item, id) => Object.assign(item, {id}), classes = (item, classes) => Object.assign(item, {classes});
 export default function(container, coords, list, delay = 0) {
 	return new Promise(resolve => {
 		const ctx = {container, resolve: data => {
@@ -205,7 +205,7 @@ export default function(container, coords, list, delay = 0) {
 			}
 			resolve(data);
 		      }, delay: delay, timeout: -1},
-		      root = list2HTML(ctx, list);
+		      root = list2HTML(ctx, list.flat(Infinity));
 		new MutationObserver((mutations, o) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 			if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
 				n.dispatchEvent(closeEvent);
