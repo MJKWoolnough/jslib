@@ -31,11 +31,14 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 }
 `)));
 
-type i = {
-	name: string;
+type Options = {
 	classes?: string;
 	id?: string;
 	disabled?: boolean;
+}
+
+type i = Options & {
+	name: string;
 }
 
 export type Item = i & {
@@ -252,7 +255,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	}));
       };
 
-export const item = (name: string, action: () => any) => ({name, action}), menu = (name: string, list: List) => ({name, list: list.flat(Infinity)}), disable = <T extends i>(item: T): T => Object.assign(item, {"disabled": true}), id = <T extends i>(item: T, id: string): T => Object.assign(item, {id}), classes = <T extends i>(item: T, classes: string): T => Object.assign(item, {classes});
+export const item = (name: string, action: () => any, options: Options = {}) => Object.assign({name, action}, options), menu = (name: string, list: List, options: Options = {}) => Object.assign({name, list: list.flat(Infinity)}, options);
 export default function (container: Element, coords: [number, number], list: List, delay: number = 0) {
 	return new Promise(resolve => {
 		const ctx: Ctx = {container, resolve: (data: any) => {

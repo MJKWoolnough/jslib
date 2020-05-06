@@ -196,7 +196,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	}));
       };
 
-export const item = (name, action) => ({name, action}), menu = (name, list) => ({name, list: list.flat(Infinity)}), disable = item => Object.assign(item, {"disabled": true}), id = (item, id) => Object.assign(item, {id}), classes = (item, classes) => Object.assign(item, {classes});
+export const item = (name, action, options = {}) => Object.assign({name, action}, options), menu = (name, list, options) => Object.assign({name, list: list.flat(Infinity)}, options);
 export default function(container, coords, list, delay = 0) {
 	return new Promise(resolve => {
 		const ctx = {container, resolve: data => {
