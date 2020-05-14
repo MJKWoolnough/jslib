@@ -1,6 +1,4 @@
-interface NestedChildren extends Array<NestedChildren | string | Node>{}
-
-export type Children = NestedChildren | string | Node;
+export type Children = string | Node | Children[];
 
 export type Props = Record<string, number | string | string[] | DOMTokenList | Function | undefined | null>;
 
@@ -8,7 +6,7 @@ const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
 		elem.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
-			children.forEach((c:NestedChildren | string | Node) => childrenArr(elem, c));
+			children.forEach((c: Children) => childrenArr(elem, c));
 	} else if(children instanceof Node) {
 		elem.appendChild(children);
 	}
