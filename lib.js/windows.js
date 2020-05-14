@@ -54,7 +54,7 @@ const windowData = new WeakMap(),
 				const width = originalWidth - dx;
 				if (width > 100) {
 					this.style.setProperty("--window-left", `${originalLeft + dx}px`);
-					this.style.setProperty("--window-width", `${originalWidth - dx}px`);
+					this.style.setProperty("--window-width", `${width}px`);
 				}
 			}
 		}
