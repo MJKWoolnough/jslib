@@ -311,6 +311,15 @@ export class WindowElement extends HTMLElement {
 	user-select: contain;
 }
 
+:host([resizable]) > div:nth-child(4) {
+	overflow: auto;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	top: calc(1em + 6px);
+}
+
 :host > div:nth-child(5) {
 	display: var(--overlay-on, block);
 	position: absolute;
