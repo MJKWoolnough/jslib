@@ -2,6 +2,7 @@ package jslib
 
 import (
 	"path"
+	"sort"
 
 	"vimagination.zapto.org/javascript"
 )
@@ -35,8 +36,13 @@ func (d *dep) Process(al *javascript.ArrayLiteral) {
 		return
 	}
 	d.written = true
-	for _, e := range d.requires {
-		e.Process(al)
+	keys := make([]string, 0, len(d.requires))
+	for k := range d.requires {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		d.requires[k].Process(al)
 	}
 	if d.Structure != nil {
 		al.ElementList = append(al.ElementList, offer(d.URL, d.Structure))
