@@ -37,7 +37,7 @@ func run() error {
 	flag.StringVar(&output, "o", "-", "output file")
 	flag.StringVar(&ch, "c", "createHTML", "createHTML function name")
 	flag.BoolVar(&pe, "e", false, "process on* attrs as javascript")
-	flag.BoolVar(&dom, "d", false, "assume dom.js is imported")
+	flag.BoolVar(&dom, "d", false, "assume html.js is imported")
 	flag.Parse()
 	if input == "-" {
 		f = os.Stdin
