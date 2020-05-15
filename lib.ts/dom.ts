@@ -6,7 +6,7 @@ const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
 		elem.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
-			children.forEach((c: Children) => childrenArr(elem, c));
+		children.forEach((c: Children) => childrenArr(elem, c));
 	} else if(children instanceof Node) {
 		elem.appendChild(children);
 	}
