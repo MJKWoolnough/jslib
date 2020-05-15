@@ -9,6 +9,16 @@ const windowData = new WeakMap(),
 	      x4 = x3 + width, y4 = y3 + height,
 	      mv = [0, 0];
 	if (snap > 0) {
+		if (x1 >= 0 && x3 < 0 && x3 >= -snap) {
+			mv[0] = -x3;
+		} else if (x3 <= shell.offsetWidth && x4 > shell.offsetWidth && x4 <= shell.offsetWidth + snap) {
+			mv[0] = shell.offsetWidth - x4;
+		}
+		if (y1 >= 0 && y3 < 0 && y3 >= -snap) {
+			mv[1] = -y3;
+		} else if (y3 <= shell.offsetHeight && y4 > shell.offsetHeight && y4 <= shell.offsetHeight + snap) {
+			mv[1] = shell.offsetHeight - y4;
+		}
 		Array.from(shell.childNodes).filter(e => e instanceof WindowElement && e !== w).forEach(e => {
 			const x5 = e.offsetLeft, y5 = e.offsetTop,
 			      x6 = x5 + e.offsetWidth, y6 = y5 + e.offsetHeight;
