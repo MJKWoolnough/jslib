@@ -2,6 +2,34 @@ import {autoFocus, createHTML} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 
 const windowData = new WeakMap(),
+      snapTo = (shell, w, x3, y3) => {
+	const snap = parseInt(shell.getAttribute("snap") || "0"),
+	      {offsetLeft: x1, offsetTop: y1, offsetWidth: width, offsetHeight: height} = w,
+	      x2 = x1 + width, y2 = y1 + height,
+	      x4 = x3 + width, y4 = y3 + height,
+	      mv = [0, 0];
+	if (snap > 0) {
+		Array.from(shell.childNodes).filter(e => e instanceof WindowElement && e !== w).forEach(e => {
+			const x5 = e.offsetLeft, y5 = e.offsetTop,
+			      x6 = x5 + e.offsetWidth, y6 = y5 + e.offsetHeight;
+			if (y3 <= y6 && y4 >= y5) {
+				if (x2 <= x5 && x4 >= x5 && x4 <= x5 + snap) {
+					mv[0] = x5 - x4;
+				} else if (x1 >= x6 && x3 <= x6 && x3 >= x6 - snap) {
+					mv[0] = x6 - x3;
+				}
+			}
+			if (x3 <= x6 && x4 >= x5) {
+				if (y2 <= y5 && y4 >= y5 && y4 <= y5 + snap) {
+					mv[1] = y5 - y4;
+				} else if (y1 >= y6 && y3 <= y6 && y3 >= y6 - snap) {
+					mv[1] = y6 - y3;
+				}
+			}
+		});
+	}
+	return mv;
+      },
       resizeWindow = function(direction, e) {
 	const shell = this.parentNode;
 	if (dragging || !(shell instanceof ShellElement)) {
@@ -77,9 +105,10 @@ const windowData = new WeakMap(),
 	      grabY = e.clientY - this.offsetTop,
 	      mouseMove = e => {
 		const x = e.clientX - grabX,
-		      y = e.clientY - grabY;
-		this.style.setProperty("--window-left", x + "px");
-		this.style.setProperty("--window-top", y + "px");
+		      y = e.clientY - grabY,
+		      [mx, my] = snapTo(shell, this, x, y);
+		this.style.setProperty("--window-left", (x + mx) + "px");
+		this.style.setProperty("--window-top", (y + my) + "px");
 	      };
 	shell.addEventListener("mousemove", mouseMove);
 	shell.addEventListener("mouseup", () => {
