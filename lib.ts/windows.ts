@@ -16,12 +16,12 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 	if (snap > 0) {
 		if (x1 >= 0 && x3 < 0 && x3 >= -snap) {
 			mv[0] = -x3;
-		} else if (x3 <= shell.offsetWidth && x4 > shell.offsetWidth && x4 <= shell.offsetWidth + snap) {
+		} else if (x2 <= shell.offsetWidth && x4 > shell.offsetWidth && x4 <= shell.offsetWidth + snap) {
 			mv[0] = shell.offsetWidth - x4;
 		}
 		if (y1 >= 0 && y3 < 0 && y3 >= -snap) {
 			mv[1] = -y3;
-		} else if (y3 <= shell.offsetHeight && y4 > shell.offsetHeight && y4 <= shell.offsetHeight + snap) {
+		} else if (y2 <= shell.offsetHeight && y4 > shell.offsetHeight && y4 <= shell.offsetHeight + snap) {
 			mv[1] = shell.offsetHeight - y4;
 		}
 		(Array.from(shell.childNodes).filter(e => e instanceof WindowElement && e !== w) as WindowElement[]).forEach(e => {
