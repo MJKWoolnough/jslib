@@ -97,6 +97,14 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	}
 	return elem;
       },
+      removeEventListeners = <T extends ChildNode & Node>(elem: T) => {
+	const newElem = elem.cloneNode(false) as T;
+	while (elem.firstChild) {
+		newElem.appendChild(elem.firstChild);
+	}
+	elem.replaceWith(newElem);
+	return newElem;
+      },
       text2HTML = (text: string): Node[] => {
 	const d = createHTML("div");
 	d.innerHTML = text;

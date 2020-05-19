@@ -62,6 +62,14 @@ export const createElements = namespace => (element, properties, children) => {
 	}
 	return elem;
       },
+      removeEventListeners = elem => {
+	const newElem = elem.cloneNode(false);
+	while (elem.firstChild) {
+		newElem.appendChild(elem.firstChild);
+	}
+	elem.replaceWith(newElem);
+	return newElem;
+      },
       text2HTML = text => {
 	const d = createHTML("div");
 	d.innerHTML = text;
