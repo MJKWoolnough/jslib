@@ -97,12 +97,14 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	}
 	return elem;
       },
-      removeEventListeners = <T extends ChildNode & Node>(elem: T) => {
+      removeEventListeners = <T extends Node>(elem: T) => {
 	const newElem = elem.cloneNode(false) as T;
 	while (elem.firstChild) {
 		newElem.appendChild(elem.firstChild);
 	}
-	elem.replaceWith(newElem);
+	if (elem.parentNode) {
+		elem.parentNode.replaceChild(newElem, elem);
+	}
 	return newElem;
       },
       text2HTML = (text: string): Node[] => {

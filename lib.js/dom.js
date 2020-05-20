@@ -67,7 +67,9 @@ export const createElements = namespace => (element, properties, children) => {
 	while (elem.firstChild) {
 		newElem.appendChild(elem.firstChild);
 	}
-	elem.replaceWith(newElem);
+	if (elem.parentNode) {
+		elem.parentNode.replaceChild(newElem, elem);
+	}
 	return newElem;
       },
       text2HTML = text => {
