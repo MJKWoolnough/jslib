@@ -76,7 +76,11 @@ export class Subscription<T> {
 		};
 		return this.then(aFn, aFn);
 	}
-	static canceller(...subs: Subscription<any>[]) {
+	static canceller(...subs: canceller[]) {
 		return () => subs.forEach(s => s.cancel());
 	}
+}
+
+interface canceller {
+	cancel: () => void;
 }
