@@ -72,4 +72,7 @@ export class Subscription {
 		};
 		return this(aFn, aFn);
 	}
+	static canceler(...subs) {
+		return () => subs.forEach(s => s.cancel());
+	}
 }
