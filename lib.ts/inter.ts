@@ -76,7 +76,7 @@ export class Subscription<T> {
 		};
 		return this.then(aFn, aFn);
 	}
-	static canceler(...subs: Subscription<any>[]) {
+	static canceller(...subs: Subscription<any>[]) {
 		return () => subs.forEach(s => s.cancel());
 	}
 }
