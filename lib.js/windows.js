@@ -165,7 +165,15 @@ const windowData = new WeakMap(),
 	parent.addWindow(w) || reject(new Error("invalid target"));
       }),
       promptFn = (parent, title, message, defaultValue, icon) => new Promise((resolve, reject) => {
-	const data = autoFocus(input({"value": defaultValue || ""})),
+	const ok = button({"onclick": () => {
+		resolve(data.value);
+		w.remove();
+	      }}, "Ok"),
+	      data = autoFocus(input({"value": defaultValue || "", "onkeypress": e => {
+		if (e.key === "Enter") {
+			ok.click();
+		}
+	      }})),
 	      w = windows({
 		"window-hide": "",
 		"window-icon": icon || noIcon,
@@ -175,10 +183,7 @@ const windowData = new WeakMap(),
 	}, [
 		div(message),
 		data,
-		div({"style": "text-align: center"}, button({"onclick": () => {
-			resolve(data.value);
-			w.remove();
-		}}, "Ok"))
+		div({"style": "text-align: center"}, ok)
 	]);
 	parent.addWindow(w) || reject(new Error("invalid target"));
       });
