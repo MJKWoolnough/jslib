@@ -25,6 +25,8 @@ export const createElements = namespace => (element, properties, children) => {
 				} else if ((prop instanceof Array || prop instanceof DOMTokenList) && prop.length > 0) {
 					elem.classList.add(...prop);
 				}
+			} else if (k === "style" && typeof prop === "object" && elem instanceof HTMLElement || elem instanceof SVGElement) {
+				Object.keys(prop).forEach(k => elem.style.setProperty(k, prop[k]));
 			} else if (typeof prop === "string" || typeof prop === "number") {
 				if (k.startsWith("--")) {
 					if (elem instanceof HTMLElement || elem instanceof SVGElement) {
