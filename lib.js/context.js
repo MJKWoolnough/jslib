@@ -147,7 +147,10 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			}
 		} else if (IsItem(e)) {
 			params = {
-				"onmousedown": () => ctx.resolve(e.action()),
+				"onmousedown": f => {
+					ctx.resolve(e.action());
+					f.preventDefault();
+				},
 				"onmouseover": () => {
 					setTO(ctx, () => {
 						closeFn();
@@ -163,6 +166,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		} else {
 			const openFn = function(e) {
 				closeFn();
+				e.preventDefault();
 				const parentLeft = parseInt(this.parentNode.style.getPropertyValue("left").slice(0, -2)),
 				      parentTop = parseInt(this.parentNode.style.getPropertyValue("top").slice(0, -2));
 				open = childMenu;
