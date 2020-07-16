@@ -123,14 +123,14 @@ export default class RequestHandler {
 		if (this.closed) {
 			return Promise.reject(new Error("RPC Closed"));
 		}
-		if (version === 2) {
+		if (this.version === 2) {
 			this.sender(JSON.stringify({
 				"jsonrpc": "2.0",
 				"method": method,
 				"id": this.nextID,
 				"params": data
 			}));
-		} else if (version === 1) {
+		} else if (this.version === 1) {
 			this.sender(JSON.stringify({
 				"method": method,
 				"id": this.nextID,
