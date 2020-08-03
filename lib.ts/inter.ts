@@ -14,6 +14,26 @@ export class Pipe<T> {
 	}
 }
 
+export class Requester<T, U extends any[] = any[]> {
+	request: (...data: U) => T;
+	responder: (fn: (...data: U) => T) => void;
+	constructor() {
+		let r: (...data: U) => T;
+		this.request = (...data: U) => {
+			if (r) {
+				return r(...data);
+			}
+			throw new Error("no responder set");
+		};
+		this.responder = (fn: (...data: U) => T) => {
+			if (!(fn instanceof Function)) {
+				throw new TypeError("Requester.responder requires function type");
+			}
+			r = fn;
+		};
+	}
+}
+
 const subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void, (data: void) => void]>();
 
 export class Subscription<T> {

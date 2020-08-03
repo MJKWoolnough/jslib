@@ -12,6 +12,25 @@ export class Pipe {
 	}
 }
 
+export class Requester {
+	constructor() {
+		let r;
+		this.request = (...data) => {
+			if (r) {
+				return r(...data);
+			}
+			throw new Error("no responder set");
+		};
+		this.responder = fn => {
+			if (!(fn instanceof Function)) {
+				throw new TypeError("Requester.responder requires function type");
+			}
+			r = fn;
+		};
+	}
+}
+
+
 const subs = new WeakMap();
 
 export class Subscription {
