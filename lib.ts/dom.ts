@@ -26,17 +26,17 @@ interface cElement {
 	<T extends Node>(element: T, properties?: Props | Children, children?: Props |Children): T;
 	(element: string, properties?: Props, children?: Children): Node;
 	(element: string, children?: Children, properties?: Props): Node;
-};
+}
 
 interface cHTML extends cElement {
 	<K extends keyof HTMLElementTagNameMap>(element: K, properties?: Props, children?: Children): HTMLElementTagNameMap[K];
 	<K extends keyof HTMLElementTagNameMap>(element: K, children?: Children, properties?: Props): HTMLElementTagNameMap[K];
-};
+}
 
 interface cSVG extends cElement {
 	<K extends keyof SVGElementTagNameMap>(element: K, properties?: Props, children?: Children): SVGElementTagNameMap[K];
 	<K extends keyof SVGElementTagNameMap>(element: K, children?: Children, properties?: Props): SVGElementTagNameMap[K];
-};
+}
 
 export interface DOMBind<T extends Node> {
 	(properties?: Props, children?: Children): T;
@@ -51,8 +51,27 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	if (typeof properties === "object" && elem instanceof Element) {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (prop instanceof Function) {
-				if (k.startsWith("on")) {
-					elem.addEventListener(k.substr(2), prop);
+				const opts: AddEventListenerOptions = {};
+				let ev = k;
+				Loop:
+				while (true) {
+					switch (ev.charAt(0)) {
+					case '1':
+						opts["once"] = true;
+						break;
+					case 'C':
+						opts["capture"] = true;
+						break;
+					case 'P':
+						opts["passive"] = true;
+						break;
+					default:
+						break Loop;
+					}
+					ev = ev.slice(1);
+				}
+				if (ev.startsWith("on")) {
+					elem.addEventListener(ev.substr(2), prop, opts);
 				}
 			} else if (k === "class") {
 				if (typeof prop === "string" && prop.length > 0) {

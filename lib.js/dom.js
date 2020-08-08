@@ -16,8 +16,26 @@ export const createElements = namespace => (element, properties, children) => {
 	if (typeof properties === "object" && elem instanceof Element) {
 		for (const [k, prop] of Object.entries(properties))  {
 			if (prop instanceof Function) {
-				if (k.startsWith("on")) {
-					elem.addEventListener(k.substr(2), prop);
+				let ev = k;
+				Loop:
+				while (true) {
+					switch (ev.charAt(0)) {
+					case '1':
+						opts["once"] = true;
+						break;
+					case 'C':
+						opts["capture"] = true;
+						break;
+					case 'P':
+						opts["passive"] = true;
+						break;
+					default:
+						break Loop;
+					}
+					ev = ev.slice(1);
+				}
+				if (ev.startsWith("on")) {
+					elem.addEventListener(ev.substr(2), prop, opts);
 				}
 			} else if (k === "class") {
 				if (typeof prop === "string" && prop.length > 0) {
