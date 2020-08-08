@@ -276,4 +276,4 @@ export default function (container: Element, coords: [number, number], list: Lis
 		}))).observe(container, {"childList": true, "subtree": true});
 		placeList(ctx, [coords, coords], root)
 	});
-};
+}
