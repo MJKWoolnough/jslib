@@ -53,6 +53,8 @@ export const createElements = namespace => (element, properties, children) => {
 				} else {
 					elem.setAttribute(k, prop);
 				}
+			} else if (typeof prop === "boolean") {
+				elem.toggleAttribute(k, prop);
 			}
 		};
 	}

@@ -1,6 +1,6 @@
 export type Children = string | Node | Children[];
 
-export type Props = Record<string, number | string | string[] | DOMTokenList | Function | undefined | null | Record<string, string>>;
+export type Props = Record<string, number | string | string[] | DOMTokenList | Function | Boolean | undefined | null | Record<string, string>>;
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -89,6 +89,8 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 				} else {
 					elem.setAttribute(k, prop as string);
 				}
+			} else if (typeof prop === "boolean") {
+				elem.toggleAttribute(k, prop);
 			}
 		};
 	}
