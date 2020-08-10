@@ -47,7 +47,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       },
       resizeWindow = function(this: WindowElement, direction: number, e: MouseEvent) {
 	const shell = this.parentNode;
-	if (dragging || !(shell instanceof ShellElement)) {
+	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
 	}
 	dragging = true;
@@ -101,17 +101,22 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 				}
 			}
 		}
-	      };
-	shell.addEventListener("mousemove", mouseMove);
-	shell.addEventListener("mouseup", () => {
+	      },
+	      mouseUp = (e: MouseEvent) => {
+		if (e.button !== 0) {
+			return;
+		}
 		shell.removeEventListener("mousemove", mouseMove);
+		shell.removeEventListener("mouseup", mouseUp);
 		shell.style.removeProperty("user-select");
 		dragging = false;
-	}, {"once": true});
+	      };
+	shell.addEventListener("mousemove", mouseMove);
+	shell.addEventListener("mouseup", mouseUp);
       },
       moveWindow = function(this: WindowElement, e: MouseEvent) {
 	const shell = this.parentNode;
-	if (dragging || !(shell instanceof ShellElement)) {
+	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
 	}
 	dragging = true;
@@ -124,13 +129,18 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 		      [mx, my] = snapTo(shell, this, x, y);
 		this.style.setProperty("--window-left", (x + mx) + "px");
 		this.style.setProperty("--window-top", (y + my) + "px");
-	      };
-	shell.addEventListener("mousemove", mouseMove);
-	shell.addEventListener("mouseup", () => {
+	      },
+	      mouseUp = (e: MouseEvent) => {
+		if (e.button !== 0) {
+			return;
+		}
 		shell.removeEventListener("mousemove", mouseMove);
+		shell.removeEventListener("mouseup", mouseUp);
 		shell.style.removeProperty("user-select");
 		dragging = false;
-	}, {"once": true});
+	      };
+	shell.addEventListener("mousemove", mouseMove);
+	shell.addEventListener("mouseup", mouseUp);
       },
       childWindows = new Map<WindowElement, WindowElement>(),
       childOf = new Map<WindowElement, WindowElement>(),
