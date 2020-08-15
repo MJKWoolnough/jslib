@@ -16,6 +16,7 @@ export const createElements = namespace => (element, properties, children) => {
 	if (typeof properties === "object" && elem instanceof Element) {
 		for (const [k, prop] of Object.entries(properties))  {
 			if (prop instanceof Function) {
+				const opts = {};
 				let ev = k;
 				Loop:
 				while (true) {
