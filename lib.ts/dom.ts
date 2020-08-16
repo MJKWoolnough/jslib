@@ -6,7 +6,9 @@ const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
 		elem.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
-		children.forEach((c: Children) => childrenArr(elem, c));
+		for (const c of children) {
+			childrenArr(elem, c);
+		}
 	} else if(children instanceof Node) {
 		elem.appendChild(children);
 	}
@@ -80,7 +82,9 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 					elem.classList.add(...prop);
 				}
 			} else if (k === "style" && typeof prop === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
-				Object.keys(prop).forEach(k => elem.style.setProperty(k, prop[k]));
+				for (const k in prop) {
+					elem.style.setProperty(k, prop[k]);
+				}
 			} else if (typeof prop === "string" || typeof prop === "number") {
 				if (k.startsWith("--")) {
 					if (elem instanceof HTMLElement || elem instanceof SVGElement) {
