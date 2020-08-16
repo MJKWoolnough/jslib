@@ -361,20 +361,20 @@ export class WindowElement extends HTMLElement {
 }
 
 :host > div:nth-child(3) button:nth-of-type(1) {
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAS0lEQVR4AbXUMQoAIBTDUO9/6Tq5h2A+uNU3SP2nmr3z6+4kOgpOYAMBgYEgzgiUYBzlmETVeKwH+/dTqK9NUuzg6zXLoV9fvhHFXORcm2UE7mcvAAAAAElFTkSuQmCC);
+	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1,1 L9,9 M9,1 L1,9" stroke="%23000" /%3E%3C/svg%3E');
 }
 
 :host > div:nth-child(3) button:nth-of-type(2) {
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAIElEQVR4AWMY2eA/JXioGkgmoMjAUQNHDRw1kCI8ZAAAn3lVqxSpx3UAAAAASUVORK5CYII=);
+	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M9,3 h-8 v-1 h8 v-1 h-8 v8 h8 v-8" stroke="%23000" fill="none" /%3E%3C/svg%3E');
 }
 
 :host([maximised]) > div:nth-child(3) button:nth-of-type(2) {
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAALElEQVR4AWNABqPgPyl4gAwkEgwdAykPM/obSCQYGgaiYxolk1EDScJDFgAAUOdXqbMbROIAAAAASUVORK5CYII=);
+	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 15 13" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1,5 h8 v-1 h-8 v8 h8 v-8 m-3,0 v-3 h8 v8 h-5 m5,-7 h-8" stroke="%23000" fill="none" /%3E%3C/svg%3E');
 }
 
 :host > div:nth-child(3) button:nth-of-type(3) {
 	display: var(--taskmanager-on, block);
-	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGklEQVR4AWMY+mAUjIJRMAr+U4KHgIFDBgAAtIAv0S+OoIsAAAAASUVORK5CYII=);
+	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cline x1="1" y1="9" x2="9" y2="9" stroke="%23000" /%3E%3C/svg%3E');
 }
 
 :host > div:nth-child(4) {
@@ -592,4 +592,4 @@ customElements.define("windows-window", WindowElement);
 export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new ShellElement(), props, children),
 desktop: DOMBind<DesktopElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new DesktopElement(), props, children),
 windows: DOMBind<WindowElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new WindowElement(), props, children),
-noIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkBAMAAACCzIhnAAAAG1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUUeIgAAAACXRSTlMA/84W08jxyb+UzoCKAAAAdklEQVR4Ae3RAQaAQBCF4WFPsAkBkAAIe4F0ko7Q/SEExHuZhcL/A/B5zARRVN2cJ+MqiN7f9jRpYsaQImYMCTHjiJhxRMw4ImYcETOOiBlPog1pUpYUucuQwxPddwQCOeujqYNwZL7PkXklBAKBQF7qIn+O6ALn8CGyjt4s2QAAAABJRU5ErkJggg==";
+noIcon = 'data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="%23000" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="%23888" /%3E%3C/svg%3E';
