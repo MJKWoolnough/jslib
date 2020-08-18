@@ -16,17 +16,14 @@ export class Requester {
 	constructor() {
 		let r;
 		this.request = (...data) => {
-			if (r) {
+			if (r === undefined) {
+				throw new Error("no responder set");
+			} else if (r instanceof Function) {
 				return r(...data);
 			}
-			throw new Error("no responder set");
+			return r;
 		};
-		this.responder = fn => {
-			if (!(fn instanceof Function)) {
-				throw new TypeError("Requester.responder requires function type");
-			}
-			r = fn;
-		};
+		this.responder = fn => r = fn;
 	}
 }
 

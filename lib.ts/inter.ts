@@ -16,21 +16,18 @@ export class Pipe<T> {
 
 export class Requester<T, U extends any[] = any[]> {
 	request: (...data: U) => T;
-	responder: (fn: (...data: U) => T) => void;
+	responder: <V = ((...data: U) => T) | T>(f: ((...data: U) => T) | T) => void;
 	constructor() {
-		let r: (...data: U) => T;
+		let r: ((...data: U) => T) | T;
 		this.request = (...data: U) => {
-			if (r) {
+			if (r === undefined) {
+				throw new Error("no responder set");
+			} else if (r instanceof Function) {
 				return r(...data);
 			}
-			throw new Error("no responder set");
+			return r;
 		};
-		this.responder = (fn: (...data: U) => T) => {
-			if (!(fn instanceof Function)) {
-				throw new TypeError("Requester.responder requires function type");
-			}
-			r = fn;
-		};
+		this.responder = (f: ((...data: U) => T) | T) => r = f;
 	}
 }
 
