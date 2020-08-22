@@ -2,7 +2,7 @@ const childrenArr = (elem, children) => {
 	if (typeof children === "string") {
 		elem.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
-		for (c of children) {
+		for (const c of children) {
 			childrenArr(elem, c);
 		}
 	} else if (children instanceof Node) {
