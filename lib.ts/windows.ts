@@ -361,11 +361,11 @@ export class WindowElement extends HTMLElement {
 }
 
 :host > div:nth-child(3) button:nth-of-type(1) {
-	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1,1 L9,9 M9,1 L1,9" stroke="%23000" /%3E%3C/svg%3E');
+	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1,1 L9,9 M9,1 L1,9" stroke="black" /%3E%3C/svg%3E');
 }
 
 :host > div:nth-child(3) button:nth-of-type(2) {
-	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M9,3 h-8 v-1 h8 v-1 h-8 v8 h8 v-8" stroke="%23000" fill="none" /%3E%3C/svg%3E');
+	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M9,3 h-8 v-1 h8 v-1 h-8 v8 h8 v-8" stroke="black" fill="none" /%3E%3C/svg%3E');
 }
 
 :host([maximised]) > div:nth-child(3) button:nth-of-type(2) {
@@ -374,7 +374,7 @@ export class WindowElement extends HTMLElement {
 
 :host > div:nth-child(3) button:nth-of-type(3) {
 	display: var(--taskmanager-on, block);
-	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cline x1="1" y1="9" x2="9" y2="9" stroke="%23000" /%3E%3C/svg%3E');
+	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cline x1="1" y1="9" x2="9" y2="9" stroke="black" /%3E%3C/svg%3E');
 }
 
 :host > div:nth-child(4) {
@@ -592,4 +592,4 @@ customElements.define("windows-window", WindowElement);
 export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new ShellElement(), props, children),
 desktop: DOMBind<DesktopElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new DesktopElement(), props, children),
 windows: DOMBind<WindowElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new WindowElement(), props, children),
-noIcon = 'data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="%23000" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="%23888" /%3E%3C/svg%3E';
+noIcon = 'data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E';
