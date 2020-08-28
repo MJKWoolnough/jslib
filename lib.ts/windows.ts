@@ -409,7 +409,7 @@ export class WindowElement extends HTMLElement {
 
 :host > div:nth-child(2) > div {
 	position: absolute;
-	border-color: #000;
+	border-color: currentColor;
 	border-style: solid;
 	border-width: 0;
 	z-index: -1;
