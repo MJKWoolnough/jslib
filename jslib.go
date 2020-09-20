@@ -103,6 +103,34 @@ func Loader(os ...Option) (*javascript.Module, error) {
 	return m, nil
 }
 
+// Plugin takes a single javascript module and converts it to a JSLib compatible
+// javascript module - useful for plugins. NB: Plugins can have no exports
+func Plugin(m *javascript.Module) (*javascript.Module, error) {
+	d := newDep("")
+	c := config{
+		files: make(map[string]*dep),
+	}
+	for n := range m.ModuleListItems {
+		var err error
+		if m.ModuleListItems[n].ImportDeclaration != nil {
+			err = c.processImport(d, m.ModuleListItems[n].ImportDeclaration)
+		} else if m.ModuleListItems[n].ExportDeclaration != nil {
+			err = ErrInvalidPlugin
+		} else {
+			err = c.processStatement(d, *m.ModuleListItems[n].StatementListItem)
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	nm := new(javascript.Module)
+	nm.ModuleListItems = make([]javascript.ModuleItem, len(d.Structure))
+	for n := range d.Structure {
+		nm.ModuleListItems[n] = javascript.ModuleItem{StatementListItem: &d.Structure[n], Tokens: d.Structure[n].Tokens}
+	}
+	return nm, nil
+}
+
 func (c *config) processImport(d *dep, id *javascript.ImportDeclaration) error {
 	url, _ := javascript.Unquote(id.FromClause.ModuleSpecifier.Data)
 	e := c.NewFile(d.RelTo(url))
@@ -453,6 +481,7 @@ func searchObjectBinding(ob *javascript.ObjectBindingPattern, mappings map[strin
 
 // Errors
 var (
-	ErrNotNeeded = errors.New("not needed")
-	ErrCircular  = errors.New("circular import")
+	ErrNotNeeded     = errors.New("not needed")
+	ErrCircular      = errors.New("circular import")
+	ErrInvalidPlugin = errors.New("plugin cannot have exports")
 )
