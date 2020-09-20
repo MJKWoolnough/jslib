@@ -34,12 +34,14 @@ func run() error {
 	var (
 		output, base string
 		filesTodo    Inputs
+		plugin       bool
 		err          error
 	)
 
 	flag.Var(&filesTodo, "i", "input file")
 	flag.StringVar(&output, "o", "-", "input file")
 	flag.StringVar(&base, "b", "", "js base dir")
+	flag.BoolVar(&plugin, "p", false, "export file(s) as plugin(s)")
 	flag.Parse()
 
 	if output == "" {
@@ -54,35 +56,51 @@ func run() error {
 	}
 	base, err = filepath.Abs(base)
 	if err != nil {
-		return fmt.Errorf("error getting absolute path for base: %w\n", err)
+		return fmt.Errorf("error getting absolute path for base: %w", err)
 	}
-	args := make([]jslib.Option, 1, len(filesTodo)+1)
-	args[0] = jslib.Get(func(url string) (*javascript.Module, error) {
-		f, err := os.Open(filepath.Join(base, filepath.FromSlash(url)))
+	var m *javascript.Module
+	if plugin && len(filesTodo) == 1 {
+		f, err := os.Open(filepath.Join(base, filepath.FromSlash(filesTodo[0])))
 		if err != nil {
-			return nil, fmt.Errorf("error opening url: %w", err)
+			return fmt.Errorf("error opening url: %w", err)
 		}
-		m, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
+		m, err = javascript.ParseModule(parser.NewReaderTokeniser(f))
 		f.Close()
 		if err != nil {
-			return nil, fmt.Errorf("error parsing javascript module: %w", err)
+			return fmt.Errorf("error parsing javascript module: %w", err)
 		}
-		return m, nil
-	})
-	for _, f := range filesTodo {
-		fn, err := filepath.Abs(f)
+		if m, err = jslib.Plugin(m); err != nil {
+			return fmt.Errorf("error processing javascript plugin: %w", err)
+		}
+	} else {
+		args := make([]jslib.Option, 1, len(filesTodo)+1)
+		args[0] = jslib.Get(func(url string) (*javascript.Module, error) {
+			f, err := os.Open(filepath.Join(base, filepath.FromSlash(url)))
+			if err != nil {
+				return nil, fmt.Errorf("error opening url: %w", err)
+			}
+			m, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
+			f.Close()
+			if err != nil {
+				return nil, fmt.Errorf("error parsing javascript module: %w", err)
+			}
+			return m, nil
+		})
+		for _, f := range filesTodo {
+			fn, err := filepath.Abs(f)
+			if err != nil {
+				return fmt.Errorf("error getting absolute filename: %w", err)
+			}
+			fn, err = filepath.Rel(base, fn)
+			if err != nil {
+				return fmt.Errorf("error getting relative filename: %w", err)
+			}
+			args = append(args, jslib.File(filepath.ToSlash(fn)))
+		}
+		m, err = jslib.Loader(args...)
 		if err != nil {
-			return fmt.Errorf("error getting absolute filename: %w", err)
+			return fmt.Errorf("error generating output: %w", err)
 		}
-		fn, err = filepath.Rel(base, fn)
-		if err != nil {
-			return fmt.Errorf("error getting relative filename: %w", err)
-		}
-		args = append(args, jslib.File(filepath.ToSlash(fn)))
-	}
-	m, err := jslib.Loader(args...)
-	if err != nil {
-		return fmt.Errorf("error generating output: %w", err)
 	}
 	var of *os.File
 	if output == "-" {
