@@ -2,6 +2,7 @@ package jslib // import "vimagination.zapto.org/jslib"
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -81,7 +82,7 @@ func Loader(os ...Option) (*javascript.Module, error) {
 		if err == ErrNotNeeded {
 			continue
 		} else if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error parsing input file (%s): %w", file, err)
 		}
 		d, _ := c.files[file]
 		for n := range m.ModuleListItems {
@@ -94,7 +95,7 @@ func Loader(os ...Option) (*javascript.Module, error) {
 				err = c.processStatement(d, *m.ModuleListItems[n].StatementListItem)
 			}
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("error processing module (%s): %w", file, err)
 			}
 		}
 	}
