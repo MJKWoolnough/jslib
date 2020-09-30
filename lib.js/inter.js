@@ -104,6 +104,23 @@ export class Subscription {
 			cancel(Subscription.canceller(...subs));
 		});
 	}
+	static splitCancel(s) {
+		const success = new Pipe(),
+		      error = new Pipe();
+		s.then(data => {
+			success.send(data);
+		}, err => {
+			error.send(err);
+		});
+		return () => new Subscription((sFn, eFn, cancelFn) => {
+			success.receive(sFn);
+			error.receive(eFn);
+			cancelFn(() => {
+				success.remove(sFn);
+				error.remove(eFn);
+			});
+		});
+	}
 	static canceller(...subs) {
 		return () => subs.forEach(s => s.cancel());
 	}

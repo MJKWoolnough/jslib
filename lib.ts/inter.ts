@@ -110,6 +110,23 @@ export class Subscription<T> {
 			cancel(Subscription.canceller(...subs));
 		});
 	}
+	static splitCancel<T>(s: Subscription<T>): () => Subscription<T> {
+		const success = new Pipe<T>(),
+		      error = new Pipe<any>();
+		s.then(data => {
+			success.send(data);
+		}, err => {
+			error.send(err);
+		});
+		return () => new Subscription<T>((sFn, eFn, cancelFn) => {
+			success.receive(sFn);
+			error.receive(eFn);
+			cancelFn(() => {
+				success.remove(sFn);
+				error.remove(eFn);
+			});
+		});
+	}
 	static canceller(...subs: canceller[]) {
 		return () => subs.forEach(s => s.cancel());
 	}
