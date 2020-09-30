@@ -8,7 +8,15 @@ export class Pipe {
 			} else if (fn !== null && fn !== undefined) {
 				throw new TypeError("pipe.receive requires function type");
 			}
-		}
+		};
+		this.remove = fn => {
+			for (let i = 0; i < out.length; i++) {
+				if (out[i] === fn) {
+					out.splice(i, 1);
+					continue;
+				}
+			}
+		};
 	}
 }
 

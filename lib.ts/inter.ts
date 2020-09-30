@@ -1,6 +1,7 @@
 export class Pipe<T> {
 	send: (data: T) => void;
 	receive: (fn: (data: T) => void) => void;
+	remove: (fn: (data: T) => void) => void;
 	constructor() {
 		const out: ((data: T) => void)[] = [];
 		this.send = (data: T) => out.forEach(o => o(data));
@@ -10,7 +11,15 @@ export class Pipe<T> {
 			} else if (fn !== null && fn !== undefined) {
 				throw new TypeError("pipe.receive requires function type");
 			}
-		}
+		};
+		this.remove = (fn: (data: T) => void) => {
+			for (let i = 0; i < out.length; i++) {
+				if (out[i] === fn) {
+					out.splice(i, 1);
+					continue;
+				}
+			}
+		};
 	}
 }
 
