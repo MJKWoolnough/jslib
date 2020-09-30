@@ -88,6 +88,14 @@ export class Subscription {
 		};
 		return this(aFn, aFn);
 	}
+	static merge(...subs) {
+		return new Subscription((success, error, cancel) => {
+			for (const s of subs) {
+				s.then(success, error);
+			}
+			cancel(Subscription.canceller(...subs));
+		});
+	}
 	static canceller(...subs) {
 		return () => subs.forEach(s => s.cancel());
 	}

@@ -93,6 +93,14 @@ export class Subscription<T> {
 		};
 		return this.then(aFn, aFn);
 	}
+	static merge<T>(...subs: Subscription<T>[]) {
+		return new Subscription<T>((success: (data: T) => void, error: (data: any) => void, cancel: (data: (data: void) => void) => void) => {
+			for (const s of subs) {
+				s.then(success, error);
+			}
+			cancel(Subscription.canceller(...subs));
+		});
+	}
 	static canceller(...subs: canceller[]) {
 		return () => subs.forEach(s => s.cancel());
 	}
