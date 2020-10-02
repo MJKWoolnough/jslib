@@ -1,4 +1,5 @@
 const pipes = new WeakMap<Pipe<any>, ((data: any) => void)[]>(),
+      requesters = new WeakMap<Requester<any>, ((...data: any) => any) | any>(),
       subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void, (data: void) => void]>();
 
 export class Pipe<T> {
@@ -30,19 +31,17 @@ export class Pipe<T> {
 }
 
 export class Requester<T, U extends any[] = any[]> {
-	request: (...data: U) => T;
-	responder: <V = ((...data: U) => T) | T>(f: ((...data: U) => T) | T) => void;
-	constructor() {
-		let r: ((...data: U) => T) | T;
-		this.request = (...data: U) => {
-			if (r === undefined) {
-				throw new Error("no responder set");
-			} else if (r instanceof Function) {
-				return r(...data);
-			}
-			return r;
-		};
-		this.responder = (f: ((...data: U) => T) | T) => r = f;
+	request(...data: U): T {
+		const r = requesters.get(this);
+		if (r === undefined) {
+			throw new Error("no responder set");
+		} else if (r instanceof Function) {
+			return r(...data);
+		}
+		return r;
+	}
+	responder(f: ((...data: U) => T) | T) {
+		requesters.set(this, f);
 	}
 }
 

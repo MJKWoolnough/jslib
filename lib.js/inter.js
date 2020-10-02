@@ -1,4 +1,5 @@
 const pipes = new WeakMap(),
+      requests = new WeakMap(),
       subs = new WeakMap();
 
 export class Pipe {
@@ -30,17 +31,17 @@ export class Pipe {
 }
 
 export class Requester {
-	constructor() {
-		let r;
-		this.request = (...data) => {
-			if (r === undefined) {
-				throw new Error("no responder set");
-			} else if (r instanceof Function) {
-				return r(...data);
-			}
-			return r;
-		};
-		this.responder = fn => r = fn;
+	request(...data) {
+		const r = requesters.get(this);
+		if (r === undefined) {
+			throw new Error("no responder set");
+		} else if (r instanceof Function) {
+			return r(...data);
+		}
+		return r;
+	}
+	responder(f) {
+		requesters.set(this, f);
 	}
 }
 
