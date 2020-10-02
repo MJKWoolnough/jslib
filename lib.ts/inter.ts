@@ -1,25 +1,31 @@
+const pipes = new WeakMap<Pipe<any>, ((data: any) => void)[]>(),
+      subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void, (data: void) => void]>();
+
 export class Pipe<T> {
-	send: (data: T) => void;
-	receive: (fn: (data: T) => void) => void;
-	remove: (fn: (data: T) => void) => void;
 	constructor() {
-		const out: ((data: T) => void)[] = [];
-		this.send = (data: T) => out.forEach(o => o(data));
-		this.receive = (fn: (data: T) => void) => {
-			if (fn instanceof Function) {
-				out.push(fn);
-			} else if (fn !== null && fn !== undefined) {
-				throw new TypeError("pipe.receive requires function type");
+		pipes.set(this, []);
+	}
+	send(data: T) {
+		const out = pipes.get(this)!;
+		for (const o of out) {
+			o(data);
+		}
+	}
+	receive(fn: (data: T) => void) {
+		if (fn instanceof Function) {
+			pipes.get(this)!.push(fn);
+		} else if (fn !== null && fn !== undefined) {
+			throw new TypeError("pipe.receive requires function type");
+		}
+	}
+	remove(fn: (data: T) => void) {
+		const out = pipes.get(this)!;
+		for (let i = 0; i < out.length; i++) {
+			if (out[i] === fn) {
+				out.splice(i, 1);
+				continue;
 			}
-		};
-		this.remove = (fn: (data: T) => void) => {
-			for (let i = 0; i < out.length; i++) {
-				if (out[i] === fn) {
-					out.splice(i, 1);
-					continue;
-				}
-			}
-		};
+		}
 	}
 }
 
@@ -39,8 +45,6 @@ export class Requester<T, U extends any[] = any[]> {
 		this.responder = (f: ((...data: U) => T) | T) => r = f;
 	}
 }
-
-const subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void, (data: void) => void]>();
 
 export class Subscription<T> {
 	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: (data: void) => void) => void) => void) {

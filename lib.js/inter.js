@@ -1,22 +1,31 @@
+const pipes = new WeakMap(),
+      subs = new WeakMap();
+
 export class Pipe {
 	constructor() {
-		const out = [];
-		this.send = data => out.forEach(o => o(data));
-		this.receive = fn => {
-			if (fn instanceof Function) {
-				out.push(fn);
-			} else if (fn !== null && fn !== undefined) {
-				throw new TypeError("pipe.receive requires function type");
+		pipes.set(this, []);
+	}
+	send(data) {
+		const out = pipes.get(this);
+		for (const o of out) {
+			o(data);
+		}
+	}
+	receive(fn) {
+		if (fn instanceof Function) {
+			pipes.get(this).push(fn);
+		} else if (fn !== null && fn !== undefined) {
+			throw new TypeError("pipe.receive requires function type");
+		}
+	}
+	remove(fn) {
+		const out = pipes.get(this);
+		for (let i = 0; i < out.length; i++) {
+			if (out[i] === fn) {
+				out.splice(i, 1);
+				continue;
 			}
-		};
-		this.remove = fn => {
-			for (let i = 0; i < out.length; i++) {
-				if (out[i] === fn) {
-					out.splice(i, 1);
-					continue;
-				}
-			}
-		};
+		}
 	}
 }
 
@@ -34,9 +43,6 @@ export class Requester {
 		this.responder = fn => r = fn;
 	}
 }
-
-
-const subs = new WeakMap();
 
 export class Subscription {
 	constructor(fn) {
