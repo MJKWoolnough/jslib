@@ -50,8 +50,8 @@ export class Subscription<T> {
 		const success = new Pipe<T>(),
 		      error = new Pipe<any>(),
 		      cancel = new Pipe<void>();
-		fn(success.send, error.send, cancel.receive);
-		subs.set(this, [success.receive, error.receive, cancel.send]);
+		fn(success.send.bind(success), error.send.bind(error), cancel.receive.bind(cancel));
+		subs.set(this, [success.receive.bind(success), error.receive.bind(error), cancel.send.bind(cancel)]);
 	}
 	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | undefined | null, errorFn?: ((data: any) => TResult2) | undefined | null) {
 		const rfn = subs.get(this);

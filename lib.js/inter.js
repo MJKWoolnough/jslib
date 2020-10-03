@@ -50,8 +50,8 @@ export class Subscription {
 		const success = new Pipe(),
 		      error = new Pipe(),
 		      cancel = new Pipe();
-		fn(success.send, error.send, cancel.receive);
-		subs.set(this, [success.receive, error.receive, cancel.send]);
+		fn(success.send.bind(success), error.send.bind(error), cancel.receive.bind(cancel));
+		subs.set(this, [success.receive.bind(success), error.receive.bind(error), cancel.send.bind(cancel)]);
 	}
 	then(successFn, errorFn) {
 		const rfn = subs.get(this);
