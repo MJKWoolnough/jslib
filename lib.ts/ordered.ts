@@ -313,7 +313,7 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 	}
 	shift(): T | undefined {
 		const root = data.get(this)!,
-		      first = root.prev;
+		      first = root.next;
 		if (first.item) {
 			removeNode(root, first);
 		}

@@ -274,7 +274,7 @@ export class SortNode {
 	}
 	shift() {
 		const root = data.get(this),
-		      first = root.prev;
+		      first = root.next;
 		if (first.item) {
 			removeNode(root, first);
 		}
