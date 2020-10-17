@@ -309,6 +309,9 @@ export class SortNode {
 		if (compareFunction) {
 			root.sortFn = compareFunction;
 			root.reverse = 1;
+			if (compareFunction === noSort) {
+				return this;
+			}
 		}
 		let curr = root.next;
 		root.next = root.prev = root;

@@ -348,6 +348,9 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 		if (compareFunction) {
 			root.sortFn = compareFunction;
 			root.order = 1;
+			if (compareFunction === noSort) {
+				return this;
+			}
 		}
 		let curr = root.next;
 		root.next = root.prev = root;
