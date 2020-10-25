@@ -95,6 +95,8 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 				}
 			} else if (typeof prop === "boolean") {
 				elem.toggleAttribute(k, prop);
+			} else if (prop === undefined && elem.hasAttribute(k)) {
+				elem.removeAttribute(k);
 			}
 		};
 	}
