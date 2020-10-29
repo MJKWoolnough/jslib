@@ -209,6 +209,7 @@ export default function(container, coords, list, delay = 0) {
 	return new Promise(resolve => {
 		const ctx = {container, resolve: data => {
 			root.remove();
+			cc.remove();
 			resolve(data);
 		      }, delay: delay, timeout: -1},
 		      root = list2HTML(ctx, list.flat(Infinity)),

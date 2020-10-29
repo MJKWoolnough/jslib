@@ -275,6 +275,7 @@ export default function (container: Element, coords: [number, number], list: Lis
 	return new Promise(resolve => {
 		const ctx: Ctx = {container, resolve: (data: any) => {
 			root.remove();
+			cc.remove();
 			resolve(data);
 		      }, delay: delay, timeout: -1},
 		      root = list2HTML(ctx, list.flat(Infinity)),
