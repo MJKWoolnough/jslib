@@ -25,8 +25,12 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	list.style.setProperty("top", "0");
 	list.style.setProperty("left", "0");
 	ctx.container.appendChild(list);
+	let top = coords[0][1] + list.clientHeight <= ctx.container.clientHeight ? coords[0][1] : coords[1][1] - list.clientHeight;
+	if (top < 0) {
+		top = 0;
+	}
 	list.style.setProperty("left", (coords[0][0] + list.clientWidth <= ctx.container.clientWidth ? coords[0][0] : coords[1][0] - list.clientWidth) + "px");
-	list.style.setProperty("top", (coords[0][1] + list.clientHeight <= ctx.container.clientHeight ? coords[0][1] : coords[1][1] - list.clientHeight) + "px");
+	list.style.setProperty("top", top + "px");
 	ctx.focus = list;
 	autoFocus(list);
       },
