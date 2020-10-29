@@ -175,7 +175,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 					childMenu.dispatchEvent(keydownEvent);
 				}
 			      },
-			      childMenu = list2HTML(ctx, e.list, l);
+			      childMenu = createHTML(list2HTML(ctx, e.list, l), {"class": e.classes});
 			classes.push("contextSubMenu");
 			params = {
 				"onmousedown": openFn,
