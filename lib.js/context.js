@@ -1,7 +1,7 @@
 import {autoFocus, createHTML} from './dom.js';
-import {li, span, style, ul} from './html.js';
+import {div, li, span, style, ul} from './html.js';
 
-pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}.contextDisabled{color:#aaa}`)));
+pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}.contextDisabled{color:#aaa}.contextClearer{position:absolute;top:0;left:0;bottom:0;right:0}`)));
 
 const mousedownEvent = new MouseEvent("mousedown"),
       keydownEvent = new KeyboardEvent("keydown", {"key": "ArrowDown"}),
@@ -213,7 +213,8 @@ export default function(container, coords, list, delay = 0) {
 			}
 			resolve(data);
 		      }, delay: delay, timeout: -1},
-		      root = list2HTML(ctx, list.flat(Infinity));
+		      root = list2HTML(ctx, list.flat(Infinity)),
+		      cc = container.appendChild(div({"class": "contextClearer", "tabindex": -1, "onfocus": () => cc.remove()}));
 		new MutationObserver((mutations, o) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 			if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
 				n.dispatchEvent(closeEvent);

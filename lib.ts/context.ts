@@ -1,5 +1,5 @@
 import {autoFocus, createHTML, Props} from './dom.js';
-import {li, span, style, ul} from './html.js';
+import {div, li, span, style, ul} from './html.js';
 
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
@@ -28,6 +28,13 @@ pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
 
 .contextDisabled {
 	color: #aaa;
+}
+.contextClearer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
 }
 `)));
 
@@ -272,7 +279,8 @@ export default function (container: Element, coords: [number, number], list: Lis
 			}
 			resolve(data);
 		      }, delay: delay, timeout: -1},
-		      root = list2HTML(ctx, list.flat(Infinity));
+		      root = list2HTML(ctx, list.flat(Infinity)),
+		      cc = container.appendChild(div({"class": "contextClearer", "tabindex": -1, "onfocus": () => cc.remove()}));
 		new MutationObserver((mutations: MutationRecord[], o: MutationObserver) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 			if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
 				n.dispatchEvent(closeEvent);
