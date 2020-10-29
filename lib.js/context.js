@@ -38,8 +38,8 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	let open = null,
 	    selected = -1;
 	const closeFn = () => {
-		if (open && open.parentNode) {
-			open.parentNode.removeChild(open);
+		if (open) {
+			open.remove()
 			open = null;
 		}
 	      },
@@ -208,9 +208,7 @@ export const item = (name, action, options = {}) => Object.assign({name, action}
 export default function(container, coords, list, delay = 0) {
 	return new Promise(resolve => {
 		const ctx = {container, resolve: data => {
-			if (root.parentNode) {
-				root.parentNode.removeChild(root);
-			}
+			root.remove();
 			resolve(data);
 		      }, delay: delay, timeout: -1},
 		      root = list2HTML(ctx, list.flat(Infinity)),

@@ -104,8 +104,8 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	let open: HTMLUListElement | null = null,
 	    selected = -1;
 	const closeFn = () => {
-		if (open && open.parentNode) {
-			open.parentNode.removeChild(open);
+		if (open) {
+			open.remove();
 			open = null;
 		}
 	      },
@@ -274,9 +274,7 @@ export const item = (name: string, action: () => any, options: Options = {}) => 
 export default function (container: Element, coords: [number, number], list: List, delay: number = 0) {
 	return new Promise(resolve => {
 		const ctx: Ctx = {container, resolve: (data: any) => {
-			if (root.parentNode) {
-				root.parentNode.removeChild(root);
-			}
+			root.remove();
 			resolve(data);
 		      }, delay: delay, timeout: -1},
 		      root = list2HTML(ctx, list.flat(Infinity)),
