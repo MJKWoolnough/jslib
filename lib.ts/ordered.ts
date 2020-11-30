@@ -198,10 +198,10 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 		}
 		return -1;
 	}
-	flat(depth?: number) {
-		return Array.from(this.values()).flat(depth);
+	flat<D extends number = 1>(depth?: D) {
+		return Array.from(this.values()).flat(depth) as FlatArray<any[], D>;
 	}
-	flatMap<U>(callback: Callback<T, U, this>, thisArg?: any) {
+	flatMap<U extends []>(callback: Callback<T, U, this>, thisArg?: any) {
 		return this.map(callback, thisArg).flat();
 	}
 	forEach(callback: Callback<T, void, this>, thisArg?: any) {
