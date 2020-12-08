@@ -110,6 +110,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 		shell.removeEventListener("mouseup", mouseUp);
 		shell.style.removeProperty("user-select");
 		dragging = false;
+		this.dispatchEvent(new CustomEvent("resized"));
 	      };
 	shell.addEventListener("mousemove", mouseMove);
 	shell.addEventListener("mouseup", mouseUp);
@@ -138,6 +139,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 		shell.removeEventListener("mouseup", mouseUp);
 		shell.style.removeProperty("user-select");
 		dragging = false;
+		this.dispatchEvent(new CustomEvent("moved"));
 	      };
 	shell.addEventListener("mousemove", mouseMove);
 	shell.addEventListener("mouseup", mouseUp);
