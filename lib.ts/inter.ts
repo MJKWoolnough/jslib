@@ -59,7 +59,7 @@ export class Subscription<T> {
 			throw new TypeError("method not called on valid Subscription object");
 		}
 		const [success, error, cancel] = rfn;
-		return new Subscription<TResult1>((sFn: (data: TResult1) => void, eFn: (data: any) => void, cFn: (data: (data: void) => void) => void) => {
+		return new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: (data: void) => void) => void) => {
 			if (successFn instanceof Function) {
 				success((data: T) => {
 					try {
@@ -74,7 +74,7 @@ export class Subscription<T> {
 			if (errorFn instanceof Function) {
 				error((data: any) => {
 					try {
-						eFn(errorFn(data));
+						sFn(errorFn(data));
 					} catch (e) {
 						eFn(e);
 					}

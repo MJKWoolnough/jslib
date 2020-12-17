@@ -74,7 +74,7 @@ export class Subscription {
 			if (errorFn instanceof Function) {
 				error(data => {
 					try {
-						eFn(errorFn(data));
+						sFn(errorFn(data));
 					} catch (e) {
 						eFn(e);
 					}
