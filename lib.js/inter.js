@@ -97,11 +97,10 @@ export class Subscription {
 		return this.then(undefined, errorFn);
 	}
 	finally(afterFn) {
-		const aFn = data => {
-			afterFn();
-			data;
-		};
-		return this(aFn, aFn);
+		return this(data => (aFn(), data), error => {
+			aFn();
+			throw error;
+		});
 	}
 	static merge(...subs) {
 		return new Subscription((success, error, cancel) => {

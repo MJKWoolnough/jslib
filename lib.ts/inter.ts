@@ -97,11 +97,10 @@ export class Subscription<T> {
 		return this.then(undefined, errorFn);
 	}
 	finally(afterFn: () => void): Subscription<T> {
-		const aFn = (data: T) => {
-			afterFn()
-			return data;
-		};
-		return this.then(aFn, aFn);
+		return this.then((data: T) => (afterFn(), data), (error: any) => {
+			afterFn();
+			throw error;
+		});
 	}
 	static merge<T>(...subs: Subscription<T>[]) {
 		return new Subscription<T>((success: (data: T) => void, error: (data: any) => void, cancel: (data: (data: void) => void) => void) => {
