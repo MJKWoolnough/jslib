@@ -96,11 +96,9 @@ export class Subscription<T> {
 	catch<TResult = never>(errorFn: ((data: any) => TResult) | undefined | null): Subscription<T | TResult> {
 		return this.then(undefined, errorFn);
 	}
-	finally(afterFn?: () => void | undefined | null): Subscription<T> {
+	finally(afterFn: () => void): Subscription<T> {
 		const aFn = (data: T) => {
-			if (afterFn) {
-				afterFn()
-			}
+			afterFn()
 			return data;
 		};
 		return this.then(aFn, aFn);
