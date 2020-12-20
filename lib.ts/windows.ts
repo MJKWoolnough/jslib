@@ -186,9 +186,13 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 		resolve(data.value);
 		w.remove();
 	      }}, "Ok"),
-	      data = autoFocus(input({"value": defaultValue || "", "onkeypress": (e: KeyboardEvent) => {
-		if (e.key === "Enter") {
+	      data = autoFocus(input({"value": defaultValue || "", "onkeydown": (e: KeyboardEvent) => {
+		switch (e.key) {
+		case "Enter":
 			ok.click();
+			break;
+		case "Escape":
+			w.remove();
 		}
 	      }})),
 	      w = windows({
