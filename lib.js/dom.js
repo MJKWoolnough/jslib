@@ -111,6 +111,11 @@ export const createElements = namespace => (element, properties, children) => {
 	return Array.from(d.childNodes).map(c => d.removeChild(c));
       },
       autoFocus = node => {
-	window.setTimeout(() => node.focus(), 0);
+	window.setTimeout(() => {
+		node.focus();
+		if (node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) {
+			node.select();
+		}
+	}, 0);
 	return node;
       };
