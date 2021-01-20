@@ -145,10 +145,10 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	d.innerHTML = text;
 	return Array.from(d.childNodes).map(c => d.removeChild(c));
       },
-      autoFocus = <T extends HTMLElement | SVGElement>(node: T) => {
+      autoFocus = <T extends HTMLElement | SVGElement>(node: T, inputSelect = true) => {
 	window.setTimeout(() => {
 		node.focus();
-		if (node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) {
+		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
 			node.select();
 		}
 	}, 0);
