@@ -143,7 +143,7 @@ const windowData = new WeakMap(),
       childOf = new Map(),
       alertFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
-		"window-hide": "",
+		"window-hide": true,
 		"window-icon": icon || noIcon,
 		"window-title": title,
 		"hide-maximise": "true",
@@ -159,7 +159,7 @@ const windowData = new WeakMap(),
       }),
       confirmFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
-		"window-hide": "",
+		"window-hide": true,
 		"window-icon": icon || noIcon,
 		"window-title": title,
 		"hide-maximise": "true",
@@ -191,7 +191,7 @@ const windowData = new WeakMap(),
 		}
 	      }})),
 	      w = windows({
-		"window-hide": "",
+		"window-hide": true,
 		"window-icon": icon || noIcon,
 		"window-title": title,
 		"hide-maximise": "true",

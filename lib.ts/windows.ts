@@ -148,7 +148,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       childOf = new Map<WindowElement, WindowElement>(),
       alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
-		"window-hide": "",
+		"window-hide": true,
 		"window-icon": icon || noIcon,
 		"window-title": title,
 		"hide-maximise": "true",
@@ -164,7 +164,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
       }),
       confirmFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
-		"window-hide": "",
+		"window-hide": true,
 		"window-icon": icon || noIcon,
 		"window-title": title,
 		"hide-maximise": "true",
@@ -196,7 +196,7 @@ const windowData = new WeakMap<WindowElement, Wdata>(),
 		}
 	      }})),
 	      w = windows({
-		"window-hide": "",
+		"window-hide": true,
 		"window-icon": icon || noIcon,
 		"window-title": title,
 		"hide-maximise": "true",
