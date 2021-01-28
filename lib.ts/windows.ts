@@ -284,7 +284,8 @@ export class WindowElement extends HTMLElement {
 	constructor() {
 		super()
 		const titleElement = span({"part": "title"}),
-		      iconElement = img({"part": "icon", "src": noIcon});
+		      iconElement = img({"part": "icon", "src": noIcon}),
+		      onclick = () => this.focus();
 		windowData.set(this, {titleElement, iconElement});
 		createHTML(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
@@ -397,6 +398,7 @@ export class WindowElement extends HTMLElement {
 }
 
 :host > div:nth-child(5) {
+	pointer-events: none;
 	display: var(--overlay-on, block);
 	position: absolute;
 	background-color: RGBA(0, 0, 0, 0.1);
@@ -508,8 +510,9 @@ export class WindowElement extends HTMLElement {
 				])
 			]),
 			div(slot()),
-			div({"onclick": () => this.focus()})
+			div({onclick})
 		]);
+		this.addEventListener("mousedown", onclick, {"capture": true});
 	}
 	connectedCallback() {
 		if (focusingWindow === this) {
