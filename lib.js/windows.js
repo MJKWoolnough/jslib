@@ -61,7 +61,7 @@ const windowData = new WeakMap(),
 			case 1:
 			case 2: {
 				const height = originalHeight - dy;
-				if (height > 100) {
+				if (height > (parseInt(this.style.getPropertyValue("min-height") || "") || 100)) {
 					this.style.setProperty("--window-top", `${originalTop + dy}px`);
 					this.style.setProperty("--window-height", `${height}px`);
 				}
@@ -71,7 +71,7 @@ const windowData = new WeakMap(),
 			case 5:
 			case 6: {
 				const height = originalHeight + dy;
-				if (height > 100) {
+				if (height > (parseInt(this.style.getPropertyValue("min-height") || "") || 100)) {
 					this.style.setProperty("--window-height", `${height}px`);
 				}
 			}
@@ -81,7 +81,7 @@ const windowData = new WeakMap(),
 			case 3:
 			case 4: {
 				const width = originalWidth + dx;
-				if (width > 100) {
+				if (width > (parseInt(this.style.getPropertyValue("min-width") || "") || 100)) {
 					this.style.setProperty("--window-width", `${width}px`);
 				}
 			}
@@ -90,7 +90,7 @@ const windowData = new WeakMap(),
 			case 7:
 			case 6: {
 				const width = originalWidth - dx;
-				if (width > 100) {
+				if (width > (parseInt(this.style.getPropertyValue("min-width") || "") || 100)) {
 					this.style.setProperty("--window-left", `${originalLeft + dx}px`);
 					this.style.setProperty("--window-width", `${width}px`);
 				}
