@@ -31,16 +31,16 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 			if (xh.status === 200) {
 				switch (props["response"]) {
 				case "text":
-					successFn.call(xh, xh.responseText);
+					successFn(xh.responseText);
 					break;
 				case "json":
-					successFn.call(xh, JSON.parse(xh.responseText));
+					successFn(JSON.parse(xh.responseText));
 					break;
 				default:
-					successFn.call(xh, xh.response);
+					successFn(xh.response);
 				}
 			} else {
-				errorFn.call(xh, new Error(xh.responseText));
+				errorFn(new Error(xh.responseText));
 			}
 		}
 	});
