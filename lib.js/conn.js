@@ -25,6 +25,9 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 				case "json":
 					successFn(JSON.parse(xh.responseText));
 					break;
+				case "xh":
+					successFn(xh);
+					break;
 				default:
 					successFn(xh.response);
 				}

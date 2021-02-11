@@ -36,6 +36,9 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 				case "json":
 					successFn(JSON.parse(xh.responseText));
 					break;
+				case "xh":
+					successFn(xh);
+					break;
 				default:
 					successFn(xh.response);
 				}
