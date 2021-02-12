@@ -339,6 +339,8 @@ export class WindowElement extends HTMLElement {
 	background-color: #aaa;
 	overflow: hidden;
 	user-select: none;
+	display: flex;
+	align-items: center;
 }
 
 :host > div:nth-child(3) > span {
