@@ -347,6 +347,7 @@ export class WindowElement extends HTMLElement {
 
 :host > div:nth-child(3) > img {
 	height: 1em;
+	pointer-events: none;
 }
 
 :host > div:nth-child(3) > div {
