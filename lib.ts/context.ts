@@ -212,7 +212,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		if (e.disabled) {
 			params = {};
 			classes.push("contextDisabled");
-			if (IsItem(e)) {
+			if (!IsItem(e)) {
 				classes.push("contextSubMenu");
 			}
 		} else if (IsItem(e)) {
