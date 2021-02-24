@@ -22,11 +22,12 @@ export default (container: Node, loader?: Node): Readonly<LayerType> => {
 	      },
 	      keyPress = (e: KeyboardEvent) => {
 		if (loading) {
-			return false;
+			return;
 		}
 		if (e.keyCode === 27) {
 			closer();
 		}
+		return true;
 	      },
 	      closeLoadingLayer = () => {
 		loading = false;

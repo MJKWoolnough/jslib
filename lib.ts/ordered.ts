@@ -100,6 +100,7 @@ const data = new WeakMap<SortNode<any, Node>, Root<any>>(),
 			return fn(index);
 		}
 	}
+	return undefined;
       },
       proxyObj = {
 	has: <T extends Item>(target: SortNode<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
@@ -123,6 +124,7 @@ const data = new WeakMap<SortNode<any, Node>, Root<any>>(),
 			removeNode(root, node);
 			return true;
 		}
+		return false;
 	}) || delete (target as any)[name]
       },
       noItemFn = (node: Node) => ({node});
@@ -145,7 +147,7 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 	concat(...items: (T | ConcatArray<T>)[]): T[] {
 		return Array.from(this.values()).concat(...items);
 	}
-	copyWithin(target: number, start?: number, end?: number): this {
+	copyWithin(_target: number, _start?: number, _end?: number): this {
 		throw new Error("invalid");
 	}
 	*entries(): IterableIterator<[number, T]> {
@@ -159,7 +161,7 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 		}
 		return true;
 	}
-	fill(value: T, start?: number, end?: number): this {
+	fill(_value: T, _start?: number, _end?: number): this {
 		throw new Error("invalid");
 	}
 	filter(callback: Callback<T, any, this>, thisArg?: any) {

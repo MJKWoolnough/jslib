@@ -16,7 +16,7 @@ export default (container, loader) => {
 	      },
 	      keyPress = e => {
 		if (loading) {
-			return false;
+			return;
 		}
 		if (e.keyCode === 27) {
 			closer();

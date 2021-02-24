@@ -95,7 +95,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		default:
 			const i = keys.get(e.key.toLowerCase());
 			if (!i) {
-				return;
+				return false;
 			}
 			e.preventDefault();
 			e.stopPropagation();
@@ -118,8 +118,8 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				};
 			}
 			l.childNodes[selected].classList.add("contextSelected");
-			return false;
 		}
+		return false;
 	      }, "onblur": () => {
 		if (ctx.focus === l) {
 			window.setTimeout(() => ctx.resolve(undefined), 0);
@@ -214,7 +214,7 @@ export default function(container, coords, list, delay = 0) {
 		      }, delay: delay, timeout: -1},
 		      root = list2HTML(ctx, list.flat(Infinity)),
 		      cc = container.appendChild(div({"class": "contextClearer", "tabindex": -1, "onfocus": () => cc.remove()}));
-		new MutationObserver((mutations, o) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
+		new MutationObserver(mutations => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 			if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
 				n.dispatchEvent(closeEvent);
 			}

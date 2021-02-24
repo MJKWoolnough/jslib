@@ -68,6 +68,7 @@ const data = new WeakMap(),
 			return fn(index);
 		}
 	}
+	return undefined;
       },
       proxyObj = {
 	has:(target, name) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
@@ -91,6 +92,7 @@ const data = new WeakMap(),
 			removeNode(root, node);
 			return true;
 		}
+		return false;
 	}) || delete target[name]
       },
       noItemFn = node => ({node});
