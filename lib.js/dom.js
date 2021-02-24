@@ -64,13 +64,7 @@ export const createElements = namespace => (element, properties, children) => {
 					}
 				}
 			} else if (typeof prop === "string" || typeof prop === "number") {
-				if (k.startsWith("--")) {
-					if (elem instanceof HTMLElement || elem instanceof SVGElement) {
-						elem.style.setProperty(k, prop);
-					}
-				} else {
-					elem.setAttribute(k, prop);
-				}
+				elem.setAttribute(k, prop);
 			} else if (typeof prop === "boolean") {
 				elem.toggleAttribute(k, prop);
 			} else if (prop === undefined && elem.hasAttribute(k)) {

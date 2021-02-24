@@ -1,6 +1,6 @@
 export type Children = string | Node | Children[];
 
-export type Props = Record<string, number | string | string[] | DOMTokenList | Function | Boolean | undefined | null | Record<string, string | undefined>>;
+export type Props = Record<string, number | string | string[] | DOMTokenList | Function | Boolean | undefined | null | Record<string, string | number | undefined>>;
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -95,17 +95,11 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 					if (prop[k] === undefined) {
 						elem.style.removeProperty(k);
 					} else {
-						elem.style.setProperty(k, prop[k]);
+						elem.style.setProperty(k, prop[k] as string);
 					}
 				}
 			} else if (typeof prop === "string" || typeof prop === "number") {
-				if (k.startsWith("--")) {
-					if (elem instanceof HTMLElement || elem instanceof SVGElement) {
-						elem.style.setProperty(k, prop as string);
-					}
-				} else {
-					elem.setAttribute(k, prop as string);
-				}
+				elem.setAttribute(k, prop as string);
 			} else if (typeof prop === "boolean") {
 				elem.toggleAttribute(k, prop);
 			} else if (prop === undefined && elem.hasAttribute(k)) {
