@@ -23,12 +23,24 @@ func (d *dep) RelTo(url string) string {
 }
 
 func (d *dep) Add(e *dep) bool {
-	if _, ok := d.requires[e.URL]; ok {
+	if e.hasRequirement(d) {
 		return false
 	}
 	d.requires[e.URL] = e
 	e.requiredBy[d.URL] = d
 	return true
+}
+
+func (d *dep) hasRequirement(e *dep) bool {
+	if _, ok := d.requires[e.URL]; ok {
+		return true
+	}
+	for _, f := range d.requires {
+		if f.hasRequirement(e) {
+			return true
+		}
+	}
+	return false
 }
 
 func (d *dep) Process(al *javascript.ArrayLiteral) {
