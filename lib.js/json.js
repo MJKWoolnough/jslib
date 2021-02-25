@@ -107,7 +107,6 @@ const whitespace = "\t\r\n ",
 		} else {
 			return -pos;
 		}
-		break;
 	case "f":
 		if (data.startsWith("false", pos)) {
 			return pos + 5;
