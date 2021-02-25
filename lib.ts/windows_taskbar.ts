@@ -1,6 +1,7 @@
-import {DOMBind, Children, Props} from './dom.js';
+import type {DOMBind, Children, Props} from './dom.js';
+import type {DesktopElement} from './windows.js';
 import {createHTML, div, img, li, slot, span, style, ul} from './html.js';
-import {ShellElement as BaseShellElement, WindowElement, DesktopElement, windows, desktop, noIcon} from './windows.js';
+import {ShellElement as BaseShellElement, WindowElement, windows, desktop, noIcon} from './windows.js';
 import contextPlace, {item as contextItem} from './context.js';
 
 export {WindowElement, DesktopElement, windows, desktop};

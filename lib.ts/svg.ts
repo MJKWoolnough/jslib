@@ -1,4 +1,5 @@
-import {createSVG, DOMBind} from './dom.js';
+import type {DOMBind} from './dom.js';
+import {createSVG} from './dom.js';
 
 export {createSVG};
 

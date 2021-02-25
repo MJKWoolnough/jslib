@@ -13,7 +13,8 @@ if [ -n "$1" ]; then
 fi;
 
 (
-	echo -e "import {createHTML, DOMBind} from './dom.js';\n";
+	echo -e "import type {DOMBind} from './dom.js';";
+	echo -e "import {createHTML} from './dom.js';\n";
 	echo -e "export {createHTML};\n";
 	echo -n "export const ";
 	first=true;

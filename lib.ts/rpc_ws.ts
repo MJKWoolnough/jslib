@@ -1,4 +1,5 @@
-import RequestHandler, {RPCType, Await} from './rpc_shared.js';
+import type {RPCType} from './rpc_shared.js';
+import RequestHandler, {Await} from './rpc_shared.js';
 import {WS} from './conn.js';
 
 export default (path: string, version = 1): Promise<Readonly<RPCType>> => WS(path).then(ws => {

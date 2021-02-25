@@ -1,4 +1,5 @@
-import {autoFocus, createHTML, DOMBind, Children, Props} from './dom.js';
+import type {DOMBind, Children, Props} from './dom.js';
+import {autoFocus, createHTML} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 
 type Wdata = {

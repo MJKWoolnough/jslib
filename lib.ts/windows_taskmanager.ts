@@ -1,6 +1,8 @@
-import {clearElement, createHTML, DOMBind, Children, Props} from './dom.js';
+import type {DOMBind, Children, Props} from './dom.js';
+import type {DesktopElement} from './windows.js';
+import {clearElement, createHTML} from './dom.js';
 import {div, li, slot, style, ul} from './html.js';
-import {ShellElement as BaseShellElement, WindowElement, DesktopElement, windows, desktop} from './windows.js';
+import {ShellElement as BaseShellElement, WindowElement, windows, desktop} from './windows.js';
 
 export {WindowElement, DesktopElement, windows, desktop};
 

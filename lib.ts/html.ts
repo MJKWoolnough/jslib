@@ -1,4 +1,5 @@
-import {createHTML, DOMBind} from './dom.js';
+import type {DOMBind} from './dom.js';
+import {createHTML} from './dom.js';
 
 export {createHTML};
 

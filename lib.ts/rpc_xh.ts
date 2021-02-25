@@ -1,4 +1,5 @@
-import RequestHandler, {RPCType, Await} from './rpc_shared.js';
+import type {RPCType} from './rpc_shared.js';
+import RequestHandler, {Await} from './rpc_shared.js';
 import {HTTPRequest} from './conn.js';
 import {split} from './json.js';
 
