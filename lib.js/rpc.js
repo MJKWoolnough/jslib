@@ -6,7 +6,7 @@ export default function (path, allowWS = true, allowXH = false, xhPing = 1000, v
 		if (!allowXH) {
 			return rpcWS(path, version);
 		}
-		return rpcWS(path).catch(() => rpcXH(path, xhPing));
+		return rpcWS(path, version).catch(() => rpcXH(path, xhPing));
 	} else if (allowXH) {
 		return rpcXH(path, xhPing);
 	}
