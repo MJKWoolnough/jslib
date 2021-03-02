@@ -6,9 +6,9 @@ export default (path: string, allowWS = true, allowXH = false, xhPing = 1000, ve
 		if (!allowXH) {
 			return rpcWS(path, version);
 		}
-		return rpcWS(path, version).catch(() => rpcXH(path, xhPing));
+		return rpcWS(path, version).catch(() => rpcXH(path, xhPing, version));
 	} else if (allowXH) {
-		return rpcXH(path, xhPing);
+		return rpcXH(path, xhPing, version);
 	}
 	return Promise.reject(new Error("no type allowed"));
 }

@@ -2,7 +2,7 @@ import RequestHandler from './rpc_shared.js';
 import {HTTPRequest} from './conn.js';
 import {split} from './json.js';
 
-export default (path, xhPing = 1000) => {
+export default (path, xhPing = 1000, version = 1) => {
 	let sto = -1,
 	    si = -1;
 	const todo = [],
@@ -26,7 +26,7 @@ export default (path, xhPing = 1000) => {
 			}
 			sto = window.setTimeout(sender, 1);
 		}
-	      }),
+	      }, version),
 	      headerID = Object.freeze({"X-RPCID": Array.from(crypto.getRandomValues(new Uint8Array(32))).map(a => a.toString(16).padStart(2, "0")).join("")});
 	return Promise.resolve(Object.freeze({
 		"request": rh.request.bind(rh),
