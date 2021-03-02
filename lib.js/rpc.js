@@ -3,10 +3,11 @@ import rpcXH from './rpc_xh.js';
 
 export default function (path, allowWS = true, allowXH = false, xhPing = 1000, version = 1) {
 	if (allowWS) {
-		if (!allowXH) {
-			return rpcWS(path, version);
+		let p = rpcWS(path, version);
+		if (allowXH) {
+			return p.catch(() => rpcXH(path, xhPing, version));
 		}
-		return rpcWS(path, version).catch(() => rpcXH(path, xhPing, version));
+		return p;
 	} else if (allowXH) {
 		return rpcXH(path, xhPing, version);
 	}
