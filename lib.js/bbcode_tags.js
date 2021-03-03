@@ -28,6 +28,17 @@ colour = (n, t, p) => {
 	}
 },
 color = colour,
+size = (n, t, p) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		const size = tk.attr ? parseInt(tk.attr) : 0;
+		if (size > 0 && size < 100) {
+			process(n.appendChild(span({"style": `font-size: ${tk.attr}`})), t, p, tk.tagName);
+		} else {
+			p[textSymbol](n, tk.fullText);
+		}
+	}
+},
 text = (n, t) => n.appendChild(document.createTextNode(t)),
 all = {
 	b,
@@ -41,5 +52,6 @@ all = {
 	full,
 	colour,
 	color,
+	size,
 	[textSymbol]: text
 };
