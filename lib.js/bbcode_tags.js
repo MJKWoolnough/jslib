@@ -17,6 +17,17 @@ center = centre,
 right = simple(div, "text-align: right"),
 justify = simple(div, "text-align: justify"),
 full = justify,
+colour = (n, t, p) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		if (tk.attr && !tk.attr.includes(';')) {
+			process(n.appendChild(span({"style": `color: ${tk.attr}`})), t, p, tk.tagName);
+		} else {
+			p[textSymbol](n, tk.fullText);
+		}
+	}
+},
+color = colour,
 text = (n, t) => n.appendChild(document.createTextNode(t)),
 all = {
 	b,
@@ -28,5 +39,7 @@ all = {
 	right,
 	justify,
 	full,
+	colour,
+	color,
 	[textSymbol]: text
 };
