@@ -1,6 +1,7 @@
 import type {Parsers, Tokeniser} from './bbcode.js';
 import type {DOMBind} from './dom.js';
 import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
+import {formatText} from './dom.js';
 import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, pre, span} from './html.js';
 
 const simple = (fn: DOMBind<Node>, style: string | undefined) => (n: Node, t: Tokeniser, p: Parsers) => {
@@ -129,7 +130,7 @@ code = (n: Node, t: Tokeniser) => {
 		n.appendChild(pre(code));
 	}
 },
-text = (n: Node, t: string) => n.appendChild(document.createTextNode(t)),
+text = (n: Node, t: string) => n.appendChild(formatText(t)),
 all = {
 	b,
 	i,
