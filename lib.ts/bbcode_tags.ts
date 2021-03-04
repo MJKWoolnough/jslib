@@ -13,6 +13,7 @@ const simple = (fn: DOMBind<Node>, style: string | undefined) => (n: Node, t: To
 export const b = simple(span, "font-weight: bold;"),
 i = simple(span, "font-style: italic"),
 u = simple(span, "text-decoration: underline"),
+s = simple(span, "text-decoration: line-through"),
 left = simple(div, "text-align: left"),
 centre = simple(div, "text-align: center"),
 center = centre,
