@@ -131,7 +131,7 @@ code = (n: Node, t: Tokeniser) => {
 	}
 },
 text = (n: Node, t: string) => n.appendChild(formatText(t)),
-all = {
+all = Object.freeze({
 	b,
 	i,
 	u,
@@ -156,4 +156,4 @@ all = {
 	img,
 	code,
 	[textSymbol]: text
-};
+});
