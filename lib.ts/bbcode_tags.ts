@@ -42,6 +42,12 @@ size = (n: Node, t: Tokeniser, p: Parsers) => {
 		}
 	}
 },
+font = (n: Node, t: Tokeniser, p: Parsers) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		process(!tk.attr || tk.attr.includes(';') ? n : n.appendChild(span({"style": `font-family: ${tk.attr}`})), t, p, tk.tagName);
+	}
+},
 h1 = simple(ah1, undefined),
 h2 = simple(ah2, undefined),
 h3 = simple(ah3, undefined),
@@ -114,6 +120,7 @@ all = {
 	b,
 	i,
 	u,
+	s,
 	left,
 	centre,
 	center,
@@ -123,11 +130,14 @@ all = {
 	colour,
 	color,
 	size,
+	font,
 	h1,
 	h2,
 	h3,
 	h4,
 	h5,
 	h6,
+	url,
+	img,
 	[textSymbol]: text
 };
