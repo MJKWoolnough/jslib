@@ -4,7 +4,7 @@ import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bb
 import {formatText} from './dom.js';
 import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, pre, span} from './html.js';
 
-const simple = (fn: DOMBind<Node>, style: string | undefined) => (n: Node, t: Tokeniser, p: Parsers) => {
+const simple = (fn: DOMBind<Node>, style?: string) => (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
 		process(n.appendChild(fn({style})), t, p, tk.tagName);
@@ -49,12 +49,12 @@ font = (n: Node, t: Tokeniser, p: Parsers) => {
 		process(!tk.attr || tk.attr.includes(';') ? n : n.appendChild(span({"style": `font-family: ${tk.attr}`})), t, p, tk.tagName);
 	}
 },
-h1 = simple(ah1, undefined),
-h2 = simple(ah2, undefined),
-h3 = simple(ah3, undefined),
-h4 = simple(ah4, undefined),
-h5 = simple(ah5, undefined),
-h6 = simple(ah6, undefined),
+h1 = simple(ah1),
+h2 = simple(ah2),
+h3 = simple(ah3),
+h4 = simple(ah4),
+h5 = simple(ah5),
+h6 = simple(ah6),
 url = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
