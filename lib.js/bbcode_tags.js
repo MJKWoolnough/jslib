@@ -1,5 +1,6 @@
-import {text as textSymbol, isOpenTag, process} from './bbcode.js';
-import {div, span} from './html.js';
+import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
+import {formatText} from './dom.js';
+import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, pre, span} from './html.js';
 
 const simple = (fn, style) => (n, t, p) => {
 	const tk = t.next(true).value;
@@ -11,6 +12,7 @@ const simple = (fn, style) => (n, t, p) => {
 export const b = simple(span, "font-weight: bold;"),
 i = simple(span, "font-style: italic"),
 u = simple(span, "text-decoration: underline"),
+s = simple(span, "text-decoration: line-through"),
 left = simple(div, "text-align: left"),
 centre = simple(div, "text-align: center"),
 center = centre,
@@ -39,11 +41,99 @@ size = (n, t, p) => {
 		}
 	}
 },
-text = (n, t) => n.appendChild(document.createTextNode(t)),
-all = {
+font = (n, t, p) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		process(!tk.attr || tk.attr.includes(';') ? n : n.appendChild(span({"style": `font-family: ${tk.attr}`})), t, p, tk.tagName);
+	}
+},
+h1 = simple(ah1),
+h2 = simple(ah2),
+h3 = simple(ah3),
+h4 = simple(ah4),
+h5 = simple(ah5),
+h6 = simple(ah6),
+url = (n, t, p) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		if (tk.attr) {
+			try {
+				process(n.appendChild(a({"href": (new URL(tk.attr, window.location.href)).href})), t, p, tk.tagName);
+				return;
+			} catch{}
+		}
+		p[textSymbol](n, tk.fullText);
+	}
+},
+img = (n, t, p) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		let src = "";
+		while (true) {
+			const end = t.next().value;
+			if (!end) {
+				p[textSymbol](n, tk.fullText);
+				p[textSymbol](n, src);
+				return;
+			}
+			if(isCloseTag(end) && end.tagName === tk.tagName) {
+				break;
+			}
+			src += isString(end) ? end : end.fullText;
+		}
+		if (!src) {
+			p[textSymbol](n, tk.fullText);
+			return;
+		}
+		try {
+			const u = new URL(src, window.location.href);
+			src = u.href;
+		} catch {
+			p[textSymbol](n, tk.fullText);
+			p[textSymbol](n, src);
+			return;
+		}
+		const params = {src};
+		if (tk.attr) {
+			const [strWidth, strHeight] = tk.attr.split('x');
+			if (strWidth) {
+				const percent = strWidth.endsWith('%') ? '%' : '',
+				      width = parseInt(percent ? strWidth.slice(-1) : strWidth);
+				if (!isNaN(width)) {
+					params["width"] = width + percent;
+				}
+			}
+			if (strHeight) {
+				const percent = strHeight.endsWith('%') ? '%' : '',
+				      height = parseInt(percent ? strHeight.slice(-1) : strHeight);
+				if (!isNaN(height)) {
+					params["height"] = height + percent;
+				}
+			}
+		}
+		n.appendChild(aimg(params));
+	}
+},
+code = (n, t) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		let code = "";
+		while (true) {
+			const end = t.next().value;
+			if (!end || isCloseTag(end) && end.tagName === tk.tagName) {
+				break;
+			}
+			code += isString(end) ? end : end.fullText;
+		}
+		n.appendChild(pre(code));
+	}
+},
+text = (n, t) => n.appendChild(formatText(t)),
+all = Object.freeze({
 	b,
 	i,
 	u,
+	s,
 	left,
 	centre,
 	center,
@@ -53,5 +143,15 @@ all = {
 	colour,
 	color,
 	size,
+	font,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	url,
+	img,
+	code,
 	[textSymbol]: text
-};
+});
