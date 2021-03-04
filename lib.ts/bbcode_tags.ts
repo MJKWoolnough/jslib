@@ -1,7 +1,7 @@
 import type {Parsers, Tokeniser} from './bbcode.js';
 import type {DOMBind} from './dom.js';
 import {text as textSymbol, isOpenTag, process} from './bbcode.js';
-import {div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, span} from './html.js';
+import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, span} from './html.js';
 
 const simple = (fn: DOMBind<Node>, style: string | undefined) => (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
@@ -47,6 +47,18 @@ h3 = simple(ah3, undefined),
 h4 = simple(ah4, undefined),
 h5 = simple(ah5, undefined),
 h6 = simple(ah6, undefined),
+url = (n: Node, t: Tokeniser, p: Parsers) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		if (tk.attr) {
+			try {
+				process(n.appendChild(a({"href": (new URL(tk.attr, window.location.href)).href})), t, p, tk.tagName);
+				return;
+			} catch{}
+		}
+		p[textSymbol](n, tk.fullText);
+	}
+},
 text = (n: Node, t: string) => n.appendChild(document.createTextNode(t)),
 all = {
 	b,
