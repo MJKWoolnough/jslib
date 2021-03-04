@@ -1,7 +1,7 @@
 import type {Parsers, Tokeniser} from './bbcode.js';
 import type {DOMBind} from './dom.js';
-import {text as textSymbol, isOpenTag, process} from './bbcode.js';
-import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, span} from './html.js';
+import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
+import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, span} from './html.js';
 
 const simple = (fn: DOMBind<Node>, style: string | undefined) => (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
@@ -57,6 +57,55 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 			} catch{}
 		}
 		p[textSymbol](n, tk.fullText);
+	}
+},
+img = (n: Node, t: Tokeniser, p: Parsers) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		let src = "";
+		while (true) {
+			const end = t.next().value;
+			if (!end) {
+				p[textSymbol](n, tk.fullText);
+				p[textSymbol](n, src);
+				return;
+			}
+			if(isCloseTag(end) && end.tagName === tk.tagName) {
+				break;
+			}
+			src += isString(end) ? end : end.fullText;
+		}
+		if (!src) {
+			p[textSymbol](n, tk.fullText);
+			return;
+		}
+		try {
+			const u = new URL(src, window.location.href);
+			src = u.href;
+		} catch {
+			p[textSymbol](n, tk.fullText);
+			p[textSymbol](n, src);
+			return;
+		}
+		const params: Record<string, string> = {src};
+		if (tk.attr) {
+			const [strWidth, strHeight] = tk.attr.split('x');
+			if (strWidth) {
+				const percent = strWidth.endsWith('%') ? '%' : '',
+				      width = parseInt(percent ? strWidth.slice(-1) : strWidth);
+				if (!isNaN(width)) {
+					params["width"] = width + percent;
+				}
+			}
+			if (strHeight) {
+				const percent = strHeight.endsWith('%') ? '%' : '',
+				      height = parseInt(percent ? strHeight.slice(-1) : strHeight);
+				if (!isNaN(height)) {
+					params["height"] = height + percent;
+				}
+			}
+		}
+		n.appendChild(aimg(params));
 	}
 },
 text = (n: Node, t: string) => n.appendChild(document.createTextNode(t)),
