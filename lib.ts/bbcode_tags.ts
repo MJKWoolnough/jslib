@@ -1,7 +1,7 @@
 import type {Parsers, Tokeniser} from './bbcode.js';
 import type {DOMBind} from './dom.js';
 import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
-import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, span} from './html.js';
+import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, pre, span} from './html.js';
 
 const simple = (fn: DOMBind<Node>, style: string | undefined) => (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
@@ -115,6 +115,20 @@ img = (n: Node, t: Tokeniser, p: Parsers) => {
 		n.appendChild(aimg(params));
 	}
 },
+code = (n: Node, t: Tokeniser) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		let code = "";
+		while (true) {
+			const end = t.next().value;
+			if (!end || isCloseTag(end) && end.tagName === tk.tagName) {
+				break;
+			}
+			code += isString(end) ? end : end.fullText;
+		}
+		n.appendChild(pre(code));
+	}
+},
 text = (n: Node, t: string) => n.appendChild(document.createTextNode(t)),
 all = {
 	b,
@@ -139,5 +153,6 @@ all = {
 	h6,
 	url,
 	img,
+	code,
 	[textSymbol]: text
 };
