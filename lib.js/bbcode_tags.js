@@ -1,6 +1,6 @@
 import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
 import {formatText} from './dom.js';
-import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, pre, span} from './html.js';
+import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, pre, span, table as atable, tbody, td, tfoot, thead, th, tr} from './html.js';
 
 const simple = (fn, style) => (n, t, p) => {
 	const tk = t.next(true).value;
@@ -128,6 +128,100 @@ code = (n, t) => {
 		n.appendChild(pre(code));
 	}
 },
+table = (n, t, p) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		const tableHeader = [],
+		      tableBody = [],
+		      tableFooter = [];
+		let state = 0, // 1 - tr, 2 - thead, 4 -> tbody, 8 -> tfoot
+		    hasHeader = false,
+		    hasBody = false,
+		    hasFooter = false,
+		    currRow = null;
+		while (true) {
+			const tk = t.next().value;
+			if (!tk) {
+				break;
+			}
+			if (isOpenTag(tk)) {
+				switch (tk.tagName) {
+				case "thead":
+					if (!hasHeader) {
+						hasHeader = true;
+						state = 2
+					}
+					break;
+				case "tbody":
+					if (!hasBody) {
+						hasBody = true;
+						state = 4;
+					}
+					break;
+				case "tfoot":
+					if (hasFooter) {
+						hasFooter = true;
+						state = 8;
+					}
+					break;
+				case "tr":
+					if ((state&1) === 1) {
+						break;
+					}
+					if (state === 0) {
+						hasBody = true;
+						state = 4;
+					}
+					currRow = tr();
+					switch (state) {
+					case 2:
+						tableHeader.push(currRow);
+						break;
+					case 4:
+						tableBody.push(currRow);
+						break;
+					case 8:
+						tableFooter.push(currRow);
+					}
+				case "th":
+				case "td":
+					if (currRow) {
+						process(currRow.appendChild(tk.tagName === "th" ? th() : td()), t, p, tk.tagName);
+					}
+				}
+			} else if (isCloseTag(tk)) {
+				if (tk.tagName === "table") {
+					n.appendChild(atable([
+						tableHeader.length > 0 ? thead(tableHeader) : [],
+						tableBody.length > 0 ? tbody(tableBody) : [],
+						tableFooter.length > 0 ? tfoot(tableFooter) : []
+					]));
+					return;
+				} else if ((state&1) === 1 && tk.tagName === "tr") {
+					state ^= 1;
+					currRow = null;
+				} else {
+					switch (state^1) {
+					case 2:
+						if (tk.tagName === "thead") {
+							state = 0;
+						}
+						break;
+					case 4:
+						if (tk.tagName === "tbody") {
+							state = 0;
+						}
+						break;
+					case 8:
+						if (tk.tagName === "tfoot") {
+							state = 0;
+						}
+					}
+				}
+			}
+		}
+	}
+},
 text = (n, t) => n.appendChild(formatText(t)),
 all = Object.freeze({
 	b,
@@ -153,5 +247,6 @@ all = Object.freeze({
 	url,
 	img,
 	code,
+	table,
 	[textSymbol]: text
 });
