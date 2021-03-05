@@ -7,6 +7,7 @@ const parseText = function* (text) {
 			if (end) {
 				pos++;
 			}
+			TagLoop:
 			for (pos++; pos < text.length; pos++) {
 				const c = text.charCodeAt(pos);
 				if (c >= 65 && c <=90 || c >=97 && c <=122) {
@@ -32,14 +33,45 @@ const parseText = function* (text) {
 						while (yield t) {}
 					}
 					const startAttr = pos;
-					for (pos++; pos < text.length; pos++) {
-						if (text.charAt(pos) === ']') {
-							break;
+					let attr = "";
+					if (text.charAt(pos+1) === '"') {
+						pos++;
+						AttrLoop:
+						for (pos++; pos < text.length; pos++) {
+							const c = text.charAt(pos);
+							switch (c) {
+							case '"':
+								if (text.charAt(pos+1) === ']') {
+									pos++;
+									break AttrLoop;
+								}
+								pos = startAttr;
+								continue TagLoop;
+							case '\\':
+								pos++;
+								const d = text.charAt(pos);
+								switch (d) {
+								case '"':
+								case "'":
+								case '\\':
+									attr += d;
+								}
+								break;
+							default:
+								attr += c;
+							}
 						}
+					} else {
+						for (pos++; pos < text.length; pos++) {
+							if (text.charAt(pos) === ']') {
+								break;
+							}
+						}
+						attr = text.slice(startAttr+1, pos);
 					}
 					const t = Object.freeze({
 						"tagName": text.slice(start+1, startAttr).toLowerCase(),
-						"attr": text.slice(startAttr+1, pos),
+						attr,
 						"fullText": text.slice(start, pos+1)
 					});
 					last = pos+1;
