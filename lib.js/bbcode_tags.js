@@ -1,6 +1,6 @@
 import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
 import {formatText} from './dom.js';
-import {a, blockquote, div, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, legend, pre, span, table as atable, tbody, td, tfoot, thead, th, tr} from './html.js';
+import {a, blockquote, div, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, legend, li, ol, pre, span, table as atable, tbody, td, tfoot, thead, th, tr, ul} from './html.js';
 
 const simple = (fn, style) => (n, t, p) => {
 	const tk = t.next(true).value;
@@ -232,6 +232,57 @@ quote = (n, t, p) => {
 		process(f.appendChild(blockquote()), t, p, tk.tagName);
 	}
 },
+list = (n, t, p) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		let type = "";
+		switch (tk.attr) {
+		case 'a':
+		case 'A':
+		case 'i':
+		case 'I':
+		case '1':
+			type = tk.attr;
+		}
+		const l = n.appendChild(type === "" ? ul() : ol({type}));
+		let currItem = null;
+		while (true) {
+			const tk = t.next().value;
+			if (!tk) {
+				return;
+			}
+			if (isString(tk)) {
+				let pos = 0;
+				while (pos < tk.length) {
+					const open = tk.indexOf("[*]", pos),
+					      close = tk.indexOf("[/*]", pos);
+					if (open < close && open !== -1) {
+						if (currItem) {
+							p[textSymbol](currItem, tk.slice(pos, open));
+						}
+						currItem = l.appendChild(li());
+						pos = open + 3;
+					} else if (close < open && close !== -1) {
+						if (currItem) {
+							p[textSymbol](currItem, tk.slice(pos, close));
+							currItem = null;
+						}
+						pos = close + 4;
+					} else if (currItem) {
+						p[textSymbol](currItem, tk.slice(pos));
+						break;
+					}
+				}
+			} else if (currItem) {
+				if (isOpenTag(tk) && p[tk.tagName]) {
+					p[tk.tagName](currItem, t, p);
+				} else {
+					p[textSymbol](currItem, tk.fullText);
+				}
+			}
+		}
+	}
+},
 text = (n, t) => n.appendChild(formatText(t)),
 all = Object.freeze({
 	b,
@@ -259,5 +310,6 @@ all = Object.freeze({
 	code,
 	table,
 	quote,
+	list,
 	[textSymbol]: text
 });
