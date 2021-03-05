@@ -16,14 +16,14 @@ const parseText = function* (text: string): Tokeniser {
 						const t = text.slice(last, start);
 						while (yield t) {}
 					}
-					const t = end ? {
+					const t = Object.freeze(end ? {
 						"tagName": text.slice(start+2, pos),
 						"fullText": text.slice(start, pos+1)
 					} : {
 						"tagName": text.slice(start+1, pos),
 						"attr": null,
 						"fullText": text.slice(start, pos+1)
-					};
+					});
 					last = pos+1;
 					while (yield t) {}
 				} else if (c === 61 && !end && pos > start + 1) { // '='
@@ -37,11 +37,11 @@ const parseText = function* (text: string): Tokeniser {
 							break;
 						}
 					}
-					const t = {
+					const t = Object.freeze({
 						"tagName": text.slice(start+1, startAttr),
 						"attr": text.slice(startAttr+1, pos),
 						"fullText": text.slice(start, pos+1)
-					};
+					});
 					last = pos+1;
 					while (yield t) {}
 				}
