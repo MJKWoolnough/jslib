@@ -1,6 +1,6 @@
 import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
 import {formatText} from './dom.js';
-import {a, div, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, pre, span, table as atable, tbody, td, tfoot, thead, th, tr} from './html.js';
+import {a, blockquote, div, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, img as aimg, legend, pre, span, table as atable, tbody, td, tfoot, thead, th, tr} from './html.js';
 
 const simple = (fn, style) => (n, t, p) => {
 	const tk = t.next(true).value;
@@ -222,6 +222,16 @@ table = (n, t, p) => {
 		}
 	}
 },
+quote = (n, t, p) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		const f = n.appendChild(fieldset());
+		if (tk.attr) {
+			f.appendChild(legend(tk.attr));
+		}
+		process(f.appendChild(blockquote()), t, p, tk.tagName);
+	}
+},
 text = (n, t) => n.appendChild(formatText(t)),
 all = Object.freeze({
 	b,
@@ -248,5 +258,6 @@ all = Object.freeze({
 	img,
 	code,
 	table,
+	quote,
 	[textSymbol]: text
 });
