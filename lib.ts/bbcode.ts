@@ -17,10 +17,10 @@ const parseText = function* (text: string): Tokeniser {
 						while (yield t) {}
 					}
 					const t = Object.freeze(end ? {
-						"tagName": text.slice(start+2, pos),
+						"tagName": text.slice(start+2, pos).toLowerCase(),
 						"fullText": text.slice(start, pos+1)
 					} : {
-						"tagName": text.slice(start+1, pos),
+						"tagName": text.slice(start+1, pos).toLowerCase(),
 						"attr": null,
 						"fullText": text.slice(start, pos+1)
 					});
@@ -38,7 +38,7 @@ const parseText = function* (text: string): Tokeniser {
 						}
 					}
 					const t = Object.freeze({
-						"tagName": text.slice(start+1, startAttr),
+						"tagName": text.slice(start+1, startAttr).toLowerCase(),
 						"attr": text.slice(startAttr+1, pos),
 						"fullText": text.slice(start, pos+1)
 					});
