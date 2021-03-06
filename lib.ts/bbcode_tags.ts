@@ -126,14 +126,14 @@ img = (n: Node, t: Tokeniser, p: Parsers) => {
 			const [strWidth, strHeight] = tk.attr.split('x');
 			if (strWidth) {
 				const percent = strWidth.endsWith('%') ? '%' : '',
-				      width = parseInt(percent ? strWidth.slice(-1) : strWidth);
+				      width = parseInt(percent ? strWidth.slice(0, -1) : strWidth);
 				if (!isNaN(width)) {
 					params["width"] = width + percent;
 				}
 			}
 			if (strHeight) {
 				const percent = strHeight.endsWith('%') ? '%' : '',
-				      height = parseInt(percent ? strHeight.slice(-1) : strHeight);
+				      height = parseInt(percent ? strHeight.slice(0, -1) : strHeight);
 				if (!isNaN(height)) {
 					params["height"] = height + percent;
 				}
