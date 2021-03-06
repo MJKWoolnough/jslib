@@ -59,10 +59,36 @@ url = (n, t, p) => {
 		if (tk.attr) {
 			try {
 				process(n.appendChild(a({"href": (new URL(tk.attr, window.location.href)).href})), t, p, tk.tagName);
-				return;
-			} catch{}
+			} catch{
+				p[textSymbol](n, tk.fullText);
+			}
+		} else {
+			let u = "", endTag = null;
+			while (true) {
+				const ut = t.next().value;
+				if (!ut) {
+					break;
+				}
+				if (isCloseTag(ut) && ut.tagName === tk.tagName) {
+					endTag = ut;
+					break;
+				} else if (isString(ut)) {
+					u += ut;
+				} else {
+					u += ut.fullText;
+				}
+			}
+			try {
+				const url = new URL(u, window.location.href);
+				n.appendChild(a({"href": url.href}, u));
+			} catch {
+				p[textSymbol](n, tk.fullText);
+				p[textSymbol](n, u);
+				if (endTag) {
+					p[textSymbol](n, endTag.fullText);
+				}
+			}
 		}
-		p[textSymbol](n, tk.fullText);
 	}
 },
 img = (n, t, p) => {
