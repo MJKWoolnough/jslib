@@ -246,7 +246,8 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 		case '1':
 			type = tk.attr;
 		}
-		const l = n.appendChild(type === "" ? ul() : ol({type}));
+		const l = n.appendChild(type === "" ? ul() : ol({type})),
+		      lname = tk.tagName;
 		let currItem: HTMLLIElement | null = null;
 		while (true) {
 			const tk = t.next().value;
@@ -258,23 +259,27 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 				while (pos < tk.length) {
 					const open = tk.indexOf("[*]", pos),
 					      close = tk.indexOf("[/*]", pos);
-					if (open < close && open !== -1) {
+					if (open < close && open !== -1 || close === -1 && open !== -1) {
 						if (currItem) {
 							p[textSymbol](currItem, tk.slice(pos, open));
 						}
 						currItem = l.appendChild(li());
 						pos = open + 3;
-					} else if (close < open && close !== -1) {
+					} else if (close < open && close !== -1 || open === -1 && close !== -1) {
 						if (currItem) {
 							p[textSymbol](currItem, tk.slice(pos, close));
 							currItem = null;
 						}
 						pos = close + 4;
-					} else if (currItem) {
-						p[textSymbol](currItem, tk.slice(pos));
+					} else {
+						if (currItem) {
+							p[textSymbol](currItem, tk.slice(pos));
+						}
 						break;
 					}
 				}
+			} else if (isCloseTag(tk) && tk.tagName === lname) {
+				return;
 			} else if (currItem) {
 				if (isOpenTag(tk) && p[tk.tagName]) {
 					p[tk.tagName](currItem, t, p);
