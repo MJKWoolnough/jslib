@@ -211,6 +211,7 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 					case 8:
 						tableFooter.push(currRow);
 					}
+					break;
 				case "th":
 				case "td":
 					if (currRow) {
@@ -229,7 +230,7 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 					state ^= 1;
 					currRow = null;
 				} else {
-					switch (state^1) {
+					switch (state&~1) {
 					case 2:
 						if (tk.tagName === "thead") {
 							state = 0;

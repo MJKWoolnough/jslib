@@ -209,6 +209,7 @@ table = (n, t, p) => {
 					case 8:
 						tableFooter.push(currRow);
 					}
+					break;
 				case "th":
 				case "td":
 					if (currRow) {
@@ -227,7 +228,7 @@ table = (n, t, p) => {
 					state ^= 1;
 					currRow = null;
 				} else {
-					switch (state^1) {
+					switch (state&~1) {
 					case 2:
 						if (tk.tagName === "thead") {
 							state = 0;
