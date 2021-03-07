@@ -112,6 +112,9 @@ img = (n, t, p) => {
 		} catch {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
+			if (endTag && isCloseTag(endTag)) {
+				p[textSymbol](n, endTag.fullText);
+			}
 			return;
 		}
 		const params = {src};

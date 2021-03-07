@@ -114,6 +114,9 @@ img = (n: Node, t: Tokeniser, p: Parsers) => {
 		} catch {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
+			if (endTag && isCloseTag(endTag)) {
+				p[textSymbol](n, endTag.fullText);
+			}
 			return;
 		}
 		const params: Record<string, string> = {src};
