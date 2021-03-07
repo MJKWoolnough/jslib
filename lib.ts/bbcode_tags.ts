@@ -326,6 +326,7 @@ all = Object.freeze({
 	h4,
 	h5,
 	h6,
+	hr,
 	url,
 	img,
 	code,
