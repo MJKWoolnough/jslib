@@ -1,12 +1,22 @@
 import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
 import {formatText} from './dom.js';
-import {a, blockquote, div, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, ol, pre, span, table as atable, tbody, td, tfoot, thead, th, tr, ul} from './html.js';
+import {a, div, blockquote, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, ol, pre, span, table as atable, tbody, td, tfoot, thead, th, tr, ul} from './html.js';
 
 const simple = (fn, style) => (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
 		process(n.appendChild(fn({style})), t, p, tk.tagName);
 	}
+      },
+      textContents = (t, endTag) => {
+		let contents = "";
+		while (true) {
+			const end = t.next().value;
+			if (!end || isCloseTag(end) && end.tagName === endTag) {
+				return contents;
+			}
+			contents += isString(end) ? end : end.fullText;
+		}
       };
 
 export const b = simple(span, "font-weight: bold;"),
@@ -64,28 +74,15 @@ url = (n, t, p) => {
 				p[textSymbol](n, tk.fullText);
 			}
 		} else {
-			let u = "", endTag = null;
-			while (true) {
-				const ut = t.next().value;
-				if (!ut) {
-					break;
-				}
-				if (isCloseTag(ut) && ut.tagName === tk.tagName) {
-					endTag = ut;
-					break;
-				} else if (isString(ut)) {
-					u += ut;
-				} else {
-					u += ut.fullText;
-				}
-			}
+			const u = textContents(t, tk.tagName);
 			try {
 				const url = new URL(u, window.location.href);
 				n.appendChild(a({"href": url.href}, u));
 			} catch {
 				p[textSymbol](n, tk.fullText);
 				p[textSymbol](n, u);
-				if (endTag) {
+				const endTag = t.next(true).value;
+				if (endTag && isCloseTag(endTag)) {
 					p[textSymbol](n, endTag.fullText);
 				}
 			}
@@ -95,21 +92,18 @@ url = (n, t, p) => {
 img = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		let src = "";
-		while (true) {
-			const end = t.next().value;
-			if (!end) {
-				p[textSymbol](n, tk.fullText);
-				p[textSymbol](n, src);
-				return;
-			}
-			if(isCloseTag(end) && end.tagName === tk.tagName) {
-				break;
-			}
-			src += isString(end) ? end : end.fullText;
+		let src = textContents(t, tk.tagName);
+		const endTag = t.next(true).value;
+		if (!endTag) {
+			p[textSymbol](n, tk.fullText);
+			p[textSymbol](n, src);
+			return;
 		}
 		if (!src) {
 			p[textSymbol](n, tk.fullText);
+			if (endTag && isCloseTag(endTag)) {
+				p[textSymbol](n, endTag.fullText);
+			}
 			return;
 		}
 		try {
@@ -144,15 +138,7 @@ img = (n, t, p) => {
 code = (n, t) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		let code = "";
-		while (true) {
-			const end = t.next().value;
-			if (!end || isCloseTag(end) && end.tagName === tk.tagName) {
-				break;
-			}
-			code += isString(end) ? end : end.fullText;
-		}
-		n.appendChild(pre(code));
+		n.appendChild(pre(textContents(t, tk.tagName)));
 	}
 },
 table = (n, t, p) => {
