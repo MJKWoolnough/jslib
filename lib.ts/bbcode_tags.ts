@@ -2,7 +2,7 @@ import type {Parsers, Tokeniser} from './bbcode.js';
 import type {DOMBind} from './dom.js';
 import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
 import {formatText} from './dom.js';
-import {a, div, blockquote, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, ol, pre, span, table as atable, tbody, td, tfoot, thead, th, tr, ul} from './html.js';
+import {a, audio as aaudio, div, blockquote, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, ol, pre, span, table as atable, tbody, td, tfoot, thead, th, tr, ul} from './html.js';
 
 const simple = (fn: DOMBind<Node>, style?: string) => (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
@@ -84,6 +84,33 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 				p[textSymbol](n, tk.fullText);
 				p[textSymbol](n, u);
 				const endTag = t.next(true).value;
+				if (endTag && isCloseTag(endTag)) {
+					p[textSymbol](n, endTag.fullText);
+				}
+			}
+		}
+	}
+},
+audio = (n: Node, t: Tokeniser, p: Parsers) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		const src = textContents(t, tk.tagName),
+		      endTag = t.next(true).value;
+		if (!endTag) {
+			p[textSymbol](n, tk.fullText);
+			p[textSymbol](n, src);
+		} else if (!src) {
+			p[textSymbol](n, tk.fullText);
+			if (endTag && isCloseTag(endTag)) {
+				p[textSymbol](n, endTag.fullText);
+			}
+		} else {
+			try {
+				const u = new URL(src, window.location.href);
+				n.appendChild(aaudio({"src": u.href, "controls": true}));
+			} catch {
+				p[textSymbol](n, tk.fullText);
+				p[textSymbol](n, src);
 				if (endTag && isCloseTag(endTag)) {
 					p[textSymbol](n, endTag.fullText);
 				}
@@ -331,6 +358,7 @@ all = Object.freeze({
 	h6,
 	hr,
 	url,
+	audio,
 	img,
 	code,
 	table,
