@@ -115,4 +115,5 @@ process = function(node, t, p, closeTag) {
 
 export default function (node, parsers, text) {
 	process(node, parseText(text), parsers);
+	return node;
 }

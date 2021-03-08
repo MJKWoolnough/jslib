@@ -135,4 +135,5 @@ export type Parsers = {
 
 export default function (node: Node, parsers: Parsers, text: string) {
 	process(node, parseText(text), parsers);
+	return node;
 }
