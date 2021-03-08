@@ -126,8 +126,10 @@ export type CloseTag = {
 
 export type Tokeniser = Generator<OpenTag | CloseTag | string, void, true | undefined>;
 
+export type TagFn = (node: Node, t: Tokeniser, p: Parsers) => void;
+
 export type Parsers = {
-	[key: string]: (node: Node, t: Tokeniser, p: Parsers) => void;
+	[key: string]: TagFn;
 	[text]: (node: Node, t: string) => void;
 }
 
