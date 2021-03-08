@@ -5,6 +5,7 @@ import {button, div, img, input, slot, span, style} from './html.js';
 type Wdata = {
 	titleElement: HTMLSpanElement;
 	iconElement: HTMLImageElement;
+	extraButtons: HTMLSpanElement;
 }
 
 const windowData = new WeakMap<WindowElement, Wdata>(),
@@ -283,11 +284,12 @@ export class DesktopElement extends HTMLElement {
 
 export class WindowElement extends HTMLElement {
 	constructor() {
-		super()
+		super();
 		const titleElement = span({"part": "title"}),
 		      iconElement = img({"part": "icon", "src": noIcon}),
+		      extraButtons = span(),
 		      onclick = () => this.focus();
-		windowData.set(this, {titleElement, iconElement});
+		windowData.set(this, {titleElement, iconElement, extraButtons});
 		createHTML(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
@@ -371,19 +373,19 @@ export class WindowElement extends HTMLElement {
 	height: calc(1em + 8px);
 }
 
-:host > div:nth-child(3) button:nth-of-type(1) {
+:host > div:nth-child(3) > div > button:nth-of-type(1) {
 	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1,1 L9,9 M9,1 L1,9" stroke="black" /%3E%3C/svg%3E');
 }
 
-:host > div:nth-child(3) button:nth-of-type(2) {
+:host > div:nth-child(3) > div> button:nth-of-type(2) {
 	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M9,3 h-8 v-1 h8 v-1 h-8 v8 h8 v-8" stroke="black" fill="none" /%3E%3C/svg%3E');
 }
 
-:host([maximised]) > div:nth-child(3) button:nth-of-type(2) {
+:host([maximised]) > div:nth-child(3) > div > button:nth-of-type(2) {
 	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 15 13" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1,5 h8 v-1 h-8 v8 h8 v-8 m-3,0 v-3 h8 v8 h-5 m5,-7 h-8" stroke="%23000" fill="none" /%3E%3C/svg%3E');
 }
 
-:host > div:nth-child(3) button:nth-of-type(3) {
+:host > div:nth-child(3) > div> button:nth-of-type(3) {
 	display: var(--taskmanager-on, block);
 	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"%3E%3Cline x1="1" y1="9" x2="9" y2="9" stroke="black" /%3E%3C/svg%3E');
 }
@@ -510,7 +512,8 @@ export class WindowElement extends HTMLElement {
 				div({"part": "controls"}, [
 					button({"part": "close", "onclick": () => this.close()}),
 					button({"part": "maximise", "onclick": () => this.toggleAttribute("maximised")}),
-					button({"part": "minimise", "onclick": () => this.toggleAttribute("minimised")})
+					button({"part": "minimise", "onclick": () => this.toggleAttribute("minimised")}),
+					extraButtons
 				])
 			]),
 			div(slot()),
@@ -574,6 +577,9 @@ export class WindowElement extends HTMLElement {
 		childOf.set(w, this);
 		this.parentNode.appendChild(w);
 		return true;
+	}
+	addControlButton(icon: string, onclick: (this: WindowElement) => void, title?: string) {
+		windowData.get(this)!.extraButtons.appendChild(button({"style": {"background-image": `url(${JSON.stringify(icon)})`}, "onclick": () => onclick.call(this), title}));
 	}
 	focus() {
 		const c = childWindows.get(this);
