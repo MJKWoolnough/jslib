@@ -40,21 +40,8 @@ export const createElements = namespace => (element, properties, children) => {
 				if (ev.startsWith("on")) {
 					elem.addEventListener(ev.substr(2), prop, opts);
 				}
-			} else if (k === "class") {
-				if (typeof prop === "string" && prop.length > 0) {
-					elem.classList.add(...prop.split(" "));
-				} else if ((prop instanceof Array || prop instanceof DOMTokenList) && prop.length > 0) {
-					elem.classList.add(...prop);
-				}
-			} else if (k === "class!") {
-				if (elem.classList.length > 0) {
-					elem.classList.remove(...elem.classList);
-				}
-				if (typeof prop === "string") {
-					elem.classList.add(...prop.split(" "));
-				} else if ((prop instanceof Array || prop instanceof DOMTokenList) && prop.length > 0) {
-					elem.classList.add(...prop);
-				}
+			} else if (k === "class" && (prop instanceof Array || prop instanceof DOMTokenList) && prop.length > 0) {
+				elem.classList.add(...prop);
 			} else if (k === "style" && typeof prop === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				for (const k in prop) {
 					if (prop[k] === undefined) {
