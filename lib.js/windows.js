@@ -347,7 +347,8 @@ export class WindowElement extends HTMLElement {
 		return true;
 	}
 	addControlButton(icon, onclick, title) {
-		windowData.get(this).extraButtons.appendChild(button({"style": {"background-image": `url(${icon})`}, "onclick": () => onclick.call(this), title}));
+		const b = windowData.get(this).extraButtons.appendChild(button({"style": {"background-image": `url(${icon})`}, "onclick": () => onclick.call(this), title}));
+		return () => b.remove();
         }
 	focus() {
 		const c = childWindows.get(this);
