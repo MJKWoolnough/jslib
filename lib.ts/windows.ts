@@ -329,10 +329,10 @@ export class WindowElement extends HTMLElement {
 :host([minimised]),
 :host > div:nth-child(2),
 :host([hide-titlebar]) > div:nth-child(3),
-:host([hide-close]) > div:nth-child(3) button:nth-of-type(1),
-:host([hide-maximise]) > div:nth-child(3) button:nth-of-type(2),
-:host([hide-minimise]) > div:nth-child(3) button:nth-of-type(3),
-:host([window-hide]) > div:nth-child(3) button:nth-of-type(3) {
+:host([hide-close]) > div:nth-child(3) > div > button:nth-of-type(1),
+:host([hide-maximise]) > div:nth-child(3) > div > button:nth-of-type(2),
+:host([hide-minimise]) > div:nth-child(3) > div > button:nth-of-type(3),
+:host([window-hide]) > div:nth-child(3) > div > button:nth-of-type(3) {
 	display: none;
 }
 
