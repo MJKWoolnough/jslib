@@ -94,7 +94,7 @@ audio = (n, t, p) => {
 	if (tk && isOpenTag(tk)) {
 		const src = textContents(t, tk.tagName),
 		      endTag = t.next(true).value;
-		if (!endTag) {
+		if (!endTag || !isCloseTag(endTag)) {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
 		} else if (!src) {
@@ -109,9 +109,7 @@ audio = (n, t, p) => {
 			} catch {
 				p[textSymbol](n, tk.fullText);
 				p[textSymbol](n, src);
-				if (endTag && isCloseTag(endTag)) {
-					p[textSymbol](n, endTag.fullText);
-				}
+				p[textSymbol](n, endTag.fullText);
 			}
 		}
 	}
@@ -121,7 +119,7 @@ img = (n, t, p) => {
 	if (tk && isOpenTag(tk)) {
 		let src = textContents(t, tk.tagName);
 		const endTag = t.next(true).value;
-		if (!endTag) {
+		if (!endTag || !isCloseTag(endTag)) {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
 			return;
@@ -139,9 +137,7 @@ img = (n, t, p) => {
 		} catch {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
-			if (endTag && isCloseTag(endTag)) {
-				p[textSymbol](n, endTag.fullText);
-			}
+			p[textSymbol](n, endTag.fullText);
 			return;
 		}
 		const params = {src};

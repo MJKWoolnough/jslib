@@ -96,7 +96,7 @@ audio = (n: Node, t: Tokeniser, p: Parsers) => {
 	if (tk && isOpenTag(tk)) {
 		const src = textContents(t, tk.tagName),
 		      endTag = t.next(true).value;
-		if (!endTag) {
+		if (!endTag || !isCloseTag(endTag)) {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
 		} else if (!src) {
@@ -111,9 +111,7 @@ audio = (n: Node, t: Tokeniser, p: Parsers) => {
 			} catch {
 				p[textSymbol](n, tk.fullText);
 				p[textSymbol](n, src);
-				if (endTag && isCloseTag(endTag)) {
-					p[textSymbol](n, endTag.fullText);
-				}
+				p[textSymbol](n, endTag.fullText);
 			}
 		}
 	}
@@ -123,7 +121,7 @@ img = (n: Node, t: Tokeniser, p: Parsers) => {
 	if (tk && isOpenTag(tk)) {
 		let src = textContents(t, tk.tagName);
 		const endTag = t.next(true).value;
-		if (!endTag) {
+		if (!endTag || !isCloseTag(endTag)) {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
 			return;
@@ -141,9 +139,7 @@ img = (n: Node, t: Tokeniser, p: Parsers) => {
 		} catch {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
-			if (endTag && isCloseTag(endTag)) {
-				p[textSymbol](n, endTag.fullText);
-			}
+			p[textSymbol](n, endTag.fullText);
 			return;
 		}
 		const params: Record<string, string> = {src};
