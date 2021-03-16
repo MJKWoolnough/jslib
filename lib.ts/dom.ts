@@ -1,6 +1,6 @@
 export type Children = string | Node | Children[];
 
-export type Props = Record<string, number | string | string[] | DOMTokenList | Function | Boolean | undefined | null | Record<string, string | number | undefined>>;
+export type Props = Record<string, number | string | string[] | DOMTokenList | Function | Boolean | undefined | Record<string, string | number | undefined>>;
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
