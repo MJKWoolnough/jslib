@@ -216,13 +216,13 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 	static from<T extends Item = Item, H extends Node = Node>(node: H, itemFn = noItemFn): SortNode<T, H> {
 		const s = new SortNode<T, H>(node),
 		      root = data.get(s)!;
-		Array.from(node.childNodes).forEach(c => {
+		for (const c of node.childNodes) {
 			const item = itemFn(c);
 			if (item) {
 				root.prev = root.prev.next = {prev: root.prev, next: root, item};
 				root.length++;
 			}
-		});
+		}
 		return s;
 	}
 	includes(valueToFind: T, fromIndex: number = 0) {

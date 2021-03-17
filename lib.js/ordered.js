@@ -181,13 +181,13 @@ export class SortNode {
 	static from(node, itemFn = noItemFn) {
 		const s = new SortNode(node),
 		      root = data.get(s);
-		Array.from(node.childNodes).forEach(c => {
+		for (const c of node.childNodes) {
 			const item = itemFn(c);
 			if (item) {
 				root.prev = root.prev.next = {prev: root.prev, next: root, item};
 				root.length++;
 			}
-		});
+		}
 		return s;
 	}
 	includes(valueToFind, fromIndex = 0) {
