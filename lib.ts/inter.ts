@@ -1,6 +1,25 @@
+export type WaitInfo = {
+	waits: number;
+	done: number;
+	errors: number;
+}
+
+type WaitGroupInfo = WaitInfo & {
+	update: Pipe<WaitInfo>;
+	complete: Pipe<WaitInfo>;
+}
+
 const pipes = new WeakMap<Pipe<any>, ((data: any) => void)[]>(),
       requesters = new WeakMap<Requester<any>, ((...data: any) => any) | any>(),
-      subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void, (data: void) => void]>();
+      subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void, (data: void) => void]>(),
+      wgs = new WeakMap<WaitGroup, WaitGroupInfo>(),
+      updateWG = (wi: WaitGroupInfo) => {
+	const data = {"waits": wi.waits, "done": wi.done, "errors": wi.errors};
+	wi.update.send(data);
+	if (wi.done + wi.errors === wi.waits) {
+		wi.complete.send(data);
+	}
+      };
 
 export class Pipe<T> {
 	constructor() {
@@ -134,4 +153,41 @@ export class Subscription<T> {
 
 interface canceller {
 	cancel: () => void;
+}
+
+export class WaitGroup {
+	constructor() {
+		wgs.set(this, {
+			waits: 0,
+			done: 0,
+			errors: 0,
+			update: new Pipe(),
+			complete: new Pipe()
+		});
+	}
+	add() {
+		const v = wgs.get(this)!;
+		v.waits++;
+		updateWG(v);
+	}
+	done() {
+		const v = wgs.get(this)!;
+		v.done++;
+		updateWG(v);
+	}
+	error() {
+		const v = wgs.get(this)!;
+		v.errors++;
+		updateWG(v);
+	}
+	onUpdate(fn: (wi: WaitInfo) => void) {
+		const v = wgs.get(this)!;
+		v.update.receive(fn);
+		return () => v.update.remove(fn);
+	}
+	onComplete(fn: (wi: WaitInfo) => void) {
+		const v = wgs.get(this)!;
+		v.complete.receive(fn);
+		return () => v.complete.remove(fn);
+	}
 }

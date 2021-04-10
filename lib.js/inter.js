@@ -1,6 +1,14 @@
 const pipes = new WeakMap(),
       requests = new WeakMap(),
-      subs = new WeakMap();
+      subs = new WeakMap(),
+      wgs = new WeakMap(),
+      updateWG = wi => {
+	const data = {"waits": wi.waits, "done": wi.done, "errors": wi.errors};
+	wi.update.send(data);
+	if (wi.done + wi.errors === wi.waits) {
+		wi.complete.send(data);
+	}
+      };
 
 export class Pipe {
 	constructor() {
@@ -129,5 +137,42 @@ export class Subscription {
 	}
 	static canceller(...subs) {
 		return () => subs.forEach(s => s.cancel());
+	}
+}
+
+export class WaitGroup {
+	constructor() {
+		wgs.set(this, {
+			waits: 0,
+			done: 0,
+			errors: 0,
+			update: new Pipe(),
+			complete: new Pipe()
+		});
+	}
+	add() {
+		const v = wgs.get(this);
+		v.waits++;
+		updateWG(v);
+	}
+	done() {
+		const v = wgs.get(this);
+		v.done++;
+		updateWG(v);
+	}
+	error() {
+		const v = wgs.get(this);
+		v.errors++;
+		updateWG(v);
+	}
+	onUpdate(fn) {
+		const v = wgs.get(this);
+		v.update.receive(fn);
+		return () => v.update.remove(fn);
+	}
+	onComplete(fn) {
+		const v = wgs.get(this);
+		v.complete.receive(fn);
+		return () => v.complete.remove(fn);
 	}
 }
