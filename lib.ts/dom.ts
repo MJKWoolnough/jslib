@@ -103,6 +103,15 @@ export const createElements: cElements = (namespace: string) => (element: Node |
       },
       createHTML = createElements("http://www.w3.org/1999/xhtml"),
       createSVG = createElements("http://www.w3.org/2000/svg"),
+      createDocumentFragment = (children?: Children) => {
+	const elem = document.createDocumentFragment();
+	if (typeof children === "string") {
+		elem.textContent = children;
+	} else if (children && (children instanceof Array || children instanceof Node)) {
+		childrenArr(elem, children);
+	}
+	return elem;
+      },
       formatText = (text: string, wrapper?: (text: string) => Node) => {
 	const df = document.createDocumentFragment(),
 	      fn = wrapper instanceof Function ? wrapper : document.createTextNode.bind(document);
