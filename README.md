@@ -7,8 +7,9 @@
 
 ```go
 var (
-	ErrNotNeeded = errors.New("not needed")
-	ErrCircular  = errors.New("circular import")
+	ErrNotNeeded     = errors.New("not needed")
+	ErrCircular      = errors.New("circular import")
+	ErrInvalidPlugin = errors.New("plugin cannot have exports")
 )
 ```
 Errors
@@ -19,6 +20,14 @@ Errors
 func Loader(os ...Option) (*javascript.Module, error)
 ```
 Loader creates a jslib loader with packed dependencies
+
+#### func  Plugin
+
+```go
+func Plugin(m *javascript.Module) (*javascript.Module, error)
+```
+Plugin takes a single javascript module and converts it to a JSLib compatible
+javascript module - useful for plugins. NB: Plugins can have no exports
 
 #### type Option
 
