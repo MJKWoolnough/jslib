@@ -18,7 +18,6 @@ const childrenArr = (elem: Node, children: Children) => {
 	}
       };
 
-
 interface cElements {
 	(namespace: string): cElement;
 	(namespace: "http://www.w3.org/1999/xhtml"): cHTML;
