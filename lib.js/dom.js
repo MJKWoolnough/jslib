@@ -7,12 +7,16 @@ const childrenArr = (elem, children) => {
 		}
 	} else if (children instanceof Node) {
 		elem.appendChild(children);
+	} else if (children instanceof NodeList) {
+		for (const c of children) {
+			elem.appendChild(c);
+		}
 	}
       };
 
 export const createElements = namespace => (element, properties, children) => {
 	const elem = typeof element === "string" ? document.createElementNS(namespace, element) : element instanceof Node ? element : document.createDocumentFragment();
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node))) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node) && !(children instanceof NodeList))) {
 		[properties, children] = [children, properties];
 	}
 	if (typeof properties === "object" && elem instanceof Element) {
@@ -61,7 +65,7 @@ export const createElements = namespace => (element, properties, children) => {
 	}
 	if (typeof children === "string") {
 		elem.textContent = children;
-	} else if (children && (children instanceof Array || children instanceof Node)) {
+	} else if (children && (children instanceof Array || children instanceof Node || children instanceof NodeList)) {
 		childrenArr(elem, children);
 	}
 	return elem;

@@ -1,4 +1,4 @@
-export type Children = string | Node | Children[];
+export type Children = string | Node | Children[] | NodeList;
 
 export type Props = Record<string, number | string | string[] | DOMTokenList | Function | Boolean | undefined | Record<string, string | number | undefined>>;
 
@@ -11,6 +11,10 @@ const childrenArr = (elem: Node, children: Children) => {
 		}
 	} else if(children instanceof Node) {
 		elem.appendChild(children);
+	} else if (children instanceof NodeList) {
+		for (const c of children) {
+			elem.appendChild(c);
+		}
 	}
       };
 
@@ -47,7 +51,7 @@ export interface DOMBind<T extends Node> {
 
 export const createElements: cElements = (namespace: string) => (element: Node | string | null, properties?: Props | Children, children?: Props | Children) => {
 	const elem: Node = typeof element === "string" ? document.createElementNS(namespace, element) : element instanceof Node ? element : document.createDocumentFragment();
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node))) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node) && !(children instanceof NodeList))) {
 		[properties, children] = [children, properties];
 	}
 	if (typeof properties === "object" && elem instanceof Element) {
@@ -96,7 +100,7 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	}
 	if (typeof children === "string") {
 		elem.textContent = children;
-	} else if (children && (children instanceof Array || children instanceof Node)) {
+	} else if (children && (children instanceof Array || children instanceof Node || children instanceof NodeList)) {
 		childrenArr(elem, children);
 	}
 	return elem;
