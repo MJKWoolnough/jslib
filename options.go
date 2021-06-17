@@ -19,3 +19,7 @@ func Loader(l func(string) (*javascript.Module, error)) Option {
 		c.loader = l
 	}
 }
+
+func ParseDynamic(c *config) {
+	c.parseDynamic = true
+}
