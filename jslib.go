@@ -11,8 +11,9 @@ import (
 type config struct {
 	filesToDo []string
 
-	loader func(string) (*javascript.Module, error)
-	bare   bool
+	loader       func(string) (*javascript.Module, error)
+	bare         bool
+	parseDynamic bool
 }
 
 func OSLoad(url string) (*javascript.Module, error) {
