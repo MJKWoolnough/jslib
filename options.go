@@ -1,5 +1,7 @@
 package jslib
 
+import "vimagination.zapto.org/javascript"
+
 type Option func(*config)
 
 func File(url string) Option {
@@ -10,4 +12,10 @@ func File(url string) Option {
 
 func NoExports(c *config) {
 	c.bare = true
+}
+
+func Loader(l func(string) (*javascript.Module, error)) Option {
+	return func(c *config) {
+		c.loader = l
+	}
 }
