@@ -15,110 +15,10 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 		MemberExpression: promise,
 		IdentifierName:   &javascript.Token{Token: parser.Token{Data: "resolve"}},
 	}
-	successFn := &javascript.Token{Token: parser.Token{Data: "successFn"}}
 	trueAE := &javascript.AssignmentExpression{
 		ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 			Literal: &javascript.Token{Token: parser.Token{Data: "true"}},
 		}),
-	}
-	window := &javascript.PrimaryExpression{
-		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "window"}},
-	}
-	pageLoad := javascript.PropertyDefinition{
-		PropertyName: &javascript.PropertyName{
-			LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "pageLoad"}},
-		},
-		AssignmentExpression: &javascript.AssignmentExpression{
-			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-				ObjectLiteral: &javascript.ObjectLiteral{
-					PropertyDefinitionList: []javascript.PropertyDefinition{
-						{
-							PropertyName: &javascript.PropertyName{
-								LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "value"}},
-							},
-							AssignmentExpression: &javascript.AssignmentExpression{
-								ConditionalExpression: &javascript.ConditionalExpression{
-									LogicalORExpression: javascript.WrapConditional(&javascript.EqualityExpression{
-										EqualityExpression: &javascript.WrapConditional(javascript.MemberExpression{
-											MemberExpression: &javascript.MemberExpression{
-												PrimaryExpression: &javascript.PrimaryExpression{
-													IdentifierReference: &javascript.Token{Token: parser.Token{Data: "document"}},
-												},
-											},
-											IdentifierName: &javascript.Token{Token: parser.Token{Data: "readyState"}},
-										}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression,
-										EqualityOperator: javascript.EqualityEqual,
-										RelationalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-											Literal: &javascript.Token{Token: parser.Token{Data: "\"complete\""}},
-										}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression,
-									}).LogicalORExpression,
-									True: &javascript.AssignmentExpression{
-										ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
-											MemberExpression: promiseResolve,
-											Arguments:        &javascript.Arguments{},
-										}),
-									},
-									False: &javascript.AssignmentExpression{
-										ConditionalExpression: javascript.WrapConditional(&javascript.NewExpression{
-											MemberExpression: javascript.MemberExpression{
-												MemberExpression: promise,
-												Arguments: &javascript.Arguments{
-													ArgumentList: []javascript.AssignmentExpression{
-														{
-															ArrowFunction: &javascript.ArrowFunction{
-																BindingIdentifier: successFn,
-																AssignmentExpression: &javascript.AssignmentExpression{
-																	ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
-																		MemberExpression: &javascript.MemberExpression{
-																			MemberExpression: &javascript.MemberExpression{
-																				PrimaryExpression: window,
-																			},
-																			IdentifierName: &javascript.Token{Token: parser.Token{Data: "addEventListener"}},
-																		},
-																		Arguments: &javascript.Arguments{
-																			ArgumentList: []javascript.AssignmentExpression{
-																				{
-																					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																						Literal: &javascript.Token{Token: parser.Token{Data: "\"load\""}},
-																					}),
-																				},
-																				{
-																					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																						IdentifierReference: successFn,
-																					}),
-																				},
-																				{
-																					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																						ObjectLiteral: &javascript.ObjectLiteral{
-																							PropertyDefinitionList: []javascript.PropertyDefinition{
-																								{
-																									PropertyName: &javascript.PropertyName{
-																										LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "once"}},
-																									},
-																									AssignmentExpression: trueAE,
-																								},
-																							},
-																						},
-																					}),
-																				},
-																			},
-																		},
-																	}),
-																},
-															},
-														},
-													},
-												},
-											},
-										}),
-									},
-								},
-							},
-						},
-					},
-				},
-			}),
-		},
 	}
 	objectDefineProperties := &javascript.MemberExpression{
 		MemberExpression: &javascript.MemberExpression{
@@ -146,22 +46,20 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 			},
 		},
 	})
-	var props [2]javascript.PropertyDefinition
-	props[0] = pageLoad
+	var include *javascript.AssignmentExpression
 	if exports == nil {
-		props[1] = javascript.PropertyDefinition{
-			PropertyName: &javascript.PropertyName{
-				LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "include"}},
-			},
-			AssignmentExpression: &javascript.AssignmentExpression{
-				ArrowFunction: &javascript.ArrowFunction{
-					BindingIdentifier: url,
-					AssignmentExpression: &javascript.AssignmentExpression{
-						ConditionalExpression: importURL,
-					},
+		include = &javascript.AssignmentExpression{
+			ArrowFunction: &javascript.ArrowFunction{
+				BindingIdentifier: url,
+				AssignmentExpression: &javascript.AssignmentExpression{
+					ConditionalExpression: importURL,
 				},
 			},
 		}
+	}
+	successFn := &javascript.Token{Token: parser.Token{Data: "successFn"}}
+	window := &javascript.PrimaryExpression{
+		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "window"}},
 	}
 	return &javascript.StatementListItem{
 		Statement: &javascript.Statement{
@@ -179,7 +77,110 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 									{
 										ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 											ObjectLiteral: &javascript.ObjectLiteral{
-												PropertyDefinitionList: props[:],
+												PropertyDefinitionList: []javascript.PropertyDefinition{
+													{
+														PropertyName: &javascript.PropertyName{
+															LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "pageLoad"}},
+														},
+														AssignmentExpression: &javascript.AssignmentExpression{
+															ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																ObjectLiteral: &javascript.ObjectLiteral{
+																	PropertyDefinitionList: []javascript.PropertyDefinition{
+																		{
+																			PropertyName: &javascript.PropertyName{
+																				LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "value"}},
+																			},
+																			AssignmentExpression: &javascript.AssignmentExpression{
+																				ConditionalExpression: &javascript.ConditionalExpression{
+																					LogicalORExpression: javascript.WrapConditional(&javascript.EqualityExpression{
+																						EqualityExpression: &javascript.WrapConditional(javascript.MemberExpression{
+																							MemberExpression: &javascript.MemberExpression{
+																								PrimaryExpression: &javascript.PrimaryExpression{
+																									IdentifierReference: &javascript.Token{Token: parser.Token{Data: "document"}},
+																								},
+																							},
+																							IdentifierName: &javascript.Token{Token: parser.Token{Data: "readyState"}},
+																						}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression,
+																						EqualityOperator: javascript.EqualityEqual,
+																						RelationalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																							Literal: &javascript.Token{Token: parser.Token{Data: "\"complete\""}},
+																						}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression,
+																					}).LogicalORExpression,
+																					True: &javascript.AssignmentExpression{
+																						ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+																							MemberExpression: promiseResolve,
+																							Arguments:        &javascript.Arguments{},
+																						}),
+																					},
+																					False: &javascript.AssignmentExpression{
+																						ConditionalExpression: javascript.WrapConditional(&javascript.NewExpression{
+																							MemberExpression: javascript.MemberExpression{
+																								MemberExpression: promise,
+																								Arguments: &javascript.Arguments{
+																									ArgumentList: []javascript.AssignmentExpression{
+																										{
+																											ArrowFunction: &javascript.ArrowFunction{
+																												BindingIdentifier: successFn,
+																												AssignmentExpression: &javascript.AssignmentExpression{
+																													ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+																														MemberExpression: &javascript.MemberExpression{
+																															MemberExpression: &javascript.MemberExpression{
+																																PrimaryExpression: window,
+																															},
+																															IdentifierName: &javascript.Token{Token: parser.Token{Data: "addEventListener"}},
+																														},
+																														Arguments: &javascript.Arguments{
+																															ArgumentList: []javascript.AssignmentExpression{
+																																{
+																																	ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																																		Literal: &javascript.Token{Token: parser.Token{Data: "\"load\""}},
+																																	}),
+																																},
+																																{
+																																	ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																																		IdentifierReference: successFn,
+																																	}),
+																																},
+																																{
+																																	ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																																		ObjectLiteral: &javascript.ObjectLiteral{
+																																			PropertyDefinitionList: []javascript.PropertyDefinition{
+																																				{
+																																					PropertyName: &javascript.PropertyName{
+																																						LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "once"}},
+																																					},
+																																					AssignmentExpression: trueAE,
+																																				},
+																																			},
+																																		},
+																																	}),
+																																},
+																															},
+																														},
+																													}),
+																												},
+																											},
+																										},
+																									},
+																								},
+																							},
+																						}),
+																					},
+																				},
+																			},
+																		},
+																	},
+																},
+															}),
+														},
+													},
+													{
+														PropertyName: &javascript.PropertyName{
+															LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "include"}},
+														},
+														AssignmentExpression: include,
+													},
+												},
 											},
 										}),
 									},
