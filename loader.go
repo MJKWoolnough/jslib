@@ -128,11 +128,41 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 		},
 		IdentifierName: &javascript.Token{Token: parser.Token{Data: "defineProperties"}},
 	}
-	var props []javascript.PropertyDefinition
-	if exports == nil {
-		props = make([]javascript.PropertyDefinition, 1)
-	}
+	url := &javascript.Token{Token: parser.Token{Data: "url"}}
+	wrappedURL := javascript.WrapConditional(&javascript.PrimaryExpression{
+		IdentifierReference: url,
+	})
+	importURL := javascript.WrapConditional(&javascript.CallExpression{
+		MemberExpression: &javascript.MemberExpression{
+			PrimaryExpression: &javascript.PrimaryExpression{
+				IdentifierReference: &javascript.Token{Token: parser.Token{Data: "import"}},
+			},
+		},
+		Arguments: &javascript.Arguments{
+			ArgumentList: []javascript.AssignmentExpression{
+				{
+					ConditionalExpression: wrappedURL,
+				},
+			},
+		},
+	})
+	var props [2]javascript.PropertyDefinition
 	props[0] = pageLoad
+	if exports == nil {
+		props[1] = javascript.PropertyDefinition{
+			PropertyName: &javascript.PropertyName{
+				LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "include"}},
+			},
+			AssignmentExpression: &javascript.AssignmentExpression{
+				ArrowFunction: &javascript.ArrowFunction{
+					BindingIdentifier: url,
+					AssignmentExpression: &javascript.AssignmentExpression{
+						ConditionalExpression: importURL,
+					},
+				},
+			},
+		}
+	}
 	return &javascript.StatementListItem{
 		Statement: &javascript.Statement{
 			ExpressionStatement: &javascript.Expression{
@@ -149,7 +179,7 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 									{
 										ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 											ObjectLiteral: &javascript.ObjectLiteral{
-												PropertyDefinitionList: props,
+												PropertyDefinitionList: props[:],
 											},
 										}),
 									},
