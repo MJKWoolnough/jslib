@@ -21,6 +21,9 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 			Literal: &javascript.Token{Token: parser.Token{Data: "true"}},
 		}),
 	}
+	window := &javascript.PrimaryExpression{
+		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "window"}},
+	}
 	pageLoad := javascript.PropertyDefinition{
 		PropertyName: &javascript.PropertyName{
 			LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "pageLoad"}},
@@ -68,9 +71,7 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 																	ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 																		MemberExpression: &javascript.MemberExpression{
 																			MemberExpression: &javascript.MemberExpression{
-																				PrimaryExpression: &javascript.PrimaryExpression{
-																					IdentifierReference: &javascript.Token{Token: parser.Token{Data: "window"}},
-																				},
+																				PrimaryExpression: window,
 																			},
 																			IdentifierName: &javascript.Token{Token: parser.Token{Data: "addEventListener"}},
 																		},
@@ -119,5 +120,45 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 			}),
 		},
 	}
-	return nil
+	objectDefineProperties := &javascript.MemberExpression{
+		MemberExpression: &javascript.MemberExpression{
+			PrimaryExpression: &javascript.PrimaryExpression{
+				IdentifierReference: &javascript.Token{Token: parser.Token{Data: "Object"}},
+			},
+		},
+		IdentifierName: &javascript.Token{Token: parser.Token{Data: "defineProperties"}},
+	}
+	var props []javascript.PropertyDefinition
+	if exports == nil {
+		props = make([]javascript.PropertyDefinition, 1)
+	}
+	props[0] = pageLoad
+	return &javascript.StatementListItem{
+		Statement: &javascript.Statement{
+			ExpressionStatement: &javascript.Expression{
+				Expressions: []javascript.AssignmentExpression{
+					{
+						ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+							MemberExpression: objectDefineProperties,
+							Arguments: &javascript.Arguments{
+
+								ArgumentList: []javascript.AssignmentExpression{
+									{
+										ConditionalExpression: javascript.WrapConditional(window),
+									},
+									{
+										ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+											ObjectLiteral: &javascript.ObjectLiteral{
+												PropertyDefinitionList: props,
+											},
+										}),
+									},
+								},
+							},
+						}),
+					},
+				},
+			},
+		},
+	}
 }
