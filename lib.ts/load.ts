@@ -7,6 +7,6 @@ declare const include: (url: string) => Promise<Object>;
 */
 
 Object.defineProperties(window, {
-	"pageLoad": {value: document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn))},
+	"pageLoad": {value: document.readyState === "complete" ? Promise.resolve() : new Promise(successFn => window.addEventListener("load", successFn, {"once": true}))},
 	"include": {value: (url: string) => import(url)}
 });
