@@ -1,4 +1,8 @@
-vimagination.zapto.org/javascript v0.0.0-20210318065732-d2a1b33a4c4c h1:CNxKHPO9ZKnFJPKzIAjoSE/b7zZzkGWo5LsA8Kwp51M=
-vimagination.zapto.org/javascript v0.0.0-20210318065732-d2a1b33a4c4c/go.mod h1:ujFaKkRh1GJtGEZvtgc8tz3jVoxQAtUiv1/7LSDwIKk=
-vimagination.zapto.org/parser v0.0.0-20190322094028-915635b05e24 h1:KSxxlFuRz9NsbybCrFOUN5omtkRD9NHY6Cw8plfZrVg=
-vimagination.zapto.org/parser v0.0.0-20190322094028-915635b05e24/go.mod h1:WT+8/T+qTZDNVO5GcXv8pWSn7AIWakJZWMN1mL662WY=
+vimagination.zapto.org/javascript v0.0.1 h1:Q9MzGPkenZFLsDLe4isBtYAO2KehN27WAPc+wZolzNA=
+vimagination.zapto.org/javascript v0.0.1/go.mod h1:YkihCKyCphmjPHqci4oJKHVABCcDFJ7w6UcRa3zsKaQ=
+vimagination.zapto.org/memio v1.0.0 h1:r0GDf430aNuGpOAV57UTvbUzAf82UclRyGG/pBp1uvU=
+vimagination.zapto.org/memio v1.0.0/go.mod h1:zHGDKp2tyvF4IAfLti4pKYqCJucXYmmKMb3UMrCHK/4=
+vimagination.zapto.org/parser v1.0.0 h1:eIhnKZBf5WX48fwRNAp55ZCSJTpiKCiLXTFkimsXfq8=
+vimagination.zapto.org/parser v1.0.0/go.mod h1:WT+8/T+qTZDNVO5GcXv8pWSn7AIWakJZWMN1mL662WY=
+vimagination.zapto.org/rwcount v0.0.0-20190223222239-1da74d07801f h1:ar4f3c6dBqN2RvBFvUcPpaXhKhYX+IZQj6rfCGgPJ3M=
+vimagination.zapto.org/rwcount v0.0.0-20190223222239-1da74d07801f/go.mod h1:lEj30C0ND1gyqNDORmrBL8iFUVMOmQpVhod5VBIsems=
