@@ -291,20 +291,7 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 															}),
 														},
 														False: &javascript.AssignmentExpression{
-															ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
-																MemberExpression: &javascript.MemberExpression{
-																	PrimaryExpression: &javascript.PrimaryExpression{
-																		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "import"}},
-																	},
-																},
-																Arguments: &javascript.Arguments{
-																	ArgumentList: []javascript.AssignmentExpression{
-																		{
-																			ConditionalExpression: wrappedURL,
-																		},
-																	},
-																},
-															}),
+															ConditionalExpression: importURL,
 														},
 													},
 												},
