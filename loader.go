@@ -354,66 +354,70 @@ func loader(exports map[string]map[string]string) *javascript.StatementListItem 
 																												{
 																													ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 																														MemberExpression: &javascript.MemberExpression{
-																															MemberExpression: props,
-																															IdentifierName:   mapt,
+																															MemberExpression: object,
+																															IdentifierName:   &javascript.Token{Token: parser.Token{Data: "fromEntries"}},
 																														},
 																														Arguments: &javascript.Arguments{
 																															ArgumentList: []javascript.AssignmentExpression{
 																																{
-																																	ArrowFunction: &javascript.ArrowFunction{
-																																		CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
-																																			Expressions: []javascript.AssignmentExpression{
+																																	ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+																																		MemberExpression: &javascript.MemberExpression{
+																																			MemberExpression: props,
+																																			IdentifierName:   mapt,
+																																		},
+																																		Arguments: &javascript.Arguments{
+																																			ArgumentList: []javascript.AssignmentExpression{
 																																				{
-																																					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																																						ArrayLiteral: &javascript.ArrayLiteral{
-																																							ElementList: []javascript.AssignmentExpression{
-																																								prop,
-																																								wrappedGet,
-																																								wrappedSet,
+																																					ArrowFunction: &javascript.ArrowFunction{
+																																						CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
+																																							Expressions: []javascript.AssignmentExpression{
+																																								{
+																																									ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																																										ArrayLiteral: &javascript.ArrayLiteral{
+																																											ElementList: []javascript.AssignmentExpression{
+																																												prop,
+																																												wrappedGet,
+																																												wrappedSet,
+																																											},
+																																										},
+																																									}),
+																																								},
 																																							},
 																																						},
-																																					}),
-																																				},
-																																			},
-																																		},
-																																		AssignmentExpression: &javascript.AssignmentExpression{
-																																			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																																				CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
-																																					Expressions: []javascript.AssignmentExpression{
-																																						{
+																																						AssignmentExpression: &javascript.AssignmentExpression{
 																																							ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																																								ObjectLiteral: &javascript.ObjectLiteral{
-																																									PropertyDefinitionList: []javascript.PropertyDefinition{
+																																								ArrayLiteral: &javascript.ArrayLiteral{
+																																									ElementList: []javascript.AssignmentExpression{
 																																										{
-																																											PropertyName: &javascript.PropertyName{
-																																												ComputedPropertyName: &prop,
-																																											},
-																																											AssignmentExpression: &javascript.AssignmentExpression{
-																																												ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																																													ObjectLiteral: &javascript.ObjectLiteral{
-																																														PropertyDefinitionList: []javascript.PropertyDefinition{
-																																															{
-																																																PropertyName: &javascript.PropertyName{
-																																																	LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "enumerable"}},
-																																																},
-																																																AssignmentExpression: trueAE,
+																																											ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																																												IdentifierReference: &javascript.Token{Token: parser.Token{Data: "prop"}},
+																																											}),
+																																										},
+																																										{
+																																											ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																																												ObjectLiteral: &javascript.ObjectLiteral{
+																																													PropertyDefinitionList: []javascript.PropertyDefinition{
+																																														{
+																																															PropertyName: &javascript.PropertyName{
+																																																LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "enumerable"}},
 																																															},
-																																															{
-																																																PropertyName: &javascript.PropertyName{
-																																																	LiteralPropertyName: get,
-																																																},
-																																																AssignmentExpression: &wrappedGet,
+																																															AssignmentExpression: trueAE,
+																																														},
+																																														{
+																																															PropertyName: &javascript.PropertyName{
+																																																LiteralPropertyName: get,
 																																															},
-																																															{
-																																																PropertyName: &javascript.PropertyName{
-																																																	LiteralPropertyName: set,
-																																																},
-																																																AssignmentExpression: &wrappedSet,
+																																															AssignmentExpression: &wrappedGet,
+																																														},
+																																														{
+																																															PropertyName: &javascript.PropertyName{
+																																																LiteralPropertyName: set,
 																																															},
+																																															AssignmentExpression: &wrappedSet,
 																																														},
 																																													},
-																																												}),
-																																											},
+																																												},
+																																											}),
 																																										},
 																																									},
 																																								},
@@ -421,9 +425,9 @@ func loader(exports map[string]map[string]string) *javascript.StatementListItem 
 																																						},
 																																					},
 																																				},
-																																			}),
+																																			},
 																																		},
-																																	},
+																																	}),
 																																},
 																															},
 																														},
