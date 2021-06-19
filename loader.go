@@ -469,6 +469,9 @@ func loader(exports map[string]map[string]string) *javascript.StatementListItem 
 	window := &javascript.PrimaryExpression{
 		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "window"}},
 	}
+	value := &javascript.PropertyName{
+		LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "value"}},
+	}
 	return &javascript.StatementListItem{
 		Statement: &javascript.Statement{
 			ExpressionStatement: &javascript.Expression{
@@ -495,9 +498,7 @@ func loader(exports map[string]map[string]string) *javascript.StatementListItem 
 																ObjectLiteral: &javascript.ObjectLiteral{
 																	PropertyDefinitionList: []javascript.PropertyDefinition{
 																		{
-																			PropertyName: &javascript.PropertyName{
-																				LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "value"}},
-																			},
+																			PropertyName: value,
 																			AssignmentExpression: &javascript.AssignmentExpression{
 																				ConditionalExpression: &javascript.ConditionalExpression{
 																					LogicalORExpression: javascript.WrapConditional(&javascript.EqualityExpression{
@@ -586,7 +587,18 @@ func loader(exports map[string]map[string]string) *javascript.StatementListItem 
 														PropertyName: &javascript.PropertyName{
 															LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "include"}},
 														},
-														AssignmentExpression: include,
+														AssignmentExpression: &javascript.AssignmentExpression{
+															ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																ObjectLiteral: &javascript.ObjectLiteral{
+																	PropertyDefinitionList: []javascript.PropertyDefinition{
+																		{
+																			PropertyName:         value,
+																			AssignmentExpression: include,
+																		},
+																	},
+																},
+															}),
+														},
 													},
 												},
 											},
