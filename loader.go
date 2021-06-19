@@ -1,6 +1,7 @@
 package jslib
 
 import (
+	"sort"
 	"strconv"
 
 	"vimagination.zapto.org/javascript"
@@ -78,13 +79,25 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 		exportArr := &javascript.ArrayLiteral{
 			ElementList: make([]javascript.AssignmentExpression, 0, len(exports)),
 		}
-		for url, es := range exports {
+		urls := make([]string, 0, len(exports))
+		for url := range exports {
+			urls = append(urls, url)
+		}
+		sort.Strings(urls)
+		for _, url := range urls {
+			es := exports[url]
 			el := append(make([]javascript.AssignmentExpression, 0, len(es)+1), javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 					Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(url)}},
 				}),
 			})
-			for prop, binding := range es {
+			props := make([]string, 0, len(es))
+			for prop := range es {
+				props = append(props, prop)
+			}
+			sort.Strings(props)
+			for _, prop := range props {
+				binding := es[prop]
 				bindingPE := &javascript.PrimaryExpression{
 					IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding.binding}},
 				}
