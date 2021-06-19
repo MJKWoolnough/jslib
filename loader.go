@@ -1,11 +1,13 @@
 package jslib
 
 import (
+	"strconv"
+
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/parser"
 )
 
-func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
+func loader(exports map[string]map[string]string) *javascript.StatementListItem {
 	promise := &javascript.MemberExpression{
 		PrimaryExpression: &javascript.PrimaryExpression{
 			IdentifierReference: &javascript.Token{Token: parser.Token{Data: "Promise"}},
@@ -48,7 +50,7 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 		},
 	})
 	var include *javascript.AssignmentExpression
-	if exports == nil {
+	if len(exports) == 0 {
 		include = &javascript.AssignmentExpression{
 			ArrowFunction: &javascript.ArrowFunction{
 				BindingIdentifier: url,
@@ -58,6 +60,80 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 			},
 		}
 	} else {
+		a := &javascript.Token{Token: parser.Token{Data: "a"}}
+		aWrapped := javascript.AssignmentExpression{
+			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+				IdentifierReference: a,
+			}),
+		}
+		exportArr := &javascript.ArrayLiteral{
+			ElementList: make([]javascript.AssignmentExpression, 0, len(exports)),
+		}
+		for url, es := range exports {
+			urlArr := &javascript.ArrayLiteral{
+				ElementList: make([]javascript.AssignmentExpression, 0, len(es)),
+			}
+			for prop, binding := range es {
+				bindingPE := &javascript.PrimaryExpression{
+					IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding}},
+				}
+				urlArr.ElementList = append(urlArr.ElementList, javascript.AssignmentExpression{
+					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+						ArrayLiteral: &javascript.ArrayLiteral{
+							ElementList: []javascript.AssignmentExpression{
+								{
+									ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+										Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(prop)}},
+									}),
+								},
+								{
+									ArrowFunction: &javascript.ArrowFunction{
+										CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
+										AssignmentExpression: &javascript.AssignmentExpression{
+											ConditionalExpression: javascript.WrapConditional(bindingPE),
+										},
+									},
+								},
+								{
+									ArrowFunction: &javascript.ArrowFunction{
+										BindingIdentifier: a,
+										AssignmentExpression: &javascript.AssignmentExpression{
+											LeftHandSideExpression: &javascript.LeftHandSideExpression{
+												NewExpression: &javascript.NewExpression{
+													MemberExpression: javascript.MemberExpression{
+														PrimaryExpression: bindingPE,
+													},
+												},
+											},
+											AssignmentOperator:   javascript.AssignmentAssign,
+											AssignmentExpression: &aWrapped,
+										},
+									},
+								},
+							},
+						},
+					}),
+				})
+			}
+			exportArr.ElementList = append(exportArr.ElementList, javascript.AssignmentExpression{
+				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+					ArrayLiteral: &javascript.ArrayLiteral{
+						ElementList: []javascript.AssignmentExpression{
+							{
+								ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+									Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(url)}},
+								}),
+							},
+							{
+								ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+									ArrayLiteral: urlArr,
+								}),
+							},
+						},
+					},
+				}),
+			})
+		}
 		imports := &javascript.Token{Token: parser.Token{Data: "imports"}}
 		importsME := &javascript.MemberExpression{
 			PrimaryExpression: &javascript.PrimaryExpression{
@@ -72,7 +148,6 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 			},
 		}
 		mapt := &javascript.Token{Token: parser.Token{Data: "map"}}
-		a := &javascript.Token{Token: parser.Token{Data: "a"}}
 		prop := javascript.AssignmentExpression{
 			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 				IdentifierReference: &javascript.Token{Token: parser.Token{Data: "prop"}},
@@ -94,11 +169,6 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 			PrimaryExpression: &javascript.PrimaryExpression{
 				IdentifierReference: &javascript.Token{Token: parser.Token{Data: "props"}},
 			},
-		}
-		aWrapped := javascript.AssignmentExpression{
-			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-				IdentifierReference: a,
-			}),
 		}
 		include = &javascript.AssignmentExpression{
 			ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
@@ -238,7 +308,7 @@ func loader(exports *javascript.ArrayLiteral) *javascript.StatementListItem {
 												MemberExpression: &javascript.MemberExpression{
 													MemberExpression: &javascript.MemberExpression{
 														PrimaryExpression: &javascript.PrimaryExpression{
-															ArrayLiteral: exports,
+															ArrayLiteral: exportArr,
 														},
 													},
 													IdentifierName: mapt,
