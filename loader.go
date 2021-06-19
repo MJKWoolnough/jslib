@@ -7,7 +7,10 @@ import (
 	"vimagination.zapto.org/parser"
 )
 
-type export string
+type export struct {
+	binding   string
+	writeable bool
+}
 
 type exportMap map[string]export
 
@@ -83,42 +86,53 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 			})
 			for prop, binding := range es {
 				bindingPE := &javascript.PrimaryExpression{
-					IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding}},
+					IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding.binding}},
+				}
+				enum := javascript.AssignmentExpression{
+					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+						Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(prop)}},
+					}),
+				}
+				get := javascript.AssignmentExpression{
+					ArrowFunction: &javascript.ArrowFunction{
+						CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
+						AssignmentExpression: &javascript.AssignmentExpression{
+							ConditionalExpression: javascript.WrapConditional(bindingPE),
+						},
+					},
+				}
+				var ael []javascript.AssignmentExpression
+				if binding.writeable {
+					ael = []javascript.AssignmentExpression{
+						enum,
+						get,
+						{
+							ArrowFunction: &javascript.ArrowFunction{
+								BindingIdentifier: a,
+								AssignmentExpression: &javascript.AssignmentExpression{
+									LeftHandSideExpression: &javascript.LeftHandSideExpression{
+										NewExpression: &javascript.NewExpression{
+											MemberExpression: javascript.MemberExpression{
+												PrimaryExpression: bindingPE,
+											},
+										},
+									},
+									AssignmentOperator:   javascript.AssignmentAssign,
+									AssignmentExpression: &aWrapped,
+								},
+							},
+						},
+					}
+				} else {
+					ael = []javascript.AssignmentExpression{
+						enum,
+						get,
+					}
 				}
 				el = append(el, javascript.AssignmentExpression{
 					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 						ArrayLiteral: &javascript.ArrayLiteral{
-							ElementList: []javascript.AssignmentExpression{
-								{
-									ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-										Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(prop)}},
-									}),
-								},
-								{
-									ArrowFunction: &javascript.ArrowFunction{
-										CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
-										AssignmentExpression: &javascript.AssignmentExpression{
-											ConditionalExpression: javascript.WrapConditional(bindingPE),
-										},
-									},
-								},
-								{
-									ArrowFunction: &javascript.ArrowFunction{
-										BindingIdentifier: a,
-										AssignmentExpression: &javascript.AssignmentExpression{
-											LeftHandSideExpression: &javascript.LeftHandSideExpression{
-												NewExpression: &javascript.NewExpression{
-													MemberExpression: javascript.MemberExpression{
-														PrimaryExpression: bindingPE,
-													},
-												},
-											},
-											AssignmentOperator:   javascript.AssignmentAssign,
-											AssignmentExpression: &aWrapped,
-										},
-									},
-								},
-							},
+							ElementList: ael,
 						},
 					}),
 				})
