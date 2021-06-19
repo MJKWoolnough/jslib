@@ -98,8 +98,14 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 			sort.Strings(props)
 			for _, prop := range props {
 				binding := es[prop]
-				bindingPE := &javascript.PrimaryExpression{
-					IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding.binding}},
+				bindingPE := &javascript.LeftHandSideExpression{
+					NewExpression: &javascript.NewExpression{
+						MemberExpression: javascript.MemberExpression{
+							PrimaryExpression: &javascript.PrimaryExpression{
+								IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding.binding}},
+							},
+						},
+					},
 				}
 				propName := javascript.AssignmentExpression{
 					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
@@ -123,15 +129,9 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 							ArrowFunction: &javascript.ArrowFunction{
 								BindingIdentifier: a,
 								AssignmentExpression: &javascript.AssignmentExpression{
-									LeftHandSideExpression: &javascript.LeftHandSideExpression{
-										NewExpression: &javascript.NewExpression{
-											MemberExpression: javascript.MemberExpression{
-												PrimaryExpression: bindingPE,
-											},
-										},
-									},
-									AssignmentOperator:   javascript.AssignmentAssign,
-									AssignmentExpression: &aWrapped,
+									LeftHandSideExpression: bindingPE,
+									AssignmentOperator:     javascript.AssignmentAssign,
+									AssignmentExpression:   &aWrapped,
 								},
 							},
 						},
@@ -164,10 +164,12 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 				IdentifierReference: imports,
 			},
 		}
-		now := &javascript.NewExpression{
-			MemberExpression: javascript.MemberExpression{
-				PrimaryExpression: &javascript.PrimaryExpression{
-					IdentifierReference: &javascript.Token{Token: parser.Token{Data: "now"}},
+		now := &javascript.LeftHandSideExpression{
+			NewExpression: &javascript.NewExpression{
+				MemberExpression: javascript.MemberExpression{
+					PrimaryExpression: &javascript.PrimaryExpression{
+						IdentifierReference: &javascript.Token{Token: parser.Token{Data: "now"}},
+					},
 				},
 			},
 		}
@@ -211,10 +213,8 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 															ConditionalExpression: wrappedURL,
 														},
 														{
-															LeftHandSideExpression: &javascript.LeftHandSideExpression{
-																NewExpression: now,
-															},
-															AssignmentOperator: javascript.AssignmentAssign,
+															LeftHandSideExpression: now,
+															AssignmentOperator:     javascript.AssignmentAssign,
 															AssignmentExpression: &javascript.AssignmentExpression{
 																ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 																	Literal: &javascript.Token{Token: parser.Token{Data: "false"}},
