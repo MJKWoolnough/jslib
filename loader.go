@@ -70,14 +70,16 @@ func loader(exports map[string]map[string]string) *javascript.StatementListItem 
 			ElementList: make([]javascript.AssignmentExpression, 0, len(exports)),
 		}
 		for url, es := range exports {
-			urlArr := &javascript.ArrayLiteral{
-				ElementList: make([]javascript.AssignmentExpression, 0, len(es)),
-			}
+			el := append(make([]javascript.AssignmentExpression, 0, len(es)+1), javascript.AssignmentExpression{
+				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+					Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(url)}},
+				}),
+			})
 			for prop, binding := range es {
 				bindingPE := &javascript.PrimaryExpression{
 					IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding}},
 				}
-				urlArr.ElementList = append(urlArr.ElementList, javascript.AssignmentExpression{
+				el = append(el, javascript.AssignmentExpression{
 					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 						ArrayLiteral: &javascript.ArrayLiteral{
 							ElementList: []javascript.AssignmentExpression{
@@ -118,18 +120,7 @@ func loader(exports map[string]map[string]string) *javascript.StatementListItem 
 			exportArr.ElementList = append(exportArr.ElementList, javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 					ArrayLiteral: &javascript.ArrayLiteral{
-						ElementList: []javascript.AssignmentExpression{
-							{
-								ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-									Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(url)}},
-								}),
-							},
-							{
-								ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-									ArrayLiteral: urlArr,
-								}),
-							},
-						},
+						ElementList: el,
 					},
 				}),
 			})
