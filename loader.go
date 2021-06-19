@@ -7,7 +7,13 @@ import (
 	"vimagination.zapto.org/parser"
 )
 
-func loader(exports map[string]map[string]string) *javascript.StatementListItem {
+type export string
+
+type exportMap map[string]export
+
+type exportsMap map[string]exportMap
+
+func loader(exports exportsMap) *javascript.StatementListItem {
 	promise := &javascript.MemberExpression{
 		PrimaryExpression: &javascript.PrimaryExpression{
 			IdentifierReference: &javascript.Token{Token: parser.Token{Data: "Promise"}},
