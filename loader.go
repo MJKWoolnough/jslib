@@ -101,7 +101,7 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 				bindingPE := &javascript.PrimaryExpression{
 					IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding.binding}},
 				}
-				enum := javascript.AssignmentExpression{
+				propName := javascript.AssignmentExpression{
 					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 						Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(prop)}},
 					}),
@@ -117,7 +117,7 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 				var ael []javascript.AssignmentExpression
 				if binding.writeable {
 					ael = []javascript.AssignmentExpression{
-						enum,
+						propName,
 						get,
 						{
 							ArrowFunction: &javascript.ArrowFunction{
@@ -138,7 +138,7 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 					}
 				} else {
 					ael = []javascript.AssignmentExpression{
-						enum,
+						propName,
 						get,
 					}
 				}
