@@ -275,7 +275,7 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 																			ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 																				MemberExpression: &javascript.MemberExpression{
 																					MemberExpression: importsME,
-																					IdentifierName:   &javascript.Token{Token: parser.Token{Data: "get"}},
+																					IdentifierName:   get,
 																				},
 																				Arguments: &javascript.Arguments{
 																					ArgumentList: []javascript.AssignmentExpression{
