@@ -154,8 +154,54 @@ func Package(os ...Option) (*javascript.Module, error) {
 				if err := walk.Walk(li.StatementListItem, d); err != nil {
 					return nil, err
 				}
-			} else if !c.bare && li.ExportDeclaration != nil {
+			} else if li.ExportDeclaration != nil {
+				ed := li.ExportDeclaration
+				if ed.ExportClause != nil {
+					if ed.FromClause != nil {
 
+					} else {
+
+					}
+				} else if ed.FromClause != nil {
+				} else if ed.VariableStatement != nil {
+					li.StatementListItem = &javascript.StatementListItem{
+						Statement: &javascript.Statement{
+							VariableStatement: ed.VariableStatement,
+						},
+					}
+				} else if ed.Declaration != nil {
+					li.StatementListItem = &javascript.StatementListItem{
+						Declaration: ed.Declaration,
+					}
+				} else {
+					def := &javascript.Token{Token: parser.Token{Data: d.prefix + "default"}}
+					if ed.DefaultFunction != nil {
+						ed.DefaultFunction.BindingIdentifier = def
+						li.StatementListItem = &javascript.StatementListItem{
+							Declaration: &javascript.Declaration{
+								FunctionDeclaration: ed.DefaultFunction,
+							},
+						}
+					} else if ed.DefaultClass != nil {
+						ed.DefaultClass.BindingIdentifier = def
+						li.StatementListItem = &javascript.StatementListItem{
+							Declaration: &javascript.Declaration{
+								ClassDeclaration: ed.DefaultClass,
+							},
+						}
+					} else if ed.DefaultAssignmentExpression != nil {
+						li.StatementListItem = &javascript.StatementListItem{
+							Statement: &javascript.Statement{
+								ExpressionStatement: &javascript.Expression{
+									Expressions: []javascript.AssignmentExpression{
+										*ed.DefaultAssignmentExpression,
+									},
+								},
+							},
+						}
+					}
+				}
+				li.ExportDeclaration = nil
 			}
 		}
 		processScope(scope, d.prefix)
