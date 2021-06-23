@@ -15,7 +15,6 @@ import (
 type data struct {
 	*config
 	url                  string
-	scope                *scope.Scope
 	module               *javascript.Module
 	requires, requiredBy map[string]*data
 	prefix               string
@@ -24,7 +23,6 @@ type data struct {
 type config struct {
 	filesToDo    []*data
 	filesDone    map[string]*data
-	files        []*data
 	loader       func(string) (*javascript.Module, error)
 	bare         bool
 	parseDynamic bool
@@ -94,7 +92,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 		if err != nil {
 			return nil, err
 		}
-		d.scope, err = scope.ModuleScope(d.module, nil)
+		scope, err := scope.ModuleScope(d.module, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -103,10 +101,10 @@ func Package(os ...Option) (*javascript.Module, error) {
 				iurl := d.RelTo(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
 				e := d.addImport(iurl)
 				if li.ImportDeclaration.ImportedDefaultBinding != nil {
-					replaceBinding(d.scope, li.ImportDeclaration.ImportedDefaultBinding.Data, e)
+					replaceBinding(scope, li.ImportDeclaration.ImportedDefaultBinding.Data, e)
 				}
 				if li.ImportDeclaration.NameSpaceImport != nil {
-					replaceBinding(d.scope, li.ImportDeclaration.NameSpaceImport.Data, e)
+					replaceBinding(scope, li.ImportDeclaration.NameSpaceImport.Data, e)
 					li.StatementListItem = &javascript.StatementListItem{
 						Declaration: &javascript.Declaration{
 							LexicalDeclaration: &javascript.LexicalDeclaration{
@@ -148,7 +146,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 						if is.ImportedBinding != nil {
 							tk = is.ImportedBinding
 						}
-						replaceBinding(d.scope, tk.Data, e)
+						replaceBinding(scope, tk.Data, e)
 					}
 				}
 				li.ImportDeclaration = nil
@@ -160,7 +158,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 
 			}
 		}
-		c.files = append(c.files, d)
+		processScope(scope, d.prefix)
 	}
 	return nil, nil
 }
@@ -195,5 +193,19 @@ func replaceBinding(scope *scope.Scope, oldBinding string, dep *data) {
 	im := scope.Bindings[oldBinding]
 	for _, imb := range im {
 		imb.Data = newBinding
+	}
+}
+
+func processScope(s *scope.Scope, prefix string) {
+	for _, b := range s.Bindings {
+		if len(b) == 0 || b[0].BindingType == scope.BindingImport || b[0].BindingType == scope.BindingBare {
+			continue
+		}
+		for _, binding := range b {
+			binding.Data = prefix + binding.Data
+		}
+	}
+	for _, scope := range s.Scopes {
+		processScope(scope, prefix)
 	}
 }
