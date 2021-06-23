@@ -12,10 +12,13 @@ import (
 )
 
 type data struct {
+	*config
 	url                  string
 	scope                *scope.Scope
 	module               *javascript.Module
 	requires, requiredBy map[string]*data
+	imports              map[string]string
+	exports              map[string]string
 }
 
 type config struct {
@@ -26,6 +29,22 @@ type config struct {
 	bare         bool
 	parseDynamic bool
 	currURL      string
+}
+
+func (c *config) addURL(url string) *data {
+	if d, ok := c.filesDone[url]; ok {
+		return d
+	}
+	d := &data{
+		config:     c,
+		url:        string,
+		requires:   make(map[string]*data),
+		requiredBy: make(map[string]*data),
+		imports:    make(map[string]string),
+		exports:    make(map[string]string),
+	}
+	c.filesToDo = append(c.filesToDo, d)
+	return d
 }
 
 func OSLoad(url string) (*javascript.Module, error) {
