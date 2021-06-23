@@ -11,15 +11,16 @@ import (
 )
 
 type data struct {
-	url    string
-	scope  *scope.Scope
-	module *javascript.Module
+	url                  string
+	scope                *scope.Scope
+	module               *javascript.Module
+	requires, requiredBy map[string]*data
 }
 
 type config struct {
-	filesToDo    []data
-	filesDone    map[string]struct{}
-	files        []data
+	filesToDo    []*data
+	filesDone    map[string]*data
+	files        []*data
 	loader       func(string) (*javascript.Module, error)
 	bare         bool
 	parseDynamic bool
