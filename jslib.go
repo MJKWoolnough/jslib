@@ -2,6 +2,7 @@ package jslib
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 
 	"vimagination.zapto.org/javascript"
@@ -92,4 +93,11 @@ func (d *data) Handle(t javascript.Type) error {
 		return nil
 	}
 	return walk.Walk(t, d)
+}
+
+func (d *data) RelTo(url string) string {
+	if len(url) > 0 && url[0] == '/' {
+		return url
+	}
+	return path.Join(path.Dir(d.url), url)
 }
