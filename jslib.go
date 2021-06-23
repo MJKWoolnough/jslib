@@ -32,36 +32,39 @@ type config struct {
 	parseDynamic bool
 	currURL      string
 	nextID       uint
+	data
 }
 
-func (c *config) addURL(url string) *data {
-	if d, ok := c.filesDone[url]; ok {
-		return d
+func (dep *data) addImport(url string) {
+	c := dep.config
+	d, ok := c.filesDone[url]
+	if !ok {
+		c.nextID++
+		id := c.nextID
+		var (
+			p [15]byte
+			n = 14
+		)
+		p[14] = '_'
+		for id >= 0 {
+			n--
+			id--
+			p[n] = 'a' + byte(id%26)
+			id /= 26
+		}
+		d := &data{
+			config:     c,
+			url:        url,
+			requires:   make(map[string]*data),
+			requiredBy: make(map[string]*data),
+			imports:    make(map[string]map[string]string),
+			exports:    make(map[string]string),
+			prefix:     string(p[n:]),
+		}
+		c.filesToDo = append(c.filesToDo, d)
 	}
-	c.nextID++
-	id := c.nextID
-	var (
-		p [15]byte
-		n = 14
-	)
-	p[14] = '_'
-	for id >= 0 {
-		n--
-		id--
-		p[n] = 'a' + byte(id%26)
-		id /= 26
-	}
-	d := &data{
-		config:     c,
-		url:        url,
-		requires:   make(map[string]*data),
-		requiredBy: make(map[string]*data),
-		imports:    make(map[string]map[string]string),
-		exports:    make(map[string]string),
-		prefix:     string(p[n:]),
-	}
-	c.filesToDo = append(c.filesToDo, d)
-	return d
+	d.requiredBy[dep.url] = dep
+	dep.requires[url] = d
 }
 
 func OSLoad(url string) (*javascript.Module, error) {
@@ -78,6 +81,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 	c := config{
 		loader: OSLoad,
 	}
+	c.data.config = &c
 	for _, o := range os {
 		o(&c)
 	}
@@ -100,9 +104,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 		for _, li := range d.module.ModuleListItems {
 			if li.ImportDeclaration != nil {
 				iurl := d.RelTo(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
-				e := c.addURL(iurl)
-				e.requiredBy[d.url] = d
-				d.requires[iurl] = e
+				d.addImport(iurl)
 				r, ok := d.imports[iurl]
 				if !ok {
 					r = make(map[string]string)
