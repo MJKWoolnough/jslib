@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/javascript/scope"
@@ -17,7 +18,7 @@ type data struct {
 	scope                *scope.Scope
 	module               *javascript.Module
 	requires, requiredBy map[string]*data
-	imports              map[string]string
+	imports              map[string]map[string]string
 	exports              map[string]string
 }
 
@@ -37,10 +38,10 @@ func (c *config) addURL(url string) *data {
 	}
 	d := &data{
 		config:     c,
-		url:        string,
+		url:        url,
 		requires:   make(map[string]*data),
 		requiredBy: make(map[string]*data),
-		imports:    make(map[string]string),
+		imports:    make(map[string]map[string]string),
 		exports:    make(map[string]string),
 	}
 	c.filesToDo = append(c.filesToDo, d)
@@ -70,7 +71,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 		if _, ok := c.filesDone[d.url]; ok {
 			continue
 		}
-		c.filesDone[d.url] = struct{}{}
+		c.filesDone[d.url] = d
 		c.filesToDo = c.filesToDo[1:]
 		d.module, err = c.loader(d.url)
 		if err != nil {
@@ -82,9 +83,62 @@ func Package(os ...Option) (*javascript.Module, error) {
 		}
 		for _, li := range d.module.ModuleListItems {
 			if li.ImportDeclaration != nil {
-
+				iurl := d.RelTo(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
+				e := c.addURL(iurl)
+				e.requiredBy[d.url] = d
+				d.requires[iurl] = e
+				r, ok := d.imports[iurl]
+				if !ok {
+					r = make(map[string]string)
+					d.imports[iurl] = r
+				}
+				if li.ImportDeclaration.ImportedDefaultBinding != nil {
+					r["default"] = li.ImportDeclaration.ImportedDefaultBinding.Data
+				}
+				if li.ImportDeclaration.NameSpaceImport != nil {
+					li.StatementListItem = &javascript.StatementListItem{
+						Declaration: &javascript.Declaration{
+							LexicalDeclaration: &javascript.LexicalDeclaration{
+								LetOrConst: javascript.Const,
+								BindingList: []javascript.LexicalBinding{
+									{
+										BindingIdentifier: li.ImportDeclaration.NameSpaceImport,
+										Initializer: &javascript.AssignmentExpression{
+											ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+												MemberExpression: &javascript.MemberExpression{
+													PrimaryExpression: &javascript.PrimaryExpression{
+														IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
+													},
+												},
+												Arguments: &javascript.Arguments{
+													ArgumentList: []javascript.AssignmentExpression{
+														{
+															ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(iurl)}},
+															}),
+														},
+														{
+															ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																Literal: &javascript.Token{Token: parser.Token{Data: "true"}},
+															}),
+														},
+													},
+												},
+											}),
+										},
+									},
+								},
+							},
+						},
+					}
+				} else if li.ImportDeclaration.NamedImports != nil {
+					for _, is := range li.ImportDeclaration.NamedImports.ImportList {
+						r[is.IdentifierName.Data] = is.ImportedBinding.Data
+					}
+				}
+				li.ImportDeclaration = nil
 			} else if li.StatementListItem != nil {
-				if err := walk.Walk(li.StatementListItem, &d); err != nil {
+				if err := walk.Walk(li.StatementListItem, d); err != nil {
 					return nil, err
 				}
 			} else if !c.bare && li.ExportDeclaration != nil {
