@@ -20,6 +20,7 @@ type data struct {
 	requires, requiredBy map[string]*data
 	imports              map[string]map[string]string
 	exports              map[string]string
+	prefix               string
 }
 
 type config struct {
@@ -30,11 +31,25 @@ type config struct {
 	bare         bool
 	parseDynamic bool
 	currURL      string
+	nextID       uint
 }
 
 func (c *config) addURL(url string) *data {
 	if d, ok := c.filesDone[url]; ok {
 		return d
+	}
+	c.nextID++
+	id := c.nextID
+	var (
+		p [15]byte
+		n = 14
+	)
+	p[14] = '_'
+	for id >= 0 {
+		n--
+		id--
+		p[n] = 'a' + byte(id%26)
+		id /= 26
 	}
 	d := &data{
 		config:     c,
@@ -43,6 +58,7 @@ func (c *config) addURL(url string) *data {
 		requiredBy: make(map[string]*data),
 		imports:    make(map[string]map[string]string),
 		exports:    make(map[string]string),
+		prefix:     string(p[n:]),
 	}
 	c.filesToDo = append(c.filesToDo, d)
 	return d
