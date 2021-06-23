@@ -18,8 +18,6 @@ type data struct {
 	scope                *scope.Scope
 	module               *javascript.Module
 	requires, requiredBy map[string]*data
-	imports              map[string]map[string]string
-	exports              map[string]string
 	prefix               string
 }
 
@@ -35,7 +33,7 @@ type config struct {
 	data
 }
 
-func (dep *data) addImport(url string) {
+func (dep *data) addImport(url string) *data {
 	c := dep.config
 	d, ok := c.filesDone[url]
 	if !ok {
@@ -57,14 +55,13 @@ func (dep *data) addImport(url string) {
 			url:        url,
 			requires:   make(map[string]*data),
 			requiredBy: make(map[string]*data),
-			imports:    make(map[string]map[string]string),
-			exports:    make(map[string]string),
 			prefix:     string(p[n:]),
 		}
 		c.filesToDo = append(c.filesToDo, d)
 	}
 	d.requiredBy[dep.url] = dep
 	dep.requires[url] = d
+	return d
 }
 
 func OSLoad(url string) (*javascript.Module, error) {
@@ -104,16 +101,12 @@ func Package(os ...Option) (*javascript.Module, error) {
 		for _, li := range d.module.ModuleListItems {
 			if li.ImportDeclaration != nil {
 				iurl := d.RelTo(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
-				d.addImport(iurl)
-				r, ok := d.imports[iurl]
-				if !ok {
-					r = make(map[string]string)
-					d.imports[iurl] = r
-				}
+				e := d.addImport(iurl)
 				if li.ImportDeclaration.ImportedDefaultBinding != nil {
-					r["default"] = li.ImportDeclaration.ImportedDefaultBinding.Data
+					replaceBinding(d.scope, li.ImportDeclaration.ImportedDefaultBinding.Data, e)
 				}
 				if li.ImportDeclaration.NameSpaceImport != nil {
+					replaceBinding(d.scope, li.ImportDeclaration.NameSpaceImport.Data, e)
 					li.StatementListItem = &javascript.StatementListItem{
 						Declaration: &javascript.Declaration{
 							LexicalDeclaration: &javascript.LexicalDeclaration{
@@ -151,7 +144,11 @@ func Package(os ...Option) (*javascript.Module, error) {
 					}
 				} else if li.ImportDeclaration.NamedImports != nil {
 					for _, is := range li.ImportDeclaration.NamedImports.ImportList {
-						r[is.IdentifierName.Data] = is.ImportedBinding.Data
+						tk := is.IdentifierName
+						if is.ImportedBinding != nil {
+							tk = is.ImportedBinding
+						}
+						replaceBinding(d.scope, tk.Data, e)
 					}
 				}
 				li.ImportDeclaration = nil
@@ -191,4 +188,12 @@ func (d *data) RelTo(url string) string {
 		return url
 	}
 	return path.Join(path.Dir(d.url), url)
+}
+
+func replaceBinding(scope *scope.Scope, oldBinding string, dep *data) {
+	newBinding := dep.prefix + oldBinding
+	im := scope.Bindings[oldBinding]
+	for _, imb := range im {
+		imb.Data = newBinding
+	}
 }
