@@ -236,7 +236,7 @@ func init() {
 				},
 			}
 			ce.ImportCall = nil
-			return nil
+			return walk.Walk(ce.Arguments.ArgumentList[0], importReplacer)
 		}
 		return walk.Walk(t, importReplacer)
 	}
