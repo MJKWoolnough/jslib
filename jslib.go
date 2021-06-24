@@ -92,6 +92,65 @@ func Package(os ...Option) (*javascript.Module, error) {
 		if err != nil {
 			return nil, err
 		}
+		for _, li := range d.module.ModuleListItems {
+			if li.ImportDeclaration != nil {
+				d.addImport(d.RelTo(li.ImportDeclaration.FromClause.ModuleSpecifier.Data))
+			} else if li.StatementListItem != nil && c.parseDynamic {
+				if err := walk.Walk(li.StatementListItem, d); err != nil {
+					return nil, err
+				}
+			} else if li.ExportDeclaration != nil {
+				ed := li.ExportDeclaration
+				if ed.ExportClause != nil {
+					if ed.FromClause != nil {
+
+					} else {
+
+					}
+				} else if ed.FromClause != nil {
+				} else if ed.VariableStatement != nil {
+					li.StatementListItem = &javascript.StatementListItem{
+						Statement: &javascript.Statement{
+							VariableStatement: ed.VariableStatement,
+						},
+					}
+				} else if ed.Declaration != nil {
+					li.StatementListItem = &javascript.StatementListItem{
+						Declaration: ed.Declaration,
+					}
+				} else {
+					def := &javascript.Token{Token: parser.Token{Data: d.prefix + "default"}}
+					if ed.DefaultFunction != nil {
+						ed.DefaultFunction.BindingIdentifier = def
+						li.StatementListItem = &javascript.StatementListItem{
+							Declaration: &javascript.Declaration{
+								FunctionDeclaration: ed.DefaultFunction,
+							},
+						}
+					} else if ed.DefaultClass != nil {
+						ed.DefaultClass.BindingIdentifier = def
+						li.StatementListItem = &javascript.StatementListItem{
+							Declaration: &javascript.Declaration{
+								ClassDeclaration: ed.DefaultClass,
+							},
+						}
+					} else if ed.DefaultAssignmentExpression != nil {
+						li.StatementListItem = &javascript.StatementListItem{
+							Statement: &javascript.Statement{
+								ExpressionStatement: &javascript.Expression{
+									Expressions: []javascript.AssignmentExpression{
+										*ed.DefaultAssignmentExpression,
+									},
+								},
+							},
+						}
+					}
+				}
+				li.ExportDeclaration = nil
+			}
+		}
+	}
+	for _, d := range c.filesDone {
 		scope, err := scope.ModuleScope(d.module, nil)
 		if err != nil {
 			return nil, err
@@ -149,59 +208,11 @@ func Package(os ...Option) (*javascript.Module, error) {
 						replaceBinding(scope, tk.Data, e)
 					}
 				}
-				li.ImportDeclaration = nil
 			} else if li.StatementListItem != nil {
-				if err := walk.Walk(li.StatementListItem, d); err != nil {
+				if err := walk.Walk(li.StatementListItem, importReplacer); err != nil {
 					return nil, err
 				}
-			} else if li.ExportDeclaration != nil {
-				ed := li.ExportDeclaration
-				if ed.ExportClause != nil {
-					if ed.FromClause != nil {
-
-					} else {
-
-					}
-				} else if ed.FromClause != nil {
-				} else if ed.VariableStatement != nil {
-					li.StatementListItem = &javascript.StatementListItem{
-						Statement: &javascript.Statement{
-							VariableStatement: ed.VariableStatement,
-						},
-					}
-				} else if ed.Declaration != nil {
-					li.StatementListItem = &javascript.StatementListItem{
-						Declaration: ed.Declaration,
-					}
-				} else {
-					def := &javascript.Token{Token: parser.Token{Data: d.prefix + "default"}}
-					if ed.DefaultFunction != nil {
-						ed.DefaultFunction.BindingIdentifier = def
-						li.StatementListItem = &javascript.StatementListItem{
-							Declaration: &javascript.Declaration{
-								FunctionDeclaration: ed.DefaultFunction,
-							},
-						}
-					} else if ed.DefaultClass != nil {
-						ed.DefaultClass.BindingIdentifier = def
-						li.StatementListItem = &javascript.StatementListItem{
-							Declaration: &javascript.Declaration{
-								ClassDeclaration: ed.DefaultClass,
-							},
-						}
-					} else if ed.DefaultAssignmentExpression != nil {
-						li.StatementListItem = &javascript.StatementListItem{
-							Statement: &javascript.Statement{
-								ExpressionStatement: &javascript.Expression{
-									Expressions: []javascript.AssignmentExpression{
-										*ed.DefaultAssignmentExpression,
-									},
-								},
-							},
-						}
-					}
-				}
-				li.ExportDeclaration = nil
+				li.ImportDeclaration = nil
 			}
 		}
 		processScope(scope, d.prefix)
@@ -209,19 +220,30 @@ func Package(os ...Option) (*javascript.Module, error) {
 	return nil, nil
 }
 
-func (d *data) Handle(t javascript.Type) error {
-	if ce, ok := t.(*javascript.CallExpression); ok && ce.ImportCall != nil {
-		ce.MemberExpression = &javascript.MemberExpression{
-			PrimaryExpression: &javascript.PrimaryExpression{
-				IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
-			},
-			Arguments: &javascript.Arguments{
-				ArgumentList: []javascript.AssignmentExpression{
-					*ce.ImportCall,
+var importReplacer walk.HandlerFunc
+
+func init() {
+	importReplacer = func(t javascript.Type) error {
+		if ce, ok := t.(*javascript.CallExpression); ok && ce.ImportCall != nil {
+			ce.MemberExpression = &javascript.MemberExpression{
+				PrimaryExpression: &javascript.PrimaryExpression{
+					IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
 				},
-			},
+				Arguments: &javascript.Arguments{
+					ArgumentList: []javascript.AssignmentExpression{
+						*ce.ImportCall,
+					},
+				},
+			}
+			ce.ImportCall = nil
+			return nil
 		}
-		ce.ImportCall = nil
+		return walk.Walk(t, importReplacer)
+	}
+}
+
+func (d *data) Handle(t javascript.Type) error {
+	if ce, ok := t.(*javascript.CallExpression); ok && ce.ImportCall != nil && ce.ImportCall.ConditionalExpression != nil {
 		return nil
 	}
 	return walk.Walk(t, d)
