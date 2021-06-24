@@ -94,7 +94,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 		}
 		for _, li := range d.module.ModuleListItems {
 			if li.ImportDeclaration != nil {
-				d.addImport(d.RelTo(li.ImportDeclaration.FromClause.ModuleSpecifier.Data))
+				d.addImport(d.RelTo(javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)))
 			} else if li.StatementListItem != nil && c.parseDynamic {
 				if err := walk.Walk(li.StatementListItem, d); err != nil {
 					return nil, err
@@ -157,7 +157,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 		}
 		for _, li := range d.module.ModuleListItems {
 			if li.ImportDeclaration != nil {
-				iurl := d.RelTo(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
+				iurl := d.RelTo(javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data))
 				e := d.addImport(iurl)
 				if li.ImportDeclaration.ImportedDefaultBinding != nil {
 					replaceBinding(scope, li.ImportDeclaration.ImportedDefaultBinding.Data, e)
