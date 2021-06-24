@@ -17,6 +17,9 @@ type data struct {
 	url                  string
 	module               *javascript.Module
 	requires, requiredBy map[string]*data
+	exports              map[string]struct{}
+	exportRenames        map[string]string
+	exportFrom           map[string]*data
 	prefix               string
 }
 
@@ -49,11 +52,14 @@ func (dep *data) addImport(url string) *data {
 			id /= 26
 		}
 		d := &data{
-			config:     c,
-			url:        url,
-			requires:   make(map[string]*data),
-			requiredBy: make(map[string]*data),
-			prefix:     string(p[n:]),
+			config:        c,
+			url:           url,
+			requires:      make(map[string]*data),
+			requiredBy:    make(map[string]*data),
+			exports:       make(map[string]struct{}),
+			exportRenames: make(map[string]string),
+			exportsFrom:   make(map[string]*data),
+			prefix:        string(p[n:]),
 		}
 		c.filesToDo = append(c.filesToDo, d)
 	}
@@ -102,12 +108,21 @@ func Package(os ...Option) (*javascript.Module, error) {
 			} else if li.ExportDeclaration != nil {
 				ed := li.ExportDeclaration
 				if ed.ExportClause != nil {
+					var fc *data
 					if ed.FromClause != nil {
-
-					} else {
-
+						fc = d.addImport(d.RelTo(javascript.Unquote(ed.FromClause.ModuleSpecifier.Data)))
 					}
-				} else if ed.FromClause != nil {
+					for _, e := range ed.ExportClause.ExportList {
+						var name = e.IdentifierName.Data
+						if e.EIdentifierName != nil && e.IdentifierName.Data != e.EIdentifierName.Data {
+							name = e.EIdentifierName.name
+							d.exportRenames[e.EIdentifierName.Data] = e.IdentifierName.Data
+						}
+						if fc != nil {
+							d.exportFrom[name] = fc
+						}
+						d.exports[name] = struct{}{}
+					}
 				} else if ed.VariableStatement != nil {
 					li.StatementListItem = &javascript.StatementListItem{
 						Statement: &javascript.Statement{
@@ -150,6 +165,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 			}
 		}
 	}
+	// process export * from ''
 	for _, d := range c.filesDone {
 		scope, err := scope.ModuleScope(d.module, nil)
 		if err != nil {
