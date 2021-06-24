@@ -244,7 +244,9 @@ func init() {
 
 func (d *data) Handle(t javascript.Type) error {
 	if ce, ok := t.(*javascript.CallExpression); ok && ce.ImportCall != nil && ce.ImportCall.ConditionalExpression != nil {
-		return nil
+		if pe, ok := javascript.UnwrapConditional(ce.ImportCall.ConditionalExpression).(*javascript.PrimaryExpression); ok && pe.Literal != nil && pe.Literal.Type == javascript.TokenStringLiteral {
+			d.addImport(d.RelTo(javascript.Unquote(pe.Literal.Data)))
+		}
 	}
 	return walk.Walk(t, d)
 }
