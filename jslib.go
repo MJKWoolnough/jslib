@@ -115,63 +115,10 @@ func Package(os ...Option) (*javascript.Module, error) {
 					return nil, err
 				}
 			} else if li.ExportDeclaration != nil {
-				ed := li.ExportDeclaration
-				if ed.ExportClause != nil {
-					var fc *data
-					if ed.FromClause != nil {
-						durl, _ := javascript.Unquote(ed.FromClause.ModuleSpecifier.Data)
-						fc = d.addImport(d.RelTo(durl))
-					}
-					for _, e := range ed.ExportClause.ExportList {
-						var name = e.IdentifierName.Data
-						if e.EIdentifierName != nil && e.IdentifierName.Data != e.EIdentifierName.Data {
-							name = e.EIdentifierName.Data
-							d.exportRenames[e.EIdentifierName.Data] = e.IdentifierName.Data
-						}
-						if fc != nil {
-							d.exportFrom[name] = fc
-						}
-						d.exports[name] = struct{}{}
-					}
-				} else if ed.VariableStatement != nil {
-					li.StatementListItem = &javascript.StatementListItem{
-						Statement: &javascript.Statement{
-							VariableStatement: ed.VariableStatement,
-						},
-					}
-				} else if ed.Declaration != nil {
-					li.StatementListItem = &javascript.StatementListItem{
-						Declaration: ed.Declaration,
-					}
-				} else {
-					def := &javascript.Token{Token: parser.Token{Data: d.prefix + "default"}}
-					if ed.DefaultFunction != nil {
-						ed.DefaultFunction.BindingIdentifier = def
-						li.StatementListItem = &javascript.StatementListItem{
-							Declaration: &javascript.Declaration{
-								FunctionDeclaration: ed.DefaultFunction,
-							},
-						}
-					} else if ed.DefaultClass != nil {
-						ed.DefaultClass.BindingIdentifier = def
-						li.StatementListItem = &javascript.StatementListItem{
-							Declaration: &javascript.Declaration{
-								ClassDeclaration: ed.DefaultClass,
-							},
-						}
-					} else if ed.DefaultAssignmentExpression != nil {
-						li.StatementListItem = &javascript.StatementListItem{
-							Statement: &javascript.Statement{
-								ExpressionStatement: &javascript.Expression{
-									Expressions: []javascript.AssignmentExpression{
-										*ed.DefaultAssignmentExpression,
-									},
-								},
-							},
-						}
-					}
+				if li.ExportDeclaration.FromClause != nil {
+					durl, _ := javascript.Unquote(li.ExportDeclaration.FromClause.ModuleSpecifier.Data)
+					d.addImport(d.RelTo(durl))
 				}
-				li.ExportDeclaration = nil
 			}
 		}
 	}
@@ -235,6 +182,64 @@ func Package(os ...Option) (*javascript.Module, error) {
 			} else if li.StatementListItem != nil {
 				walk.Walk(li.StatementListItem, importReplacer)
 				li.ImportDeclaration = nil
+			} else if li.ExportDeclaration != nil {
+				ed := li.ExportDeclaration
+				if ed.ExportClause != nil {
+					var fc *data
+					if ed.FromClause != nil {
+						durl, _ := javascript.Unquote(ed.FromClause.ModuleSpecifier.Data)
+						fc = d.addImport(d.RelTo(durl))
+					}
+					for _, e := range ed.ExportClause.ExportList {
+						var name = e.IdentifierName.Data
+						if e.EIdentifierName != nil && e.IdentifierName.Data != e.EIdentifierName.Data {
+							name = e.EIdentifierName.Data
+							d.exportRenames[e.EIdentifierName.Data] = e.IdentifierName.Data
+						}
+						if fc != nil {
+							d.exportFrom[name] = fc
+						}
+						d.exports[name] = struct{}{}
+					}
+				} else if ed.VariableStatement != nil {
+					li.StatementListItem = &javascript.StatementListItem{
+						Statement: &javascript.Statement{
+							VariableStatement: ed.VariableStatement,
+						},
+					}
+				} else if ed.Declaration != nil {
+					li.StatementListItem = &javascript.StatementListItem{
+						Declaration: ed.Declaration,
+					}
+				} else {
+					def := &javascript.Token{Token: parser.Token{Data: d.prefix + "default"}}
+					if ed.DefaultFunction != nil {
+						ed.DefaultFunction.BindingIdentifier = def
+						li.StatementListItem = &javascript.StatementListItem{
+							Declaration: &javascript.Declaration{
+								FunctionDeclaration: ed.DefaultFunction,
+							},
+						}
+					} else if ed.DefaultClass != nil {
+						ed.DefaultClass.BindingIdentifier = def
+						li.StatementListItem = &javascript.StatementListItem{
+							Declaration: &javascript.Declaration{
+								ClassDeclaration: ed.DefaultClass,
+							},
+						}
+					} else if ed.DefaultAssignmentExpression != nil {
+						li.StatementListItem = &javascript.StatementListItem{
+							Statement: &javascript.Statement{
+								ExpressionStatement: &javascript.Expression{
+									Expressions: []javascript.AssignmentExpression{
+										*ed.DefaultAssignmentExpression,
+									},
+								},
+							},
+						}
+					}
+				}
+				li.ExportDeclaration = nil
 			}
 			slis = append(slis, li)
 		}
