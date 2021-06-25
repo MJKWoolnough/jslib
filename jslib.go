@@ -180,7 +180,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 					}
 				}
 				li.ImportDeclaration = nil
-			} else if li.StatementListItem != nil {
+			} else if li.StatementListItem != nil && c.parseDynamic {
 				walk.Walk(li.StatementListItem, importReplacer)
 			} else if li.ExportDeclaration != nil {
 				ed := li.ExportDeclaration
