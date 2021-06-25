@@ -9,8 +9,8 @@ import (
 )
 
 type export struct {
-	binding   string
-	writeable bool
+	binding, module string
+	writeable       bool
 }
 
 type exportMap map[string]export
@@ -98,48 +98,82 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 			sort.Strings(props)
 			for _, prop := range props {
 				binding := es[prop]
-				bindingPE := &javascript.LeftHandSideExpression{
-					NewExpression: &javascript.NewExpression{
-						MemberExpression: javascript.MemberExpression{
-							PrimaryExpression: &javascript.PrimaryExpression{
-								IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding.binding}},
-							},
-						},
-					},
-				}
 				propName := javascript.AssignmentExpression{
 					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 						Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(prop)}},
 					}),
 				}
-				get := javascript.AssignmentExpression{
-					ArrowFunction: &javascript.ArrowFunction{
-						CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
-						AssignmentExpression: &javascript.AssignmentExpression{
-							ConditionalExpression: javascript.WrapConditional(bindingPE),
-						},
-					},
-				}
 				var ael []javascript.AssignmentExpression
-				if binding.writeable {
+				if binding.module != "" {
 					ael = []javascript.AssignmentExpression{
 						propName,
-						get,
 						{
 							ArrowFunction: &javascript.ArrowFunction{
-								BindingIdentifier: a,
+								CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
 								AssignmentExpression: &javascript.AssignmentExpression{
-									LeftHandSideExpression: bindingPE,
-									AssignmentOperator:     javascript.AssignmentAssign,
-									AssignmentExpression:   &aWrapped,
+									ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+										MemberExpression: &javascript.MemberExpression{
+											PrimaryExpression: &javascript.PrimaryExpression{
+												IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
+											},
+										},
+										Arguments: &javascript.Arguments{
+											ArgumentList: []javascript.AssignmentExpression{
+												{
+													ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+														Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(binding.module)}},
+													}),
+												},
+												{
+													ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+														Literal: &javascript.Token{Token: parser.Token{Data: "true"}},
+													}),
+												},
+											},
+										},
+									}),
 								},
 							},
 						},
 					}
 				} else {
-					ael = []javascript.AssignmentExpression{
-						propName,
-						get,
+					bindingPE := &javascript.LeftHandSideExpression{
+						NewExpression: &javascript.NewExpression{
+							MemberExpression: javascript.MemberExpression{
+								PrimaryExpression: &javascript.PrimaryExpression{
+									IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding.binding}},
+								},
+							},
+						},
+					}
+					get := javascript.AssignmentExpression{
+						ArrowFunction: &javascript.ArrowFunction{
+							CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
+							AssignmentExpression: &javascript.AssignmentExpression{
+								ConditionalExpression: javascript.WrapConditional(bindingPE),
+							},
+						},
+					}
+					if binding.writeable {
+						ael = []javascript.AssignmentExpression{
+							propName,
+							get,
+							{
+								ArrowFunction: &javascript.ArrowFunction{
+									BindingIdentifier: a,
+									AssignmentExpression: &javascript.AssignmentExpression{
+										LeftHandSideExpression: bindingPE,
+										AssignmentOperator:     javascript.AssignmentAssign,
+										AssignmentExpression:   &aWrapped,
+									},
+								},
+							},
+						}
+					} else {
+						ael = []javascript.AssignmentExpression{
+							propName,
+							get,
+						}
 					}
 				}
 				el = append(el, javascript.AssignmentExpression{
