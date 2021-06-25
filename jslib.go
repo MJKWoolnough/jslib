@@ -16,6 +16,7 @@ type data struct {
 	*config
 	url                  string
 	module               *javascript.Module
+	scope                *scope.Scope
 	requires, requiredBy map[string]*data
 	exports              map[string]struct{}
 	exportRenames        map[string]string
@@ -87,6 +88,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 		o(&c)
 	}
 	var err error
+	n := 1
 	for len(c.filesToDo) > 0 {
 		d := c.filesToDo[0]
 		if _, ok := c.filesDone[d.url]; ok {
@@ -98,6 +100,11 @@ func Package(os ...Option) (*javascript.Module, error) {
 		if err != nil {
 			return nil, err
 		}
+		d.scope, err = scope.ModuleScope(d.module, nil)
+		if err != nil {
+			return nil, err
+		}
+		n += len(d.module.ModuleListItems)
 		for _, li := range d.module.ModuleListItems {
 			if li.ImportDeclaration != nil {
 				durl, _ := javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
@@ -167,22 +174,19 @@ func Package(os ...Option) (*javascript.Module, error) {
 			}
 		}
 	}
-	// process export * from ''
-	for _, d := range c.filesDone {
-		scope, err := scope.ModuleScope(d.module, nil)
-		if err != nil {
-			return nil, err
-		}
+	slis := make([]javascript.ModuleItem, 1, n)
+	dw := make(depWalker)
+	dw.walkDeps(&c.data, func(d *data) {
 		for _, li := range d.module.ModuleListItems {
 			if li.ImportDeclaration != nil {
 				durl, _ := javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
 				iurl := d.RelTo(durl)
 				e := d.addImport(iurl)
 				if li.ImportDeclaration.ImportedDefaultBinding != nil {
-					replaceBinding(scope, li.ImportDeclaration.ImportedDefaultBinding.Data, e)
+					replaceBinding(d.scope, li.ImportDeclaration.ImportedDefaultBinding.Data, e)
 				}
 				if li.ImportDeclaration.NameSpaceImport != nil {
-					replaceBinding(scope, li.ImportDeclaration.NameSpaceImport.Data, e)
+					replaceBinding(d.scope, li.ImportDeclaration.NameSpaceImport.Data, e)
 					li.StatementListItem = &javascript.StatementListItem{
 						Declaration: &javascript.Declaration{
 							LexicalDeclaration: &javascript.LexicalDeclaration{
@@ -224,19 +228,20 @@ func Package(os ...Option) (*javascript.Module, error) {
 						if is.ImportedBinding != nil {
 							tk = is.ImportedBinding
 						}
-						replaceBinding(scope, tk.Data, e)
+						replaceBinding(d.scope, tk.Data, e)
 					}
 				}
 			} else if li.StatementListItem != nil {
-				if err := walk.Walk(li.StatementListItem, importReplacer); err != nil {
-					return nil, err
-				}
+				walk.Walk(li.StatementListItem, importReplacer)
 				li.ImportDeclaration = nil
 			}
+			slis = append(slis, li)
 		}
-		processScope(scope, d.prefix)
-	}
-	return nil, nil
+		processScope(d.scope, d.prefix)
+	})
+	return &javascript.Module{
+		ModuleListItems: slis,
+	}, nil
 }
 
 var importReplacer walk.HandlerFunc
@@ -297,5 +302,20 @@ func processScope(s *scope.Scope, prefix string) {
 	}
 	for _, scope := range s.Scopes {
 		processScope(scope, prefix)
+	}
+}
+
+type depWalker map[string]struct{}
+
+func (dw depWalker) walkDeps(d *data, fn func(*data)) {
+	if _, ok := dw[d.url]; ok {
+		return
+	}
+	dw[d.url] = struct{}{}
+	for _, e := range d.requires {
+		dw.walkDeps(e, fn)
+	}
+	if d.url != "" {
+		fn(d)
 	}
 }
