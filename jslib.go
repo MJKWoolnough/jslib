@@ -274,12 +274,19 @@ func init() {
 
 func (d *data) Handle(t javascript.Type) error {
 	if ce, ok := t.(*javascript.CallExpression); ok && ce.ImportCall != nil && ce.ImportCall.ConditionalExpression != nil {
-		if pe, ok := javascript.UnwrapConditional(ce.ImportCall.ConditionalExpression).(*javascript.PrimaryExpression); ok && pe.Literal != nil && pe.Literal.Type == javascript.TokenStringLiteral {
-			durl, _ := javascript.Unquote(pe.Literal.Data)
-			d.addImport(d.RelTo(durl))
-		}
+		d.HandleImportConditional(ce.ImportCall.ConditionalExpression)
 	}
 	return walk.Walk(t, d)
+}
+
+func (d *data) HandleImportConditional(ce *javascript.ConditionalExpression) {
+	if ce.True != nil && ce.False != nil {
+		d.HandleImportConditional(ce.True)
+		d.HandleImportConditional(ce.False)
+	} else if pe, ok := javascript.UnwrapConditional(ce.ImportCall.ConditionalExpression).(*javascript.PrimaryExpression); ok && pe.Literal != nil && pe.Literal.Type == javascript.TokenStringLiteral {
+		durl, _ := javascript.Unquote(pe.Literal.Data)
+		d.addImport(d.RelTo(durl))
+	}
 }
 
 func (d *data) RelTo(url string) string {
