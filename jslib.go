@@ -58,7 +58,7 @@ func (dep *data) addImport(url string) *data {
 			requiredBy:    make(map[string]*data),
 			exports:       make(map[string]struct{}),
 			exportRenames: make(map[string]string),
-			exportsFrom:   make(map[string]*data),
+			exportFrom:    make(map[string]*data),
 			prefix:        string(p[n:]),
 		}
 		c.filesToDo = append(c.filesToDo, d)
@@ -100,7 +100,8 @@ func Package(os ...Option) (*javascript.Module, error) {
 		}
 		for _, li := range d.module.ModuleListItems {
 			if li.ImportDeclaration != nil {
-				d.addImport(d.RelTo(javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)))
+				durl, _ := javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
+				d.addImport(d.RelTo(durl))
 			} else if li.StatementListItem != nil && c.parseDynamic {
 				if err := walk.Walk(li.StatementListItem, d); err != nil {
 					return nil, err
@@ -110,12 +111,13 @@ func Package(os ...Option) (*javascript.Module, error) {
 				if ed.ExportClause != nil {
 					var fc *data
 					if ed.FromClause != nil {
-						fc = d.addImport(d.RelTo(javascript.Unquote(ed.FromClause.ModuleSpecifier.Data)))
+						durl, _ := javascript.Unquote(ed.FromClause.ModuleSpecifier.Data)
+						fc = d.addImport(d.RelTo(durl))
 					}
 					for _, e := range ed.ExportClause.ExportList {
 						var name = e.IdentifierName.Data
 						if e.EIdentifierName != nil && e.IdentifierName.Data != e.EIdentifierName.Data {
-							name = e.EIdentifierName.name
+							name = e.EIdentifierName.Data
 							d.exportRenames[e.EIdentifierName.Data] = e.IdentifierName.Data
 						}
 						if fc != nil {
@@ -173,7 +175,8 @@ func Package(os ...Option) (*javascript.Module, error) {
 		}
 		for _, li := range d.module.ModuleListItems {
 			if li.ImportDeclaration != nil {
-				iurl := d.RelTo(javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data))
+				durl, _ := javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
+				iurl := d.RelTo(durl)
 				e := d.addImport(iurl)
 				if li.ImportDeclaration.ImportedDefaultBinding != nil {
 					replaceBinding(scope, li.ImportDeclaration.ImportedDefaultBinding.Data, e)
@@ -261,7 +264,8 @@ func init() {
 func (d *data) Handle(t javascript.Type) error {
 	if ce, ok := t.(*javascript.CallExpression); ok && ce.ImportCall != nil && ce.ImportCall.ConditionalExpression != nil {
 		if pe, ok := javascript.UnwrapConditional(ce.ImportCall.ConditionalExpression).(*javascript.PrimaryExpression); ok && pe.Literal != nil && pe.Literal.Type == javascript.TokenStringLiteral {
-			d.addImport(d.RelTo(javascript.Unquote(pe.Literal.Data)))
+			durl, _ := javascript.Unquote(pe.Literal.Data)
+			d.addImport(d.RelTo(durl))
 		}
 	}
 	return walk.Walk(t, d)
