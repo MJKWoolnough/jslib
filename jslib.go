@@ -179,9 +179,9 @@ func Package(os ...Option) (*javascript.Module, error) {
 						replaceBinding(d.scope, tk.Data, e)
 					}
 				}
+				li.ImportDeclaration = nil
 			} else if li.StatementListItem != nil {
 				walk.Walk(li.StatementListItem, importReplacer)
-				li.ImportDeclaration = nil
 			} else if li.ExportDeclaration != nil {
 				ed := li.ExportDeclaration
 				if ed.ExportClause != nil {
