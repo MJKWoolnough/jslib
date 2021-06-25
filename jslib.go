@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strconv"
 
 	"vimagination.zapto.org/javascript"
@@ -307,12 +308,37 @@ func processScope(s *scope.Scope, prefix string) {
 
 type depWalker map[string]struct{}
 
+type deps []*data
+
+func (d deps) Len() int {
+	return len(d)
+}
+
+func (d deps) Less(i, j int) bool {
+	if len(d[i].prefix) < len(d[j].prefix) {
+		return true
+	}
+	if len(d[j].prefix) < len(d[i].prefix) {
+		return false
+	}
+	return d[i].prefix < d[j].prefix
+}
+
+func (d deps) Swap(i, j int) {
+	d[i], d[j] = d[j], d[i]
+}
+
 func (dw depWalker) walkDeps(d *data, fn func(*data)) {
 	if _, ok := dw[d.url]; ok {
 		return
 	}
 	dw[d.url] = struct{}{}
+	urls := make(deps, 0, len(d.requires))
 	for _, e := range d.requires {
+		urls = append(urls, e)
+	}
+	sort.Sort(urls)
+	for _, e := range urls {
 		dw.walkDeps(e, fn)
 	}
 	if d.url != "" {
