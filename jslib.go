@@ -286,6 +286,7 @@ func (d *data) HandleImportConditional(ce *javascript.ConditionalExpression) {
 	} else if pe, ok := javascript.UnwrapConditional(ce.ImportCall.ConditionalExpression).(*javascript.PrimaryExpression); ok && pe.Literal != nil && pe.Literal.Type == javascript.TokenStringLiteral {
 		durl, _ := javascript.Unquote(pe.Literal.Data)
 		d.addImport(d.RelTo(durl))
+		d.config.bare = false
 	}
 }
 
