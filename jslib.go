@@ -19,7 +19,7 @@ type data struct {
 	module               *javascript.Module
 	scope                *scope.Scope
 	requires, requiredBy map[string]*data
-	exports              map[string]struct{}
+	exports              exportMap
 	exportRenames        map[string]string
 	exportFrom           map[string]*data
 	prefix               string
@@ -58,7 +58,7 @@ func (dep *data) addImport(url string) *data {
 			url:           url,
 			requires:      make(map[string]*data),
 			requiredBy:    make(map[string]*data),
-			exports:       make(map[string]struct{}),
+			exports:       make(exportMap),
 			exportRenames: make(map[string]string),
 			exportFrom:    make(map[string]*data),
 			prefix:        string(p[n:]),
@@ -116,12 +116,50 @@ func Package(os ...Option) (*javascript.Module, error) {
 					return nil, err
 				}
 			} else if li.ExportDeclaration != nil {
-				if li.ExportDeclaration.FromClause != nil {
-					durl, _ := javascript.Unquote(li.ExportDeclaration.FromClause.ModuleSpecifier.Data)
+				ed := li.ExportDeclaration
+				if ed.FromClause != nil {
+					durl, _ := javascript.Unquote(ed.FromClause.ModuleSpecifier.Data)
 					e := d.addImport(d.RelTo(durl))
-					if li.ExportDeclaration.ExportFromClause == nil && li.ExportDeclaration.ExportClause == nil {
+					if ed.ExportFromClause != nil {
+						d.exports[ed.ExportFromClause.Data] = export{module: d.RelTo(durl)}
+					} else if ed.ExportClause != nil {
+						for _, es := range ed.ExportClause.ExportList {
+							if es.EIdentifierName != nil && es.EIdentifierName.Data != es.IdentifierName.Data {
+
+							}
+						}
+					} else {
 						exportAllFrom = append(exportAllFrom, struct{ d, e *data }{d, e})
 					}
+				} else if ed.Declaration != nil {
+					if ed.Declaration.FunctionDeclaration != nil {
+						d.processBinding(ed.Declaration.FunctionDeclaration.BindingIdentifier, false)
+					} else if ed.Declaration.ClassDeclaration != nil {
+						d.processBinding(ed.Declaration.ClassDeclaration.BindingIdentifier, false)
+					} else if ed.Declaration.LexicalDeclaration != nil {
+						writeable := bool(!ed.Declaration.LexicalDeclaration.LetOrConst)
+						for _, ld := range ed.Declaration.LexicalDeclaration.BindingList {
+							if ld.BindingIdentifier != nil {
+								d.processBinding(ld.BindingIdentifier, writeable)
+							} else if ld.ArrayBindingPattern != nil {
+								d.processArrayBinding(ld.ArrayBindingPattern, writeable)
+							} else if ld.ObjectBindingPattern != nil {
+								d.processObjectBinding(ld.ObjectBindingPattern, writeable)
+							}
+						}
+					}
+				} else if ed.VariableStatement != nil {
+					for _, vd := range ed.VariableStatement.VariableDeclarationList {
+						if vd.BindingIdentifier != nil {
+							d.processBinding(vd.BindingIdentifier, true)
+						} else if vd.ArrayBindingPattern != nil {
+							d.processArrayBinding(vd.ArrayBindingPattern, true)
+						} else if vd.ObjectBindingPattern != nil {
+							d.processObjectBinding(vd.ObjectBindingPattern, true)
+						}
+					}
+				} else if ed.DefaultClass != nil || ed.DefaultFunction != nil || ed.DefaultAssignmentExpression != nil {
+					d.exports["default"] = export{binding: d.prefix + "default"}
 				}
 			}
 		}
@@ -131,8 +169,8 @@ func Package(os ...Option) (*javascript.Module, error) {
 		changed = false
 		for _, eaf := range exportAllFrom {
 			for name := range eaf.e.exports {
-				if _, ok := eaf.d.exports[name]; !ok {
-					eaf.d.exports[name] = struct{}{}
+				if e, ok := eaf.d.exports[name]; !ok {
+					eaf.d.exports[name] = e
 					eaf.d.exportFrom[name] = eaf.e
 					changed = true
 				}
@@ -216,7 +254,6 @@ func Package(os ...Option) (*javascript.Module, error) {
 						if fc != nil {
 							d.exportFrom[name] = fc
 						}
-						d.exports[name] = struct{}{}
 					}
 				} else if ed.VariableStatement != nil {
 					li.StatementListItem = &javascript.StatementListItem{
@@ -383,5 +420,40 @@ func (dw depWalker) walkDeps(d *data, fn func(*data)) {
 	}
 	if d.url != "" {
 		fn(d)
+	}
+}
+
+func (d *data) processBinding(binding *javascript.Token, writeable bool) {
+	d.exports[binding.Data] = export{
+		binding:   d.prefix + binding.Data,
+		writeable: writeable,
+	}
+}
+
+func (d *data) processArrayBinding(binding *javascript.ArrayBindingPattern, writeable bool) {
+	for n := range binding.BindingElementList {
+		d.processBindingElement(&binding.BindingElementList[n], writeable)
+	}
+	if binding.BindingRestElement != nil {
+		d.processBindingElement(binding.BindingRestElement, writeable)
+	}
+}
+
+func (d *data) processObjectBinding(binding *javascript.ObjectBindingPattern, writeable bool) {
+	for n := range binding.BindingPropertyList {
+		d.processBindingElement(&binding.BindingPropertyList[n].BindingElement, writeable)
+	}
+	if binding.BindingRestProperty != nil {
+		d.processBinding(binding.BindingRestProperty, writeable)
+	}
+}
+
+func (d *data) processBindingElement(binding *javascript.BindingElement, writeable bool) {
+	if binding.SingleNameBinding != nil {
+		d.processBinding(binding.SingleNameBinding, writeable)
+	} else if binding.ArrayBindingPattern != nil {
+		d.processArrayBinding(binding.ArrayBindingPattern, writeable)
+	} else if binding.ObjectBindingPattern != nil {
+		d.processObjectBinding(binding.ObjectBindingPattern, writeable)
 	}
 }
