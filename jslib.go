@@ -90,6 +90,7 @@ func Package(os ...Option) (*javascript.Module, error) {
 	}
 	var err error
 	n := 1
+	exportAllFrom := make([]struct{ d, e *data }, 0)
 	for len(c.filesToDo) > 0 {
 		d := c.filesToDo[0]
 		if _, ok := c.filesDone[d.url]; ok {
@@ -117,7 +118,23 @@ func Package(os ...Option) (*javascript.Module, error) {
 			} else if li.ExportDeclaration != nil {
 				if li.ExportDeclaration.FromClause != nil {
 					durl, _ := javascript.Unquote(li.ExportDeclaration.FromClause.ModuleSpecifier.Data)
-					d.addImport(d.RelTo(durl))
+					e := d.addImport(d.RelTo(durl))
+					if li.ExportDeclaration.ExportFromClause == nil && li.ExportDeclaration.ExportClause == nil {
+						exportAllFrom = append(exportAllFrom, struct{ d, e *data }{d, e})
+					}
+				}
+			}
+		}
+	}
+	changed := true
+	for changed {
+		changed = false
+		for _, eaf := range exportAllFrom {
+			for name := range eaf.e.exports {
+				if _, ok := eaf.d.exports[name]; !ok {
+					eaf.d.exports[name] = struct{}{}
+					eaf.d.exportFrom[name] = eaf.e
+					changed = true
 				}
 			}
 		}
