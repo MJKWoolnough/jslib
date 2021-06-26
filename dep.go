@@ -75,13 +75,15 @@ func (d *dependency) process() error {
 		if li.ImportDeclaration != nil {
 			durl, _ := javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
 			iurl := d.RelTo(durl)
-			_, err := d.addImport(iurl)
+			e, err := d.addImport(iurl)
 			if err != nil {
 				return err
 			}
 			if li.ImportDeclaration.ImportedDefaultBinding != nil {
+				d.setImportBinding(li.ImportDeclaration.ImportedDefaultBinding.Data, e, "default")
 			}
 			if li.ImportDeclaration.NameSpaceImport != nil {
+				d.setImportBinding(li.ImportDeclaration.NameSpaceImport.Data, e, "*")
 				li.StatementListItem = &javascript.StatementListItem{
 					Declaration: &javascript.Declaration{
 						LexicalDeclaration: &javascript.LexicalDeclaration{
@@ -123,7 +125,7 @@ func (d *dependency) process() error {
 					if is.ImportedBinding != nil {
 						tk = is.ImportedBinding
 					}
-					_ = tk
+					d.setImportBinding(tk.Data, e, is.IdentifierName.Data)
 				}
 			}
 			li.ImportDeclaration = nil
