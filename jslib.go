@@ -10,13 +10,14 @@ import (
 )
 
 type config struct {
-	filesToDo    []string
-	filesDone    map[string]*dependency
-	loader       func(string) (*javascript.Module, error)
-	bare         bool
-	parseDynamic bool
-	currURL      string
-	nextID       uint
+	filesToDo     []string
+	filesDone     map[string]*dependency
+	loader        func(string) (*javascript.Module, error)
+	bare          bool
+	parseDynamic  bool
+	currURL       string
+	nextID        uint
+	exportAllFrom [][2]*dependency
 	dependency
 }
 
