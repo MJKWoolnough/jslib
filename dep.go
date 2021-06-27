@@ -152,7 +152,7 @@ func (d *dependency) process() error {
 				} else if ed.ExportFromClause != nil {
 					d.setExportBinding(ed.ExportFromClause.Data, e, "")
 				} else {
-					d.config.exportAllFrom = [2]*dependency{d, e}
+					d.config.exportAllFrom = append(d.config.exportAllFrom, [2]*dependency{d, e})
 				}
 			} else if ed.ExportClause != nil {
 				for _, es := range ed.ExportClause.ExportList {
