@@ -160,7 +160,7 @@ func (d *dependency) process() error {
 					if es.EIdentifierName != nil {
 						tk = es.EIdentifierName.Data
 					}
-					d.setExportBinding(tk, d, es.IdentifierName.Data)
+					d.setExportBinding(tk, nil, es.IdentifierName.Data)
 				}
 			} else if ed.VariableStatement != nil {
 				for _, vd := range ed.VariableStatement.VariableDeclarationList {
