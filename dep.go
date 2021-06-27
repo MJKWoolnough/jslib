@@ -137,21 +137,48 @@ func (d *dependency) process() error {
 			ed := li.ExportDeclaration
 			if ed.FromClause != nil {
 				durl, _ := javascript.Unquote(ed.FromClause.ModuleSpecifier.Data)
-				_, err := d.addImport(d.RelTo(durl))
+				e, err := d.addImport(d.RelTo(durl))
 				if err != nil {
 					return err
 				}
 				if ed.ExportClause != nil {
+					for _, es := range ed.ExportClause.ExportList {
+						tk := es.IdentifierName.Data
+						if es.EIdentifierName != nil {
+							tk = es.EIdentifierName.Data
+						}
+						d.setExportBinding(tk, e, es.IdentifierName.Data)
+					}
 				} else if ed.ExportFromClause != nil {
+					d.setExportBinding(ed.ExportFromClause.Data, e, "")
 				}
 			} else if ed.ExportClause != nil {
+				for _, es := range ed.ExportClause.ExportList {
+					tk := es.IdentifierName.Data
+					if es.EIdentifierName != nil {
+						tk = es.EIdentifierName.Data
+					}
+					d.setExportBinding(tk, d, es.IdentifierName.Data)
+				}
 			} else if ed.VariableStatement != nil {
+				for _, vd := range ed.VariableStatement.VariableDeclarationList {
+					d.processBindingElement(vd.BindingIdentifier, vd.ArrayBindingPattern, vd.ObjectBindingPattern)
+				}
 				li.StatementListItem = &javascript.StatementListItem{
 					Statement: &javascript.Statement{
 						VariableStatement: ed.VariableStatement,
 					},
 				}
 			} else if ed.Declaration != nil {
+				if ed.Declaration.FunctionDeclaration != nil {
+					d.setExportBinding(ed.Declaration.FunctionDeclaration.BindingIdentifier.Data, nil, ed.Declaration.FunctionDeclaration.BindingIdentifier.Data)
+				} else if ed.Declaration.ClassDeclaration != nil {
+					d.setExportBinding(ed.Declaration.ClassDeclaration.BindingIdentifier.Data, nil, ed.Declaration.ClassDeclaration.BindingIdentifier.Data)
+				} else if ed.Declaration.LexicalDeclaration != nil {
+					for _, lb := range ed.Declaration.LexicalDeclaration.BindingList {
+						d.processBindingElement(lb.BindingIdentifier, lb.ArrayBindingPattern, lb.ObjectBindingPattern)
+					}
+				}
 				li.StatementListItem = &javascript.StatementListItem{
 					Declaration: ed.Declaration,
 				}
@@ -182,6 +209,7 @@ func (d *dependency) process() error {
 						},
 					}
 				}
+				d.setExportBinding("default", nil, "default")
 			}
 			li.ExportDeclaration = nil
 		}
@@ -254,4 +282,32 @@ func (d *dependency) setExportBinding(binding string, e *dependency, exportedBin
 
 func isConditionalExpression(ae *javascript.AssignmentExpression) bool {
 	return ae.ConditionalExpression != nil && ae.Yield == false && ae.Delegate == false && (ae.AssignmentOperator == javascript.AssignmentNone || ae.AssignmentOperator == javascript.AssignmentAssign)
+}
+
+func (d *dependency) processArrayBinding(binding *javascript.ArrayBindingPattern) {
+	for _, be := range binding.BindingElementList {
+		d.processBindingElement(be.SingleNameBinding, be.ArrayBindingPattern, be.ObjectBindingPattern)
+	}
+	if binding.BindingRestElement != nil {
+		d.processBindingElement(binding.BindingRestElement.SingleNameBinding, binding.BindingRestElement.ArrayBindingPattern, binding.BindingRestElement.ObjectBindingPattern)
+	}
+}
+
+func (d *dependency) processObjectBinding(binding *javascript.ObjectBindingPattern) {
+	for _, be := range binding.BindingPropertyList {
+		d.processBindingElement(be.BindingElement.SingleNameBinding, be.BindingElement.ArrayBindingPattern, be.BindingElement.ObjectBindingPattern)
+	}
+	if binding.BindingRestProperty != nil {
+		d.setExportBinding(binding.BindingRestProperty.Data, nil, binding.BindingRestProperty.Data)
+	}
+}
+
+func (d *dependency) processBindingElement(snb *javascript.Token, abp *javascript.ArrayBindingPattern, obp *javascript.ObjectBindingPattern) {
+	if snb != nil {
+		d.setExportBinding(snb.Data, nil, snb.Data)
+	} else if abp != nil {
+		d.processArrayBinding(abp)
+	} else if obp != nil {
+		d.processObjectBinding(obp)
+	}
 }
