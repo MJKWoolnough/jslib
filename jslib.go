@@ -18,6 +18,7 @@ type config struct {
 	currURL       string
 	nextID        uint
 	exportAllFrom [][2]*dependency
+	statementList []javascript.StatementListItem
 	dependency
 }
 
@@ -31,9 +32,10 @@ func OSLoad(url string) (*javascript.Module, error) {
 	return m, err
 }
 
-func Package(opts ...Option) (*javascript.Module, error) {
+func Package(opts ...Option) (*javascript.Script, error) {
 	c := config{
-		loader: OSLoad,
+		loader:        OSLoad,
+		statementList: make([]javascript.StatementListItem, 1),
 	}
 	c.config = &c
 	var err error
@@ -69,7 +71,9 @@ func Package(opts ...Option) (*javascript.Module, error) {
 			}
 		}
 	}
-	return nil, nil
+	return &javascript.Script{
+		StatementList: c.statementList,
+	}, nil
 }
 
 var (

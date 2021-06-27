@@ -17,7 +17,7 @@ type exportMap map[string]export
 
 type exportsMap map[string]exportMap
 
-func loader(exports exportsMap) *javascript.StatementListItem {
+func loader(exports exportsMap) javascript.StatementListItem {
 	promise := &javascript.MemberExpression{
 		PrimaryExpression: &javascript.PrimaryExpression{
 			IdentifierReference: &javascript.Token{Token: parser.Token{Data: "Promise"}},
@@ -505,7 +505,7 @@ func loader(exports exportsMap) *javascript.StatementListItem {
 	value := &javascript.PropertyName{
 		LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "value"}},
 	}
-	return &javascript.StatementListItem{
+	return javascript.StatementListItem{
 		Statement: &javascript.Statement{
 			ExpressionStatement: &javascript.Expression{
 				Expressions: []javascript.AssignmentExpression{
