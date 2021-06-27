@@ -57,7 +57,7 @@ func Package(opts ...Option) (*javascript.Script, error) {
 	for changed := true; changed; {
 		changed = false
 		for _, eaf := range c.exportAllFrom {
-			for export, binding := range eaf[1].exports {
+			for export := range eaf[1].exports {
 				if export == "default" {
 					continue
 				}
