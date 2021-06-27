@@ -52,6 +52,23 @@ func Package(opts ...Option) (*javascript.Module, error) {
 			return nil, err
 		}
 	}
+	for changed := true; changed; {
+		changed = false
+		for _, eaf := range c.exportAllFrom {
+			for export, binding := range eaf[1].exports {
+				if export == "default" {
+					continue
+				}
+				if _, ok := eaf[0].exports[export]; !ok {
+					eaf[0].exports[export] = &importBinding{
+						dependency: eaf[1],
+						binding:    export,
+					}
+					changed = true
+				}
+			}
+		}
+	}
 	return nil, nil
 }
 
