@@ -84,7 +84,7 @@ func (d *dependency) process() error {
 			}
 			if li.ImportDeclaration.NameSpaceImport != nil {
 				d.setImportBinding(li.ImportDeclaration.NameSpaceImport.Data, e, "*")
-				li.StatementListItem = &javascript.StatementListItem{
+				d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
 					Declaration: &javascript.Declaration{
 						LexicalDeclaration: &javascript.LexicalDeclaration{
 							LetOrConst: javascript.Const,
@@ -118,7 +118,7 @@ func (d *dependency) process() error {
 							},
 						},
 					},
-				}
+				})
 			} else if li.ImportDeclaration.NamedImports != nil {
 				for _, is := range li.ImportDeclaration.NamedImports.ImportList {
 					tk := is.IdentifierName
@@ -128,11 +128,11 @@ func (d *dependency) process() error {
 					d.setImportBinding(tk.Data, e, is.IdentifierName.Data)
 				}
 			}
-			li.ImportDeclaration = nil
 		} else if li.StatementListItem != nil && d.config.parseDynamic {
 			if err := walk.Walk(li.StatementListItem, d); err != nil {
 				return err
 			}
+			d.config.statementList = append(d.config.statementList, *li.StatementListItem)
 		} else if li.ExportDeclaration != nil {
 			ed := li.ExportDeclaration
 			if ed.FromClause != nil {
@@ -166,11 +166,11 @@ func (d *dependency) process() error {
 				for _, vd := range ed.VariableStatement.VariableDeclarationList {
 					d.processBindingElement(vd.BindingIdentifier, vd.ArrayBindingPattern, vd.ObjectBindingPattern)
 				}
-				li.StatementListItem = &javascript.StatementListItem{
+				d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
 					Statement: &javascript.Statement{
 						VariableStatement: ed.VariableStatement,
 					},
-				}
+				})
 			} else if ed.Declaration != nil {
 				if ed.Declaration.FunctionDeclaration != nil {
 					d.setExportBinding(ed.Declaration.FunctionDeclaration.BindingIdentifier.Data, nil, ed.Declaration.FunctionDeclaration.BindingIdentifier.Data)
@@ -181,27 +181,27 @@ func (d *dependency) process() error {
 						d.processBindingElement(lb.BindingIdentifier, lb.ArrayBindingPattern, lb.ObjectBindingPattern)
 					}
 				}
-				li.StatementListItem = &javascript.StatementListItem{
+				d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
 					Declaration: ed.Declaration,
-				}
+				})
 			} else {
 				def := &javascript.Token{Token: parser.Token{Data: d.prefix + "default"}}
 				if ed.DefaultFunction != nil {
 					ed.DefaultFunction.BindingIdentifier = def
-					li.StatementListItem = &javascript.StatementListItem{
+					d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
 						Declaration: &javascript.Declaration{
 							FunctionDeclaration: ed.DefaultFunction,
 						},
-					}
+					})
 				} else if ed.DefaultClass != nil {
 					ed.DefaultClass.BindingIdentifier = def
-					li.StatementListItem = &javascript.StatementListItem{
+					d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
 						Declaration: &javascript.Declaration{
 							ClassDeclaration: ed.DefaultClass,
 						},
-					}
+					})
 				} else if ed.DefaultAssignmentExpression != nil {
-					li.StatementListItem = &javascript.StatementListItem{
+					d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
 						Statement: &javascript.Statement{
 							ExpressionStatement: &javascript.Expression{
 								Expressions: []javascript.AssignmentExpression{
@@ -209,7 +209,7 @@ func (d *dependency) process() error {
 								},
 							},
 						},
-					}
+					})
 				}
 				d.setExportBinding("default", nil, "default")
 			}
