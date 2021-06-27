@@ -313,3 +313,22 @@ func (d *dependency) processBindingElement(snb *javascript.Token, abp *javascrip
 		d.processObjectBinding(obp)
 	}
 }
+
+func (d *dependency) resolveExport(binding string) *scope.Binding {
+	export, ok := d.exports[binding]
+	if !ok {
+		return nil
+	}
+	if export.dependency != nil {
+		return export.dependency.resolveExport(export.binding)
+	}
+	imp, ok := d.imports[export.binding]
+	if ok {
+		return imp.dependency.resolveExport(imp.binding)
+	}
+	sc, ok := d.scope.Bindings[export.binding]
+	if !ok || len(sc) == 0 {
+		return nil
+	}
+	return &sc[0]
+}
