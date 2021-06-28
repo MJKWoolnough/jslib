@@ -18,7 +18,7 @@ type exportMap map[string]export
 
 type exportsMap map[string]exportMap
 
-func (c *config) makeLoader() {
+func (c *config) makeLoader() error {
 	promise := &javascript.MemberExpression{
 		PrimaryExpression: &javascript.PrimaryExpression{
 			IdentifierReference: &javascript.Token{Token: parser.Token{Data: "Promise"}},
@@ -133,6 +133,9 @@ func (c *config) makeLoader() {
 					}
 				} else {
 					b := d.resolveExport(binding.binding)
+					if b == nil {
+						return ErrInvalidExport
+					}
 					name := b.Data
 					writeable := b.BindingType == scope.BindingLexicalLet || b.BindingType == scope.BindingVar
 					bindingPE := &javascript.LeftHandSideExpression{
@@ -645,4 +648,5 @@ func (c *config) makeLoader() {
 			},
 		},
 	}
+	return nil
 }
