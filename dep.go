@@ -19,7 +19,6 @@ type importBinding struct {
 type dependency struct {
 	config               *config
 	url                  string
-	module               *javascript.Module
 	scope                *scope.Scope
 	requires, requiredBy map[string]*dependency
 	imports, exports     map[string]*importBinding
@@ -65,16 +64,15 @@ func (d *dependency) addImport(url string) (*dependency, error) {
 }
 
 func (d *dependency) process() error {
-	var err error
-	d.module, err = d.config.loader(d.url)
+	module, err := d.config.loader(d.url)
 	if err != nil {
 		return err
 	}
-	d.scope, err = scope.ModuleScope(d.module, nil)
+	d.scope, err = scope.ModuleScope(module, nil)
 	if err != nil {
 		return err
 	}
-	for _, li := range d.module.ModuleListItems {
+	for _, li := range module.ModuleListItems {
 		if li.ImportDeclaration != nil {
 			durl, _ := javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
 			iurl := d.RelTo(durl)
