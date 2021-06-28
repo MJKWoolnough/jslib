@@ -1,6 +1,7 @@
 package jslib
 
 import (
+	"errors"
 	"path"
 	"strconv"
 
@@ -23,6 +24,7 @@ type dependency struct {
 	requires, requiredBy map[string]*dependency
 	imports, exports     map[string]*importBinding
 	prefix               string
+	done                 bool
 }
 
 func (d *dependency) addImport(url string) (*dependency, error) {
@@ -340,3 +342,29 @@ func (d *dependency) resolveExport(binding string) *scope.Binding {
 	}
 	return &sc[0]
 }
+
+func (d *dependency) resolveImports() error {
+	if d.done {
+		return nil
+	}
+	d.done = true
+	for _, r := range d.requires {
+		if err := r.resolveImports(); err != nil {
+			return err
+		}
+	}
+	for name, binding := range d.imports {
+		b := binding.dependency.resolveExport(binding.binding)
+		if b == nil {
+			return ErrInvalidExport
+		}
+		for c := range d.scope.Bindings[name] {
+			b.Data = b.Data
+		}
+	}
+	return nil
+}
+
+var (
+	ErrInvalidExport = errors.New("invalid export")
+)
