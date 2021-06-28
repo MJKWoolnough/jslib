@@ -24,6 +24,7 @@ type dependency struct {
 	requires, requiredBy map[string]*dependency
 	imports, exports     map[string]*importBinding
 	prefix               string
+	dynamicRequirement   bool
 	done                 bool
 }
 
@@ -258,7 +259,7 @@ func (d *dependency) HandleImportConditional(ce *javascript.ConditionalExpressio
 		iurl := d.RelTo(durl)
 		pe.Literal.Data = strconv.Quote(iurl)
 		d.addImport(iurl)
-		d.config.bare = false
+		d.dynamicRequirement = true
 		return true
 	}
 	return false
@@ -358,10 +359,6 @@ func (d *dependency) resolveImports() error {
 	return nil
 }
 
-var (
-	ErrInvalidExport = errors.New("invalid export")
-)
-
 func (d *dependency) processBindings(s *scope.Scope) {
 	for name, bindings := range s.Bindings {
 		if len(bindings) == 0 || bindings[0].BindingType == scope.BindingRef || bindings[0].BindingType == scope.BindingBare || bindings[0].BindingType == scope.BindingImport {
@@ -375,3 +372,7 @@ func (d *dependency) processBindings(s *scope.Scope) {
 		d.processBindings(cs)
 	}
 }
+
+var (
+	ErrInvalidExport = errors.New("invalid export")
+)
