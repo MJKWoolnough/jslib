@@ -351,8 +351,8 @@ func (d *dependency) resolveImports() error {
 		if b == nil {
 			return ErrInvalidExport
 		}
-		for c := range d.scope.Bindings[name] {
-			b.Data = c.Data
+		for _, c := range d.scope.Bindings[name] {
+			c.Data = b.Data
 		}
 	}
 	return nil
