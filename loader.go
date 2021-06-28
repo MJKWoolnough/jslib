@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"vimagination.zapto.org/javascript"
+	"vimagination.zapto.org/javascript/scope"
 	"vimagination.zapto.org/parser"
 )
 
@@ -17,7 +18,7 @@ type exportMap map[string]export
 
 type exportsMap map[string]exportMap
 
-func loader(exports exportsMap) javascript.StatementListItem {
+func (c *config) makeLoader() {
 	promise := &javascript.MemberExpression{
 		PrimaryExpression: &javascript.PrimaryExpression{
 			IdentifierReference: &javascript.Token{Token: parser.Token{Data: "Promise"}},
@@ -60,16 +61,7 @@ func loader(exports exportsMap) javascript.StatementListItem {
 		},
 	})
 	var include *javascript.AssignmentExpression
-	if len(exports) == 0 {
-		include = &javascript.AssignmentExpression{
-			ArrowFunction: &javascript.ArrowFunction{
-				BindingIdentifier: url,
-				AssignmentExpression: &javascript.AssignmentExpression{
-					ConditionalExpression: importURL,
-				},
-			},
-		}
-	} else {
+	if !c.bare || c.parseDynamic {
 		a := &javascript.Token{Token: parser.Token{Data: "a"}}
 		aWrapped := javascript.AssignmentExpression{
 			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
@@ -77,34 +69,37 @@ func loader(exports exportsMap) javascript.StatementListItem {
 			}),
 		}
 		exportArr := &javascript.ArrayLiteral{
-			ElementList: make([]javascript.AssignmentExpression, 0, len(exports)),
+			ElementList: make([]javascript.AssignmentExpression, 0, len(c.filesDone)),
 		}
-		urls := make([]string, 0, len(exports))
-		for url := range exports {
+		urls := make([]string, 0, len(c.filesDone))
+		for url := range c.filesDone {
 			urls = append(urls, url)
 		}
 		sort.Strings(urls)
 		for _, url := range urls {
-			es := exports[url]
-			el := append(make([]javascript.AssignmentExpression, 0, len(es)+1), javascript.AssignmentExpression{
+			d := c.filesDone[url]
+			if c.bare && !d.dynamicRequirement {
+				continue
+			}
+			el := append(make([]javascript.AssignmentExpression, 0, len(d.exports)+1), javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 					Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(url)}},
 				}),
 			})
-			props := make([]string, 0, len(es))
-			for prop := range es {
+			props := make([]string, 0, len(d.exports))
+			for prop := range d.exports {
 				props = append(props, prop)
 			}
 			sort.Strings(props)
 			for _, prop := range props {
-				binding := es[prop]
+				binding := d.exports[prop]
 				propName := javascript.AssignmentExpression{
 					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 						Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(prop)}},
 					}),
 				}
 				var ael []javascript.AssignmentExpression
-				if binding.module != "" {
+				if binding.binding == "" {
 					ael = []javascript.AssignmentExpression{
 						propName,
 						{
@@ -121,7 +116,7 @@ func loader(exports exportsMap) javascript.StatementListItem {
 											ArgumentList: []javascript.AssignmentExpression{
 												{
 													ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-														Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(binding.module)}},
+														Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(binding.dependency.url)}},
 													}),
 												},
 												{
@@ -137,11 +132,14 @@ func loader(exports exportsMap) javascript.StatementListItem {
 						},
 					}
 				} else {
+					b := d.resolveExport(binding.binding)
+					name := b.Data
+					writeable := b.BindingType == scope.BindingLexicalLet || b.BindingType == scope.BindingVar
 					bindingPE := &javascript.LeftHandSideExpression{
 						NewExpression: &javascript.NewExpression{
 							MemberExpression: javascript.MemberExpression{
 								PrimaryExpression: &javascript.PrimaryExpression{
-									IdentifierReference: &javascript.Token{Token: parser.Token{Data: binding.binding}},
+									IdentifierReference: &javascript.Token{Token: parser.Token{Data: name}},
 								},
 							},
 						},
@@ -154,7 +152,7 @@ func loader(exports exportsMap) javascript.StatementListItem {
 							},
 						},
 					}
-					if binding.writeable {
+					if writeable {
 						ael = []javascript.AssignmentExpression{
 							propName,
 							get,
@@ -498,6 +496,16 @@ func loader(exports exportsMap) javascript.StatementListItem {
 			}),
 		}
 	}
+	if include == nil {
+		include = &javascript.AssignmentExpression{
+			ArrowFunction: &javascript.ArrowFunction{
+				BindingIdentifier: url,
+				AssignmentExpression: &javascript.AssignmentExpression{
+					ConditionalExpression: importURL,
+				},
+			},
+		}
+	}
 	successFn := &javascript.Token{Token: parser.Token{Data: "successFn"}}
 	window := &javascript.PrimaryExpression{
 		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "window"}},
@@ -505,7 +513,7 @@ func loader(exports exportsMap) javascript.StatementListItem {
 	value := &javascript.PropertyName{
 		LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "value"}},
 	}
-	return javascript.StatementListItem{
+	c.statementList[0] = javascript.StatementListItem{
 		Statement: &javascript.Statement{
 			ExpressionStatement: &javascript.Expression{
 				Expressions: []javascript.AssignmentExpression{
