@@ -71,6 +71,7 @@ func Package(opts ...Option) (*javascript.Script, error) {
 			}
 		}
 	}
+	c.makeLoader()
 	return &javascript.Script{
 		StatementList: c.statementList,
 	}, nil
