@@ -218,14 +218,7 @@ func (d *dependency) process() error {
 			li.ExportDeclaration = nil
 		}
 	}
-	for name, bindings := range d.scope.Bindings {
-		if len(bindings) == 0 || bindings[0].BindingType == scope.BindingRef || bindings[0].BindingType == scope.BindingBare || bindings[0].BindingType == scope.BindingImport {
-			continue
-		}
-		for n := range bindings {
-			bindings[n].Data = d.prefix + bindings[n].Data
-		}
-	}
+	d.processBindings(d.scope)
 	return nil
 }
 
@@ -359,7 +352,7 @@ func (d *dependency) resolveImports() error {
 			return ErrInvalidExport
 		}
 		for c := range d.scope.Bindings[name] {
-			b.Data = b.Data
+			b.Data = c.Data
 		}
 	}
 	return nil
@@ -368,3 +361,17 @@ func (d *dependency) resolveImports() error {
 var (
 	ErrInvalidExport = errors.New("invalid export")
 )
+
+func (d *dependency) processBindings(s *scope.Scope) {
+	for name, bindings := range s.Bindings {
+		if len(bindings) == 0 || bindings[0].BindingType == scope.BindingRef || bindings[0].BindingType == scope.BindingBare || bindings[0].BindingType == scope.BindingImport {
+			continue
+		}
+		for n := range bindings {
+			bindings[n].Data = d.prefix + name
+		}
+	}
+	for _, cs := range s.Scopes {
+		d.processBindings(cs)
+	}
+}
