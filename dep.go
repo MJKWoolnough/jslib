@@ -38,7 +38,7 @@ func (d *dependency) addImport(url string) (*dependency, error) {
 			n = 14
 		)
 		p[14] = '_'
-		for id >= 0 {
+		for id > 0 {
 			n--
 			id--
 			p[n] = 'a' + byte(id%26)
