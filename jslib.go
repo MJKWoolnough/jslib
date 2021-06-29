@@ -36,6 +36,10 @@ func Package(opts ...Option) (*javascript.Script, error) {
 	c := config{
 		loader:        OSLoad,
 		statementList: make([]javascript.StatementListItem, 1),
+		filesDone:     make(map[string]*dependency),
+		dependency: dependency{
+			requires: make(map[string]*dependency),
+		},
 	}
 	c.config = &c
 	var err error
