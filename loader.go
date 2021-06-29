@@ -48,17 +48,8 @@ func (c *config) makeLoader() error {
 		IdentifierReference: url,
 	})
 	importURL := javascript.WrapConditional(&javascript.CallExpression{
-		MemberExpression: &javascript.MemberExpression{
-			PrimaryExpression: &javascript.PrimaryExpression{
-				IdentifierReference: &javascript.Token{Token: parser.Token{Data: "import"}},
-			},
-		},
-		Arguments: &javascript.Arguments{
-			ArgumentList: []javascript.AssignmentExpression{
-				{
-					ConditionalExpression: wrappedURL,
-				},
-			},
+		ImportCall: &javascript.AssignmentExpression{
+			ConditionalExpression: wrappedURL,
 		},
 	})
 	var include *javascript.AssignmentExpression
@@ -424,11 +415,7 @@ func (c *config) makeLoader() error {
 																												},
 																											}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression,
 																										},
-																										BitwiseORExpression: javascript.WrapConditional(&javascript.CallExpression{
-																											ImportCall: &javascript.AssignmentExpression{
-																												ConditionalExpression: wrappedURL,
-																											},
-																										}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression,
+																										BitwiseORExpression: importURL.LogicalORExpression.LogicalANDExpression.BitwiseORExpression,
 																									},
 																								},
 																							},
