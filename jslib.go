@@ -44,6 +44,7 @@ func Package(opts ...Option) (*javascript.Script, error) {
 	c.config = &c
 	var err error
 	c.url, err = os.Getwd()
+	c.url += "/"
 	if err != nil {
 		return nil, err
 	}
