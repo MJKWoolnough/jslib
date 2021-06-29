@@ -6,7 +6,7 @@ type Option func(*config)
 
 func File(url string) Option {
 	return func(c *config) {
-		c.addImport(url)
+		c.filesToDo = append(c.filesToDo, url)
 	}
 }
 
