@@ -43,3 +43,12 @@ func Test2(t *testing.T) {
 	l := loader{path.Join(cwd, "a.js"): "1"}
 	runTest(t, "Object.defineProperties(window, {pageLoad: {value: document.readyState == \"complete\" ? Promise.resolve() : new Promise(successFn => window.addEventListener(\"load\", successFn, {once: true}))}, include: {value: url => import(url)}});\n\n1;", Loader(l.load), File("a.js"), NoExports)
 }
+
+func Test3(t *testing.T) {
+	cwd, _ := os.Getwd()
+	l := loader{
+		path.Join(cwd, "a.js"): "import {c} from './b.js'; console.log(c)",
+		path.Join(cwd, "b.js"): "export const c = 1",
+	}
+	runTest(t, "Object.defineProperties(window, {pageLoad: {value: document.readyState == \"complete\" ? Promise.resolve() : new Promise(successFn => window.addEventListener(\"load\", successFn, {once: true}))}, include: {value: (() => {\n\tconst imports = new Map([[\"a.js\"], [\"b.js\", [\"c\", () => b_c]]].map(([url, ...props]) => [url, Object.freeze(Object.defineProperties({}, Object.fromEntries(props.map(([prop, get, set]) => [prop, {enumerable: true, get, set}]))))]));\n\treturn url => Promise.resolve(imports.get(url) ?? import(url));\n})()}});\n\nconst b_c = 1;\n\nconsole.log(b_c);", Loader(l.load), File("a.js"))
+}
