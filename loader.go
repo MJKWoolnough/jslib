@@ -54,12 +54,6 @@ func (c *config) makeLoader() error {
 	})
 	var include *javascript.AssignmentExpression
 	if !c.bare || c.parseDynamic {
-		a := &javascript.Token{Token: parser.Token{Data: "a"}}
-		aWrapped := javascript.AssignmentExpression{
-			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-				IdentifierReference: a,
-			}),
-		}
 		exportArr := &javascript.ArrayLiteral{
 			ElementList: make([]javascript.AssignmentExpression, 0, len(c.filesDone)),
 		}
@@ -129,13 +123,11 @@ func (c *config) makeLoader() error {
 					if b == nil {
 						return ErrInvalidExport
 					}
-					name := b.Data
-					writeable := b.BindingType == scope.BindingLexicalLet || b.BindingType == scope.BindingVar
 					bindingPE := &javascript.LeftHandSideExpression{
 						NewExpression: &javascript.NewExpression{
 							MemberExpression: javascript.MemberExpression{
 								PrimaryExpression: &javascript.PrimaryExpression{
-									IdentifierReference: &javascript.Token{Token: parser.Token{Data: name}},
+									IdentifierReference: b.Token,
 								},
 							},
 						},
@@ -148,7 +140,8 @@ func (c *config) makeLoader() error {
 							},
 						},
 					}
-					if writeable {
+					if b.BindingType == scope.BindingLexicalLet || b.BindingType == scope.BindingVar {
+						a := &javascript.Token{Token: parser.Token{Data: "a"}}
 						ael = []javascript.AssignmentExpression{
 							propName,
 							get,
@@ -158,7 +151,11 @@ func (c *config) makeLoader() error {
 									AssignmentExpression: &javascript.AssignmentExpression{
 										LeftHandSideExpression: bindingPE,
 										AssignmentOperator:     javascript.AssignmentAssign,
-										AssignmentExpression:   &aWrapped,
+										AssignmentExpression: &javascript.AssignmentExpression{
+											ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+												IdentifierReference: a,
+											}),
+										},
 									},
 								},
 							},
