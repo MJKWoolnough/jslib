@@ -76,6 +76,7 @@ func Package(opts ...Option) (*javascript.Script, error) {
 			}
 		}
 	}
+	c.dependency.resolveImports()
 	if err := c.makeLoader(); err != nil {
 		return nil, err
 	}
