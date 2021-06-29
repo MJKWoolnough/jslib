@@ -3,6 +3,7 @@ package jslib
 import (
 	"fmt"
 	"os"
+	"path"
 	"testing"
 
 	"vimagination.zapto.org/javascript"
@@ -29,4 +30,10 @@ func runTest(t *testing.T, expectedOutput string, opts ...Option) {
 	if output != expectedOutput {
 		t.Errorf("expecting output: %q\ngot: %q", expectedOutput, output)
 	}
+}
+
+func Test1(t *testing.T) {
+	cwd, _ := os.Getwd()
+	l := loader{path.Join(cwd, "a.js"): "1"}
+	runTest(t, "Object.defineProperties(window, {pageLoad: {value: document.readyState == \"complete\" ? Promise.resolve() : new Promise(successFn => window.addEventListener(\"load\", successFn, {once: true}))}, include: {value: (imports => (url, now = false) => imports.has(url) ? (a => now ? a : Promise.resolve(a))(imports.get(url)) : import(url))(new Map([[\"a.js\"]].map(([url, ...props]) => [url, Object.freeze(Object.defineProperties({}, Object.fromEntries(props.map(([prop, get, set]) => [prop, {enumerable: true, get, set}]))))])))}});\n\n1;", Loader(l.load), File("a.js"))
 }
