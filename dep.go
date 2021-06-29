@@ -129,9 +129,11 @@ func (d *dependency) process() error {
 					d.setImportBinding(tk.Data, e, is.IdentifierName.Data)
 				}
 			}
-		} else if li.StatementListItem != nil && d.config.parseDynamic {
-			if err := walk.Walk(li.StatementListItem, d); err != nil {
-				return err
+		} else if li.StatementListItem != nil {
+			if d.config.parseDynamic {
+				if err := walk.Walk(li.StatementListItem, d); err != nil {
+					return err
+				}
 			}
 			d.config.statementList = append(d.config.statementList, *li.StatementListItem)
 		} else if li.ExportDeclaration != nil {
