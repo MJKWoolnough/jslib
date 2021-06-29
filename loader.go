@@ -1,6 +1,7 @@
 package jslib
 
 import (
+	"path/filepath"
 	"sort"
 	"strconv"
 
@@ -81,9 +82,10 @@ func (c *config) makeLoader() error {
 			if c.bare && !d.dynamicRequirement {
 				continue
 			}
+			rurl, _ := filepath.Rel(filepath.Dir(c.dependency.url), url)
 			el := append(make([]javascript.AssignmentExpression, 0, len(d.exports)+1), javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-					Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(url)}},
+					Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(filepath.ToSlash(rurl))}},
 				}),
 			})
 			props := make([]string, 0, len(d.exports))
