@@ -93,23 +93,30 @@ func (d *dependency) process() error {
 								{
 									BindingIdentifier: li.ImportDeclaration.NameSpaceImport,
 									Initializer: &javascript.AssignmentExpression{
-										ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
-											MemberExpression: &javascript.MemberExpression{
-												PrimaryExpression: &javascript.PrimaryExpression{
-													IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
-												},
-											},
-											Arguments: &javascript.Arguments{
-												ArgumentList: []javascript.AssignmentExpression{
-													{
-														ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-															Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(iurl)}},
-														}),
-													},
-													{
-														ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-															Literal: &javascript.Token{Token: parser.Token{Data: "true"}},
-														}),
+										ConditionalExpression: javascript.WrapConditional(javascript.UnaryExpression{
+											UnaryOperators: []javascript.UnaryOperator{javascript.UnaryAwait},
+											UpdateExpression: javascript.UpdateExpression{
+												LeftHandSideExpression: &javascript.LeftHandSideExpression{
+													CallExpression: &javascript.CallExpression{
+														MemberExpression: &javascript.MemberExpression{
+															PrimaryExpression: &javascript.PrimaryExpression{
+																IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
+															},
+														},
+														Arguments: &javascript.Arguments{
+															ArgumentList: []javascript.AssignmentExpression{
+																{
+																	ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																		Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(iurl)}},
+																	}),
+																},
+																{
+																	ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																		Literal: &javascript.Token{Token: parser.Token{Data: "true"}},
+																	}),
+																},
+															},
+														},
 													},
 												},
 											},
