@@ -1,6 +1,7 @@
 package jslib
 
 import (
+	"fmt"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -121,7 +122,7 @@ func (c *config) makeLoader() error {
 				} else {
 					b := d.resolveExport(binding.binding)
 					if b == nil {
-						return ErrInvalidExport
+						return fmt.Errorf("error resolving export (%s): %w", d.url, ErrInvalidExport)
 					}
 					bindingPE := &javascript.LeftHandSideExpression{
 						NewExpression: &javascript.NewExpression{

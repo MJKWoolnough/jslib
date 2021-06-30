@@ -2,6 +2,7 @@ package jslib
 
 import (
 	"errors"
+	"fmt"
 	"path"
 	"strconv"
 
@@ -357,7 +358,7 @@ func (d *dependency) resolveImports() error {
 	for name, binding := range d.imports {
 		b := binding.dependency.resolveExport(binding.binding)
 		if b == nil {
-			return ErrInvalidExport
+			return fmt.Errorf("error resolving import (%s): %w", d.url, ErrInvalidExport)
 		}
 		for _, c := range d.scope.Bindings[name] {
 			c.Data = b.Data
