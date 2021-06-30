@@ -81,6 +81,9 @@ func (d *dependency) process() error {
 			if err != nil {
 				return err
 			}
+			if li.ImportDeclaration.ImportClause == nil {
+				continue
+			}
 			if li.ImportDeclaration.ImportedDefaultBinding != nil {
 				d.setImportBinding(li.ImportDeclaration.ImportedDefaultBinding.Data, e, "default")
 			}
