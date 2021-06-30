@@ -199,7 +199,7 @@ func (d *dependency) process() error {
 					Declaration: ed.Declaration,
 				})
 			} else {
-				def := &javascript.Token{Token: parser.Token{Data: d.prefix + "default"}}
+				def := &javascript.Token{Token: parser.Token{Data: "default"}}
 				if ed.DefaultFunction != nil {
 					ed.DefaultFunction.BindingIdentifier = def
 					d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
@@ -216,18 +216,27 @@ func (d *dependency) process() error {
 					})
 				} else if ed.DefaultAssignmentExpression != nil {
 					d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
-						Statement: &javascript.Statement{
-							ExpressionStatement: &javascript.Expression{
-								Expressions: []javascript.AssignmentExpression{
-									*ed.DefaultAssignmentExpression,
+						Declaration: &javascript.Declaration{
+							LexicalDeclaration: &javascript.LexicalDeclaration{
+								LetOrConst: javascript.Const,
+								BindingList: []javascript.LexicalBinding{
+									{
+										BindingIdentifier: def,
+										Initializer:       ed.DefaultAssignmentExpression,
+									},
 								},
 							},
 						},
 					})
 				}
+				d.scope.Bindings["default"] = []scope.Binding{
+					{
+						BindingType: scope.BindingLexicalConst,
+						Token:       def,
+					},
+				}
 				d.setExportBinding("default", nil, "default")
 			}
-			li.ExportDeclaration = nil
 		}
 	}
 	d.processBindings(d.scope)
