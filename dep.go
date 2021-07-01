@@ -18,14 +18,14 @@ type importBinding struct {
 }
 
 type dependency struct {
-	config               *config
-	url                  string
-	scope                *scope.Scope
-	requires, requiredBy map[string]*dependency
-	imports, exports     map[string]*importBinding
-	prefix               string
-	dynamicRequirement   bool
-	done                 bool
+	config             *config
+	url                string
+	scope              *scope.Scope
+	requires           map[string]*dependency
+	imports, exports   map[string]*importBinding
+	prefix             string
+	dynamicRequirement bool
+	done               bool
 }
 
 func (d *dependency) addImport(url string) (*dependency, error) {
@@ -46,20 +46,18 @@ func (d *dependency) addImport(url string) (*dependency, error) {
 			id /= 26
 		}
 		e = &dependency{
-			config:     c,
-			url:        url,
-			requires:   make(map[string]*dependency),
-			requiredBy: make(map[string]*dependency),
-			imports:    make(map[string]*importBinding),
-			exports:    make(map[string]*importBinding),
-			prefix:     string(p[n:]),
+			config:   c,
+			url:      url,
+			requires: make(map[string]*dependency),
+			imports:  make(map[string]*importBinding),
+			exports:  make(map[string]*importBinding),
+			prefix:   string(p[n:]),
 		}
 		c.filesDone[url] = e
 		if err := e.process(); err != nil {
 			return nil, err
 		}
 	}
-	e.requiredBy[d.url] = d
 	d.requires[url] = e
 	return e, nil
 }
