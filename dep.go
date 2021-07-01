@@ -71,6 +71,11 @@ func (d *dependency) process() error {
 	if err != nil {
 		return err
 	}
+	if d.config.parseDynamic {
+		if err := walk.Walk(module, d); err != nil {
+			return err
+		}
+	}
 	for _, li := range module.ModuleListItems {
 		if li.ImportDeclaration != nil {
 			durl, _ := javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
@@ -139,11 +144,6 @@ func (d *dependency) process() error {
 				}
 			}
 		} else if li.StatementListItem != nil {
-			if d.config.parseDynamic {
-				if err := walk.Walk(li.StatementListItem, d); err != nil {
-					return err
-				}
-			}
 			d.config.statementList = append(d.config.statementList, *li.StatementListItem)
 		} else if li.ExportDeclaration != nil {
 			ed := li.ExportDeclaration
