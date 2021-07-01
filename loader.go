@@ -101,7 +101,7 @@ func (c *config) makeLoader() error {
 						propName,
 						{
 							ArrowFunction: &javascript.ArrowFunction{
-								CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
+								FormalParameters: &javascript.FormalParameters{},
 								AssignmentExpression: &javascript.AssignmentExpression{
 									ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 										MemberExpression: importsGet,
@@ -135,7 +135,7 @@ func (c *config) makeLoader() error {
 					}
 					get := javascript.AssignmentExpression{
 						ArrowFunction: &javascript.ArrowFunction{
-							CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
+							FormalParameters: &javascript.FormalParameters{},
 							AssignmentExpression: &javascript.AssignmentExpression{
 								ConditionalExpression: javascript.WrapConditional(bindingPE),
 							},
@@ -182,28 +182,10 @@ func (c *config) makeLoader() error {
 		}
 		if len(exportArr.ElementList) > 0 {
 			mapt := &javascript.Token{Token: parser.Token{Data: "map"}}
-			prop := javascript.AssignmentExpression{
-				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-					IdentifierReference: &javascript.Token{Token: parser.Token{Data: "prop"}},
-				}),
-			}
+			prop := &javascript.Token{Token: parser.Token{Data: "prop"}}
 			get := &javascript.Token{Token: parser.Token{Data: "get"}}
-			wrappedGet := javascript.AssignmentExpression{
-				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-					IdentifierReference: get,
-				}),
-			}
 			set := &javascript.Token{Token: parser.Token{Data: "set"}}
-			wrappedSet := javascript.AssignmentExpression{
-				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-					IdentifierReference: set,
-				}),
-			}
-			props := &javascript.MemberExpression{
-				PrimaryExpression: &javascript.PrimaryExpression{
-					IdentifierReference: &javascript.Token{Token: parser.Token{Data: "props"}},
-				},
-			}
+			props := &javascript.Token{Token: parser.Token{Data: "props"}}
 			include = &javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 					MemberExpression: &javascript.MemberExpression{
@@ -212,7 +194,7 @@ func (c *config) makeLoader() error {
 								Expressions: []javascript.AssignmentExpression{
 									{
 										ArrowFunction: &javascript.ArrowFunction{
-											CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{},
+											FormalParameters: &javascript.FormalParameters{},
 											FunctionBody: &javascript.Block{
 												StatementList: []javascript.StatementListItem{
 													{
@@ -245,19 +227,19 @@ func (c *config) makeLoader() error {
 																									ArgumentList: []javascript.AssignmentExpression{
 																										{
 																											ArrowFunction: &javascript.ArrowFunction{
-																												CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
-																													Expressions: []javascript.AssignmentExpression{
+																												FormalParameters: &javascript.FormalParameters{
+																													FormalParameterList: []javascript.BindingElement{
 																														{
-																															ConditionalExpression: javascript.WrapConditional(&javascript.ArrayLiteral{
-																																ElementList: []javascript.AssignmentExpression{
+																															ArrayBindingPattern: &javascript.ArrayBindingPattern{
+																																BindingElementList: []javascript.BindingElement{
 																																	{
-																																		ConditionalExpression: wrappedURL,
+																																		SingleNameBinding: url,
 																																	},
 																																},
-																																SpreadElement: &javascript.AssignmentExpression{
-																																	ConditionalExpression: javascript.WrapConditional(props),
+																																BindingRestElement: &javascript.BindingElement{
+																																	SingleNameBinding: props,
 																																},
-																															}),
+																															},
 																														},
 																													},
 																												},
@@ -294,23 +276,33 @@ func (c *config) makeLoader() error {
 																																											{
 																																												ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 																																													MemberExpression: &javascript.MemberExpression{
-																																														MemberExpression: props,
-																																														IdentifierName:   mapt,
+																																														MemberExpression: &javascript.MemberExpression{
+																																															PrimaryExpression: &javascript.PrimaryExpression{
+																																																IdentifierReference: props,
+																																															},
+																																														},
+																																														IdentifierName: mapt,
 																																													},
 																																													Arguments: &javascript.Arguments{
 																																														ArgumentList: []javascript.AssignmentExpression{
 																																															{
 																																																ArrowFunction: &javascript.ArrowFunction{
-																																																	CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
-																																																		Expressions: []javascript.AssignmentExpression{
+																																																	FormalParameters: &javascript.FormalParameters{
+																																																		FormalParameterList: []javascript.BindingElement{
 																																																			{
-																																																				ConditionalExpression: javascript.WrapConditional(&javascript.ArrayLiteral{
-																																																					ElementList: []javascript.AssignmentExpression{
-																																																						prop,
-																																																						wrappedGet,
-																																																						wrappedSet,
+																																																				ArrayBindingPattern: &javascript.ArrayBindingPattern{
+																																																					BindingElementList: []javascript.BindingElement{
+																																																						{
+																																																							SingleNameBinding: prop,
+																																																						},
+																																																						{
+																																																							SingleNameBinding: get,
+																																																						},
+																																																						{
+																																																							SingleNameBinding: set,
+																																																						},
 																																																					},
-																																																				}),
+																																																				},
 																																																			},
 																																																		},
 																																																	},
@@ -319,7 +311,7 @@ func (c *config) makeLoader() error {
 																																																			ElementList: []javascript.AssignmentExpression{
 																																																				{
 																																																					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																																																						IdentifierReference: &javascript.Token{Token: parser.Token{Data: "prop"}},
+																																																						IdentifierReference: prop,
 																																																					}),
 																																																				},
 																																																				{
@@ -335,13 +327,21 @@ func (c *config) makeLoader() error {
 																																																								PropertyName: &javascript.PropertyName{
 																																																									LiteralPropertyName: get,
 																																																								},
-																																																								AssignmentExpression: &wrappedGet,
+																																																								AssignmentExpression: &javascript.AssignmentExpression{
+																																																									ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																																																										IdentifierReference: get,
+																																																									}),
+																																																								},
 																																																							},
 																																																							{
 																																																								PropertyName: &javascript.PropertyName{
 																																																									LiteralPropertyName: set,
 																																																								},
-																																																								AssignmentExpression: &wrappedSet,
+																																																								AssignmentExpression: &javascript.AssignmentExpression{
+																																																									ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+																																																										IdentifierReference: set,
+																																																									}),
+																																																								},
 																																																							},
 																																																						},
 																																																					}),
