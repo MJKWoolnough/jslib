@@ -36,18 +36,19 @@ func OSLoad(base string) func(url string) (*javascript.Module, error) {
 }
 
 func Package(opts ...Option) (*javascript.Script, error) {
-	base, err := os.Getwd()
-	l := OSLoad(base)
 	c := config{
-		loader:        l,
 		statementList: make([]javascript.StatementListItem, 1),
 		filesDone:     make(map[string]*dependency),
 		dependency: dependency{
 			requires: make(map[string]*dependency),
 		},
 	}
-	if c.loader == l && err != nil {
-		return nil, err
+	if c.loader == nil {
+		base, err := os.Getwd()
+		if err != nil {
+			return nil, err
+		}
+		c.loader = OSLoad(base)
 	}
 	c.config = &c
 	for _, o := range opts {
