@@ -451,8 +451,8 @@ func (c *config) makeLoader() error {
 		}
 	}
 	successFn := &javascript.Token{Token: parser.Token{Data: "successFn"}}
-	window := &javascript.PrimaryExpression{
-		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "window"}},
+	globalThis := &javascript.PrimaryExpression{
+		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "globalThis"}},
 	}
 	value := &javascript.PropertyName{
 		LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "value"}},
@@ -468,7 +468,7 @@ func (c *config) makeLoader() error {
 
 								ArgumentList: []javascript.AssignmentExpression{
 									{
-										ConditionalExpression: javascript.WrapConditional(window),
+										ConditionalExpression: javascript.WrapConditional(globalThis),
 									},
 									{
 										ConditionalExpression: javascript.WrapConditional(&javascript.ObjectLiteral{
@@ -517,7 +517,7 @@ func (c *config) makeLoader() error {
 																											ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 																												MemberExpression: &javascript.MemberExpression{
 																													MemberExpression: &javascript.MemberExpression{
-																														PrimaryExpression: window,
+																														PrimaryExpression: globalThis,
 																													},
 																													IdentifierName: &javascript.Token{Token: parser.Token{Data: "addEventListener"}},
 																												},
