@@ -16,15 +16,29 @@ fi;
 	echo -e "import type {DOMBind} from './dom.js';";
 	echo -e "import {createSVG} from './dom.js';\n";
 	echo -e "export {createSVG};\n";
-	echo -n "export const ";
+	echo -n "export const [";
 	first=true;
 	for tag in $tags; do
 		if $first; then
 			first=false;
 		else
-			echo ",";
+			echo -n ", ";
 		fi;
-		echo -n "$tag = createSVG.bind(null, \"$tag\") as DOMBind<";
+		if [ "$tag" = "switch" ]; then
+			echo -n "switche";
+		else
+			echo -n "$tag";
+		fi;
+	done;
+	echo -n "] = \"$tags\".split(\" \").map(e => createSVG.bind(null, e)) as [";
+	first=true;
+	for tag in $tags; do
+		if $first; then
+			first=false;
+		else
+			echo -n ",";
+		fi;
+		echo -n "DOMBind<";
 		case "$tag" in
 		"animate"|"animateMotion"|"animateTransform")
 			echo -n "SVGA${tag:1}Element";;
@@ -34,8 +48,8 @@ fi;
 			echo -n "SVGElementTagNameMap[\"$tag\"]";;
 		esac;
 		echo -n ">";
-	done | sed -e 's/^switch /switche /';
-	echo ";";
+	done;
+	echo "];";
 ) > lib.ts/svg.ts;
 
 (
@@ -51,7 +65,7 @@ fi;
 		fi;
 		if [ "$tag" = "switch" ]; then
 			echo -n "switche";
-		else 
+		else
 			echo -n "$tag";
 		fi;
 	done;

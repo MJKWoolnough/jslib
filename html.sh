@@ -16,17 +16,31 @@ fi;
 	echo -e "import type {DOMBind} from './dom.js';";
 	echo -e "import {createHTML} from './dom.js';\n";
 	echo -e "export {createHTML};\n";
-	echo -n "export const ";
+	echo -n "export const [";
 	first=true;
 	for tag in $tags; do
 		if $first; then
 			first=false;
 		else
-			echo ",";
+			echo -n ", ";
 		fi;
-		echo -n "$tag = createHTML.bind(null, \"$tag\") as DOMBind<HTMLElementTagNameMap[\"$tag\"]>";
-	done | sed -e 's/^var /vare /';
-	echo ";";
+		if [ "$tag" = "var" ]; then
+			echo -n "vare";
+		else
+			echo -n "$tag";
+		fi;
+	done;
+	echo -n "] = \"$tags\".split(\" \").map(e => createHTML.bind(null, e)) as [";
+	first=true;
+	for tag in $tags; do
+		if $first; then
+			first=false;
+		else
+			echo -n ", ";
+		fi;
+		echo -n "DOMBind<HTMLElementTagNameMap[\"$tag\"]>";
+	done;
+	echo "];";
 ) > lib.ts/html.ts;
 
 (
@@ -42,7 +56,7 @@ fi;
 		fi;
 		if [ "$tag" = "var" ]; then
 			echo -n "vare";
-		else 
+		else
 			echo -n "$tag";
 		fi;
 	done;
