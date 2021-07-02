@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/parser"
@@ -22,32 +23,33 @@ type config struct {
 	dependency
 }
 
-func OSLoad(url string) (*javascript.Module, error) {
-	f, err := os.Open(filepath.FromSlash(url))
-	if err != nil {
-		return nil, err
+func OSLoad(base string) func(url string) (*javascript.Module, error) {
+	return func(url string) (*javascript.Module, error) {
+		f, err := os.Open(filepath.Join(base, filepath.FromSlash(url)))
+		if err != nil {
+			return nil, err
+		}
+		m, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
+		f.Close()
+		return m, err
 	}
-	m, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
-	f.Close()
-	return m, err
 }
 
 func Package(opts ...Option) (*javascript.Script, error) {
+	base, err := os.Getwd()
+	l := OSLoad(base)
 	c := config{
-		loader:        OSLoad,
+		loader:        l,
 		statementList: make([]javascript.StatementListItem, 1),
 		filesDone:     make(map[string]*dependency),
 		dependency: dependency{
 			requires: make(map[string]*dependency),
 		},
 	}
-	c.config = &c
-	var err error
-	c.url, err = os.Getwd()
-	c.url += "/"
-	if err != nil {
+	if c.loader == l && err != nil {
 		return nil, err
 	}
+	c.config = &c
 	for _, o := range opts {
 		o(&c)
 	}
@@ -55,6 +57,9 @@ func Package(opts ...Option) (*javascript.Script, error) {
 		return nil, ErrNoFiles
 	}
 	for _, url := range c.filesToDo {
+		if !strings.HasPrefix(url, "/") {
+			return nil, ErrInvalidURL
+		}
 		if _, err := c.dependency.addImport(c.dependency.RelTo(url)); err != nil {
 			return nil, err
 		}
@@ -86,5 +91,6 @@ func Package(opts ...Option) (*javascript.Script, error) {
 }
 
 var (
-	ErrNoFiles = errors.New("no files")
+	ErrNoFiles    = errors.New("no files")
+	ErrInvalidURL = errors.New("added files must be absolute URLs")
 )
