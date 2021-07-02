@@ -199,14 +199,22 @@ func (d *dependency) process() error {
 			} else {
 				def := &javascript.Token{Token: parser.Token{Data: "default"}}
 				if ed.DefaultFunction != nil {
-					ed.DefaultFunction.BindingIdentifier = def
+					if ed.DefaultFunction.BindingIdentifier == nil {
+						ed.DefaultFunction.BindingIdentifier = def
+					} else {
+						def = ed.DefaultFunction.BindingIdentifier
+					}
 					d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
 						Declaration: &javascript.Declaration{
 							FunctionDeclaration: ed.DefaultFunction,
 						},
 					})
 				} else if ed.DefaultClass != nil {
-					ed.DefaultClass.BindingIdentifier = def
+					if ed.DefaultClass.BindingIdentifier == nil {
+						ed.DefaultClass.BindingIdentifier = def
+					} else {
+						def = ed.DefaultClass.BindingIdentifier
+					}
 					d.config.statementList = append(d.config.statementList, javascript.StatementListItem{
 						Declaration: &javascript.Declaration{
 							ClassDeclaration: ed.DefaultClass,
