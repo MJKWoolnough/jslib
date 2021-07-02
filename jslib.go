@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"vimagination.zapto.org/javascript"
+	"vimagination.zapto.org/javascript/scope"
 	"vimagination.zapto.org/parser"
 )
 
@@ -216,7 +217,12 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 			}
 		}
 	}
-	// rewrite scope
+	scope, err := scope.ModuleScope(m, nil)
+	if err != nil {
+		return nil, err
+	}
+	d := dependency{prefix: "_"}
+	d.processBindings(scope)
 	// rewrite import()->include()
 	return &javascript.Script{
 		StatementList: statementList,
