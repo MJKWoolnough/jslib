@@ -284,8 +284,10 @@ func (d *dependency) HandleImportConditional(ce *javascript.ConditionalExpressio
 		durl, _ := javascript.Unquote(pe.Literal.Data)
 		iurl := d.RelTo(durl)
 		pe.Literal.Data = strconv.Quote(iurl)
-		d.addImport(iurl)
-		d.dynamicRequirement = true
+		if d.config != nil {
+			d.addImport(iurl)
+			d.dynamicRequirement = true
+		}
 		return true
 	}
 	return false

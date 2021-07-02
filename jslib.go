@@ -8,6 +8,7 @@ import (
 
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/javascript/scope"
+	"vimagination.zapto.org/javascript/walk"
 	"vimagination.zapto.org/parser"
 )
 
@@ -221,9 +222,12 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 	if err != nil {
 		return nil, err
 	}
-	d := dependency{prefix: "_"}
+	d := dependency{
+		url:    url,
+		prefix: "_",
+	}
 	d.processBindings(scope)
-	// rewrite import()->include()
+	walk.Walk(m, &d)
 	return &javascript.Script{
 		StatementList: statementList,
 	}, nil
