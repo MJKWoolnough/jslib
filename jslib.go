@@ -90,6 +90,138 @@ func Package(opts ...Option) (*javascript.Script, error) {
 	}, nil
 }
 
+func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
+	statementList := make([]javascript.StatementListItem, 0, len(m.ModuleListItems))
+	for _, li := range m.ModuleListItems {
+		if li.ImportDeclaration != nil {
+			awic := javascript.AssignmentExpression{
+				ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
+					ImportCall: &javascript.AssignmentExpression{
+						ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+							Literal: li.ImportDeclaration.FromClause.ModuleSpecifier,
+						}),
+					},
+				}),
+			}
+			awic.ConditionalExpression.LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression.ShiftExpression.AdditiveExpression.MultiplicativeExpression.ExponentiationExpression.UnaryExpression.UnaryOperators = []javascript.UnaryOperator{javascript.UnaryAwait}
+			if ic := li.ImportDeclaration.ImportClause; ic == nil {
+				statementList = append(statementList, javascript.StatementListItem{
+					Statement: &javascript.Statement{
+						ExpressionStatement: &javascript.Expression{
+							Expressions: []javascript.AssignmentExpression{awic},
+						},
+					},
+				})
+			} else {
+				var bpl []javascript.BindingProperty
+				if ic.NamedImports != nil {
+					if ic.ImportedDefaultBinding != nil {
+						bpl = make([]javascript.BindingProperty, 1, len(ic.NamedImports.ImportList)+1)
+						bpl[0].PropertyName.LiteralPropertyName = &javascript.Token{Token: parser.Token{Data: "default"}}
+						bpl[0].BindingElement.SingleNameBinding = ic.ImportedDefaultBinding
+					}
+					for _, is := range ic.NamedImports.ImportList {
+						tk := is.ImportedBinding
+						if is.IdentifierName != nil {
+							tk = is.IdentifierName
+						}
+						bpl = append(bpl, javascript.BindingProperty{
+							PropertyName: javascript.PropertyName{
+								LiteralPropertyName: tk,
+							},
+							BindingElement: javascript.BindingElement{
+								SingleNameBinding: is.ImportedBinding,
+							},
+						})
+					}
+				} else if ic.ImportedDefaultBinding != nil {
+					bpl = []javascript.BindingProperty{
+						{
+							PropertyName: javascript.PropertyName{
+								LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "default"}},
+							},
+							BindingElement: javascript.BindingElement{
+								SingleNameBinding: ic.ImportedDefaultBinding,
+							},
+						},
+					}
+				}
+				bl := make([]javascript.LexicalBinding, 0, 2)
+				if len(bpl) > 0 {
+					bl = append(bl, javascript.LexicalBinding{
+						ObjectBindingPattern: &javascript.ObjectBindingPattern{
+							BindingPropertyList: bpl,
+						},
+						Initializer: &awic,
+					})
+				}
+				if ic.NameSpaceImport != nil {
+					bl = append(bl, javascript.LexicalBinding{
+						BindingIdentifier: ic.NameSpaceImport,
+						Initializer:       &awic,
+					})
+				}
+				if len(bl) > 0 {
+					statementList = append(statementList, javascript.StatementListItem{
+						Declaration: &javascript.Declaration{
+							LexicalDeclaration: &javascript.LexicalDeclaration{
+								LetOrConst:  javascript.Const,
+								BindingList: bl,
+							},
+						},
+					})
+				}
+			}
+		} else if li.StatementListItem != nil {
+			statementList = append(statementList, *li.StatementListItem)
+		} else if li.ExportDeclaration != nil {
+			ed := li.ExportDeclaration
+			if ed.VariableStatement != nil {
+				statementList = append(statementList, javascript.StatementListItem{
+					Statement: &javascript.Statement{
+						VariableStatement: ed.VariableStatement,
+					},
+				})
+			} else if ed.Declaration != nil {
+				statementList = append(statementList, javascript.StatementListItem{
+					Declaration: ed.Declaration,
+				})
+			} else if ed.DefaultFunction != nil {
+				if ed.DefaultFunction.BindingIdentifier != nil {
+					statementList = append(statementList, javascript.StatementListItem{
+						Declaration: &javascript.Declaration{
+							FunctionDeclaration: ed.DefaultFunction,
+						},
+					})
+				}
+			} else if ed.DefaultClass != nil {
+				if ed.DefaultClass.BindingIdentifier != nil {
+					statementList = append(statementList, javascript.StatementListItem{
+						Declaration: &javascript.Declaration{
+							ClassDeclaration: ed.DefaultClass,
+						},
+					})
+				}
+			} else if ed.DefaultAssignmentExpression != nil {
+				statementList = append(statementList, javascript.StatementListItem{
+					Statement: &javascript.Statement{
+						ExpressionStatement: &javascript.Expression{
+							Expressions: []javascript.AssignmentExpression{
+								*ed.DefaultAssignmentExpression,
+							},
+						},
+					},
+				})
+			}
+		}
+	}
+	// rewrite scope
+	// rewrite import()->include()
+	return &javascript.Script{
+		StatementList: statementList,
+	}, nil
+}
+
 var (
 	ErrNoFiles    = errors.New("no files")
 	ErrInvalidURL = errors.New("added files must be absolute URLs")
