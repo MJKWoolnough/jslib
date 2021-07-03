@@ -101,6 +101,9 @@ func Package(opts ...Option) (*javascript.Script, error) {
 }
 
 func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
+	if !strings.HasPrefix(url, "/") {
+		return nil, ErrInvalidURL
+	}
 	statementList := make([]javascript.StatementListItem, 0, len(m.ModuleListItems))
 	for _, li := range m.ModuleListItems {
 		if li.ImportDeclaration != nil {
