@@ -32,16 +32,17 @@ func main() {
 
 func run() error {
 	var (
-		output, base string
-		filesTodo    Inputs
-		plugin       bool
-		err          error
+		output, base      string
+		filesTodo         Inputs
+		plugin, noExports bool
+		err               error
 	)
 
 	flag.Var(&filesTodo, "i", "input file")
 	flag.StringVar(&output, "o", "-", "input file")
 	flag.StringVar(&base, "b", "", "js base dir")
 	flag.BoolVar(&plugin, "p", false, "export file(s) as plugin(s)")
+	flag.BoolVar(&noExports, "n", false, "no exports")
 	flag.Parse()
 
 	if output == "" {
@@ -73,9 +74,13 @@ func run() error {
 			return fmt.Errorf("error processing javascript plugin: %w", err)
 		}
 	} else {
-		args := make([]jslib.Option, 0, len(filesTodo)+1)
+		args := make([]jslib.Option, 1, len(filesTodo)+3)
+		args[0] = jslib.ParseDynamic
 		if base != "" {
 			args = append(args, jslib.Loader(jslib.OSLoad(base)))
+		}
+		if noExports {
+			args = append(args, jslib.NoExports)
 		}
 		for _, f := range filesTodo {
 			args = append(args, jslib.File(f))
