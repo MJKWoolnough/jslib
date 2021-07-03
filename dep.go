@@ -251,37 +251,32 @@ func (d *dependency) process() error {
 
 func (d *dependency) Handle(t javascript.Type) error {
 	if ce, ok := t.(*javascript.CallExpression); ok && isConditionalExpression(ce.ImportCall) {
-		if d.HandleImportConditional(ce.ImportCall.ConditionalExpression) {
-			ce.MemberExpression = &javascript.MemberExpression{
-				PrimaryExpression: &javascript.PrimaryExpression{
-					IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
+		d.HandleImportConditional(ce.ImportCall.ConditionalExpression)
+		ce.MemberExpression = &javascript.MemberExpression{
+			PrimaryExpression: &javascript.PrimaryExpression{
+				IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
+			},
+			Arguments: &javascript.Arguments{
+				ArgumentList: []javascript.AssignmentExpression{
+					*ce.ImportCall,
 				},
-				Arguments: &javascript.Arguments{
-					ArgumentList: []javascript.AssignmentExpression{
-						*ce.ImportCall,
-					},
-				},
-			}
-			ce.ImportCall = nil
+			},
 		}
+		ce.ImportCall = nil
 	} else if ok && ce.MemberExpression != nil && ce.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference.Data == "include" && ce.MemberExpression.MemberExpression == nil && ce.MemberExpression.Expression == nil && ce.MemberExpression.IdentifierName == nil && ce.MemberExpression.TemplateLiteral == nil && !ce.MemberExpression.SuperProperty && !ce.MemberExpression.NewTarget && !ce.MemberExpression.ImportMeta && ce.MemberExpression.Arguments == nil && !ce.SuperCall && ce.ImportCall == nil && ce.Arguments != nil && ce.Expression == nil && ce.IdentifierName == nil && ce.TemplateLiteral == nil && len(ce.Arguments.ArgumentList) == 1 {
 		d.HandleImportConditional(ce.Arguments.ArgumentList[0].ConditionalExpression)
 	}
 	return walk.Walk(t, d)
 }
 
-func (d *dependency) HandleImportConditional(ce *javascript.ConditionalExpression) bool {
+func (d *dependency) HandleImportConditional(ce *javascript.ConditionalExpression) {
 	if ce.True != nil && ce.False != nil {
-		ret := false
 		if isConditionalExpression(ce.True) {
-			ret = d.HandleImportConditional(ce.True.ConditionalExpression)
+			d.HandleImportConditional(ce.True.ConditionalExpression)
 		}
 		if isConditionalExpression(ce.False) {
-			if d.HandleImportConditional(ce.False.ConditionalExpression) {
-				ret = true
-			}
+			d.HandleImportConditional(ce.False.ConditionalExpression)
 		}
-		return ret
 	} else if pe, ok := javascript.UnwrapConditional(ce).(*javascript.PrimaryExpression); ok && pe.Literal != nil && pe.Literal.Type == javascript.TokenStringLiteral {
 		durl, _ := javascript.Unquote(pe.Literal.Data)
 		iurl := d.RelTo(durl)
@@ -290,9 +285,7 @@ func (d *dependency) HandleImportConditional(ce *javascript.ConditionalExpressio
 			d.addImport(iurl)
 			d.dynamicRequirement = true
 		}
-		return true
 	}
-	return false
 }
 
 func (d *dependency) RelTo(url string) string {
