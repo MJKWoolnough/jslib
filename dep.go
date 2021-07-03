@@ -256,10 +256,10 @@ func (d *dependency) Handle(t javascript.Type) error {
 			PrimaryExpression: &javascript.PrimaryExpression{
 				IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
 			},
-			Arguments: &javascript.Arguments{
-				ArgumentList: []javascript.AssignmentExpression{
-					*ce.ImportCall,
-				},
+		}
+		ce.Arguments = &javascript.Arguments{
+			ArgumentList: []javascript.AssignmentExpression{
+				*ce.ImportCall,
 			},
 		}
 		ce.ImportCall = nil
