@@ -25,11 +25,18 @@ type config struct {
 	dependency
 }
 
+const jsSuffix = ".js"
+
 func OSLoad(base string) func(url string) (*javascript.Module, error) {
 	return func(url string) (*javascript.Module, error) {
 		f, err := os.Open(filepath.Join(base, filepath.FromSlash(url)))
 		if err != nil {
-			return nil, err
+			if os.IsNotExist(err) && !strings.HasSuffix(url, jsSuffix) {
+				f, err = os.Open(filepath.Join(base, filepath.FromSlash(url)+".js"))
+			}
+			if err != nil {
+				return nil, err
+			}
 		}
 		m, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
 		f.Close()
