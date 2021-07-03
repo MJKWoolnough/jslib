@@ -58,46 +58,29 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("error getting absolute path for base: %w", err)
 	}
-	var m *javascript.Module
+	var s *javascript.Script
 	if plugin && len(filesTodo) == 1 {
 		f, err := os.Open(filepath.Join(base, filepath.FromSlash(filesTodo[0])))
 		if err != nil {
 			return fmt.Errorf("error opening url: %w", err)
 		}
-		m, err = javascript.ParseModule(parser.NewReaderTokeniser(f))
+		m, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
 		f.Close()
 		if err != nil {
 			return fmt.Errorf("error parsing javascript module: %w", err)
 		}
-		if m, err = jslib.Plugin(m); err != nil {
+		if s, err = jslib.Plugin(m, filesTodo[0]); err != nil {
 			return fmt.Errorf("error processing javascript plugin: %w", err)
 		}
 	} else {
-		args := make([]jslib.Option, 1, len(filesTodo)+1)
-		args[0] = jslib.Get(func(url string) (*javascript.Module, error) {
-			f, err := os.Open(filepath.Join(base, filepath.FromSlash(url)))
-			if err != nil {
-				return nil, fmt.Errorf("error opening url: %w", err)
-			}
-			m, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
-			f.Close()
-			if err != nil {
-				return nil, fmt.Errorf("error parsing javascript module: %w", err)
-			}
-			return m, nil
-		})
-		for _, f := range filesTodo {
-			fn, err := filepath.Abs(f)
-			if err != nil {
-				return fmt.Errorf("error getting absolute filename: %w", err)
-			}
-			fn, err = filepath.Rel(base, fn)
-			if err != nil {
-				return fmt.Errorf("error getting relative filename: %w", err)
-			}
-			args = append(args, jslib.File(filepath.ToSlash(fn)))
+		args := make([]jslib.Option, 0, len(filesTodo)+1)
+		if base != "" {
+			args = append(args, jslib.Loader(jslib.OSLoad(base)))
 		}
-		m, err = jslib.Loader(args...)
+		for _, f := range filesTodo {
+			args = append(args, jslib.File(f))
+		}
+		s, err = jslib.Package(args...)
 		if err != nil {
 			return fmt.Errorf("error generating output: %w", err)
 		}
@@ -111,7 +94,7 @@ func run() error {
 			return fmt.Errorf("error creating output file: %w", err)
 		}
 	}
-	_, err = fmt.Fprintf(of, "%+s\n", m)
+	_, err = fmt.Fprintf(of, "%+s\n", s)
 	if err != nil {
 		return fmt.Errorf("error writing to output: %w", err)
 	}
