@@ -71,11 +71,6 @@ func (d *dependency) process() error {
 	if err != nil {
 		return err
 	}
-	if d.config.parseDynamic {
-		if err := walk.Walk(module, d); err != nil {
-			return err
-		}
-	}
 	for _, li := range module.ModuleListItems {
 		if li.ImportDeclaration != nil {
 			durl, _ := javascript.Unquote(li.ImportDeclaration.FromClause.ModuleSpecifier.Data)
@@ -246,6 +241,11 @@ func (d *dependency) process() error {
 		}
 	}
 	d.processBindings(d.scope)
+	if d.config.parseDynamic {
+		if err := walk.Walk(module, d); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -264,6 +264,8 @@ func (d *dependency) Handle(t javascript.Type) error {
 			}
 			ce.ImportCall = nil
 		}
+	} else if ce.MemberExpression != nil && ce.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference.Data == "include" && ce.MemberExpression.MemberExpression == nil && ce.MemberExpression.Expression == nil && ce.MemberExpression.IdentifierName == nil && ce.MemberExpression.TemplateLiteral == nil && !ce.MemberExpression.SuperProperty && !ce.MemberExpression.NewTarget && !ce.MemberExpression.ImportMeta && ce.MemberExpression.Arguments == nil && !ce.SuperCall && ce.ImportCall == nil && ce.Arguments != nil && ce.Expression == nil && ce.IdentifierName == nil && ce.TemplateLiteral == nil && len(ce.Arguments.ArgumentList) == 1 {
+		d.HandleImportConditional(ce.Arguments.ArgumentList[0].ConditionalExpression)
 	}
 	return walk.Walk(t, d)
 }
