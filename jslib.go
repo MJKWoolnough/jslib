@@ -225,7 +225,10 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 			}
 		}
 	}
-	scope, err := scope.ModuleScope(m, nil)
+	s := &javascript.Script{
+		StatementList: statementList,
+	}
+	scope, err := scope.ScriptScope(s, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -234,10 +237,8 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 		prefix: "_",
 	}
 	d.processBindings(scope)
-	walk.Walk(m, &d)
-	return &javascript.Script{
-		StatementList: statementList,
-	}, nil
+	walk.Walk(s, &d)
+	return s, nil
 }
 
 var (
