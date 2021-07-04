@@ -111,7 +111,9 @@ func Package(opts ...Option) (*javascript.Script, error) {
 			}
 		}
 	}
-	c.dependency.resolveImports()
+	if err := c.dependency.resolveImports(); err != nil {
+		return nil, err
+	}
 	if err := c.makeLoader(); err != nil {
 		return nil, err
 	}
