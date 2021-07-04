@@ -437,6 +437,9 @@ func (d *dependency) resolveImports() error {
 		}
 	}
 	for name, binding := range d.imports {
+		if binding.binding == "*" {
+			continue
+		}
 		b := binding.dependency.resolveExport(binding.binding)
 		if b == nil {
 			return fmt.Errorf("error resolving import (%s): %w", d.url, ErrInvalidExport)
