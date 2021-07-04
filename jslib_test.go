@@ -122,6 +122,15 @@ func TestPackage(t *testing.T) {
 			"Object.defineProperties(globalThis, {pageLoad: {value: document.readyState == \"complete\" ? Promise.resolve() : new Promise(successFn => globalThis.addEventListener(\"load\", successFn, {once: true}))}, include: {value: (() => {\n\tconst imports = new Map([[\"/a.js\"], [\"/b/b.js\", [\"a\", () => b_a], [\"b\", () => c_b]], [\"/c/c.js\", [\"a\", () => b_a], [\"b\", () => c_b]]].map(([url, ...props]) => [url, Object.freeze(Object.defineProperties({}, Object.fromEntries(props.map(([prop, get, set]) => [prop, {enumerable: true, get, set}]))))]));\n\treturn url => Promise.resolve(imports.get(url) ?? import(url));\n})()}});\n\nconst c_b = 2;\n\nconst b_a = 1;\n\nconsole.log(b_a, c_b, b_a, c_b);",
 			[]Option{File("/a.js")},
 		},
+		{ // 13
+			loader{
+				"/a.js":   "import {a, b, c} from './b/b.js'; console.log(a, b, c)",
+				"/b/b.js": "export * from '../c/c.js';export const a = 1;",
+				"/c/c.js": "export const a = 2, b = 3, c = 4",
+			},
+			"Object.defineProperties(globalThis, {pageLoad: {value: document.readyState == \"complete\" ? Promise.resolve() : new Promise(successFn => globalThis.addEventListener(\"load\", successFn, {once: true}))}, include: {value: (() => {\n\tconst imports = new Map([[\"/a.js\"], [\"/b/b.js\", [\"a\", () => b_a], [\"b\", () => c_b], [\"c\", () => c_c]], [\"/c/c.js\", [\"a\", () => c_a], [\"b\", () => c_b], [\"c\", () => c_c]]].map(([url, ...props]) => [url, Object.freeze(Object.defineProperties({}, Object.fromEntries(props.map(([prop, get, set]) => [prop, {enumerable: true, get, set}]))))]));\n\treturn url => Promise.resolve(imports.get(url) ?? import(url));\n})()}});\n\nconst c_a = 2, c_b = 3, c_c = 4;\n\nconst b_a = 1;\n\nconsole.log(b_a, c_b, c_c);",
+			[]Option{File("/a.js")},
+		},
 	} {
 		s, err := Package(append(test.Options, Loader(test.Input.load))...)
 		if err != nil {
