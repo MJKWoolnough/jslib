@@ -25,6 +25,7 @@ type dependency struct {
 	imports, exports   map[string]*importBinding
 	prefix             string
 	dynamicRequirement bool
+	needsMeta          bool
 	done               bool
 }
 
@@ -240,6 +241,63 @@ func (d *dependency) process() error {
 			}
 		}
 	}
+	if d.needsMeta {
+		d.config.statementList[1].Declaration.LexicalDeclaration.BindingList = append(d.config.statementList[1].Declaration.LexicalDeclaration.BindingList, javascript.LexicalBinding{
+			BindingIdentifier: &javascript.Token{Token: parser.Token{Data: d.prefix + "import"}},
+			Initializer: &javascript.AssignmentExpression{
+				ConditionalExpression: javascript.WrapConditional(&javascript.ObjectLiteral{
+					PropertyDefinitionList: []javascript.PropertyDefinition{
+						{
+							PropertyName: &javascript.PropertyName{
+								LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "url"}},
+							},
+							AssignmentExpression: &javascript.AssignmentExpression{
+								ConditionalExpression: javascript.WrapConditional(&javascript.AdditiveExpression{
+									AdditiveExpression: &javascript.AdditiveExpression{
+										MultiplicativeExpression: javascript.MultiplicativeExpression{
+											ExponentiationExpression: javascript.ExponentiationExpression{
+												UnaryExpression: javascript.UnaryExpression{
+													UpdateExpression: javascript.UpdateExpression{
+														LeftHandSideExpression: &javascript.LeftHandSideExpression{
+															NewExpression: &javascript.NewExpression{
+																MemberExpression: javascript.MemberExpression{
+																	PrimaryExpression: &javascript.PrimaryExpression{
+																		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "o"}},
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+									AdditiveOperator: javascript.AdditiveAdd,
+									MultiplicativeExpression: javascript.MultiplicativeExpression{
+										ExponentiationExpression: javascript.ExponentiationExpression{
+											UnaryExpression: javascript.UnaryExpression{
+												UpdateExpression: javascript.UpdateExpression{
+													LeftHandSideExpression: &javascript.LeftHandSideExpression{
+														NewExpression: &javascript.NewExpression{
+															MemberExpression: javascript.MemberExpression{
+																PrimaryExpression: &javascript.PrimaryExpression{
+																	Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(d.url)}},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								}),
+							},
+						},
+					},
+				}),
+			},
+		})
+	}
 	d.processBindings(d.scope)
 	if d.config.parseDynamic {
 		if err := walk.Walk(module, d); err != nil {
@@ -265,6 +323,14 @@ func (d *dependency) Handle(t javascript.Type) error {
 		ce.ImportCall = nil
 	} else if ok && ce.MemberExpression != nil && ce.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.PrimaryExpression.IdentifierReference.Data == "include" && ce.MemberExpression.MemberExpression == nil && ce.MemberExpression.Expression == nil && ce.MemberExpression.IdentifierName == nil && ce.MemberExpression.TemplateLiteral == nil && !ce.MemberExpression.SuperProperty && !ce.MemberExpression.NewTarget && !ce.MemberExpression.ImportMeta && ce.MemberExpression.Arguments == nil && !ce.SuperCall && ce.ImportCall == nil && ce.Arguments != nil && ce.Expression == nil && ce.IdentifierName == nil && ce.TemplateLiteral == nil && len(ce.Arguments.ArgumentList) == 1 {
 		d.HandleImportConditional(ce.Arguments.ArgumentList[0].ConditionalExpression)
+	} else if d.config != nil {
+		if me, ok := t.(*javascript.MemberExpression); ok && me.ImportMeta {
+			d.needsMeta = true
+			me.PrimaryExpression = &javascript.PrimaryExpression{
+				IdentifierReference: &javascript.Token{Token: parser.Token{Data: d.prefix + "import"}},
+			}
+			me.ImportMeta = false
+		}
 	}
 	return walk.Walk(t, d)
 }

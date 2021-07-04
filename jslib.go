@@ -46,7 +46,7 @@ func OSLoad(base string) func(url string) (*javascript.Module, error) {
 
 func Package(opts ...Option) (*javascript.Script, error) {
 	c := config{
-		statementList: make([]javascript.StatementListItem, 1),
+		statementList: make([]javascript.StatementListItem, 2),
 		filesDone:     make(map[string]*dependency),
 		dependency: dependency{
 			requires: make(map[string]*dependency),
@@ -65,6 +65,26 @@ func Package(opts ...Option) (*javascript.Script, error) {
 	}
 	if len(c.filesToDo) == 0 {
 		return nil, ErrNoFiles
+	}
+	c.statementList[1].Declaration = &javascript.Declaration{
+		LexicalDeclaration: &javascript.LexicalDeclaration{
+			LetOrConst: javascript.Const,
+			BindingList: []javascript.LexicalBinding{
+				{
+					BindingIdentifier: &javascript.Token{Token: parser.Token{Data: "o"}},
+					Initializer: &javascript.AssignmentExpression{
+						ConditionalExpression: javascript.WrapConditional(javascript.MemberExpression{
+							MemberExpression: &javascript.MemberExpression{
+								PrimaryExpression: &javascript.PrimaryExpression{
+									IdentifierReference: &javascript.Token{Token: parser.Token{Data: "location"}},
+								},
+							},
+							IdentifierName: &javascript.Token{Token: parser.Token{Data: "origin"}},
+						}),
+					},
+				},
+			},
+		},
 	}
 	for _, url := range c.filesToDo {
 		if !strings.HasPrefix(url, "/") {
@@ -94,6 +114,10 @@ func Package(opts ...Option) (*javascript.Script, error) {
 	c.dependency.resolveImports()
 	if err := c.makeLoader(); err != nil {
 		return nil, err
+	}
+	if len(c.statementList[1].Declaration.LexicalDeclaration.BindingList) == 1 {
+		c.statementList[1] = c.statementList[0]
+		c.statementList = c.statementList[1:]
 	}
 	return &javascript.Script{
 		StatementList: c.statementList,
