@@ -2,59 +2,80 @@
 --
     import "vimagination.zapto.org/jslib"
 
+Package jslib is a javascript packer and library for javascript projects
 
 ## Usage
 
 ```go
 var (
-	ErrNotNeeded     = errors.New("not needed")
-	ErrCircular      = errors.New("circular import")
-	ErrInvalidPlugin = errors.New("plugin cannot have exports")
+	ErrNoFiles    = errors.New("no files")
+	ErrInvalidURL = errors.New("added files must be absolute URLs")
 )
 ```
 Errors
 
-#### func  Loader
+```go
+var (
+	ErrInvalidExport = errors.New("invalid export")
+)
+```
+Errors
+
+#### func  NoExports
 
 ```go
-func Loader(os ...Option) (*javascript.Module, error)
+func NoExports(c *config)
 ```
-Loader creates a jslib loader with packed dependencies
+NoExports disables the creation of exports for any potential plugins
+
+#### func  OSLoad
+
+```go
+func OSLoad(base string) func(url string) (*javascript.Module, error)
+```
+OSLoad is the default loader for Package, with the base set to CWD
+
+#### func  Package
+
+```go
+func Package(opts ...Option) (*javascript.Script, error)
+```
+Package packages up multiple javascript modules into a single file, renaming
+bindings to simulate imports
+
+#### func  ParseDynamic
+
+```go
+func ParseDynamic(c *config)
+```
+ParseDynamic turns on dynamic import/include parsing
 
 #### func  Plugin
 
 ```go
-func Plugin(m *javascript.Module) (*javascript.Module, error)
+func Plugin(m *javascript.Module, url string) (*javascript.Script, error)
 ```
-Plugin takes a single javascript module and converts it to a JSLib compatible
-javascript module - useful for plugins. NB: Plugins can have no exports
+Plugin converts a single javascript module to make use of the processed exports
+from package
 
 #### type Option
 
 ```go
-type Option func(c *config)
+type Option func(*config)
 ```
 
-Option is an configuration option that changes how the jslib packer operates
+Option in a type that can be passed to Package to set an option
 
 #### func  File
 
 ```go
 func File(url string) Option
 ```
-File adds a file for packer to parse and pack
+File is an Option that specifies a starting file for Package
 
-#### func  Get
-
-```go
-func Get(getter func(string) (*javascript.Module, error)) Option
-```
-Get provides the user a way to choose what data is loaded for a given URL
-
-#### func  LoadFromOS
+#### func  Loader
 
 ```go
-func LoadFromOS() Option
+func Loader(l func(string) (*javascript.Module, error)) Option
 ```
-LoadFromOS assumes that the layout of the files to pack are layed out the same
-on both the filesystem and the web system
+Loader sets the func that will take URLs and produce a parsed module
