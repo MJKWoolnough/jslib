@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"vimagination.zapto.org/javascript"
-	"vimagination.zapto.org/javascript/scope"
 	"vimagination.zapto.org/parser"
 )
 
@@ -122,48 +121,18 @@ func (c *config) makeLoader() error {
 					if b == nil {
 						return fmt.Errorf("error resolving export (%s): %w", d.url, ErrInvalidExport)
 					}
-					bindingPE := &javascript.LeftHandSideExpression{
-						NewExpression: &javascript.NewExpression{
-							MemberExpression: javascript.MemberExpression{
-								PrimaryExpression: &javascript.PrimaryExpression{
-									IdentifierReference: b.Token,
+					ael = []javascript.AssignmentExpression{
+						propName,
+						javascript.AssignmentExpression{
+							ArrowFunction: &javascript.ArrowFunction{
+								FormalParameters: &javascript.FormalParameters{},
+								AssignmentExpression: &javascript.AssignmentExpression{
+									ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
+										IdentifierReference: b.Token,
+									}),
 								},
 							},
 						},
-					}
-					get := javascript.AssignmentExpression{
-						ArrowFunction: &javascript.ArrowFunction{
-							FormalParameters: &javascript.FormalParameters{},
-							AssignmentExpression: &javascript.AssignmentExpression{
-								ConditionalExpression: javascript.WrapConditional(bindingPE),
-							},
-						},
-					}
-					if b.BindingType == scope.BindingLexicalLet || b.BindingType == scope.BindingVar {
-						a := &javascript.Token{Token: parser.Token{Data: "a"}}
-						ael = []javascript.AssignmentExpression{
-							propName,
-							get,
-							{
-								ArrowFunction: &javascript.ArrowFunction{
-									BindingIdentifier: a,
-									AssignmentExpression: &javascript.AssignmentExpression{
-										LeftHandSideExpression: bindingPE,
-										AssignmentOperator:     javascript.AssignmentAssign,
-										AssignmentExpression: &javascript.AssignmentExpression{
-											ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-												IdentifierReference: a,
-											}),
-										},
-									},
-								},
-							},
-						}
-					} else {
-						ael = []javascript.AssignmentExpression{
-							propName,
-							get,
-						}
 					}
 				}
 				el = append(el, javascript.AssignmentExpression{
@@ -182,7 +151,6 @@ func (c *config) makeLoader() error {
 			mapt := &javascript.Token{Token: parser.Token{Data: "map"}}
 			prop := &javascript.Token{Token: parser.Token{Data: "prop"}}
 			get := &javascript.Token{Token: parser.Token{Data: "get"}}
-			set := &javascript.Token{Token: parser.Token{Data: "set"}}
 			props := &javascript.Token{Token: parser.Token{Data: "props"}}
 			include = &javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
@@ -296,9 +264,6 @@ func (c *config) makeLoader() error {
 																																																						{
 																																																							SingleNameBinding: get,
 																																																						},
-																																																						{
-																																																							SingleNameBinding: set,
-																																																						},
 																																																					},
 																																																				},
 																																																			},
@@ -328,16 +293,6 @@ func (c *config) makeLoader() error {
 																																																								AssignmentExpression: &javascript.AssignmentExpression{
 																																																									ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
 																																																										IdentifierReference: get,
-																																																									}),
-																																																								},
-																																																							},
-																																																							{
-																																																								PropertyName: &javascript.PropertyName{
-																																																									LiteralPropertyName: set,
-																																																								},
-																																																								AssignmentExpression: &javascript.AssignmentExpression{
-																																																									ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																																																										IdentifierReference: set,
 																																																									}),
 																																																								},
 																																																							},
