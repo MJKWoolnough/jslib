@@ -27,6 +27,7 @@ type config struct {
 
 const jsSuffix = ".js"
 
+// OSLoad is the default loader for Package, with the base set to CWD
 func OSLoad(base string) func(url string) (*javascript.Module, error) {
 	return func(url string) (*javascript.Module, error) {
 		f, err := os.Open(filepath.Join(base, filepath.FromSlash(url)))
@@ -44,6 +45,8 @@ func OSLoad(base string) func(url string) (*javascript.Module, error) {
 	}
 }
 
+// Package packages up multiple javascript modules into a single file, renaming
+// bindings to simulate imports
 func Package(opts ...Option) (*javascript.Script, error) {
 	c := config{
 		statementList: make([]javascript.StatementListItem, 2),
@@ -126,6 +129,8 @@ func Package(opts ...Option) (*javascript.Script, error) {
 	}, nil
 }
 
+// Plugin converts a single javascript module to make use of the processed
+// exports from package
 func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 	if !strings.HasPrefix(url, "/") {
 		return nil, ErrInvalidURL
@@ -270,6 +275,7 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 	return s, nil
 }
 
+// Errors
 var (
 	ErrNoFiles    = errors.New("no files")
 	ErrInvalidURL = errors.New("added files must be absolute URLs")
