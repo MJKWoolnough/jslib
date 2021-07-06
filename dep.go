@@ -135,11 +135,11 @@ func (d *dependency) process() error {
 				})
 			} else if li.ImportDeclaration.NamedImports != nil {
 				for _, is := range li.ImportDeclaration.NamedImports.ImportList {
-					tk := is.IdentifierName
-					if is.ImportedBinding != nil {
-						tk = is.ImportedBinding
+					tk := is.ImportedBinding
+					if is.IdentifierName != nil {
+						tk = is.IdentifierName
 					}
-					d.setImportBinding(tk.Data, e, is.IdentifierName.Data)
+					d.setImportBinding(is.ImportedBinding.Data, e, tk.Data)
 				}
 			}
 		} else if li.StatementListItem != nil {
