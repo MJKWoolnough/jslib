@@ -196,6 +196,11 @@ func TestPlugin(t *testing.T) {
 			"/a.js",
 			"const a_ = await include(\"/b.js\");\n\nconsole.log(a_.default);",
 		},
+		{ // 2
+			"import a from '../b.js';console.log(a)",
+			"/a/a.js",
+			"const a_ = await include(\"/b.js\");\n\nconsole.log(a_.default);",
+		},
 	} {
 		m, err := javascript.ParseModule(parser.NewStringTokeniser(test.Input))
 		if err != nil {
