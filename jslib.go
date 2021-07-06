@@ -75,15 +75,15 @@ func Package(opts ...Option) (*javascript.Script, error) {
 			LetOrConst: javascript.Const,
 			BindingList: []javascript.LexicalBinding{
 				{
-					BindingIdentifier: &javascript.Token{Token: parser.Token{Data: "o"}},
+					BindingIdentifier: Token("o"),
 					Initializer: &javascript.AssignmentExpression{
 						ConditionalExpression: javascript.WrapConditional(javascript.MemberExpression{
 							MemberExpression: &javascript.MemberExpression{
 								PrimaryExpression: &javascript.PrimaryExpression{
-									IdentifierReference: &javascript.Token{Token: parser.Token{Data: "location"}},
+									IdentifierReference: Token("location"),
 								},
 							},
-							IdentifierName: &javascript.Token{Token: parser.Token{Data: "origin"}},
+							IdentifierName: Token("origin"),
 						}),
 					},
 				},
@@ -162,7 +162,7 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 				if ic.NamedImports != nil {
 					if ic.ImportedDefaultBinding != nil {
 						bpl = make([]javascript.BindingProperty, 1, len(ic.NamedImports.ImportList)+1)
-						bpl[0].PropertyName.LiteralPropertyName = &javascript.Token{Token: parser.Token{Data: "default"}}
+						bpl[0].PropertyName.LiteralPropertyName = Token("default")
 						bpl[0].BindingElement.SingleNameBinding = ic.ImportedDefaultBinding
 					}
 					for _, is := range ic.NamedImports.ImportList {
@@ -183,7 +183,7 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 					bpl = []javascript.BindingProperty{
 						{
 							PropertyName: javascript.PropertyName{
-								LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "default"}},
+								LiteralPropertyName: Token("default"),
 							},
 							BindingElement: javascript.BindingElement{
 								SingleNameBinding: ic.ImportedDefaultBinding,

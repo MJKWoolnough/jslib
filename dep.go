@@ -9,7 +9,6 @@ import (
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/javascript/scope"
 	"vimagination.zapto.org/javascript/walk"
-	"vimagination.zapto.org/parser"
 )
 
 type importBinding struct {
@@ -107,19 +106,19 @@ func (d *dependency) process() error {
 													CallExpression: &javascript.CallExpression{
 														MemberExpression: &javascript.MemberExpression{
 															PrimaryExpression: &javascript.PrimaryExpression{
-																IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
+																IdentifierReference: Token("include"),
 															},
 														},
 														Arguments: &javascript.Arguments{
 															ArgumentList: []javascript.AssignmentExpression{
 																{
 																	ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																		Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(iurl)}},
+																		Literal: Token(strconv.Quote(iurl)),
 																	}),
 																},
 																{
 																	ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																		Literal: &javascript.Token{Token: parser.Token{Data: "true"}},
+																		Literal: Token("true"),
 																	}),
 																},
 															},
@@ -197,7 +196,7 @@ func (d *dependency) process() error {
 					Declaration: ed.Declaration,
 				})
 			} else {
-				def := &javascript.Token{Token: parser.Token{Data: "default"}}
+				def := Token("default")
 				if ed.DefaultFunction != nil {
 					if ed.DefaultFunction.BindingIdentifier == nil {
 						ed.DefaultFunction.BindingIdentifier = def
@@ -247,13 +246,13 @@ func (d *dependency) process() error {
 	}
 	if d.needsMeta {
 		d.config.statementList[1].Declaration.LexicalDeclaration.BindingList = append(d.config.statementList[1].Declaration.LexicalDeclaration.BindingList, javascript.LexicalBinding{
-			BindingIdentifier: &javascript.Token{Token: parser.Token{Data: d.prefix + "import"}},
+			BindingIdentifier: Token(d.prefix + "import"),
 			Initializer: &javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.ObjectLiteral{
 					PropertyDefinitionList: []javascript.PropertyDefinition{
 						{
 							PropertyName: &javascript.PropertyName{
-								LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "url"}},
+								LiteralPropertyName: Token("url"),
 							},
 							AssignmentExpression: &javascript.AssignmentExpression{
 								ConditionalExpression: javascript.WrapConditional(&javascript.AdditiveExpression{
@@ -266,7 +265,7 @@ func (d *dependency) process() error {
 															NewExpression: &javascript.NewExpression{
 																MemberExpression: javascript.MemberExpression{
 																	PrimaryExpression: &javascript.PrimaryExpression{
-																		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "o"}},
+																		IdentifierReference: Token("o"),
 																	},
 																},
 															},
@@ -285,7 +284,7 @@ func (d *dependency) process() error {
 														NewExpression: &javascript.NewExpression{
 															MemberExpression: javascript.MemberExpression{
 																PrimaryExpression: &javascript.PrimaryExpression{
-																	Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(d.url)}},
+																	Literal: Token(strconv.Quote(d.url)),
 																},
 															},
 														},
@@ -316,7 +315,7 @@ func (d *dependency) Handle(t javascript.Type) error {
 		d.HandleImportConditional(ce.ImportCall.ConditionalExpression)
 		ce.MemberExpression = &javascript.MemberExpression{
 			PrimaryExpression: &javascript.PrimaryExpression{
-				IdentifierReference: &javascript.Token{Token: parser.Token{Data: "include"}},
+				IdentifierReference: Token("include"),
 			},
 		}
 		ce.Arguments = &javascript.Arguments{
@@ -331,7 +330,7 @@ func (d *dependency) Handle(t javascript.Type) error {
 		if me, ok := t.(*javascript.MemberExpression); ok && me.ImportMeta {
 			d.needsMeta = true
 			me.PrimaryExpression = &javascript.PrimaryExpression{
-				IdentifierReference: &javascript.Token{Token: parser.Token{Data: d.prefix + "import"}},
+				IdentifierReference: Token(d.prefix + "import"),
 			}
 			me.ImportMeta = false
 		}

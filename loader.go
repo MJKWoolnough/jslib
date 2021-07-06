@@ -9,6 +9,10 @@ import (
 	"vimagination.zapto.org/parser"
 )
 
+func Token(data string) *javascript.Token {
+	return &javascript.Token{Token: parser.Token{Data: data}}
+}
+
 type export struct {
 	binding, module string
 	writeable       bool
@@ -21,28 +25,28 @@ type exportsMap map[string]exportMap
 func (c *config) makeLoader() error {
 	promise := &javascript.MemberExpression{
 		PrimaryExpression: &javascript.PrimaryExpression{
-			IdentifierReference: &javascript.Token{Token: parser.Token{Data: "Promise"}},
+			IdentifierReference: Token("Promise"),
 		},
 	}
 	promiseResolve := &javascript.MemberExpression{
 		MemberExpression: promise,
-		IdentifierName:   &javascript.Token{Token: parser.Token{Data: "resolve"}},
+		IdentifierName:   Token("resolve"),
 	}
 	trueAE := &javascript.AssignmentExpression{
 		ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-			Literal: &javascript.Token{Token: parser.Token{Data: "true"}},
+			Literal: Token("true"),
 		}),
 	}
 	object := &javascript.MemberExpression{
 		PrimaryExpression: &javascript.PrimaryExpression{
-			IdentifierReference: &javascript.Token{Token: parser.Token{Data: "Object"}},
+			IdentifierReference: Token("Object"),
 		},
 	}
 	objectDefineProperties := &javascript.MemberExpression{
 		MemberExpression: object,
-		IdentifierName:   &javascript.Token{Token: parser.Token{Data: "defineProperties"}},
+		IdentifierName:   Token("defineProperties"),
 	}
-	url := &javascript.Token{Token: parser.Token{Data: "url"}}
+	url := Token("url")
 	wrappedURL := javascript.WrapConditional(&javascript.PrimaryExpression{
 		IdentifierReference: url,
 	})
@@ -57,14 +61,14 @@ func (c *config) makeLoader() error {
 			ElementList: make([]javascript.AssignmentExpression, 0, len(c.filesDone)),
 		}
 		urls := make([]string, 0, len(c.filesDone))
-		imports := &javascript.Token{Token: parser.Token{Data: "imports"}}
+		imports := Token("imports")
 		importsGet := &javascript.MemberExpression{
 			MemberExpression: &javascript.MemberExpression{
 				PrimaryExpression: &javascript.PrimaryExpression{
 					IdentifierReference: imports,
 				},
 			},
-			IdentifierName: &javascript.Token{Token: parser.Token{Data: "get"}},
+			IdentifierName: Token("get"),
 		}
 		for url := range c.filesDone {
 			urls = append(urls, url)
@@ -77,7 +81,7 @@ func (c *config) makeLoader() error {
 			}
 			el := append(make([]javascript.AssignmentExpression, 0, len(d.exports)+1), javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-					Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(url)}},
+					Literal: Token(strconv.Quote(url)),
 				}),
 			})
 			props := make([]string, 0, len(d.exports))
@@ -89,7 +93,7 @@ func (c *config) makeLoader() error {
 				binding := d.exports[prop]
 				propName := javascript.AssignmentExpression{
 					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-						Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(prop)}},
+						Literal: Token(strconv.Quote(prop)),
 					}),
 				}
 				var ael []javascript.AssignmentExpression
@@ -106,7 +110,7 @@ func (c *config) makeLoader() error {
 											ArgumentList: []javascript.AssignmentExpression{
 												{
 													ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-														Literal: &javascript.Token{Token: parser.Token{Data: strconv.Quote(binding.dependency.url)}},
+														Literal: Token(strconv.Quote(binding.dependency.url)),
 													}),
 												},
 											},
@@ -148,10 +152,10 @@ func (c *config) makeLoader() error {
 			})
 		}
 		if len(exportArr.ElementList) > 0 {
-			mapt := &javascript.Token{Token: parser.Token{Data: "map"}}
-			prop := &javascript.Token{Token: parser.Token{Data: "prop"}}
-			get := &javascript.Token{Token: parser.Token{Data: "get"}}
-			props := &javascript.Token{Token: parser.Token{Data: "props"}}
+			mapt := Token("map")
+			prop := Token("prop")
+			get := Token("get")
+			props := Token("props")
 			include = &javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 					MemberExpression: &javascript.MemberExpression{
@@ -174,7 +178,7 @@ func (c *config) makeLoader() error {
 																			ConditionalExpression: javascript.WrapConditional(javascript.MemberExpression{
 																				MemberExpression: &javascript.MemberExpression{
 																					PrimaryExpression: &javascript.PrimaryExpression{
-																						IdentifierReference: &javascript.Token{Token: parser.Token{Data: "Map"}},
+																						IdentifierReference: Token("Map"),
 																					},
 																				},
 																				Arguments: &javascript.Arguments{
@@ -219,7 +223,7 @@ func (c *config) makeLoader() error {
 																																ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 																																	MemberExpression: &javascript.MemberExpression{
 																																		MemberExpression: object,
-																																		IdentifierName:   &javascript.Token{Token: parser.Token{Data: "freeze"}},
+																																		IdentifierName:   Token("freeze"),
 																																	},
 																																	Arguments: &javascript.Arguments{
 																																		ArgumentList: []javascript.AssignmentExpression{
@@ -235,7 +239,7 @@ func (c *config) makeLoader() error {
 																																								ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 																																									MemberExpression: &javascript.MemberExpression{
 																																										MemberExpression: object,
-																																										IdentifierName:   &javascript.Token{Token: parser.Token{Data: "fromEntries"}},
+																																										IdentifierName:   Token("fromEntries"),
 																																									},
 																																									Arguments: &javascript.Arguments{
 																																										ArgumentList: []javascript.AssignmentExpression{
@@ -282,7 +286,7 @@ func (c *config) makeLoader() error {
 																																																						PropertyDefinitionList: []javascript.PropertyDefinition{
 																																																							{
 																																																								PropertyName: &javascript.PropertyName{
-																																																									LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "enumerable"}},
+																																																									LiteralPropertyName: Token("enumerable"),
 																																																								},
 																																																								AssignmentExpression: trueAE,
 																																																							},
@@ -403,12 +407,12 @@ func (c *config) makeLoader() error {
 			},
 		}
 	}
-	successFn := &javascript.Token{Token: parser.Token{Data: "successFn"}}
+	successFn := Token("successFn")
 	globalThis := &javascript.PrimaryExpression{
-		IdentifierReference: &javascript.Token{Token: parser.Token{Data: "globalThis"}},
+		IdentifierReference: Token("globalThis"),
 	}
 	value := &javascript.PropertyName{
-		LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "value"}},
+		LiteralPropertyName: Token("value"),
 	}
 	c.statementList[0] = javascript.StatementListItem{
 		Statement: &javascript.Statement{
@@ -428,7 +432,7 @@ func (c *config) makeLoader() error {
 											PropertyDefinitionList: []javascript.PropertyDefinition{
 												{
 													PropertyName: &javascript.PropertyName{
-														LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "pageLoad"}},
+														LiteralPropertyName: Token("pageLoad"),
 													},
 													AssignmentExpression: &javascript.AssignmentExpression{
 														ConditionalExpression: javascript.WrapConditional(&javascript.ObjectLiteral{
@@ -441,14 +445,14 @@ func (c *config) makeLoader() error {
 																				EqualityExpression: &javascript.WrapConditional(javascript.MemberExpression{
 																					MemberExpression: &javascript.MemberExpression{
 																						PrimaryExpression: &javascript.PrimaryExpression{
-																							IdentifierReference: &javascript.Token{Token: parser.Token{Data: "document"}},
+																							IdentifierReference: Token("document"),
 																						},
 																					},
-																					IdentifierName: &javascript.Token{Token: parser.Token{Data: "readyState"}},
+																					IdentifierName: Token("readyState"),
 																				}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression,
 																				EqualityOperator: javascript.EqualityEqual,
 																				RelationalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																					Literal: &javascript.Token{Token: parser.Token{Data: "\"complete\""}},
+																					Literal: Token("\"complete\""),
 																				}).LogicalORExpression.LogicalANDExpression.BitwiseORExpression.BitwiseXORExpression.BitwiseANDExpression.EqualityExpression.RelationalExpression,
 																			}).LogicalORExpression,
 																			True: &javascript.AssignmentExpression{
@@ -472,13 +476,13 @@ func (c *config) makeLoader() error {
 																													MemberExpression: &javascript.MemberExpression{
 																														PrimaryExpression: globalThis,
 																													},
-																													IdentifierName: &javascript.Token{Token: parser.Token{Data: "addEventListener"}},
+																													IdentifierName: Token("addEventListener"),
 																												},
 																												Arguments: &javascript.Arguments{
 																													ArgumentList: []javascript.AssignmentExpression{
 																														{
 																															ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																																Literal: &javascript.Token{Token: parser.Token{Data: "\"load\""}},
+																																Literal: Token("\"load\""),
 																															}),
 																														},
 																														{
@@ -491,7 +495,7 @@ func (c *config) makeLoader() error {
 																																PropertyDefinitionList: []javascript.PropertyDefinition{
 																																	{
 																																		PropertyName: &javascript.PropertyName{
-																																			LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "once"}},
+																																			LiteralPropertyName: Token("once"),
 																																		},
 																																		AssignmentExpression: trueAE,
 																																	},
@@ -518,7 +522,7 @@ func (c *config) makeLoader() error {
 												},
 												{
 													PropertyName: &javascript.PropertyName{
-														LiteralPropertyName: &javascript.Token{Token: parser.Token{Data: "include"}},
+														LiteralPropertyName: Token("include"),
 													},
 													AssignmentExpression: &javascript.AssignmentExpression{
 														ConditionalExpression: javascript.WrapConditional(&javascript.ObjectLiteral{
