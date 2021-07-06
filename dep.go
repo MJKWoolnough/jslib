@@ -29,30 +29,34 @@ type dependency struct {
 	done               bool
 }
 
+func id2String(id uint) string {
+	var (
+		p [15]byte
+		n = 14
+	)
+	p[14] = '_'
+	for id > 0 {
+		n--
+		id--
+		p[n] = 'a' + byte(id%26)
+		id /= 26
+	}
+	return string(p[n:])
+}
+
 func (d *dependency) addImport(url string) (*dependency, error) {
 	c := d.config
 	e, ok := c.filesDone[url]
 	if !ok {
 		c.nextID++
 		id := c.nextID
-		var (
-			p [15]byte
-			n = 14
-		)
-		p[14] = '_'
-		for id > 0 {
-			n--
-			id--
-			p[n] = 'a' + byte(id%26)
-			id /= 26
-		}
 		e = &dependency{
 			config:   c,
 			url:      url,
 			requires: make(map[string]*dependency),
 			imports:  make(map[string]*importBinding),
 			exports:  make(map[string]*importBinding),
-			prefix:   string(p[n:]),
+			prefix:   id2String(id),
 		}
 		c.filesDone[url] = e
 		if err := e.process(); err != nil {
