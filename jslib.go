@@ -3,6 +3,7 @@ package jslib
 
 import (
 	"errors"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,12 +30,23 @@ type config struct {
 const jsSuffix = ".js"
 
 // OSLoad is the default loader for Package, with the base set to CWD
-func OSLoad(base string) func(url string) (*javascript.Module, error) {
-	return func(url string) (*javascript.Module, error) {
-		f, err := os.Open(filepath.Join(base, filepath.FromSlash(url)))
+func OSLoad(base string) func(string) (*javascript.Module, error) {
+	return func(urlPath string) (*javascript.Module, error) {
+		f, err := os.Open(filepath.Join(base, filepath.FromSlash(urlPath)))
 		if err != nil {
-			if os.IsNotExist(err) && !strings.HasSuffix(url, jsSuffix) {
-				f, err = os.Open(filepath.Join(base, filepath.FromSlash(url)+".js"))
+			if os.IsNotExist(err) {
+				if u, errr := url.Parse(urlPath); errr == nil {
+					if u.Path != urlPath {
+						f, err = os.Open(filepath.Join(base, filepath.FromSlash(u.Path)))
+					}
+					if err != nil && !strings.HasSuffix(u.Path, jsSuffix) {
+						u.Path += jsSuffix
+						f, err = os.Open(filepath.Join(base, u.String()))
+						if err != nil {
+							f, err = os.Open(filepath.Join(base, u.Path))
+						}
+					}
+				}
 			}
 			if err != nil {
 				return nil, err
