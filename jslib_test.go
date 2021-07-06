@@ -184,3 +184,30 @@ func TestPackage(t *testing.T) {
 		}
 	}
 }
+
+func TestPlugin(t *testing.T) {
+	for n, test := range [...]struct {
+		Input  string
+		URL    string
+		Output string
+	}{
+		{ // 1
+			"import a from './b.js';console.log(a)",
+			"/a.js",
+			"const a_ = await include(\"/b.js\");\n\nconsole.log(a_.default);",
+		},
+	} {
+		m, err := javascript.ParseModule(parser.NewStringTokeniser(test.Input))
+		if err != nil {
+			t.Fatalf("test %d: unexpected err: %s", n+1, err)
+		}
+		s, err := Plugin(m, test.URL)
+		if err != nil {
+			t.Fatalf("test %d: unexpected err: %s", n+1, err)
+		}
+		output := fmt.Sprintf("%s", s)
+		if output != test.Output {
+			t.Errorf("test %d: expecting output: %q\ngot: %q", n+1, test.Output, output)
+		}
+	}
+}
