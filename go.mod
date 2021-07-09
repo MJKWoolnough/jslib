@@ -5,5 +5,4 @@ go 1.16
 require (
 	vimagination.zapto.org/javascript v0.0.6
 	vimagination.zapto.org/parser v1.0.0
-	vimagination.zapto.org/rwcount v0.0.0-20190223222239-1da74d07801f
 )

@@ -14,7 +14,6 @@ import (
 
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/parser"
-	"vimagination.zapto.org/rwcount"
 )
 
 func main() {
@@ -165,34 +164,33 @@ type element struct {
 }
 
 func (e *element) WriteTo(w io.Writer) (int64, error) {
-	sw := rwcount.Writer{Writer: w}
 	if lib {
-		fmt.Fprintf(&sw, "%s(", e.name)
+		fmt.Fprintf(w, "%s(", e.name)
 	} else {
-		fmt.Fprintf(&sw, "%s(%q", ch, e.name)
+		fmt.Fprintf(w, "%s(%q", ch, e.name)
 	}
-	ip := indentPrinter{&sw}
+	ip := indentPrinter{w}
 	first := true
 	if len(e.children) == 1 && isText(e.children[0]) {
 		if lib {
 			first = false
 		} else {
-			fmt.Fprint(&sw, ", ")
+			fmt.Fprint(w, ", ")
 		}
-		e.children[0].WriteTo(&sw)
+		e.children[0].WriteTo(w)
 	}
 	if len(e.attrs) == 1 {
 		for k, v := range e.attrs {
 			if lib && first {
-				fmt.Fprint(&sw, "{")
+				fmt.Fprint(w, "{")
 				first = false
 			} else {
-				fmt.Fprint(&sw, ", {")
+				fmt.Fprint(w, ", {")
 			}
-			if err := printAttr(&sw, k, v); err != nil {
-				return sw.Count, err
+			if err := printAttr(w, k, v); err != nil {
+				return 0, err
 			}
-			fmt.Fprint(&sw, "}")
+			fmt.Fprint(w, "}")
 		}
 	} else if len(e.attrs) > 1 {
 		if lib && first {
@@ -209,16 +207,16 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 				f = true
 			}
 			if err := printAttr(&ip, k, v); err != nil {
-				return sw.Count, err
+				return 0, err
 			}
 		}
-		fmt.Fprint(&sw, "\n}")
+		fmt.Fprint(w, "\n}")
 	}
 	if len(e.children) == 1 && !isText(e.children[0]) {
 		if !lib || !first {
-			fmt.Fprint(&sw, ", ")
+			fmt.Fprint(w, ", ")
 		}
-		e.children[0].WriteTo(&sw)
+		e.children[0].WriteTo(w)
 	} else if len(e.children) > 1 {
 		if lib && first {
 			fmt.Fprint(&ip, "[\n")
@@ -234,10 +232,10 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 			}
 			c.WriteTo(&ip)
 		}
-		fmt.Fprint(&sw, "\n]")
+		fmt.Fprint(w, "\n]")
 	}
-	fmt.Fprint(&sw, ")")
-	return sw.Count, sw.Err
+	fmt.Fprint(w, ")")
+	return 0, sw.Err
 }
 
 func printAttr(w io.Writer, key, value string) error {
