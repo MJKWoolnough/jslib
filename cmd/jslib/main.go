@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/jslib"
@@ -32,10 +33,10 @@ func main() {
 
 func run() error {
 	var (
-		output, base      string
-		filesTodo         Inputs
-		plugin, noExports bool
-		err               error
+		output, base               string
+		filesTodo                  Inputs
+		plugin, noExports, reorder bool
+		err                        error
 	)
 
 	flag.Var(&filesTodo, "i", "input file")
@@ -43,6 +44,7 @@ func run() error {
 	flag.StringVar(&base, "b", "", "js base dir")
 	flag.BoolVar(&plugin, "p", false, "export file(s) as plugin(s)")
 	flag.BoolVar(&noExports, "n", false, "no exports")
+	flag.BoolVar(&reorder, "x", false, "experimental script re-ordering to enable better minification (BE CAREFUL)")
 	flag.Parse()
 
 	if output == "" {
@@ -90,6 +92,9 @@ func run() error {
 			return fmt.Errorf("error generating output: %w", err)
 		}
 	}
+	if reorder {
+		sort.Stable(statementSorter(s.StatementList[1:]))
+	}
 	var of *os.File
 	if output == "-" {
 		of = os.Stdout
@@ -107,4 +112,42 @@ func run() error {
 		return fmt.Errorf("error closing output: %w", err)
 	}
 	return nil
+}
+
+type statementSorter []javascript.StatementListItem
+
+func (s statementSorter) Len() int {
+	return len(s)
+}
+
+func (s statementSorter) Less(i, j int) bool {
+	a := s[i]
+	b := s[j]
+	if a.Declaration != nil {
+		if b.Declaration == nil {
+			return true
+		}
+		if a.Declaration.ClassDeclaration != nil && b.Declaration.ClassDeclaration == nil {
+			return true
+		} else if b.Declaration.ClassDeclaration != nil {
+			return false
+		}
+		if a.Declaration.FunctionDeclaration != nil && b.Declaration.FunctionDeclaration == nil {
+			return true
+		} else if b.Declaration.FunctionDeclaration != nil {
+			return false
+		}
+		if a.Declaration.LexicalDeclaration.LetOrConst == javascript.Let && b.Declaration.LexicalDeclaration.LetOrConst == javascript.Const {
+			return true
+		} else if b.Declaration.LexicalDeclaration.LetOrConst == javascript.Let {
+			return false
+		}
+	} else if b.Declaration != nil {
+		return false
+	}
+	return i < j
+}
+
+func (s statementSorter) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
 }
