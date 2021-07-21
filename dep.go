@@ -73,7 +73,7 @@ func (d *dependency) process() error {
 	}
 	d.scope, err = scope.ModuleScope(module, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("error processing scope in file %s: %w", d.url, err)
 	}
 	for _, li := range module.ModuleListItems {
 		if li.ImportDeclaration != nil {
