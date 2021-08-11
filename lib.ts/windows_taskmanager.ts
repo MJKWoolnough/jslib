@@ -70,7 +70,7 @@ export class ShellElement extends BaseShellElement {
 				})) {
 					data.item = taskbar.appendChild(li());
 				}
-				const taskbarItem = windows({"window-icon": target.getAttribute("window-icon"), "window-title": target.getAttribute("window-title"), "hide-minimise": "", "maximised": "", "exportparts": "close, minimise, maximise, titlebar, title, controls, icon", "onclose": (e: Event) => {
+				const taskbarItem = windows({"window-icon": target.getAttribute("window-icon") ?? undefined, "window-title": target.getAttribute("window-title") ?? undefined, "hide-minimise": "", "maximised": "", "exportparts": "close, minimise, maximise, titlebar, title, controls, icon", "onclose": (e: Event) => {
 					target.close();
 					e.preventDefault();
 				}, "onremove": () => taskbarData.delete(taskbarItem)});

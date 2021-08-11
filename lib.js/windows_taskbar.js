@@ -64,7 +64,7 @@ export class ShellElement extends BaseShellElement {
 								contextItem("&Close", () => w.close())
 							]);
 						      }}, [
-							img({"part": "icon", "src": w.getAttribute("window-icon") || noIcon, "title": w.getAttribute("window-title")}),
+							img({"part": "icon", "src": w.getAttribute("window-icon") || noIcon, "title": w.getAttribute("window-title") ?? undefined}),
 							span({"part": "title"}, w.getAttribute("window-title") || "")
 						      ]));
 						windowData.set(w, item);
