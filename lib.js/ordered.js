@@ -98,11 +98,12 @@ const data = new WeakMap(),
       noItemFn = node => ({node});
 
 export class SortNode {
-	constructor(parentNode, sortFn = noSort) {
+	constructor(parentNode, sortFn = noSort, elements = []) {
 		const root = {sortFn, parentNode, length: 0, order: 1},
 		      p = new Proxy(this, proxyObj);
 		data.set(this, root.prev = root.next = root);
 		data.set(p, root);
+		elements.forEach(item => addItemAfter(root, root.prev, item));
 		return p;
 	}
 	get node() {

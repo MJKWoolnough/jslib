@@ -130,11 +130,12 @@ const data = new WeakMap<SortNode<any, Node>, Root<any>>(),
       noItemFn = (node: Node) => ({node});
 
 export class SortNode<T extends Item, H extends Node = Node> implements Array<T> {
-	constructor(parentNode: H, sortFn: sortFunc<T> = noSort) {
+	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, elements: T[] = []) {
 		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>,
 		      p = new Proxy<SortNode<T, H>>(this, proxyObj);
 		data.set(this, root.prev = root.next = root);
 		data.set(p, root);
+		elements.forEach(item => addItemAfter(root, root.prev, item));
 		return p;
 	}
 	get node(): H {
