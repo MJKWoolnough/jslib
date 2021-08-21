@@ -96,7 +96,35 @@ const data = new WeakMap(),
 		return false;
 	}) || delete target[name]
       },
-      noItemFn = n => ({[node]: n});
+      noItemFn = n => ({[node]: n}),
+      sort = (t, compareFunction) => {
+	const root = data.get(t);
+	if (compareFunction) {
+		root.sortFn = compareFunction;
+		root.order = 1;
+		if (compareFunction === noSort) {
+			return;
+		}
+	}
+	let curr = root.next;
+	root.next = root.prev = root;
+	while (curr.item) {
+		const next = curr.next;
+		curr.prev = root.prev;
+		curr.next = root;
+		sortNodes(root, root.prev = root.prev.next = curr);
+		curr = next;
+	}
+      },
+      reverse = t => {
+	const root = data.get(t);
+	[root.prev, root.next] = [root.next, root.prev];
+	root.order *= -1;
+	for (let curr = root.next; curr.item; curr = curr.next) {
+		[curr.next, curr.prev] = [curr.prev, curr.next];
+		root.parentNode.appendChild(curr.item[node]);
+	}
+      }
 
 export class SortNode {
 	constructor(parentNode, sortFn = noSort, elements = []) {
@@ -267,13 +295,7 @@ export class SortNode {
 		return initialValue;
 	}
 	reverse() {
-		const root = data.get(this);
-		[root.prev, root.next] = [root.next, root.prev];
-		root.order *= -1;
-		for (let curr = root.next; curr.item; curr = curr.next) {
-			[curr.next, curr.prev] = [curr.prev, curr.next];
-			root.parentNode.appendChild(curr.item[node]);
-		}
+		reverse(this);
 		return this;
 	}
 	shift() {
@@ -309,23 +331,7 @@ export class SortNode {
 		return false;
 	}
 	sort(compareFunction) {
-		const root = data.get(this);
-		if (compareFunction) {
-			root.sortFn = compareFunction;
-			root.order = 1;
-			if (compareFunction === noSort) {
-				return this;
-			}
-		}
-		let curr = root.next;
-		root.next = root.prev = root;
-		while (curr.item) {
-			const next = curr.next;
-			curr.prev = root.prev;
-			curr.next = root;
-			sortNodes(root, root.prev = root.prev.next = curr);
-			curr = next;
-		}
+		sort(this, compareFunction);
 		return this;
 	}
 	splice(start, deleteCount = 0, ...items) {
@@ -364,5 +370,81 @@ export class SortNode {
 			"keys": true,
 			"values": true
 		}
+	}
+}
+
+export class MapNode {
+	constructor(parentNode, sortFn = noSort, entries) {
+		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()};
+		data.set(this, root.prev = root.next = root);
+		if (entries) {
+			entries.forEach(([k, item]) => this.set(k, item));
+		}
+	}
+	get [node]() {
+		return data.get(this).parentNode;
+	}
+	get size() {
+		return data.get(this).length;
+	}
+	clear() {
+		const root = data.get(this);
+		for (let curr = root.next; curr.item; curr = curr.next) {
+			removeNode(root, curr);
+		}
+		root.map.clear();
+	}
+	delete(k) {
+		const root = data.get(this),
+		      curr = root.map.get(k);
+		if (!curr) {
+			return false;
+		}
+		removeNode(root, curr);
+		return root.map.delete(k);
+	}
+	*entries() {
+		for (const [k, v] of data.get(this).map) {
+			yield [k, v.item];
+		}
+	}
+	forEach(callbackfn, thisArg = this) {
+		data.get(this).map.forEach((v, k) => callbackfn(v.item, k, thisArg));
+	}
+	get(k) {
+		return data.get(this).map.get(k)?.item;
+	}
+	has(k) {
+		return data.get(this).map.has(k);
+	}
+	keys() {
+		return data.get(this).map.keys();
+	}
+	reverse() {
+		reverse(this);
+		return this;
+	}
+	set(k, item) {
+		const root = data.get(this);
+		root.map.set(k, addItemAfter(root, root.prev, item));
+		return this;
+	}
+	sort(compareFunction) {
+		sort(this, compareFunction);
+		return this;
+	}
+	*values() {
+		for (const v of data.get(this).map.values()) {
+			yield v.item;
+		}
+	}
+	*[Symbol.iterator]() {
+		yield* this.entries();
+	}
+	get [Symbol.species]() {
+		return MapNode;
+	}
+	get [Symbol.toStringTag]() {
+		return "[object MapNode]";
 	}
 }

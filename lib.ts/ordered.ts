@@ -18,6 +18,10 @@ type Root<T extends Item, H extends Node = Node> = {
 	order: number;
 }
 
+type MapRoot<K, T extends Item, H extends Node = Node> = Root<T, H> & {
+	map: Map<K, ItemNode<T>>;
+}
+
 interface ItemOrRoot<T> {
 	prev: ItemOrRoot<T>;
 	next: ItemOrRoot<T>;
@@ -34,7 +38,7 @@ interface Item {
 	[node]: Node;
 }
 
-const data = new WeakMap<SortNode<any, Node>, Root<any>>(),
+const data = new WeakMap<SortNode<any, Node> | MapNode<any, any, Node>, Root<any> | MapRoot<any, any>>(),
       sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
 	while (n.prev.item && root.sortFn(n.item, n.prev.item) * root.order < 0) {
 		n.next.prev = n.prev;
@@ -128,7 +132,35 @@ const data = new WeakMap<SortNode<any, Node>, Root<any>>(),
 		return false;
 	}) || delete (target as any)[name]
       },
-      noItemFn = (n: Node) => ({[node]: n});
+      noItemFn = (n: Node) => ({[node]: n}),
+      sort = <T extends Item>(t: SortNode<any, Node> | MapNode<any, any, Node>, compareFunction?: sortFunc<T>) => {
+	const root = data.get(t)!;
+	if (compareFunction) {
+		root.sortFn = compareFunction;
+		root.order = 1;
+		if (compareFunction === noSort) {
+			return;
+		}
+	}
+	let curr = root.next;
+	root.next = root.prev = root;
+	while (curr.item) {
+		const next = curr.next;
+		curr.prev = root.prev;
+		curr.next = root;
+		sortNodes(root, root.prev = root.prev.next = curr);
+		curr = next;
+	}
+      },
+      reverse = (t: SortNode<any, Node> | MapNode<any, any, Node>) =>{
+	const root = data.get(t)!;
+	[root.prev, root.next] = [root.next, root.prev];
+	root.order *= -1;
+	for (let curr = root.next; curr.item; curr = curr.next) {
+		[curr.next, curr.prev] = [curr.prev, curr.next];
+		root.parentNode.appendChild(curr.item[node]);
+	}
+      };
 
 export class SortNode<T extends Item, H extends Node = Node> implements Array<T> {
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, elements: T[] = []) {
@@ -306,13 +338,7 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 		return initialValue;
 	}
 	reverse() {
-		const root = data.get(this)!;
-		[root.prev, root.next] = [root.next, root.prev];
-		root.order *= -1;
-		for (let curr = root.next; curr.item; curr = curr.next) {
-			[curr.next, curr.prev] = [curr.prev, curr.next];
-			root.parentNode.appendChild(curr.item[node]);
-		}
+		reverse(this);
 		return this;
 	}
 	shift(): T | undefined {
@@ -347,24 +373,8 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 		}
 		return false;
 	}
-	sort(compareFunction?: sortFunc<T>) {
-		const root = data.get(this)!;
-		if (compareFunction) {
-			root.sortFn = compareFunction;
-			root.order = 1;
-			if (compareFunction === noSort) {
-				return this;
-			}
-		}
-		let curr = root.next;
-		root.next = root.prev = root;
-		while (curr.item) {
-			const next = curr.next;
-			curr.prev = root.prev;
-			curr.next = root;
-			sortNodes(root, root.prev = root.prev.next = curr);
-			curr = next;
-		}
+	sort(compareFunction?: sortFunc<T>): this {
+		sort(this, compareFunction);
 		return this;
 	}
 	splice(start: number, deleteCount: number = 0, ...items: T[]) {
@@ -405,4 +415,80 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 		}
 	}
 	[n: number]: T;
+}
+
+export class MapNode<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, entries?: readonly (readonly [K, T])[] | null) {
+		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()} as MapRoot<K, T, H>;
+		data.set(this, root.prev = root.next = root);
+		if (entries) {
+			entries.forEach(([k, item]) => this.set(k, item));
+		}
+	}
+	get [node](): H {
+		return data.get(this)!.parentNode as H;
+	}
+	get size(): number {
+		return data.get(this)!.length;
+	}
+	clear() {
+		const root = data.get(this) as MapRoot<K, T, H>;
+		for (let curr = root.next; curr.item; curr = curr.next) {
+			removeNode(root, curr as ItemNode<T>);
+		}
+		root.map.clear();
+	}
+	delete(k: K) {
+		const root = data.get(this) as MapRoot<K, T, H>,
+		      curr = root.map.get(k);
+		if (!curr) {
+			return false;
+		}
+		removeNode(root, curr);
+		return root.map.delete(k);
+	}
+	*entries(): IterableIterator<[K, T]> {
+		for (const [k, v] of (data.get(this) as MapRoot<K, T, H>).map) {
+			yield [k, v.item];
+		}
+	}
+	forEach(callbackfn: (value: T, key: K, map: MapNode<K, T>) => void, thisArg: any = this) {
+		(data.get(this) as MapRoot<K, T, H>).map.forEach((v, k) => callbackfn(v.item, k, thisArg));
+	}
+	get(k: K): T | undefined {
+		return (data.get(this) as MapRoot<K, T, H>).map.get(k)?.item;
+	}
+	has(k: K): boolean {
+		return (data.get(this) as MapRoot<K, T, H>).map.has(k);
+	}
+	keys(): IterableIterator<K> {
+		return (data.get(this) as MapRoot<K, T, H>).map.keys();
+	}
+	reverse() {
+		reverse(this);
+		return this;
+	}
+	set(k: K, item: T) {
+		const root = data.get(this) as MapRoot<K, T, H>;
+		root.map.set(k, addItemAfter(root, root.prev, item));
+		return this;
+	}
+	sort(compareFunction?: sortFunc<T>) {
+		sort(this, compareFunction);
+		return this;
+	}
+	*values(): IterableIterator<T> {
+		for (const v of (data.get(this) as MapRoot<K, T, H>).map.values()) {
+			yield v.item;
+		}
+	}
+	*[Symbol.iterator](): IterableIterator<[K, T]> {
+		yield* this.entries();
+	}
+	get [Symbol.species]() {
+		return MapNode;
+	}
+	get [Symbol.toStringTag]() {
+		return "[object MapNode]";
+	}
 }
