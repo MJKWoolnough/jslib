@@ -132,7 +132,9 @@ export class SortNode {
 		      p = new Proxy(this, proxyObj);
 		data.set(this, root.prev = root.next = root);
 		data.set(p, root);
-		elements.forEach(item => addItemAfter(root, root.prev, item));
+		for (const item of elements) {
+			addItemAfter(root, root.prev, item);
+		}
 		return p;
 	}
 	get [node]() {
@@ -374,11 +376,11 @@ export class SortNode {
 }
 
 export class MapNode {
-	constructor(parentNode, sortFn = noSort, entries) {
+	constructor(parentNode, sortFn = noSort, entries = []) {
 		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()};
 		data.set(this, root.prev = root.next = root);
-		if (entries) {
-			entries.forEach(([k, item]) => this.set(k, item));
+		for (const [k, item] of entries) {
+			root.map.set(k, addItemAfter(root, root.prev, item));
 		}
 	}
 	get [node]() {

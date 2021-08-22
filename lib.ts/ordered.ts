@@ -163,12 +163,14 @@ const data = new WeakMap<SortNode<any, Node> | MapNode<any, any, Node>, Root<any
       };
 
 export class SortNode<T extends Item, H extends Node = Node> implements Array<T> {
-	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, elements: T[] = []) {
+	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, elements: Iterable<T> = []) {
 		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>,
 		      p = new Proxy<SortNode<T, H>>(this, proxyObj);
 		data.set(this, root.prev = root.next = root);
 		data.set(p, root);
-		elements.forEach(item => addItemAfter(root, root.prev, item));
+		for (const item of elements) {
+			addItemAfter(root, root.prev, item);
+		}
 		return p;
 	}
 	get [node](): H {
@@ -418,11 +420,11 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 }
 
 export class MapNode<K, T extends Item, H extends Node = Node> implements Map<K, T> {
-	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, entries?: readonly (readonly [K, T])[] | null) {
+	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, entries: Iterable<[K, T]> = []) {
 		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()} as MapRoot<K, T, H>;
 		data.set(this, root.prev = root.next = root);
-		if (entries) {
-			entries.forEach(([k, item]) => this.set(k, item));
+		for (const [k, item] of entries) {
+			root.map.set(k, addItemAfter(root, root.prev, item));
 		}
 	}
 	get [node](): H {
