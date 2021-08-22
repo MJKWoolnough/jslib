@@ -160,6 +160,16 @@ const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<an
 		[curr.next, curr.prev] = [curr.prev, curr.next];
 		root.parentNode.appendChild(curr.item[node]);
 	}
+      },
+      replaceKey = <K, T extends Item>(root: MapRoot<K, T>, key: K, item: T, prev: ItemOrRoot<T>) => {
+	const old = root.map.get(key);
+	if (!old) {
+		return;
+	}
+	if (!Object.is(old.item, item) || old.prev != prev) {
+		removeNode(root, old);
+		root.map.set(key, addItemAfter(root, prev, item));
+	}
       };
 
 export class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
@@ -424,7 +434,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()} as MapRoot<K, T, H>;
 		data.set(this, root.prev = root.next = root);
 		for (const [k, item] of entries) {
-			root.map.set(k, addItemAfter(root, root.prev, item));
+			replaceKey(root, k, item, root.prev);
 		}
 	}
 	get [node](): H {
@@ -469,7 +479,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		if (!a) {
 			return false;
 		}
-		root.map.set(k, addItemAfter(root, a, item));
+		replaceKey(root, k, item, a);
 		return true;
 	}
 	insertBefore(k: K, item: T, before: K) {
@@ -478,7 +488,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		if (!b) {
 			return false;
 		}
-		root.map.set(k, addItemAfter(root, b.prev, item));
+		replaceKey(root, k, item, b.prev);
 		return true;
 	}
 	keys(): IterableIterator<K> {
@@ -490,7 +500,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	}
 	set(k: K, item: T) {
 		const root = data.get(this) as MapRoot<K, T, H>;
-		root.map.set(k, addItemAfter(root, root.prev, item));
+		replaceKey(root, k, item, root.prev);
 		return this;
 	}
 	sort(compareFunction?: sortFunc<T>) {

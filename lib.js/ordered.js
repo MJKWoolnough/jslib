@@ -124,7 +124,17 @@ const data = new WeakMap(),
 		[curr.next, curr.prev] = [curr.prev, curr.next];
 		root.parentNode.appendChild(curr.item[node]);
 	}
-      }
+      },
+      replaceKey = (root, key, item, prev) => {
+	const old = root.map.get(key);
+	if (!old) {
+		return;
+	}
+	if (!Object.is(old.item, item) || old.prev != prev) {
+		removeNode(root, old);
+		root.map.set(key, addItemAfter(root, prev, item));
+	}
+      };
 
 export class NodeArray {
 	constructor(parentNode, sortFn = noSort, elements = []) {
@@ -380,7 +390,7 @@ export class NodeMap {
 		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()};
 		data.set(this, root.prev = root.next = root);
 		for (const [k, item] of entries) {
-			root.map.set(k, addItemAfter(root, root.prev, item));
+			replaceKey(root, k, item, root.prev);
 		}
 	}
 	get [node]() {
@@ -425,7 +435,7 @@ export class NodeMap {
 		if (!a) {
 			return false;
 		}
-		root.map.set(k, addItemAfter(root, a, item));
+		replaceKey(root, k, item, a);
 		return true;
 	}
 	insertBefore(k, item, before) {
@@ -434,7 +444,7 @@ export class NodeMap {
 		if (!b) {
 			return false;
 		}
-		root.map.set(k, addItemAfter(root, b.prev, item));
+		replaceKey(root, k, item, b.prev);
 		return true;
 	}
 	keys() {
@@ -446,7 +456,7 @@ export class NodeMap {
 	}
 	set(k, item) {
 		const root = data.get(this);
-		root.map.set(k, addItemAfter(root, root.prev, item));
+		replaceKey(root, k, item, root.prev);
 		return this;
 	}
 	sort(compareFunction) {
