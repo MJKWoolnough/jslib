@@ -463,6 +463,24 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	has(k: K): boolean {
 		return (data.get(this) as MapRoot<K, T, H>).map.has(k);
 	}
+	insertAfter(k: K, item: T, after: K) {
+		const root = data.get(this) as MapRoot<K, T, H>,
+		      a = root.map.get(after);
+		if (!a) {
+			return false;
+		}
+		root.map.set(k, addItemAfter(root, a, item));
+		return true;
+	}
+	insertBefore(k: K, item: T, before: K) {
+		const root = data.get(this) as MapRoot<K, T, H>,
+		      b = root.map.get(before);
+		if (!b) {
+			return false;
+		}
+		root.map.set(k, addItemAfter(root, b.prev, item));
+		return true;
+	}
 	keys(): IterableIterator<K> {
 		return (data.get(this) as MapRoot<K, T, H>).map.keys();
 	}

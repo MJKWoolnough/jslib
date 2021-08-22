@@ -419,6 +419,24 @@ export class NodeMap {
 	has(k) {
 		return data.get(this).map.has(k);
 	}
+	insertAfter(k, item, after) {
+		const root = data.get(this),
+		      a = root.map.get(after);
+		if (!a) {
+			return false;
+		}
+		root.map.set(k, addItemAfter(root, a, item));
+		return true;
+	}
+	insertBefore(k, item, before) {
+		const root = data.get(this),
+		      b = root.map.get(before);
+		if (!b) {
+			return false;
+		}
+		root.map.set(k, addItemAfter(root, b.prev, item));
+		return true;
+	}
 	keys() {
 		return data.get(this).map.keys();
 	}
