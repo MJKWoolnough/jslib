@@ -126,7 +126,7 @@ const data = new WeakMap(),
 	}
       }
 
-export class SortNode {
+export class NodeArray {
 	constructor(parentNode, sortFn = noSort, elements = []) {
 		const root = {sortFn, parentNode, length: 0, order: 1},
 		      p = new Proxy(this, proxyObj);
@@ -211,7 +211,7 @@ export class SortNode {
 		}
 	}
 	static from(n, itemFn) {
-		const s = new SortNode(n),
+		const s = new NodeArray(n),
 		      root = data.get(s);
 		for (const c of n.childNodes) {
 			const item = itemFn(c);
@@ -375,7 +375,7 @@ export class SortNode {
 	}
 }
 
-export class MapNode {
+export class NodeMap {
 	constructor(parentNode, sortFn = noSort, entries = []) {
 		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()};
 		data.set(this, root.prev = root.next = root);
@@ -444,9 +444,9 @@ export class MapNode {
 		yield* this.entries();
 	}
 	get [Symbol.species]() {
-		return MapNode;
+		return NodeMap;
 	}
 	get [Symbol.toStringTag]() {
-		return "[object MapNode]";
+		return "[object NodeMap]";
 	}
 }

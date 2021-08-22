@@ -38,7 +38,7 @@ interface Item {
 	[node]: Node;
 }
 
-const data = new WeakMap<SortNode<any, Node> | MapNode<any, any, Node>, Root<any> | MapRoot<any, any>>(),
+const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<any> | MapRoot<any, any>>(),
       sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
 	while (n.prev.item && root.sortFn(n.item, n.prev.item) * root.order < 0) {
 		n.next.prev = n.prev;
@@ -91,7 +91,7 @@ const data = new WeakMap<SortNode<any, Node> | MapNode<any, any, Node>, Root<any
 	root.parentNode.removeChild(n.item[node]);
 	root.length--;
       },
-      entries = function* <T extends Item>(s: SortNode<T, Node>, start = 0, direction = 1): IterableIterator<[number, T]> {
+      entries = function* <T extends Item>(s: NodeArray<T, Node>, start = 0, direction = 1): IterableIterator<[number, T]> {
 	for (let [curr, pos] = getNode(data.get(s)!, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
 	}
@@ -108,9 +108,9 @@ const data = new WeakMap<SortNode<any, Node> | MapNode<any, any, Node>, Root<any
 	return undefined;
       },
       proxyObj = {
-	has: <T extends Item>(target: SortNode<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-	get: <T extends Item>(target: SortNode<T>, name: PropertyKey) => pIFn(name, index => getNode(data.get(target)!, index)[0].item) || (target as any)[name],
-	set: <T extends Item>(target: SortNode<T>, name: PropertyKey, value: T) => pIFn(name, index => {
+	has: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+	get: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => getNode(data.get(target)!, index)[0].item) || (target as any)[name],
+	set: <T extends Item>(target: NodeArray<T>, name: PropertyKey, value: T) => pIFn(name, index => {
 		const root = data.get(target)!,
 		      [n] = getNode(root, index);
 		if (n.item) {
@@ -122,7 +122,7 @@ const data = new WeakMap<SortNode<any, Node> | MapNode<any, any, Node>, Root<any
 		}
 		return true;
 	}) || false,
-	deleteProperty: <T extends Item>(target: SortNode<T>, name: PropertyKey) => pIFn(name, index => {
+	deleteProperty: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => {
 		const root = data.get(target)!,
 		      [n] = getNode(root, index);
 		if (n.item) {
@@ -133,7 +133,7 @@ const data = new WeakMap<SortNode<any, Node> | MapNode<any, any, Node>, Root<any
 	}) || delete (target as any)[name]
       },
       noItemFn = (n: Node) => ({[node]: n}),
-      sort = <T extends Item>(t: SortNode<any, Node> | MapNode<any, any, Node>, compareFunction?: sortFunc<T>) => {
+      sort = <T extends Item>(t: NodeArray<any, Node> | NodeMap<any, any, Node>, compareFunction?: sortFunc<T>) => {
 	const root = data.get(t)!;
 	if (compareFunction) {
 		root.sortFn = compareFunction;
@@ -152,7 +152,7 @@ const data = new WeakMap<SortNode<any, Node> | MapNode<any, any, Node>, Root<any
 		curr = next;
 	}
       },
-      reverse = (t: SortNode<any, Node> | MapNode<any, any, Node>) =>{
+      reverse = (t: NodeArray<any, Node> | NodeMap<any, any, Node>) =>{
 	const root = data.get(t)!;
 	[root.prev, root.next] = [root.next, root.prev];
 	root.order *= -1;
@@ -162,10 +162,10 @@ const data = new WeakMap<SortNode<any, Node> | MapNode<any, any, Node>, Root<any
 	}
       };
 
-export class SortNode<T extends Item, H extends Node = Node> implements Array<T> {
+export class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, elements: Iterable<T> = []) {
 		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>,
-		      p = new Proxy<SortNode<T, H>>(this, proxyObj);
+		      p = new Proxy<NodeArray<T, H>>(this, proxyObj);
 		data.set(this, root.prev = root.next = root);
 		data.set(p, root);
 		for (const item of elements) {
@@ -247,10 +247,10 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 			callback.call(thisArg, item, index, this);
 		}
 	}
-	static from<_, H extends Node = Node>(n: H): SortNode<Item, H>;
-	static from<T extends Item, H extends Node = Node>(n: H, itemFn: (node: Node) => T|undefined): SortNode<T, H>;
-	static from<T extends Item = Item, H extends Node = Node>(n: H, itemFn = noItemFn): SortNode<T, H> {
-		const s = new SortNode<T, H>(n),
+	static from<_, H extends Node = Node>(n: H): NodeArray<Item, H>;
+	static from<T extends Item, H extends Node = Node>(n: H, itemFn: (node: Node) => T|undefined): NodeArray<T, H>;
+	static from<T extends Item = Item, H extends Node = Node>(n: H, itemFn = noItemFn): NodeArray<T, H> {
+		const s = new NodeArray<T, H>(n),
 		      root = data.get(s)!;
 		for (const c of n.childNodes) {
 			const item = itemFn(c);
@@ -419,7 +419,7 @@ export class SortNode<T extends Item, H extends Node = Node> implements Array<T>
 	[n: number]: T;
 }
 
-export class MapNode<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, entries: Iterable<[K, T]> = []) {
 		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()} as MapRoot<K, T, H>;
 		data.set(this, root.prev = root.next = root);
@@ -454,7 +454,7 @@ export class MapNode<K, T extends Item, H extends Node = Node> implements Map<K,
 			yield [k, v.item];
 		}
 	}
-	forEach(callbackfn: (value: T, key: K, map: MapNode<K, T>) => void, thisArg: any = this) {
+	forEach(callbackfn: (value: T, key: K, map: NodeMap<K, T>) => void, thisArg: any = this) {
 		(data.get(this) as MapRoot<K, T, H>).map.forEach((v, k) => callbackfn(v.item, k, thisArg));
 	}
 	get(k: K): T | undefined {
@@ -488,9 +488,9 @@ export class MapNode<K, T extends Item, H extends Node = Node> implements Map<K,
 		yield* this.entries();
 	}
 	get [Symbol.species]() {
-		return MapNode;
+		return NodeMap;
 	}
 	get [Symbol.toStringTag]() {
-		return "[object MapNode]";
+		return "[object NodeMap]";
 	}
 }
