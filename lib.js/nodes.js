@@ -450,6 +450,16 @@ export class NodeMap {
 	keys() {
 		return data.get(this).map.keys();
 	}
+	position(key) {
+		const root = data.get(this);
+		let count = -1,
+		    curr = root.map.get(key) ?? root;
+		while (curr !== root) {
+			curr = curr.prev;
+			count++;
+		}
+		return count;
+	}
 	reverse() {
 		reverse(this);
 		return this;

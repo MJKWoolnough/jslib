@@ -494,6 +494,16 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	keys(): IterableIterator<K> {
 		return (data.get(this) as MapRoot<K, T, H>).map.keys();
 	}
+	position(key: K) {
+		const root = data.get(this) as MapRoot<K, T, H>;
+		let count = -1,
+		    curr = (root.map.get(key) ?? root) as ItemOrRoot<T>;
+		while (curr !== root) {
+			curr = curr.prev;
+			count++;
+		}
+		return count;
+	}
 	reverse() {
 		reverse(this);
 		return this;
