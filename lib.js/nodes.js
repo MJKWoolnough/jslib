@@ -127,13 +127,13 @@ const data = new WeakMap(),
       },
       replaceKey = (root, key, item, prev) => {
 	const old = root.map.get(key);
-	if (!old) {
-		return;
-	}
-	if (!Object.is(old.item, item) || old.prev != prev) {
+	if (old) {
+		if (Object.is(old.item, item) && old.prev === prev) {
+			return;
+		}
 		removeNode(root, old);
-		root.map.set(key, addItemAfter(root, prev, item));
 	}
+	root.map.set(key, addItemAfter(root, prev, item));
       };
 
 export class NodeArray {

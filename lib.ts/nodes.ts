@@ -163,13 +163,13 @@ const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<an
       },
       replaceKey = <K, T extends Item>(root: MapRoot<K, T>, key: K, item: T, prev: ItemOrRoot<T>) => {
 	const old = root.map.get(key);
-	if (!old) {
-		return;
-	}
-	if (!Object.is(old.item, item) || old.prev != prev) {
+	if (old) {
+		if (Object.is(old.item, item) && old.prev === prev) {
+			return;
+		}
 		removeNode(root, old);
-		root.map.set(key, addItemAfter(root, prev, item));
 	}
+	root.map.set(key, addItemAfter(root, prev, item));
       };
 
 export class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
