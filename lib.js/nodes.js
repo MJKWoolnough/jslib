@@ -447,6 +447,14 @@ export class NodeMap {
 		replaceKey(root, k, item, b.prev);
 		return true;
 	}
+	keyAt(pos) {
+		for (let curr = data.get(this).next; curr.item; pos--, curr = curr.next) {
+			if (pos === 0) {
+				return curr.key;
+			}
+		}
+		return undefined;
+	}
 	keys() {
 		return data.get(this).map.keys();
 	}

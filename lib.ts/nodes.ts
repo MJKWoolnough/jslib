@@ -495,6 +495,14 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		replaceKey(root, k, item, b.prev);
 		return true;
 	}
+	keyAt(pos: number) {
+		for (let curr = data.get(this)!.next; curr.item; pos--, curr = curr.next) {
+			if (pos === 0) {
+				return (curr as KeyedItemNode<K, T>).key;
+			}
+		}
+		return undefined;
+	}
 	keys(): IterableIterator<K> {
 		return (data.get(this) as MapRoot<K, T, H>).map.keys();
 	}
