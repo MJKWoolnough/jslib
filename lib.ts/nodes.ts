@@ -2,6 +2,10 @@
 
 type sortFunc<T extends Item> = (a: T, b: T) => number;
 
+type KeyedItemNode<K, T> = ItemNode<T> & {
+	key: K;
+}
+
 type ItemNode<T> = {
 	prev: ItemOrRoot<T>;
 	next: ItemOrRoot<T>;
@@ -19,7 +23,7 @@ type Root<T extends Item, H extends Node = Node> = {
 }
 
 type MapRoot<K, T extends Item, H extends Node = Node> = Root<T, H> & {
-	map: Map<K, ItemNode<T>>;
+	map: Map<K, KeyedItemNode<K, T>>;
 }
 
 interface ItemOrRoot<T> {
@@ -169,7 +173,7 @@ const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<an
 		}
 		removeNode(root, old);
 	}
-	root.map.set(key, addItemAfter(root, prev, item));
+	root.map.set(key, Object.assign(addItemAfter(root, prev, item), {key}));
       };
 
 export class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {

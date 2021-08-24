@@ -133,7 +133,7 @@ const data = new WeakMap(),
 		}
 		removeNode(root, old);
 	}
-	root.map.set(key, addItemAfter(root, prev, item));
+	root.map.set(key, Object.assign(addItemAfter(root, prev, item), {key}));
       };
 
 export class NodeArray {
