@@ -52,7 +52,9 @@ const data = new WeakMap(),
       removeNode = (root, n) => {
 	n.prev.next = n.next;
 	n.next.prev = n.prev;
-	root.parentNode.removeChild(n.item[node]);
+	if (n.item[node].parentNode === root.parentNode) {
+		root.parentNode.removeChild(n.item[node]);
+	}
 	root.length--;
       },
       entries = function* (s, start = 0, direction = 1) {

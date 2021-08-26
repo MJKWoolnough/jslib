@@ -92,7 +92,9 @@ const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<an
       removeNode = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
 	n.prev.next = n.next;
 	n.next.prev = n.prev;
-	root.parentNode.removeChild(n.item[node]);
+	if (n.item[node].parentNode === root.parentNode) {
+		root.parentNode.removeChild(n.item[node]);
+	}
 	root.length--;
       },
       entries = function* <T extends Item>(s: NodeArray<T, Node>, start = 0, direction = 1): IterableIterator<[number, T]> {
