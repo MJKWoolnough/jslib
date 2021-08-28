@@ -121,33 +121,32 @@ func (s statementSorter) Len() int {
 }
 
 func (s statementSorter) Less(i, j int) bool {
-	a := s[i]
-	b := s[j]
-	if a.Declaration != nil {
-		if b.Declaration == nil {
-			return true
-		}
-		if a.Declaration.ClassDeclaration != nil && b.Declaration.ClassDeclaration == nil {
-			return true
-		} else if b.Declaration.ClassDeclaration != nil {
-			return false
-		}
-		if a.Declaration.FunctionDeclaration != nil && b.Declaration.FunctionDeclaration == nil {
-			return true
-		} else if b.Declaration.FunctionDeclaration != nil {
-			return false
-		}
-		if a.Declaration.LexicalDeclaration.LetOrConst == javascript.Let && b.Declaration.LexicalDeclaration.LetOrConst == javascript.Const {
-			return true
-		} else if b.Declaration.LexicalDeclaration.LetOrConst == javascript.Let {
-			return false
-		}
-	} else if b.Declaration != nil {
-		return false
+	if scoreA, scoreB := score(&s[i]), score(&s[j]); scoreA != scoreB {
+		return scoreA > scoreB
 	}
 	return i < j
 }
 
 func (s statementSorter) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
+}
+
+func score(sli *javascript.StatementListItem) uint8 {
+	if sli.Statement != nil {
+		if sli.Statement.VariableStatement != nil {
+			return 2
+		}
+	} else if sli.Declaration != nil {
+		if sli.Declaration.ClassDeclaration != nil {
+			return 6
+		} else if sli.Declaration.FunctionDeclaration != nil {
+			return 5
+		} else if sli.Declaration.LexicalDeclaration != nil {
+			if sli.Declaration.LexicalDeclaration.LetOrConst == javascript.Let {
+				return 3
+			}
+			return 1
+		}
+	}
+	return 0
 }
