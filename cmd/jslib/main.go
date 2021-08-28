@@ -133,7 +133,13 @@ func (s statementSorter) Swap(i, j int) {
 
 func score(sli *javascript.StatementListItem) uint8 {
 	if sli.Statement != nil {
-		if sli.Statement.VariableStatement != nil {
+		if sli.Statement.ExpressionStatement != nil && len(sli.Statement.ExpressionStatement.Expressions) == 1 && sli.Statement.ExpressionStatement.Expressions[0].ConditionalExpression != nil && sli.Statement.ExpressionStatement.Expressions[0].AssignmentOperator == javascript.AssignmentNone {
+			if ce, ok := javascript.UnwrapConditional(sli.Statement.ExpressionStatement.Expressions[0].ConditionalExpression).(*javascript.CallExpression); ok {
+				if ce.MemberExpression != nil && ce.MemberExpression.MemberExpression != nil && ce.MemberExpression.MemberExpression.PrimaryExpression != nil && ce.MemberExpression.MemberExpression.PrimaryExpression.IdentifierReference != nil && ce.MemberExpression.MemberExpression.PrimaryExpression.IdentifierReference.Data == "customElements" && ce.MemberExpression.IdentifierName != nil && ce.MemberExpression.IdentifierName.Data == "define" {
+					return 4
+				}
+			}
+		} else if sli.Statement.VariableStatement != nil {
 			return 2
 		}
 	} else if sli.Declaration != nil {
