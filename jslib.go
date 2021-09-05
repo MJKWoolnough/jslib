@@ -3,6 +3,7 @@ package jslib
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -55,7 +56,10 @@ func OSLoad(base string) func(string) (*javascript.Module, error) {
 		}
 		m, err := javascript.ParseModule(parser.NewReaderTokeniser(f))
 		f.Close()
-		return m, err
+		if err != nil {
+			return nil, fmt.Errorf("error parsing file (%s): %w", urlPath, err)
+		}
+		return m, nil
 	}
 }
 

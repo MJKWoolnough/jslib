@@ -73,6 +73,9 @@ func (d *dependency) process() error {
 	}
 	d.scope, err = scope.ModuleScope(module, nil)
 	if err != nil {
+		if derr, ok := err.(scope.ErrDuplicateDeclaration); ok {
+			return fmt.Errorf("error processing scope in file %s: %w: %v", d.url, err, derr.Duplicate)
+		}
 		return fmt.Errorf("error processing scope in file %s: %w", d.url, err)
 	}
 	for _, li := range module.ModuleListItems {
