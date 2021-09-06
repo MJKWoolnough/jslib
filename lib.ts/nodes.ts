@@ -1,5 +1,3 @@
-"use strict";
-
 type sortFunc<T extends Item> = (a: T, b: T) => number;
 
 type KeyedItemNode<K, T> = ItemNode<T> & {
