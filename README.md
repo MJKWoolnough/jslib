@@ -31,7 +31,7 @@ NoExports disables the creation of exports for any potential plugins
 #### func  OSLoad
 
 ```go
-func OSLoad(base string) func(url string) (*javascript.Module, error)
+func OSLoad(base string) func(string) (*javascript.Module, error)
 ```
 OSLoad is the default loader for Package, with the base set to CWD
 
