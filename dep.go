@@ -109,19 +109,19 @@ func (d *dependency) process() error {
 													CallExpression: &javascript.CallExpression{
 														MemberExpression: &javascript.MemberExpression{
 															PrimaryExpression: &javascript.PrimaryExpression{
-																IdentifierReference: Token("include"),
+																IdentifierReference: jToken("include"),
 															},
 														},
 														Arguments: &javascript.Arguments{
 															ArgumentList: []javascript.AssignmentExpression{
 																{
 																	ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																		Literal: Token(strconv.Quote(iurl)),
+																		Literal: jToken(strconv.Quote(iurl)),
 																	}),
 																},
 																{
 																	ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																		Literal: Token("true"),
+																		Literal: jToken("true"),
 																	}),
 																},
 															},
@@ -199,7 +199,7 @@ func (d *dependency) process() error {
 					Declaration: ed.Declaration,
 				})
 			} else {
-				def := Token("default")
+				def := jToken("default")
 				if ed.DefaultFunction != nil {
 					if ed.DefaultFunction.BindingIdentifier == nil {
 						ed.DefaultFunction.BindingIdentifier = def
@@ -249,13 +249,13 @@ func (d *dependency) process() error {
 	}
 	if d.needsMeta {
 		d.config.statementList[1].Declaration.LexicalDeclaration.BindingList = append(d.config.statementList[1].Declaration.LexicalDeclaration.BindingList, javascript.LexicalBinding{
-			BindingIdentifier: Token(d.prefix + "import"),
+			BindingIdentifier: jToken(d.prefix + "import"),
 			Initializer: &javascript.AssignmentExpression{
 				ConditionalExpression: javascript.WrapConditional(&javascript.ObjectLiteral{
 					PropertyDefinitionList: []javascript.PropertyDefinition{
 						{
 							PropertyName: &javascript.PropertyName{
-								LiteralPropertyName: Token("url"),
+								LiteralPropertyName: jToken("url"),
 							},
 							AssignmentExpression: &javascript.AssignmentExpression{
 								ConditionalExpression: javascript.WrapConditional(&javascript.AdditiveExpression{
@@ -268,7 +268,7 @@ func (d *dependency) process() error {
 															NewExpression: &javascript.NewExpression{
 																MemberExpression: javascript.MemberExpression{
 																	PrimaryExpression: &javascript.PrimaryExpression{
-																		IdentifierReference: Token("o"),
+																		IdentifierReference: jToken("o"),
 																	},
 																},
 															},
@@ -287,7 +287,7 @@ func (d *dependency) process() error {
 														NewExpression: &javascript.NewExpression{
 															MemberExpression: javascript.MemberExpression{
 																PrimaryExpression: &javascript.PrimaryExpression{
-																	Literal: Token(strconv.Quote(d.url)),
+																	Literal: jToken(strconv.Quote(d.url)),
 																},
 															},
 														},
@@ -318,7 +318,7 @@ func (d *dependency) Handle(t javascript.Type) error {
 		d.HandleImportConditional(ce.ImportCall.ConditionalExpression)
 		ce.MemberExpression = &javascript.MemberExpression{
 			PrimaryExpression: &javascript.PrimaryExpression{
-				IdentifierReference: Token("include"),
+				IdentifierReference: jToken("include"),
 			},
 		}
 		ce.Arguments = &javascript.Arguments{
@@ -333,7 +333,7 @@ func (d *dependency) Handle(t javascript.Type) error {
 		if me, ok := t.(*javascript.MemberExpression); ok && me.ImportMeta {
 			d.needsMeta = true
 			me.PrimaryExpression = &javascript.PrimaryExpression{
-				IdentifierReference: Token(d.prefix + "import"),
+				IdentifierReference: jToken(d.prefix + "import"),
 			}
 			me.ImportMeta = false
 		}

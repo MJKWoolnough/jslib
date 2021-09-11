@@ -92,15 +92,15 @@ func Package(opts ...Option) (*javascript.Script, error) {
 			LetOrConst: javascript.Const,
 			BindingList: []javascript.LexicalBinding{
 				{
-					BindingIdentifier: Token("o"),
+					BindingIdentifier: jToken("o"),
 					Initializer: &javascript.AssignmentExpression{
 						ConditionalExpression: javascript.WrapConditional(javascript.MemberExpression{
 							MemberExpression: &javascript.MemberExpression{
 								PrimaryExpression: &javascript.PrimaryExpression{
-									IdentifierReference: Token("location"),
+									IdentifierReference: jToken("location"),
 								},
 							},
-							IdentifierName: Token("origin"),
+							IdentifierName: jToken("origin"),
 						}),
 					},
 				},
@@ -181,11 +181,11 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 				importURLs[iurl] = ib
 				importURLsArray = append(importURLsArray, javascript.AssignmentExpression{
 					ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-						Literal: Token(strconv.Quote(iurl)),
+						Literal: jToken(strconv.Quote(iurl)),
 					}),
 				})
 				importObjectBindings = append(importObjectBindings, javascript.BindingElement{
-					SingleNameBinding: Token(ib),
+					SingleNameBinding: jToken(ib),
 				})
 			}
 			if id.ImportClause != nil {
@@ -198,10 +198,10 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 					importBindings[id.ImportedDefaultBinding.Data] = javascript.MemberExpression{
 						MemberExpression: &javascript.MemberExpression{
 							PrimaryExpression: &javascript.PrimaryExpression{
-								IdentifierReference: Token(ib),
+								IdentifierReference: jToken(ib),
 							},
 						},
-						IdentifierName: Token("default"),
+						IdentifierName: jToken("default"),
 					}
 				}
 				if id.NamedImports != nil {
@@ -213,7 +213,7 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 						importBindings[is.ImportedBinding.Data] = javascript.MemberExpression{
 							MemberExpression: &javascript.MemberExpression{
 								PrimaryExpression: &javascript.PrimaryExpression{
-									IdentifierReference: Token(ib),
+									IdentifierReference: jToken(ib),
 								},
 							},
 							IdentifierName: tk,
@@ -283,7 +283,7 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 											CallExpression: &javascript.CallExpression{
 												MemberExpression: &javascript.MemberExpression{
 													PrimaryExpression: &javascript.PrimaryExpression{
-														IdentifierReference: Token("include"),
+														IdentifierReference: jToken("include"),
 													},
 												},
 												Arguments: &javascript.Arguments{
@@ -318,10 +318,10 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 												MemberExpression: &javascript.MemberExpression{
 													MemberExpression: &javascript.MemberExpression{
 														PrimaryExpression: &javascript.PrimaryExpression{
-															IdentifierReference: Token("Promise"),
+															IdentifierReference: jToken("Promise"),
 														},
 													},
-													IdentifierName: Token("all"),
+													IdentifierName: jToken("all"),
 												},
 												Arguments: &javascript.Arguments{
 													ArgumentList: []javascript.AssignmentExpression{
@@ -335,13 +335,13 @@ func Plugin(m *javascript.Module, url string) (*javascript.Script, error) {
 																			},
 																		},
 																	},
-																	IdentifierName: Token("map"),
+																	IdentifierName: jToken("map"),
 																},
 																Arguments: &javascript.Arguments{
 																	ArgumentList: []javascript.AssignmentExpression{
 																		{
 																			ConditionalExpression: javascript.WrapConditional(&javascript.PrimaryExpression{
-																				IdentifierReference: Token("include"),
+																				IdentifierReference: jToken("include"),
 																			}),
 																		},
 																	},
