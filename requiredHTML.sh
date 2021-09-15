@@ -28,6 +28,4 @@ for f; do
 	scanFile "$(realpath "$f")";
 done;
 
-echo -n "\"";
 echo "$tags" | tr ',' '\n' | grep -v "^$" | grep -v "createHTML" | sort | uniq | tr '\n' ' ' | sed -e 's/ $//';
-echo "\"";
