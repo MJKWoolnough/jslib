@@ -160,7 +160,7 @@ func (c *config) makeLoader() error {
 				ConditionalExpression: javascript.WrapConditional(&javascript.CallExpression{
 					MemberExpression: &javascript.MemberExpression{
 						PrimaryExpression: &javascript.PrimaryExpression{
-							CoverParenthesizedExpressionAndArrowParameterList: &javascript.CoverParenthesizedExpressionAndArrowParameterList{
+							ParenthesizedExpression: &javascript.ParenthesizedExpression{
 								Expressions: []javascript.AssignmentExpression{
 									{
 										ArrowFunction: &javascript.ArrowFunction{
