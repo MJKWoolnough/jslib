@@ -2,8 +2,7 @@ export const node = Symbol("node"),
 noSort = () => 0,
 stringSort = new Intl.Collator().compare;
 
-const data = new WeakMap(),
-      sortNodes = (root, n) => {
+const sortNodes = (root, n) => {
 	while (n.prev.item && root.sortFn(n.item, n.prev.item) * root.order < 0) {
 		n.next.prev = n.prev;
 		n.prev.next = n.next;
@@ -57,8 +56,8 @@ const data = new WeakMap(),
 	}
 	root.length--;
       },
-      entries = function* (s, start = 0, direction = 1) {
-	for (let [curr, pos] = getNode(data.get(s), start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
+      entries = function* (root, start = 0, direction = 1) {
+	for (let [curr, pos] = getNode(root, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
 	}
       },
@@ -75,32 +74,15 @@ const data = new WeakMap(),
       },
       proxyObj = {
 	has: (target, name) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-	get: (target, name) => pIFn(name, index => getNode(data.get(target), index)[0].item) || target[name],
+	get: (target, name) => pIFn(name, index => target.at(index)) || target[name],
 	set: (target, name, value) => pIFn(name, index => {
-		const root = data.get(target),
-		      [n] = getNode(root, index);
-		if (n.item) {
-			root.parentNode.removeChild(n.item[node]);
-			n.item = value;
-			sortNodes(root, n);
-		} else {
-			addItemAfter(root, root.prev, value);
-		}
+		target.splice(index, 0, value)
 		return true;
 	}) || false,
-	deleteProperty: (target, name) => pIFn(name, index => {
-		const root = data.get(target),
-		      [n] = getNode(root, index);
-		if (n.item) {
-			removeNode(root, n);
-			return true;
-		}
-		return false;
-	}) || delete target[name]
+	deleteProperty: (target, name) => pIFn(name, index => target.splice(index, 1).length > 0) || delete target[name]
       },
       noItemFn = n => ({[node]: n}),
-      sort = (t, compareFunction) => {
-	const root = data.get(t);
+      sort = (root, compareFunction) => {
 	if (compareFunction) {
 		root.sortFn = compareFunction;
 		root.order = 1;
@@ -118,8 +100,7 @@ const data = new WeakMap(),
 		curr = next;
 	}
       },
-      reverse = t => {
-	const root = data.get(t);
+      reverse = root =>{
 	[root.prev, root.next] = [root.next, root.prev];
 	root.order *= -1;
 	for (let curr = root.next; curr.item; curr = curr.next) {
@@ -140,20 +121,20 @@ const data = new WeakMap(),
 
 export class NodeArray {
 	constructor(parentNode, sortFn = noSort, elements = []) {
-		const root = {sortFn, parentNode, length: 0, order: 1},
-		      p = new Proxy(this, proxyObj);
-		data.set(this, root.prev = root.next = root);
-		data.set(p, root);
+		const root = this.#root = {sortFn, parentNode, length: 0, order: 1};
 		for (const item of elements) {
 			addItemAfter(root, root.prev, item);
 		}
-		return p;
+		return new Proxy<NodeArray<T, H>>(this, proxyObj);
 	}
 	get [node]() {
-		return data.get(this).parentNode;
+		return this.#root.parentNode;
 	}
 	get length() {
-		return data.get(this).length;
+		return this.#root.length;
+	}
+	at(index) {
+		return getNode(this.#root, index);
 	}
 	concat(...items) {
 		return Array.from(this.values()).concat(...items);
@@ -162,10 +143,10 @@ export class NodeArray {
 		throw new Error("invalid");
 	}
 	*entries() {
-		yield *entries(this);
+		yield *entries(this.#root);
 	}
 	every(callback, thisArg) {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (!callback.call(thisArg, item, index, this)) {
 				return false;
 			}
@@ -177,7 +158,7 @@ export class NodeArray {
 	}
 	filter(callback, thisArg) {
 		const filter = [];
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				filter.push(item);
 			}
@@ -185,7 +166,7 @@ export class NodeArray {
 		return filter;
 	}
 	filterRemove(callback, thisArg) {
-		const root = data.get(this),
+		const root = this.#root,
 		      filtered = [];
 		for (let curr = root.next, i = 0; curr.item; curr = curr.next, i++) {
 			if (callback.call(thisArg, curr.item, i, this)) {
@@ -196,7 +177,7 @@ export class NodeArray {
 		return filtered;
 	}
 	find(callback, thisArg) {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
 			}
@@ -204,7 +185,7 @@ export class NodeArray {
 		return undefined;
 	}
 	findIndex(callback, thisArg) {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return index;
 			}
@@ -218,13 +199,13 @@ export class NodeArray {
 		return this.map(callback, thisArg).flat();
 	}
 	forEach(callback, thisArg) {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			callback.call(thisArg, item, index, this);
 		}
 	}
-	static from(n, itemFn) {
+	static from(n, itemFn = noItemFn) {
 		const s = new NodeArray(n),
-		      root = data.get(s);
+		      root = s.#root;
 		for (const c of n.childNodes) {
 			const item = itemFn(c);
 			if (item) {
@@ -235,7 +216,7 @@ export class NodeArray {
 		return s;
 	}
 	includes(valueToFind, fromIndex = 0) {
-		for (const [, item] of entries(this, fromIndex)) {
+		for (const [, item] of entries(this.#root, fromIndex)) {
 			if (Object.is(valueToFind, item)) {
 				return true;
 			}
@@ -243,7 +224,7 @@ export class NodeArray {
 		return false;
 	}
 	indexOf(searchElement, fromIndex = 0) {
-		for (const [index, item] of entries(this, fromIndex)) {
+		for (const [index, item] of entries(this.#root, fromIndex)) {
 			if (Object.is(searchElement, item)) {
 				return index;
 			}
@@ -254,13 +235,12 @@ export class NodeArray {
 		return Array.from(this.values()).join(separator);
 	}
 	*keys() {
-		const root = data.get(this);
-		for (let i = 0; i < root.length; i++) {
+		for (let i = 0; i < this.#root.length; i++) {
 			yield i;
 		}
 	}
 	lastIndexOf(searchElement, fromIndex = 0) {
-		for (const [index, item] of entries(this, fromIndex, -1)) {
+		for (const [index, item] of entries(this.#root, fromIndex, -1)) {
 			if (Object.is(searchElement, item)) {
 				return index;
 			}
@@ -269,13 +249,13 @@ export class NodeArray {
 	}
 	map(callback, thisArg) {
 		const map = [];
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			map.push(callback.call(thisArg, item, index, this));
 		}
 		return map;
 	}
 	pop() {
-		const root = data.get(this),
+		const root = this.#root,
 		      last = root.prev;
 		if (last.item) {
 			removeNode(root, last);
@@ -283,13 +263,13 @@ export class NodeArray {
 		return last.item;
 	}
 	push(element, ...elements) {
-		const root = data.get(this);
+		const root = this.#root;
 		addItemAfter(root, root.prev, element);
 		elements.forEach(item => addItemAfter(root, root.prev, item));
 		return root.length;
 	}
 	reduce(callbackfn, initialValue) {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (initialValue === undefined) {
 				initialValue = item;
 			} else {
@@ -299,7 +279,7 @@ export class NodeArray {
 		return initialValue;
 	}
 	reduceRight(callbackfn, initialValue) {
-		for (const [index, item] of entries(this, 0, -1)) {
+		for (const [index, item] of entries(this.#root, 0, -1)) {
 			if (initialValue === undefined) {
 				initialValue = item;
 			} else {
@@ -309,11 +289,11 @@ export class NodeArray {
 		return initialValue;
 	}
 	reverse() {
-		reverse(this);
+		reverse(this.#root);
 		return this;
 	}
 	shift() {
-		const root = data.get(this),
+		const root = this.#root,
 		      first = root.next;
 		if (first.item) {
 			removeNode(root, first);
@@ -321,14 +301,14 @@ export class NodeArray {
 		return first.item;
 	}
 	slice(begin = 0, end) {
-		const root = data.get(this),
+		const root = this.#root,
 		      slice = [];
 		if (end === undefined) {
 			end = root.length;
 		} else if (end < 0) {
 			end += root.length;
 		}
-		for (const [index, item] of entries(this, begin)) {
+		for (const [index, item] of entries(root, begin)) {
 			if (index >= end) {
 				break;
 			}
@@ -337,7 +317,7 @@ export class NodeArray {
 		return slice;
 	}
 	some(callback, thisArg) {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return true;
 			}
@@ -345,11 +325,12 @@ export class NodeArray {
 		return false;
 	}
 	sort(compareFunction) {
-		sort(this, compareFunction);
+		sort(this.#root, compareFunction);
 		return this;
 	}
 	splice(start, deleteCount = 0, ...items) {
-		const root = data.get(this), removed = [];
+		const root = this.#root,
+		      removed = [];
 		let [curr] = getNode(root, start),
 		    adder = curr.prev;
 		for (; curr.item && deleteCount > 0; deleteCount--, curr = curr.next) {
@@ -360,13 +341,13 @@ export class NodeArray {
 		return removed;
 	}
 	unshift(element, ...elements) {
-		const root = data.get(this);
+		const root = this.#root;
 		let adder = addItemAfter(root, root, element);
 		elements.forEach(item => adder = addItemAfter(root, adder, item));
 		return root.length;
 	}
 	*values() {
-		for (let curr = data.get(this).next; curr.item; curr = curr.next) {
+		for (let curr = this.#root.next; curr.item; curr = curr.next) {
 			yield curr.item;
 		}
 	}
@@ -389,27 +370,27 @@ export class NodeArray {
 
 export class NodeMap {
 	constructor(parentNode, sortFn = noSort, entries = []) {
-		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()};
-		data.set(this, root.prev = root.next = root);
+		const root = this.#root = {sortFn, parentNode, length: 0, order: 1, map: new Map()};
+		root.prev = root.next = root;
 		for (const [k, item] of entries) {
 			replaceKey(root, k, item, root.prev);
 		}
 	}
 	get [node]() {
-		return data.get(this).parentNode;
+		return this.#root.parentNode;
 	}
 	get size() {
-		return data.get(this).length;
+		return this.#root.length;
 	}
 	clear() {
-		const root = data.get(this);
+		const root = this.#root;
 		for (let curr = root.next; curr.item; curr = curr.next) {
 			removeNode(root, curr);
 		}
 		root.map.clear();
 	}
 	delete(k) {
-		const root = data.get(this),
+		const root = this.#root,
 		      curr = root.map.get(k);
 		if (!curr) {
 			return false;
@@ -418,21 +399,21 @@ export class NodeMap {
 		return root.map.delete(k);
 	}
 	*entries() {
-		for (const [k, v] of data.get(this).map) {
+		for (const [k, v] of this.#root.map) {
 			yield [k, v.item];
 		}
 	}
 	forEach(callbackfn, thisArg = this) {
-		data.get(this).map.forEach((v, k) => callbackfn(v.item, k, thisArg));
+		this.#root.map.forEach((v, k) => callbackfn(v.item, k, thisArg));
 	}
 	get(k) {
-		return data.get(this).map.get(k)?.item;
+		return this.#root.map.get(k)?.item;
 	}
 	has(k) {
-		return data.get(this).map.has(k);
+		return this.#root.map.has(k);
 	}
 	insertAfter(k, item, after) {
-		const root = data.get(this),
+		const root = this.#root,
 		      a = root.map.get(after);
 		if (!a) {
 			return false;
@@ -441,7 +422,7 @@ export class NodeMap {
 		return true;
 	}
 	insertBefore(k, item, before) {
-		const root = data.get(this),
+		const root = this.#root,
 		      b = root.map.get(before);
 		if (!b) {
 			return false;
@@ -450,7 +431,7 @@ export class NodeMap {
 		return true;
 	}
 	keyAt(pos) {
-		for (let curr = data.get(this).next; curr.item; pos--, curr = curr.next) {
+		for (let curr = this.#root.next; curr.item; pos--, curr = curr.next) {
 			if (pos === 0) {
 				return curr.key;
 			}
@@ -458,10 +439,10 @@ export class NodeMap {
 		return undefined;
 	}
 	keys() {
-		return data.get(this).map.keys();
+		return this.#root.map.keys();
 	}
 	position(key) {
-		const root = data.get(this);
+		const root = this.#root;
 		let count = -1,
 		    curr = root.map.get(key) ?? root;
 		while (curr !== root) {
@@ -471,20 +452,20 @@ export class NodeMap {
 		return count;
 	}
 	reverse() {
-		reverse(this);
+		reverse(this.#root);
 		return this;
 	}
 	set(k, item) {
-		const root = data.get(this);
+		const root = this.#root;
 		replaceKey(root, k, item, root.prev);
 		return this;
 	}
 	sort(compareFunction) {
-		sort(this, compareFunction);
+		sort(this.#root, compareFunction);
 		return this;
 	}
 	*values() {
-		for (const v of data.get(this).map.values()) {
+		for (const v of this.#root.map.values()) {
 			yield v.item;
 		}
 	}

@@ -40,8 +40,7 @@ interface Item {
 	[node]: Node;
 }
 
-const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<any> | MapRoot<any, any>>(),
-      sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
+const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
 	while (n.prev.item && root.sortFn(n.item, n.prev.item) * root.order < 0) {
 		n.next.prev = n.prev;
 		n.prev.next = n.next;
@@ -87,7 +86,7 @@ const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<an
 	root.length++;
 	return sortNodes(root, after.next = after.next.prev = {prev: after, next: after.next, item});
       },
-      removeNode = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
+      removeNode = (root: Root<any>, n: ItemNode<any>) => {
 	n.prev.next = n.next;
 	n.next.prev = n.prev;
 	if (n.item[node].parentNode === root.parentNode) {
@@ -95,8 +94,8 @@ const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<an
 	}
 	root.length--;
       },
-      entries = function* <T extends Item>(s: NodeArray<T, Node>, start = 0, direction = 1): IterableIterator<[number, T]> {
-	for (let [curr, pos] = getNode(data.get(s)!, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
+      entries = function* <T extends Item>(root: Root<T>, start = 0, direction = 1): IterableIterator<[number, T]> {
+	for (let [curr, pos] = getNode(root, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
 		yield [pos, curr.item];
 	}
       },
@@ -113,32 +112,15 @@ const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<an
       },
       proxyObj = {
 	has: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-	get: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => getNode(data.get(target)!, index)[0].item) || (target as any)[name],
+	get: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => target.at(index)) || (target as any)[name],
 	set: <T extends Item>(target: NodeArray<T>, name: PropertyKey, value: T) => pIFn(name, index => {
-		const root = data.get(target)!,
-		      [n] = getNode(root, index);
-		if (n.item) {
-			root.parentNode.removeChild(n.item[node]);
-			n.item = value;
-			sortNodes(root, n);
-		} else {
-			addItemAfter(root, root.prev, value);
-		}
+		target.splice(index, 0, value)
 		return true;
 	}) || false,
-	deleteProperty: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => {
-		const root = data.get(target)!,
-		      [n] = getNode(root, index);
-		if (n.item) {
-			removeNode(root, n);
-			return true;
-		}
-		return false;
-	}) || delete (target as any)[name]
+	deleteProperty: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => target.splice(index, 1).length > 0) || delete (target as any)[name]
       },
       noItemFn = (n: Node) => ({[node]: n}),
-      sort = <T extends Item>(t: NodeArray<any, Node> | NodeMap<any, any, Node>, compareFunction?: sortFunc<T>) => {
-	const root = data.get(t)!;
+      sort = <T extends Item>(root: Root<T>, compareFunction?: sortFunc<T>) => {
 	if (compareFunction) {
 		root.sortFn = compareFunction;
 		root.order = 1;
@@ -156,8 +138,7 @@ const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<an
 		curr = next;
 	}
       },
-      reverse = (t: NodeArray<any, Node> | NodeMap<any, any, Node>) =>{
-	const root = data.get(t)!;
+      reverse = <T extends Item>(root: Root<T>) =>{
 	[root.prev, root.next] = [root.next, root.prev];
 	root.order *= -1;
 	for (let curr = root.next; curr.item; curr = curr.next) {
@@ -177,21 +158,22 @@ const data = new WeakMap<NodeArray<any, Node> | NodeMap<any, any, Node>, Root<an
       };
 
 export class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
+	#root: Root<T, H>;
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, elements: Iterable<T> = []) {
-		const root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>,
-		      p = new Proxy<NodeArray<T, H>>(this, proxyObj);
-		data.set(this, root.prev = root.next = root);
-		data.set(p, root);
+		const root = this.#root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>;
 		for (const item of elements) {
 			addItemAfter(root, root.prev, item);
 		}
-		return p;
+		return new Proxy<NodeArray<T, H>>(this, proxyObj);
 	}
 	get [node](): H {
-		return data.get(this)!.parentNode as H;
+		return this.#root.parentNode;
 	}
 	get length(): number {
-		return data.get(this)!.length;
+		return this.#root.length;
+	}
+	at(index: number) {
+		return getNode(this.#root, index);
 	}
 	concat(...items: ConcatArray<T>[]): T[];
 	concat(...items: (T | ConcatArray<T>)[]): T[] {
@@ -201,10 +183,10 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		throw new Error("invalid");
 	}
 	*entries(): IterableIterator<[number, T]> {
-		yield *entries<T>(this);
+		yield *entries(this.#root);
 	}
 	every(callback: Callback<T, unknown, this>, thisArg?: any) {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (!callback.call(thisArg, item, index, this)) {
 				return false;
 			}
@@ -216,7 +198,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	}
 	filter(callback: Callback<T, any, this>, thisArg?: any) {
 		const filter: T[] = [];
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				filter.push(item);
 			}
@@ -224,7 +206,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return filter;
 	}
 	filterRemove(callback: Callback<T, any, this>, thisArg?: any) {
-		const root = data.get(this)!,
+		const root = this.#root,
 		      filtered: T[] = [];
 		for (let curr = root.next, i = 0; curr.item; curr = curr.next, i++) {
 			if (callback.call(thisArg, curr.item, i, this)) {
@@ -235,7 +217,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return filtered;
 	}
 	find(callback: Callback<T, any, this>, thisArg?: any): T | undefined {
-		for (const [index, item] of entries<T>(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
 			}
@@ -243,7 +225,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return undefined;
 	}
 	findIndex(callback: Callback<T, any, this>, thisArg?: any): number {
-		for (const [index, item] of entries<T>(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return index;
 			}
@@ -257,7 +239,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return this.map(callback, thisArg).flat();
 	}
 	forEach(callback: Callback<T, void, this>, thisArg?: any) {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			callback.call(thisArg, item, index, this);
 		}
 	}
@@ -265,9 +247,9 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	static from<T extends Item, H extends Node = Node>(n: H, itemFn: (node: Node) => T|undefined): NodeArray<T, H>;
 	static from<T extends Item = Item, H extends Node = Node>(n: H, itemFn = noItemFn): NodeArray<T, H> {
 		const s = new NodeArray<T, H>(n),
-		      root = data.get(s)!;
+		      root = s.#root;
 		for (const c of n.childNodes) {
-			const item = itemFn(c);
+			const item = itemFn(c) as T;
 			if (item) {
 				root.prev = root.prev.next = {prev: root.prev, next: root, item};
 				root.length++;
@@ -276,7 +258,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return s;
 	}
 	includes(valueToFind: T, fromIndex: number = 0) {
-		for (const [, item] of entries(this, fromIndex)) {
+		for (const [, item] of entries(this.#root, fromIndex)) {
 			if (Object.is(valueToFind, item)) {
 				return true;
 			}
@@ -284,7 +266,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return false;
 	}
 	indexOf(searchElement: T, fromIndex: number = 0): number {
-		for (const [index, item] of entries<T>(this, fromIndex)) {
+		for (const [index, item] of entries(this.#root, fromIndex)) {
 			if (Object.is(searchElement, item)) {
 				return index;
 			}
@@ -295,13 +277,12 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return Array.from(this.values()).join(separator);
 	}
 	*keys() {
-		const root = data.get(this)!;
-		for (let i = 0; i < root.length; i++) {
+		for (let i = 0; i < this.#root.length; i++) {
 			yield i;
 		}
 	}
 	lastIndexOf(searchElement: T, fromIndex: number = 0): number {
-		for (const [index, item] of entries<T>(this, fromIndex, -1)) {
+		for (const [index, item] of entries(this.#root, fromIndex, -1)) {
 			if (Object.is(searchElement, item)) {
 				return index;
 			}
@@ -310,13 +291,13 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	}
 	map<U>(callback: Callback<T, U, this>, thisArg?: any) {
 		const map: U[] = [];
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			map.push(callback.call(thisArg, item, index, this));
 		}
 		return map;
 	}
 	pop(): T | undefined {
-		const root = data.get(this)!,
+		const root = this.#root,
 		      last = root.prev;
 		if (last.item) {
 			removeNode(root, last);
@@ -324,7 +305,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return last.item;
 	}
 	push(element: T, ...elements: T[]) {
-		const root: Root<T> = data.get(this)!;
+		const root = this.#root;
 		addItemAfter(root, root.prev, element);
 		elements.forEach(item => addItemAfter(root, root.prev, item));
 		return root.length;
@@ -332,7 +313,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	reduce<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
 	reduce(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T): T;
 	reduce(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (initialValue === undefined) {
 				initialValue = item;
 			} else {
@@ -344,7 +325,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
 	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T): T;
 	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
-		for (const [index, item] of entries(this, 0, -1)) {
+		for (const [index, item] of entries(this.#root, 0, -1)) {
 			if (initialValue === undefined) {
 				initialValue = item;
 			} else {
@@ -354,11 +335,11 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return initialValue;
 	}
 	reverse() {
-		reverse(this);
+		reverse(this.#root);
 		return this;
 	}
 	shift(): T | undefined {
-		const root = data.get(this)!,
+		const root = this.#root,
 		      first = root.next;
 		if (first.item) {
 			removeNode(root, first);
@@ -366,14 +347,14 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return first.item;
 	}
 	slice(begin: number = 0, end?: number) {
-		const root = data.get(this)!,
+		const root = this.#root,
 		      slice: T[] = [];
 		if (end === undefined) {
 			end = root.length;
 		} else if (end < 0) {
 			end += root.length;
 		}
-		for (const [index, item] of entries(this, begin)) {
+		for (const [index, item] of entries(root, begin)) {
 			if (index >= end) {
 				break;
 			}
@@ -382,7 +363,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return slice;
 	}
 	some(callback: Callback<T, any, this>, thisArg?: any) {
-		for (const [index, item] of entries(this)) {
+		for (const [index, item] of entries(this.#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return true;
 			}
@@ -390,11 +371,12 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return false;
 	}
 	sort(compareFunction?: sortFunc<T>): this {
-		sort(this, compareFunction);
+		sort(this.#root, compareFunction);
 		return this;
 	}
 	splice(start: number, deleteCount: number = 0, ...items: T[]) {
-		const root = data.get(this)!, removed: T[] = [];
+		const root = this.#root,
+		      removed: T[] = [];
 		let [curr] = getNode(root, start),
 		    adder = curr.prev;
 		for (; curr.item && deleteCount > 0; deleteCount--, curr = curr.next) {
@@ -405,13 +387,13 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return removed;
 	}
 	unshift(element: T, ...elements: T[]): number {
-		const root = data.get(this)!;
+		const root = this.#root;
 		let adder = addItemAfter(root, root, element);
 		elements.forEach(item => adder = addItemAfter(root, adder, item));
 		return root.length;
 	}
 	*values(): IterableIterator<T> {
-		for (let curr = data.get(this)!.next; curr.item; curr = curr.next) {
+		for (let curr = this.#root.next; curr.item; curr = curr.next) {
 			yield curr.item;
 		}
 	}
@@ -434,28 +416,29 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 }
 
 export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	#root: MapRoot<K, T, H>;
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, entries: Iterable<[K, T]> = []) {
-		const root = {sortFn, parentNode, length: 0, order: 1, map: new Map()} as MapRoot<K, T, H>;
-		data.set(this, root.prev = root.next = root);
+		const root = this.#root = {sortFn, parentNode, length: 0, order: 1, map: new Map()} as MapRoot<K, T, H>;
+		root.prev = root.next = root;
 		for (const [k, item] of entries) {
 			replaceKey(root, k, item, root.prev);
 		}
 	}
 	get [node](): H {
-		return data.get(this)!.parentNode as H;
+		return this.#root.parentNode;
 	}
 	get size(): number {
-		return data.get(this)!.length;
+		return this.#root.length;
 	}
 	clear() {
-		const root = data.get(this) as MapRoot<K, T, H>;
+		const root = this.#root;
 		for (let curr = root.next; curr.item; curr = curr.next) {
 			removeNode(root, curr as ItemNode<T>);
 		}
 		root.map.clear();
 	}
 	delete(k: K) {
-		const root = data.get(this) as MapRoot<K, T, H>,
+		const root = this.#root,
 		      curr = root.map.get(k);
 		if (!curr) {
 			return false;
@@ -464,21 +447,21 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return root.map.delete(k);
 	}
 	*entries(): IterableIterator<[K, T]> {
-		for (const [k, v] of (data.get(this) as MapRoot<K, T, H>).map) {
+		for (const [k, v] of this.#root.map) {
 			yield [k, v.item];
 		}
 	}
 	forEach(callbackfn: (value: T, key: K, map: NodeMap<K, T>) => void, thisArg: any = this) {
-		(data.get(this) as MapRoot<K, T, H>).map.forEach((v, k) => callbackfn(v.item, k, thisArg));
+		this.#root.map.forEach((v, k) => callbackfn(v.item, k, thisArg));
 	}
 	get(k: K): T | undefined {
-		return (data.get(this) as MapRoot<K, T, H>).map.get(k)?.item;
+		return this.#root.map.get(k)?.item;
 	}
 	has(k: K): boolean {
-		return (data.get(this) as MapRoot<K, T, H>).map.has(k);
+		return this.#root.map.has(k);
 	}
 	insertAfter(k: K, item: T, after: K) {
-		const root = data.get(this) as MapRoot<K, T, H>,
+		const root = this.#root,
 		      a = root.map.get(after);
 		if (!a) {
 			return false;
@@ -487,7 +470,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return true;
 	}
 	insertBefore(k: K, item: T, before: K) {
-		const root = data.get(this) as MapRoot<K, T, H>,
+		const root = this.#root,
 		      b = root.map.get(before);
 		if (!b) {
 			return false;
@@ -496,7 +479,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return true;
 	}
 	keyAt(pos: number) {
-		for (let curr = data.get(this)!.next; curr.item; pos--, curr = curr.next) {
+		for (let curr = this.#root.next; curr.item; pos--, curr = curr.next) {
 			if (pos === 0) {
 				return (curr as KeyedItemNode<K, T>).key;
 			}
@@ -504,10 +487,10 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return undefined;
 	}
 	keys(): IterableIterator<K> {
-		return (data.get(this) as MapRoot<K, T, H>).map.keys();
+		return this.#root.map.keys();
 	}
 	position(key: K) {
-		const root = data.get(this) as MapRoot<K, T, H>;
+		const root = this.#root;
 		let count = -1,
 		    curr = (root.map.get(key) ?? root) as ItemOrRoot<T>;
 		while (curr !== root) {
@@ -517,20 +500,20 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return count;
 	}
 	reverse() {
-		reverse(this);
+		reverse(this.#root);
 		return this;
 	}
 	set(k: K, item: T) {
-		const root = data.get(this) as MapRoot<K, T, H>;
+		const root = this.#root;
 		replaceKey(root, k, item, root.prev);
 		return this;
 	}
 	sort(compareFunction?: sortFunc<T>) {
-		sort(this, compareFunction);
+		sort(this.#root, compareFunction);
 		return this;
 	}
 	*values(): IterableIterator<T> {
-		for (const v of (data.get(this) as MapRoot<K, T, H>).map.values()) {
+		for (const v of this.#root.map.values()) {
 			yield v.item;
 		}
 	}
