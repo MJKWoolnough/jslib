@@ -1,34 +1,19 @@
-const pipes = new WeakMap(),
-      requests = new WeakMap(),
-      subs = new WeakMap(),
-      wgs = new WeakMap(),
-      updateWG = wi => {
-	const data = {"waits": wi.waits, "done": wi.done, "errors": wi.errors};
-	wi.update.send(data);
-	if (wi.done + wi.errors === wi.waits) {
-		wi.complete.send(data);
-	}
-      };
-
 export class Pipe {
-	constructor() {
-		pipes.set(this, []);
-	}
+	#out = [];
 	send(data) {
-		const out = pipes.get(this);
-		for (const o of out) {
+		for (const o of this.#out) {
 			o(data);
 		}
 	}
 	receive(fn) {
 		if (fn instanceof Function) {
-			pipes.get(this).push(fn);
+			this.#out.push(fn);
 		} else if (fn !== null && fn !== undefined) {
 			throw new TypeError("pipe.receive requires function type");
 		}
 	}
 	remove(fn) {
-		const out = pipes.get(this);
+		const out = this.#out;
 		for (let i = 0; i < out.length; i++) {
 			if (out[i] === fn) {
 				out.splice(i, 1);
@@ -40,7 +25,7 @@ export class Pipe {
 
 export class Requester {
 	request(...data) {
-		const r = requesters.get(this);
+		const r = this.#responder;
 		if (r === undefined) {
 			throw new Error("no responder set");
 		} else if (r instanceof Function) {
@@ -49,7 +34,7 @@ export class Requester {
 		return r;
 	}
 	responder(f) {
-		requesters.set(this, f);
+		this.#responder = f;
 	}
 }
 
@@ -59,14 +44,14 @@ export class Subscription {
 		      error = new Pipe(),
 		      cancel = new Pipe();
 		fn(success.send.bind(success), error.send.bind(error), cancel.receive.bind(cancel));
-		subs.set(this, [success.receive.bind(success), error.receive.bind(error), cancel.send.bind(cancel)]);
+		this.#success = success.receive.bind(success);
+		this.#error = error.receive.bind(error);
+		this.#cancel = cancel.send.bind(cancel);
 	}
 	then(successFn, errorFn) {
-		const rfn = subs.get(this);
-		if (rfn === undefined) {
-			throw new TypeError("method not called on valid Subscription object");
-		}
-		const [success, error, cancel] = rfn;
+		const success = this.#success,
+		      error = this.#error,
+		      cancel = this.#cancel;
 		return new Subscription((sFn, eFn, cFn) => {
 			if (successFn instanceof Function) {
 				success(data => {
@@ -94,12 +79,7 @@ export class Subscription {
 		});
 	}
 	cancel() {
-		const rfn = subs.get(this);
-		if (rfn === undefined) {
-			throw new TypeError("method not called on valid Subscription object");
-		}
-		const [,, cancel] = rfn;
-		cancel();
+		this.#cancel();
 	}
 	catch(errorFn) {
 		return this.then(undefined, errorFn);
@@ -141,38 +121,40 @@ export class Subscription {
 }
 
 export class WaitGroup {
-	constructor() {
-		wgs.set(this, {
-			waits: 0,
-			done: 0,
-			errors: 0,
-			update: new Pipe(),
-			complete: new Pipe()
-		});
-	}
+	#waits = 0;
+	#done = 0;
+	#errors = 0;
+	#update = new Pipe();
+	#complete = new Pipe();
 	add() {
-		const v = wgs.get(this);
-		v.waits++;
-		updateWG(v);
+		this.#waits++;
+		this.#updateWG();
 	}
 	done() {
-		const v = wgs.get(this);
-		v.done++;
-		updateWG(v);
+		this.#done++;
+		this.#updateWG();
 	}
 	error() {
-		const v = wgs.get(this);
-		v.errors++;
-		updateWG(v);
+		this.#errors++;
+		this.#updateWG();
 	}
 	onUpdate(fn) {
-		const v = wgs.get(this);
-		v.update.receive(fn);
-		return () => v.update.remove(fn);
+		this.#update.receive(fn);
+		return () => this.#update.remove(fn);
 	}
 	onComplete(fn) {
-		const v = wgs.get(this);
-		v.complete.receive(fn);
-		return () => v.complete.remove(fn);
+		this.#complete.receive(fn);
+		return () => this.#complete.remove(fn);
+	}
+	#updateWG() {
+		const data = {
+			"waits": this.#waits,
+			"done": this.#done,
+			"errors": this.#errors
+		};
+		this.#update.send(data);
+		if (this.#done + this.#errors === this.#waits) {
+			this.#complete.send(data);
+		}
 	}
 }

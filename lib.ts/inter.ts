@@ -4,42 +4,22 @@ export type WaitInfo = {
 	errors: number;
 }
 
-type WaitGroupInfo = WaitInfo & {
-	update: Pipe<WaitInfo>;
-	complete: Pipe<WaitInfo>;
-}
-
-const pipes = new WeakMap<Pipe<any>, ((data: any) => void)[]>(),
-      requesters = new WeakMap<Requester<any>, ((...data: any) => any) | any>(),
-      subs = new WeakMap<Subscription<any>, [(fn: (data: any) => void) => void, (fn: (data: any) => void) => void, (data: void) => void]>(),
-      wgs = new WeakMap<WaitGroup, WaitGroupInfo>(),
-      updateWG = (wi: WaitGroupInfo) => {
-	const data = {"waits": wi.waits, "done": wi.done, "errors": wi.errors};
-	wi.update.send(data);
-	if (wi.done + wi.errors === wi.waits) {
-		wi.complete.send(data);
-	}
-      };
-
 export class Pipe<T> {
-	constructor() {
-		pipes.set(this, []);
-	}
+	#out: ((data: any) => void)[] = [];
 	send(data: T) {
-		const out = pipes.get(this)!;
-		for (const o of out) {
+		for (const o of this.#out) {
 			o(data);
 		}
 	}
 	receive(fn: (data: T) => void) {
 		if (fn instanceof Function) {
-			pipes.get(this)!.push(fn);
+			this.#out.push(fn);
 		} else if (fn !== null && fn !== undefined) {
 			throw new TypeError("pipe.receive requires function type");
 		}
 	}
 	remove(fn: (data: T) => void) {
-		const out = pipes.get(this)!;
+		const out = this.#out;
 		for (let i = 0; i < out.length; i++) {
 			if (out[i] === fn) {
 				out.splice(i, 1);
@@ -50,8 +30,9 @@ export class Pipe<T> {
 }
 
 export class Requester<T, U extends any[] = any[]> {
+	#responder?: ((...data: any) => any) | any;
 	request(...data: U): T {
-		const r = requesters.get(this);
+		const r = this.#responder;
 		if (r === undefined) {
 			throw new Error("no responder set");
 		} else if (r instanceof Function) {
@@ -60,24 +41,27 @@ export class Requester<T, U extends any[] = any[]> {
 		return r;
 	}
 	responder(f: ((...data: U) => T) | T) {
-		requesters.set(this, f);
+		this.#responder = f;
 	}
 }
 
 export class Subscription<T> {
+	#success: (fn: (data: T) => void) => void;
+	#error: (fn: (data: any) => void) => void;
+	#cancel: (data: void) => void;
 	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: (data: void) => void) => void) => void) {
 		const success = new Pipe<T>(),
 		      error = new Pipe<any>(),
 		      cancel = new Pipe<void>();
 		fn(success.send.bind(success), error.send.bind(error), cancel.receive.bind(cancel));
-		subs.set(this, [success.receive.bind(success), error.receive.bind(error), cancel.send.bind(cancel)]);
+		this.#success = success.receive.bind(success);
+		this.#error = error.receive.bind(error);
+		this.#cancel = cancel.send.bind(cancel);
 	}
 	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | undefined | null, errorFn?: ((data: any) => TResult2) | undefined | null) {
-		const rfn = subs.get(this);
-		if (rfn === undefined) {
-			throw new TypeError("method not called on valid Subscription object");
-		}
-		const [success, error, cancel] = rfn;
+		const success = this.#success,
+		      error = this.#error,
+		      cancel = this.#cancel;
 		return new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: (data: void) => void) => void) => {
 			if (successFn instanceof Function) {
 				success((data: T) => {
@@ -88,7 +72,7 @@ export class Subscription<T> {
 					}
 				});
 			} else {
-				success(sFn);
+				success(sFn as any);
 			}
 			if (errorFn instanceof Function) {
 				error((data: any) => {
@@ -105,12 +89,7 @@ export class Subscription<T> {
 		});
 	}
 	cancel() {
-		const rfn = subs.get(this);
-		if (rfn === undefined) {
-			throw new TypeError("method not called on valid Subscription object");
-		}
-		const [,, cancel] = rfn;
-		cancel();
+		this.#cancel();
 	}
 	catch<TResult = never>(errorFn: ((data: any) => TResult) | undefined | null): Subscription<T | TResult> {
 		return this.then(undefined, errorFn);
@@ -156,38 +135,40 @@ interface canceller {
 }
 
 export class WaitGroup {
-	constructor() {
-		wgs.set(this, {
-			waits: 0,
-			done: 0,
-			errors: 0,
-			update: new Pipe(),
-			complete: new Pipe()
-		});
-	}
+	#waits=  0;
+	#done = 0;
+	#errors = 0;
+	#update = new Pipe<WaitInfo>();
+	#complete = new Pipe<WaitInfo>();
 	add() {
-		const v = wgs.get(this)!;
-		v.waits++;
-		updateWG(v);
+		this.#waits++;
+		this.#updateWG();
 	}
 	done() {
-		const v = wgs.get(this)!;
-		v.done++;
-		updateWG(v);
+		this.#done++;
+		this.#updateWG();
 	}
 	error() {
-		const v = wgs.get(this)!;
-		v.errors++;
-		updateWG(v);
+		this.#errors++;
+		this.#updateWG();
 	}
 	onUpdate(fn: (wi: WaitInfo) => void) {
-		const v = wgs.get(this)!;
-		v.update.receive(fn);
-		return () => v.update.remove(fn);
+		this.#update.receive(fn);
+		return () => this.#update.remove(fn);
 	}
 	onComplete(fn: (wi: WaitInfo) => void) {
-		const v = wgs.get(this)!;
-		v.complete.receive(fn);
-		return () => v.complete.remove(fn);
+		this.#complete.receive(fn);
+		return () => this.#complete.remove(fn);
+	}
+	#updateWG() {
+		const data = {
+			"waits": this.#waits,
+			"done": this.#done,
+			"errors": this.#errors
+		};
+		this.#update.send(data);
+		if (this.#done + this.#errors === this.#waits) {
+			this.#complete.send(data);
+		}
 	}
 }
