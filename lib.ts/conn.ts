@@ -8,7 +8,7 @@ type properties = {
 	type?: string;
 	response?: string;
 	onprogress?: (event: ProgressEvent) => void;
-	data?: string | Document | BodyInit;
+	data?: XMLHttpRequestBodyInit;
 }
 
 export const HTTPRequest = (url: string, props: properties = {}) => new Promise((successFn, errorFn) => {
@@ -66,7 +66,7 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 		xh.responseType = props["response"];
 		break;
 	}
-	xh.send(props.hasOwnProperty("data") ? props["data"] : null);
+	xh.send(props["data"] ?? null);
       }),
       WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
 		const ws = new WebSocket(url);

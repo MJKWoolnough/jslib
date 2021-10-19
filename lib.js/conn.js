@@ -55,7 +55,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		xh.responseType = props["response"];
 		break;
 	}
-	xh.send(props.hasOwnProperty("data") ? props["data"] : null);
+	xh.send(props["data"] ?? null);
       }),
       WS = url => new Promise((successFn, errorFn) => {
 	const ws = new WebSocket(url);
