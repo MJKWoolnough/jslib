@@ -2,14 +2,7 @@ import type {DOMBind, Children, Props} from './dom.js';
 import {autoFocus, createHTML, svgNS} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 
-type Wdata = {
-	titleElement: HTMLSpanElement;
-	iconElement: HTMLImageElement;
-	extraButtons: HTMLSpanElement;
-}
-
-const windowData = new WeakMap<WindowElement, Wdata>(),
-      snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) => {
+const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) => {
 	const snap = parseInt(shell.getAttribute("snap") || "0"),
 	      {offsetLeft: x1, offsetTop: y1, offsetWidth: width, offsetHeight: height} = w,
 	      x2 = x1 + width, y2 = y1 + height,
@@ -283,13 +276,15 @@ export class DesktopElement extends HTMLElement {
 }
 
 export class WindowElement extends HTMLElement {
+	#title: HTMLSpanElement;
+	#icon: HTMLImageElement;
+	#extra: HTMLSpanElement;
 	constructor() {
 		super();
-		const titleElement = span({"part": "title"}),
-		      iconElement = img({"part": "icon", "src": noIcon}),
-		      extraButtons = span(),
+		const titleElement = this.#title = span({"part": "title"}),
+		      iconElement = this.#icon = img({"part": "icon", "src": noIcon}),
+		      extraButtons = this.#extra = span(),
 		      onclick = () => this.focus();
-		windowData.set(this, {titleElement, iconElement, extraButtons});
 		createHTML(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
@@ -543,13 +538,12 @@ export class WindowElement extends HTMLElement {
 		this.dispatchEvent(new CustomEvent("remove", {"cancelable": false}));
 	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
-		const wd = windowData.get(this)!;
 		switch (name) {
 		case "window-title":
-			wd.titleElement.innerText = newValue;
+			this.#title.innerText = newValue;
 			break;
 		case "window-icon":
-			wd.iconElement.setAttribute("src", newValue);
+			this.#icon.setAttribute("src", newValue);
 			break;
 		}
 	}
@@ -579,7 +573,7 @@ export class WindowElement extends HTMLElement {
 		return true;
 	}
 	addControlButton(icon: string, onclick: (this: WindowElement) => void, title?: string) {
-		const b = windowData.get(this)!.extraButtons.appendChild(button({"style": {"background-image": `url(${JSON.stringify(icon)})`}, "onclick": () => onclick.call(this), title}));
+		const b = this.#extra.appendChild(button({"style": {"background-image": `url(${JSON.stringify(icon)})`}, "onclick": () => onclick.call(this), title}));
 		return () => b.remove();
 	}
 	focus() {
