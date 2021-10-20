@@ -76,7 +76,7 @@ const sortNodes = (root, n) => {
 	has: (target, name) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
 	get: (target, name) => pIFn(name, index => target.at(index)) || target[name],
 	set: (target, name, value) => pIFn(name, index => {
-		target.splice(index, 0, value)
+		target.splice(index, 1, value)
 		return true;
 	}) || false,
 	deleteProperty: (target, name) => pIFn(name, index => target.splice(index, 1).length > 0) || delete target[name]
