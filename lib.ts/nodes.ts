@@ -171,10 +171,10 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return p;
 	}
-	get [node](): H {
+	get [node]() {
 		return this[realTarget].#root.parentNode;
 	}
-	get length(): number {
+	get length() {
 		return this[realTarget].#root.length;
 	}
 	at(index: number) {
@@ -222,7 +222,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return filtered;
 	}
-	find(callback: Callback<T, any, this>, thisArg?: any): T | undefined {
+	find(callback: Callback<T, any, this>, thisArg?: any) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
@@ -230,7 +230,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return undefined;
 	}
-	findIndex(callback: Callback<T, any, this>, thisArg?: any): number {
+	findIndex(callback: Callback<T, any, this>, thisArg?: any) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return index;
@@ -271,7 +271,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return false;
 	}
-	indexOf(searchElement: T, fromIndex: number = 0): number {
+	indexOf(searchElement: T, fromIndex: number = 0) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex)) {
 			if (Object.is(searchElement, item)) {
 				return index;
@@ -287,7 +287,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 			yield i;
 		}
 	}
-	lastIndexOf(searchElement: T, fromIndex: number = 0): number {
+	lastIndexOf(searchElement: T, fromIndex: number = 0) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex, -1)) {
 			if (Object.is(searchElement, item)) {
 				return index;
@@ -302,7 +302,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return map;
 	}
-	pop(): T | undefined {
+	pop() {
 		const root = this[realTarget].#root,
 		      last = root.prev;
 		if (last.item) {
@@ -344,7 +344,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		reverse(this[realTarget].#root);
 		return this;
 	}
-	shift(): T | undefined {
+	shift() {
 		const root = this[realTarget].#root,
 		      first = root.next;
 		if (first.item) {
@@ -376,7 +376,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return false;
 	}
-	sort(compareFunction?: sortFunc<T>): this {
+	sort(compareFunction?: sortFunc<T>) {
 		sort(this[realTarget].#root, compareFunction);
 		return this;
 	}
@@ -392,7 +392,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		items.forEach(item => adder = addItemAfter(root, adder, item));
 		return removed;
 	}
-	unshift(element: T, ...elements: T[]): number {
+	unshift(element: T, ...elements: T[]) {
 		const root = this[realTarget].#root;
 		let adder = addItemAfter(root, root, element);
 		elements.forEach(item => adder = addItemAfter(root, adder, item));
@@ -430,10 +430,10 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 			replaceKey(root, k, item, root.prev);
 		}
 	}
-	get [node](): H {
+	get [node]() {
 		return this.#root.parentNode;
 	}
-	get size(): number {
+	get size() {
 		return this.#root.length;
 	}
 	clear() {
@@ -460,10 +460,10 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	forEach(callbackfn: (value: T, key: K, map: NodeMap<K, T>) => void, thisArg: any = this) {
 		this.#root.map.forEach((v, k) => callbackfn(v.item, k, thisArg));
 	}
-	get(k: K): T | undefined {
+	get(k: K) {
 		return this.#root.map.get(k)?.item;
 	}
-	has(k: K): boolean {
+	has(k: K) {
 		return this.#root.map.has(k);
 	}
 	insertAfter(k: K, item: T, after: K) {
