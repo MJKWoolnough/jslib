@@ -2,123 +2,6 @@ export const node = Symbol("node"),
 noSort = () => 0,
 stringSort = new Intl.Collator().compare;
 
-const sortNodes = (root, n) => {
-	while (n.prev.item && root.sortFn(n.item, n.prev.item) * root.order < 0) {
-		n.next.prev = n.prev;
-		n.prev.next = n.next;
-		n.next = n.prev;
-		const pp = n.prev.prev;
-		n.prev.prev = n;
-		n.prev = pp;
-		pp.next = n;
-	}
-	while (n.next.item && root.sortFn(n.item, n.next.item) * root.order > 0) {
-		n.next.prev = n.prev;
-		n.prev.next = n.next;
-		n.prev = n.next;
-		const nn = n.next.next;
-		n.next.next = n;
-		n.next = nn;
-		nn.prev = n;
-	}
-	if (n.next.item) {
-		root.parentNode.insertBefore(n.item[node], n.next.item[node]);
-	} else {
-		root.parentNode.appendChild(n.item[node]);
-	}
-	return n;
-      },
-      getNode = (root, index) => {
-	if (index < 0) {
-		for (let curr = root.prev, pos = index; curr.item; pos++, curr = curr.prev) {
-			if (pos === 0) {
-				return [curr, pos];
-			}
-		}
-	} else if (index < root.length) {
-		for (let curr = root.next, pos = index; curr.item; pos--, curr = curr.next) {
-			if (pos === 0) {
-				return [curr, pos];
-			}
-		}
-	}
-	return [root, -1];
-      },
-      addItemAfter = (root, after, item) => {
-	root.length++;
-	return sortNodes(root, after.next = after.next.prev = {prev: after, next: after.next, item});
-      },
-      removeNode = (root, n) => {
-	n.prev.next = n.next;
-	n.next.prev = n.prev;
-	if (n.item[node].parentNode === root.parentNode) {
-		root.parentNode.removeChild(n.item[node]);
-	}
-	root.length--;
-      },
-      entries = function* (root, start = 0, direction = 1) {
-	for (let [curr, pos] = getNode(root, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
-		yield [pos, curr.item];
-	}
-      },
-      pIFn = (name, fn) => {
-	if (typeof name === "number") {
-		return fn(name);
-	} else if (typeof name === "string") {
-		const index = parseInt(name);
-		if (index.toString() === name) {
-			return fn(index);
-		}
-	}
-	return undefined;
-      },
-      proxyObj = {
-	has: (target, name) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-	get: (target, name) => pIFn(name, index => target.at(index)) || target[name],
-	set: (target, name, value) => pIFn(name, index => {
-		target.splice(index, 1, value)
-		return true;
-	}) || false,
-	deleteProperty: (target, name) => pIFn(name, index => target.splice(index, 1).length > 0) || delete target[name]
-      },
-      noItemFn = n => ({[node]: n}),
-      sort = (root, compareFunction) => {
-	if (compareFunction) {
-		root.sortFn = compareFunction;
-		root.order = 1;
-		if (compareFunction === noSort) {
-			return;
-		}
-	}
-	let curr = root.next;
-	root.next = root.prev = root;
-	while (curr.item) {
-		const next = curr.next;
-		curr.prev = root.prev;
-		curr.next = root;
-		sortNodes(root, root.prev = root.prev.next = curr);
-		curr = next;
-	}
-      },
-      reverse = root =>{
-	[root.prev, root.next] = [root.next, root.prev];
-	root.order *= -1;
-	for (let curr = root.next; curr.item; curr = curr.next) {
-		[curr.next, curr.prev] = [curr.prev, curr.next];
-		root.parentNode.appendChild(curr.item[node]);
-	}
-      },
-      replaceKey = (root, key, item, prev) => {
-	const old = root.map.get(key);
-	if (old) {
-		if (Object.is(old.item, item) && old.prev === prev) {
-			return;
-		}
-		removeNode(root, old);
-	}
-	root.map.set(key, Object.assign(addItemAfter(root, prev, item), {key}));
-      };
-
 export class NodeArray {
 	constructor(parentNode, sortFn = noSort, elements = []) {
 		const root = this.#root = {sortFn, parentNode, length: 0, order: 1};
@@ -126,12 +9,18 @@ export class NodeArray {
 		for (const item of elements) {
 			addItemAfter(root, root.prev, item);
 		}
-		return new Proxy<NodeArray<T, H>>(this, proxyObj);
+		return Object.setPrototypeOf(this, pp);
 	}
 	get [node]() {
 		return this.#root.parentNode;
 	}
+	_n() {
+		return this.#root.parentNode;
+	}
 	get length() {
+		return this.#root.length;
+	}
+	_l() {
 		return this.#root.length;
 	}
 	at(index) {
@@ -481,3 +370,120 @@ export class NodeMap {
 		return "[object NodeMap]";
 	}
 }
+
+const sortNodes = (root, n) => {
+	while (n.prev.item && root.sortFn(n.item, n.prev.item) * root.order < 0) {
+		n.next.prev = n.prev;
+		n.prev.next = n.next;
+		n.next = n.prev;
+		const pp = n.prev.prev;
+		n.prev.prev = n;
+		n.prev = pp;
+		pp.next = n;
+	}
+	while (n.next.item && root.sortFn(n.item, n.next.item) * root.order > 0) {
+		n.next.prev = n.prev;
+		n.prev.next = n.next;
+		n.prev = n.next;
+		const nn = n.next.next;
+		n.next.next = n;
+		n.next = nn;
+		nn.prev = n;
+	}
+	if (n.next.item) {
+		root.parentNode.insertBefore(n.item[node], n.next.item[node]);
+	} else {
+		root.parentNode.appendChild(n.item[node]);
+	}
+	return n;
+      },
+      getNode = (root, index) => {
+	if (index < 0) {
+		for (let curr = root.prev, pos = index; curr.item; pos++, curr = curr.prev) {
+			if (pos === 0) {
+				return [curr, pos];
+			}
+		}
+	} else if (index < root.length) {
+		for (let curr = root.next, pos = index; curr.item; pos--, curr = curr.next) {
+			if (pos === 0) {
+				return [curr, pos];
+			}
+		}
+	}
+	return [root, -1];
+      },
+      addItemAfter = (root, after, item) => {
+	root.length++;
+	return sortNodes(root, after.next = after.next.prev = {prev: after, next: after.next, item});
+      },
+      removeNode = (root, n) => {
+	n.prev.next = n.next;
+	n.next.prev = n.prev;
+	if (n.item[node].parentNode === root.parentNode) {
+		root.parentNode.removeChild(n.item[node]);
+	}
+	root.length--;
+      },
+      entries = function* (root, start = 0, direction = 1) {
+	for (let [curr, pos] = getNode(root, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
+		yield [pos, curr.item];
+	}
+      },
+      pIFn = (name, fn) => {
+	if (typeof name === "number") {
+		return fn(name);
+	} else if (typeof name === "string") {
+		const index = parseInt(name);
+		if (index.toString() === name) {
+			return fn(index);
+		}
+	}
+	return undefined;
+      },
+      noItemFn = n => ({[node]: n}),
+      sort = (root, compareFunction) => {
+	if (compareFunction) {
+		root.sortFn = compareFunction;
+		root.order = 1;
+		if (compareFunction === noSort) {
+			return;
+		}
+	}
+	let curr = root.next;
+	root.next = root.prev = root;
+	while (curr.item) {
+		const next = curr.next;
+		curr.prev = root.prev;
+		curr.next = root;
+		sortNodes(root, root.prev = root.prev.next = curr);
+		curr = next;
+	}
+      },
+      reverse = (root) =>{
+	[root.prev, root.next] = [root.next, root.prev];
+	root.order *= -1;
+	for (let curr = root.next; curr.item; curr = curr.next) {
+		[curr.next, curr.prev] = [curr.prev, curr.next];
+		root.parentNode.appendChild(curr.item[node]);
+	}
+      },
+      replaceKey = (root, key, item, prev) => {
+	const old = root.map.get(key);
+	if (old) {
+		if (Object.is(old.item, item) && old.prev === prev) {
+			return;
+		}
+		removeNode(root, old);
+	}
+	root.map.set(key, Object.assign(addItemAfter(root, prev, item), {key}));
+      },
+      pp = new Proxy(NodeArray.prototype, {
+	has: (target, name) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+	get: (target, name, receiver) => pIFn(name, index => receiver.at(index)) || name === node ? receiver._n() : name === "length" ? receiver._l() : target[name],
+	set: (target, name, value, receiver) => pIFn(name, index => {
+		receiver.splice(index, 1, value)
+		return true;
+	}) || false,
+	deleteProperty: (target, name) => pIFn(name, index => target.splice(index, 1).length > 0) || delete target[name]
+      });
