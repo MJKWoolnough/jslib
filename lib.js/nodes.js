@@ -134,7 +134,8 @@ export class NodeArray {
 		return this.#root.length;
 	}
 	at(index) {
-		return getNode(this.#root, index);
+		const [node, pos] = getNode(this.#root, index);
+		return pos !== -1 ? node : undefined;
 	}
 	concat(...items) {
 		return Array.from(this.values()).concat(...items);

@@ -173,7 +173,8 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return this.#root.length;
 	}
 	at(index: number) {
-		return getNode(this.#root, index);
+		const [node, pos] = getNode(this.#root, index);
+		return pos !== -1 ? node : undefined;
 	}
 	concat(...items: ConcatArray<T>[]): T[];
 	concat(...items: (T | ConcatArray<T>)[]): T[] {
