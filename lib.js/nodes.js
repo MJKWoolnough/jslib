@@ -122,6 +122,7 @@ const sortNodes = (root, n) => {
 export class NodeArray {
 	constructor(parentNode, sortFn = noSort, elements = []) {
 		const root = this.#root = {sortFn, parentNode, length: 0, order: 1};
+		root.prev = root.next = root;
 		for (const item of elements) {
 			addItemAfter(root, root.prev, item);
 		}

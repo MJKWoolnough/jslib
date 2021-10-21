@@ -161,6 +161,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	#root: Root<T, H>;
 	constructor(parentNode: H, sortFn: sortFunc<T> = noSort, elements: Iterable<T> = []) {
 		const root = this.#root = {sortFn, parentNode, length: 0, order: 1} as Root<T, H>;
+		root.prev = root.next = root;
 		for (const item of elements) {
 			addItemAfter(root, root.prev, item);
 		}
