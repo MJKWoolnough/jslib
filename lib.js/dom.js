@@ -54,10 +54,10 @@ export const createElements = namespace => (element, properties, children) => {
 						elem.style.setProperty(k, prop[k]);
 					}
 				}
-			} else if (typeof prop === "string" || typeof prop === "number") {
-				elem.setAttribute(k, prop);
 			} else if (typeof prop === "boolean") {
 				elem.toggleAttribute(k, prop);
+			} else if (prop && prop.toString instanceof Function) {
+				elem.setAttribute(k, prop.toString());
 			} else if (prop === undefined && elem.hasAttribute(k)) {
 				elem.removeAttribute(k);
 			}

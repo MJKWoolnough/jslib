@@ -1,6 +1,10 @@
+interface ToString {
+	toString(): string;
+}
+
 export type Children = string | Node | Children[] | NodeList;
 
-export type Props = Record<string, number | string | string[] | DOMTokenList | Function | Boolean | undefined | Record<string, string | number | undefined>>;
+export type Props = Record<string, number | string | ToString | string[] | DOMTokenList | Function | Boolean | undefined | Record<string, string | number | undefined>>;
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -88,10 +92,10 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 						elem.style.setProperty(k, prop[k] as string);
 					}
 				}
-			} else if (typeof prop === "string" || typeof prop === "number") {
-				elem.setAttribute(k, prop as string);
 			} else if (typeof prop === "boolean") {
 				elem.toggleAttribute(k, prop);
+			} else if (prop && prop.toString instanceof Function) {
+				elem.setAttribute(k, prop.toString());
 			} else if (prop === undefined && elem.hasAttribute(k)) {
 				elem.removeAttribute(k);
 			}
