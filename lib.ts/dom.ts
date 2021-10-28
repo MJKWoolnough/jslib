@@ -94,7 +94,7 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 				}
 			} else if (typeof prop === "boolean") {
 				elem.toggleAttribute(k, prop);
-			} else if (prop && prop.toString instanceof Function) {
+			} else if (prop?.toString instanceof Function) {
 				elem.setAttribute(k, prop.toString());
 			} else if (prop === undefined && elem.hasAttribute(k)) {
 				elem.removeAttribute(k);
