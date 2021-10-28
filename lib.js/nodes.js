@@ -139,7 +139,7 @@ export class NodeArray {
 	}
 	at(index) {
 		const [node, pos] = getNode(this[realTarget].#root, index);
-		return pos !== -1 ? node : undefined;
+		return pos !== -1 ? node.item : undefined;
 	}
 	concat(...items) {
 		return Array.from(this.values()).concat(...items);
