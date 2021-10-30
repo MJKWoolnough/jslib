@@ -201,7 +201,22 @@ const snapTo = (shell, w, x3, y3) => {
 		div({"style": "text-align: center"}, ok)
 	]);
 	parent.addWindow(w) || reject(new Error("invalid target"));
-      });
+      }),
+      getScrolls = elm => {
+	const scrolls = [];
+	for (const c of elm.children) {
+		const {scrollTop, scrollLeft} = c;
+		if (scrollTop !== 0 || scrollLeft !== 0) {
+			scrolls.push(() => {
+				c.scrollTop = scrollTop;
+				c.scrollLeft = scrollLeft;
+			});
+		}
+		scrolls.push(...getScrolls(c));
+	}
+	return scrolls;
+      };
+
 let focusingWindow = null, dragging = false;
 
 export class ShellElement extends HTMLElement {
@@ -282,7 +297,7 @@ export class WindowElement extends HTMLElement {
 					extraButtons
 				])
 			]),
-			div(slot()),
+			this.#slot = div(slot()),
 			div({onclick})
 		]);
 		this.addEventListener("mousedown", onclick, {"capture": true});
@@ -355,7 +370,14 @@ export class WindowElement extends HTMLElement {
 		}
 		if (this.parentNode && this.nextElementSibling) {
 			focusingWindow = this;
+			const scrolls = getScrolls(this),
+			      {scrollTop, scrollLeft} = this.#slot;
 			this.parentNode.appendChild(this);
+			this.#slot.scrollTop = scrollTop;
+			this.#slot.scrollLeft = scrollLeft;
+			for (const scroll of scrolls) {
+				scroll();
+			}
 		}
 		super.focus();
 	}

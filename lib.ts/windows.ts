@@ -202,7 +202,22 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 		div({"style": "text-align: center"}, ok)
 	]);
 	parent.addWindow(w) || reject(new Error("invalid target"));
-      });
+      }),
+      getScrolls = (elm: Element) => {
+	const scrolls: (() => void)[] = [];
+	for (const c of elm.children) {
+		const {scrollTop, scrollLeft} = c;
+		if (scrollTop !== 0 || scrollLeft !== 0) {
+			scrolls.push(() => {
+				c.scrollTop = scrollTop;
+				c.scrollLeft = scrollLeft;
+			});
+		}
+		scrolls.push(...getScrolls(c));
+	}
+	return scrolls;
+      };
+
 let focusingWindow: WindowElement | null = null, dragging = false;
 
 export class ShellElement extends HTMLElement {
@@ -279,6 +294,7 @@ export class WindowElement extends HTMLElement {
 	#title: HTMLSpanElement;
 	#icon: HTMLImageElement;
 	#extra: HTMLSpanElement;
+	#slot: HTMLDivElement;
 	constructor() {
 		super();
 		const titleElement = this.#title = span({"part": "title"}),
@@ -511,7 +527,7 @@ export class WindowElement extends HTMLElement {
 					extraButtons
 				])
 			]),
-			div(slot()),
+			this.#slot = div(slot()),
 			div({onclick})
 		]);
 		this.addEventListener("mousedown", onclick, {"capture": true});
@@ -584,7 +600,14 @@ export class WindowElement extends HTMLElement {
 		}
 		if (this.parentNode && this.nextElementSibling) {
 			focusingWindow = this;
+			const scrolls = getScrolls(this),
+			      {scrollTop, scrollLeft} = this.#slot;
 			this.parentNode.appendChild(this);
+			this.#slot.scrollTop = scrollTop;
+			this.#slot.scrollLeft = scrollLeft;
+			for (const scroll of scrolls) {
+				scroll();
+			}
 		}
 		super.focus();
 	}
