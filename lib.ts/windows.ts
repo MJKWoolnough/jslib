@@ -297,10 +297,7 @@ export class WindowElement extends HTMLElement {
 	#slot: HTMLDivElement;
 	constructor() {
 		super();
-		const titleElement = this.#title = span({"part": "title"}),
-		      iconElement = this.#icon = img({"part": "icon", "src": noIcon}),
-		      extraButtons = this.#extra = span(),
-		      onclick = () => this.focus();
+		const onclick = () => this.focus();
 		createHTML(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
@@ -518,13 +515,13 @@ export class WindowElement extends HTMLElement {
 					this.toggleAttribute("maximised");
 				}
 			      }}, [
-				iconElement,
-				titleElement,
+				this.#icon = img({"part": "icon", "src": noIcon}),
+				this.#title = span({"part": "title"}),
 				div({"part": "controls"}, [
 					button({"part": "close", "onclick": () => this.close()}),
 					button({"part": "maximise", "onclick": () => this.toggleAttribute("maximised")}),
 					button({"part": "minimise", "onclick": () => this.toggleAttribute("minimised")}),
-					extraButtons
+					this.#extra = span()
 				])
 			]),
 			this.#slot = div(slot()),
