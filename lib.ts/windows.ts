@@ -203,17 +203,29 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 	]);
 	parent.addWindow(w) || reject(new Error("invalid target"));
       }),
-      getScrolls = (elm: Element) => {
+      getScrolls = (parent: Element) => {
 	const scrolls: (() => void)[] = [];
-	for (const c of elm.children) {
-		const {scrollTop, scrollLeft} = c;
+	let elm = parent;
+	while (elm.firstElementChild) {
+		elm = elm.firstElementChild;
+	}
+	while (elm !== parent) {
+		const {scrollTop, scrollLeft} = elm;
 		if (scrollTop !== 0 || scrollLeft !== 0) {
+			const c = elm;
 			scrolls.push(() => {
 				c.scrollTop = scrollTop;
 				c.scrollLeft = scrollLeft;
 			});
 		}
-		scrolls.push(...getScrolls(c));
+		if (elm.nextElementSibling) {
+			elm = elm.nextElementSibling;
+			while (elm.firstElementChild) {
+				elm = elm.firstElementChild;
+			}
+		} else {
+			elm = elm.parentElement as Element;
+		}
 	}
 	return scrolls;
       };
