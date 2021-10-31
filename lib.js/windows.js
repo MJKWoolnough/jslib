@@ -202,31 +202,11 @@ const snapTo = (shell, w, x3, y3) => {
 	]);
 	parent.addWindow(w) || reject(new Error("invalid target"));
       }),
-      getScrolls = parent => {
-	const scrolls = [];
-	let elm = parent;
+      deepestChildElement = elm => {
 	while (elm.firstElementChild) {
 		elm = elm.firstElementChild;
 	}
-	while (elm !== parent) {
-		const {scrollTop, scrollLeft} = elm;
-		if (scrollTop !== 0 || scrollLeft !== 0) {
-			const c = elm;
-			scrolls.push(() => {
-				c.scrollTop = scrollTop;
-				c.scrollLeft = scrollLeft;
-			});
-		}
-		if (elm.nextElementSibling) {
-			elm = elm.nextElementSibling;
-			while (elm.firstElementChild) {
-				elm = elm.firstElementChild;
-			}
-		} else {
-			elm = elm.parentElement;
-		}
-	}
-	return scrolls;
+	return elm;
       };
 
 let focusingWindow = null, dragging = false;
@@ -379,13 +359,17 @@ export class WindowElement extends HTMLElement {
 		}
 		if (this.parentNode && this.nextElementSibling) {
 			focusingWindow = this;
-			const scrolls = getScrolls(this),
-			      {scrollTop, scrollLeft} = this.#slot;
+			const scrolls = [[this, this.scrollTop, this.scrollLeft]];
+			for (let elm = deepestChildElement(this.#slot); elm !== this.#slot; elm = elm.nextElementSibling ? deepestChildElement(elm.nextElementSibling) : elm.parentElement) {
+				const {scrollTop, scrollLeft} = elm;
+				if (scrollTop !== 0 || scrollLeft !== 0) {
+					scrolls.push([elm, scrollTop, scrollLeft]);
+				}
+			}
 			this.parentNode.appendChild(this);
-			this.#slot.scrollTop = scrollTop;
-			this.#slot.scrollLeft = scrollLeft;
-			for (const scroll of scrolls) {
-				scroll();
+			for (const [elm, scrollTop, scrollLeft] of scrolls) {
+				elm.scrollTop = scrollTop;
+				elm.scrollLeft = scrollLeft;
 			}
 		}
 		super.focus();
