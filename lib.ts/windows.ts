@@ -1,5 +1,5 @@
 import type {DOMBind, Children, Props} from './dom.js';
-import {autoFocus, createHTML, svgNS} from './dom.js';
+import {autoFocus, createHTML, svgNS, walkNode} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 
 const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) => {
@@ -202,13 +202,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 		div({"style": "text-align: center"}, ok)
 	]);
 	parent.addWindow(w) || reject(new Error("invalid target"));
-      }),
-      deepestChildElement = (elm: Element) => {
-	while (elm.firstElementChild) {
-		elm = elm.firstElementChild;
-	}
-	return elm;
-      };
+      });
 
 let focusingWindow: WindowElement | null = null, dragging = false;
 
@@ -589,11 +583,14 @@ export class WindowElement extends HTMLElement {
 		}
 		if (this.parentNode && this.nextElementSibling) {
 			focusingWindow = this;
-			const scrolls: [Element, number, number][] = [[this, this.scrollTop, this.scrollLeft]];
-			for (let elm: Element = deepestChildElement(this.#slot); elm !== this.#slot; elm = elm.nextElementSibling ? deepestChildElement(elm.nextElementSibling) : elm.parentElement!) {
-				const {scrollTop, scrollLeft} = elm;
-				if (scrollTop !== 0 || scrollLeft !== 0) {
-					scrolls.push([elm, scrollTop, scrollLeft]);
+			const {scrollTop, scrollLeft} = this,
+			      scrolls: [Element, number, number][] = scrollTop || scrollLeft ? [[this, scrollTop, scrollLeft]] : [];
+			for (const elm of walkNode(this.#slot)) {
+				if (elm instanceof Element) {
+					const {scrollTop, scrollLeft} = elm as Element;
+					if (scrollTop || scrollLeft) {
+						scrolls.push([elm, scrollTop, scrollLeft]);
+					}
 				}
 			}
 			this.parentNode.appendChild(this);
