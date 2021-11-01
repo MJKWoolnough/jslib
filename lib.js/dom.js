@@ -12,6 +12,12 @@ const childrenArr = (elem, children) => {
 			elem.appendChild(c);
 		}
 	}
+      },
+      deepestChild = elm => {
+	while (elm.firstChild) {
+		elm = elm.firstChild;
+	}
+	return elm;
       };
 
 export const createElements = namespace => (element, properties, children) => {
@@ -123,4 +129,12 @@ export const createElements = namespace => (element, properties, children) => {
 		}
 	}, 0);
 	return node;
+      },
+      walkNode = function* (elm, self) {
+	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode)  {
+		yield e;
+	}
+	if (self) {
+		yield elm;
+	}
       };

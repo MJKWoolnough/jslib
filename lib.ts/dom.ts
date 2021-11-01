@@ -20,6 +20,12 @@ const childrenArr = (elem: Node, children: Children) => {
 			elem.appendChild(c);
 		}
 	}
+      },
+      deepestChild = (elm: Node) => {
+	while (elm.firstChild) {
+		elm = elm.firstChild;
+	}
+	return elm;
       };
 
 interface cElements {
@@ -161,4 +167,12 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 		}
 	}, 0);
 	return node;
+      },
+      walkNode = function* (elm: Node, self = false) {
+	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode!)  {
+		yield e;
+	}
+	if (self) {
+		yield elm;
+	}
       };
