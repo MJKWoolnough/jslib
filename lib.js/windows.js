@@ -388,4 +388,6 @@ customElements.define("windows-window", WindowElement);
 export const shell = (props, children) => createHTML(new ShellElement(), props, children),
 desktop = (props, children) => createHTML(new DesktopElement(), props, children),
 windows = (props, children) => createHTML(new WindowElement(), props, children),
-noIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;
+setDefaultIcon = icon => noIcon = icon;
+
+export let noIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;
