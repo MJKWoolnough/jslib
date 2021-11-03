@@ -144,7 +144,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
       alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
-		"window-icon": icon || defaultIcon,
+		"window-icon": icon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
@@ -160,7 +160,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
       confirmFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
-		"window-icon": icon || defaultIcon,
+		"window-icon": icon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
@@ -192,7 +192,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 	      }})),
 	      w = windows({
 		"window-hide": true,
-		"window-icon": icon || defaultIcon,
+		"window-icon": icon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(null)

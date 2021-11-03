@@ -143,7 +143,7 @@ const snapTo = (shell, w, x3, y3) => {
       alertFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
-		"window-icon": icon || defaultIcon,
+		"window-icon": icon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
@@ -159,7 +159,7 @@ const snapTo = (shell, w, x3, y3) => {
       confirmFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
-		"window-icon": icon || defaultIcon,
+		"window-icon": icon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
@@ -191,7 +191,7 @@ const snapTo = (shell, w, x3, y3) => {
 	      }})),
 	      w = windows({
 		"window-hide": true,
-		"window-icon": icon || defaultIcon,
+		"window-icon": icon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(null)
