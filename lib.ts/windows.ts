@@ -542,7 +542,7 @@ export class WindowElement extends HTMLElement {
 			this.#title.innerText = newValue;
 			break;
 		case "window-icon":
-			this.#icon.setAttribute("src", newValue);
+			this.#icon.setAttribute("src", newValue ?? defaultIcon);
 			break;
 		}
 	}
