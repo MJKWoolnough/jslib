@@ -143,7 +143,7 @@ const snapTo = (shell, w, x3, y3) => {
       alertFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
-		"window-icon": icon || noIcon,
+		"window-icon": icon || defaultIcon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
@@ -159,7 +159,7 @@ const snapTo = (shell, w, x3, y3) => {
       confirmFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
-		"window-icon": icon || noIcon,
+		"window-icon": icon || defaultIcon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
@@ -191,7 +191,7 @@ const snapTo = (shell, w, x3, y3) => {
 	      }})),
 	      w = windows({
 		"window-hide": true,
-		"window-icon": icon || noIcon,
+		"window-icon": icon || defaultIcon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(null)
@@ -271,7 +271,7 @@ export class WindowElement extends HTMLElement {
 					this.toggleAttribute("maximised");
 				}
 			      }}, [
-				this.#icon = img({"part": "icon", "src": noIcon}),
+				this.#icon = img({"part": "icon", "src": defaultIcon}),
 				this.#title = span({"part": "title"}),
 				div({"part": "controls"}, [
 					button({"part": "close", "onclick": () => this.close()}),
@@ -388,6 +388,6 @@ customElements.define("windows-window", WindowElement);
 export const shell = (props, children) => createHTML(new ShellElement(), props, children),
 desktop = (props, children) => createHTML(new DesktopElement(), props, children),
 windows = (props, children) => createHTML(new WindowElement(), props, children),
-setDefaultIcon = icon => noIcon = icon;
+setDefaultIcon = icon => defaultIcon = icon;
 
-export let noIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;
+export let defaultIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;

@@ -144,7 +144,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
       alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
-		"window-icon": icon || noIcon,
+		"window-icon": icon || defaultIcon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
@@ -160,7 +160,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
       confirmFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
-		"window-icon": icon || noIcon,
+		"window-icon": icon || defaultIcon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(false)
@@ -192,7 +192,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 	      }})),
 	      w = windows({
 		"window-hide": true,
-		"window-icon": icon || noIcon,
+		"window-icon": icon || defaultIcon,
 		"window-title": title,
 		"hide-maximise": "true",
 		"onremove": () => resolve(null)
@@ -501,7 +501,7 @@ export class WindowElement extends HTMLElement {
 					this.toggleAttribute("maximised");
 				}
 			      }}, [
-				this.#icon = img({"part": "icon", "src": noIcon}),
+				this.#icon = img({"part": "icon", "src": defaultIcon}),
 				this.#title = span({"part": "title"}),
 				div({"part": "controls"}, [
 					button({"part": "close", "onclick": () => this.close()}),
@@ -619,6 +619,6 @@ customElements.define("windows-window", WindowElement);
 export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new ShellElement(), props, children),
 desktop: DOMBind<DesktopElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new DesktopElement(), props, children),
 windows: DOMBind<WindowElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new WindowElement(), props, children),
-setDefaultIcon = (icon: string) => noIcon = icon;
+setDefaultIcon = (icon: string) => defaultIcon = icon;
 
-export let noIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;
+export let defaultIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;
