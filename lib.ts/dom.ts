@@ -13,7 +13,7 @@ const childrenArr = (elem: Node, children: Children) => {
 		for (const c of children) {
 			childrenArr(elem, c);
 		}
-	} else if(children instanceof Node) {
+	} else if (children instanceof Node) {
 		elem.appendChild(children);
 	} else if (children instanceof NodeList) {
 		for (const c of children) {
@@ -169,7 +169,7 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	return node;
       },
       walkNode = function* (elm: Node, self = false) {
-	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode!)  {
+	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode!) {
 		yield e;
 	}
 	if (self) {

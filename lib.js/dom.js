@@ -26,7 +26,7 @@ export const createElements = namespace => (element, properties, children) => {
 		[properties, children] = [children, properties];
 	}
 	if (typeof properties === "object" && elem instanceof Element) {
-		for (const [k, prop] of Object.entries(properties))  {
+		for (const [k, prop] of Object.entries(properties)) {
 			if (prop instanceof Function) {
 				const opts = {};
 				let ev = k;
@@ -80,7 +80,7 @@ export const createElements = namespace => (element, properties, children) => {
       svgNS = "http://www.w3.org/2000/svg",
       createHTML = createElements(htmlNS),
       createSVG = createElements(svgNS),
-      createDocumentFragment = (children) => {
+      createDocumentFragment = children => {
 	const elem = document.createDocumentFragment();
 	if (typeof children === "string") {
 		elem.textContent = children;
