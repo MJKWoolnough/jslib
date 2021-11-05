@@ -260,6 +260,10 @@ export class DesktopElement extends HTMLElement {
 }
 
 export class WindowElement extends HTMLElement {
+	#icon;
+	#title;
+	#extra;
+	#slot;
 	constructor() {
 		super();
 		const onclick = () => this.focus();

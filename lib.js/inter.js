@@ -24,6 +24,7 @@ export class Pipe {
 }
 
 export class Requester {
+	#responder;
 	request(...data) {
 		const r = this.#responder;
 		if (r === undefined) {
@@ -39,6 +40,9 @@ export class Requester {
 }
 
 export class Subscription {
+	#success;
+	#error;
+	#cancel;
 	constructor(fn) {
 		const success = new Pipe(),
 		      error = new Pipe(),

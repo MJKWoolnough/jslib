@@ -121,6 +121,7 @@ const sortNodes = (root, n) => {
       };
 
 export class NodeArray {
+	#root;
 	constructor(parentNode, sortFn = noSort, elements = []) {
 		const root = this.#root = {sortFn, parentNode, length: 0, order: 1},
 		      p = new Proxy(this, proxyObj);
@@ -374,6 +375,7 @@ export class NodeArray {
 }
 
 export class NodeMap {
+	#root;
 	constructor(parentNode, sortFn = noSort, entries = []) {
 		const root = this.#root = {sortFn, parentNode, length: 0, order: 1, map: new Map()};
 		root.prev = root.next = root;
