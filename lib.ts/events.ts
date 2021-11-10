@@ -82,14 +82,14 @@ export const keyEvent = (key: string, onkeydown?: KeyFn, onkeyup?: KeyFn, once =
 			ups.get(key)?.delete(id);
 			toRun?.(ke("up", key));
 		}
-	];
+	] as const;
 },
 mouseMoveEvent = (onmousemove: MouseFn) => {
 	const id = nextMouseID++;
 	return [
 		() => mouseMove.set(id, onmousemove),
 		() => mouseMove.delete(id)
-	];
+	] as const;
 },
 mouseDragEvent = (button: 0 | 1 | 2, onmousemove?: MouseFn, onmouseup: MouseFn = () => {}) => {
 	const id = nextMouseID++;
@@ -106,7 +106,7 @@ mouseDragEvent = (button: 0 | 1 | 2, onmousemove?: MouseFn, onmouseup: MouseFn =
 			mouseUp[button].delete(id);
 			toRun?.(me(button));
 		}
-	];
+	] as const;
 },
 hasKeyEvent = (key: string) => !!(downs.get(key)?.size || ups.get(key)?.size);
 
