@@ -3,40 +3,40 @@ noSort = () => 0,
 stringSort = new Intl.Collator().compare;
 
 const sortNodes = (root, n) => {
-	while (n.prev.item && root.sortFn(n.item, n.prev.item) * root.order < 0) {
-		n.next.prev = n.prev;
-		n.prev.next = n.next;
-		n.next = n.prev;
-		const pp = n.prev.prev;
-		n.prev.prev = n;
-		n.prev = pp;
-		pp.next = n;
+	while (n.p.i && root.s(n.i, n.p.i) * root.o < 0) {
+		n.n.p = n.p;
+		n.p.n = n.n;
+		n.n = n.p;
+		const pp = n.p.p;
+		n.p.p = n;
+		n.p = pp;
+		pp.n = n;
 	}
-	while (n.next.item && root.sortFn(n.item, n.next.item) * root.order > 0) {
-		n.next.prev = n.prev;
-		n.prev.next = n.next;
-		n.prev = n.next;
-		const nn = n.next.next;
-		n.next.next = n;
-		n.next = nn;
-		nn.prev = n;
+	while (n.n.i && root.s(n.i, n.n.i) * root.o > 0) {
+		n.n.p = n.p;
+		n.p.n = n.n;
+		n.p = n.n;
+		const nn = n.n.n;
+		n.n.n = n;
+		n.n = nn;
+		nn.p = n;
 	}
-	if (n.next.item) {
-		root.parentNode.insertBefore(n.item[node], n.next.item[node]);
+	if (n.n.i) {
+		root.pN.insertBefore(n.i[node], n.n.i[node]);
 	} else {
-		root.parentNode.appendChild(n.item[node]);
+		root.pN.appendChild(n.i[node]);
 	}
 	return n;
       },
       getNode = (root, index) => {
 	if (index < 0) {
-		for (let curr = root.prev, pos = index; curr.item; pos++, curr = curr.prev) {
+		for (let curr = root.p, pos = index; curr.i; pos++, curr = curr.p) {
 			if (pos === 0) {
 				return [curr, pos];
 			}
 		}
-	} else if (index < root.length) {
-		for (let curr = root.next, pos = index; curr.item; pos--, curr = curr.next) {
+	} else if (index < root.l) {
+		for (let curr = root.n, pos = index; curr.i; pos--, curr = curr.n) {
 			if (pos === 0) {
 				return [curr, pos];
 			}
@@ -44,21 +44,21 @@ const sortNodes = (root, n) => {
 	}
 	return [root, -1];
       },
-      addItemAfter = (root, after, item) => {
-	root.length++;
-	return sortNodes(root, after.next = after.next.prev = {prev: after, next: after.next, item});
+      addItemAfter = (root, after, i) => {
+	root.l++;
+	return sortNodes(root, after.n = after.n.p = {"p": after, "n": after.n, i});
       },
       removeNode = (root, n) => {
-	n.prev.next = n.next;
-	n.next.prev = n.prev;
-	if (n.item[node].parentNode === root.parentNode) {
-		root.parentNode.removeChild(n.item[node]);
+	n.p.n = n.n;
+	n.n.p = n.p;
+	if (n.i[node].parentNode === root.pN) {
+		root.pN.removeChild(n.i[node]);
 	}
-	root.length--;
+	root.l--;
       },
       entries = function* (root, start = 0, direction = 1) {
-	for (let [curr, pos] = getNode(root, start); curr.item; pos += direction, curr = direction === 1 ? curr.next : curr.prev) {
-		yield [pos, curr.item];
+	for (let [curr, pos] = getNode(root, start); curr.i; pos += direction, curr = direction === 1 ? curr.n : curr.p) {
+		yield [pos, curr.i];
 	}
       },
       pIFn = (name, fn) => {
@@ -75,39 +75,39 @@ const sortNodes = (root, n) => {
       noItemFn = n => ({[node]: n}),
       sort = (root, compareFunction) => {
 	if (compareFunction) {
-		root.sortFn = compareFunction;
-		root.order = 1;
+		root.s = compareFunction;
+		root.o = 1;
 		if (compareFunction === noSort) {
 			return;
 		}
 	}
-	let curr = root.next;
-	root.next = root.prev = root;
-	while (curr.item) {
-		const next = curr.next;
-		curr.prev = root.prev;
-		curr.next = root;
-		sortNodes(root, root.prev = root.prev.next = curr);
+	let curr = root.n;
+	root.n = root.p = root;
+	while (curr.i) {
+		const next = curr.n;
+		curr.p = root.p;
+		curr.n = root;
+		sortNodes(root, root.p = root.p.n = curr);
 		curr = next;
 	}
       },
       reverse = root =>{
-	[root.prev, root.next] = [root.next, root.prev];
-	root.order *= -1;
-	for (let curr = root.next; curr.item; curr = curr.next) {
-		[curr.next, curr.prev] = [curr.prev, curr.next];
-		root.parentNode.appendChild(curr.item[node]);
+	[root.p, root.n] = [root.n, root.p];
+	root.o *= -1;
+	for (let curr = root.n; curr.i; curr = curr.n) {
+		[curr.n, curr.p] = [curr.p, curr.n];
+		root.pN.appendChild(curr.i[node]);
 	}
       },
-      replaceKey = (root, key, item, prev) => {
-	const old = root.map.get(key);
+      replaceKey = (root, k, item, prev) => {
+	const old = root.m.get(k);
 	if (old) {
-		if (Object.is(old.item, item) && old.prev === prev) {
+		if (Object.is(old.i, item) && old.p === prev) {
 			return;
 		}
 		removeNode(root, old);
 	}
-	root.map.set(key, Object.assign(addItemAfter(root, prev, item), {key}));
+	root.m.set(k, Object.assign(addItemAfter(root, prev, item), {k}));
       },
       realTarget = Symbol("realTarget"),
       proxyObj = {
@@ -122,25 +122,26 @@ const sortNodes = (root, n) => {
 
 export class NodeArray {
 	#root;
-	constructor(parentNode, sortFn = noSort, elements = []) {
-		const root = this.#root = {sortFn, parentNode, length: 0, order: 1},
+	[realTarget];
+	constructor(pN, s = noSort, elements = []) {
+		const root = this.#root = {s, pN, l: 0, o: 1},
 		      p = new Proxy(this, proxyObj);
 		Object.defineProperty(this, realTarget, {"value": this});
-		root.prev = root.next = root;
+		root.p = root.n = root;
 		for (const item of elements) {
-			addItemAfter(root, root.prev, item);
+			addItemAfter(root, root.p, item);
 		}
 		return p;
 	}
 	get [node]() {
-		return this[realTarget].#root.parentNode;
+		return this[realTarget].#root.pN;
 	}
 	get length() {
-		return this[realTarget].#root.length;
+		return this[realTarget].#root.l;
 	}
 	at(index) {
 		const [node, pos] = getNode(this[realTarget].#root, index);
-		return pos !== -1 ? node.item : undefined;
+		return pos !== -1 ? node.i : undefined;
 	}
 	concat(...items) {
 		return Array.from(this.values()).concat(...items);
@@ -174,10 +175,10 @@ export class NodeArray {
 	filterRemove(callback, thisArg) {
 		const root = this[realTarget].#root,
 		      filtered = [];
-		for (let curr = root.next, i = 0; curr.item; curr = curr.next, i++) {
-			if (callback.call(thisArg, curr.item, i, this)) {
+		for (let curr = root.n, i = 0; curr.i; curr = curr.n, i++) {
+			if (callback.call(thisArg, curr.i, i, this)) {
 				removeNode(root, curr);
-				filtered.push(curr.item);
+				filtered.push(curr.i);
 			}
 		}
 		return filtered;
@@ -213,10 +214,10 @@ export class NodeArray {
 		const s = new NodeArray(n),
 		      root = s.#root;
 		for (const c of n.childNodes) {
-			const item = itemFn(c);
-			if (item) {
-				root.prev = root.prev.next = {prev: root.prev, next: root, item};
-				root.length++;
+			const i = itemFn(c);
+			if (i) {
+				root.p = root.p.n = {"p": root.p, n: root, i};
+				root.l++;
 			}
 		}
 		return s;
@@ -241,7 +242,7 @@ export class NodeArray {
 		return Array.from(this.values()).join(separator);
 	}
 	*keys() {
-		for (let i = 0; i < this[realTarget].#root.length; i++) {
+		for (let i = 0; i < this[realTarget].#root.l; i++) {
 			yield i;
 		}
 	}
@@ -262,17 +263,17 @@ export class NodeArray {
 	}
 	pop() {
 		const root = this[realTarget].#root,
-		      last = root.prev;
-		if (last.item) {
+		      last = root.p;
+		if (last.i) {
 			removeNode(root, last);
 		}
-		return last.item;
+		return last.i;
 	}
 	push(element, ...elements) {
 		const root = this[realTarget].#root;
-		addItemAfter(root, root.prev, element);
-		elements.forEach(item => addItemAfter(root, root.prev, item));
-		return root.length;
+		addItemAfter(root, root.p, element);
+		elements.forEach(item => addItemAfter(root, root.p, item));
+		return root.l;
 	}
 	reduce(callbackfn, initialValue) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
@@ -300,19 +301,19 @@ export class NodeArray {
 	}
 	shift() {
 		const root = this[realTarget].#root,
-		      first = root.next;
-		if (first.item) {
+		      first = root.n;
+		if (first.i) {
 			removeNode(root, first);
 		}
-		return first.item;
+		return first.i;
 	}
 	slice(begin = 0, end) {
 		const root = this[realTarget].#root,
 		      slice = [];
 		if (end === undefined) {
-			end = root.length;
+			end = root.l;
 		} else if (end < 0) {
-			end += root.length;
+			end += root.l;
 		}
 		for (const [index, item] of entries(root, begin)) {
 			if (index >= end) {
@@ -338,9 +339,9 @@ export class NodeArray {
 		const root = this[realTarget].#root,
 		      removed = [];
 		let [curr] = getNode(root, start),
-		    adder = curr.prev;
-		for (; curr.item && deleteCount > 0; deleteCount--, curr = curr.next) {
-			removed.push(curr.item);
+		    adder = curr.p;
+		for (; curr.i && deleteCount > 0; deleteCount--, curr = curr.n) {
+			removed.push(curr.i);
 			removeNode(root, curr);
 		}
 		items.forEach(item => adder = addItemAfter(root, adder, item));
@@ -350,11 +351,11 @@ export class NodeArray {
 		const root = this[realTarget].#root;
 		let adder = addItemAfter(root, root, element);
 		elements.forEach(item => adder = addItemAfter(root, adder, item));
-		return root.length;
+		return root.l;
 	}
 	*values() {
-		for (let curr = this[realTarget].#root.next; curr.item; curr = curr.next) {
-			yield curr.item;
+		for (let curr = this[realTarget].#root.n; curr.i; curr = curr.n) {
+			yield curr.i;
 		}
 	}
 	*[Symbol.iterator]() {
@@ -376,52 +377,52 @@ export class NodeArray {
 
 export class NodeMap {
 	#root;
-	constructor(parentNode, sortFn = noSort, entries = []) {
-		const root = this.#root = {sortFn, parentNode, length: 0, order: 1, map: new Map()};
-		root.prev = root.next = root;
+	constructor(pN, s = noSort, entries = []) {
+		const root = this.#root = {s, pN, l: 0, o: 1, m: new Map()};
+		root.p = root.n = root;
 		for (const [k, item] of entries) {
-			replaceKey(root, k, item, root.prev);
+			replaceKey(root, k, item, root.p);
 		}
 	}
 	get [node]() {
-		return this.#root.parentNode;
+		return this.#root.pN;
 	}
 	get size() {
-		return this.#root.length;
+		return this.#root.l;
 	}
 	clear() {
 		const root = this.#root;
-		for (let curr = root.next; curr.item; curr = curr.next) {
+		for (let curr = root.n; curr.i; curr = curr.n) {
 			removeNode(root, curr);
 		}
-		root.map.clear();
+		root.m.clear();
 	}
 	delete(k) {
 		const root = this.#root,
-		      curr = root.map.get(k);
+		      curr = root.m.get(k);
 		if (!curr) {
 			return false;
 		}
 		removeNode(root, curr);
-		return root.map.delete(k);
+		return root.m.delete(k);
 	}
 	*entries() {
-		for (const [k, v] of this.#root.map) {
-			yield [k, v.item];
+		for (const [k, v] of this.#root.m) {
+			yield [k, v.i];
 		}
 	}
 	forEach(callbackfn, thisArg = this) {
-		this.#root.map.forEach((v, k) => callbackfn(v.item, k, thisArg));
+		this.#root.m.forEach((v, k) => callbackfn(v.i, k, thisArg));
 	}
 	get(k) {
-		return this.#root.map.get(k)?.item;
+		return this.#root.m.get(k)?.i;
 	}
 	has(k) {
-		return this.#root.map.has(k);
+		return this.#root.m.has(k);
 	}
 	insertAfter(k, item, after) {
 		const root = this.#root,
-		      a = root.map.get(after);
+		      a = root.m.get(after);
 		if (!a) {
 			return false;
 		}
@@ -430,30 +431,30 @@ export class NodeMap {
 	}
 	insertBefore(k, item, before) {
 		const root = this.#root,
-		      b = root.map.get(before);
+		      b = root.m.get(before);
 		if (!b) {
 			return false;
 		}
-		replaceKey(root, k, item, b.prev);
+		replaceKey(root, k, item, b.p);
 		return true;
 	}
 	keyAt(pos) {
-		for (let curr = this.#root.next; curr.item; pos--, curr = curr.next) {
+		for (let curr = this.#root.n; curr.i; pos--, curr = curr.n) {
 			if (pos === 0) {
-				return curr.key;
+				return curr.k;
 			}
 		}
 		return undefined;
 	}
 	keys() {
-		return this.#root.map.keys();
+		return this.#root.m.keys();
 	}
 	position(key) {
 		const root = this.#root;
 		let count = -1,
-		    curr = root.map.get(key) ?? root;
+		    curr = (root.m.get(key) ?? root);
 		while (curr !== root) {
-			curr = curr.prev;
+			curr = curr.p;
 			count++;
 		}
 		return count;
@@ -464,7 +465,7 @@ export class NodeMap {
 	}
 	set(k, item) {
 		const root = this.#root;
-		replaceKey(root, k, item, root.prev);
+		replaceKey(root, k, item, root.p);
 		return this;
 	}
 	sort(compareFunction) {
@@ -472,8 +473,8 @@ export class NodeMap {
 		return this;
 	}
 	*values() {
-		for (const v of this.#root.map.values()) {
-			yield v.item;
+		for (const v of this.#root.m.values()) {
+			yield v.i;
 		}
 	}
 	*[Symbol.iterator]() {
