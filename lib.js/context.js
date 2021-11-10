@@ -1,7 +1,7 @@
-import {autoFocus, createHTML} from './dom.js';
+import {autoFocus, createHTML, Props} from './dom.js';
 import {div, li, span, style, ul} from './html.js';
 
-pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}.contextDisabled{color:#aaa}.contextClearer{position:absolute;top:0;left:0;bottom:0;right:0}`)));
+pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, '.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:not(.contextDisabled):hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}.contextDisabled{color:#aaa}.contextClearer{position:absolute;top:0;left:0;bottom:0;right:0}')));
 
 const mousedownEvent = new MouseEvent("mousedown"),
       keydownEvent = new KeyboardEvent("keydown", {"key": "ArrowDown"}),
@@ -9,29 +9,29 @@ const mousedownEvent = new MouseEvent("mousedown"),
       IsItem = item => item.action !== undefined,
       setTO = (ctx, fn) => {
 	clearTO(ctx);
-	ctx.timeout = window.setTimeout(() => {
-		ctx.timeout = -1;
+	ctx.t = window.setTimeout(() => {
+		ctx.t = -1;
 		fn()
-	}, ctx.delay);
+	}, ctx.d);
       },
       clearTO = ctx => {
-	if (ctx.timeout !== -1) {
-		window.clearTimeout(ctx.timeout);
-		ctx.timeout = -1;
+	if (ctx.t !== -1) {
+		window.clearTimeout(ctx.t);
+		ctx.t = -1;
 	}
       },
       placeList = (ctx, coords, list) => {
 	clearTO(ctx);
 	list.style.setProperty("top", "0");
 	list.style.setProperty("left", "0");
-	ctx.container.appendChild(list);
-	let top = coords[0][1] + list.clientHeight <= ctx.container.clientHeight ? coords[0][1] : coords[1][1] - list.clientHeight;
+	ctx.c.appendChild(list);
+	let top = coords[0][1] + list.clientHeight <= ctx.c.clientHeight ? coords[0][1] : coords[1][1] - list.clientHeight;
 	if (top < 0) {
 		top = 0;
 	}
-	list.style.setProperty("left", (coords[0][0] + list.clientWidth <= ctx.container.clientWidth ? coords[0][0] : coords[1][0] - list.clientWidth) + "px");
+	list.style.setProperty("left", (coords[0][0] + list.clientWidth <= ctx.c.clientWidth ? coords[0][0] : coords[1][0] - list.clientWidth) + "px");
 	list.style.setProperty("top", top + "px");
-	ctx.focus = list;
+	ctx.f = list;
 	autoFocus(list);
       },
       list2HTML = (ctx, list, last) => {
@@ -39,18 +39,18 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	    selected = -1;
 	const closeFn = () => {
 		if (open) {
-			open.remove()
+			open.remove();
 			open = null;
 		}
 	      },
 	      keys = new Map(),
 	      l = ul();
 	return createHTML(l, {"class": "contextMenu", "oncontextremove": () => {
+		closeFn();
 		if (selected >= 0) {
 			l.childNodes[selected].classList.remove("contextSelected");
 			selected = -1;
 		}
-		closeFn();
 	}, "tabindex": "-1", "onkeydown": e => {
 		let mode = -1;
 		switch (e.key) {
@@ -86,7 +86,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			mode = 1;
 		case "Escape":
 			if (last) {
-				ctx.focus = last;
+				ctx.f = last;
 				last.focus();
 			} else if (mode === -1) {
 				l.blur();
@@ -121,8 +121,8 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		}
 		return false;
 	      }, "onblur": () => {
-		if (ctx.focus === l) {
-			window.setTimeout(() => ctx.resolve(undefined), 0);
+		if (ctx.f === l) {
+			window.setTimeout(() => ctx.r(undefined), 0);
 		}
 	      }, "onfocus": closeFn}, list.map((e, n) => {
 		let name = [e.name];
@@ -142,7 +142,8 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				}
 			}
 		}
-		let params, classes = [];
+		let params,
+		    classes = [];
 		if (e.disabled) {
 			params = {};
 			classes.push("contextDisabled");
@@ -152,13 +153,13 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		} else if (IsItem(e)) {
 			params = {
 				"onmousedown": f => {
-					ctx.resolve(e.action());
+					ctx.r(e.action());
 					f.preventDefault();
 				},
 				"onmouseover": () => {
 					setTO(ctx, () => {
 						closeFn();
-						ctx.focus = l;
+						ctx.f = l;
 						l.focus();
 					});
 					if (selected >= 0) {
@@ -204,21 +205,22 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	}));
       };
 
-export const item = (name, action, options = {}) => Object.assign({name, action}, options), menu = (name, list, options) => Object.assign({name, list: list.flat(Infinity)}, options);
-export default function(container, coords, list, delay = 0) {
+export const item = (name, action, options) => Object.assign({name, action}, options), menu = (name, list, options = {}) => Object.assign({name, list: list.flat(Infinity)}, options);
+
+export default function (c, coords, list, d = 0) {
 	return new Promise(resolve => {
-		const ctx = {container, resolve: data => {
+		const ctx = {c, r: data => {
 			root.remove();
 			cc.remove();
 			resolve(data);
-		      }, delay: delay, timeout: -1},
+		      }, d, t: -1},
 		      root = list2HTML(ctx, list.flat(Infinity)),
-		      cc = container.appendChild(div({"class": "contextClearer", "tabindex": -1, "onfocus": () => cc.remove()}));
+		      cc = c.appendChild(div({"class": "contextClearer", "tabindex": -1, "onfocus": () => cc.remove()}));
 		new MutationObserver(mutations => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 			if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
 				n.dispatchEvent(closeEvent);
 			}
-		}))).observe(container, {"childList": true, "subtree": true});
+		}))).observe(c, {"childList": true, "subtree": true});
 		placeList(ctx, [coords, coords], root)
-	})
-};
+	});
+}

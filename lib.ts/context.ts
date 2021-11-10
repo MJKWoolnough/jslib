@@ -57,11 +57,11 @@ export type Menu = i & {
 }
 
 type Ctx = {
-	container: Element;
-	resolve: (a: any) => any;
-	delay: number;
-	timeout: number;
-	focus?: HTMLUListElement;
+	c: Element;
+	r: (a: any) => any;
+	d: number;
+	t: number;
+	f?: HTMLUListElement;
 }
 
 type Coords = [[number, number], [number, number]];
@@ -75,29 +75,29 @@ const mousedownEvent = new MouseEvent("mousedown"),
       IsItem = (item: Item | Menu): item is Item => (item as Item).action !== undefined,
       setTO = (ctx: Ctx, fn: () => any) => {
 	clearTO(ctx);
-	ctx.timeout = window.setTimeout(() => {
-		ctx.timeout = -1;
+	ctx.t = window.setTimeout(() => {
+		ctx.t = -1;
 		fn()
-	}, ctx.delay);
+	}, ctx.d);
       },
       clearTO = (ctx: Ctx) => {
-	if (ctx.timeout !== -1) {
-		window.clearTimeout(ctx.timeout);
-		ctx.timeout = -1;
+	if (ctx.t !== -1) {
+		window.clearTimeout(ctx.t);
+		ctx.t = -1;
 	}
       },
       placeList = (ctx: Ctx, coords: Coords, list: HTMLUListElement) => {
 	clearTO(ctx);
 	list.style.setProperty("top", "0");
 	list.style.setProperty("left", "0");
-	ctx.container.appendChild(list);
-	let top = coords[0][1] + list.clientHeight <= ctx.container.clientHeight ? coords[0][1] : coords[1][1] - list.clientHeight;
+	ctx.c.appendChild(list);
+	let top = coords[0][1] + list.clientHeight <= ctx.c.clientHeight ? coords[0][1] : coords[1][1] - list.clientHeight;
 	if (top < 0) {
 		top = 0;
 	}
-	list.style.setProperty("left", (coords[0][0] + list.clientWidth <= ctx.container.clientWidth ? coords[0][0] : coords[1][0] - list.clientWidth) + "px");
+	list.style.setProperty("left", (coords[0][0] + list.clientWidth <= ctx.c.clientWidth ? coords[0][0] : coords[1][0] - list.clientWidth) + "px");
 	list.style.setProperty("top", top + "px");
-	ctx.focus = list;
+	ctx.f = list;
 	autoFocus(list);
       },
       list2HTML = (ctx: Ctx, list: LList, last?: HTMLUListElement): HTMLUListElement => {
@@ -152,7 +152,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			mode = 1;
 		case "Escape":
 			if (last) {
-				ctx.focus = last;
+				ctx.f = last;
 				last.focus();
 			} else if (mode === -1) {
 				l.blur();
@@ -187,8 +187,8 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		}
 		return false;
 	      }, "onblur": () => {
-		if (ctx.focus === l) {
-			window.setTimeout(() => ctx.resolve(undefined), 0);
+		if (ctx.f === l) {
+			window.setTimeout(() => ctx.r(undefined), 0);
 		}
 	      }, "onfocus": closeFn}, list.map((e, n) => {
 		let name: (string | HTMLSpanElement)[] = [e.name];
@@ -208,7 +208,8 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				}
 			}
 		}
-		let params: Props, classes = [];
+		let params: Props,
+		    classes = [];
 		if (e.disabled) {
 			params = {};
 			classes.push("contextDisabled");
@@ -218,13 +219,13 @@ const mousedownEvent = new MouseEvent("mousedown"),
 		} else if (IsItem(e)) {
 			params = {
 				"onmousedown": (f: Event) => {
-					ctx.resolve(e.action());
+					ctx.r(e.action());
 					f.preventDefault();
 				},
 				"onmouseover": () => {
 					setTO(ctx, () => {
 						closeFn();
-						ctx.focus = l;
+						ctx.f = l;
 						l.focus();
 					});
 					if (selected >= 0) {
@@ -271,20 +272,21 @@ const mousedownEvent = new MouseEvent("mousedown"),
       };
 
 export const item = (name: string, action: () => any, options: Options = {}) => Object.assign({name, action}, options), menu = (name: string, list: List, options: Options = {}) => Object.assign({name, list: list.flat(Infinity)}, options);
-export default function (container: Element, coords: [number, number], list: List, delay: number = 0) {
+
+export default function (c: Element, coords: [number, number], list: List, d: number = 0) {
 	return new Promise(resolve => {
-		const ctx: Ctx = {container, resolve: (data: any) => {
+		const ctx: Ctx = {c, r: (data: any) => {
 			root.remove();
 			cc.remove();
 			resolve(data);
-		      }, delay: delay, timeout: -1},
+		      }, d, t: -1},
 		      root = list2HTML(ctx, list.flat(Infinity)),
-		      cc = container.appendChild(div({"class": "contextClearer", "tabindex": -1, "onfocus": () => cc.remove()}));
+		      cc = c.appendChild(div({"class": "contextClearer", "tabindex": -1, "onfocus": () => cc.remove()}));
 		new MutationObserver((mutations: MutationRecord[]) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 			if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
 				n.dispatchEvent(closeEvent);
 			}
-		}))).observe(container, {"childList": true, "subtree": true});
+		}))).observe(c, {"childList": true, "subtree": true});
 		placeList(ctx, [coords, coords], root)
 	});
 }
