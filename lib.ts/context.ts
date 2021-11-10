@@ -273,7 +273,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 
 export const item = (name: string, action: () => any, options: Options = {}) => Object.assign({name, action}, options), menu = (name: string, list: List, options: Options = {}) => Object.assign({name, list: list.flat(Infinity)}, options);
 
-export default function (c: Element, coords: [number, number], list: List, d: number = 0) {
+export default (c: Element, coords: [number, number], list: List, d: number = 0) => {
 	return new Promise(resolve => {
 		const ctx: Ctx = {c, r: (data: any) => {
 			root.remove();
