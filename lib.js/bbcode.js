@@ -90,7 +90,7 @@ export const text = Symbol("text"),
 isOpenTag = t => typeof t === "object" && t.attr !== undefined,
 isCloseTag = t => typeof t === "object" && t.attr === undefined,
 isString = t => typeof t === "string",
-process = function(node, t, p, closeTag) {
+process = (node, t, p, closeTag) => {
 	while (true) {
 		const tk = t.next().value;
 		if (!tk) {
