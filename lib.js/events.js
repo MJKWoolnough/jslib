@@ -1,7 +1,7 @@
 let nextKeyID = 0,
     nextMouseID = 0;
 
-const held = new Set,
+const held = new Set(),
       downs = new Map(),
       ups = new Map(),
       ke = (event, key) => new KeyboardEvent(`key${event}`, {
