@@ -23,6 +23,7 @@ const held = new Set<string>(),
 	"metaKey": held.has("OS")
       }),
       mouseMove = new Map<number, MouseFn>(),
+      mouseLeave = new Map<number, () => void>(),
       mouseUp = [
 	      new Map<number, MouseFn>(),
 	      new Map<number, MouseFn>(),
@@ -84,11 +85,21 @@ export const keyEvent = (key: string, onkeydown?: KeyFn, onkeyup?: KeyFn, once =
 		}
 	] as const;
 },
-mouseMoveEvent = (onmousemove: MouseFn) => {
+mouseMoveEvent = (onmousemove: MouseFn, onend?: () => void) => {
 	const id = nextMouseID++;
 	return [
-		() => mouseMove.set(id, onmousemove),
-		() => mouseMove.delete(id)
+		() => {
+			mouseMove.set(id, onmousemove);
+			if (onend) {
+				mouseLeave.set(id, onend);
+			}
+		},
+		(run = true) => {
+			const toRun = run ? mouseLeave.get(id) : null;
+			mouseMove.delete(id);
+			mouseLeave.delete(id);
+			toRun?.();
+		}
 	] as const;
 },
 mouseDragEvent = (button: 0 | 1 | 2, onmousemove?: MouseFn, onmouseup: MouseFn = () => {}) => {
@@ -156,4 +167,9 @@ window.addEventListener("blur", () => {
 		}
 	}
 	mouseMove.clear();
+	for (const [id, fn] of mouseLeave) {
+		mouseMove.delete(id);
+		fn();
+	}
+	mouseLeave.clear();
 });

@@ -19,6 +19,7 @@ const held = new Set,
 	"metaKey": held.has("OS")
       }),
       mouseMove = new Map(),
+      mouseLeave = new Map(),
       mouseUp = [
 	      new Map(),
 	      new Map(),
@@ -80,11 +81,21 @@ export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
 		}
 	];
 },
-mouseMoveEvent = onmousemove => {
+mouseMoveEvent = (onmousemove, onend) => {
 	const id = nextMouseID++;
 	return [
-		() => mouseMove.set(id, onmousemove),
-		() => mouseMove.delete(id)
+		() => {
+			mouseMove.set(id, onmousemove);
+			if (onend) {
+				mouseLeave.set(id, onend);
+			}
+		},
+		(run = true) => {
+			const toRun = run ? mouseLeave.get(id) : null;
+			mouseMove.delete(id);
+			mouseLeave.delete(id);
+			toRun?.();
+		}
 	];
 },
 mouseDragEvent = (button, onmousemove, onmouseup = () => {}) => {
@@ -152,4 +163,9 @@ window.addEventListener("blur", () => {
 		}
 	}
 	mouseMove.clear();
+	for (const [id, fn] of mouseLeave) {
+		mouseMove.delete(id);
+		fn();
+	}
+	mouseLeave.clear();
 });
