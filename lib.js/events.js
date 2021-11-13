@@ -46,6 +46,9 @@ const held = new Set(),
 	}
       };
 
+export let mouseX = 0,
+mouseY = 0;
+
 export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
 	const id = nextKeyID++,
 	      keydown = [onkeydown, once],
@@ -122,6 +125,8 @@ window.addEventListener("keydown", e => keyEventFn(true, e));
 window.addEventListener("keyup", e => keyEventFn(false, e));
 
 window.addEventListener("mousemove", e => {
+	mouseX = e.clientX;
+	mouseY = e.clientY;
 	for (const [, event] of mouseMove) {
 		event(e);
 	}

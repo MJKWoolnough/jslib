@@ -50,6 +50,9 @@ const held = new Set<string>(),
 	}
       };
 
+export let mouseX = 0,
+mouseY = 0;
+
 export const keyEvent = (key: string, onkeydown?: KeyFn, onkeyup?: KeyFn, once = false) => {
 	const id = nextKeyID++,
 	      keydown: [KeyFn, boolean] = [onkeydown!, once],
@@ -126,6 +129,8 @@ window.addEventListener("keydown", (e: KeyboardEvent) => keyEventFn(true, e));
 window.addEventListener("keyup", (e: KeyboardEvent) => keyEventFn(false, e));
 
 window.addEventListener("mousemove", (e: MouseEvent) => {
+	mouseX = e.clientX;
+	mouseY = e.clientY;
 	for (const [, event] of mouseMove) {
 		event(e);
 	}
