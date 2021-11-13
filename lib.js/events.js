@@ -13,6 +13,8 @@ const held = new Set(),
       }),
       me = button => new MouseEvent(`mouseup`, {
 	button,
+	"clientX": mouseX,
+	"clientY": mouseY,
 	"ctrlKey": held.has("Control"),
 	"shiftKey": held.has("Shift"),
 	"altKey": held.has("Alt"),
