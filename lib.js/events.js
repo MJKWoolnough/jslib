@@ -54,35 +54,40 @@ mouseY = 0;
 export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
 	const id = nextKeyID++,
 	      keydown = [onkeydown, once],
-	      keyup = [onkeyup, once];
+	      keyup = [onkeyup, once],
+	      keys = typeof key === "string" ? [key] : key;
 	return [
 		() => {
-			if (onkeydown) {
-				const kh = held.has(key);
-				if (kh) {
-					onkeydown(ke("down", key));
-				}
-				if (!kh || !once) {
-					let m = downs.get(key);
-					if (!m) {
-						downs.set(key, m = new Map());
+			for (const key of keys) {
+				if (onkeydown) {
+					const kh = held.has(key);
+					if (kh) {
+						onkeydown(ke("down", key));
 					}
-					m.set(id, keydown);
+					if (!kh || !once) {
+						let m = downs.get(key);
+						if (!m) {
+							downs.set(key, m = new Map());
+						}
+						m.set(id, keydown);
+					}
 				}
-			}
-			if (onkeyup) {
-				let m = ups.get(key);
-				if (!m) {
-					ups.set(key, m = new Map());
+				if (onkeyup) {
+					let m = ups.get(key);
+					if (!m) {
+						ups.set(key, m = new Map());
+					}
+					m.set(id, keyup);
 				}
-				m.set(id, keyup);
 			}
 		},
 		(now = true) => {
-			const toRun = now && held.has(key) ? ups.get(key)?.get(id)?.[0] : null;
-			downs.get(key)?.delete(id);
-			ups.get(key)?.delete(id);
-			toRun?.(ke("up", key));
+			for (const key of keys) {
+				const toRun = now && held.has(key) ? ups.get(key)?.get(id)?.[0] : null;
+				downs.get(key)?.delete(id);
+				ups.get(key)?.delete(id);
+				toRun?.(ke("up", key));
+			}
 		}
 	];
 },
