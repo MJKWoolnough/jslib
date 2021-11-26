@@ -4,7 +4,7 @@ interface ToString {
 
 export type Children = string | Node | Children[] | NodeList;
 
-export type Props = Record<string, number | string | ToString | string[] | DOMTokenList | Function | Boolean | undefined | Record<string, string | number | undefined>>;
+export type Props = Record<string, ToString | ToString[] | DOMTokenList | Function | Record<string, ToString | undefined> | undefined>;
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -38,7 +38,7 @@ interface cElement {
 	(element: null | DocumentFragment, children?: Children): Node;
 	<T extends Node>(element: T, properties?: Props, children?: Children): T;
 	<T extends Node>(element: T, children?: Children, properties?: Props): T;
-	<T extends Node>(element: T, properties?: Props | Children, children?: Props |Children): T;
+	<T extends Node>(element: T, properties?: Props | Children, children?: Props | Children): T;
 	(element: string, properties?: Props, children?: Children): Node;
 	(element: string, children?: Children, properties?: Props): Node;
 }
