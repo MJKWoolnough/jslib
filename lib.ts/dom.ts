@@ -168,11 +168,12 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	}, 0);
 	return node;
       },
-      walkNode = function* (elm: Node, self = false) {
+      walkNode = function* (elm: Node, self = false): Generator<Node, true | undefined> {
 	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode!) {
-		yield e;
+		while (yield e) {}
 	}
 	if (self) {
-		yield elm;
+		while (yield elm) {};
 	}
+	return;
       };

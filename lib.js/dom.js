@@ -132,9 +132,9 @@ export const createElements = namespace => (element, properties, children) => {
       },
       walkNode = function* (elm, self) {
 	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode)  {
-		yield e;
+		while (yield e) {}
 	}
 	if (self) {
-		yield elm;
+		while (yield elm) {}
 	}
       };
