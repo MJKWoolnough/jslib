@@ -21,6 +21,9 @@ export class Pipe {
 			}
 		}
 	}
+	bind() {
+		return [data => this.send(data), fn => this.receive(fn)];
+	}
 }
 
 export class Requester {

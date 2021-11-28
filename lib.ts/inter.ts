@@ -27,6 +27,9 @@ export class Pipe<T> {
 			}
 		}
 	}
+	bind() {
+		return [(data: T) => this.send(data), (fn: (data: T) => void) => this.receive(fn)] as const;
+	}
 }
 
 export class Requester<T, U extends any[] = any[]> {
