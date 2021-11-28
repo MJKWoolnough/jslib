@@ -47,13 +47,13 @@ export class Subscription {
 	#error;
 	#cancel;
 	constructor(fn) {
-		const success = new Pipe(),
-		      error = new Pipe(),
-		      cancel = new Pipe();
-		fn(success.send.bind(success), error.send.bind(error), cancel.receive.bind(cancel));
-		this.#success = success.receive.bind(success);
-		this.#error = error.receive.bind(error);
-		this.#cancel = cancel.send.bind(cancel);
+		const [successSend, successReceive] = new Pipe().bind(),
+		      [errorSend, errorReceive] = new Pipe().bind(),
+		      [cancelSend, cancelReceive] = new Pipe().bind();
+		fn(successSend, errorSend, cancelReceive);
+		this.#success = successReceive;
+		this.#error = errorReceive;
+		this.#cancel = cancelSend;
 	}
 	then(successFn, errorFn) {
 		const success = this.#success,

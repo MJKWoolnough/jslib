@@ -53,13 +53,13 @@ export class Subscription<T> {
 	#error: (fn: (data: any) => void) => void;
 	#cancel: (data: void) => void;
 	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: (data: void) => void) => void) => void) {
-		const success = new Pipe<T>(),
-		      error = new Pipe<any>(),
-		      cancel = new Pipe<void>();
-		fn(success.send.bind(success), error.send.bind(error), cancel.receive.bind(cancel));
-		this.#success = success.receive.bind(success);
-		this.#error = error.receive.bind(error);
-		this.#cancel = cancel.send.bind(cancel);
+		const [successSend, successReceive] = new Pipe<T>().bind(),
+		      [errorSend, errorReceive] = new Pipe<any>().bind(),
+		      [cancelSend, cancelReceive] = new Pipe<void>().bind();
+		fn(successSend, errorSend, cancelReceive);
+		this.#success = successReceive;
+		this.#error = errorReceive;
+		this.#cancel = cancelSend;
 	}
 	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | undefined | null, errorFn?: ((data: any) => TResult2) | undefined | null) {
 		const success = this.#success,
