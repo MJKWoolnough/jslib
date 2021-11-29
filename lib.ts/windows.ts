@@ -139,8 +139,6 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 	shell.addEventListener("mousemove", mouseMove);
 	shell.addEventListener("mouseup", mouseUp);
       },
-      childWindows = new Map<WindowElement, WindowElement>(),
-      childOf = new Map<WindowElement, WindowElement>(),
       alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
@@ -281,6 +279,8 @@ export class WindowElement extends HTMLElement {
 	#icon: HTMLImageElement;
 	#extra: HTMLSpanElement;
 	#slot: HTMLDivElement;
+	#child: WindowElement | null = null;
+	#parent: WindowElement | null = null;
 	constructor() {
 		super();
 		const onclick = () => this.focus();
@@ -524,15 +524,15 @@ export class WindowElement extends HTMLElement {
 		if (focusingWindow === this) {
 			return;
 		}
-		const p = childOf.get(this),
-		      c = childWindows.get(this);
+		const p = this.#parent,
+		      c = this.#child;
 		if (p) {
-			childWindows.delete(p);
-			childOf.delete(this);
+			p.#child = null;
+			this.#parent = null;
 		}
 		if (c) {
 			c.remove();
-			childWindows.delete(this);
+			this.#child = null;
 		}
 		this.dispatchEvent(new CustomEvent("remove", {"cancelable": false}));
 	}
@@ -562,12 +562,12 @@ export class WindowElement extends HTMLElement {
 		if (!this.parentNode) {
 			return false;
 		}
-		if (childWindows.has(this)) {
-			childWindows.get(this)!.addWindow(w);
+		if (this.#child) {
+			this.#child.addWindow(w);
 			return true;
 		}
-		childWindows.set(this, w);
-		childOf.set(w, this);
+		this.#child = w;
+		w.#parent = this;
 		this.parentNode.appendChild(w);
 		return true;
 	}
@@ -576,7 +576,7 @@ export class WindowElement extends HTMLElement {
 		return () => b.remove();
 	}
 	focus() {
-		const c = childWindows.get(this);
+		const c = this.#child;
 		if (c) {
 			c.focus();
 			return;
@@ -602,8 +602,8 @@ export class WindowElement extends HTMLElement {
 		super.focus();
 	}
 	close() {
-		if (childWindows.has(this)) {
-			childWindows.get(this)!.focus();
+		if (this.#child) {
+			this.#child.focus();
 		} else if (this.dispatchEvent(new CustomEvent("close", {"cancelable": true}))) {
 			this.remove();
 			return true;

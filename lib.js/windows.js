@@ -138,8 +138,6 @@ const snapTo = (shell, w, x3, y3) => {
 	shell.addEventListener("mousemove", mouseMove);
 	shell.addEventListener("mouseup", mouseUp);
       },
-      childWindows = new Map(),
-      childOf = new Map(),
       alertFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
 		"window-hide": true,
@@ -264,6 +262,8 @@ export class WindowElement extends HTMLElement {
 	#title;
 	#extra;
 	#slot;
+	#parent = null;
+	#child = null;
 	constructor() {
 		super();
 		const onclick = () => this.focus();
@@ -298,15 +298,15 @@ export class WindowElement extends HTMLElement {
 		if (focusingWindow === this) {
 			return;
 		}
-		const p = childOf.get(this),
-		      c = childWindows.get(this);
+		const p = this.#parent,
+		      c = this.#child;
 		if (p) {
-			childWindows.delete(p);
-			childOf.delete(this);
+			p.#child = null;
+			this.#parent = null;
 		}
 		if (c) {
 			c.remove();
-			childWindows.delete(this);
+			this.#child = null;
 		}
 		this.dispatchEvent(new CustomEvent("remove", {"cancelable": false}));
 	}
@@ -336,28 +336,29 @@ export class WindowElement extends HTMLElement {
 		if (!this.parentNode) {
 			return false;
 		}
-		if (childWindows.has(this)) {
-			childWindows.get(this).addWindow(w);
+		if (this.#child) {
+			this.#child.addWindow(w);
 			return true;
 		}
-		childWindows.set(this, w);
-		childOf.set(w, this);
+		this.#child = w;
+		w.#parent = this;
 		this.parentNode.appendChild(w);
 		return true;
 	}
 	addControlButton(icon, onclick, title) {
-		const b = this.#extra.appendChild(button({"style": {"background-image": `url(${icon})`}, "onclick": () => onclick.call(this), title}));
+		const b = this.#extra.appendChild(button({"style": {"background-image": `url(${JSON.stringify(icon)})`}, "onclick": () => onclick.call(this), title}));
 		return () => b.remove();
-        }
+	}
 	focus() {
-		const c = childWindows.get(this);
+		const c = this.#child;
 		if (c) {
 			c.focus();
 			return;
 		}
 		if (this.parentNode && this.nextElementSibling) {
 			focusingWindow = this;
-			const scrolls = this.scrollTop || this.scrollLeft ? [[this, this.scrollTop, this.scrollLeft]] : [];
+			const {scrollTop, scrollLeft} = this,
+			      scrolls = scrollTop || scrollLeft ? [[this, scrollTop, scrollLeft]] : [];
 			for (const elm of walkNode(this.#slot)) {
 				if (elm instanceof Element) {
 					const {scrollTop, scrollLeft} = elm;
@@ -375,8 +376,8 @@ export class WindowElement extends HTMLElement {
 		super.focus();
 	}
 	close() {
-		if (childWindows.has(this)) {
-			childWindows.get(this).focus();
+		if (this.#child) {
+			this.#child.focus();
 		} else if (this.dispatchEvent(new CustomEvent("close", {"cancelable": true}))) {
 			this.remove();
 			return true;
