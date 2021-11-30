@@ -397,8 +397,11 @@ export class WindowElement extends HTMLElement {
 	top: calc(1em + 6px);
 }
 
-:host > div:nth-child(5) {
+:host > div:nth-child(4):not(.hasChild) + div:nth-child(5) {
 	pointer-events: none;
+}
+
+:host > div:nth-child(5) {
 	display: var(--overlay-on, block);
 	position: absolute;
 	background-color: RGBA(0, 0, 0, 0.1);
@@ -527,6 +530,7 @@ export class WindowElement extends HTMLElement {
 		const p = this.#parent,
 		      c = this.#child;
 		if (p) {
+			p.#slot.classList.toggle("hasChild", false);
 			p.#child = null;
 			this.#parent = null;
 		}
@@ -568,6 +572,7 @@ export class WindowElement extends HTMLElement {
 		}
 		this.#child = w;
 		w.#parent = this;
+		this.#slot.classList.toggle("hasChild", true);
 		this.parentNode.appendChild(w);
 		return true;
 	}
