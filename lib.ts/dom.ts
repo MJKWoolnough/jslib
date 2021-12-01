@@ -154,10 +154,10 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	}
 	return newElem;
       },
-      text2HTML = (text: string): Node[] => {
-	const d = createHTML("div");
+      text2HTML = (text: string): DocumentFragment => {
+	const d = document.createElement("template");
 	d.innerHTML = text;
-	return Array.from(d.childNodes).map(c => d.removeChild(c));
+	return d.content;
       },
       autoFocus = <T extends HTMLElement | SVGElement>(node: T, inputSelect = true) => {
 	window.setTimeout(() => {

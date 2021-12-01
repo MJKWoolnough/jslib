@@ -117,9 +117,9 @@ export const createElements = namespace => (element, properties, children) => {
 	return newElem;
       },
       text2HTML = text => {
-	const d = createHTML("div");
+	const d = document.createElement("template");
 	d.innerHTML = text;
-	return Array.from(d.childNodes).map(c => d.removeChild(c));
+	return d.content;
       },
       autoFocus = (node, inputSelect = true) => {
 	window.setTimeout(() => {
