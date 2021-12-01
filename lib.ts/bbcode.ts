@@ -133,7 +133,8 @@ export type Parsers = {
 	[text]: (node: Node, t: string) => void;
 }
 
-export default function (node: Node, parsers: Parsers, text: string) {
-	process(node, parseText(text), parsers);
-	return node;
+export default (parsers: Parsers, text: string) => {
+	const df = document.createDocumentFragment();
+	process(df, parseText(text), parsers);
+	return df;
 }

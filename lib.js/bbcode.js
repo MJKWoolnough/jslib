@@ -113,7 +113,8 @@ process = (node, t, p, closeTag) => {
 	}
 };
 
-export default function (node, parsers, text) {
-	process(node, parseText(text), parsers);
-	return node;
+export default (parsers, text) => {
+	const df = document.createDocumentFragment();
+	process(df, parseText(text), parsers);
+	return df;
 }
