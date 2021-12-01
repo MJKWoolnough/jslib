@@ -118,7 +118,7 @@ export const createElements: cElements = (namespace: string) => (element: Node |
 	const elem = document.createDocumentFragment();
 	if (typeof children === "string") {
 		elem.textContent = children;
-	} else if (children && (children instanceof Array || children instanceof Node)) {
+	} else if (children !== undefined) {
 		childrenArr(elem, children);
 	}
 	return elem;

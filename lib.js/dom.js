@@ -80,7 +80,7 @@ export const createElements = namespace => (element, properties, children) => {
 	const elem = document.createDocumentFragment();
 	if (typeof children === "string") {
 		elem.textContent = children;
-	} else if (children && (children instanceof Array || children instanceof Node)) {
+	} else if (children !== undefined) {
 		childrenArr(elem, children);
 	}
 	return elem;
