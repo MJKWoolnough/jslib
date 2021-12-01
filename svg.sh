@@ -24,7 +24,7 @@ if [ -n "$ts" ]; then
 	(
 		echo -e "import type {DOMBind} from './dom.js';";
 		echo -e "import {createElements} from './dom.js';\n";
-		echo -en "export const ns = \"http://www.w3.org/2000/svg\",\ncreateSVG = createElements(ns),\n[";
+		echo -en "export const ns = \"http://www.w3.org/2000/svg\",\ncreateSVG = createElements(ns),\nsvgData = (s: SVGSVGElement) => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + s.outerHTML.slice(4)),\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -64,7 +64,7 @@ fi;
 if [ -n "$js" ]; then
 	(
 		echo -e "import {createElements} from './dom.js';\n";
-		echo -en "export const ns = \"http://www.w3.org/2000/svg\",\ncreateSVG = createElements(ns),\n[";
+		echo -en "export const ns = \"http://www.w3.org/2000/svg\",\ncreateSVG = createElements(ns),\nsvgData = (s: SVGSVGElement) => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + s.outerHTML.slice(4)),\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
