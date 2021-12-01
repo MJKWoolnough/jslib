@@ -89,17 +89,6 @@ export const createElements = namespace => (element, properties, children) => {
 	}
 	return elem;
       },
-      formatText = (text, wrapper) => {
-	const df = document.createDocumentFragment(),
-	      fn = wrapper instanceof Function ? wrapper : document.createTextNode.bind(document);
-	text.split("\n").forEach((text, n) => {
-		if (n > 0) {
-			df.appendChild(createHTML("br"));
-		}
-		df.appendChild(fn(text));
-	});
-	return df;
-      },
       clearElement = elem => {
 	while (elem.lastChild !== null) {
 		elem.removeChild(elem.lastChild);
