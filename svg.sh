@@ -23,9 +23,8 @@ fi;
 if [ -n "$ts" ]; then
 	(
 		echo -e "import type {DOMBind} from './dom.js';";
-		echo -e "import {createSVG} from './dom.js';\n";
-		echo -e "export {createSVG};\n";
-		echo -n "export const [";
+		echo -e "import {createElements} from './dom.js';\n";
+		echo -en "export const ns = \"http://www.w3.org/2000/svg\",\ncreateSVG = createElements(ns),\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -64,9 +63,8 @@ fi;
 
 if [ -n "$js" ]; then
 	(
-		echo -e "import {createSVG} from './dom.js';\n";
-		echo -e "export {createSVG};\n";
-		echo -n "export const [";
+		echo -e "import {createElements} from './dom.js';\n";
+		echo -en "export const ns = \"http://www.w3.org/2000/svg\",\ncreateSVG = createElements(ns),\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then

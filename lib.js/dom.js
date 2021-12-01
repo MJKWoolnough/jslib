@@ -76,10 +76,6 @@ export const createElements = namespace => (element, properties, children) => {
 	}
 	return elem;
       },
-      htmlNS = "http://www.w3.org/1999/xhtml",
-      svgNS = "http://www.w3.org/2000/svg",
-      createHTML = createElements(htmlNS),
-      createSVG = createElements(svgNS),
       createDocumentFragment = children => {
 	const elem = document.createDocumentFragment();
 	if (typeof children === "string") {

@@ -1,5 +1,5 @@
-import {autoFocus, createHTML, Props} from './dom.js';
-import {div, li, span, style, ul} from './html.js';
+import {autoFocus} from './dom.js';
+import {createHTML, div, li, span, style, ul} from './html.js';
 
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, '.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:not(.contextDisabled):hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}.contextDisabled{color:#aaa}.contextClearer{position:absolute;top:0;left:0;bottom:0;right:0}')));
 

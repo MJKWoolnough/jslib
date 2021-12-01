@@ -1,5 +1,6 @@
-import {autoFocus, createHTML, Props} from './dom.js';
-import {div, li, span, style, ul} from './html.js';
+import type {Props} from './dom.js';
+import {autoFocus} from './dom.js';
+import {createHTML, div, li, span, style, ul} from './html.js';
 
 declare const pageLoad: Promise<void>;
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `
