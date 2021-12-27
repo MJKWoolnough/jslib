@@ -22,9 +22,9 @@ fi;
 
 if [ -n "$ts" ]; then
 	(
-		echo -e "import type {DOMBind} from './dom.js';";
-		echo -e "import {createElements} from './dom.js';\n";
-		echo -en "export const ns = \"http://www.w3.org/2000/svg\",\ncreateSVG = createElements(ns),\nsvgData = (s: SVGSVGElement) => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + s.outerHTML.slice(4)),\n[";
+		echo "import type {Children, DOMBind, Props} from './dom.js';";
+		echo "import {makeElement} from './dom.js';";
+		echo -en "\nexport const ns = \"http://www.w3.org/2000/svg\",\nsvgData = (s: SVGSVGElement) => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + s.outerHTML.slice(4)),\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -38,13 +38,13 @@ if [ -n "$ts" ]; then
 				echo -n "$tag";
 			fi;
 		done;
-		echo -n "] = \"$tags\".split(\" \").map(e => createSVG.bind(null, e)) as [";
+		echo -n "] = \"$tags\".split(\" \").map(e => (props?: Props, children?: Children) => makeElement(document.createElementNS(ns, e), props, children)) as [";
 		first=true;
 		for tag in $tags; do
 			if $first; then
 				first=false;
 			else
-				echo -n ",";
+				echo -n ", ";
 			fi;
 			echo -n "DOMBind<";
 			case "$tag" in
@@ -63,8 +63,8 @@ fi;
 
 if [ -n "$js" ]; then
 	(
-		echo -e "import {createElements} from './dom.js';\n";
-		echo -en "export const ns = \"http://www.w3.org/2000/svg\",\ncreateSVG = createElements(ns),\nsvgData = (s: SVGSVGElement) => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + s.outerHTML.slice(4)),\n[";
+		echo "import {makeElement} from './dom.js';";
+		echo -en "\nexport const ns = \"http://www.w3.org/2000/svg\",\nsvgData = s => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + s.outerHTML.slice(4)),\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -78,6 +78,6 @@ if [ -n "$js" ]; then
 				echo -n "$tag";
 			fi;
 		done;
-		echo "] = \"$tags\".split(\" \").map(e => createSVG.bind(null, e));";
+		echo "] = \"$tags\".split(\" \").map(e => (props, children) => makeElement(document.createElementNS(ns, e), props, children));";
 	) > "$js";
 fi;

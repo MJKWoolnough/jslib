@@ -22,9 +22,9 @@ fi;
 
 if [ -n "$ts" ]; then
 	(
-		echo -e "import type {DOMBind} from './dom.js';";
-		echo -e "import {createElements} from './dom.js';\n";
-		echo -en "export const ns = \"http://www.w3.org/1999/xhtml\",\ncreateHTML = createElements(ns),\n[";
+		echo "import type {Children, DOMBind, Props} from './dom.js';";
+		echo "import {makeElement} from './dom.js';";
+		echo -en "\nexport const ns = \"http://www.w3.org/1999/xhtml\",\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -38,7 +38,7 @@ if [ -n "$ts" ]; then
 				echo -n "$tag";
 			fi;
 		done;
-		echo -n "] = \"$tags\".split(\" \").map(e => createHTML.bind(null, e)) as [";
+		echo -n "] = \"$tags\".split(\" \").map(e => (props?: Props, children?: Children) => makeElement(document.createElementNS(ns, e), props, children)) as [";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -54,8 +54,8 @@ fi;
 
 if [ -n "$js" ]; then
 	(
-		echo -e "import {createElements} from './dom.js';\n";
-		echo -en "export const ns = \"http://www.w3.org/1999/xhtml\",\ncreateHTML = createElements(ns),\n[";
+		echo -e "import {makeElement} from './dom.js';\n";
+		echo -en "export const ns = \"http://www.w3.org/1999/xhtml\",\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -69,6 +69,6 @@ if [ -n "$js" ]; then
 				echo -n "$tag";
 			fi;
 		done;
-		echo "] = \"$tags\".split(\" \").map(e => createHTML.bind(null, e));";
+		echo "] = \"$tags\".split(\" \").map(e => (props, children) => makeElement(document.createElementNS(ns, e), props, children));";
 	) > "$js";
 fi;
