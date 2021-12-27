@@ -28,29 +28,10 @@ const childrenArr = (elem: Node, children: Children) => {
 	return elm;
       };
 
-interface cElements {
-	(namespace: string): cElement;
-	(namespace: "http://www.w3.org/1999/xhtml"): cHTML;
-	(namespace: "http://www.w3.org/2000/svg"): cSVG;
-}
-
-interface cElement {
-	(element: null | DocumentFragment, children?: Children): Node;
+interface mElement {
 	<T extends Node>(element: T, properties?: Props, children?: Children): T;
 	<T extends Node>(element: T, children?: Children, properties?: Props): T;
 	<T extends Node>(element: T, properties?: Props | Children, children?: Props | Children): T;
-	(element: string, properties?: Props, children?: Children): Node;
-	(element: string, children?: Children, properties?: Props): Node;
-}
-
-interface cHTML extends cElement {
-	<K extends keyof HTMLElementTagNameMap>(element: K, properties?: Props, children?: Children): HTMLElementTagNameMap[K];
-	<K extends keyof HTMLElementTagNameMap>(element: K, children?: Children, properties?: Props): HTMLElementTagNameMap[K];
-}
-
-interface cSVG extends cElement {
-	<K extends keyof SVGElementTagNameMap>(element: K, properties?: Props, children?: Children): SVGElementTagNameMap[K];
-	<K extends keyof SVGElementTagNameMap>(element: K, children?: Children, properties?: Props): SVGElementTagNameMap[K];
 }
 
 export interface DOMBind<T extends Node> {
@@ -58,8 +39,7 @@ export interface DOMBind<T extends Node> {
 	(children?: Children, properties?: Props): T;
 }
 
-export const createElements: cElements = (namespace: string) => (element: Node | string | null, properties?: Props | Children, children?: Props | Children) => {
-	const elem: Node = typeof element === "string" ? document.createElementNS(namespace, element) : element instanceof Node ? element : document.createDocumentFragment();
+export const makeElement: mElement = (elem: Element, properties?: Props | Children, children?: Props | Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node) && !(children instanceof NodeList))) {
 		[properties, children] = [children, properties];
 	}

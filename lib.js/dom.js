@@ -20,8 +20,7 @@ const childrenArr = (elem, children) => {
 	return elm;
       };
 
-export const createElements = namespace => (element, properties, children) => {
-	const elem = typeof element === "string" ? document.createElementNS(namespace, element) : element instanceof Node ? element : document.createDocumentFragment();
+export const makeElement = (elem, properties, children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node) && !(children instanceof NodeList))) {
 		[properties, children] = [children, properties];
 	}
