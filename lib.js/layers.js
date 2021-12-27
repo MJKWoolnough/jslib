@@ -1,5 +1,5 @@
 import {clearElement} from './dom.js';
-import {createHTML} from './html.js';
+import {div, span} from './html.js';
 
 export default (container, loader) => {
 	const layers = [],
@@ -29,7 +29,7 @@ export default (container, loader) => {
 			container.removeChild(container.lastChild);
 		}
 	      },
-	      defaultLoader = loader ? loader : createHTML("div", {"class": "loading"});
+	      defaultLoader = loader ? loader : div({"class": "loading"});
 	let loading = false;
 	return Object.freeze({
 		"addLayer": closerFn => {
@@ -43,7 +43,7 @@ export default (container, loader) => {
 				}
 				layers.push(df);
 			}
-			return container.appendChild(createHTML("div", createHTML("span", {"class": "closer", "onclick": closer.bind(null, closerFn)}, "X")));
+			return container.appendChild(div(span({"class": "closer", "onclick": closer.bind(null, closerFn)}, "X")));
 		},
 		"removeLayer": closer,
 		"loading": (p, loadDiv) => {

@@ -1,6 +1,6 @@
 import type {DOMBind, Children, Props} from './dom.js';
-import {autoFocus, walkNode} from './dom.js';
-import {createHTML, button, div, img, input, slot, span, style} from './html.js';
+import {autoFocus, makeElement, walkNode} from './dom.js';
+import {button, div, img, input, slot, span, style} from './html.js';
 import {ns as svgNS} from './svg.js';
 
 const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) => {
@@ -211,7 +211,7 @@ export class ShellElement extends HTMLElement {
 		if (new.target !== ShellElement) {
 			return;
 		}
-		createHTML(this.attachShadow({"mode": "closed"}), [
+		makeElement(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
 	display: block;
@@ -268,7 +268,7 @@ export class DesktopElement extends HTMLElement {
 	constructor() {
 		super()
 		this.setAttribute("slot", "desktop");
-		createHTML(this.attachShadow({"mode": "closed"}), [
+		makeElement(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, ":host{position:absolute;top:0;left:0;bottom:0;right:0}"),
 			slot({"slot": "desktop"})
 		]);
@@ -285,7 +285,7 @@ export class WindowElement extends HTMLElement {
 	constructor() {
 		super();
 		const onclick = () => this.focus();
-		createHTML(this.attachShadow({"mode": "closed"}), [
+		makeElement(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
 	position: absolute;
@@ -622,9 +622,9 @@ customElements.define("windows-shell", ShellElement);
 customElements.define("windows-desktop", DesktopElement);
 customElements.define("windows-window", WindowElement);
 
-export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new ShellElement(), props, children),
-desktop: DOMBind<DesktopElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new DesktopElement(), props, children),
-windows: DOMBind<WindowElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new WindowElement(), props, children),
+export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => makeElement(new ShellElement(), props, children),
+desktop: DOMBind<DesktopElement> = (props?: Props | Children, children?: Props | Children) => makeElement(new DesktopElement(), props, children),
+windows: DOMBind<WindowElement> = (props?: Props | Children, children?: Props | Children) => makeElement(new WindowElement(), props, children),
 setDefaultIcon = (icon: string) => defaultIcon = icon;
 
 export let defaultIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;

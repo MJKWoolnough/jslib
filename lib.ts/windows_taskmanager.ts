@@ -1,6 +1,6 @@
 import type {DOMBind, Children, Props} from './dom.js';
 import type {DesktopElement} from './windows.js';
-import {clearElement, createHTML} from './dom.js';
+import {clearElement, makeElement} from './dom.js';
 import {div, li, slot, style, ul} from './html.js';
 import {ShellElement as BaseShellElement, WindowElement, windows, desktop} from './windows.js';
 
@@ -81,7 +81,7 @@ export class ShellElement extends BaseShellElement {
 			}
 		      })),
 		      taskbar = ul();
-		createHTML(this.attachShadow({"mode": "closed"}), [
+		makeElement(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
 	display: block;
@@ -152,4 +152,4 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskmanager", ShellElement);
 
-export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new ShellElement(), props, children);
+export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => makeElement(new ShellElement(), props, children);

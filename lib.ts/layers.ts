@@ -1,5 +1,5 @@
-import {clearElement} from './dom.js';
-import {createHTML} from './html.js';
+import {clearElement, makeElement} from './dom.js';
+import {div, span} from './html.js';
 
 export type LayerType = {
 	addLayer: (closerFn?: () => void) => HTMLElement;
@@ -36,7 +36,7 @@ export default (container: Node, loader?: Node): Readonly<LayerType> => {
 			container.removeChild(container.lastChild);
 		}
 	      },
-	      defaultLoader: Node = loader ? loader : createHTML("div", {"class": "loading"});
+	      defaultLoader: Node = loader ? loader : div({"class": "loading"});
 	let loading = false;
 	return Object.freeze({
 		"addLayer": (closerFn?: () => void) => {
@@ -50,7 +50,7 @@ export default (container: Node, loader?: Node): Readonly<LayerType> => {
 				}
 				layers.push(df);
 			}
-			return container.appendChild(createHTML("div", createHTML("span", {"class": "closer", "onclick": closer.bind(null, closerFn ? closerFn : () => {})}, "X")));
+			return makeElement(container, div(span({"class": "closer", "onclick": closer.bind(null, closerFn ? closerFn : () => {})}, "X")));
 		},
 		"removeLayer": closer,
 		"loading": (p: Promise<any>, loadDiv?: Node) => {

@@ -1,7 +1,8 @@
 import type {DOMBind, Children, Props} from './dom.js';
 import type {DesktopElement} from './windows.js';
-import {createHTML, div, img, li, slot, span, style, ul} from './html.js';
-import {ShellElement as BaseShellElement, WindowElement, windows, desktop, noIcon} from './windows.js';
+import {makeElement} from './dom.js';
+import {div, img, li, slot, span, style, ul} from './html.js';
+import {ShellElement as BaseShellElement, WindowElement, windows, desktop} from './windows.js';
 import contextPlace, {item as contextItem} from './context.js';
 
 export {WindowElement, DesktopElement, windows, desktop};
@@ -35,7 +36,7 @@ export class ShellElement extends BaseShellElement {
 				break;
 			}
 		      }));
-		createHTML(this.attachShadow({"mode": "closed"}), [
+		makeElement(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
 	display: block;
@@ -194,7 +195,7 @@ export class ShellElement extends BaseShellElement {
 								contextItem("&Close", () => w.close())
 							]);
 						      }}, [
-							img({"part": "icon", "src": w.getAttribute("window-icon") || noIcon, "title": w.getAttribute("window-title") ?? undefined}),
+							img({"part": "icon", "src": w.getAttribute("window-icon") || undefined, "title": w.getAttribute("window-title") ?? undefined}),
 							span({"part": "title"}, w.getAttribute("window-title") || "")
 						      ]));
 						windowData.set(w, item);
@@ -212,4 +213,4 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskmanager", ShellElement);
 
-export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => createHTML(new ShellElement(), props, children);
+export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => makeElement(new ShellElement(), props, children);
