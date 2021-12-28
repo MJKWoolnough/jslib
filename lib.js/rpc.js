@@ -3,7 +3,7 @@ import rpcXH from './rpc_xh.js';
 
 export default (path, allowWS = true, allowXH = false, xhPing = 1000, version = 1) => {
 	if (allowWS) {
-		let p = rpcWS(path, version);
+		const p = rpcWS(path, version);
 		if (allowXH) {
 			return p.catch(() => rpcXH(path, xhPing, version));
 		}
