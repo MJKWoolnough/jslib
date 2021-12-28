@@ -62,7 +62,7 @@ class AwaitRequest {
 		this.subscriptions.forEach(([, eFn]) => eFn(e));
 	}
 	subscribed() {
-		return this.subscriptions.count > 0;
+		return this.subscriptions.size > 0;
 	}
 }
 
