@@ -26,7 +26,7 @@ export class ShellElement extends BaseShellElement {
 				w.focus();
 			}
 		      })),
-		      windowObserver = new MutationObserver(list => list.forEach(({target, type, attributeName, }) => {
+		      windowObserver = new MutationObserver(list => list.forEach(({target, type, attributeName}) => {
 			if (type !== "attributes" || !(target instanceof WindowElement)) {
 				return;
 			}
