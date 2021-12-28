@@ -46,7 +46,7 @@ export class Subscription {
 	#success;
 	#error;
 	#cancel;
-	constructor(fn) {
+	constructor(fn, errorFn, cancelFn) {
 		const [successSend, successReceive] = new Pipe().bind(),
 		      [errorSend, errorReceive] = new Pipe().bind(),
 		      [cancelSend, cancelReceive] = new Pipe().bind();
@@ -92,8 +92,8 @@ export class Subscription {
 		return this.then(undefined, errorFn);
 	}
 	finally(afterFn) {
-		return this(data => (aFn(), data), error => {
-			aFn();
+		return this.then(data => (afterFn(), data), error => {
+			afterFn();
 			throw error;
 		});
 	}
