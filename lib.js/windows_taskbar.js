@@ -1,6 +1,6 @@
 import {makeElement} from './dom.js';
 import {div, img, li, slot, span, style, ul} from './html.js';
-import {ShellElement as BaseShellElement, WindowElement, DesktopElement, windows, desktop, noIcon} from './windows.js';
+import {ShellElement as BaseShellElement, WindowElement, DesktopElement, windows, desktop} from './windows.js';
 import contextPlace, {item as contextItem} from './context.js';
 
 export {WindowElement, DesktopElement, windows, desktop};
@@ -65,7 +65,7 @@ export class ShellElement extends BaseShellElement {
 								contextItem("&Close", () => w.close())
 							]);
 						      }}, [
-							img({"part": "icon", "src": w.getAttribute("window-icon") || noIcon, "title": w.getAttribute("window-title") ?? undefined}),
+							img({"part": "icon", "src": w.getAttribute("window-icon") || undefined, "title": w.getAttribute("window-title") ?? undefined}),
 							span({"part": "title"}, w.getAttribute("window-title") || "")
 						      ]));
 						windowData.set(w, item);
