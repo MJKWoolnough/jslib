@@ -169,11 +169,12 @@ const whitespace = "\t\r\n ",
 	}
 	return pos;
       };
+
 export const split = (odata, limit = -1) => {
 	const ret = [];
 	let total = 0,
 	    data = odata;
-	while (data.length > 0 && limit !== 0) {
+	while(data.length > 0 && limit !== 0) {
 		const len = readElement(data);
 		if (len <= 0) {
 			const ws = readWhitespace(data);
