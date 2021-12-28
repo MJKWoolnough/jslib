@@ -49,7 +49,7 @@ const whitespace: string = "\t\r\n ",
 		if (data.charAt(pos) === "}") {
 			return pos + 1;
 		}
-		while(pos < data.length) {
+		while (pos < data.length) {
 			pos += readWhitespace(data.substring(pos));
 			const j = readString(data.substring(pos));
 			if (j < 0) {
@@ -134,7 +134,7 @@ const whitespace: string = "\t\r\n ",
 			return -pos;
 		}
 		pos++;
-		for(; pos < data.length; pos++) {
+		for (; pos < data.length; pos++) {
 			if (!digits.includes(data.charAt(pos))) {
 				break;
 			}
