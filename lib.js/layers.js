@@ -1,4 +1,4 @@
-import {clearElement} from './dom.js';
+import {clearElement, makeElement} from './dom.js';
 import {div, span} from './html.js';
 
 export default (container, loader) => {
@@ -43,7 +43,7 @@ export default (container, loader) => {
 				}
 				layers.push(df);
 			}
-			return container.appendChild(div(span({"class": "closer", "onclick": closer.bind(null, closerFn)}, "X")));
+			return makeElement(container, div(span({"class": "closer", "onclick": closer.bind(null, closerFn ? closerFn : () => {})}, "X")));
 		},
 		"removeLayer": closer,
 		"loading": (p, loadDiv) => {
