@@ -138,7 +138,7 @@ export const makeElement: mElement = (elem: Element, properties?: Props | Childr
 		while (yield e) {}
 	}
 	if (self) {
-		while (yield elm) {};
+		while (yield elm) {}
 	}
 	return;
       };
