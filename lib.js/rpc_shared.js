@@ -67,7 +67,7 @@ class AwaitRequest {
 }
 
 export default class RequestHandler {
-	constructor(sender, version) {
+	constructor(sender, version = 1) {
 		this.closed = false;
 		this.nextID = 0;
 		this.requests = new Map();
