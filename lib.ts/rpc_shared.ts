@@ -31,7 +31,7 @@ class AwaitRequest {
 	promiseSuccess?: promiseFn;
 	promiseError?: promiseFn;
 	constructor() {
-		this.clearPromise()
+		this.clearPromise();
 		this.subscriptions = new Set();
 	}
 	getPromise() {
