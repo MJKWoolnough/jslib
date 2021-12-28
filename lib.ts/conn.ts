@@ -69,28 +69,28 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 	xh.send(props["data"] ?? null);
       }),
       WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
-		const ws = new WebSocket(url);
-		ws.addEventListener("open", () => successFn(Object.freeze({
-			close:  ws.close.bind(ws),
-			send: ws.send.bind(ws),
-			when: Subscription.prototype.then.bind(new Subscription((sFn, eFn) => {
-				ws.removeEventListener("error", errorFn);
-				ws.addEventListener("message", sFn);
-				ws.addEventListener("error", (e: Event) => eFn((e as ErrorEvent).error));
-				ws.addEventListener("close", (e: CloseEvent) => {
-					if (!e.wasClean) {
-						eFn(new Error(e.reason));
-					}
-				});
-			})),
-			get binaryType() {
-				return ws.binaryType;
-			},
-			set binaryType(t: BinaryType) {
-				ws.binaryType = t;
-			},
-		})));
-		ws.addEventListener("error", errorFn);
+	const ws = new WebSocket(url);
+	ws.addEventListener("open", () => successFn(Object.freeze({
+		close: ws.close.bind(ws),
+		send: ws.send.bind(ws),
+		when: Subscription.prototype.then.bind(new Subscription((sFn, eFn) => {
+			ws.removeEventListener("error", errorFn);
+			ws.addEventListener("message", sFn);
+			ws.addEventListener("error", (e: Event) => eFn((e as ErrorEvent).error));
+			ws.addEventListener("close", (e: CloseEvent) => {
+				if (!e.wasClean) {
+					eFn(new Error(e.reason));
+				}
+			});
+		})),
+		get binaryType() {
+			return ws.binaryType;
+		},
+		set binaryType(t: BinaryType) {
+			ws.binaryType = t;
+		},
+	})));
+	ws.addEventListener("error", errorFn);
       });
 
 interface WSConn {
