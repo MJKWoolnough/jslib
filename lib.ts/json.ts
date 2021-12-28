@@ -1,9 +1,9 @@
-const whitespace: string = "\t\r\n ",
-      escapes: string = "\"\\/bfnrt",
-      hexDigits: string = "0123456789abcdefABCDEF",
-      digits: string = "0123456789",
-      exp: string = "eE",
-      pm: string = "+-",
+const whitespace = "\t\r\n ",
+      escapes = "\"\\/bfnrt",
+      hexDigits = "0123456789abcdefABCDEF",
+      digits = "0123456789",
+      exp = "eE",
+      pm = "+-",
       readWhitespace = (data: string) => {
 	for (let pos = 0; pos < data.length; pos++) {
 		if (!whitespace.includes(data.charAt(pos))) {
