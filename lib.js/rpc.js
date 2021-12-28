@@ -1,7 +1,7 @@
 import rpcWS from './rpc_ws.js';
 import rpcXH from './rpc_xh.js';
 
-export default function (path, allowWS = true, allowXH = false, xhPing = 1000, version = 1) {
+export default (path, allowWS = true, allowXH = false, xhPing = 1000, version = 1) => {
 	if (allowWS) {
 		let p = rpcWS(path, version);
 		if (allowXH) {
