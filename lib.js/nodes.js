@@ -22,9 +22,9 @@ const sortNodes = (root, n) => {
 		nn.p = n;
 	}
 	if (n.n.i) {
-		root.pN.insertBefore(n.i[node], n.n.i[node]);
+		root.h.insertBefore(n.i[node], n.n.i[node]);
 	} else {
-		root.pN.appendChild(n.i[node]);
+		root.h.appendChild(n.i[node]);
 	}
 	return n;
       },
@@ -51,8 +51,8 @@ const sortNodes = (root, n) => {
       removeNode = (root, n) => {
 	n.p.n = n.n;
 	n.n.p = n.p;
-	if (n.i[node].parentNode === root.pN) {
-		root.pN.removeChild(n.i[node]);
+	if (n.i[node].parentNode === root.h) {
+		root.h.removeChild(n.i[node]);
 	}
 	root.l--;
       },
@@ -96,7 +96,7 @@ const sortNodes = (root, n) => {
 	root.o *= -1;
 	for (let curr = root.n; curr.i; curr = curr.n) {
 		[curr.n, curr.p] = [curr.p, curr.n];
-		root.pN.appendChild(curr.i[node]);
+		root.h.appendChild(curr.i[node]);
 	}
       },
       replaceKey = (root, k, item, prev) => {
@@ -122,9 +122,8 @@ const sortNodes = (root, n) => {
 
 export class NodeArray {
 	#root;
-	[realTarget];
-	constructor(pN, s = noSort, elements = []) {
-		const root = this.#root = {s, pN, l: 0, o: 1},
+	constructor(h, s = noSort, elements = []) {
+		const root = this.#root = {s, h, l: 0, o: 1},
 		      p = new Proxy(this, proxyObj);
 		Object.defineProperty(this, realTarget, {"value": this});
 		root.p = root.n = root;
@@ -134,7 +133,7 @@ export class NodeArray {
 		return p;
 	}
 	get [node]() {
-		return this[realTarget].#root.pN;
+		return this[realTarget].#root.h;
 	}
 	get length() {
 		return this[realTarget].#root.l;
@@ -377,15 +376,15 @@ export class NodeArray {
 
 export class NodeMap {
 	#root;
-	constructor(pN, s = noSort, entries = []) {
-		const root = this.#root = {s, pN, l: 0, o: 1, m: new Map()};
+	constructor(h, s = noSort, entries = []) {
+		const root = this.#root = {s, h, l: 0, o: 1, m: new Map()};
 		root.p = root.n = root;
 		for (const [k, item] of entries) {
 			replaceKey(root, k, item, root.p);
 		}
 	}
 	get [node]() {
-		return this.#root.pN;
+		return this.#root.h;
 	}
 	get size() {
 		return this.#root.l;
