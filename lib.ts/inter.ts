@@ -138,7 +138,7 @@ interface canceller {
 }
 
 export class WaitGroup {
-	#waits=  0;
+	#waits = 0;
 	#done = 0;
 	#errors = 0;
 	#update = new Pipe<WaitInfo>();
