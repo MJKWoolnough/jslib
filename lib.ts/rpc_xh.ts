@@ -6,7 +6,7 @@ import {split} from './json.js';
 export default (path: string, xhPing = 1000, version = 1): Promise<Readonly<RPCType>> => {
 	let sto = -1,
 	    si = -1;
-	const todo: string[]  = [],
+	const todo: string[] = [],
 	      sender = () => {
 		HTTPRequest(path, {
 			"method": "POST",
