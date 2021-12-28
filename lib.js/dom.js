@@ -115,7 +115,7 @@ export const makeElement = (elem, properties, children) => {
 	return node;
       },
       walkNode = function* (elm, self) {
-	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode)  {
+	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode) {
 		while (yield e) {}
 	}
 	if (self) {
