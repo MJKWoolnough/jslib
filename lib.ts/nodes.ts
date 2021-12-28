@@ -263,7 +263,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return s;
 	}
-	includes(valueToFind: T, fromIndex: number = 0) {
+	includes(valueToFind: T, fromIndex = 0) {
 		for (const [, item] of entries(this[realTarget].#root, fromIndex)) {
 			if (Object.is(valueToFind, item)) {
 				return true;
@@ -271,7 +271,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return false;
 	}
-	indexOf(searchElement: T, fromIndex: number = 0) {
+	indexOf(searchElement: T, fromIndex = 0) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex)) {
 			if (Object.is(searchElement, item)) {
 				return index;
@@ -287,7 +287,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 			yield i;
 		}
 	}
-	lastIndexOf(searchElement: T, fromIndex: number = 0) {
+	lastIndexOf(searchElement: T, fromIndex = 0) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex, -1)) {
 			if (Object.is(searchElement, item)) {
 				return index;
@@ -352,7 +352,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return first.i;
 	}
-	slice(begin: number = 0, end?: number) {
+	slice(begin = 0, end?: number) {
 		const root = this[realTarget].#root,
 		      slice: T[] = [];
 		if (end === undefined) {
@@ -380,7 +380,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		sort(this[realTarget].#root, compareFunction);
 		return this;
 	}
-	splice(start: number, deleteCount: number = 0, ...items: T[]) {
+	splice(start: number, deleteCount = 0, ...items: T[]) {
 		const root = this[realTarget].#root,
 		      removed: T[] = [];
 		let [curr] = getNode(root, start),
