@@ -32,7 +32,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 					successFn(xh.response);
 				}
 			} else {
-				errorFn.call(xh, new Error(xh.responseText));
+				errorFn(new Error(xh.responseText));
 			}
 		}
 	});
