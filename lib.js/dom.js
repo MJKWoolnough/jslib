@@ -86,7 +86,7 @@ export const makeElement = (elem, properties, children) => {
       },
       clearElement = elem => {
 	while (elem.lastChild !== null) {
-		elem.removeChild(elem.lastChild);
+		elem.lastChild.remove();
 	}
 	return elem;
       },
