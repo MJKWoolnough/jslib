@@ -328,7 +328,7 @@ list = (n, t, p) => {
 		}
 	}
 },
-text = (n, t) => makeElement(n, t.split("\n").map((s, n) => [document.createTextNode(s), n > 0 ? br() : []])),
+text = (n, t) => makeElement(n, t.split("\n").map((s, n) => [s, n > 0 ? br() : []])),
 all = Object.freeze({
 	b,
 	i,

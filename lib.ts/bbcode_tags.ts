@@ -330,7 +330,7 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 		}
 	}
 },
-text = (n: Node, t: string) => makeElement(n, t.split("\n").map((s, n) => [document.createTextNode(s), n > 0 ? br() : []])),
+text = (n: Node, t: string) => makeElement(n, t.split("\n").map((s, n) => [s, n > 0 ? br() : []])),
 all = Object.freeze({
 	b,
 	i,
