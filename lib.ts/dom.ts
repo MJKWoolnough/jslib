@@ -104,8 +104,12 @@ export const makeElement: mElement = (elem: Element, properties?: Props | Childr
 	return elem;
       },
       clearElement = <T extends Node>(elem: T) => {
-	while (elem.lastChild !== null) {
-		elem.lastChild.remove();
+	if (elem instanceof Element) {
+	      elem.replaceChildren();
+	} else {
+		while (elem.lastChild !== null) {
+			elem.lastChild.remove();
+		}
 	}
 	return elem;
       },

@@ -85,8 +85,12 @@ export const makeElement = (elem, properties, children) => {
 	return elem;
       },
       clearElement = elem => {
-	while (elem.lastChild !== null) {
-		elem.lastChild.remove();
+	if (elem instanceof Element) {
+		elem.replaceChildren();
+	} else {
+		while (elem.lastChild !== null) {
+			elem.lastChild.remove();
+		}
 	}
 	return elem;
       },
