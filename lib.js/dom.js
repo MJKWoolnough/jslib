@@ -94,16 +94,6 @@ export const makeElement = (elem, properties, children) => {
 	}
 	return elem;
       },
-      removeEventListeners = elem => {
-	const newElem = elem.cloneNode(false);
-	while (elem.firstChild) {
-		newElem.appendChild(elem.firstChild);
-	}
-	if (elem.parentNode) {
-		elem.parentNode.replaceChild(newElem, elem);
-	}
-	return newElem;
-      },
       text2HTML = text => {
 	const d = document.createElement("template");
 	d.innerHTML = text;

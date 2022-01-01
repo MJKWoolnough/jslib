@@ -113,16 +113,6 @@ export const makeElement: mElement = (elem: Element, properties?: Props | Childr
 	}
 	return elem;
       },
-      removeEventListeners = <T extends Node>(elem: T) => {
-	const newElem = elem.cloneNode(false) as T;
-	while (elem.firstChild) {
-		newElem.appendChild(elem.firstChild);
-	}
-	if (elem.parentNode) {
-		elem.parentNode.replaceChild(newElem, elem);
-	}
-	return newElem;
-      },
       text2HTML = (text: string): DocumentFragment => {
 	const d = document.createElement("template");
 	d.innerHTML = text;
