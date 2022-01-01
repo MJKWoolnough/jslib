@@ -196,6 +196,6 @@ export const split = (odata: string, limit = -1) => {
 		limit--;
 	}
 	return ret;
-      },
-      parse = (data: string) => split(data).map(d => JSON.parse(d)),
-      stringify = (...objs: Object[]) => objs.map(o => JSON.stringify(o)).reduce((a, v) => a + v);
+},
+parse = (data: string) => split(data).map(d => JSON.parse(d)),
+stringify = (...objs: Object[]) => objs.map(o => JSON.stringify(o)).reduce((a, v) => a + v);
