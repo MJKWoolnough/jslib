@@ -25,8 +25,8 @@ func main() {
 }
 
 var (
-	ch, base          string
-	pe, lib, svg, mod bool
+	base         string
+	pe, svg, mod bool
 )
 
 func run() error {
@@ -37,22 +37,11 @@ func run() error {
 	)
 	flag.StringVar(&input, "i", "-", "input file")
 	flag.StringVar(&output, "o", "-", "output file")
-	flag.StringVar(&ch, "c", "", "createHTML/createSVG function name")
 	flag.BoolVar(&pe, "e", false, "process on* attrs as javascript")
 	flag.BoolVar(&svg, "s", false, "svg mode")
-	flag.BoolVar(&lib, "l", false, "use svg/html.js lib")
 	flag.BoolVar(&mod, "m", false, "add required module import")
 	flag.StringVar(&base, "b", "lib/", "lib base")
 	flag.Parse()
-	rename := true
-	if ch == "" {
-		if svg {
-			ch = "createSVG"
-		} else {
-			ch = "createHTML"
-		}
-		rename = false
-	}
 	if input == "-" {
 		f = os.Stdin
 	} else {
@@ -111,40 +100,29 @@ func run() error {
 		}
 	}
 	if mod {
-		m := "dom.js"
-		if lib {
-			if svg {
-				m = "svg.js"
-			} else {
-				m = "html.js"
-			}
-			fmt.Fprint(o, "import {")
-			elems := make([]string, 0, len(tagNames))
-			for e := range tagNames {
-				elems = append(elems, e)
-			}
-			sort.Strings(elems)
-			for n, e := range elems {
-				if n > 0 {
-					fmt.Fprint(o, ", ")
-				}
-				fmt.Fprint(o, e)
-			}
+		var m string
+		if svg {
+			m = "svg.js"
 		} else {
-			t := "HTML"
-			if svg {
-				t = "SVG"
+			m = "html.js"
+		}
+		fmt.Fprint(o, "import {")
+		elems := make([]string, 0, len(tagNames))
+		for e := range tagNames {
+			elems = append(elems, e)
+		}
+		sort.Strings(elems)
+		for n, e := range elems {
+			if n > 0 {
+				fmt.Fprint(o, ", ")
 			}
-			fmt.Fprintf(o, "import {create%s", t)
-			if rename {
-				fmt.Fprintf(o, " as %s", ch)
-			}
+			fmt.Fprint(o, e)
 		}
 		b := path.Join(base, m)
 		if b[0] != '/' {
 			b = "./" + b
 		}
-		fmt.Fprintf(o, "} from '%q';\n", b)
+		fmt.Fprintf(o, "} from %q;\n", b)
 	}
 	if len(elements[0].children) == 1 {
 		_, err = elements[0].children[0].WriteTo(o)
@@ -166,24 +144,12 @@ type element struct {
 
 func (e *element) WriteTo(w io.Writer) (int64, error) {
 	sw := &rwcount.Writer{Writer: w}
-	if lib {
-		fmt.Fprintf(sw, "%s(", e.name)
-	} else {
-		fmt.Fprintf(sw, "%s(%q", ch, e.name)
-	}
+	fmt.Fprintf(sw, "%s(", e.name)
 	ip := indentPrinter{sw}
 	first := true
-	if len(e.children) == 1 && isText(e.children[0]) {
-		if lib {
-			first = false
-		} else {
-			fmt.Fprint(sw, ", ")
-		}
-		e.children[0].WriteTo(sw)
-	}
 	if len(e.attrs) == 1 {
 		for k, v := range e.attrs {
-			if lib && first {
+			if first {
 				fmt.Fprint(sw, "{")
 				first = false
 			} else {
@@ -195,7 +161,7 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 			fmt.Fprint(sw, "}")
 		}
 	} else if len(e.attrs) > 1 {
-		if lib && first {
+		if first {
 			fmt.Fprint(&ip, "{\n")
 			first = false
 		} else {
@@ -214,13 +180,13 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 		}
 		fmt.Fprint(sw, "\n}")
 	}
-	if len(e.children) == 1 && !isText(e.children[0]) {
-		if !lib || !first {
+	if len(e.children) == 1 {
+		if !first {
 			fmt.Fprint(sw, ", ")
 		}
 		e.children[0].WriteTo(sw)
 	} else if len(e.children) > 1 {
-		if lib && first {
+		if first {
 			fmt.Fprint(&ip, "[\n")
 		} else {
 			fmt.Fprint(&ip, ", [\n")
@@ -257,11 +223,6 @@ type text string
 func (t text) WriteTo(w io.Writer) (int64, error) {
 	n, err := io.WriteString(w, strconv.Quote(string(t)))
 	return int64(n), err
-}
-
-func isText(n io.WriterTo) bool {
-	_, ok := n.(text)
-	return ok
 }
 
 type indentPrinter struct {
