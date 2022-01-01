@@ -275,7 +275,7 @@ export class WindowElement extends HTMLElement {
 				if (!(e.target instanceof HTMLButtonElement) && !this.hasAttribute("hide-maximise")) {
 					this.toggleAttribute("maximised");
 				}
-			      }}, [
+			}}, [
 				this.#icon = img({"part": "icon", "src": defaultIcon}),
 				this.#title = span({"part": "title"}),
 				div({"part": "controls"}, [
