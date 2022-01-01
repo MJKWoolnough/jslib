@@ -100,7 +100,7 @@ export class ShellElement extends BaseShellElement {
 					}
 				});
 			}}))
-		      ]);
+		]);
 	}
 }
 
