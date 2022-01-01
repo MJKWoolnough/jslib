@@ -73,6 +73,12 @@ func run() error {
 		}
 		switch t := t.(type) {
 		case xml.StartElement:
+			switch t.Name.Local {
+			case "var":
+				t.Name.Local = "vare"
+			case "switch":
+				t.Name.Local = "switche"
+			}
 			tagNames[t.Name.Local] = struct{}{}
 			elements = append(elements, &element{
 				name:  t.Name.Local,
