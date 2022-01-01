@@ -14,6 +14,7 @@ import (
 
 	"vimagination.zapto.org/javascript"
 	"vimagination.zapto.org/parser"
+	"vimagination.zapto.org/rwcount"
 )
 
 func main() {
@@ -164,33 +165,34 @@ type element struct {
 }
 
 func (e *element) WriteTo(w io.Writer) (int64, error) {
+	sw := &rwcount.Writer{Writer: w}
 	if lib {
-		fmt.Fprintf(w, "%s(", e.name)
+		fmt.Fprintf(sw, "%s(", e.name)
 	} else {
-		fmt.Fprintf(w, "%s(%q", ch, e.name)
+		fmt.Fprintf(sw, "%s(%q", ch, e.name)
 	}
-	ip := indentPrinter{w}
+	ip := indentPrinter{sw}
 	first := true
 	if len(e.children) == 1 && isText(e.children[0]) {
 		if lib {
 			first = false
 		} else {
-			fmt.Fprint(w, ", ")
+			fmt.Fprint(sw, ", ")
 		}
-		e.children[0].WriteTo(w)
+		e.children[0].WriteTo(sw)
 	}
 	if len(e.attrs) == 1 {
 		for k, v := range e.attrs {
 			if lib && first {
-				fmt.Fprint(w, "{")
+				fmt.Fprint(sw, "{")
 				first = false
 			} else {
-				fmt.Fprint(w, ", {")
+				fmt.Fprint(sw, ", {")
 			}
-			if err := printAttr(w, k, v); err != nil {
+			if err := printAttr(sw, k, v); err != nil {
 				return 0, err
 			}
-			fmt.Fprint(w, "}")
+			fmt.Fprint(sw, "}")
 		}
 	} else if len(e.attrs) > 1 {
 		if lib && first {
@@ -210,13 +212,13 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 				return 0, err
 			}
 		}
-		fmt.Fprint(w, "\n}")
+		fmt.Fprint(sw, "\n}")
 	}
 	if len(e.children) == 1 && !isText(e.children[0]) {
 		if !lib || !first {
-			fmt.Fprint(w, ", ")
+			fmt.Fprint(sw, ", ")
 		}
-		e.children[0].WriteTo(w)
+		e.children[0].WriteTo(sw)
 	} else if len(e.children) > 1 {
 		if lib && first {
 			fmt.Fprint(&ip, "[\n")
@@ -232,10 +234,10 @@ func (e *element) WriteTo(w io.Writer) (int64, error) {
 			}
 			c.WriteTo(&ip)
 		}
-		fmt.Fprint(w, "\n]")
+		fmt.Fprint(sw, "\n]")
 	}
-	fmt.Fprint(w, ")")
-	return 0, sw.Err
+	fmt.Fprint(sw, ")")
+	return sw.Count, sw.Err
 }
 
 func printAttr(w io.Writer, key, value string) error {
