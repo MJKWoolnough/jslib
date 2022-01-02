@@ -16,6 +16,11 @@ export class ContextItem extends HTMLElement {
 	constructor() {
 		super();
 		this.setAttribute("slot", "context-item");
+		makeElement(this.attachShadow({"mode": "closed"}), [
+			div(slot({"name": "context-title"})),
+			div({"style": "display: none"}, slot({"name": "context-menu"})),
+			slot()
+		]);
 	}
 }
 
