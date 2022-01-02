@@ -1,4 +1,4 @@
-import type {DOMBind, Children, Props} from './dom.js';
+import type {Children, Props} from './dom.js';
 import {makeElement} from './dom.js';
 import {div, img, li, slot, span, style, ul} from './html.js';
 import {ShellElement as BaseShellElement, DesktopElement, WindowElement, windows, desktop} from './windows.js';
@@ -212,4 +212,4 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskmanager", ShellElement);
 
-export const shell: DOMBind<ShellElement> = (props?: Props | Children, children?: Props | Children) => makeElement(new ShellElement(), props, children);
+export const shell = (props?: Props | Children, children?: Props | Children) => makeElement(new ShellElement(), props, children);
