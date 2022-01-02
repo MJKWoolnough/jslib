@@ -18,12 +18,12 @@ export class ContextItem extends HTMLElement {
 		this.setAttribute("slot", "context-item");
 		makeElement(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
-div:first-of-type:not(:empty) ~ :where(slot, div) {
+div:first-of-type:not(:empty) ~ :where(slot, div), div:last-of-type {
 	display: none;
 }
 `),
 			div(slot({"name": "context-title"})),
-			div({"style": "display: none"}, slot({"name": "context-menu"})),
+			div(slot({"name": "context-menu"})),
 			slot()
 		]);
 	}
