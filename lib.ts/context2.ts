@@ -1,6 +1,6 @@
 import type {Children, Props} from './dom.js';
 import {makeElement} from './dom.js';
-import {div, slot} from './html.js';
+import {div, slot, style} from './html.js';
 
 export class ContextMenu extends HTMLElement {
 	constructor() {
@@ -17,6 +17,11 @@ export class ContextItem extends HTMLElement {
 		super();
 		this.setAttribute("slot", "context-item");
 		makeElement(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, `
+div:first-of-type:not(:empty) ~ :where(slot, div) {
+	display: none;
+}
+`),
 			div(slot({"name": "context-title"})),
 			div({"style": "display: none"}, slot({"name": "context-menu"})),
 			slot()
