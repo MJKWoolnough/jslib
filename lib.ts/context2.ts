@@ -7,6 +7,11 @@ export class ContextMenu extends HTMLElement {
 		super();
 		this.setAttribute("slot", "context-menu");
 		makeElement(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, `
+:host {
+	position: absolute;
+}
+`),
 			div(slot({"name": "context-item"}))
 		]);
 	}
