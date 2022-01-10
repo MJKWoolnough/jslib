@@ -35,7 +35,7 @@ colour = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
 		if (tk.attr && !tk.attr.includes(';')) {
-			process(n.appendChild(span({"style": `color: ${tk.attr}`})), t, p, tk.tagName);
+			process(n.appendChild(span({"style": {"color": tk.attr}})), t, p, tk.tagName);
 		} else {
 			p[textSymbol](n, tk.fullText);
 		}
@@ -47,7 +47,7 @@ size = (n: Node, t: Tokeniser, p: Parsers) => {
 	if (tk && isOpenTag(tk)) {
 		const size = tk.attr ? parseInt(tk.attr) : 0;
 		if (size > 0 && size < 100) {
-			process(n.appendChild(span({"style": `font-size: ${tk.attr}`})), t, p, tk.tagName);
+			process(n.appendChild(span({"style": {"font-size": tk.attr+""}})), t, p, tk.tagName);
 		} else {
 			p[textSymbol](n, tk.fullText);
 		}
@@ -56,7 +56,7 @@ size = (n: Node, t: Tokeniser, p: Parsers) => {
 font = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		process(!tk.attr || tk.attr.includes(';') ? n : n.appendChild(span({"style": `font-family: ${tk.attr}`})), t, p, tk.tagName);
+		process(tk.attr ? n.appendChild(span({"style": {"font-family": tk.attr}})) : n, t, p, tk.tagName);
 	}
 },
 h1 = simple(ah1),
