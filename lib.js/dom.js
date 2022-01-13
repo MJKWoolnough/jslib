@@ -18,7 +18,9 @@ const childrenArr = (elem, children) => {
 		elm = elm.firstChild;
 	}
 	return elm;
-      };
+      },
+      isEventListenerOrEventListenerObject = props => props instanceof Function || props.handleEvent instanceof Function,
+      isStyleObj = props => !(props.toString instanceof Function);
 
 export const makeElement = (elem, properties, children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node) && !(children instanceof NodeList))) {
@@ -26,7 +28,7 @@ export const makeElement = (elem, properties, children) => {
 	}
 	if (typeof properties === "object" && elem instanceof Element) {
 		for (const [k, prop] of Object.entries(properties)) {
-			if (prop instanceof Function) {
+			if (isEventListenerOrEventListenerObject(prop)) {
 				const opts = {};
 				let ev = k;
 				Loop:
@@ -49,9 +51,17 @@ export const makeElement = (elem, properties, children) => {
 				if (ev.startsWith("on")) {
 					elem.addEventListener(ev.substr(2), prop, opts);
 				}
-			} else if (k === "class" && (prop instanceof Array || prop instanceof DOMTokenList) && prop.length > 0) {
-				elem.classList.add(...prop);
-			} else if (k === "style" && typeof prop === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
+			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
+				if (k === "class" && prop.length) {
+					elem.classList.add(...prop);
+				}
+			} else if (typeof prop === "boolean") {
+				elem.toggleAttribute(k, prop);
+			} else if (prop === undefined) {
+				elem.removeAttribute(k);
+			} else if (!isStyleObj(prop)) {
+				elem.setAttribute(k, prop.toString());
+			} else if (k === "style" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				for (const k in prop) {
 					if (prop[k] === undefined) {
 						elem.style.removeProperty(k);
@@ -59,12 +69,6 @@ export const makeElement = (elem, properties, children) => {
 						elem.style.setProperty(k, prop[k]);
 					}
 				}
-			} else if (typeof prop === "boolean") {
-				elem.toggleAttribute(k, prop);
-			} else if (prop === undefined) {
-				elem.removeAttribute(k);
-			} else if (prop.toString instanceof Function) {
-				elem.setAttribute(k, prop.toString());
 			}
 		};
 	}

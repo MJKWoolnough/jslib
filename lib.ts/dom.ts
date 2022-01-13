@@ -2,9 +2,13 @@ interface ToString {
 	toString(): string;
 }
 
+type StyleObj = Record<string, ToString | undefined>;
+
 export type Children = string | Node | Children[] | NodeList;
 
-export type Props = Record<string, ToString | ToString[] | DOMTokenList | Function | Record<string, ToString | undefined> | undefined>;
+type PropValue = ToString | string[] | DOMTokenList | Function | EventListenerObject | StyleObj | undefined;
+
+export type Props = Record<string, PropValue>;
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -26,7 +30,9 @@ const childrenArr = (elem: Node, children: Children) => {
 		elm = elm.firstChild;
 	}
 	return elm;
-      };
+      },
+      isEventListenerOrEventListenerObject = (props: PropValue): props is EventListenerOrEventListenerObject => props instanceof Function || (props as EventListenerObject).handleEvent instanceof Function,
+      isStyleObj = (props: ToString | StyleObj): props is StyleObj => !((props as ToString).toString instanceof Function);
 
 interface mElement {
 	<T extends Node>(element: T, properties?: Props, children?: Children): T;
@@ -44,8 +50,8 @@ export const makeElement: mElement = (elem: Element, properties?: Props | Childr
 		[properties, children] = [children, properties];
 	}
 	if (typeof properties === "object" && elem instanceof Element) {
-		for (const [k, prop] of Object.entries(properties)) {
-			if (prop instanceof Function) {
+		for (const [k, prop] of Object.entries(properties) as [string, PropValue][]) {
+			if (isEventListenerOrEventListenerObject(prop)) {
 				const opts: AddEventListenerOptions = {};
 				let ev = k;
 				Loop:
@@ -68,9 +74,17 @@ export const makeElement: mElement = (elem: Element, properties?: Props | Childr
 				if (ev.startsWith("on")) {
 					elem.addEventListener(ev.substr(2), prop, opts);
 				}
-			} else if (k === "class" && (prop instanceof Array || prop instanceof DOMTokenList) && prop.length > 0) {
-				elem.classList.add(...prop);
-			} else if (k === "style" && typeof prop === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
+			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
+				if (k === "class" && prop.length) {
+					elem.classList.add(...prop);
+				}
+			} else if (typeof prop === "boolean") {
+				elem.toggleAttribute(k, prop);
+			} else if (prop === undefined) {
+				elem.removeAttribute(k);
+			} else if (!isStyleObj(prop)) {
+				elem.setAttribute(k, prop.toString());
+			} else if (k === "style" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 				for (const k in prop) {
 					if (prop[k] === undefined) {
 						elem.style.removeProperty(k);
@@ -78,12 +92,6 @@ export const makeElement: mElement = (elem: Element, properties?: Props | Childr
 						elem.style.setProperty(k, prop[k] as string);
 					}
 				}
-			} else if (typeof prop === "boolean") {
-				elem.toggleAttribute(k, prop);
-			} else if (prop === undefined) {
-				elem.removeAttribute(k);
-			} else if (prop.toString instanceof Function) {
-				elem.setAttribute(k, prop.toString());
 			}
 		};
 	}
