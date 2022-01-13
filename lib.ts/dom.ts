@@ -6,9 +6,14 @@ type StyleObj = Record<string, ToString | undefined>;
 
 export type Children = string | Node | Children[] | NodeList;
 
-type PropValue = ToString | string[] | DOMTokenList | Function | EventListenerObject | StyleObj | undefined;
+type PropValue = ToString | string[] | DOMTokenList | Function | EventListenerObjectWithOptions | StyleObj | undefined;
 
 export type Props = Record<string, PropValue>;
+
+type EventListenerObjectWithOptions = EventListenerObject & {
+	eventOptions?: AddEventListenerOptions;
+	eventRemove?: true;
+}
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -32,6 +37,7 @@ const childrenArr = (elem: Node, children: Children) => {
 	return elm;
       },
       isEventListenerOrEventListenerObject = (props: PropValue): props is EventListenerOrEventListenerObject => props instanceof Function || (props as EventListenerObject).handleEvent instanceof Function,
+      isEventOptions = (props: EventListenerObject): props is EventListenerObjectWithOptions => (props as EventListenerObjectWithOptions).eventOptions instanceof Object,
       isStyleObj = (props: ToString | StyleObj): props is StyleObj => !((props as ToString).toString instanceof Function);
 
 interface mElement {
@@ -52,26 +58,32 @@ export const makeElement: mElement = (elem: Element, properties?: Props | Childr
 		for (const [k, prop] of Object.entries(properties) as [string, PropValue][]) {
 			if (isEventListenerOrEventListenerObject(prop)) {
 				const opts: AddEventListenerOptions = {};
-				let ev = k;
-				Loop:
-				while (true) {
-					switch (ev.charAt(0)) {
-					case '1':
-						opts["once"] = true;
-						break;
-					case 'C':
-						opts["capture"] = true;
-						break;
-					case 'P':
-						opts["passive"] = true;
-						break;
-					default:
-						break Loop;
+				let ev = k,
+				    remove = false;
+				if (prop instanceof Function) {
+					Loop:
+					while (true) {
+						switch (ev.charAt(0)) {
+						case '1':
+							opts["once"] = true;
+							break;
+						case 'C':
+							opts["capture"] = true;
+							break;
+						case 'P':
+							opts["passive"] = true;
+							break;
+						default:
+							break Loop;
+						}
+						ev = ev.slice(1);
 					}
-					ev = ev.slice(1);
+				} else if (isEventOptions(prop)) {
+					Object.assign(opts, prop.eventOptions);
+					remove = !!prop.eventRemove;
 				}
 				if (ev.startsWith("on")) {
-					elem.addEventListener(ev.substr(2), prop, opts);
+					(remove ? elem.removeEventListener : elem.addEventListener)(ev.substr(2), prop, opts);
 				}
 			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 				if (k === "class" && prop.length) {

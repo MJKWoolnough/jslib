@@ -20,36 +20,42 @@ const childrenArr = (elem, children) => {
 	return elm;
       },
       isEventListenerOrEventListenerObject = props => props instanceof Function || props.handleEvent instanceof Function,
+      isEventOptions = props => props.eventOptions instanceof Object,
       isStyleObj = props => !(props.toString instanceof Function);
 
 export const makeElement = (elem, properties, children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node) && !(children instanceof NodeList))) {
-		[properties, children] = [children, properties];
-	}
-	if (typeof properties === "object" && elem instanceof Element) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList) {
+		children = properties;
+	} else if (typeof properties === "object" && elem instanceof Element) {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (isEventListenerOrEventListenerObject(prop)) {
 				const opts = {};
-				let ev = k;
-				Loop:
-				while (true) {
-					switch (ev.charAt(0)) {
-					case '1':
-						opts["once"] = true;
-						break;
-					case 'C':
-						opts["capture"] = true;
-						break;
-					case 'P':
-						opts["passive"] = true;
-						break;
-					default:
-						break Loop;
+				let ev = k,
+				    remove = false;
+				if (prop instanceof Function) {
+					Loop:
+					while (true) {
+						switch (ev.charAt(0)) {
+						case '1':
+							opts["once"] = true;
+							break;
+						case 'C':
+							opts["capture"] = true;
+							break;
+						case 'P':
+							opts["passive"] = true;
+							break;
+						default:
+							break Loop;
+						}
+						ev = ev.slice(1);
 					}
-					ev = ev.slice(1);
+				} else if (isEventOptions(prop)) {
+					Object.assign(opts, prop.eventOptions);
+					remove = !!prop.eventRemove;
 				}
 				if (ev.startsWith("on")) {
-					elem.addEventListener(ev.substr(2), prop, opts);
+					(remove ? elem.removeEventListener : elem.addEventListener)(ev.substr(2), prop, opts);
 				}
 			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 				if (k === "class" && prop.length) {
@@ -74,7 +80,7 @@ export const makeElement = (elem, properties, children) => {
 	}
 	if (typeof children === "string") {
 		elem.textContent = children;
-	} else if (children && (children instanceof Array || children instanceof Node || children instanceof NodeList)) {
+	} else if (children) {
 		childrenArr(elem, children);
 	}
 	return elem;
