@@ -51,10 +51,10 @@ export interface DOMBind<T extends Node> {
 	(children?: Children): T;
 }
 
-export const makeElement: mElement = (elem: Element, properties?: Props | Children, children?: Children) => {
+export const makeElement: mElement = (elem: Node, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList) {
 		children = properties;
-	} else if (typeof properties === "object" && elem instanceof Element) {
+	} else if (typeof properties === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 		for (const [k, prop] of Object.entries(properties) as [string, PropValue][]) {
 			if (isEventListenerOrEventListenerObject(prop)) {
 				const opts: AddEventListenerOptions = {};
@@ -95,7 +95,7 @@ export const makeElement: mElement = (elem: Element, properties?: Props | Childr
 				elem.removeAttribute(k);
 			} else if (!isStyleObj(prop)) {
 				elem.setAttribute(k, prop.toString());
-			} else if (k === "style" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
+			} else if (k === "style") {
 				for (const k in prop) {
 					if (prop[k] === undefined) {
 						elem.style.removeProperty(k);

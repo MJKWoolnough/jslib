@@ -26,7 +26,7 @@ const childrenArr = (elem, children) => {
 export const makeElement = (elem, properties, children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList) {
 		children = properties;
-	} else if (typeof properties === "object" && elem instanceof Element) {
+	} else if (typeof properties === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (isEventListenerOrEventListenerObject(prop)) {
 				const opts = {};
@@ -67,7 +67,7 @@ export const makeElement = (elem, properties, children) => {
 				elem.removeAttribute(k);
 			} else if (!isStyleObj(prop)) {
 				elem.setAttribute(k, prop.toString());
-			} else if (k === "style" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
+			} else if (k === "style") {
 				for (const k in prop) {
 					if (prop[k] === undefined) {
 						elem.style.removeProperty(k);
