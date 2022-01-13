@@ -54,7 +54,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 	      originalHeight = this.offsetHeight,
 	      grabX = e.clientX,
 	      grabY = e.clientY,
-	      mouseMove = (e: MouseEvent) => {
+	      onmousemove = (e: MouseEvent) => {
 		const dx = e.clientX - grabX,
 		      dy = e.clientY - grabY;
 		switch (direction) {
@@ -98,18 +98,15 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 			}
 		}
 	      },
-	      mouseUp = (e: MouseEvent) => {
+	      onmouseup = (e: MouseEvent) => {
 		if (e.button !== 0) {
 			return;
 		}
-		shell.removeEventListener("mousemove", mouseMove);
-		shell.removeEventListener("mouseup", mouseUp);
-		shell.style.removeProperty("user-select");
+		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": {"handleEvent": onmousemove, "remove": true}, "onmouseup": {"handleEvent": onmouseup, "remove": true}});
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("resized"));
 	      };
-	shell.addEventListener("mousemove", mouseMove);
-	shell.addEventListener("mouseup", mouseUp);
+	makeElement(shell, {onmousemove, onmouseup});
       },
       moveWindow = function(this: WindowElement, e: MouseEvent) {
 	const shell = this.parentNode;
@@ -120,25 +117,22 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 	this.style.setProperty("user-select", "none");
 	const grabX = e.clientX - this.offsetLeft,
 	      grabY = e.clientY - this.offsetTop,
-	      mouseMove = (e: MouseEvent) => {
+	      onmousemove = (e: MouseEvent) => {
 		const x = e.clientX - grabX,
 		      y = e.clientY - grabY,
 		      [mx, my] = snapTo(shell, this, x, y);
 		this.style.setProperty("--window-left", (x + mx) + "px");
 		this.style.setProperty("--window-top", (y + my) + "px");
 	      },
-	      mouseUp = (e: MouseEvent) => {
+	      onmouseup = (e: MouseEvent) => {
 		if (e.button !== 0) {
 			return;
 		}
-		shell.removeEventListener("mousemove", mouseMove);
-		shell.removeEventListener("mouseup", mouseUp);
-		shell.style.removeProperty("user-select");
+		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": {"handleEvent": onmousemove, "remove": true}, "onmouseup": {"handleEvent": onmouseup, "remove": true}});
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("moved"));
 	      };
-	shell.addEventListener("mousemove", mouseMove);
-	shell.addEventListener("mouseup", mouseUp);
+	makeElement(shell, {onmousemove, onmouseup});
       },
       alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
 	const w = windows({
@@ -517,7 +511,7 @@ export class WindowElement extends HTMLElement {
 			this.#slot = div(slot()),
 			div({onclick})
 		]);
-		this.addEventListener("mousedown", onclick, {"capture": true});
+		makeElement(this, {"onmousedown": {"handleEvent": onclick, "eventOptions": {"capture": true}}});
 	}
 	connectedCallback() {
 		if (focusingWindow === this) {
