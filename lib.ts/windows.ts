@@ -102,7 +102,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 		if (e.button !== 0) {
 			return;
 		}
-		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": {"handleEvent": onmousemove, "remove": true}, "onmouseup": {"handleEvent": onmouseup, "remove": true}});
+		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": {"handleEvent": onmousemove, "eventRemove": true}, "onmouseup": {"handleEvent": onmouseup, "eventRemove": true}});
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("resized"));
 	      };
@@ -128,7 +128,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 		if (e.button !== 0) {
 			return;
 		}
-		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": {"handleEvent": onmousemove, "remove": true}, "onmouseup": {"handleEvent": onmouseup, "remove": true}});
+		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": {"handleEvent": onmousemove, "eventRemove": true}, "onmouseup": {"handleEvent": onmouseup, "eventRemove": true}});
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("moved"));
 	      };
