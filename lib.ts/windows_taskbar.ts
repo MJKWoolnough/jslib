@@ -212,4 +212,4 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskmanager", ShellElement);
 
-export const shell = (props?: Props | Children, children?: Props | Children) => makeElement(new ShellElement(), props, children);
+export const shell = (props?: Props | Children, children?: Children) => makeElement(new ShellElement(), props, children);

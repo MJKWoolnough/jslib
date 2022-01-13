@@ -622,9 +622,9 @@ customElements.define("windows-shell", ShellElement);
 customElements.define("windows-desktop", DesktopElement);
 customElements.define("windows-window", WindowElement);
 
-export const shell = (props?: Props | Children, children?: Props | Children) => makeElement(new ShellElement(), props, children),
-desktop = (props?: Props | Children, children?: Props | Children) => makeElement(new DesktopElement(), props, children),
-windows = (props?: Props | Children, children?: Props | Children) => makeElement(new WindowElement(), props, children),
+export const shell = (props?: Props | Children, children?: Children) => makeElement(new ShellElement(), props, children),
+desktop = (props?: Props | Children, children?: Children) => makeElement(new DesktopElement(), props, children),
+windows = (props?: Props | Children, children?: Children) => makeElement(new WindowElement(), props, children),
 setDefaultIcon = (icon: string) => defaultIcon = icon;
 
 export let defaultIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;
