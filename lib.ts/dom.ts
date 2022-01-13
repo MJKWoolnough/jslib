@@ -36,20 +36,19 @@ const childrenArr = (elem: Node, children: Children) => {
 
 interface mElement {
 	<T extends Node>(element: T, properties?: Props, children?: Children): T;
-	<T extends Node>(element: T, children?: Children, properties?: Props): T;
-	<T extends Node>(element: T, properties?: Props | Children, children?: Props | Children): T;
+	<T extends Node>(element: T, children?: Children): T;
+	<T extends Node>(element: T, properties?: Props | Children, children?: Children): T;
 }
 
 export interface DOMBind<T extends Node> {
 	(properties?: Props, children?: Children): T;
-	(children?: Children, properties?: Props): T;
+	(children?: Children): T;
 }
 
-export const makeElement: mElement = (elem: Element, properties?: Props | Children, children?: Props | Children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node || (typeof children === "object" && !(children instanceof Array) && !(children instanceof Node) && !(children instanceof NodeList))) {
-		[properties, children] = [children, properties];
-	}
-	if (typeof properties === "object" && elem instanceof Element) {
+export const makeElement: mElement = (elem: Element, properties?: Props | Children, children?: Children) => {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList) {
+		children = properties;
+	} else if (typeof properties === "object" && elem instanceof Element) {
 		for (const [k, prop] of Object.entries(properties) as [string, PropValue][]) {
 			if (isEventListenerOrEventListenerObject(prop)) {
 				const opts: AddEventListenerOptions = {};
@@ -97,7 +96,7 @@ export const makeElement: mElement = (elem: Element, properties?: Props | Childr
 	}
 	if (typeof children === "string") {
 		elem.textContent = children;
-	} else if (children && (children instanceof Array || children instanceof Node || children instanceof NodeList)) {
+	} else if (children) {
 		childrenArr(elem, children);
 	}
 	return elem;
