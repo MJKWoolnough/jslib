@@ -10,7 +10,7 @@ type EventArray = [EventListenerOrEventListenerObject, AddEventListenerOptions, 
 
 type EventObject = EventArray | EventListenerOrEventListenerObject;
 
-type PropValue = ToString | string[] | DOMTokenList | EventObject | StyleObj | undefined;
+type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | undefined;
 
 export type Props = Record<string, PropValue>;
 
@@ -93,7 +93,7 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
       eventCapture = 2,
       eventPassive = 4,
       eventRemove = 8,
-      event = (fn: EventListenerOrEventListenerObject, options: number, signal?: AbortSignal) => [fn, {
+      event = (fn: Function | EventListenerObject, options: number, signal?: AbortSignal): EventObject => [fn as EventListenerOrEventListenerObject, {
 		"once": bitSet(options, eventOnce),
 		"capture": bitSet(options, eventCapture),
 		"passive": bitSet(options, eventPassive),
