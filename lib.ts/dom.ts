@@ -118,12 +118,13 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
       eventCapture = 2,
       eventPassive = 4,
       eventRemove = 8,
-      event = <T extends Event>(handleEvent: (e: T) => void, options: number): EventListenerObjectWithOptions => ({
+      event = <T extends Event>(handleEvent: (e: T) => void, options: number, signal?: AbortSignal): EventListenerObjectWithOptions => ({
 	handleEvent,
 	"eventOptions": {
 		"once": bitSet(options, eventOnce),
 		"capture": bitSet(options, eventCapture),
 		"passive": bitSet(options, eventPassive),
+		signal
 	},
 	"eventRemove": bitSet(options, eventRemove),
       }),

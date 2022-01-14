@@ -90,12 +90,13 @@ export const makeElement = (elem, properties, children) => {
       eventCapture = 2,
       eventPassive = 4,
       eventRemove = 8,
-      event = (handleEvent, options) => ({
+      event = (handleEvent, options, signal) => ({
 	handleEvent,
 	"eventOptions": {
 		"once": bitSet(options, eventOnce),
 		"capture": bitSet(options, eventCapture),
 		"passive": bitSet(options, eventPassive),
+		signal
 	},
 	"eventRemove": bitSet(options, eventRemove),
       }),
