@@ -25,7 +25,7 @@ const childrenArr = (elem, children) => {
       bitSet = (a, b) => (a & b) === b;
 
 export const makeElement = (elem, properties, children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
 		children = properties;
 	} else if (typeof properties === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 		for (const [k, prop] of Object.entries(properties)) {

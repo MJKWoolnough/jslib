@@ -53,7 +53,7 @@ export interface DOMBind<T extends Node> {
 }
 
 export const makeElement: mElement = (elem: Node, properties?: Props | Children, children?: Children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
 		children = properties;
 	} else if (typeof properties === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 		for (const [k, prop] of Object.entries(properties) as [string, PropValue][]) {
