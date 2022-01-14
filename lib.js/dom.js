@@ -19,9 +19,9 @@ const childrenArr = (elem, children) => {
 	}
 	return elm;
       },
-      isEventListenerOrEventListenerObject = props => props instanceof Function || props.handleEvent instanceof Function,
-      isEventOptions = prop => prop.eventOptions instanceof Object,
-      isStyleObj = prop => prop.toString instanceof Object,
+      isEventListenerOrEventListenerObject = prop => prop instanceof Function || (prop instanceof Object && prop.handleEvent instanceof Function),
+      isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
+      isStyleObj = prop => prop instanceof Object,
       bitSet = (a, b) => (a & b) === b;
 
 export const makeElement = (elem, properties, children) => {
@@ -29,15 +29,10 @@ export const makeElement = (elem, properties, children) => {
 		children = properties;
 	} else if (typeof properties === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 		for (const [k, prop] of Object.entries(properties)) {
-			if (isEventListenerOrEventListenerObject(prop)) {
+			if (isEventObject(prop)) {
 				if (k.startsWith("on")) {
-					const opts = {};
-					let remove = false;
-					if (isEventOptions(prop)) {
-						Object.assign(opts, prop.eventOptions);
-						remove = !!prop.eventRemove;
-					}
-					(remove ? elem.removeEventListener : elem.addEventListener).call(elem, k.substr(2), prop, opts);
+					const arr = prop instanceof Array;
+					(arr && prop[2] ? elem.removeEventListener : elem.addEventListener).call(elem, k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : {});
 				}
 			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 				if (k === "class" && prop.length) {
@@ -71,16 +66,12 @@ export const makeElement = (elem, properties, children) => {
       eventCapture = 2,
       eventPassive = 4,
       eventRemove = 8,
-      event = (handleEvent, options, signal) => ({
-	handleEvent,
-	"eventOptions": {
+      event = (fn, options, signal) => [fn, {
 		"once": bitSet(options, eventOnce),
 		"capture": bitSet(options, eventCapture),
 		"passive": bitSet(options, eventPassive),
 		signal
-	},
-	"eventRemove": bitSet(options, eventRemove),
-      }),
+      }, bitSet(options, eventRemove)],
       createDocumentFragment = children => {
 	const elem = document.createDocumentFragment();
 	if (typeof children === "string") {

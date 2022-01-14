@@ -6,14 +6,13 @@ type StyleObj = Record<string, ToString | undefined>;
 
 export type Children = string | Node | Children[] | NodeList;
 
-type PropValue = ToString | string[] | DOMTokenList | Function | EventListenerObjectWithOptions | StyleObj | undefined;
+type EventArray = [EventListenerOrEventListenerObject, AddEventListenerOptions, boolean];
+
+type EventObject = EventArray | EventListenerOrEventListenerObject;
+
+type PropValue = ToString | string[] | DOMTokenList | EventObject | StyleObj | undefined;
 
 export type Props = Record<string, PropValue>;
-
-type EventListenerObjectWithOptions = EventListenerObject & {
-	eventOptions?: AddEventListenerOptions;
-	eventRemove?: boolean;
-}
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -36,8 +35,8 @@ const childrenArr = (elem: Node, children: Children) => {
 	}
 	return elm;
       },
-      isEventListenerOrEventListenerObject = (props: PropValue): props is EventListenerOrEventListenerObject => props instanceof Function || (props as EventListenerObject).handleEvent instanceof Function,
-      isEventOptions = (prop: EventListenerObject): prop is EventListenerObjectWithOptions => (prop as EventListenerObjectWithOptions).eventOptions instanceof Object,
+      isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function),
+      isEventObject = (prop: PropValue): prop is EventObject => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof Object,
       bitSet = (a: number, b: number) => (a & b) === b;
 
@@ -57,15 +56,10 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
 		children = properties;
 	} else if (typeof properties === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 		for (const [k, prop] of Object.entries(properties) as [string, PropValue][]) {
-			if (prop && isEventListenerOrEventListenerObject(prop)) {
+			if (isEventObject(prop)) {
 				if (k.startsWith("on")) {
-					const opts: AddEventListenerOptions = {};
-					let remove = false;
-					if (isEventOptions(prop)) {
-						Object.assign(opts, prop.eventOptions);
-						remove = !!prop.eventRemove;
-					}
-					(remove ? elem.removeEventListener : elem.addEventListener).call(elem, k.substr(2), prop, opts);
+					const arr = prop instanceof Array;
+					(arr && prop[2] ? elem.removeEventListener : elem.addEventListener).call(elem, k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : {});
 				}
 			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 				if (k === "class" && prop.length) {
@@ -99,16 +93,12 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
       eventCapture = 2,
       eventPassive = 4,
       eventRemove = 8,
-      event = <T extends Event>(handleEvent: (e: T) => void, options: number, signal?: AbortSignal): EventListenerObjectWithOptions => ({
-	handleEvent,
-	"eventOptions": {
+      event = (fn: EventListenerOrEventListenerObject, options: number, signal?: AbortSignal) => [fn, {
 		"once": bitSet(options, eventOnce),
 		"capture": bitSet(options, eventCapture),
 		"passive": bitSet(options, eventPassive),
 		signal
-	},
-	"eventRemove": bitSet(options, eventRemove),
-      }),
+      }, bitSet(options, eventRemove)],
       createDocumentFragment = (children?: Children) => {
 	const elem = document.createDocumentFragment();
 	if (typeof children === "string") {
