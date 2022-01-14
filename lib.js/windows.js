@@ -1,4 +1,4 @@
-import {autoFocus, event, eventCapture, eventRemove, makeElement, walkNode} from './dom.js';
+import {autoFocus, event, eventCapture, makeElement, walkNode} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 import {ns as svgNS} from './svg.js';
 
@@ -53,7 +53,9 @@ const snapTo = (shell, w, x3, y3) => {
 	      originalHeight = this.offsetHeight,
 	      grabX = e.clientX,
 	      grabY = e.clientY,
-	      onmousemove = e => {
+	      ac = new AbortController(),
+	      {signal} = ac;
+	makeElement(shell, {"onmousemove": event(e => {
 		const dx = e.clientX - grabX,
 		      dy = e.clientY - grabY;
 		switch (direction) {
@@ -96,16 +98,15 @@ const snapTo = (shell, w, x3, y3) => {
 				}
 			}
 		}
-	      },
-	      onmouseup = e => {
+	}, 0, signal), "onmouseup": event(e => {
 		if (e.button !== 0) {
 			return;
 		}
-		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": event(onmousemove, eventRemove), "onmouseup": event(onmouseup, eventRemove)});
+		makeElement(shell, {"style": {"user-select": undefined}});
+		ac.abort();
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("resized"));
-	      };
-	makeElement(shell, {onmousemove, onmouseup});
+	}, 0, signal)});
       },
       moveWindow = function(e) {
 	const shell = this.parentNode;
@@ -116,22 +117,23 @@ const snapTo = (shell, w, x3, y3) => {
 	this.style.setProperty("user-select", "none");
 	const grabX = e.clientX - this.offsetLeft,
 	      grabY = e.clientY - this.offsetTop,
-	      onmousemove = e => {
+	      ac = new AbortController(),
+	      {signal} = ac;
+	makeElement(shell, {"onmousemove": event(e => {
 		const x = e.clientX - grabX,
 		      y = e.clientY - grabY,
 		      [mx, my] = snapTo(shell, this, x, y);
 		this.style.setProperty("--window-left", (x + mx) + "px");
 		this.style.setProperty("--window-top", (y + my) + "px");
-	      },
-	      onmouseup = e => {
+	}, 0, signal), "onmouseup": event(e => {
 		if (e.button !== 0) {
 			return;
 		}
-		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": event(onmousemove, eventRemove), "onmouseup": event(onmouseup, eventRemove)});
+		makeElement(shell, {"style": {"user-select": undefined}});
+		ac.abort();
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("moved"));
-	      };
-	makeElement(shell, {onmousemove, onmouseup});
+	}, 0, signal)});
       },
       alertFn = (parent, title, message, icon) => new Promise((resolve, reject) => {
 	const w = windows({
