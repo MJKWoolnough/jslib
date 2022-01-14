@@ -1,4 +1,4 @@
-import {autoFocus, makeElement, walkNode} from './dom.js';
+import {autoFocus, event, eventCapture, eventRemove, makeElement, walkNode} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 import {ns as svgNS} from './svg.js';
 
@@ -101,7 +101,7 @@ const snapTo = (shell, w, x3, y3) => {
 		if (e.button !== 0) {
 			return;
 		}
-		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": {"handleEvent": onmousemove, "eventRemove": true}, "onmouseup": {"handleEvent": onmouseup, "eventRemove": true}});
+		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": event(onmousemove, eventRemove), "onmouseup": event(onmouseup, eventRemove)});
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("resized"));
 	      };
@@ -127,7 +127,7 @@ const snapTo = (shell, w, x3, y3) => {
 		if (e.button !== 0) {
 			return;
 		}
-		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": {"handleEvent": onmousemove, "eventRemove": true}, "onmouseup": {"handleEvent": onmouseup, "eventRemove": true}});
+		makeElement(shell, {"style": {"user-select": undefined}, "onmousemove": event(onmousemove, eventRemove), "onmouseup": event(onmouseup, eventRemove)});
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("moved"));
 	      };
@@ -282,7 +282,7 @@ export class WindowElement extends HTMLElement {
 			this.#slot = div(slot()),
 			div({onclick})
 		]);
-		makeElement(this, {"onmousedown": {"handleEvent": onclick, "eventOptions": {"capture": true}}});
+		makeElement(this, {"onmousedown": event(onclick, eventCapture)});
 	}
 	connectedCallback() {
 		if (focusingWindow === this) {
