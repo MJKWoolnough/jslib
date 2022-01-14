@@ -65,7 +65,7 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
 						Object.assign(opts, prop.eventOptions);
 						remove = !!prop.eventRemove;
 					}
-					(remove ? elem.removeEventListener : elem.addEventListener)(k.substr(2), prop, opts);
+					(remove ? elem.removeEventListener : elem.addEventListener).call(elem, k.substr(2), prop, opts);
 				}
 			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 				if (k === "class" && prop.length) {
