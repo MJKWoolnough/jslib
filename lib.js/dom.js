@@ -21,7 +21,8 @@ const childrenArr = (elem, children) => {
       },
       isEventListenerOrEventListenerObject = props => props instanceof Function || props.handleEvent instanceof Function,
       isEventOptions = props => props.eventOptions instanceof Object,
-      isStyleObj = props => !(props.toString instanceof Function);
+      isStyleObj = props => !(props.toString instanceof Function),
+      bitSet = (a, b) => (a & b) === b;
 
 export const makeElement = (elem, properties, children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList) {
@@ -85,6 +86,19 @@ export const makeElement = (elem, properties, children) => {
 	}
 	return elem;
       },
+      eventOnce = 1,
+      eventCapture = 2,
+      eventPassive = 4,
+      eventRemove = 8,
+      event = (handleEvent, options) => ({
+	handleEvent,
+	"eventOptions": {
+		"once": bitSet(options, eventOnce),
+		"capture": bitSet(options, eventCapture),
+		"passive": bitSet(options, eventPassive),
+	},
+	"eventRemove": bitSet(options, eventRemove),
+      }),
       createDocumentFragment = children => {
 	const elem = document.createDocumentFragment();
 	if (typeof children === "string") {
