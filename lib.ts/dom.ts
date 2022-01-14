@@ -37,8 +37,8 @@ const childrenArr = (elem: Node, children: Children) => {
 	return elm;
       },
       isEventListenerOrEventListenerObject = (props: PropValue): props is EventListenerOrEventListenerObject => props instanceof Function || (props as EventListenerObject).handleEvent instanceof Function,
-      isEventOptions = (props: EventListenerObject): props is EventListenerObjectWithOptions => (props as EventListenerObjectWithOptions).eventOptions instanceof Object,
-      isStyleObj = (props: ToString | StyleObj): props is StyleObj => !((props as ToString).toString instanceof Function),
+      isEventOptions = (prop: EventListenerObject): prop is EventListenerObjectWithOptions => (prop as EventListenerObjectWithOptions).eventOptions instanceof Object,
+      isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof Object,
       bitSet = (a: number, b: number) => (a & b) === b;
 
 interface mElement {
@@ -75,9 +75,7 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
 				elem.toggleAttribute(k, prop);
 			} else if (prop === undefined) {
 				elem.removeAttribute(k);
-			} else if (!isStyleObj(prop)) {
-				elem.setAttribute(k, prop.toString());
-			} else if (k === "style") {
+			} else if (k === "style" && isStyleObj(prop)) {
 				for (const k in prop) {
 					if (prop[k] === undefined) {
 						elem.style.removeProperty(k);
@@ -85,6 +83,8 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
 						elem.style.setProperty(k, prop[k] as string);
 					}
 				}
+			} else {
+				elem.setAttribute(k, prop.toString());
 			}
 		};
 	}

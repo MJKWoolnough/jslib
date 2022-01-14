@@ -20,8 +20,8 @@ const childrenArr = (elem, children) => {
 	return elm;
       },
       isEventListenerOrEventListenerObject = props => props instanceof Function || props.handleEvent instanceof Function,
-      isEventOptions = props => props.eventOptions instanceof Object,
-      isStyleObj = props => !(props.toString instanceof Function),
+      isEventOptions = prop => prop.eventOptions instanceof Object,
+      isStyleObj = prop => prop.toString instanceof Object,
       bitSet = (a, b) => (a & b) === b;
 
 export const makeElement = (elem, properties, children) => {
@@ -47,9 +47,7 @@ export const makeElement = (elem, properties, children) => {
 				elem.toggleAttribute(k, prop);
 			} else if (prop === undefined) {
 				elem.removeAttribute(k);
-			} else if (!isStyleObj(prop)) {
-				elem.setAttribute(k, prop.toString());
-			} else if (k === "style") {
+			} else if (k === "style" && isStyleObj(prop)) {
 				for (const k in prop) {
 					if (prop[k] === undefined) {
 						elem.style.removeProperty(k);
@@ -57,6 +55,8 @@ export const makeElement = (elem, properties, children) => {
 						elem.style.setProperty(k, prop[k]);
 					}
 				}
+			} else {
+				elem.setAttribute(k, prop.toString());
 			}
 		};
 	}
