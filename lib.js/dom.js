@@ -30,32 +30,13 @@ export const makeElement = (elem, properties, children) => {
 	} else if (typeof properties === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (isEventListenerOrEventListenerObject(prop)) {
-				const opts = {};
-				let ev = k,
-				    remove = false;
-				if (prop instanceof Function) {
-					Loop:
-					while (true) {
-						switch (ev.charAt(0)) {
-						case '1':
-							opts["once"] = true;
-							break;
-						case 'C':
-							opts["capture"] = true;
-							break;
-						case 'P':
-							opts["passive"] = true;
-							break;
-						default:
-							break Loop;
-						}
-						ev = ev.slice(1);
+				if (k.startsWith("on")) {
+					const opts = {};
+					let remove = false;
+					if (isEventOptions(prop)) {
+						Object.assign(opts, prop.eventOptions);
+						remove = !!prop.eventRemove;
 					}
-				} else if (isEventOptions(prop)) {
-					Object.assign(opts, prop.eventOptions);
-					remove = !!prop.eventRemove;
-				}
-				if (ev.startsWith("on")) {
 					(remove ? elem.removeEventListener : elem.addEventListener)(ev.substr(2), prop, opts);
 				}
 			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
