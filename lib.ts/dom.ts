@@ -2,15 +2,26 @@ interface ToString {
 	toString(): string;
 }
 
-type StyleObj = Record<string, ToString | undefined>;
+interface mElement {
+	<T extends Node>(element: T, properties?: Props, children?: Children): T;
+	<T extends Node>(element: T, children?: Children): T;
+	<T extends Node>(element: T, properties?: Props | Children, children?: Children): T;
+}
 
-export type Children = string | Node | Children[] | NodeList;
+type StyleObj = Record<string, ToString | undefined>;
 
 type EventArray = [EventListenerOrEventListenerObject, AddEventListenerOptions, boolean];
 
 type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | undefined;
 
 export type Props = Record<string, PropValue>;
+
+export type Children = string | Node | Children[] | NodeList;
+
+export interface DOMBind<T extends Node> {
+	(properties?: Props, children?: Children): T;
+	(children?: Children): T;
+}
 
 const childrenArr = (elem: Node, children: Children) => {
 	if (typeof children === "string") {
@@ -37,17 +48,6 @@ const childrenArr = (elem: Node, children: Children) => {
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof Object,
       bitSet = (a: number, b: number) => (a & b) === b;
-
-interface mElement {
-	<T extends Node>(element: T, properties?: Props, children?: Children): T;
-	<T extends Node>(element: T, children?: Children): T;
-	<T extends Node>(element: T, properties?: Props | Children, children?: Children): T;
-}
-
-export interface DOMBind<T extends Node> {
-	(properties?: Props, children?: Children): T;
-	(children?: Children): T;
-}
 
 export const makeElement: mElement = (elem: Node, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
