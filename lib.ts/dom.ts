@@ -59,7 +59,7 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
 			if (isEventObject(prop)) {
 				if (k.startsWith("on")) {
 					const arr = prop instanceof Array;
-					elem[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : {});
+					elem[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 				}
 			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 				if (k === "class" && prop.length) {
