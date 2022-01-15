@@ -93,7 +93,7 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
       eventCapture = 2,
       eventPassive = 4,
       eventRemove = 8,
-      event = (fn: Function | EventListenerObject, options: number, signal?: AbortSignal): EventObject => [fn as EventListenerOrEventListenerObject, {
+      event = (fn: Function | EventListenerObject, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {
 		"once": bitSet(options, eventOnce),
 		"capture": bitSet(options, eventCapture),
 		"passive": bitSet(options, eventPassive),
