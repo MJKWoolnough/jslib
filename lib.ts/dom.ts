@@ -70,11 +70,11 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
 			} else if (prop === undefined) {
 				elem.removeAttribute(k);
 			} else if (k === "style" && isStyleObj(prop)) {
-				for (const k in prop) {
-					if (prop[k] === undefined) {
+				for (const [k, p] of Object.entries(prop)) {
+					if (p === undefined) {
 						elem.style.removeProperty(k);
 					} else {
-						elem.style.setProperty(k, prop[k] as string);
+						elem.style.setProperty(k, p.toString());
 					}
 				}
 			} else {
