@@ -32,7 +32,7 @@ export const makeElement = (elem, properties, children) => {
 			if (isEventObject(prop)) {
 				if (k.startsWith("on")) {
 					const arr = prop instanceof Array;
-					(arr && prop[2] ? elem.removeEventListener : elem.addEventListener).call(elem, k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : {});
+					elem[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : {});
 				}
 			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 				if (k === "class" && prop.length) {
