@@ -38,7 +38,7 @@ if [ -n "$ts" ]; then
 				echo -n "$tag";
 			fi;
 		done;
-		echo -n "] = \"$tags\".split(\" \").map(e => (props?: Props, children?: Children) => makeElement(document.createElementNS(ns, e), props, children)) as [";
+		echo -n "] = \"$tags\".split(\" \").map(e => (props?: Props | Children, children?: Children) => makeElement(document.createElementNS(ns, e), props, children)) as [";
 		first=true;
 		for tag in $tags; do
 			if $first; then
