@@ -118,7 +118,7 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
 	}
 	return elem;
       },
-      text2HTML = (text: string): DocumentFragment => {
+      text2HTML = (text: string) => {
 	const d = document.createElement("template");
 	d.innerHTML = text;
 	return d.content;
