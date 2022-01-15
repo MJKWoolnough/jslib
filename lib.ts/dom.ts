@@ -92,10 +92,10 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
       eventPassive = 4,
       eventRemove = 8,
       event = (fn: Function | EventListenerObject, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {
-		"once": bitSet(options, eventOnce),
-		"capture": bitSet(options, eventCapture),
-		"passive": bitSet(options, eventPassive),
-		signal
+	"once": bitSet(options, eventOnce),
+	"capture": bitSet(options, eventCapture),
+	"passive": bitSet(options, eventPassive),
+	signal
       }, bitSet(options, eventRemove)],
       createDocumentFragment = (children?: Children) => {
 	const elem = document.createDocumentFragment();

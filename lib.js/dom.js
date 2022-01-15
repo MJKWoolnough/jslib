@@ -67,10 +67,10 @@ export const makeElement = (elem, properties, children) => {
       eventPassive = 4,
       eventRemove = 8,
       event = (fn, options, signal) => [fn, {
-		"once": bitSet(options, eventOnce),
-		"capture": bitSet(options, eventCapture),
-		"passive": bitSet(options, eventPassive),
-		signal
+	"once": bitSet(options, eventOnce),
+	"capture": bitSet(options, eventCapture),
+	"passive": bitSet(options, eventPassive),
+	signal
       }, bitSet(options, eventRemove)],
       createDocumentFragment = children => {
 	const elem = document.createDocumentFragment();
