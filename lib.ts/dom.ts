@@ -8,8 +8,6 @@ export type Children = string | Node | Children[] | NodeList;
 
 type EventArray = [EventListenerOrEventListenerObject, AddEventListenerOptions, boolean];
 
-type EventObject = EventArray | EventListenerOrEventListenerObject;
-
 type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | undefined;
 
 export type Props = Record<string, PropValue>;
@@ -36,7 +34,7 @@ const childrenArr = (elem: Node, children: Children) => {
 	return elm;
       },
       isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function),
-      isEventObject = (prop: PropValue): prop is EventObject => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
+      isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof Object,
       bitSet = (a: number, b: number) => (a & b) === b;
 
