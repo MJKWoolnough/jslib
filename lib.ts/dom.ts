@@ -46,8 +46,7 @@ const childrenArr = (elem: Node, children: Children) => {
       },
       isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function),
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
-      isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof Object,
-      bitSet = (a: number, b: number) => (a & b) === b;
+      isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof Object;
 
 export const makeElement: mElement = (elem: Node, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
@@ -104,11 +103,11 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
       eventPassive = 4,
       eventRemove = 8,
       event = (fn: Function | EventListenerObject, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {
-	"once": bitSet(options, eventOnce),
-	"capture": bitSet(options, eventCapture),
-	"passive": bitSet(options, eventPassive),
+	"once": !!(options&eventOnce),
+	"capture": !!(options&eventCapture),
+	"passive": !!(options&eventPassive),
 	signal
-      }, bitSet(options, eventRemove)],
+      }, !!(options&eventRemove)],
       createDocumentFragment = (children?: Children) => {
 	const elem = document.createDocumentFragment();
 	if (typeof children === "string") {
