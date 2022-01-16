@@ -56,8 +56,8 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		break;
 	}
 	xh.send(props["data"] ?? null);
-      }),
-      WS = url => new Promise((successFn, errorFn) => {
+}),
+WS = url => new Promise((successFn, errorFn) => {
 	const ws = new WebSocket(url);
 	ws.addEventListener("open", () => successFn(Object.freeze({
 		close: ws.close.bind(ws),
@@ -80,4 +80,4 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		},
 	})));
 	ws.addEventListener("error", errorFn);
-      });
+});

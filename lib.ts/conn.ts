@@ -67,8 +67,8 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 		break;
 	}
 	xh.send(props["data"] ?? null);
-      }),
-      WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
+}),
+WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
 	const ws = new WebSocket(url);
 	ws.addEventListener("open", () => successFn(Object.freeze({
 		close: ws.close.bind(ws),
@@ -91,7 +91,7 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 		},
 	})));
 	ws.addEventListener("error", errorFn);
-      });
+});
 
 interface WSConn {
 	close: (code?: number, reason?: string) => void;
