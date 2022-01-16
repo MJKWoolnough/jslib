@@ -36,17 +36,9 @@ export const makeElement = (elem, properties, children) => {
 			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 				if (k === "class" && prop.length) {
 					for (let c of prop) {
-						let m = true;
-						switch (c.slice(0, 1)) {
-						case '!':
-							m = false;
-							c = c.slice(1);
-							break;
-						case '~':
-							m = undefined;
-							c = c.slice(1);
-						}
-						elem.classList.toggle(c, m);
+						const f = c.slice(0, 1),
+						      m = f !== '!' && (f !== '~' || undefined);
+						elem.classList.toggle(m ? c : c.slice(1), m);
 					}
 				}
 			} else if (typeof prop === "boolean") {
