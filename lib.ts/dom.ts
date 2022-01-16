@@ -91,18 +91,13 @@ export const makeElement: mElement = (node: Node, properties?: Props | Children,
 		childrenArr(node, children);
 	}
 	return node;
-      },
-      eventOnce = 1,
-      eventCapture = 2,
-      eventPassive = 4,
-      eventRemove = 8,
-      event = (fn: Function | EventListenerObject, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {
-	"once": !!(options&eventOnce),
-	"capture": !!(options&eventCapture),
-	"passive": !!(options&eventPassive),
-	signal
-      }, !!(options&eventRemove)],
-      createDocumentFragment = (children?: Children) => {
+},
+eventOnce = 1,
+eventCapture = 2,
+eventPassive = 4,
+eventRemove = 8,
+event = (fn: Function | EventListenerObject, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
+createDocumentFragment = (children?: Children) => {
 	const df = document.createDocumentFragment();
 	if (typeof children === "string") {
 		df.textContent = children;
@@ -110,8 +105,8 @@ export const makeElement: mElement = (node: Node, properties?: Props | Children,
 		childrenArr(df, children);
 	}
 	return df;
-      },
-      clearElement = <T extends Node>(node: T) => {
+},
+clearElement = <T extends Node>(node: T) => {
 	if (node instanceof Element) {
 		node.replaceChildren();
 	} else {
@@ -120,13 +115,13 @@ export const makeElement: mElement = (node: Node, properties?: Props | Children,
 		}
 	}
 	return node;
-      },
-      text2HTML = (text: string) => {
+},
+text2HTML = (text: string) => {
 	const d = document.createElement("template");
 	d.innerHTML = text;
 	return d.content;
-      },
-      autoFocus = <T extends HTMLElement | SVGElement>(node: T, inputSelect = true) => {
+},
+autoFocus = <T extends HTMLElement | SVGElement>(node: T, inputSelect = true) => {
 	window.setTimeout(() => {
 		node.focus();
 		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
@@ -134,8 +129,8 @@ export const makeElement: mElement = (node: Node, properties?: Props | Children,
 		}
 	}, 0);
 	return node;
-      },
-      walkNode = function* (elm: Node, self = false): Generator<Node, true | undefined> {
+},
+walkNode = function* (elm: Node, self = false): Generator<Node, true | undefined> {
 	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode!) {
 		while (yield e) {}
 	}
@@ -143,4 +138,4 @@ export const makeElement: mElement = (node: Node, properties?: Props | Children,
 		while (yield elm) {}
 	}
 	return;
-      };
+};

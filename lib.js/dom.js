@@ -66,18 +66,13 @@ export const makeElement = (node, properties, children) => {
 		childrenArr(node, children);
 	}
 	return node;
-      },
-      eventOnce = 1,
-      eventCapture = 2,
-      eventPassive = 4,
-      eventRemove = 8,
-      event = (fn, options, signal) => [fn, {
-	"once": !!(options&eventOnce),
-	"capture": !!(options&eventCapture),
-	"passive": !!(options&eventPassive),
-	signal
-      }, !!(options&eventRemove)],
-      createDocumentFragment = children => {
+},
+eventOnce = 1,
+eventCapture = 2,
+eventPassive = 4,
+eventRemove = 8,
+event = (fn, options, signal) => [fn, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
+createDocumentFragment = children => {
 	const df = document.createDocumentFragment();
 	if (typeof children === "string") {
 		df.textContent = children;
@@ -85,8 +80,8 @@ export const makeElement = (node, properties, children) => {
 		childrenArr(df, children);
 	}
 	return df;
-      },
-      clearElement = node => {
+},
+clearElement = node => {
 	if (node instanceof Element) {
 		node.replaceChildren();
 	} else {
@@ -95,13 +90,13 @@ export const makeElement = (node, properties, children) => {
 		}
 	}
 	return node;
-      },
-      text2HTML = text => {
+},
+text2HTML = text => {
 	const d = document.createElement("template");
 	d.innerHTML = text;
 	return d.content;
-      },
-      autoFocus = (node, inputSelect = true) => {
+},
+autoFocus = (node, inputSelect = true) => {
 	window.setTimeout(() => {
 		node.focus();
 		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
@@ -109,12 +104,12 @@ export const makeElement = (node, properties, children) => {
 		}
 	}, 0);
 	return node;
-      },
-      walkNode = function* (elm, self) {
+},
+walkNode = function* (elm, self) {
 	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode) {
 		while (yield e) {}
 	}
 	if (self) {
 		while (yield elm) {}
 	}
-      };
+};
