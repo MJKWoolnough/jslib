@@ -1,71 +1,71 @@
-const childrenArr = (elem, children) => {
+const childrenArr = (node, children) => {
 	if (typeof children === "string") {
-		elem.appendChild(document.createTextNode(children));
+		node.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
 		for (const c of children) {
-			childrenArr(elem, c);
+			childrenArr(node, c);
 		}
 	} else if (children instanceof Node) {
-		elem.appendChild(children);
+		node.appendChild(children);
 	} else if (children instanceof NodeList) {
 		for (const c of children) {
-			elem.appendChild(c);
+			node.appendChild(c);
 		}
 	}
       },
-      deepestChild = elm => {
-	while (elm.firstChild) {
-		elm = elm.firstChild;
+      deepestChild = node => {
+	while (node.firstChild) {
+		node = node.firstChild;
 	}
-	return elm;
+	return node;
       },
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || (prop instanceof Object && prop.handleEvent instanceof Function),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object;
 
-export const makeElement = (elem, properties, children) => {
+export const makeElement = (node, properties, children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
 		children = properties;
 	} else if (typeof properties === "object") {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (isEventObject(prop)) {
-				if (k.startsWith("on") && elem instanceof EventTarget) {
+				if (k.startsWith("on") && node instanceof EventTarget) {
 					const arr = prop instanceof Array;
-					elem[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : false);
+					node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 				}
-			} else if (elem instanceof HTMLElement || elem instanceof SVGElement) {
+			} else if (node instanceof HTMLElement || elem instanceof SVGElement) {
 				if (prop instanceof Array || prop instanceof DOMTokenList) {
 					if (k === "class" && prop.length) {
 						for (let c of prop) {
 							const f = c.slice(0, 1),
 							      m = f !== '!' && (f !== '~' || undefined);
-							elem.classList.toggle(m ? c : c.slice(1), m);
+							node.classList.toggle(m ? c : c.slice(1), m);
 						}
 					}
 				} else if (typeof prop === "boolean") {
-					elem.toggleAttribute(k, prop);
+					node.toggleAttribute(k, prop);
 				} else if (prop === undefined) {
-					elem.removeAttribute(k);
+					node.removeAttribute(k);
 				} else if (k === "style" && isStyleObj(prop)) {
 					for (const [k, p] of prop instanceof CSSStyleDeclaration ? Array.from(prop, k => [k, prop.getPropertyValue(k)]) : Object.entries(prop)) {
 						if (p === undefined) {
-							elem.style.removeProperty(k);
+							node.style.removeProperty(k);
 						} else {
-							elem.style.setProperty(k, p.toString());
+							node.style.setProperty(k, p.toString());
 						}
 					}
 				} else {
-					elem.setAttribute(k, prop.toString());
+					node.setAttribute(k, prop.toString());
 				}
 			}
 		};
 	}
 	if (typeof children === "string") {
-		elem.textContent = children;
+		node.textContent = children;
 	} else if (children) {
-		childrenArr(elem, children);
+		childrenArr(node, children);
 	}
-	return elem;
+	return node;
       },
       eventOnce = 1,
       eventCapture = 2,
@@ -78,23 +78,23 @@ export const makeElement = (elem, properties, children) => {
 	signal
       }, !!(options&eventRemove)],
       createDocumentFragment = children => {
-	const elem = document.createDocumentFragment();
+	const df = document.createDocumentFragment();
 	if (typeof children === "string") {
-		elem.textContent = children;
+		df.textContent = children;
 	} else if (children !== undefined) {
-		childrenArr(elem, children);
+		childrenArr(df, children);
 	}
-	return elem;
+	return df;
       },
-      clearElement = elem => {
-	if (elem instanceof Element) {
-		elem.replaceChildren();
+      clearElement = node => {
+	if (node instanceof Element) {
+		node.replaceChildren();
 	} else {
-		while (elem.lastChild !== null) {
-			elem.lastChild.remove();
+		while (node.lastChild !== null) {
+			node.lastChild.remove();
 		}
 	}
-	return elem;
+	return node;
       },
       text2HTML = text => {
 	const d = document.createElement("template");
