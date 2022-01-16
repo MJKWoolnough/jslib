@@ -40,7 +40,7 @@ const childrenArr = (node: Node, children: Children) => {
       },
       deepestChild = (node: Node) => {
 	while (node.firstChild) {
-		node= node.firstChild;
+		node = node.firstChild;
 	}
 	return node;
       },
