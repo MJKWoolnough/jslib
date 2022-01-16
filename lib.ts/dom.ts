@@ -51,35 +51,37 @@ const childrenArr = (elem: Node, children: Children) => {
 export const makeElement: mElement = (elem: Node, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
 		children = properties;
-	} else if (typeof properties === "object" && (elem instanceof HTMLElement || elem instanceof SVGElement)) {
+	} else if (typeof properties === "object") {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (isEventObject(prop)) {
-				if (k.startsWith("on")) {
+				if (k.startsWith("on") && elem instanceof EventTarget) {
 					const arr = prop instanceof Array;
 					elem[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 				}
-			} else if (prop instanceof Array || prop instanceof DOMTokenList) {
-				if (k === "class" && prop.length) {
-					for (let c of prop) {
-						const f = c.slice(0, 1),
-						      m = f !== '!' && (f !== '~' || undefined);
-						elem.classList.toggle(m ? c : c.slice(1), m);
+			} else if (elem instanceof HTMLElement || elem instanceof SVGElement) {
+				if (prop instanceof Array || prop instanceof DOMTokenList) {
+					if (k === "class" && prop.length) {
+						for (let c of prop) {
+							const f = c.slice(0, 1),
+							      m = f !== '!' && (f !== '~' || undefined);
+							elem.classList.toggle(m ? c : c.slice(1), m);
+						}
 					}
-				}
-			} else if (typeof prop === "boolean") {
-				elem.toggleAttribute(k, prop);
-			} else if (prop === undefined) {
-				elem.removeAttribute(k);
-			} else if (k === "style" && isStyleObj(prop)) {
-				for (const [k, p] of prop instanceof CSSStyleDeclaration ? Array.from(prop, k => [k, prop.getPropertyValue(k)]) : Object.entries(prop)) {
-					if (p === undefined) {
-						elem.style.removeProperty(k);
-					} else {
-						elem.style.setProperty(k, p.toString());
+				} else if (typeof prop === "boolean") {
+					elem.toggleAttribute(k, prop);
+				} else if (prop === undefined) {
+					elem.removeAttribute(k);
+				} else if (k === "style" && isStyleObj(prop)) {
+					for (const [k, p] of prop instanceof CSSStyleDeclaration ? Array.from(prop, k => [k, prop.getPropertyValue(k)]) : Object.entries(prop)) {
+						if (p === undefined) {
+							elem.style.removeProperty(k);
+						} else {
+							elem.style.setProperty(k, p.toString());
+						}
 					}
+				} else {
+					elem.setAttribute(k, prop.toString());
 				}
-			} else {
-				elem.setAttribute(k, prop.toString());
 			}
 		};
 	}
