@@ -8,7 +8,7 @@ interface mElement {
 	<T extends Node>(element: T, properties?: Props | Children, children?: Children): T;
 }
 
-type StyleObj = Record<string, ToString | undefined>;
+type StyleObj = Record<string, ToString | undefined> | CSSStyleDeclaration;
 
 type EventArray = [EventListenerOrEventListenerObject, AddEventListenerOptions, boolean];
 
@@ -46,7 +46,7 @@ const childrenArr = (elem: Node, children: Children) => {
       },
       isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function),
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
-      isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof Object;
+      isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object;
 
 export const makeElement: mElement = (elem: Node, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
@@ -79,7 +79,7 @@ export const makeElement: mElement = (elem: Node, properties?: Props | Children,
 			} else if (prop === undefined) {
 				elem.removeAttribute(k);
 			} else if (k === "style" && isStyleObj(prop)) {
-				for (const [k, p] of Object.entries(prop)) {
+				for (const [k, p] of prop instanceof CSSStyleDeclaration ? Array.from(prop, k => [k, prop.getPropertyValue(k)]) : Object.entries(prop)) {
 					if (p === undefined) {
 						elem.style.removeProperty(k);
 					} else {

@@ -21,7 +21,7 @@ const childrenArr = (elem, children) => {
       },
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || (prop instanceof Object && prop.handleEvent instanceof Function),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
-      isStyleObj = prop => prop instanceof Object;
+      isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object;
 
 export const makeElement = (elem, properties, children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
@@ -54,7 +54,7 @@ export const makeElement = (elem, properties, children) => {
 			} else if (prop === undefined) {
 				elem.removeAttribute(k);
 			} else if (k === "style" && isStyleObj(prop)) {
-				for (const [k, p] of Object.entries(prop)) {
+				for (const [k, p] of prop instanceof CSSStyleDeclaration ? Array.from(prop, k => [k, prop.getPropertyValue(k)]) : Object.entries(prop)) {
 					if (p === undefined) {
 						elem.style.removeProperty(k);
 					} else {
