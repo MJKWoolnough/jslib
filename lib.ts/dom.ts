@@ -85,7 +85,7 @@ export const makeElement: mElement = (node: Node, properties?: Props | Children,
 			}
 		};
 	}
-	if (typeof children === "string") {
+	if (typeof children === "string" && !node.firstChild) {
 		node.textContent = children;
 	} else if (children) {
 		childrenArr(node, children);
