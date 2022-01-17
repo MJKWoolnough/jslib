@@ -81,7 +81,7 @@ createDocumentFragment = children => {
 	}
 	return df;
 },
-clearElement = node => {
+clearElement = (node, properties, children) => {
 	if (node instanceof Element) {
 		node.replaceChildren();
 	} else {
@@ -89,7 +89,7 @@ clearElement = node => {
 			node.lastChild.remove();
 		}
 	}
-	return node;
+	return makeElement(node, properties, children);
 },
 text2HTML = text => {
 	const d = document.createElement("template");

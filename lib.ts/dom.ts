@@ -106,7 +106,7 @@ createDocumentFragment = (children?: Children) => {
 	}
 	return df;
 },
-clearElement = <T extends Node>(node: T) => {
+clearElement: mElement = (node: Node, properties?: Props | Children, children?: Children) => {
 	if (node instanceof Element) {
 		node.replaceChildren();
 	} else {
@@ -114,7 +114,7 @@ clearElement = <T extends Node>(node: T) => {
 			node.lastChild.remove();
 		}
 	}
-	return node;
+	return makeElement(node, properties, children);
 },
 text2HTML = (text: string) => {
 	const d = document.createElement("template");
