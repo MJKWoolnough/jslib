@@ -221,6 +221,6 @@ export default (c, coords, list, d = 0) => {
 				n.dispatchEvent(closeEvent);
 			}
 		}))).observe(c, {"childList": true, "subtree": true});
-		placeList(ctx, [coords, coords], root)
+		placeList(ctx, [coords, coords], root);
 	});
 }
