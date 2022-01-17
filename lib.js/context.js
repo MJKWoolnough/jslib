@@ -1,4 +1,4 @@
-import {autoFocus, makeElement} from './dom.js';
+import {amendNode, autoFocus} from './dom.js';
 import {div, li, span, style, ul} from './html.js';
 
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:not(.contextDisabled):hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}.contextDisabled{color:#aaa}.contextClearer{position:absolute;top:0;left:0;bottom:0;right:0}`)));
@@ -45,7 +45,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	      },
 	      keys = new Map(),
 	      l = ul();
-	return makeElement(l, {"class": "contextMenu", "oncontextremove": () => {
+	return amendNode(l, {"class": "contextMenu", "oncontextremove": () => {
 		closeFn();
 		if (selected >= 0) {
 			l.childNodes[selected].classList.remove("contextSelected");
@@ -180,7 +180,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 					childMenu.dispatchEvent(keydownEvent);
 				}
 			      },
-			      childMenu = makeElement(list2HTML(ctx, e.list, l), {"class": "contextMenu " + (e.classes || "")});
+			      childMenu = amendNode(list2HTML(ctx, e.list, l), {"class": "contextMenu " + (e.classes || "")});
 			classes.push("contextSubMenu");
 			params = {
 				"onmousedown": openFn,

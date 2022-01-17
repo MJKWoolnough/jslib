@@ -1,5 +1,5 @@
 import type {Props} from './dom.js';
-import {autoFocus, makeElement} from './dom.js';
+import {amendNode, autoFocus} from './dom.js';
 import {div, li, span, style, ul} from './html.js';
 
 declare const pageLoad: Promise<void>;
@@ -112,7 +112,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	      },
 	      keys = new Map<string, number[]>(),
 	      l = ul();
-	return makeElement(l, {"class": "contextMenu", "oncontextremove": () => {
+	return amendNode(l, {"class": "contextMenu", "oncontextremove": () => {
 		closeFn();
 		if (selected >= 0) {
 			(l.childNodes[selected] as HTMLLIElement).classList.remove("contextSelected");
@@ -247,7 +247,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 					childMenu.dispatchEvent(keydownEvent);
 				}
 			      },
-			      childMenu = makeElement(list2HTML(ctx, e.list, l), {"class": "contextMenu " + (e.classes || "")});
+			      childMenu = amendNode(list2HTML(ctx, e.list, l), {"class": "contextMenu " + (e.classes || "")});
 			classes.push("contextSubMenu");
 			params = {
 				"onmousedown": openFn,

@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import {autoFocus, event, eventCapture, makeElement, walkNode} from './dom.js';
+import {amendNode, autoFocus, event, eventCapture, walkNode} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 import {ns as svgNS} from './svg.js';
 
@@ -56,7 +56,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 	      grabY = e.clientY,
 	      ac = new AbortController(),
 	      {signal} = ac;
-	makeElement(shell, {"onmousemove": event((e: MouseEvent) => {
+	amendNode(shell, {"onmousemove": event((e: MouseEvent) => {
 		const dx = e.clientX - grabX,
 		      dy = e.clientY - grabY;
 		switch (direction) {
@@ -103,7 +103,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 		if (e.button !== 0) {
 			return;
 		}
-		makeElement(shell, {"style": {"user-select": undefined}});
+		amendNode(shell, {"style": {"user-select": undefined}});
 		ac.abort();
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("resized"));
@@ -120,7 +120,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 	      grabY = e.clientY - this.offsetTop,
 	      ac = new AbortController(),
 	      {signal} = ac;
-	makeElement(shell, {"onmousemove": event((e: MouseEvent) => {
+	amendNode(shell, {"onmousemove": event((e: MouseEvent) => {
 		const x = e.clientX - grabX,
 		      y = e.clientY - grabY,
 		      [mx, my] = snapTo(shell, this, x, y);
@@ -130,7 +130,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 		if (e.button !== 0) {
 			return;
 		}
-		makeElement(shell, {"style": {"user-select": undefined}});
+		amendNode(shell, {"style": {"user-select": undefined}});
 		ac.abort();
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("moved"));
@@ -207,7 +207,7 @@ export class ShellElement extends HTMLElement {
 		if (new.target !== ShellElement) {
 			return;
 		}
-		makeElement(this.attachShadow({"mode": "closed"}), [
+		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
 	display: block;
@@ -264,7 +264,7 @@ export class DesktopElement extends HTMLElement {
 	constructor() {
 		super()
 		this.setAttribute("slot", "desktop");
-		makeElement(this.attachShadow({"mode": "closed"}), [
+		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, ":host{position:absolute;top:0;left:0;bottom:0;right:0}"),
 			slot({"slot": "desktop"})
 		]);
@@ -281,7 +281,7 @@ export class WindowElement extends HTMLElement {
 	constructor() {
 		super();
 		const onclick = () => this.focus();
-		makeElement(this.attachShadow({"mode": "closed"}), [
+		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
 	position: absolute;
@@ -513,7 +513,7 @@ export class WindowElement extends HTMLElement {
 			this.#slot = div(slot()),
 			div({onclick})
 		]);
-		makeElement(this, {"onmousedown": event(onclick, eventCapture)});
+		amendNode(this, {"onmousedown": event(onclick, eventCapture)});
 	}
 	connectedCallback() {
 		if (focusingWindow === this) {
@@ -618,9 +618,9 @@ customElements.define("windows-shell", ShellElement);
 customElements.define("windows-desktop", DesktopElement);
 customElements.define("windows-window", WindowElement);
 
-export const shell = (props?: Props | Children, children?: Children) => makeElement(new ShellElement(), props, children),
-desktop = (props?: Props | Children, children?: Children) => makeElement(new DesktopElement(), props, children),
-windows = (props?: Props | Children, children?: Children) => makeElement(new WindowElement(), props, children),
+export const shell = (props?: Props | Children, children?: Children) => amendNode(new ShellElement(), props, children),
+desktop = (props?: Props | Children, children?: Children) => amendNode(new DesktopElement(), props, children),
+windows = (props?: Props | Children, children?: Children) => amendNode(new WindowElement(), props, children),
 setDefaultIcon = (icon: string) => defaultIcon = icon;
 
 export let defaultIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;

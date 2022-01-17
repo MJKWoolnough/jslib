@@ -48,7 +48,7 @@ const childrenArr = (node: Node, children: Children) => {
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object;
 
-export const makeElement: mElement = (node: Node, properties?: Props | Children, children?: Children) => {
+export const amendNode: mElement = (node: Node, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
 		children = properties;
 	} else if (typeof properties === "object") {
@@ -106,7 +106,7 @@ createDocumentFragment = (children?: Children) => {
 	}
 	return df;
 },
-clearElement: mElement = (node: Node, properties?: Props | Children, children?: Children) => {
+clearNode: mElement = (node: Node, properties?: Props | Children, children?: Children) => {
 	if (node instanceof Element) {
 		node.replaceChildren();
 	} else {
@@ -114,7 +114,7 @@ clearElement: mElement = (node: Node, properties?: Props | Children, children?: 
 			node.lastChild.remove();
 		}
 	}
-	return makeElement(node, properties, children);
+	return amendNode(node, properties, children);
 },
 text2HTML = (text: string) => {
 	const d = document.createElement("template");

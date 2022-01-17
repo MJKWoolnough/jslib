@@ -1,7 +1,7 @@
 import type {Parsers, Tokeniser} from './bbcode.js';
 import type {DOMBind} from './dom.js';
 import {text as textSymbol, isOpenTag, isString, isCloseTag, process} from './bbcode.js';
-import {makeElement} from './dom.js';
+import {amendNode} from './dom.js';
 import {a, br, audio as aaudio, div, blockquote, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, ol, pre, span, table as atable, tbody, td, tfoot, thead, th, tr, ul} from './html.js';
 
 const simple = (fn: DOMBind<Node>, style?: string) => (n: Node, t: Tokeniser, p: Parsers) => {
@@ -330,7 +330,7 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 		}
 	}
 },
-text = (n: Node, t: string) => makeElement(n, t.split("\n").map((s, n) => [n > 0 ? br() : [], s])),
+text = (n: Node, t: string) => amendNode(n, t.split("\n").map((s, n) => [n > 0 ? br() : [], s])),
 all = Object.freeze({
 	b,
 	i,

@@ -1,4 +1,4 @@
-import {clearElement, makeElement} from './dom.js';
+import {amendNode, clearNode} from './dom.js';
 import {div, li, slot, style, ul} from './html.js';
 import {ShellElement as BaseShellElement, WindowElement, DesktopElement, windows, desktop} from './windows.js';
 
@@ -74,7 +74,7 @@ export class ShellElement extends BaseShellElement {
 			}
 		      })),
 		      taskbar = ul();
-		makeElement(this.attachShadow({"mode": "closed"}), [
+		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, ":host{display:block;position:relative;overflow:hidden;width:var(--shell-width,100%);height:var(--shell-height,100%)}::slotted(windows-window:last-of-type){--overlay-on:none}:host>ul{list-style:none;padding:0;display:grid;position:absolute;transform:scaleY(-1);grid-gap:5px;grid-template-columns:repeat(auto-fit,200px);width:100%;bottom:0;left:0}:host>ul>li{transform:scaleY(-1)}:host>ul>li>windows-window:not([maximised]){visibility:hidden}:host>ul>li>windows-window{min-height:auto;position:static;--overlay-on:none}"),
 			slot({"name": "desktop"}),
 			taskbar,
@@ -94,7 +94,7 @@ export class ShellElement extends BaseShellElement {
 				windowData.forEach((data, w) => {
 					if (data.state !== state) {
 						if (data.item) {
-							clearElement(data.item);
+							clearNode(data.item);
 						}
 						windowData.delete(w);
 					}
@@ -106,4 +106,4 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskmanager", ShellElement);
 
-export const shell = (props, children) => makeElement(new ShellElement(), props, children);
+export const shell = (props, children) => amendNode(new ShellElement(), props, children);

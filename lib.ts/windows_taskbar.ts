@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import {makeElement} from './dom.js';
+import {amendNode} from './dom.js';
 import {div, img, li, slot, span, style, ul} from './html.js';
 import {ShellElement as BaseShellElement, DesktopElement, WindowElement, windows, desktop} from './windows.js';
 import contextPlace, {item as contextItem} from './context.js';
@@ -35,7 +35,7 @@ export class ShellElement extends BaseShellElement {
 				break;
 			}
 		      }));
-		makeElement(this.attachShadow({"mode": "closed"}), [
+		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
 	display: block;
@@ -212,4 +212,4 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskmanager", ShellElement);
 
-export const shell = (props?: Props | Children, children?: Children) => makeElement(new ShellElement(), props, children);
+export const shell = (props?: Props | Children, children?: Children) => amendNode(new ShellElement(), props, children);
