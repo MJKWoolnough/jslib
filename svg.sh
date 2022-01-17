@@ -63,7 +63,7 @@ fi;
 
 if [ -n "$js" ]; then
 	(
-		echo "import {makeElement} from './dom.js';";
+		echo "import {amendNode} from './dom.js';";
 		echo -en "\nexport const ns = \"http://www.w3.org/2000/svg\",\nsvgData = s => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + s.outerHTML.slice(4)),\n[";
 		first=true;
 		for tag in $tags; do

@@ -1,4 +1,4 @@
-import {makeElement} from './dom.js';
+import {amendNode} from './dom.js';
 
 export const ns = "http://www.w3.org/2000/svg",
 svgData = s => "data:image/svg+xml," + encodeURIComponent("<svg xmlns=\"" + ns + "\"" + s.outerHTML.slice(4)),
