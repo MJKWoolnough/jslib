@@ -8,22 +8,20 @@ let nextKeyID = 0,
 const held = new Set<string>(),
       downs = new Map<string, Map<number, [KeyFn, boolean]>>(),
       ups = new Map<string, Map<number, [KeyFn, boolean]>>(),
-      ke = (event: "down" | "up", key: string) => new KeyboardEvent(`key${event}`, {
-	key,
+      e = <T = MouseEventInit | KeyboardEventInit>(o: T): EventModifierInit => Object.assign(o, {
 	"ctrlKey": held.has("Control"),
 	"shiftKey": held.has("Shift"),
 	"altKey": held.has("Alt"),
 	"metaKey": held.has("OS")
       }),
-      me = (button: 0 | 1 | 2) => new MouseEvent(`mouseup`, {
+      ke = (event: "down" | "up", key: string) => new KeyboardEvent(`key${event}`, e({
+	key,
+      })),
+      me = (button: 0 | 1 | 2) => new MouseEvent(`mouseup`, e({
 	button,
 	"clientX": mouseX,
 	"clientY": mouseY,
-	"ctrlKey": held.has("Control"),
-	"shiftKey": held.has("Shift"),
-	"altKey": held.has("Alt"),
-	"metaKey": held.has("OS")
-      }),
+      })),
       mouseMove = new Map<number, MouseFn>(),
       mouseLeave = new Map<number, () => void>(),
       mouseUp = [

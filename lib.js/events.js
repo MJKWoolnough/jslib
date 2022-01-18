@@ -4,22 +4,20 @@ let nextKeyID = 0,
 const held = new Set(),
       downs = new Map(),
       ups = new Map(),
-      ke = (event, key) => new KeyboardEvent(`key${event}`, {
-	key,
+      e = o => Object.assign(o, {
 	"ctrlKey": held.has("Control"),
 	"shiftKey": held.has("Shift"),
 	"altKey": held.has("Alt"),
 	"metaKey": held.has("OS")
       }),
-      me = button => new MouseEvent(`mouseup`, {
+      ke = (event, key) => new KeyboardEvent(`key${event}`, e({
+	key,
+      })),
+      me = button => new MouseEvent(`mouseup`, e({
 	button,
 	"clientX": mouseX,
 	"clientY": mouseY,
-	"ctrlKey": held.has("Control"),
-	"shiftKey": held.has("Shift"),
-	"altKey": held.has("Alt"),
-	"metaKey": held.has("OS")
-      }),
+      })),
       mouseMove = new Map(),
       mouseLeave = new Map(),
       mouseUp = [
