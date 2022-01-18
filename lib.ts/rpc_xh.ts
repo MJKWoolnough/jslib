@@ -1,7 +1,8 @@
 import type {Await, RPCType} from './rpc_shared.js';
 import RequestHandler from './rpc_shared.js';
 import {HTTPRequest} from './conn.js';
-import {split} from './json.js';
+
+const sep = "\x1E";
 
 export default (path: string, xhPing = 1000, version = 1): Promise<Readonly<RPCType>> => {
 	let sto = -1,
@@ -13,8 +14,8 @@ export default (path: string, xhPing = 1000, version = 1): Promise<Readonly<RPCT
 			"type": "application/json",
 			"response": "text",
 			"headers": headerID,
-			"data": todo.join()
-		}).then((responseText) => typeof responseText !== "string" ? "" : split(responseText).forEach(data => rh.handleMessage({data})), rh.handleError);
+			"data": todo.join(sep)
+		}).then((responseText) => typeof responseText !== "string" ? "" : responseText.split(sep).forEach(data => rh.handleMessage({data})), rh.handleError);
 		todo.splice(0, todo.length);
 		sto = -1;
 	      },
