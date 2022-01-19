@@ -1,15 +1,109 @@
-import rpcWS from './rpc_ws.js';
-import rpcXH from './rpc_xh.js';
+import type {WSConn} from './conn.js';
+import {WS} from './conn.js';
+import {Subscription} from './inter.js';
 
-export default (path: string, allowWS = true, allowXH = false, xhPing = 1000, version = 1) => {
-	if (allowWS) {
-		const p = rpcWS(path, version);
-		if (allowXH) {
-			return p.catch(() => rpcXH(path, xhPing, version));
-		}
-		return p;
-	} else if (allowXH) {
-		return rpcXH(path, xhPing, version);
-	}
-	return Promise.reject(new Error("no type allowed"));
+export type RPCError = {
+	code: number;
+	message: string;
+	data?: any;
 }
+
+type MessageData = {
+	id: number;
+	result?: any;
+	error?: RPCError;
+}
+
+type handler = [(data: any) => void, (data: RPCError) => void];
+
+const noop = () => {},
+      noops = [noop, noop],
+      set = (m: Map<number, Set<handler>>, id: number, s: Set<handler>) => {
+	      m.set(id, s);
+	      return s;
+      };
+
+class RPC {
+	#c: WSConn | null;
+	#v: number;
+	#id: number = 0;
+	#r = new Map<number, handler>();
+	#a = new Map<number, Set<handler>>();
+	constructor(conn: WSConn, version: number) {
+		this.#c = conn;
+		this.#v = version;
+		conn.when(({data}: MessageEvent) => {
+			const message = JSON.parse(data) as MessageData,
+			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
+			      i = +!!message.error,
+			      m = message.error || message.result as RPCError;
+			for (const r of id >= 0 ? [this.#r.get(id) ?? noops] : this.#a.get(id) ?? []) {
+				r[i](m);
+			}
+		}, (err: string) => {
+			this.close();
+			const e = Object.freeze({
+				"code": -999,
+				"message": err
+			});
+			for (const [, r] of this.#r) {
+				r[1](e);
+			}
+			for (const [, s] of this.#a) {
+				for (const r of s) {
+					r[1](e);
+				}
+			}
+		});
+	}
+	request (method: string, data?: any) {
+		if (!this.#c) {
+			return Promise.reject("RPC Closed");
+		}
+		const id = this.#id++,
+		      r: Record<string, any> = {
+			id,
+			method,
+			"params": this.#v === 1 ? [data] : data
+		};
+		if (this.#v === 2) {
+			r["jsonrpc"] = "2.0";
+		}
+		return new Promise<any>((sFn, eFn) => {
+			this.#r.set(id, [sFn, eFn])
+			this.#c?.send(JSON.stringify(r));
+		});
+	}
+	await (id: number) {
+		if (!this.#c) {
+			return Promise.reject("RPC Closed");
+		}
+		const h: handler = [noop, noop],
+		      rm = () => this.#a.get(id)?.delete(h);
+		return new Promise<any>((sFn, eFn) => {
+			h[0] = sFn;
+			h[1] = eFn;
+			(this.#a.get(id) ?? set(this.#a, id, new Set<handler>())).add(h);
+		}).then((data: any) => {
+			rm();
+			return data;
+		}, rm);
+	}
+	subscribe (id: number) {
+		if (!this.#c) {
+			return new Subscription((_, eFn) => eFn("RPC Closed"));
+		}
+		return new Subscription<any>((sFn, eFn, cFn) => {
+			const h: handler = [sFn, eFn],
+			      s = this.#a.get(id) ?? set(this.#a, id, new Set<handler>());
+			s.add(h);
+			cFn(() => s.delete(h));
+		});
+	}
+	close () {
+		this.#c?.close();
+		this.#c = null;
+	}
+}
+
+export default (path: string, version = 1) => WS(path).then(c => new RPC(c, version));
