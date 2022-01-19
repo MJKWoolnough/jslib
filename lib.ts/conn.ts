@@ -93,7 +93,7 @@ WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
 	ws.addEventListener("error", errorFn);
 });
 
-interface WSConn {
+export interface WSConn {
 	close: (code?: number, reason?: string) => void;
 	send: (data: string | ArrayBuffer | Blob | ArrayBufferView) => any;
 	when: (successFn?: (event: MessageEvent) => void, errorFn?: (event: string) => void) => Subscription<any>;
