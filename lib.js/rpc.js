@@ -64,15 +64,14 @@ class RPC {
 			return Promise.reject("RPC Closed");
 		}
 		const h = [noop, noop],
-		      rm = () => this.#a.get(id)?.delete(h);
-		return new Promise<any>((sFn, eFn) => {
+		      s = this.#a.get(id) ?? set(this.#a, id, new Set()),
+		      p = new Promise<any>((sFn, eFn) => {
 			h[0] = sFn;
 			h[1] = eFn;
-			(this.#a.get(id) ?? set(this.#a, id, new Set())).add(h);
-		}).then(data => {
-			rm();
-			return data;
-		}, rm);
+			s.add(h);
+		      });
+		p.finally(() => s.delete(h));
+		return p;
 	}
 	subscribe (id) {
 		if (!this.#c) {
