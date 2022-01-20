@@ -589,7 +589,7 @@ export class WindowElement extends HTMLElement {
 			      scrolls: [Element, number, number][] = scrollTop || scrollLeft ? [[this, scrollTop, scrollLeft]] : [];
 			for (const elm of walkNode(this.#slot)) {
 				if (elm instanceof Element) {
-					const {scrollTop, scrollLeft} = elm as Element;
+					const {scrollTop, scrollLeft} = elm;
 					if (scrollTop || scrollLeft) {
 						scrolls.push([elm, scrollTop, scrollLeft]);
 					}
