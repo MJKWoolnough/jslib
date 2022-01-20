@@ -115,4 +115,4 @@ class RPC {
 	}
 }
 
-export default (path: string, version = 1) => WS(path).then(c => new RPC(c, version));
+export default (path: string, version: 1 | 2 = 1) => WS(path).then(c => new RPC(c, version));
