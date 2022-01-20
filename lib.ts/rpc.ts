@@ -2,6 +2,13 @@ import type {WSConn} from './conn.js';
 import {WS} from './conn.js';
 import {Subscription} from './inter.js';
 
+type Request = {
+	jsonrpc?: "2.0",
+	id: number;
+	method: string,
+	params: any | [any];
+}
+
 type MessageData = {
 	id: number;
 	result?: any;
@@ -69,11 +76,11 @@ class RPC {
 		}
 		const id = this.#id++,
 		      v = this.#v,
-		      r: Record<string, any> = {
+		      r: Request = {
 			id,
 			method,
 			"params": v === 1 ? [data] : data
-		};
+		      };
 		if (v === 2) {
 			r["jsonrpc"] = "2.0";
 		}
