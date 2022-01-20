@@ -68,12 +68,13 @@ class RPC {
 			return Promise.reject("RPC Closed");
 		}
 		const id = this.#id++,
+		      v = this.#v,
 		      r: Record<string, any> = {
 			id,
 			method,
-			"params": this.#v === 1 ? [data] : data
+			"params": v === 1 ? [data] : data
 		};
-		if (this.#v === 2) {
+		if (v === 2) {
 			r["jsonrpc"] = "2.0";
 		}
 		return new Promise<any>((sFn, eFn) => {
