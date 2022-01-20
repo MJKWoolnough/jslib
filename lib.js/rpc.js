@@ -8,6 +8,21 @@ const noop = () => {},
 	      return s;
       };
 
+export class RPCError {
+	code;
+	message;
+	data;
+	constructor(code, message, data) {
+		this.code = code;
+		this.message = message;
+		this.data = data;
+		Object.freeze(this);
+	}
+	toString() {
+		return this.message;
+	}
+}
+
 class RPC {
 	#c;
 	#v;
@@ -20,17 +35,15 @@ class RPC {
 		conn.when(({data}) => {
 			const message = JSON.parse(data),
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
-			      i = +!!message.error,
-			      m = message.error || message.result;
+			      e = message.error,
+			      i = +!!e,
+			      m = e ? new RPCError(e.code, e.message, e.data) : message.result;
 			for (const r of id >= 0 ? [this.#r.get(id) ?? noops] : this.#a.get(id) ?? []) {
 				r[i](m);
 			}
-		}, err => {
+		}, (err) => {
 			this.close();
-			const e = Object.freeze({
-				"code": -999,
-				"message": err
-			});
+			const e = new RPCError(-999, err);
 			for (const [, r] of this.#r) {
 				r[1](e);
 			}

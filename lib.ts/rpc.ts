@@ -2,12 +2,6 @@ import type {WSConn} from './conn.js';
 import {WS} from './conn.js';
 import {Subscription} from './inter.js';
 
-export type RPCError = {
-	code: number;
-	message: string;
-	data?: any;
-}
-
 type MessageData = {
 	id: number;
 	result?: any;
@@ -23,6 +17,21 @@ const noop = () => {},
 	      return s;
       };
 
+export class RPCError {
+	code: number;
+	message: string;
+	data?: any;
+	constructor(code: number, message: string, data?: any) {
+		this.code = code;
+		this.message = message;
+		this.data = data;
+		Object.freeze(this);
+	}
+	toString() {
+		return this.message;
+	}
+}
+
 class RPC {
 	#c: WSConn | null;
 	#v: number;
@@ -35,17 +44,15 @@ class RPC {
 		conn.when(({data}: MessageEvent) => {
 			const message = JSON.parse(data) as MessageData,
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
-			      i = +!!message.error,
-			      m = message.error || message.result as RPCError;
+			      e = message.error,
+			      i = +!!e,
+			      m = e ? new RPCError(e.code, e.message, e.data) : message.result as RPCError;
 			for (const r of id >= 0 ? [this.#r.get(id) ?? noops] : this.#a.get(id) ?? []) {
 				r[i](m);
 			}
 		}, (err: string) => {
 			this.close();
-			const e = Object.freeze({
-				"code": -999,
-				"message": err
-			});
+			const e = new RPCError(-999, err);
 			for (const [, r] of this.#r) {
 				r[1](e);
 			}
