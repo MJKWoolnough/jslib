@@ -67,7 +67,7 @@ class RPC {
 		if (this.#v === 2) {
 			r["jsonrpc"] = "2.0";
 		}
-		return new Promise<any>((sFn, eFn) => {
+		return new Promise((sFn, eFn) => {
 			this.#r.set(id, [sFn, eFn])
 			this.#c?.send(JSON.stringify(r));
 		});
@@ -77,8 +77,9 @@ class RPC {
 			return Promise.reject("RPC Closed");
 		}
 		const h = [noop, noop],
-		      s = this.#a.get(id) ?? set(this.#a, id, new Set()),
-		      p = new Promise<any>((sFn, eFn) => {
+		      a = this.#a,
+		      s = a.get(id) ?? set(a, id, new Set()),
+		      p = new Promise((sFn, eFn) => {
 			h[0] = sFn;
 			h[1] = eFn;
 			s.add(h);
@@ -90,9 +91,10 @@ class RPC {
 		if (!this.#c) {
 			return new Subscription((_, eFn) => eFn("RPC Closed"));
 		}
-		return new Subscription<any>((sFn, eFn, cFn) => {
+		return new Subscription((sFn, eFn, cFn) => {
 			const h = [sFn, eFn],
-			      s = this.#a.get(id) ?? set(this.#a, id, new Set());
+			      a = this.#a,
+			      s = a.get(id) ?? set(a, id, new Set());
 			s.add(h);
 			cFn(() => s.delete(h));
 		});

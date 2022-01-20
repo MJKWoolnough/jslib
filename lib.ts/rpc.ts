@@ -86,7 +86,8 @@ class RPC {
 			return Promise.reject("RPC Closed");
 		}
 		const h: handler = [noop, noop],
-		      s = this.#a.get(id) ?? set(this.#a, id, new Set<handler>()),
+		      a = this.#a,
+		      s = a.get(id) ?? set(a, id, new Set<handler>()),
 		      p = new Promise<any>((sFn, eFn) => {
 			h[0] = sFn;
 			h[1] = eFn;
@@ -101,7 +102,8 @@ class RPC {
 		}
 		return new Subscription<any>((sFn, eFn, cFn) => {
 			const h: handler = [sFn, eFn],
-			      s = this.#a.get(id) ?? set(this.#a, id, new Set<handler>());
+			      a = this.#a,
+			      s = a.get(id) ?? set(a, id, new Set<handler>());
 			s.add(h);
 			cFn(() => s.delete(h));
 		});
