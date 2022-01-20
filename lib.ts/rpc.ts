@@ -63,7 +63,7 @@ class RPC {
 			}
 		});
 	}
-	request (method: string, data?: any) {
+	request(method: string, data?: any) {
 		if (!this.#c) {
 			return Promise.reject("RPC Closed");
 		}
@@ -81,7 +81,7 @@ class RPC {
 			this.#c?.send(JSON.stringify(r));
 		});
 	}
-	await (id: number) {
+	await(id: number) {
 		if (!this.#c) {
 			return Promise.reject("RPC Closed");
 		}
@@ -95,7 +95,7 @@ class RPC {
 		p.finally(() => s.delete(h));
 		return p;
 	}
-	subscribe (id: number) {
+	subscribe(id: number) {
 		if (!this.#c) {
 			return new Subscription((_, eFn) => eFn("RPC Closed"));
 		}
@@ -106,7 +106,7 @@ class RPC {
 			cFn(() => s.delete(h));
 		});
 	}
-	close () {
+	close() {
 		this.#c?.close();
 		this.#c = null;
 	}
