@@ -106,7 +106,7 @@ class RPC {
 	}
 	subscribe(id: number) {
 		if (!this.#c) {
-			return new Subscription((_, eFn) => eFn("RPC Closed"));
+			return new Subscription<never>((_, eFn) => eFn("RPC Closed"));
 		}
 		return new Subscription<any>((sFn, eFn, cFn) => {
 			const h: handler = [sFn, eFn],
