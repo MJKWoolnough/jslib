@@ -73,14 +73,21 @@ WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
 	ws.addEventListener("open", () => successFn(Object.freeze({
 		close: ws.close.bind(ws),
 		send: ws.send.bind(ws),
-		when: Subscription.prototype.then.bind(new Subscription((sFn, eFn) => {
-			ws.removeEventListener("error", errorFn);
-			ws.addEventListener("message", sFn);
-			ws.addEventListener("error", (e: Event) => eFn((e as ErrorEvent).error));
-			ws.addEventListener("close", (e: CloseEvent) => {
+		when: Subscription.prototype.then.bind(new Subscription((sFn, eFn, cFn) => {
+			const err = (e: Event) => eFn((e as ErrorEvent).error),
+			      close = (e: CloseEvent) => {
 				if (!e.wasClean) {
 					eFn(new Error(e.reason));
 				}
+			      };
+			ws.removeEventListener("error", errorFn);
+			ws.addEventListener("message", sFn);
+			ws.addEventListener("error", err);
+			ws.addEventListener("close", close);
+			cFn(() => {
+				ws.removeEventListener("message", sFn);
+				ws.removeEventListener("error", err);
+				ws.removeEventListener("close", close);
 			});
 		})),
 		get binaryType() {

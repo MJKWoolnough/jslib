@@ -62,14 +62,21 @@ WS = url => new Promise((successFn, errorFn) => {
 	ws.addEventListener("open", () => successFn(Object.freeze({
 		close: ws.close.bind(ws),
 		send: ws.send.bind(ws),
-		when: Subscription.prototype.then.bind(new Subscription((sFn, eFn) => {
-			ws.removeEventListener("error", errorFn);
-			ws.addEventListener("message", sFn);
-			ws.addEventListener("error", e => eFn(e.error));
-			ws.addEventListener("close", e => {
+		when: Subscription.prototype.then.bind(new Subscription((sFn, eFn, cFn) => {
+			const err = e => eFn(e.error),
+			      close = e => {
 				if (!e.wasClean) {
 					eFn(new Error(e.reason));
 				}
+			      };
+			ws.removeEventListener("error", errorFn);
+			ws.addEventListener("message", sFn);
+			ws.addEventListener("error", err);
+			ws.addEventListener("close", close);
+			cFn(() => {
+				ws.removeEventListener("message", sFn);
+				ws.removeEventListener("error", err);
+				ws.removeEventListener("close", close);
 			});
 		})),
 		get binaryType() {
