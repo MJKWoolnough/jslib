@@ -11,6 +11,8 @@ type properties = {
 	data?: XMLHttpRequestBodyInit;
 }
 
+const once = {"once": true};
+
 export const HTTPRequest = (url: string, props: properties = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
 	xh.open(
@@ -75,20 +77,22 @@ WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
 		send: (data: string | ArrayBufferLike | Blob | ArrayBufferView) => ws.send(data),
 		when: Subscription.prototype.then.bind(new Subscription((sFn, eFn, cFn) => {
 			const err = (e: Event) => eFn((e as ErrorEvent).error),
+			      end = () => {
+				ws.removeEventListener("message", sFn);
+				ws.removeEventListener("error", err);
+				ws.removeEventListener("close", close);
+			      },
 			      close = (e: CloseEvent) => {
 				if (!e.wasClean) {
 					eFn(new Error(e.reason));
 				}
+				end();
 			      };
 			ws.removeEventListener("error", errorFn);
 			ws.addEventListener("message", sFn);
 			ws.addEventListener("error", err);
-			ws.addEventListener("close", close);
-			cFn(() => {
-				ws.removeEventListener("message", sFn);
-				ws.removeEventListener("error", err);
-				ws.removeEventListener("close", close);
-			});
+			ws.addEventListener("close", close, once);
+			cFn(end);
 		})),
 		get binaryType() {
 			return ws.binaryType;
@@ -96,8 +100,8 @@ WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
 		set binaryType(t: BinaryType) {
 			ws.binaryType = t;
 		},
-	})));
-	ws.addEventListener("error", errorFn);
+	})), once);
+	ws.addEventListener("error", errorFn, once);
 });
 
 export interface WSConn {
