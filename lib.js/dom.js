@@ -82,7 +82,11 @@ createDocumentFragment = children => {
 	return df;
 },
 clearNode = (node, properties, children) => {
-	if (node instanceof Element) {
+	if (typeof properties === "string") {
+		children = properties = void (node.textContent = properties);
+	} else if (typeof children === "string") {
+		children = void (node.textContent = children);
+	} else if (node instanceof Element) {
 		node.replaceChildren();
 	} else {
 		while (node.lastChild !== null) {
