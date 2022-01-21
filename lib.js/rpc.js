@@ -38,8 +38,12 @@ class RPC {
 			      e = message.error,
 			      i = +!!e,
 			      m = e ? new RPCError(e.code, e.message, e.data) : message.result;
-			for (const r of id >= 0 ? [this.#r.get(id) ?? noops] : this.#a.get(id) ?? []) {
-				r[i](m);
+			if (id >= 0) {
+				(this.#r.get(id) ?? noops)[i](m);
+			} else {
+				for (const r of this.#a.get(id) ?? []) {
+					r[i](m);
+				}
 			}
 		}, (err) => {
 			this.close();
