@@ -4,8 +4,8 @@ import {Subscription} from './inter.js';
 const noop = () => {},
       noops = [noop, noop],
       set = (m, id, s) => {
-	      m.set(id, s);
-	      return s;
+	m.set(id, s);
+	return s;
       };
 
 export class RPCError {

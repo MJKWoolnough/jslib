@@ -20,8 +20,8 @@ type handler = [(data: any) => void, (data: RPCError) => void];
 const noop = () => {},
       noops = [noop, noop],
       set = (m: Map<number, Set<handler>>, id: number, s: Set<handler>) => {
-	      m.set(id, s);
-	      return s;
+	m.set(id, s);
+	return s;
       };
 
 export class RPCError {
