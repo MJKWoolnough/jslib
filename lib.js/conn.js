@@ -60,8 +60,8 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 WS = url => new Promise((successFn, errorFn) => {
 	const ws = new WebSocket(url);
 	ws.addEventListener("open", () => successFn(Object.freeze({
-		close: ws.close.bind(ws),
-		send: ws.send.bind(ws),
+		close: (code, reason) => ws.close(code, reason),
+		send: data => ws.send(data),
 		when: Subscription.prototype.then.bind(new Subscription((sFn, eFn, cFn) => {
 			const err = e => eFn(e.error),
 			      close = e => {

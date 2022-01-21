@@ -71,8 +71,8 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
 	const ws = new WebSocket(url);
 	ws.addEventListener("open", () => successFn(Object.freeze({
-		close: ws.close.bind(ws),
-		send: ws.send.bind(ws),
+		close: (code?: number, reason?: string) => ws.close(code, reason),
+		send: (data: string | ArrayBufferLike | Blob | ArrayBufferView) => ws.send(data),
 		when: Subscription.prototype.then.bind(new Subscription((sFn, eFn, cFn) => {
 			const err = (e: Event) => eFn((e as ErrorEvent).error),
 			      close = (e: CloseEvent) => {
