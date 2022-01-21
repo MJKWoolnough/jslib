@@ -61,7 +61,7 @@ export class Subscription<T> {
 		this.#error = errorReceive;
 		this.#cancel = cancelSend;
 	}
-	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | undefined | null, errorFn?: ((data: any) => TResult2) | undefined | null) {
+	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
 		const success = this.#success,
 		      error = this.#error,
 		      cancel = this.#cancel;
@@ -94,7 +94,7 @@ export class Subscription<T> {
 	cancel() {
 		this.#cancel();
 	}
-	catch<TResult = never>(errorFn: ((data: any) => TResult) | undefined | null): Subscription<T | TResult> {
+	catch<TResult = never>(errorFn: (data: any) => TResult): Subscription<T | TResult> {
 		return this.then(undefined, errorFn);
 	}
 	finally(afterFn: () => void): Subscription<T> {
