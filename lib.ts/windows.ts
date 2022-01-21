@@ -585,9 +585,10 @@ export class WindowElement extends HTMLElement {
 		}
 		if (this.parentNode && this.nextElementSibling) {
 			focusingWindow = this;
-			const {scrollTop, scrollLeft} = this,
-			      scrolls: [Element, number, number][] = scrollTop || scrollLeft ? [[this, scrollTop, scrollLeft]] : [];
-			for (const elm of walkNode(this.#slot)) {
+			const s = this.#slot,
+			      {scrollTop, scrollLeft} = s,
+			      scrolls: [Element, number, number][] = scrollTop || scrollLeft ? [[s, scrollTop, scrollLeft]] : [];
+			for (const elm of walkNode(this, true)) {
 				if (elm instanceof Element) {
 					const {scrollTop, scrollLeft} = elm;
 					if (scrollTop || scrollLeft) {
