@@ -244,19 +244,21 @@ export class ShellElement extends BaseElement {
 	}
 	realignWindows() {
 		const {offsetWidth: tw, offsetHeight: th} = this;
-		(Array.from(this.childNodes).filter(e => e instanceof WindowElement) as WindowElement[]).forEach(e => {
-			const {offsetLeft: x, offsetTop: y, offsetWidth: w, offsetHeight: h} = e;
-			if (x + w > tw) {
-				amendNode(e, {"style": {"--window-left": Math.max(tw - w, 0) + "px"}});
-			} else if (x < 0) {
-				amendNode(e, {"style": {"--window-left": "0px"}});
+		for (const e of this.childNodes) {
+			if (e instanceof WindowElement) {
+				const {offsetLeft: x, offsetTop: y, offsetWidth: w, offsetHeight: h} = e;
+				if (x + w > tw) {
+					amendNode(e, {"style": {"--window-left": Math.max(tw - w, 0) + "px"}});
+				} else if (x < 0) {
+					amendNode(e, {"style": {"--window-left": "0px"}});
+				}
+				if (y + h > th) {
+					amendNode(e, {"style": {"--window-top": Math.max(th - h) + "px"}});
+				} else if (y < 0) {
+					amendNode(e, {"style": {"--window-top": "0px"}});
+				}
 			}
-			if (y + h > th) {
-				amendNode(e, {"style": {"--window-top": Math.max(th - h) + "px"}});
-			} else if (y < 0) {
-				amendNode(e, {"style": {"--window-top": "0px"}});
-			}
-		});
+		};
 	}
 }
 
