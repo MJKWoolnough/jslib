@@ -135,73 +135,83 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 		dragging = false;
 		this.dispatchEvent(new CustomEvent("moved"));
 	}, 0, signal)});
-      },
-      alertFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
-	const w = windows({
-		"window-hide": true,
-		"window-icon": icon,
-		"window-title": title,
-		"hide-maximise": "true",
-		"onremove": () => resolve(false)
-	}, [
-		div(message),
-		div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
-			resolve(true);
-			w.remove();
-		}}, "Ok")))
-	]);
-	parent.addWindow(w) || reject(new Error("invalid target"));
-      }),
-      confirmFn = (parent: WindowElement|ShellElement, title: string, message: string, icon?: string) => new Promise<boolean>((resolve, reject) => {
-	const w = windows({
-		"window-hide": true,
-		"window-icon": icon,
-		"window-title": title,
-		"hide-maximise": "true",
-		"onremove": () => resolve(false)
-	}, [
-		div(message),
-		div({"style": "text-align: center"}, [
-			autoFocus(button({"onclick": () => {
-				resolve(true);
-				w.remove();
-			}}, "Ok")),
-			button({"onclick": () => w.remove()}, "Cancel")
-		])
-	]);
-	parent.addWindow(w) || reject(new Error("invalid target"));
-      }),
-      promptFn = (parent: WindowElement|ShellElement, title: string, message: string, defaultValue?: string, icon?: string) => new Promise<string|null>((resolve, reject) => {
-	const ok = button({"onclick": () => {
-		resolve(data.value);
-		w.remove();
-	      }}, "Ok"),
-	      data = autoFocus(input({"value": defaultValue || "", "onkeydown": (e: KeyboardEvent) => {
-		switch (e.key) {
-		case "Enter":
-			ok.click();
-			break;
-		case "Escape":
-			w.remove();
-		}
-	      }})),
-	      w = windows({
-		"window-hide": true,
-		"window-icon": icon,
-		"window-title": title,
-		"hide-maximise": "true",
-		"onremove": () => resolve(null)
-	}, [
-		div(message),
-		data,
-		div({"style": "text-align: center"}, ok)
-	]);
-	parent.addWindow(w) || reject(new Error("invalid target"));
-      });
+      };
 
 let focusingWindow: WindowElement | null = null, dragging = false;
 
-export class ShellElement extends HTMLElement {
+abstract class BaseElement extends HTMLElement {
+	alert(title: string, message: string, icon?: string) {
+		return new Promise<boolean>((resolve, reject) => {
+			const w = windows({
+				"window-hide": true,
+				"window-icon": icon,
+				"window-title": title,
+				"hide-maximise": "true",
+				"onremove": () => resolve(false)
+			}, [
+				div(message),
+				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
+					resolve(true);
+					w.remove();
+				}}, "Ok")))
+			]);
+			this.addWindow(w) || reject(new Error("invalid target"));
+		});
+	}
+	confirm(title: string, message: string, icon?: string) {
+		return new Promise<boolean>((resolve, reject) => {
+			const w = windows({
+				"window-hide": true,
+				"window-icon": icon,
+				"window-title": title,
+				"hide-maximise": "true",
+				"onremove": () => resolve(false)
+			}, [
+				div(message),
+				div({"style": "text-align: center"}, [
+					autoFocus(button({"onclick": () => {
+						resolve(true);
+						w.remove();
+					}}, "Ok")),
+					button({"onclick": () => w.remove()}, "Cancel")
+				])
+			]);
+			this.addWindow(w) || reject(new Error("invalid target"));
+		});
+	}
+	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
+		return new Promise<string|null>((resolve, reject) => {
+			const ok = button({"onclick": () => {
+				resolve(data.value);
+				w.remove();
+			      }}, "Ok"),
+			      data = autoFocus(input({"value": defaultValue || "", "onkeydown": (e: KeyboardEvent) => {
+				switch (e.key) {
+				case "Enter":
+					ok.click();
+					break;
+				case "Escape":
+					w.remove();
+				}
+			      }})),
+			      w = windows({
+				"window-hide": true,
+				"window-icon": icon,
+				"window-title": title,
+				"hide-maximise": "true",
+				"onremove": () => resolve(null)
+			}, [
+				div(message),
+				data,
+				div({"style": "text-align: center"}, ok)
+			]);
+			this.addWindow(w) || reject(new Error("invalid target"));
+		});
+	}
+	abstract addWindow(w: WindowElement): boolean;
+}
+
+export class ShellElement extends BaseElement {
 	constructor() {
 		super();
 		if (new.target !== ShellElement) {
@@ -228,15 +238,6 @@ export class ShellElement extends HTMLElement {
 			slot({"name": "desktop"}),
 			div(slot())
 		]);
-	}
-	alert(title: string, message: string, icon?: string) {
-		return alertFn(this, title, message, icon);
-	}
-	confirm(title: string, message: string, icon?: string) {
-		return confirmFn(this, title, message, icon);
-	}
-	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
-		return promptFn(this, title, message, defaultValue, icon);
 	}
 	addWindow(w: WindowElement) {
 		amendNode(this, w);
@@ -271,7 +272,7 @@ export class DesktopElement extends HTMLElement {
 	}
 }
 
-export class WindowElement extends HTMLElement {
+export class WindowElement extends BaseElement {
 	#title: HTMLSpanElement;
 	#icon: HTMLImageElement;
 	#extra: HTMLSpanElement;
@@ -549,15 +550,6 @@ export class WindowElement extends HTMLElement {
 	}
 	static get observedAttributes() {
 		return ["window-title", "window-icon"];
-	}
-	alert(title: string, message: string, icon?: string) {
-		return alertFn(this, title, message, icon);
-	}
-	confirm(title: string, message: string, icon?: string) {
-		return confirmFn(this, title, message, icon);
-	}
-	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
-		return promptFn(this, title, message, defaultValue, icon);
 	}
 	addWindow(w: WindowElement) {
 		if (!this.parentNode) {
