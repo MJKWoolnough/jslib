@@ -19,24 +19,26 @@ const snapTo = (shell, w, x3, y3) => {
 		} else if (y2 <= shell.offsetHeight && y4 > shell.offsetHeight && y4 <= shell.offsetHeight + snap) {
 			mv[1] = shell.offsetHeight - y4;
 		}
-		Array.from(shell.childNodes).filter(e => e instanceof WindowElement && e !== w).forEach(e => {
-			const x5 = e.offsetLeft, y5 = e.offsetTop,
-			      x6 = x5 + e.offsetWidth, y6 = y5 + e.offsetHeight;
-			if (y3 <= y6 && y4 >= y5) {
-				if (x2 <= x5 && x4 >= x5 && x4 <= x5 + snap) {
-					mv[0] = x5 - x4;
-				} else if (x1 >= x6 && x3 <= x6 && x3 >= x6 - snap) {
-					mv[0] = x6 - x3;
+		for (const e of shell.childNodes) {
+			if (e instanceof WindowElement && e !== w) {
+				const x5 = e.offsetLeft, y5 = e.offsetTop,
+				      x6 = x5 + e.offsetWidth, y6 = y5 + e.offsetHeight;
+				if (y3 <= y6 && y4 >= y5) {
+					if (x2 <= x5 && x4 >= x5 && x4 <= x5 + snap) {
+						mv[0] = x5 - x4;
+					} else if (x1 >= x6 && x3 <= x6 && x3 >= x6 - snap) {
+						mv[0] = x6 - x3;
+					}
+				}
+				if (x3 <= x6 && x4 >= x5) {
+					if (y2 <= y5 && y4 >= y5 && y4 <= y5 + snap) {
+						mv[1] = y5 - y4;
+					} else if (y1 >= y6 && y3 <= y6 && y3 >= y6 - snap) {
+						mv[1] = y6 - y3;
+					}
 				}
 			}
-			if (x3 <= x6 && x4 >= x5) {
-				if (y2 <= y5 && y4 >= y5 && y4 <= y5 + snap) {
-					mv[1] = y5 - y4;
-				} else if (y1 >= y6 && y3 <= y6 && y3 >= y6 - snap) {
-					mv[1] = y6 - y3;
-				}
-			}
-		});
+		}
 	}
 	return mv;
       },
