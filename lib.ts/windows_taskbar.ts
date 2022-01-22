@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import {amendNode} from './dom.js';
+import {amendNode, event, eventOnce} from './dom.js';
 import {div, img, li, slot, span, style, ul} from './html.js';
 import {ShellElement as BaseShellElement, DesktopElement, WindowElement, windows, desktop} from './windows.js';
 import contextPlace, {item as contextItem} from './context.js';
@@ -21,17 +21,13 @@ export class ShellElement extends BaseShellElement {
 			if (type !== "attributes" || !(target instanceof WindowElement)) {
 				return;
 			}
-			let item = windowData.get(target)!;
+			const item = windowData.get(target)!;
 			switch (attributeName) {
 			case "window-icon":
-				if (target.hasAttribute("window-icon")) {
-					(item.firstChild as HTMLImageElement).setAttribute("src", target.getAttribute("window-icon")!);
-				} else {
-					(item.firstChild as HTMLImageElement).removeAttribute("src");
-				}
+				amendNode(item.firstChild!, {"src": target.getAttribute("window-icon") ?? undefined});
 				break;
 			case "window-title":
-				(item.lastChild as HTMLSpanElement).innerText = target.getAttribute("window-title") || "";
+				amendNode(item.lastChild!, target.getAttribute("window-title") ?? "");
 				break;
 			}
 		      }));
@@ -175,22 +171,20 @@ export class ShellElement extends BaseShellElement {
 					if (!windowData.has(w) && !w.hasAttribute("window-hide")) {
 						const item = taskbar.appendChild(li({"onclick": () => {
 							if (w.hasAttribute("minimised")) {
-								w.removeAttribute("minimised");
+								amendNode(w, {"minimised": false});
 								w.focus();
 							} else if (w.nextElementSibling) {
 								w.focus();
 							} else {
-								w.setAttribute("minimised", "");
+								amendNode(w, {"minimised": true});
 							}
 						      }, "oncontextmenu": (e: MouseEvent) => {
 							e.preventDefault();
 							contextPlace(self, [e.clientX, e.clientY], [
 								w.hasAttribute("minimised") ? contextItem("&Restore", () => {
-									w.removeAttribute("minimised");
+									amendNode(w, {"minimised": false});
 									w.focus();
-								}) : contextItem("&Minimise", () => {
-									w.setAttribute("minimised", "");
-								}),
+								}) : contextItem("&Minimise", () => amendNode(w, {"minimised": true})),
 								contextItem("&Close", () => w.close())
 							]);
 						      }}, [
@@ -198,10 +192,10 @@ export class ShellElement extends BaseShellElement {
 							span({"part": "title"}, w.getAttribute("window-title") || "")
 						      ]));
 						windowData.set(w, item);
-						w.addEventListener("remove", () => {
+						amendNode(w, {"onremove": event(() => {
 							windowData.delete(w);
 							item.remove();
-						}, {"once": true});
+						}, eventOnce)});
 						windowObserver.observe(w, windowObservations);
 					}
 				});
