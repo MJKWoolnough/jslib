@@ -222,7 +222,7 @@ export class ShellElement extends HTMLElement {
 		return promptFn(this, title, message, defaultValue, icon);
 	}
 	addWindow(w) {
-		this.appendChild(w);
+		amendNode(this, w);
 		return true;
 	}
 	realignWindows() {
@@ -341,7 +341,7 @@ export class WindowElement extends HTMLElement {
 		this.#child = w;
 		w.#parent = this;
 		this.#slot.classList.toggle("hasChild", true);
-		this.parentNode.appendChild(w);
+		amendNode(this.parentNode, w);
 		return true;
 	}
 	addControlButton(icon, onclick, title) {
@@ -367,7 +367,7 @@ export class WindowElement extends HTMLElement {
 					}
 				}
 			}
-			this.parentNode.appendChild(this);
+			amendNode(this.parentNode, this);
 			for (const [elm, scrollTop, scrollLeft] of scrolls) {
 				elm.scrollTop = scrollTop;
 				elm.scrollLeft = scrollLeft;
