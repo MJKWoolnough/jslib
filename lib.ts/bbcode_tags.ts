@@ -7,7 +7,7 @@ import {a, br, audio as aaudio, div, blockquote, fieldset, h1 as ah1, h2 as ah2,
 const simple = (fn: DOMBind<Node>, style?: string) => (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		process(n.appendChild(fn({style})), t, p, tk.tagName);
+		amendNode(n, process(fn({style}), t, p, tk.tagName));
 	}
       },
       textContents = (t: Tokeniser, endTag: string) => {
@@ -35,7 +35,7 @@ colour = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
 		if (tk.attr && !tk.attr.includes(';')) {
-			process(n.appendChild(span({"style": {"color": tk.attr}})), t, p, tk.tagName);
+			amendNode(n, process(span({"style": {"color": tk.attr}}), t, p, tk.tagName));
 		} else {
 			p[textSymbol](n, tk.fullText);
 		}
@@ -47,7 +47,7 @@ size = (n: Node, t: Tokeniser, p: Parsers) => {
 	if (tk && isOpenTag(tk)) {
 		const size = tk.attr ? parseInt(tk.attr) : 0;
 		if (size > 0 && size < 100) {
-			process(n.appendChild(span({"style": {"font-size": tk.attr+""}})), t, p, tk.tagName);
+			amendNode(n, process(span({"style": {"font-size": tk.attr+""}}), t, p, tk.tagName));
 		} else {
 			p[textSymbol](n, tk.fullText);
 		}
@@ -71,7 +71,7 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 	if (tk && isOpenTag(tk)) {
 		if (tk.attr) {
 			try {
-				process(n.appendChild(a({"href": (new URL(tk.attr, window.location.href)).href})), t, p, tk.tagName);
+				amendNode(n, process(a({"href": (new URL(tk.attr, window.location.href)).href}), t, p, tk.tagName));
 			} catch{
 				p[textSymbol](n, tk.fullText);
 			}
@@ -79,7 +79,7 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 			const u = textContents(t, tk.tagName);
 			try {
 				const url = new URL(u, window.location.href);
-				n.appendChild(a({"href": url.href}, u));
+				amendNode(n, a({"href": url.href}, u));
 			} catch {
 				p[textSymbol](n, tk.fullText);
 				p[textSymbol](n, u);
@@ -107,7 +107,7 @@ audio = (n: Node, t: Tokeniser, p: Parsers) => {
 		} else {
 			try {
 				const u = new URL(src, window.location.href);
-				n.appendChild(aaudio({"src": u.href, "controls": true}));
+				amendNode(n, aaudio({"src": u.href, "controls": true}));
 			} catch {
 				p[textSymbol](n, tk.fullText);
 				p[textSymbol](n, src);
@@ -160,13 +160,13 @@ img = (n: Node, t: Tokeniser, p: Parsers) => {
 				}
 			}
 		}
-		n.appendChild(aimg(params));
+		amendNode(n, aimg(params));
 	}
 },
 code = (n: Node, t: Tokeniser) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		n.appendChild(pre(textContents(t, tk.tagName)));
+		amendNode(n, pre(textContents(t, tk.tagName)));
 	}
 },
 table = (n: Node, t: Tokeniser, p: Parsers) => {
@@ -228,12 +228,12 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 				case "th":
 				case "td":
 					if (currRow) {
-						process(currRow.appendChild(tk.tagName === "th" ? th() : td()), t, p, tk.tagName);
+						amendNode(currRow, process(tk.tagName === "th" ? th() : td(), t, p, tk.tagName));
 					}
 				}
 			} else if (isCloseTag(tk)) {
 				if (tk.tagName === "table") {
-					n.appendChild(atable([
+					amendNode(n, atable([
 						tableHeader.length > 0 ? thead(tableHeader) : [],
 						tableBody.length > 0 ? tbody(tableBody) : [],
 						tableFooter.length > 0 ? tfoot(tableFooter) : []
@@ -267,11 +267,11 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 quote = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		const f = n.appendChild(fieldset());
+		const f = fieldset();
 		if (tk.attr) {
-			f.appendChild(legend(tk.attr));
+			amendNode(f, legend(tk.attr));
 		}
-		process(f.appendChild(blockquote()), t, p, tk.tagName);
+		amendNode(n, amendNode(f, process(blockquote(), t, p, tk.tagName)));
 	}
 },
 list = (n: Node, t: Tokeniser, p: Parsers) => {
@@ -286,13 +286,13 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 		case '1':
 			type = tk.attr;
 		}
-		const l = n.appendChild(type === "" ? ul() : ol({type})),
+		const l = type === "" ? ul() : ol({type}),
 		      lname = tk.tagName;
 		let currItem: HTMLLIElement | null = null;
 		while (true) {
 			const tk = t.next().value;
 			if (!tk) {
-				return;
+				break;
 			}
 			if (isString(tk)) {
 				let pos = 0;
@@ -303,7 +303,7 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 						if (currItem) {
 							p[textSymbol](currItem, tk.slice(pos, open));
 						}
-						currItem = l.appendChild(li());
+						amendNode(l, currItem = li());
 						pos = open + 3;
 					} else if (close < open && close !== -1 || open === -1 && close !== -1) {
 						if (currItem) {
@@ -319,7 +319,7 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 					}
 				}
 			} else if (isCloseTag(tk) && tk.tagName === lname) {
-				return;
+				break;
 			} else if (currItem) {
 				if (isOpenTag(tk) && p[tk.tagName]) {
 					p[tk.tagName](currItem, t, p);
@@ -328,6 +328,7 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 				}
 			}
 		}
+		amendNode(n, l);
 	}
 },
 text = (n: Node, t: string) => amendNode(n, t.split("\n").map((s, n) => [n > 0 ? br() : [], s])),
