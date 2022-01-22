@@ -10,9 +10,7 @@ const held = new Set(),
 	"altKey": held.has("Alt"),
 	"metaKey": held.has("OS")
       }),
-      ke = (event, key) => new KeyboardEvent(`key${event}`, e({
-	key,
-      })),
+      ke = (event, key) => new KeyboardEvent(`key${event}`, e({key})),
       me = button => new MouseEvent(`mouseup`, e({
 	button,
 	"clientX": mouseX,
