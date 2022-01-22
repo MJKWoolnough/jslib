@@ -90,7 +90,7 @@ export const text = Symbol("text"),
 isOpenTag = (t: OpenTag | CloseTag | string): t is OpenTag => typeof t === "object" && (t as OpenTag).attr !== undefined,
 isCloseTag = (t: OpenTag | CloseTag | string): t is CloseTag => typeof t === "object" && (t as OpenTag).attr === undefined,
 isString = (t: OpenTag | CloseTag | string): t is string => typeof t === "string",
-process = (node: Node, t: Tokeniser, p: Parsers, closeTag?: string) => {
+process = <T extends Node>(node: T, t: Tokeniser, p: Parsers, closeTag?: string) => {
 	while (true) {
 		const tk = t.next().value;
 		if (!tk) {
@@ -104,13 +104,14 @@ process = (node: Node, t: Tokeniser, p: Parsers, closeTag?: string) => {
 			}
 		} else if (isCloseTag(tk)) {
 			if (tk.tagName === closeTag) {
-				return;
+				break;
 			}
 			p[text](node, tk.fullText);
 		} else {
 			p[text](node, tk);
 		}
 	}
+	return node;
 };
 
 export type OpenTag = {
@@ -133,8 +134,4 @@ export type Parsers = {
 	[text]: (node: Node, t: string) => void;
 }
 
-export default (parsers: Parsers, text: string) => {
-	const df = document.createDocumentFragment();
-	process(df, parseText(text), parsers);
-	return df;
-}
+export default (parsers: Parsers, text: string) => process(document.createDocumentFragment(), parseText(text), parsers);

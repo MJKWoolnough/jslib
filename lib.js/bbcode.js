@@ -104,17 +104,14 @@ process = (node, t, p, closeTag) => {
 			}
 		} else if (isCloseTag(tk)) {
 			if (tk.tagName === closeTag) {
-				return;
+				break;
 			}
 			p[text](node, tk.fullText);
 		} else {
 			p[text](node, tk);
 		}
 	}
+	return node;
 };
 
-export default (parsers, text) => {
-	const df = document.createDocumentFragment();
-	process(df, parseText(text), parsers);
-	return df;
-}
+export default (parsers, text) => process(document.createDocumentFragment(), parseText(text), parsers);
