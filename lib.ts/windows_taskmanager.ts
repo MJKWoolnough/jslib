@@ -1,6 +1,6 @@
 import type {Children, Props} from './dom.js';
 import type {DesktopElement} from './windows.js';
-import {amendNode, clearNode} from './dom.js';
+import {amendNode, clearNode, event, eventOnce} from './dom.js';
 import {div, li, slot, style, ul} from './html.js';
 import {ShellElement as BaseShellElement, WindowElement, windows, desktop} from './windows.js';
 
@@ -29,7 +29,7 @@ export class ShellElement extends BaseShellElement {
 		      taskbarObserver = new MutationObserver(list => list.forEach(({target, type, attributeName}) => {
 			if (type === "attributes" && attributeName === "maximised" && target instanceof WindowElement && !target.hasAttribute("maximised")) {
 				const w = taskbarData.get(target)!;
-				w.removeAttribute("minimised");
+				amendNode(w, {"minimised": false});
 				w.focus();
 			}
 		      })),
@@ -41,16 +41,12 @@ export class ShellElement extends BaseShellElement {
 			switch (attributeName) {
 			case "window-icon":
 				if (data.item) {
-					if (target.hasAttribute("window-icon")) {
-						(data.item.firstChild as WindowElement).setAttribute("window-icon", target.getAttribute("window-icon")!);
-					} else {
-						(data.item.firstChild as WindowElement).removeAttribute("window-icon");
-					}
+					amendNode(data.item.firstChild!, {"window-icon": target.getAttribute("window-icon") ?? undefined});
 				}
 				break;
 			case "window-title":
 				if (data.item) {
-					(data.item.firstChild as WindowElement).setAttribute("window-title", target.getAttribute("window-title") || "");
+					amendNode(data.item.firstChild!, {"window-title": target.getAttribute("window-title") || ""});
 				}
 				break;
 			case "minimised":
@@ -58,7 +54,7 @@ export class ShellElement extends BaseShellElement {
 					return;
 				}
 				if (data.item) {
-					(data.item.firstChild as WindowElement).setAttribute("maximised", "");
+					amendNode(data.item.firstChild!, {"maximised": true});
 					return;
 				}
 				if (!Array.from(taskbar.children).some(i => {
@@ -76,8 +72,8 @@ export class ShellElement extends BaseShellElement {
 				}, "onremove": () => taskbarData.delete(taskbarItem)});
 				taskbarData.set(taskbarItem, target);
 				taskbarObserver.observe(data.item!.appendChild(taskbarItem), taskbarObservations);
-				target.addEventListener("onremove",  () => taskbarItem.remove(), {"once": true});
-			break;
+				amendNode(target, {"onremove": event(() => taskbarItem.remove(), eventOnce)});
+				break;
 			}
 		      })),
 		      taskbar = ul();
