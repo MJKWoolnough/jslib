@@ -43,17 +43,17 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 	}
 	return mv;
       },
-      resizeWindow = function(this: WindowElement, direction: number, e: MouseEvent) {
-	const shell = this.parentNode;
+      resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
+	const shell = w.parentNode;
 	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
 	}
 	dragging = true;
 	shell.style.setProperty("user-select", "none");
-	const originalLeft = this.offsetLeft,
-	      originalTop = this.offsetTop,
-	      originalWidth = this.offsetWidth,
-	      originalHeight = this.offsetHeight,
+	const originalLeft = w.offsetLeft,
+	      originalTop = w.offsetTop,
+	      originalWidth = w.offsetWidth,
+	      originalHeight = w.offsetHeight,
 	      grabX = e.clientX,
 	      grabY = e.clientY,
 	      ac = new AbortController(),
@@ -66,9 +66,9 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 			case 1:
 			case 2: {
 				const height = originalHeight - dy;
-				if (height > (parseInt(this.style.getPropertyValue("min-height") || "") || 100)) {
-					this.style.setProperty("--window-top", `${originalTop + dy}px`);
-					this.style.setProperty("--window-height", `${height}px`);
+				if (height > (parseInt(w.style.getPropertyValue("min-height") || "") || 100)) {
+					w.style.setProperty("--window-top", `${originalTop + dy}px`);
+					w.style.setProperty("--window-height", `${height}px`);
 				}
 			}
 			break;
@@ -76,8 +76,8 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 			case 5:
 			case 6: {
 				const height = originalHeight + dy;
-				if (height > (parseInt(this.style.getPropertyValue("min-height") || "") || 100)) {
-					this.style.setProperty("--window-height", `${height}px`);
+				if (height > (parseInt(w.style.getPropertyValue("min-height") || "") || 100)) {
+					w.style.setProperty("--window-height", `${height}px`);
 				}
 			}
 		}
@@ -86,8 +86,8 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 			case 3:
 			case 4: {
 				const width = originalWidth + dx;
-				if (width > (parseInt(this.style.getPropertyValue("min-width") || "") || 100)) {
-					this.style.setProperty("--window-width", `${width}px`);
+				if (width > (parseInt(w.style.getPropertyValue("min-width") || "") || 100)) {
+					w.style.setProperty("--window-width", `${width}px`);
 				}
 			}
 			break;
@@ -95,9 +95,9 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 			case 7:
 			case 6: {
 				const width = originalWidth - dx;
-				if (width > (parseInt(this.style.getPropertyValue("min-width") || "") || 100)) {
-					this.style.setProperty("--window-left", `${originalLeft + dx}px`);
-					this.style.setProperty("--window-width", `${width}px`);
+				if (width > (parseInt(w.style.getPropertyValue("min-width") || "") || 100)) {
+					w.style.setProperty("--window-left", `${originalLeft + dx}px`);
+					w.style.setProperty("--window-width", `${width}px`);
 				}
 			}
 		}
@@ -108,26 +108,26 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 		amendNode(shell, {"style": {"user-select": undefined}});
 		ac.abort();
 		dragging = false;
-		this.dispatchEvent(new CustomEvent("resized"));
+		w.dispatchEvent(new CustomEvent("resized"));
 	}, 0, signal)});
       },
-      moveWindow = function(this: WindowElement, e: MouseEvent) {
-	const shell = this.parentNode;
+      moveWindow = (w: WindowElement, e: MouseEvent) => {
+	const shell = w.parentNode;
 	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
 	}
 	dragging = true;
-	this.style.setProperty("user-select", "none");
-	const grabX = e.clientX - this.offsetLeft,
-	      grabY = e.clientY - this.offsetTop,
+	w.style.setProperty("user-select", "none");
+	const grabX = e.clientX - w.offsetLeft,
+	      grabY = e.clientY - w.offsetTop,
 	      ac = new AbortController(),
 	      {signal} = ac;
 	amendNode(shell, {"onmousemove": event((e: MouseEvent) => {
 		const x = e.clientX - grabX,
 		      y = e.clientY - grabY,
-		      [mx, my] = snapTo(shell, this, x, y);
-		this.style.setProperty("--window-left", (x + mx) + "px");
-		this.style.setProperty("--window-top", (y + my) + "px");
+		      [mx, my] = snapTo(shell, w, x, y);
+		w.style.setProperty("--window-left", (x + mx) + "px");
+		w.style.setProperty("--window-top", (y + my) + "px");
 	}, 0, signal), "onmouseup": event((e: MouseEvent) => {
 		if (e.button !== 0) {
 			return;
@@ -135,7 +135,7 @@ const snapTo = (shell: ShellElement, w: WindowElement, x3: number, y3: number) =
 		amendNode(shell, {"style": {"user-select": undefined}});
 		ac.abort();
 		dragging = false;
-		this.dispatchEvent(new CustomEvent("moved"));
+		w.dispatchEvent(new CustomEvent("moved"));
 	}, 0, signal)});
       };
 
@@ -498,8 +498,8 @@ export class WindowElement extends BaseElement {
 	cursor: ew-resize;
 }
 `),
-			div(Array.from({length: 8}, (_, n) => div({"onmousedown": resizeWindow.bind(this, n)}))),
-			div({"part": "titlebar", "onmousedown": moveWindow.bind(this), "ondblclick": (e: Event) => {
+			div(Array.from({length: 8}, (_, n) => div({"onmousedown": (e: MouseEvent) => resizeWindow(this, n, e)}))),
+			div({"part": "titlebar", "onmousedown": (e: MouseEvent) => moveWindow(this, e), "ondblclick": (e: Event) => {
 				if (!(e.target instanceof HTMLButtonElement) && !this.hasAttribute("hide-maximise")) {
 					this.toggleAttribute("maximised");
 				}

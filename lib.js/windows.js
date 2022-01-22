@@ -42,17 +42,17 @@ const snapTo = (shell, w, x3, y3) => {
 	}
 	return mv;
       },
-      resizeWindow = function(direction, e) {
-	const shell = this.parentNode;
+      resizeWindow = (w, direction, e) => {
+	const shell = w.parentNode;
 	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
 	}
 	dragging = true;
 	shell.style.setProperty("user-select", "none");
-	const originalLeft = this.offsetLeft,
-	      originalTop = this.offsetTop,
-	      originalWidth = this.offsetWidth,
-	      originalHeight = this.offsetHeight,
+	const originalLeft = w.offsetLeft,
+	      originalTop = w.offsetTop,
+	      originalWidth = w.offsetWidth,
+	      originalHeight = w.offsetHeight,
 	      grabX = e.clientX,
 	      grabY = e.clientY,
 	      ac = new AbortController(),
@@ -65,9 +65,9 @@ const snapTo = (shell, w, x3, y3) => {
 			case 1:
 			case 2: {
 				const height = originalHeight - dy;
-				if (height > (parseInt(this.style.getPropertyValue("min-height") || "") || 100)) {
-					this.style.setProperty("--window-top", `${originalTop + dy}px`);
-					this.style.setProperty("--window-height", `${height}px`);
+				if (height > (parseInt(w.style.getPropertyValue("min-height") || "") || 100)) {
+					w.style.setProperty("--window-top", `${originalTop + dy}px`);
+					w.style.setProperty("--window-height", `${height}px`);
 				}
 			}
 			break;
@@ -75,8 +75,8 @@ const snapTo = (shell, w, x3, y3) => {
 			case 5:
 			case 6: {
 				const height = originalHeight + dy;
-				if (height > (parseInt(this.style.getPropertyValue("min-height") || "") || 100)) {
-					this.style.setProperty("--window-height", `${height}px`);
+				if (height > (parseInt(w.style.getPropertyValue("min-height") || "") || 100)) {
+					w.style.setProperty("--window-height", `${height}px`);
 				}
 			}
 		}
@@ -85,8 +85,8 @@ const snapTo = (shell, w, x3, y3) => {
 			case 3:
 			case 4: {
 				const width = originalWidth + dx;
-				if (width > (parseInt(this.style.getPropertyValue("min-width") || "") || 100)) {
-					this.style.setProperty("--window-width", `${width}px`);
+				if (width > (parseInt(w.style.getPropertyValue("min-width") || "") || 100)) {
+					w.style.setProperty("--window-width", `${width}px`);
 				}
 			}
 			break;
@@ -94,9 +94,9 @@ const snapTo = (shell, w, x3, y3) => {
 			case 7:
 			case 6: {
 				const width = originalWidth - dx;
-				if (width > (parseInt(this.style.getPropertyValue("min-width") || "") || 100)) {
-					this.style.setProperty("--window-left", `${originalLeft + dx}px`);
-					this.style.setProperty("--window-width", `${width}px`);
+				if (width > (parseInt(w.style.getPropertyValue("min-width") || "") || 100)) {
+					w.style.setProperty("--window-left", `${originalLeft + dx}px`);
+					w.style.setProperty("--window-width", `${width}px`);
 				}
 			}
 		}
@@ -107,26 +107,26 @@ const snapTo = (shell, w, x3, y3) => {
 		amendNode(shell, {"style": {"user-select": undefined}});
 		ac.abort();
 		dragging = false;
-		this.dispatchEvent(new CustomEvent("resized"));
+		w.dispatchEvent(new CustomEvent("resized"));
 	}, 0, signal)});
       },
-      moveWindow = function(e) {
-	const shell = this.parentNode;
+      moveWindow = (w, e) => {
+	const shell = w.parentNode;
 	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
 	}
 	dragging = true;
-	this.style.setProperty("user-select", "none");
-	const grabX = e.clientX - this.offsetLeft,
-	      grabY = e.clientY - this.offsetTop,
+	w.style.setProperty("user-select", "none");
+	const grabX = e.clientX - w.offsetLeft,
+	      grabY = e.clientY - w.offsetTop,
 	      ac = new AbortController(),
 	      {signal} = ac;
 	amendNode(shell, {"onmousemove": event(e => {
 		const x = e.clientX - grabX,
 		      y = e.clientY - grabY,
-		      [mx, my] = snapTo(shell, this, x, y);
-		this.style.setProperty("--window-left", (x + mx) + "px");
-		this.style.setProperty("--window-top", (y + my) + "px");
+		      [mx, my] = snapTo(shell, w, x, y);
+		w.style.setProperty("--window-left", (x + mx) + "px");
+		w.style.setProperty("--window-top", (y + my) + "px");
 	}, 0, signal), "onmouseup": event(e => {
 		if (e.button !== 0) {
 			return;
@@ -134,7 +134,7 @@ const snapTo = (shell, w, x3, y3) => {
 		amendNode(shell, {"style": {"user-select": undefined}});
 		ac.abort();
 		dragging = false;
-		this.dispatchEvent(new CustomEvent("moved"));
+		w.dispatchEvent(new CustomEvent("moved"));
 	}, 0, signal)});
       };
 
@@ -268,8 +268,8 @@ export class WindowElement extends BaseElement {
 		const onclick = () => this.focus();
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `:host{position:absolute;display:block;background-color:#fff;color:#000;border:1px solid #000;width:var(--window-width,auto);height:var(--window-height,auto);min-width:100px;min-height:100px;top:var(--window-top,0);left:var(--window-left,0);list-style:none;padding:0;z-index:0}:host([maximised]){left:0;right:0;top:0;bottom:0;width:auto;height:auto}:host([resizable]){border-width:0}:host([resizable])>div:nth-child(2){display:block}:host([minimised]),:host>div:nth-child(2),:host([hide-titlebar])>div:nth-child(3),:host([hide-close])>div:nth-child(3)>div>button:nth-of-type(1),:host([hide-maximise])>div:nth-child(3)>div>button:nth-of-type(2),:host([hide-minimise])>div:nth-child(3)>div>button:nth-of-type(3),:host([window-hide])>div:nth-child(3)>div>button:nth-of-type(3){display:none}:host>div:nth-child(3){white-space:nowrap;height:calc(1em + 6px);background-color:#aaa;overflow:hidden;user-select:none;display:flex;align-items:center}:host>div:nth-child(3)>span{margin-right:calc(3em + 24px)}:host>div:nth-child(3)>img{height:1em;pointer-events:none}:host>div:nth-child(3)>div{position:absolute;right:0;top:0}:host>div:nth-child(3) button{padding:0;border-width:2px;float:right;background-repeat:no-repeat;background-position:center;background-color:#eee;background-size:1em 1em;width:calc(1em + 8px);height:calc(1em + 8px)}:host>div:nth-child(3)>div>button:nth-of-type(1){background-image:url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="${svgNS}"%3E%3Cpath d="M1,1 L9,9 M9,1 L1,9" stroke="black" /%3E%3C/svg%3E')}:host>div:nth-child(3)>div>button:nth-of-type(2){background-image:url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="${svgNS}"%3E%3Cpath d="M9,3 h-8 v-1 h8 v-1 h-8 v8 h8 v-8" stroke="black" fill="none" /%3E%3C/svg%3E')}:host([maximised])>div:nth-child(3)>div>button:nth-of-type(2){background-image:url('data:image/svg+xml,%3Csvg viewBox="0 0 15 13" xmlns="${svgNS}"%3E%3Cpath d="M1,5 h8 v-1 h-8 v8 h8 v-8 m-3,0 v-3 h8 v8 h-5 m5,-7 h-8" stroke="%23000" fill="none" /%3E%3C/svg%3E')}:host>div:nth-child(3)>div>button:nth-of-type(3){display:var(--taskmanager-on,block);background-image:url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="${svgNS}"%3E%3Cline x1="1" y1="9" x2="9" y2="9" stroke="black" /%3E%3C/svg%3E')}:host>div:nth-child(4){user-select:contain}:host([resizable])>div:nth-child(4){overflow:auto;position:absolute;bottom:0;left:0;right:0;top:calc(1em + 6px)}:host>div:nth-child(4):not(.hasChild)+div:nth-child(5){pointer-events:none}:host>div:nth-child(5){display:var(--overlay-on,block);position:absolute;background-color:rgba(0,0,0,0.1);top:0;left:0;bottom:0;right:0}:host([resizeable])>div:nth-child(5){top:var(calc(--window-resize), -2px);left:var(calc(--window-resize), -2px);bottom:var(calc(--window-resize), -2px);right:var(calc(--window-resize), -2px)}:host>div:nth-child(2)>div{position:absolute;border-color:currentColor;border-style:solid;border-width:0;z-index:-1}:host>div:nth-child(2)>div:nth-child(1){top:-2px;left:-2px;width:10px;height:10px;cursor:nwse-resize;border-left-width:3px;border-top-width:3px}:host>div:nth-child(2)>div:nth-child(2){top:-2px;left:8px;right:8px;border-top-width:3px;cursor:ns-resize}:host>div:nth-child(2)>div:nth-child(3){top:-2px;right:-2px;width:10px;height:10px;border-top-width:3px;border-right-width:3px;cursor:nesw-resize}:host>div:nth-child(2)>div:nth-child(4){top:8px;right:-2px;bottom:8px;border-right-width:3px;cursor:ew-resize}:host>div:nth-child(2)>div:nth-child(5){bottom:-2px;right:-2px;width:10px;height:10px;border-right-width:3px;border-bottom-width:3px;cursor:nwse-resize}:host>div:nth-child(2)>div:nth-child(6){bottom:-2px;left:8px;right:8px;border-bottom-width:3px;cursor:ns-resize}:host>div:nth-child(2)>div:nth-child(7){bottom:-2px;left:-2px;width:10px;height:10px;border-left-width:3px;border-bottom-width:3px;cursor:nesw-resize}:host>div:nth-child(2)>div:nth-child(8){top:8px;left:-2px;bottom:8px;border-left-width:3px;cursor:ew-resize}`),
-			div(Array.from({length: 8}, (_, n) => div({"onmousedown": resizeWindow.bind(this, n)}))),
-			div({"part": "titlebar", "onmousedown": moveWindow.bind(this), "ondblclick": e => {
+			div(Array.from({length: 8}, (_, n) => div({"onmousedown": e => resizeWindow(this, n, e)}))),
+			div({"part": "titlebar", "onmousedown": e => moveWindow(this, e), "ondblclick": e => {
 				if (!(e.target instanceof HTMLButtonElement) && !this.hasAttribute("hide-maximise")) {
 					this.toggleAttribute("maximised");
 				}
