@@ -61,34 +61,36 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 }),
 WS = url => new Promise((successFn, errorFn) => {
 	const ws = new WebSocket(url);
-	ws.addEventListener("open", () => successFn(Object.freeze({
-		close: (code, reason) => ws.close(code, reason),
-		send: data => ws.send(data),
-		when: (ssFn, eeFn) => new Subscription((sFn, eFn, cFn) => {
-			const err = e => eFn(e.error),
-			      end = () => {
-				ws.removeEventListener("message", sFn);
-				ws.removeEventListener("error", err);
-				ws.removeEventListener("close", close);
-			      },
-			      close = e => {
-				if (!e.wasClean) {
-					eFn(new Error(e.reason));
-				}
-				end();
-			      };
-			ws.removeEventListener("error", errorFn);
-			ws.addEventListener("message", sFn);
-			ws.addEventListener("error", err);
-			ws.addEventListener("close", close, once);
-			cFn(end);
-		}).then(ssFn, eeFn),
-		get binaryType() {
-			return ws.binaryType;
-		},
-		set binaryType(t) {
-			ws.binaryType = t;
-		},
-	})), once);
+	ws.addEventListener("open", () => {
+		ws.removeEventListener("error", errorFn);
+		successFn(Object.freeze({
+			close: (code, reason) => ws.close(code, reason),
+			send: data => ws.send(data),
+			when: (ssFn, eeFn) => new Subscription((sFn, eFn, cFn) => {
+				const err = e => eFn(e.error),
+				      end = () => {
+					ws.removeEventListener("message", sFn);
+					ws.removeEventListener("error", err);
+					ws.removeEventListener("close", close);
+				      },
+				      close = e => {
+					if (!e.wasClean) {
+						eFn(new Error(e.reason));
+					}
+					end();
+				      };
+				ws.addEventListener("message", sFn);
+				ws.addEventListener("error", err);
+				ws.addEventListener("close", close, once);
+				cFn(end);
+			}).then(ssFn, eeFn),
+			get binaryType() {
+				return ws.binaryType;
+			},
+			set binaryType(t) {
+				ws.binaryType = t;
+			}
+		}))
+	}, once);
 	ws.addEventListener("error", errorFn, once);
 });

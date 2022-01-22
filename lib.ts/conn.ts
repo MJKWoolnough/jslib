@@ -72,35 +72,37 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 }),
 WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
 	const ws = new WebSocket(url);
-	ws.addEventListener("open", () => successFn(Object.freeze({
-		close: (code?: number, reason?: string) => ws.close(code, reason),
-		send: (data: string | ArrayBufferLike | Blob | ArrayBufferView) => ws.send(data),
-		when: (ssFn?: (data: MessageEvent) => void, eeFn?: (data: string) => void) => new Subscription<MessageEvent>((sFn, eFn, cFn) => {
-			const err = (e: Event) => eFn((e as ErrorEvent).error),
-			      end = () => {
-				ws.removeEventListener("message", sFn);
-				ws.removeEventListener("error", err);
-				ws.removeEventListener("close", close);
-			      },
-			      close = (e: CloseEvent) => {
-				if (!e.wasClean) {
-					eFn(new Error(e.reason));
-				}
-				end();
-			      };
-			ws.removeEventListener("error", errorFn);
-			ws.addEventListener("message", sFn);
-			ws.addEventListener("error", err);
-			ws.addEventListener("close", close, once);
-			cFn(end);
-		}).then(ssFn, eeFn),
-		get binaryType() {
-			return ws.binaryType;
-		},
-		set binaryType(t: BinaryType) {
-			ws.binaryType = t;
-		},
-	})), once);
+	ws.addEventListener("open", () => {
+		ws.removeEventListener("error", errorFn);
+		successFn(Object.freeze({
+			close: (code?: number, reason?: string) => ws.close(code, reason),
+			send: (data: string | ArrayBufferLike | Blob | ArrayBufferView) => ws.send(data),
+			when: (ssFn?: (data: MessageEvent) => void, eeFn?: (data: string) => void) => new Subscription<MessageEvent>((sFn, eFn, cFn) => {
+				const err = (e: Event) => eFn((e as ErrorEvent).error),
+				      end = () => {
+					ws.removeEventListener("message", sFn);
+					ws.removeEventListener("error", err);
+					ws.removeEventListener("close", close);
+				      },
+				      close = (e: CloseEvent) => {
+					if (!e.wasClean) {
+						eFn(new Error(e.reason));
+					}
+					end();
+				      };
+				ws.addEventListener("message", sFn);
+				ws.addEventListener("error", err);
+				ws.addEventListener("close", close, once);
+				cFn(end);
+			}).then(ssFn, eeFn),
+			get binaryType() {
+				return ws.binaryType;
+			},
+			set binaryType(t: BinaryType) {
+				ws.binaryType = t;
+			}
+		}))
+	}, once);
 	ws.addEventListener("error", errorFn, once);
 });
 
