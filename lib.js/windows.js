@@ -48,7 +48,7 @@ const snapTo = (shell, w, x3, y3) => {
 		return;
 	}
 	dragging = true;
-	shell.style.setProperty("user-select", "none");
+	amendNode(shell, {"style": {"user-select": "none"}});
 	const originalLeft = w.offsetLeft,
 	      originalTop = w.offsetTop,
 	      originalWidth = w.offsetWidth,
@@ -66,8 +66,7 @@ const snapTo = (shell, w, x3, y3) => {
 			case 2: {
 				const height = originalHeight - dy;
 				if (height > (parseInt(w.style.getPropertyValue("min-height") || "") || 100)) {
-					w.style.setProperty("--window-top", `${originalTop + dy}px`);
-					w.style.setProperty("--window-height", `${height}px`);
+					amendNode(w, {"style": {"--window-top": `${originalTop + dy}px`, "--window-height": `${height}px`}});
 				}
 			}
 			break;
@@ -76,7 +75,7 @@ const snapTo = (shell, w, x3, y3) => {
 			case 6: {
 				const height = originalHeight + dy;
 				if (height > (parseInt(w.style.getPropertyValue("min-height") || "") || 100)) {
-					w.style.setProperty("--window-height", `${height}px`);
+					amendNode(w, {"style": {"--window-height": `${height}px`}});
 				}
 			}
 		}
@@ -86,7 +85,7 @@ const snapTo = (shell, w, x3, y3) => {
 			case 4: {
 				const width = originalWidth + dx;
 				if (width > (parseInt(w.style.getPropertyValue("min-width") || "") || 100)) {
-					w.style.setProperty("--window-width", `${width}px`);
+					amendNode(w, {"style": {"--window-width": `${width}px`}});
 				}
 			}
 			break;
@@ -95,8 +94,7 @@ const snapTo = (shell, w, x3, y3) => {
 			case 6: {
 				const width = originalWidth - dx;
 				if (width > (parseInt(w.style.getPropertyValue("min-width") || "") || 100)) {
-					w.style.setProperty("--window-left", `${originalLeft + dx}px`);
-					w.style.setProperty("--window-width", `${width}px`);
+					amendNode(w, {"style": {"--window-left": `${originalLeft + dx}px`, "--window-width": `${width}px`}});
 				}
 			}
 		}
@@ -116,7 +114,7 @@ const snapTo = (shell, w, x3, y3) => {
 		return;
 	}
 	dragging = true;
-	w.style.setProperty("user-select", "none");
+	amendNode(shell, {"style": {"user-select": "none"}});
 	const grabX = e.clientX - w.offsetLeft,
 	      grabY = e.clientY - w.offsetTop,
 	      ac = new AbortController(),
@@ -125,8 +123,7 @@ const snapTo = (shell, w, x3, y3) => {
 		const x = e.clientX - grabX,
 		      y = e.clientY - grabY,
 		      [mx, my] = snapTo(shell, w, x, y);
-		w.style.setProperty("--window-left", (x + mx) + "px");
-		w.style.setProperty("--window-top", (y + my) + "px");
+		amendNode(w, {"style": {"--window-left": (x + mx) + "px", "--window-top": (y + my) + "px"}});
 	}, 0, signal), "onmouseup": event(e => {
 		if (e.button !== 0) {
 			return;
@@ -232,14 +229,14 @@ export class ShellElement extends BaseElement {
 		Array.from(this.childNodes).filter(e => e instanceof WindowElement).forEach(e => {
 			const {offsetLeft: x, offsetTop: y, offsetWidth: w, offsetHeight: h} = e;
 			if (x + w > tw) {
-				e.style.setProperty("--window-left", Math.max(tw - w, 0) + "px");
+				amendNode(e, {"style": {"--window-left": Math.max(tw - w, 0) + "px"}});
 			} else if (x < 0) {
-				e.style.setProperty("--window-left", "0px");
+				amendNode(e, {"style": {"--window-left": "0px"}});
 			}
 			if (y + h > th) {
-				e.style.setProperty("--window-top", Math.max(th - h) + "px");
+				amendNode(e, {"style": {"--window-top": Math.max(th - h) + "px"}});
 			} else if (y < 0) {
-				e.style.setProperty("--window-top", "0px");
+				amendNode(e, {"style": {"--window-top": "0px"}});
 			}
 		});
 	}
@@ -248,7 +245,7 @@ export class ShellElement extends BaseElement {
 export class DesktopElement extends HTMLElement {
 	constructor() {
 		super()
-		this.setAttribute("slot", "desktop");
+		amendNode(this, {"slot": "desktop"});
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, ":host{position:absolute;top:0;left:0;bottom:0;right:0}"),
 			slot({"slot": "desktop"})
@@ -313,10 +310,10 @@ export class WindowElement extends BaseElement {
 	attributeChangedCallback(name, _, newValue) {
 		switch (name) {
 		case "window-title":
-			this.#title.innerText = newValue;
+			this.#title.textContent = newValue;
 			break;
 		case "window-icon":
-			this.#icon.setAttribute("src", newValue ?? defaultIcon);
+			amendNode(this.#icon, {"src": newValue ?? defaultIcon});
 			break;
 		}
 	}
