@@ -70,45 +70,35 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 	}
 	xh.send(props["data"] ?? null);
 }),
-WS = (url: string) => new Promise<Readonly<WSConn>>((successFn, errorFn) => {
-	const ws = new WebSocket(url);
+WS = (url: string) => new Promise<WSConn>((successFn, errorFn) => {
+	const ws = new WSConn(url);
 	ws.addEventListener("open", () => {
 		ws.removeEventListener("error", errorFn);
-		successFn(Object.freeze({
-			close: (code?: number, reason?: string) => ws.close(code, reason),
-			send: (data: string | ArrayBufferLike | Blob | ArrayBufferView) => ws.send(data),
-			when: (ssFn?: (data: MessageEvent) => void, eeFn?: (data: string) => void) => new Subscription<MessageEvent>((sFn, eFn, cFn) => {
-				const err = (e: Event) => eFn((e as ErrorEvent).error),
-				      end = () => {
-					ws.removeEventListener("message", sFn);
-					ws.removeEventListener("error", err);
-					ws.removeEventListener("close", close);
-				      },
-				      close = (e: CloseEvent) => {
-					if (!e.wasClean) {
-						eFn(new Error(e.reason));
-					}
-					end();
-				      };
-				ws.addEventListener("message", sFn);
-				ws.addEventListener("error", err);
-				ws.addEventListener("close", close, once);
-				cFn(end);
-			}).then(ssFn, eeFn),
-			get binaryType() {
-				return ws.binaryType;
-			},
-			set binaryType(t: BinaryType) {
-				ws.binaryType = t;
-			}
-		}))
+		successFn(ws);
 	}, once);
 	ws.addEventListener("error", errorFn, once);
 });
 
-export interface WSConn {
-	close: (code?: number, reason?: string) => void;
-	send: (data: string | ArrayBuffer | Blob | ArrayBufferView) => any;
-	when: (successFn?: (event: MessageEvent) => void, errorFn?: (event: string) => void) => Subscription<any>;
-	binaryType: BinaryType;
+export class WSConn extends WebSocket {
+	when(ssFn?: (data: MessageEvent) => any, eeFn?: (data: string) => any) {
+		return new Subscription<MessageEvent>((sFn, eFn, cFn) => {
+			const w = this,
+			      err = (e: Event) => eFn((e as ErrorEvent).error),
+			      end = () => {
+				w.removeEventListener("message", sFn);
+				w.removeEventListener("error", err);
+				w.removeEventListener("close", close);
+			      },
+			      close = (e: CloseEvent) => {
+				if (!e.wasClean) {
+					eFn(new Error(e.reason));
+				}
+				end();
+			      };
+			w.addEventListener("message", sFn);
+			w.addEventListener("error", err);
+			w.addEventListener("close", close, once);
+			cFn(end);
+		}).then(ssFn, eeFn);
+	}
 }
