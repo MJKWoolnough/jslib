@@ -2,47 +2,7 @@ import {amendNode, autoFocus, event, eventCapture, walkNode} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 import {ns as svgNS} from './svg.js';
 
-const snapTo = (shell, w, x3, y3) => {
-	const snap = parseInt(shell.getAttribute("snap") || "0"),
-	      {offsetLeft: x1, offsetTop: y1, offsetWidth: width, offsetHeight: height} = w,
-	      x2 = x1 + width, y2 = y1 + height,
-	      x4 = x3 + width, y4 = y3 + height,
-	      mv = [0, 0];
-	if (snap > 0) {
-		if (x1 >= 0 && x3 < 0 && x3 >= -snap) {
-			mv[0] = -x3;
-		} else if (x2 <= shell.offsetWidth && x4 > shell.offsetWidth && x4 <= shell.offsetWidth + snap) {
-			mv[0] = shell.offsetWidth - x4;
-		}
-		if (y1 >= 0 && y3 < 0 && y3 >= -snap) {
-			mv[1] = -y3;
-		} else if (y2 <= shell.offsetHeight && y4 > shell.offsetHeight && y4 <= shell.offsetHeight + snap) {
-			mv[1] = shell.offsetHeight - y4;
-		}
-		for (const e of shell.childNodes) {
-			if (e instanceof WindowElement && e !== w) {
-				const x5 = e.offsetLeft, y5 = e.offsetTop,
-				      x6 = x5 + e.offsetWidth, y6 = y5 + e.offsetHeight;
-				if (y3 <= y6 && y4 >= y5) {
-					if (x2 <= x5 && x4 >= x5 && x4 <= x5 + snap) {
-						mv[0] = x5 - x4;
-					} else if (x1 >= x6 && x3 <= x6 && x3 >= x6 - snap) {
-						mv[0] = x6 - x3;
-					}
-				}
-				if (x3 <= x6 && x4 >= x5) {
-					if (y2 <= y5 && y4 >= y5 && y4 <= y5 + snap) {
-						mv[1] = y5 - y4;
-					} else if (y1 >= y6 && y3 <= y6 && y3 >= y6 - snap) {
-						mv[1] = y6 - y3;
-					}
-				}
-			}
-		}
-	}
-	return mv;
-      },
-      resizeWindow = (w, direction, e) => {
+const resizeWindow = (w, direction, e) => {
 	const shell = w.parentNode;
 	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
@@ -120,10 +80,51 @@ const snapTo = (shell, w, x3, y3) => {
 	      ac = new AbortController(),
 	      {signal} = ac;
 	amendNode(shell, {"onmousemove": event(e => {
-		const x = e.clientX - grabX,
-		      y = e.clientY - grabY,
-		      [mx, my] = snapTo(shell, w, x, y);
-		amendNode(w, {"style": {"--window-left": (x + mx) + "px", "--window-top": (y + my) + "px"}});
+		const snap = parseInt(shell.getAttribute("snap") || "0"),
+		      {offsetLeft: x1, offsetTop: y1, offsetWidth: width, offsetHeight: height} = w,
+		      x2 = x1 + width,
+		      y2 = y1 + height,
+		      x3 = e.clientX - grabX,
+		      y3 = e.clientY - grabY,
+		      x4 = x3 + width,
+		      y4 = y3 + height;
+		let mx = 0,
+		    my = 0;
+		if (snap > 0) {
+			if (x1 >= 0 && x3 < 0 && x3 >= -snap) {
+				mx = -x3;
+			} else if (x2 <= shell.offsetWidth && x4 > shell.offsetWidth && x4 <= shell.offsetWidth + snap) {
+				mx = shell.offsetWidth - x4;
+			}
+			if (y1 >= 0 && y3 < 0 && y3 >= -snap) {
+				my = -y3;
+			} else if (y2 <= shell.offsetHeight && y4 > shell.offsetHeight && y4 <= shell.offsetHeight + snap) {
+				my = shell.offsetHeight - y4;
+			}
+			for (const e of shell.childNodes) {
+				if (e instanceof WindowElement && e !== w) {
+					const x5 = e.offsetLeft,
+					      y5 = e.offsetTop,
+					      x6 = x5 + e.offsetWidth,
+					      y6 = y5 + e.offsetHeight;
+					if (y3 <= y6 && y4 >= y5) {
+						if (x2 <= x5 && x4 >= x5 && x4 <= x5 + snap) {
+							mx = x5 - x4;
+						} else if (x1 >= x6 && x3 <= x6 && x3 >= x6 - snap) {
+							mx = x6 - x3;
+						}
+					}
+					if (x3 <= x6 && x4 >= x5) {
+						if (y2 <= y5 && y4 >= y5 && y4 <= y5 + snap) {
+							my = y5 - y4;
+						} else if (y1 >= y6 && y3 <= y6 && y3 >= y6 - snap) {
+							my = y6 - y3;
+						}
+					}
+				}
+			}
+		}
+		amendNode(w, {"style": {"--window-left": (x3 + mx) + "px", "--window-top": (y3 + my) + "px"}});
 	}, 0, signal), "onmouseup": event(e => {
 		if (e.button !== 0) {
 			return;
