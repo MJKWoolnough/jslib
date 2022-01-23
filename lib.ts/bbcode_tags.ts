@@ -47,7 +47,7 @@ size = (n: Node, t: Tokeniser, p: Parsers) => {
 	if (tk && isOpenTag(tk)) {
 		const size = tk.attr ? parseInt(tk.attr) : 0;
 		if (size > 0 && size < 100) {
-			amendNode(n, process(span({"style": {"font-size": tk.attr+""}}), t, p, tk.tagName));
+			amendNode(n, process(span({"style": {"font-size": size}}), t, p, tk.tagName));
 		} else {
 			p[textSymbol](n, tk.fullText);
 		}
