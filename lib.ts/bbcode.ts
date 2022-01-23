@@ -12,7 +12,7 @@ const parseText = function* (text: string): Tokeniser {
 				const c = text.charCodeAt(pos);
 				if (c >= 65 && c <=90 || c >=97 && c <=122 || c >= 48 && c <= 57) {
 					continue;
-				} else if (c === 93 && pos > start + (end ? 2 : 1)) { // ']'
+				} else if (c === 93 && pos > start + +end + 1) { // ']'
 					if (last != start) {
 						const t = text.slice(last, start);
 						while (yield t) {}
