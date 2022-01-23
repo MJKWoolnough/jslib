@@ -21,13 +21,13 @@ export class ShellElement extends BaseShellElement {
 			if (type !== "attributes" || !(target instanceof WindowElement)) {
 				return;
 			}
-			const item = windowData.get(target)!;
+			const item = windowData.get(target)!.firstChild!;
 			switch (attributeName) {
 			case "window-icon":
-				amendNode(item.firstChild!, {"src": target.getAttribute("window-icon") ?? undefined});
+				amendNode(item, {"src": target.getAttribute("window-icon") ?? undefined});
 				break;
 			case "window-title":
-				amendNode(item.lastChild!, target.getAttribute("window-title") ?? "");
+				amendNode(item, target.getAttribute("window-title") ?? "");
 				break;
 			}
 		      }));
