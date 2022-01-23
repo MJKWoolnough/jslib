@@ -271,7 +271,9 @@ export class NodeArray {
 	push(element, ...elements) {
 		const root = this[realTarget].#root;
 		addItemAfter(root, root.p, element);
-		elements.forEach(item => addItemAfter(root, root.p, item));
+		for (const item of elements) {
+			addItemAfter(root, root.p, item);
+		}
 		return root.l;
 	}
 	reduce(callbackfn, initialValue) {
@@ -343,13 +345,17 @@ export class NodeArray {
 			removed.push(curr.i);
 			removeNode(root, curr);
 		}
-		items.forEach(item => adder = addItemAfter(root, adder, item));
+		for (const item of items) {
+			adder = addItemAfter(root, adder, item);
+		}
 		return removed;
 	}
 	unshift(element, ...elements) {
 		const root = this[realTarget].#root;
 		let adder = addItemAfter(root, root, element);
-		elements.forEach(item => adder = addItemAfter(root, adder, item));
+		for (const item of elements) {
+			adder = addItemAfter(root, adder, item);
+		}
 		return root.l;
 	}
 	*values() {

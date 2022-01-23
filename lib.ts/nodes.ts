@@ -313,7 +313,9 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	push(element: T, ...elements: T[]) {
 		const root = this[realTarget].#root;
 		addItemAfter(root, root.p, element);
-		elements.forEach(item => addItemAfter(root, root.p, item));
+		for (const item of elements) {
+			addItemAfter(root, root.p, item);
+		}
 		return root.l;
 	}
 	reduce<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
@@ -389,13 +391,17 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 			removed.push(curr.i);
 			removeNode(root, curr);
 		}
-		items.forEach(item => adder = addItemAfter(root, adder, item));
+		for (const item of items) {
+			adder = addItemAfter(root, adder, item);
+		}
 		return removed;
 	}
 	unshift(element: T, ...elements: T[]) {
 		const root = this[realTarget].#root;
 		let adder = addItemAfter(root, root, element);
-		elements.forEach(item => adder = addItemAfter(root, adder, item));
+		for (const item of elements) {
+			adder = addItemAfter(root, adder, item);
+		}
 		return root.l;
 	}
 	*values(): IterableIterator<T> {
