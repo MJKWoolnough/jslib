@@ -64,7 +64,8 @@ export class ShellElement extends BaseShellElement {
 					e.preventDefault();
 				}, "onremove": () => taskbarData.delete(taskbarItem)});
 				taskbarData.set(taskbarItem, target);
-				taskbarObserver.observe(data.item.appendChild(taskbarItem), taskbarObservations);
+				amendNode(data.item, taskbarItem);
+				taskbarObserver.observe(taskbarItem, taskbarObservations);
 				amendNode(target, {"onremove": event(() => taskbarItem.remove(), eventOnce)});
 				break;
 			}
