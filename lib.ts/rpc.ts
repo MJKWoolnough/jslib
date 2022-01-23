@@ -74,7 +74,7 @@ class RPC {
 			}
 		});
 	}
-	request(method: string, data?: any) {
+	request<T = any>(method: string, data?: any) {
 		if (!this.#c) {
 			return Promise.reject("RPC Closed");
 		}
@@ -88,19 +88,19 @@ class RPC {
 		if (v === 2) {
 			r["jsonrpc"] = "2.0";
 		}
-		return new Promise<any>((sFn, eFn) => {
+		return new Promise<T>((sFn, eFn) => {
 			this.#r.set(id, [sFn, eFn])
 			this.#c?.send(JSON.stringify(r));
 		});
 	}
-	await(id: number) {
+	await<T = any>(id: number) {
 		if (!this.#c) {
 			return Promise.reject("RPC Closed");
 		}
 		const h: handler = [noop, noop],
 		      a = this.#a,
 		      s = a.get(id) ?? set(a, id, new Set<handler>()),
-		      p = new Promise<any>((sFn, eFn) => {
+		      p = new Promise<T>((sFn, eFn) => {
 			h[0] = sFn;
 			h[1] = eFn;
 			s.add(h);
@@ -108,11 +108,11 @@ class RPC {
 		p.finally(() => s.delete(h));
 		return p;
 	}
-	subscribe(id: number) {
+	subscribe<T = any>(id: number) {
 		if (!this.#c) {
 			return new Subscription<never>((_, eFn) => eFn("RPC Closed"));
 		}
-		return new Subscription<any>((sFn, eFn, cFn) => {
+		return new Subscription<T>((sFn, eFn, cFn) => {
 			const h: handler = [sFn, eFn],
 			      a = this.#a,
 			      s = a.get(id) ?? set(a, id, new Set<handler>());
