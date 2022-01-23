@@ -1,5 +1,5 @@
 export class Pipe {
-	#out = [];
+	#out = new Set();
 	send(data) {
 		for (const o of this.#out) {
 			o(data);
@@ -7,19 +7,13 @@ export class Pipe {
 	}
 	receive(fn) {
 		if (fn instanceof Function) {
-			this.#out.push(fn);
+			this.#out.add(fn);
 		} else if (fn !== null && fn !== undefined) {
 			throw new TypeError("pipe.receive requires function type");
 		}
 	}
 	remove(fn) {
-		const out = this.#out;
-		for (let i = 0; i < out.length; i++) {
-			if (out[i] === fn) {
-				out.splice(i, 1);
-				continue;
-			}
-		}
+		this.#out.delete(fn);
 	}
 	bind() {
 		return [data => this.send(data), fn => this.receive(fn)];
