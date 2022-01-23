@@ -132,14 +132,14 @@ export class ShellElement extends BaseShellElement {
 						windowData.set(w, {item: null, state});
 					}
 				});
-				windowData.forEach((data, w) => {
+				for (const [w, data] of windowData.entries()) {
 					if (data.state !== state) {
 						if (data.item) {
 							clearNode(data.item);
 						}
 						windowData.delete(w);
 					}
-				});
+				};
 			}}))
 		]);
 	}
