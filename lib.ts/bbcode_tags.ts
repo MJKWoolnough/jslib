@@ -34,7 +34,7 @@ full = justify,
 colour = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		if (tk.attr && !tk.attr.includes(';')) {
+		if (tk.attr) {
 			amendNode(n, process(span({"style": {"color": tk.attr}}), t, p, tk.tagName));
 		} else {
 			p[textSymbol](n, tk.fullText);
