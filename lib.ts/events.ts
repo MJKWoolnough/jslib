@@ -23,9 +23,9 @@ const held = new Set<string>(),
       mouseMove = new Map<number, MouseFn>(),
       mouseLeave = new Map<number, () => void>(),
       mouseUp = [
-	      new Map<number, MouseFn>(),
-	      new Map<number, MouseFn>(),
-	      new Map<number, MouseFn>()
+	new Map<number, MouseFn>(),
+	new Map<number, MouseFn>(),
+	new Map<number, MouseFn>()
       ],
       keyEventFn = (down: boolean, e: KeyboardEvent) => {
 	const {key, target} = e;

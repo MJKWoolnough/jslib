@@ -19,9 +19,9 @@ const held = new Set(),
       mouseMove = new Map(),
       mouseLeave = new Map(),
       mouseUp = [
-	      new Map(),
-	      new Map(),
-	      new Map()
+	new Map(),
+	new Map(),
+	new Map()
       ],
       keyEventFn = (down, e) => {
 	const {key, target} = e;
