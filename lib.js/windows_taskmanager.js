@@ -50,14 +50,14 @@ export class ShellElement extends BaseShellElement {
 					amendNode(data.item.firstChild, {"maximised": true});
 					return;
 				}
-				if (!Array.from(taskbar.children).some(i => {
+				for (const i of taskbar.children) {
 					if (i.childElementCount === 0 && i instanceof HTMLLIElement) {
 						data.item = i;
-						return true;
+						break;
 					}
-					return false;
-				})) {
-					data.item = taskbar.appendChild(li());
+				}
+				if (!data.item) {
+					amendNode(taskbar, data.item = li());
 				}
 				const taskbarItem = windows({"window-icon": target.getAttribute("window-icon") ?? undefined, "window-title": target.getAttribute("window-title") ?? undefined, "hide-minimise": "", "maximised": "", "exportparts": "close, minimise, maximise, titlebar, title, controls, icon", "onclose": e => {
 					target.close();
