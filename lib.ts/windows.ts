@@ -181,14 +181,14 @@ abstract class BaseElement extends HTMLElement {
 	}
 	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
 		return new Promise<string|null>((resolve, reject) => {
-			const ok = button({"onclick": () => {
+			const ok = () => {
 				resolve(data.value);
 				w.remove();
-			      }}, "Ok"),
+			      },
 			      data = autoFocus(input({"value": defaultValue || "", "onkeydown": (e: KeyboardEvent) => {
 				switch (e.key) {
 				case "Enter":
-					ok.click();
+					ok();
 					break;
 				case "Escape":
 					w.remove();
@@ -200,11 +200,11 @@ abstract class BaseElement extends HTMLElement {
 				"window-title": title,
 				"hide-maximise": "true",
 				"onremove": () => resolve(null)
-			}, [
+			      }, [
 				div(message),
 				data,
-				div({"style": "text-align: center"}, ok)
-			]);
+				div({"style": "text-align: center"}, button({"onclick": ok}, "Ok"))
+			      ]);
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
