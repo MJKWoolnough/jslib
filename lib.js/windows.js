@@ -134,6 +134,10 @@ const resizeWindow = (w, direction, e) => {
 		dragging = false;
 		w.dispatchEvent(new CustomEvent("moved"));
 	}, 0, signal)});
+      },
+      lang = {
+	"OK": "Ok",
+	"CANCEL": "Cancel"
       };
 
 let focusingWindow = null, dragging = false;
@@ -152,7 +156,7 @@ class BaseElement extends HTMLElement {
 				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
 					resolve(true);
 					w.remove();
-				}}, "Ok")))
+				}}, lang["OK"])))
 			]);
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
@@ -171,8 +175,8 @@ class BaseElement extends HTMLElement {
 					autoFocus(button({"onclick": () => {
 						resolve(true);
 						w.remove();
-					}}, "Ok")),
-					button({"onclick": () => w.remove()}, "Cancel")
+					}}, lang["OK"])),
+					button({"onclick": () => w.remove()}, lang["CANCEL"])
 				])
 			]);
 			this.addWindow(w) || reject(new Error("invalid target"));
@@ -202,7 +206,7 @@ class BaseElement extends HTMLElement {
 			      }, [
 				div(message),
 				data,
-				div({"style": "text-align: center"}, button({"onclick": ok}, "Ok"))
+				div({"style": "text-align: center"}, button({"onclick": ok}, lang["OK"]))
 			      ]);
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
@@ -386,6 +390,7 @@ customElements.define("windows-window", WindowElement);
 export const shell = (props, children) => amendNode(new ShellElement(), props, children),
 desktop = (props, children) => amendNode(new DesktopElement(), props, children),
 windows = (props, children) => amendNode(new WindowElement(), props, children),
-setDefaultIcon = icon => defaultIcon = icon;
+setDefaultIcon = icon => defaultIcon = icon,
+setLanguage = l => Object.assign(lang, l);
 
 export let defaultIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;

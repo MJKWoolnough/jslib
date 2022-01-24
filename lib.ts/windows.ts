@@ -135,6 +135,10 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 		dragging = false;
 		w.dispatchEvent(new CustomEvent("moved"));
 	}, 0, signal)});
+      },
+      lang = {
+	"OK": "Ok",
+	"CANCEL": "Cancel"
       };
 
 let focusingWindow: WindowElement | null = null, dragging = false;
@@ -153,7 +157,7 @@ abstract class BaseElement extends HTMLElement {
 				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
 					resolve(true);
 					w.remove();
-				}}, "Ok")))
+				}}, lang["OK"])))
 			]);
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
@@ -172,8 +176,8 @@ abstract class BaseElement extends HTMLElement {
 					autoFocus(button({"onclick": () => {
 						resolve(true);
 						w.remove();
-					}}, "Ok")),
-					button({"onclick": () => w.remove()}, "Cancel")
+					}}, lang["OK"])),
+					button({"onclick": () => w.remove()}, lang["CANCEL"])
 				])
 			]);
 			this.addWindow(w) || reject(new Error("invalid target"));
@@ -203,7 +207,7 @@ abstract class BaseElement extends HTMLElement {
 			      }, [
 				div(message),
 				data,
-				div({"style": "text-align: center"}, button({"onclick": ok}, "Ok"))
+				div({"style": "text-align: center"}, button({"onclick": ok}, lang["OK"]))
 			      ]);
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
@@ -616,6 +620,7 @@ customElements.define("windows-window", WindowElement);
 export const shell = (props?: Props | Children, children?: Children) => amendNode(new ShellElement(), props, children),
 desktop = (props?: Props | Children, children?: Children) => amendNode(new DesktopElement(), props, children),
 windows = (props?: Props | Children, children?: Children) => amendNode(new WindowElement(), props, children),
-setDefaultIcon = (icon: string) => defaultIcon = icon;
+setDefaultIcon = (icon: string) => defaultIcon = icon,
+setLanguage = (l: Partial<typeof lang>) => Object.assign(lang, l);
 
 export let defaultIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;
