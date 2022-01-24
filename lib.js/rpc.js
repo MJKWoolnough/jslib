@@ -59,20 +59,20 @@ class RPC {
 		});
 	}
 	request(method, data) {
-		if (!this.#c) {
+		const c = this.#c;
+		if (!c) {
 			return Promise.reject("RPC Closed");
 		}
-		const id = this.#id++,
-		      v = this.#v,
-		      r = {
-			"jsonrpc": v.toFixed(1),
-			id,
-			method,
-			"params": v === 1 ? [data] : data
-		      };
 		return new Promise((sFn, eFn) => {
+			const id = this.#id++,
+			      v = this.#v;
 			this.#r.set(id, [sFn, eFn])
-			this.#c?.send(JSON.stringify(r));
+			c.send(JSON.stringify({
+				"jsonrpc": v.toFixed(1),
+				id,
+				method,
+				"params": v === 1 ? [data] : data
+			}));
 		});
 	}
 	await(id) {

@@ -2,13 +2,6 @@ import type {WSConn} from './conn.js';
 import {WS} from './conn.js';
 import {Subscription} from './inter.js';
 
-type Request = {
-	jsonrpc: string,
-	id: number;
-	method: string,
-	params: any | [any];
-}
-
 type MessageData = {
 	id: number;
 	result?: any;
@@ -75,20 +68,20 @@ class RPC {
 		});
 	}
 	request<T = any>(method: string, data?: any) {
-		if (!this.#c) {
+		const c = this.#c;
+		if (!c) {
 			return Promise.reject("RPC Closed");
 		}
-		const id = this.#id++,
-		      v = this.#v,
-		      r: Request = {
-			"jsonrpc": v.toFixed(1),
-			id,
-			method,
-			"params": v === 1 ? [data] : data
-		      };
 		return new Promise<T>((sFn, eFn) => {
+			const id = this.#id++,
+			      v = this.#v;
 			this.#r.set(id, [sFn, eFn])
-			this.#c?.send(JSON.stringify(r));
+			c.send(JSON.stringify({
+				"jsonrpc": v.toFixed(1),
+				id,
+				method,
+				"params": v === 1 ? [data] : data
+			}));
 		});
 	}
 	await<T = any>(id: number) {
