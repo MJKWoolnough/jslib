@@ -48,7 +48,7 @@ class RPC {
 	constructor(conn: WSConn, version: number) {
 		this.#c = conn;
 		this.#v = version;
-		conn.when(({data}: MessageEvent) => {
+		conn.when(({data}) => {
 			const message = JSON.parse(data) as MessageData,
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
 			      e = message.error,
@@ -61,7 +61,7 @@ class RPC {
 					r[i](m);
 				}
 			}
-		}, (err: string) => {
+		}, err => {
 			this.close();
 			const e = new RPCError(-999, err);
 			for (const [, r] of this.#r) {
