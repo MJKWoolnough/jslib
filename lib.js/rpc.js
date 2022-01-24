@@ -65,13 +65,11 @@ class RPC {
 		const id = this.#id++,
 		      v = this.#v,
 		      r = {
+			"jsonrpc": v.toFixed(1),
 			id,
 			method,
 			"params": v === 1 ? [data] : data
-		};
-		if (v === 2) {
-			r["jsonrpc"] = "2.0";
-		}
+		      };
 		return new Promise((sFn, eFn) => {
 			this.#r.set(id, [sFn, eFn])
 			this.#c?.send(JSON.stringify(r));
