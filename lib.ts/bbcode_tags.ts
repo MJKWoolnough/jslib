@@ -78,8 +78,7 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 		} else {
 			const u = textContents(t, tk.tagName);
 			try {
-				const url = new URL(u, window.location.href);
-				amendNode(n, a({"href": url.href}, u));
+				amendNode(n, a({"href": (new URL(u, window.location.href)).href}, u));
 			} catch {
 				p[textSymbol](n, tk.fullText);
 				p[textSymbol](n, u);
@@ -106,8 +105,7 @@ audio = (n: Node, t: Tokeniser, p: Parsers) => {
 			}
 		} else {
 			try {
-				const u = new URL(src, window.location.href);
-				amendNode(n, aaudio({"src": u.href, "controls": true}));
+				amendNode(n, aaudio({"src": (new URL(src, window.location.href)).href, "controls": true}));
 			} catch {
 				p[textSymbol](n, tk.fullText);
 				p[textSymbol](n, src);
@@ -134,8 +132,7 @@ img = (n: Node, t: Tokeniser, p: Parsers) => {
 			return;
 		}
 		try {
-			const u = new URL(src, window.location.href);
-			src = u.href;
+			src = (new URL(src, window.location.href)).href;
 		} catch {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
