@@ -123,7 +123,11 @@ export class Subscription<T> {
 		});
 	}
 	static canceller(...subs: canceller[]) {
-		return () => subs.forEach(s => s.cancel());
+		return () => {
+			for (const s of subs) {
+				s.cancel();
+			}
+		};
 	}
 }
 

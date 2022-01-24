@@ -117,7 +117,11 @@ export class Subscription {
 		});
 	}
 	static canceller(...subs) {
-		return () => subs.forEach(s => s.cancel());
+		return () => {
+			for (const s of subs) {
+				s.cancel();
+			}
+		}
 	}
 }
 
