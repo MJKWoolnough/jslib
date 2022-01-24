@@ -120,11 +120,6 @@ clearNode: mElement = (node: Node, properties?: Props | Children, children?: Chi
 	}
 	return amendNode(node, properties, children);
 },
-text2HTML = (text: string) => {
-	const d = document.createElement("template");
-	d.innerHTML = text;
-	return d.content;
-},
 autoFocus = <T extends HTMLElement | SVGElement>(node: T, inputSelect = true) => {
 	window.setTimeout(() => {
 		node.focus();

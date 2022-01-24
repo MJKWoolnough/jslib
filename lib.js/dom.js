@@ -95,11 +95,6 @@ clearNode = (node, properties, children) => {
 	}
 	return amendNode(node, properties, children);
 },
-text2HTML = text => {
-	const d = document.createElement("template");
-	d.innerHTML = text;
-	return d.content;
-},
 autoFocus = (node, inputSelect = true) => {
 	window.setTimeout(() => {
 		node.focus();
