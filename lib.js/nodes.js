@@ -91,7 +91,7 @@ const sortNodes = (root, n) => {
 		curr = next;
 	}
       },
-      reverse = root =>{
+      reverse = root => {
 	[root.p, root.n] = [root.n, root.p];
 	root.o *= -1;
 	for (let curr = root.n; curr.i; curr = curr.n) {

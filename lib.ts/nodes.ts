@@ -129,7 +129,7 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
 		curr = next;
 	}
       },
-      reverse = <T extends Item>(root: Root<T>) =>{
+      reverse = <T extends Item>(root: Root<T>) => {
 	[root.p, root.n] = [root.n, root.p];
 	root.o *= -1;
 	for (let curr = root.n; curr.i; curr = curr.n) {
