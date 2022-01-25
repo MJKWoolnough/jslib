@@ -60,10 +60,7 @@ class RPC {
 	}
 	request(method, data) {
 		const c = this.#c;
-		if (!c) {
-			return Promise.reject("RPC Closed");
-		}
-		return new Promise((sFn, eFn) => {
+		return c ?  new Promise((sFn, eFn) => {
 			const id = this.#id++,
 			      v = this.#v;
 			this.#r.set(id, [sFn, eFn])
@@ -73,7 +70,7 @@ class RPC {
 				method,
 				"params": v === 1 ? [data] : data
 			}));
-		});
+		}) : Promise.reject("RPC Closed");
 	}
 	await(id) {
 		if (!this.#c) {
@@ -91,16 +88,13 @@ class RPC {
 		return p;
 	}
 	subscribe(id) {
-		if (!this.#c) {
-			return new Subscription((_, eFn) => eFn("RPC Closed"));
-		}
-		return new Subscription((sFn, eFn, cFn) => {
+		return this.#c ? new Subscription((sFn, eFn, cFn) => {
 			const h = [sFn, eFn],
 			      a = this.#a,
 			      s = a.get(id) ?? set(a, id, new Set());
 			s.add(h);
 			cFn(() => s.delete(h));
-		});
+		}) : new Subscription((_, eFn) => eFn("RPC Closed"));
 	}
 	close() {
 		this.#c?.close();
