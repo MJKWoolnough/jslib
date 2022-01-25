@@ -80,7 +80,7 @@ WS = (url: string) => new Promise<WSConn>((successFn, errorFn) => {
 });
 
 export class WSConn extends WebSocket {
-	when(ssFn?: (data: MessageEvent) => any, eeFn?: (data: string) => any) {
+	when<T = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: string) => any) {
 		return new Subscription<MessageEvent>((sFn, eFn, cFn) => {
 			const w = this,
 			      ac = new AbortController(),
@@ -95,6 +95,6 @@ export class WSConn extends WebSocket {
 				end();
 			}, o);
 			cFn(end);
-		}).then(ssFn, eeFn);
+		}).then<T, any>(ssFn, eeFn);
 	}
 }
