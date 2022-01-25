@@ -77,7 +77,7 @@ export class ShellElement extends BaseShellElement {
 			taskbar,
 			div(slot({"onslotchange": function() {
 				state = !state;
-				this.assignedElements().forEach(w => {
+				for (const w of this.assignedElements()) {
 					if (!(w instanceof WindowElement)) {
 						return;
 					}
@@ -87,7 +87,7 @@ export class ShellElement extends BaseShellElement {
 						windowObserver.observe(w, windowObservations);
 						windowData.set(w, {item: null, state});
 					}
-				});
+				};
 				for (const [w, data] of windowData.entries()) {
 					if (data.state !== state) {
 						if (data.item) {
