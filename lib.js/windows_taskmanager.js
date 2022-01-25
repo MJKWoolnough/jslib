@@ -28,7 +28,7 @@ export class ShellElement extends BaseShellElement {
 			if (type !== "attributes" || !(target instanceof WindowElement)) {
 				return;
 			}
-			let data = windowData.get(target);
+			const data = windowData.get(target);
 			switch (attributeName) {
 			case "window-icon":
 				if (data.item) {
