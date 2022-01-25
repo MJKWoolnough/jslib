@@ -21,9 +21,7 @@ export class ShellElement extends BaseShellElement {
 		      taskbarData = new Map(),
 		      taskbarObserver = new MutationObserver(list => list.forEach(({target, type, attributeName}) => {
 			if (type === "attributes" && attributeName === "maximised" && target instanceof WindowElement && !target.hasAttribute("maximised")) {
-				const w = taskbarData.get(target);
-				amendNode(w, {"minimised": false});
-				w.focus();
+				amendNode(taskbarData.get(target), {"minimised": false}).focus();
 			}
 		      })),
 		      windowObserver = new MutationObserver(list => list.forEach(({target, type, attributeName}) => {
