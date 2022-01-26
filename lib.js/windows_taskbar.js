@@ -1,9 +1,9 @@
+import contextPlace, {item as contextItem} from './context.js';
 import {amendNode, event, eventOnce} from './dom.js';
 import {div, img, li, slot, span, style, ul} from './html.js';
-import {ShellElement as BaseShellElement, DesktopElement, WindowElement, windows, desktop} from './windows.js';
-import contextPlace, {item as contextItem} from './context.js';
+import {ShellElement as BaseShellElement, DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows} from './windows.js';
 
-export {WindowElement, DesktopElement, windows, desktop};
+export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows};
 
 const windowObservations = {
 	"attributeFilter": ["window-icon", "window-title"],
