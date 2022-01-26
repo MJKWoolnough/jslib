@@ -262,6 +262,14 @@ export class DesktopElement extends HTMLElement {
 			slot({"slot": "desktop"})
 		]);
 	}
+	attributeChangedCallback(name, _, newValue) {
+		if (name === "slot" && newValue !== "desktop") {
+			amendNode(this, {"slot": "desktop"});
+		}
+	}
+	static get observedAttributes() {
+		return ["slot"];
+	}
 }
 
 export class WindowElement extends BaseElement {
