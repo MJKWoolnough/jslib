@@ -330,7 +330,7 @@ export class WindowElement extends BaseElement {
 	attributeChangedCallback(name, _, newValue) {
 		switch (name) {
 		case "window-title":
-			this.#title.textContent = newValue;
+			this.#title.textContent = newValue ?? "";
 			break;
 		case "window-icon":
 			amendNode(this.#icon, {"src": newValue ?? defaultIcon});
