@@ -380,7 +380,7 @@ export class WindowElement extends BaseElement {
 	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="${svgNS}"%3E%3Cpath d="M1,1 L9,9 M9,1 L1,9" stroke="black" /%3E%3C/svg%3E');
 }
 
-:host > div:nth-child(3) > div> button:nth-of-type(2) {
+:host > div:nth-child(3) > div > button:nth-of-type(2) {
 	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="${svgNS}"%3E%3Cpath d="M9,3 h-8 v-1 h8 v-1 h-8 v8 h8 v-8" stroke="black" fill="none" /%3E%3C/svg%3E');
 }
 
@@ -388,7 +388,7 @@ export class WindowElement extends BaseElement {
 	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 15 13" xmlns="${svgNS}"%3E%3Cpath d="M1,5 h8 v-1 h-8 v8 h8 v-8 m-3,0 v-3 h8 v8 h-5 m5,-7 h-8" stroke="%23000" fill="none" /%3E%3C/svg%3E');
 }
 
-:host > div:nth-child(3) > div> button:nth-of-type(3) {
+:host > div:nth-child(3) > div > button:nth-of-type(3) {
 	display: var(--taskmanager-on, block);
 	background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="${svgNS}"%3E%3Cline x1="1" y1="9" x2="9" y2="9" stroke="black" /%3E%3C/svg%3E');
 }
