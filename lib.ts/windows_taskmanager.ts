@@ -1,9 +1,9 @@
 import type {Children, Props} from './dom.js';
 import {amendNode, clearNode, event, eventOnce} from './dom.js';
 import {div, li, slot, style, ul} from './html.js';
-import {ShellElement as BaseShellElement, WindowElement, DesktopElement, windows, desktop} from './windows.js';
+import {ShellElement as BaseShellElement, DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows} from './windows.js';
 
-export {WindowElement, DesktopElement, windows, desktop};
+export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows};
 
 const windowObservations = {
 	"attributeFilter": ["window-icon", "window-title", "minimised"],
