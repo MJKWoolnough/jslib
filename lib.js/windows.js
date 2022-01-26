@@ -136,8 +136,12 @@ const resizeWindow = (w, direction, e) => {
 	}, 0, signal)});
       },
       lang = {
+	"CANCEL": "Cancel",
+	"CLOSE": "Close",
+	"MAXIMISE": "Maximise",
+	"MINIMISE": "Minimise",
 	"OK": "Ok",
-	"CANCEL": "Cancel"
+	"RESTORE": "Restore"
       };
 
 let focusingWindow = null, dragging = false;
@@ -267,6 +271,7 @@ export class WindowElement extends BaseElement {
 	#slot;
 	#child = null;
 	#parent = null;
+	#maximise;
 	constructor() {
 		super();
 		const onclick = () => this.focus();
@@ -282,7 +287,7 @@ export class WindowElement extends BaseElement {
 				this.#title = span({"part": "title"}),
 				div({"part": "controls"}, [
 					button({"part": "close", "onclick": () => this.close()}),
-					button({"part": "maximise", "onclick": () => this.toggleAttribute("maximised")}),
+					this.#maximise = button({"part": "maximise", "onclick": () => this.toggleAttribute("maximised")}),
 					button({"part": "minimise", "onclick": () => this.toggleAttribute("minimised")}),
 					this.#extra = span()
 				])
@@ -322,10 +327,12 @@ export class WindowElement extends BaseElement {
 		case "window-icon":
 			amendNode(this.#icon, {"src": newValue ?? defaultIcon});
 			break;
+		case "maximise":
+			amendNode(this.#maximise, {"title": newValue === null ? lang["MAXIMISE"] : lang["RESTORE"]});
 		}
 	}
 	static get observedAttributes() {
-		return ["window-title", "window-icon"];
+		return ["maximise", "window-icon", "window-title"];
 	}
 	addWindow(w) {
 		if (!this.parentNode) {
