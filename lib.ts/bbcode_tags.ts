@@ -264,11 +264,10 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 quote = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		const f = fieldset();
-		if (tk.attr) {
-			amendNode(f, legend(tk.attr));
-		}
-		amendNode(n, amendNode(f, process(blockquote(), t, p, tk.tagName)));
+		amendNode(n, fieldset([
+			tk.attr ? legend(tk.attr) : [],
+			process(blockquote(), t, p, tk.tagName)
+		]));
 	}
 },
 list = (n: Node, t: Tokeniser, p: Parsers) => {

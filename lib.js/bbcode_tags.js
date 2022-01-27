@@ -262,11 +262,10 @@ table = (n, t, p) => {
 quote = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		const f = fieldset();
-		if (tk.attr) {
-			amendNode(f, legend(tk.attr));
-		}
-		amendNode(n, amendNode(f, process(blockquote(), t, p, tk.tagName)));
+		amendNode(n, fieldset([
+			tk.attr ? legend(tk.attr) : [],
+			process(blockquote(), t, p, tk.tagName)
+		]));
 	}
 },
 list = (n, t, p) => {
