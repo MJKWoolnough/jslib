@@ -51,28 +51,20 @@ export class Subscription {
 		const success = this.#success,
 		      error = this.#error;
 		return new Subscription((sFn, eFn, cFn) => {
-			if (successFn instanceof Function) {
-				success(data => {
-					try {
-						sFn(successFn(data));
-					} catch (e) {
-						eFn(e);
-					}
-				});
-			} else {
-				success(sFn);
-			}
-			if (errorFn instanceof Function) {
-				error(data => {
-					try {
-						sFn(errorFn(data));
-					} catch (e) {
-						eFn(e);
-					}
-				});
-			} else {
-				error(eFn);
-			}
+			success(successFn instanceof Function ? data => {
+				try {
+					sFn(successFn(data));
+				} catch (e) {
+					eFn(e);
+				}
+			} : sFn);
+			error(errorFn instanceof Function ? data => {
+				try {
+					sFn(errorFn(data));
+				} catch (e) {
+					eFn(e);
+				}
+			} : eFn);
 			cFn(() => this.#cancel());
 		});
 	}
