@@ -18,7 +18,7 @@ const held = new Set<string>(),
       me = (button: 0 | 1 | 2) => new MouseEvent(`mouseup`, e({
 	button,
 	"clientX": mouseX,
-	"clientY": mouseY,
+	"clientY": mouseY
       })),
       mouseMove = new Map<number, MouseFn>(),
       mouseLeave = new Map<number, () => void>(),
