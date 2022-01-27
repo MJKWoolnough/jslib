@@ -46,7 +46,7 @@ export class Subscription<T> {
 	#success: (fn: (data: T) => void) => void;
 	#error: (fn: (data: any) => void) => void;
 	#cancel: (data: void) => void;
-	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: (data: void) => void) => void) => void) {
+	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: () => void) => void) => void) {
 		const [successSend, successReceive] = new Pipe<T>().bind(),
 		      [errorSend, errorReceive] = new Pipe<any>().bind(),
 		      [cancelSend, cancelReceive] = new Pipe<void>().bind();
@@ -59,7 +59,7 @@ export class Subscription<T> {
 		const success = this.#success,
 		      error = this.#error,
 		      cancel = this.#cancel;
-		return new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: (data: void) => void) => void) => {
+		return new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: () => void) => void) => {
 			if (successFn instanceof Function) {
 				success((data: T) => {
 					try {
@@ -98,7 +98,7 @@ export class Subscription<T> {
 		});
 	}
 	static merge<T>(...subs: Subscription<T>[]) {
-		return new Subscription<T>((success: (data: T) => void, error: (data: any) => void, cancel: (data: (data: void) => void) => void) => {
+		return new Subscription<T>((success: (data: T) => void, error: (data: any) => void, cancel: (data: () => void) => void) => {
 			for (const s of subs) {
 				s.then(success, error);
 			}
