@@ -287,7 +287,7 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 		let currItem: HTMLLIElement | null = null;
 		while (true) {
 			const tk = t.next().value;
-			if (!tk) {
+			if (!tk || (isCloseTag(tk) && tk.tagName === lname)) {
 				break;
 			}
 			if (isString(tk)) {
@@ -314,8 +314,6 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 						break;
 					}
 				}
-			} else if (isCloseTag(tk) && tk.tagName === lname) {
-				break;
 			} else if (currItem) {
 				if (isOpenTag(tk) && p[tk.tagName]) {
 					p[tk.tagName](currItem, t, p);

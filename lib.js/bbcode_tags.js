@@ -285,7 +285,7 @@ list = (n, t, p) => {
 		let currItem = null;
 		while (true) {
 			const tk = t.next().value;
-			if (!tk) {
+			if (!tk || (isCloseTag(tk) && tk.tagName === lname)) {
 				break;
 			}
 			if (isString(tk)) {
@@ -312,8 +312,6 @@ list = (n, t, p) => {
 						break;
 					}
 				}
-			} else if (isCloseTag(tk) && tk.tagName === lname) {
-				break;
 			} else if (currItem) {
 				if (isOpenTag(tk) && p[tk.tagName]) {
 					p[tk.tagName](currItem, t, p);
