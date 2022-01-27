@@ -5,7 +5,7 @@ export type WaitInfo = {
 }
 
 export class Pipe<T> {
-	#out = new Set<(data: any) => void>();
+	#out = new Set<(data: T) => void>();
 	send(data: T) {
 		for (const o of this.#out) {
 			o(data);
