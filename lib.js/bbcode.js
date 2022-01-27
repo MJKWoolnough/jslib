@@ -13,7 +13,7 @@ const parseText = function* (text) {
 				if (c >= 65 && c <=90 || c >=97 && c <=122 || c >= 48 && c <= 57) {
 					continue;
 				} else if (c === 93 && pos > start + +end + 1) { // ']'
-					if (last != start) {
+					if (last !== start) {
 						const t = text.slice(last, start);
 						while (yield t) {}
 					}
@@ -28,7 +28,7 @@ const parseText = function* (text) {
 					last = pos+1;
 					while (yield t) {}
 				} else if (c === 61 && !end && pos > start + 1) { // '='
-					if (last != start) {
+					if (last !== start) {
 						const t = text.slice(last, start);
 						while (yield t) {}
 					}
