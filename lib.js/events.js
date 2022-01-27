@@ -123,57 +123,56 @@ mouseDragEvent = (button, onmousemove, onmouseup = () => {}) => {
 },
 hasKeyEvent = key => !!(downs.get(key)?.size || ups.get(key)?.size);
 
-window.addEventListener("keydown", e => keyEventFn(true, e));
-
-window.addEventListener("keyup", e => keyEventFn(false, e));
-
-window.addEventListener("mousemove", e => {
-	mouseX = e.clientX;
-	mouseY = e.clientY;
-	for (const [, event] of mouseMove) {
-		event(e);
-	}
-});
-
-window.addEventListener("mouseup", e => {
-	const {button} = e;
-	if (button !== 0 && button !== 1 && button !== 2) {
-		return;
-	}
-	for (const [id, event] of mouseUp[button]) {
-		event(e);
-		mouseMove.delete(id);
-	}
-	mouseUp[button].clear();
-});
-
-window.addEventListener("blur", () => {
-	for (const key of held) {
-		const events = ups.get(key);
-		if (events && events.size) {
-			const e = ke("up", key);
-			for (const [id, [event, once]] of events) {
-				event(e);
-				if (once) {
-					events.delete(id);
+for (const [evt, fn] of [
+	["keydown", e => keyEventFn(true, e)],
+	["keyup", e => keyEventFn(false, e)],
+	["mousemove", e => {
+		mouseX = e.clientX;
+		mouseY = e.clientY;
+		for (const [, event] of mouseMove) {
+			event(e);
+		}
+	}],
+	["mouseup", e => {
+		const {button} = e;
+		if (button !== 0 && button !== 1 && button !== 2) {
+			return;
+		}
+		for (const [id, event] of mouseUp[button]) {
+			event(e);
+			mouseMove.delete(id);
+		}
+		mouseUp[button].clear();
+	}],
+	["blur", () => {
+		for (const key of held) {
+			const events = ups.get(key);
+			if (events && events.size) {
+				const e = ke("up", key);
+				for (const [id, [event, once]] of events) {
+					event(e);
+					if (once) {
+						events.delete(id);
+					}
 				}
 			}
+			held.delete(key);
 		}
-		held.delete(key);
-	}
-	for (let button = 0; button < 3; button++) {
-		if (mouseUp[button].size) {
-			const e = me(button);
-			for (const [, event] of mouseUp[button]) {
-				event(e);
+		for (let button = 0; button < 3; button++) {
+			if (mouseUp[button].size) {
+				const e = me(button);
+				for (const [, event] of mouseUp[button]) {
+					event(e);
+				}
+				mouseUp[button].clear();
 			}
-			mouseUp[button].clear();
 		}
-	}
-	mouseMove.clear();
-	for (const [id, fn] of mouseLeave) {
-		mouseMove.delete(id);
-		fn();
-	}
-	mouseLeave.clear();
-});
+		mouseMove.clear();
+		for (const [id, fn] of mouseLeave) {
+			mouseMove.delete(id);
+			fn();
+		}
+		mouseLeave.clear();
+	}]]) {
+	window.addEventListener(evt, fn);
+}
