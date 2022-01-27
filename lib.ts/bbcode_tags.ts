@@ -11,14 +11,14 @@ const simple = (fn: DOMBind<Node>, style?: string) => (n: Node, t: Tokeniser, p:
 	}
       },
       textContents = (t: Tokeniser, endTag: string) => {
-		let contents = "";
-		while (true) {
-			const end = t.next().value;
-			if (!end || isCloseTag(end) && end.tagName === endTag) {
-				return contents;
-			}
-			contents += isString(end) ? end : end.fullText;
+	let contents = "";
+	while (true) {
+		const end = t.next().value;
+		if (!end || isCloseTag(end) && end.tagName === endTag) {
+			return contents;
 		}
+		contents += isString(end) ? end : end.fullText;
+	}
       };
 
 export const b = simple(span, "font-weight: bold;"),

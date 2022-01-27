@@ -9,14 +9,14 @@ const simple = (fn, style) => (n, t, p) => {
 	}
       },
       textContents = (t, endTag) => {
-		let contents = "";
-		while (true) {
-			const end = t.next().value;
-			if (!end || isCloseTag(end) && end.tagName === endTag) {
-				return contents;
-			}
-			contents += isString(end) ? end : end.fullText;
+	let contents = "";
+	while (true) {
+		const end = t.next().value;
+		if (!end || isCloseTag(end) && end.tagName === endTag) {
+			return contents;
 		}
+		contents += isString(end) ? end : end.fullText;
+	}
       };
 
 export const b = simple(span, "font-weight: bold;"),
