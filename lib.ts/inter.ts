@@ -45,20 +45,17 @@ export class Requester<T, U extends any[] = any[]> {
 export class Subscription<T> {
 	#success: (fn: (data: T) => void) => void;
 	#error: (fn: (data: any) => void) => void;
-	#cancel: (data: void) => void;
+	#cancel = () => {};
 	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: () => void) => void) => void) {
 		const [successSend, successReceive] = new Pipe<T>().bind(),
-		      [errorSend, errorReceive] = new Pipe<any>().bind(),
-		      [cancelSend, cancelReceive] = new Pipe<void>().bind();
-		fn(successSend, errorSend, cancelReceive);
+		      [errorSend, errorReceive] = new Pipe<any>().bind();
+		fn(successSend, errorSend, (data: () => void) => this.#cancel = data);
 		this.#success = successReceive;
 		this.#error = errorReceive;
-		this.#cancel = cancelSend;
 	}
 	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
 		const success = this.#success,
-		      error = this.#error,
-		      cancel = this.#cancel;
+		      error = this.#error;
 		return new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: () => void) => void) => {
 			if (successFn instanceof Function) {
 				success((data: T) => {
@@ -82,7 +79,7 @@ export class Subscription<T> {
 			} else {
 				error(eFn);
 			}
-			cFn(cancel);
+			cFn(() => this.#cancel());
 		});
 	}
 	cancel() {

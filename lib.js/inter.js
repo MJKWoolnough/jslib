@@ -39,20 +39,17 @@ export class Requester {
 export class Subscription {
 	#success;
 	#error;
-	#cancel;
-	constructor(fn, errorFn, cancelFn) {
+	#cancel = () => {};
+	constructor(fn) {
 		const [successSend, successReceive] = new Pipe().bind(),
-		      [errorSend, errorReceive] = new Pipe().bind(),
-		      [cancelSend, cancelReceive] = new Pipe().bind();
-		fn(successSend, errorSend, cancelReceive);
+		      [errorSend, errorReceive] = new Pipe().bind();
+		fn(successSend, errorSend, data => this.#cancel = data);
 		this.#success = successReceive;
 		this.#error = errorReceive;
-		this.#cancel = cancelSend;
 	}
 	then(successFn, errorFn) {
 		const success = this.#success,
-		      error = this.#error,
-		      cancel = this.#cancel;
+		      error = this.#error;
 		return new Subscription((sFn, eFn, cFn) => {
 			if (successFn instanceof Function) {
 				success(data => {
@@ -76,7 +73,7 @@ export class Subscription {
 			} else {
 				error(eFn);
 			}
-			cFn(cancel);
+			cFn(() => this.#cancel());
 		});
 	}
 	cancel() {
