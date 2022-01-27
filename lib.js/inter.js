@@ -13,7 +13,7 @@ export class Pipe {
 		}
 	}
 	remove(fn) {
-		this.#out.delete(fn);
+		return this.#out.delete(fn);
 	}
 	bind() {
 		return [data => this.send(data), fn => this.receive(fn)];
