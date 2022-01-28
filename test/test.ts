@@ -76,3 +76,30 @@ test("Pipe Bind", async () => {
 	send(true);
 	return res;
 });
+
+// -- Requester
+
+test("Requester Respond/Request value", async () => {
+	const {Requester} = await import("./lib/inter.js"),
+	      r = new Requester<boolean>();
+	r.responder(true);
+	return r.request();
+});
+
+test("Requester Respond/Request fn", async () => {
+	const {Requester} = await import("./lib/inter.js"),
+	      r = new Requester<boolean>();
+	r.responder(() => true);
+	return r.request();
+});
+
+test("Requester No Responder", async () => {
+	const {Requester} = await import("./lib/inter.js"),
+	      r = new Requester<boolean>();
+	try {
+		r.request();
+	} catch(e) {
+		return true;
+	}
+	return false;
+});
