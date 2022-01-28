@@ -257,3 +257,105 @@ test("Subscription chain-cancel (check)", async () => {
 	new Subscription((_sFn, _eFn, cFn) => cFn(() => res = true)).then(() => {});
 	return !res;
 });
+
+// -- WaitGroup
+
+test("WaitGroup add-done", async () => {
+	let res = false;
+	const {WaitGroup} = await import("./lib/inter.js"),
+	      wg = new WaitGroup();
+	wg.onComplete(() => res = true);
+	wg.add();
+	wg.done();
+	return res;
+});
+
+test("WaitGroup add-done (check)", async () => {
+	let res = false;
+	const {WaitGroup} = await import("./lib/inter.js"),
+	      wg = new WaitGroup();
+	wg.onComplete(() => res = true);
+	wg.add();
+	return !res;
+});
+
+test("WaitGroup multi-add-done", async () => {
+	let res = false;
+	const {WaitGroup} = await import("./lib/inter.js"),
+	      wg = new WaitGroup();
+	wg.onComplete(() => res = true);
+	wg.add();
+	wg.add();
+	wg.done();
+	wg.done();
+	return res;
+});
+
+test("WaitGroup multi-add-done (check)", async () => {
+	let res = false;
+	const {WaitGroup} = await import("./lib/inter.js"),
+	      wg = new WaitGroup();
+	wg.onComplete(() => res = true);
+	wg.add();
+	wg.add();
+	wg.done();
+	return !res;
+});
+
+test("WaitGroup error-done", async () => {
+	let res = false;
+	const {WaitGroup} = await import("./lib/inter.js"),
+	      wg = new WaitGroup();
+	wg.onComplete(() => res = true);
+	wg.add();
+	wg.error();
+	return res;
+});
+
+test("WaitGroup multi-error-done", async () => {
+	let res = false;
+	const {WaitGroup} = await import("./lib/inter.js"),
+	      wg = new WaitGroup();
+	wg.onComplete(() => res = true);
+	wg.add();
+	wg.add();
+	wg.error();
+	wg.error();
+	return res;
+});
+
+test("WaitGroup multi-error-done (check)", async () => {
+	let res = false;
+	const {WaitGroup} = await import("./lib/inter.js"),
+	      wg = new WaitGroup();
+	wg.onComplete(() => res = true);
+	wg.add();
+	wg.add();
+	wg.error();
+	return !res;
+});
+
+test("WaitGroup onUpdate", async () => {
+	let res = 0;
+	const {WaitGroup} = await import("./lib/inter.js"),
+	      wg = new WaitGroup();
+	wg.onUpdate(wi => res += wi.waits * 2 + wi.done * 3 + wi.errors * 5);
+	wg.add();
+	wg.add();
+	wg.error();
+	wg.done();
+	return res === 27;
+});
+
+test("WaitGroup onUpdate/onComplete", async () => {
+	let res = 0;
+	const {WaitGroup} = await import("./lib/inter.js"),
+	      wg = new WaitGroup();
+	wg.onComplete(() => res *= 2);
+	wg.onUpdate(wi => res += wi.waits * 2 + wi.done * 3 + wi.errors * 5);
+	wg.add();
+	wg.add();
+	wg.error();
+	wg.done();
+	return res === 54;
+});
