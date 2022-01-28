@@ -1,0 +1,38 @@
+html, body {
+	margin: 0;
+}
+
+ul {
+	list-style: none;
+	padding: 0;
+}
+
+li {
+	background-color: #ccc;
+}
+
+li:nth-child(2) {
+	background-color: #ddd;
+}
+
+li:before {
+	display: inline-block;
+	background-color: #000;
+	color: #fff;
+	content: "Pending...";
+	margin-right: 1em;
+	width: 5em;
+	text-align: center;
+}
+
+li.pass:before {
+	background-color: #0f0;
+	color: #000;
+	content: "PASS";
+}
+
+li.fail:before {
+	background-color: #f00;
+	color: #000;
+	content: "FAIL";
+}
