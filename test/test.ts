@@ -103,3 +103,157 @@ test("Requester No Responder", async () => {
 	}
 	return false;
 });
+
+
+// -- Subscription
+
+test("Subscription then", async () => {
+	let res = false,
+	    sFn = (_: boolean) => {};
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(s => sFn = s).then(b => res = b).catch(() => res = false);
+	sFn(true);
+	return res;
+});
+
+test("Subscription then-chain", async () => {
+	let res = false,
+	    sFn = (_: boolean) => {};
+	const {Subscription} = await import("./lib/inter.js"),
+	      s = new Subscription<boolean>(s => sFn = s);
+	s.then(b => b).then(b => res = b).catch(() => res = false);;
+	sFn(true);
+	return res;
+});
+
+test("Subscription multi-then", async () => {
+	let res = 0,
+	    sFn = (_: number) => {};
+	const {Subscription} = await import("./lib/inter.js"),
+	      s = new Subscription<number>(s => sFn = s);
+	s.then(b => res += b).catch(() => res = 0);
+	s.then(b => res += b).catch(() => res = 0);;
+	s.then(b => res += b).catch(() => res = 0);;
+	sFn(1);
+	return res === 3;
+});
+
+test("Subscription multi-then-chain", async () => {
+	let res = 0,
+	    sFn = (_: number) => {};
+	const {Subscription} = await import("./lib/inter.js"),
+	      s = new Subscription<number>(s => sFn = s);
+	s.then(b => b + 1).then(b => res += b);
+	s.then(b => b + 2).then(b => res += b);
+	s.then(b => b + 3).then(b => res += b);
+	sFn(1);
+	return res === 9;
+});
+
+test("Subscription catch", async () => {
+	let res = false,
+	    eFn = (_: any) => {};
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>((_, e) => eFn = e).then(() => res = false).catch(() => res = true);
+	eFn(0);
+	return res;
+});
+
+test("Subscription catch (check)", async () => {
+	let res = false;
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(() => {}).then(() => res = false).catch(() => res = true);
+	return !res;
+});
+
+test("Subscription error catch", async () => {
+	let res = false,
+	    sFn = (_: boolean) => {};
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(s => sFn = s).then(() => {throw 1}).catch(() => res = true);
+	sFn(false);
+	return res;
+});
+
+test("Subscription error catch (check)", async () => {
+	let res = false;
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(() => {}).then(() => {throw 1}).catch(() => res = true);
+	return !res;
+});
+
+test("Subscription finally", async () => {
+	let res = false,
+	    sFn = (_: boolean) => {};
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(s => sFn = s).finally(() => res = true);
+	sFn(false);
+	return res;
+});
+
+test("Subscription finally (check)", async () => {
+	let res = false;
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(() => {}).finally(() => res = true);
+	return !res;
+});
+
+test("Subscription finally-chain", async () => {
+	let res = false,
+	    sFn = (_: boolean) => {};
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(s => sFn = s).then(() => {}).finally(() => res = true);
+	sFn(false);
+	return res;
+});
+
+test("Subscription finally-chain (check)", async () => {
+	let res = false;
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(() => {}).then(() => {}).finally(() => res = true);
+	return !res;
+});
+
+test("Subscription error finally", async () => {
+	let res = false,
+	    sFn = (_: boolean) => {};
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(s => sFn = s).then(() => {throw 1}).finally(() => res = true);
+	sFn(false);
+	return res;
+});
+
+test("Subscription error finally (check)", async () => {
+	let res = false;
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription<boolean>(() => {}).then(() => {throw 1}).finally(() => res = true);
+	return !res;
+});
+
+test("Subscription cancel", async () => {
+	let res = false;
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription((_sFn, _eFn, cFn) => cFn(() => res = true)).cancel();
+	return res;
+});
+
+test("Subscription cancel (check)", async () => {
+	let res = false;
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription((_sFn, _eFn, cFn) => cFn(() => res = true));
+	return !res;
+});
+
+test("Subscription chain-cancel", async () => {
+	let res = false;
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription((_sFn, _eFn, cFn) => cFn(() => res = true)).then(() => {}).cancel();
+	return res;
+});
+
+test("Subscription chain-cancel (check)", async () => {
+	let res = false;
+	const {Subscription} = await import("./lib/inter.js");
+	new Subscription((_sFn, _eFn, cFn) => cFn(() => res = true)).then(() => {});
+	return !res;
+});
