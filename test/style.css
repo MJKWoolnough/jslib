@@ -11,7 +11,7 @@ li {
 	background-color: #ccc;
 }
 
-li:nth-child(2) {
+li:nth-child(2n) {
 	background-color: #ddd;
 }
 
