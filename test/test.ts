@@ -30,3 +30,49 @@ const test = (() => {
       })();
 
 test("pageLoad", () => true);
+
+// inter.js
+
+// -- Pipe
+
+test("Pipe Send/Receive", async () => {
+	const {Pipe} = await import("./lib/inter.js"),
+	      p = new Pipe<boolean>();
+	let res: boolean = false;
+	p.receive(v => res = v);
+	p.send(true);
+	return res;
+});
+
+test("Pipe Send/Multi-receive", async () => {
+	const {Pipe} = await import("./lib/inter.js"),
+	      p = new Pipe<number>();
+	let num = 0;
+	p.receive(v => num += v);
+	p.receive(v => num += v);
+	p.receive(v => num += v);
+	p.send(2);
+	return num === 6;
+});
+
+test("Pipe Remove", async () => {
+	const {Pipe} = await import("./lib/inter.js"),
+	      p = new Pipe<number>(),
+	      fn = (v: number) => num += v;
+	let num = 0;
+	p.receive(fn);
+	p.receive(v => num += v);
+	p.receive(v => num += v);
+	p.remove(fn);
+	p.send(2);
+	return num === 4;
+});
+
+test("Pipe Bind", async () => {
+	const {Pipe} = await import("./lib/inter.js"),
+	      [send, receive] = new Pipe<boolean>().bind();
+	let res: boolean = false;
+	receive(v => res = v);
+	send(true);
+	return res;
+});
