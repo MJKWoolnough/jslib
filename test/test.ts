@@ -400,3 +400,107 @@ test("amendNode style set CSSStyleDeclaration", async () => {
 	      div = amendNode(document.createElement("div"), {"style": {"font-size": "2em", "color": "rgb(255, 0, 0)"}});
 	return amendNode(document.createElement("div"), {"style": div.style}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
 });
+
+type W = typeof window & {
+	res: number;
+};
+
+test("amendNode event string set", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	(window as W).res = 0;
+	amendNode(document.createElement("div"), {"onclick": "window.res++"}).click();
+	return (window as W).res === 1;
+});
+
+test("amendNode event string unset", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	(window as W).res = 0;
+	amendNode(amendNode(document.createElement("div"), {"onclick": "window.res++"}), {"onclick": undefined}).click();
+	return (window as W).res === 0;
+});
+
+test("amendNode event arrow fn set", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      div = amendNode(document.createElement("div"), {"onclick": () => res++});
+	div.click();
+	div.click();
+	return res === 2;
+});
+
+test("amendNode event fn set", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      div = amendNode(document.createElement("div"), {"onclick": function(this: HTMLDivElement) {res += +(this === div)}});
+	div.click();
+	div.click();
+	return res === 2;
+});
+
+test("amendNode event EventListenerObject set", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      he = {"handleEvent": function(this: object) {res += +(this === he)}},
+	      div = amendNode(document.createElement("div"), {"onclick": he});
+	div.click();
+	div.click();
+	return res === 2;
+});
+
+test("amendNode event array arrow fn once set", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      div = amendNode(document.createElement("div"), {"onclick": [() => res++, {"once": true}, false]});
+	div.click();
+	div.click();
+	return res === 1;
+});
+
+test("amendNode event array fn once set", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      div = amendNode(document.createElement("div"), {"onclick": [function(this: HTMLDivElement) {res += +(this === div)}, {"once": true}, false]});
+	div.click();
+	div.click();
+	return res === 1;
+});
+
+test("amendNode event EventListenerObject once set", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      he = {"handleEvent": function(this: object) {res += +(this === he)}},
+	      div = amendNode(document.createElement("div"), {"onclick": [he, {"once": true}, false]});
+	div.click();
+	div.click();
+	return res === 1;
+});
+
+test("amendNode event array arrow fn remove", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      fn = () => res++,
+	      div = amendNode(amendNode(document.createElement("div"), {"onclick": [fn, {}, false]}), {"onclick": [fn, {}, true]});
+	div.click();
+	div.click();
+	return res === 0;
+});
+
+test("amendNode event array fn remove", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      fn = function(this: HTMLDivElement) {res += +(this === div)},
+	      div = amendNode(amendNode(document.createElement("div"), {"onclick": [fn, {}, false]}), {"onclick": [fn, {}, true]});
+	div.click();
+	div.click();
+	return res === 0;
+});
+
+test("amendNode event EventListenerObject remove", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      he = {"handleEvent": function(this: object) {res += +(this === he)}},
+	      div = amendNode(amendNode(document.createElement("div"), {"onclick": [he, {}, false]}), {"onclick": [he, {}, true]});
+	div.click();
+	div.click();
+	return res === 0;
+});
