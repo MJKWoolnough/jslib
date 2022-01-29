@@ -295,3 +295,108 @@ test("WaitGroup onUpdate/onComplete", async () => {
 	wg.done();
 	return res === 54;
 });
+
+// dom.js
+
+// -- amendNode
+
+test("amendNode type test (div)", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div")) instanceof HTMLDivElement;
+});
+
+test("amendNode type test (span)", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("span")) instanceof HTMLSpanElement;
+});
+
+test("amendNode no property", () => {
+	return document.createElement("div").getAttribute("property") === null;
+});
+
+test("amendNode string property", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), {"property": "value"}).getAttribute("property") === "value";
+});
+
+test("amendNode number property", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), {"property": 1}).getAttribute("property") === "1";
+});
+
+test("amendNode boolean property", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), {"property": true}).getAttribute("property") === "";
+});
+
+test("amendNode unset boolean property", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(amendNode(document.createElement("div"), {"property": true}), {"property": false}).getAttribute("property") === null;
+});
+
+test("amendNode ToString property", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), {"property": {}}).getAttribute("property") === "[object Object]";
+});
+
+test("amendNode remove string property", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(amendNode(document.createElement("div"), {"property": "value"}), {"property": undefined}).getAttribute("property") === null;
+});
+
+test("amendNode remove number property", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(amendNode(document.createElement("div"), {"property": 1}), {"property": undefined}).getAttribute("property") === null;
+});
+
+test("amendNode remove boolean property", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(amendNode(document.createElement("div"), {"property": true}), {"property": undefined}).getAttribute("property") === null;
+});
+
+test("amendNode remove ToString property", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(amendNode(document.createElement("div"), {"property": {}}), {"property": undefined}).getAttribute("property") === null;
+});
+
+test("amendNode class set string", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), {"class": "class1 class2"}).getAttribute("class") === "class1 class2";
+});
+
+test("amendNode class set array", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), {"class": ["class1", "class2"]}).getAttribute("class") === "class1 class2";
+});
+
+test("amendNode class set multi-array", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2"]}), {"class": ["class3"]}).getAttribute("class") === "class1 class2 class3";
+});
+
+test("amendNode class set array -> string", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2"]}), {"class": "class3"}).getAttribute("class") === "class3";
+});
+
+test("amendNode class set DOMTokenList", async () => {
+	const {amendNode} = await import("./lib/dom.js"),
+	      div = amendNode(document.createElement("div"), {"class": ["class1", "class2"]});
+	return amendNode(document.createElement("div"), {"class": div.classList}).getAttribute("class") === "class1 class2";
+});
+
+test("amendNode style set string", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), {"style": "font-size: 2em; color: rgb(255, 0, 0);"}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
+});
+
+test("amendNode style set object", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), {"style": {"font-size": "2em", "color": "rgb(255, 0, 0)"}}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
+});
+
+test("amendNode style set CSSStyleDeclaration", async () => {
+	const {amendNode} = await import("./lib/dom.js"),
+	      div = amendNode(document.createElement("div"), {"style": {"font-size": "2em", "color": "rgb(255, 0, 0)"}});
+	return amendNode(document.createElement("div"), {"style": div.style}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
+});
