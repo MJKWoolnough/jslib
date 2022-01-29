@@ -151,155 +151,97 @@ test("Subscription multi-then-chain", async () => {
 });
 
 test("Subscription catch", async () => {
-	let res = false,
+	let res = 0,
 	    eFn = (_: any) => {};
 	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>((_, e) => eFn = e).then(() => res = false).catch(() => res = true);
-	eFn(0);
-	return res;
-});
-
-test("Subscription catch (check)", async () => {
-	let res = false;
-	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>(() => {}).then(() => res = false).catch(() => res = true);
-	return !res;
+	new Subscription<boolean>((_, e) => eFn = e).catch(e => res += e);
+	eFn(1);
+	return res === 1;
 });
 
 test("Subscription error catch", async () => {
-	let res = false,
+	let res = 0,
 	    sFn = (_: boolean) => {};
 	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>(s => sFn = s).then(() => {throw 1}).catch(() => res = true);
+	new Subscription<boolean>(s => sFn = s).then(() => {throw 1}).catch(e => res += e);
 	sFn(false);
-	return res;
-});
-
-test("Subscription error catch (check)", async () => {
-	let res = false;
-	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>(() => {}).then(() => {throw 1}).catch(() => res = true);
-	return !res;
+	return res === 1;
 });
 
 test("Subscription finally", async () => {
-	let res = false,
+	let res = 0,
 	    sFn = (_: boolean) => {};
 	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>(s => sFn = s).finally(() => res = true);
+	new Subscription<boolean>(s => sFn = s).finally(() => res++);
+	new Subscription<boolean>(() => {}).finally(() => res++);
 	sFn(false);
-	return res;
-});
-
-test("Subscription finally (check)", async () => {
-	let res = false;
-	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>(() => {}).finally(() => res = true);
-	return !res;
+	return res === 1;
 });
 
 test("Subscription finally-chain", async () => {
-	let res = false,
+	let res = 0,
 	    sFn = (_: boolean) => {};
 	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>(s => sFn = s).then(() => {}).finally(() => res = true);
+	new Subscription<boolean>(s => sFn = s).then(() => {}).finally(() => res++);
+	new Subscription<boolean>(() => {}).then(() => {}).finally(() => res++);
 	sFn(false);
-	return res;
-});
-
-test("Subscription finally-chain (check)", async () => {
-	let res = false;
-	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>(() => {}).then(() => {}).finally(() => res = true);
-	return !res;
+	return res === 1;
 });
 
 test("Subscription error finally", async () => {
-	let res = false,
+	let res = 0,
 	    sFn = (_: boolean) => {};
 	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>(s => sFn = s).then(() => {throw 1}).finally(() => res = true);
+	new Subscription<boolean>(s => sFn = s).then(() => {throw 1}).finally(() => res++);
+	new Subscription<boolean>(() => {}).then(() => {throw 1}).finally(() => res++);
 	sFn(false);
-	return res;
-});
-
-test("Subscription error finally (check)", async () => {
-	let res = false;
-	const {Subscription} = await import("./lib/inter.js");
-	new Subscription<boolean>(() => {}).then(() => {throw 1}).finally(() => res = true);
-	return !res;
+	return res === 1;
 });
 
 test("Subscription cancel", async () => {
-	let res = false;
+	let res = 0;
 	const {Subscription} = await import("./lib/inter.js");
-	new Subscription((_sFn, _eFn, cFn) => cFn(() => res = true)).cancel();
-	return res;
-});
-
-test("Subscription cancel (check)", async () => {
-	let res = false;
-	const {Subscription} = await import("./lib/inter.js");
-	new Subscription((_sFn, _eFn, cFn) => cFn(() => res = true));
-	return !res;
+	new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).cancel();
+	new Subscription((_sFn, _eFn, cFn) => cFn(() => res++));
+	return res === 1;
 });
 
 test("Subscription chain-cancel", async () => {
-	let res = false;
+	let res = 0;
 	const {Subscription} = await import("./lib/inter.js");
-	new Subscription((_sFn, _eFn, cFn) => cFn(() => res = true)).then(() => {}).cancel();
-	return res;
-});
-
-test("Subscription chain-cancel (check)", async () => {
-	let res = false;
-	const {Subscription} = await import("./lib/inter.js");
-	new Subscription((_sFn, _eFn, cFn) => cFn(() => res = true)).then(() => {});
-	return !res;
+	new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).then(() => {}).cancel();
+	new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).then(() => {});
+	return res === 1;
 });
 
 // -- WaitGroup
 
 test("WaitGroup add-done", async () => {
-	let res = false;
+	let res = 0;
 	const {WaitGroup} = await import("./lib/inter.js"),
 	      wg = new WaitGroup();
-	wg.onComplete(() => res = true);
+	wg.onComplete(() => res = 1);
+	res++;
 	wg.add();
+	res++;
 	wg.done();
-	return res;
-});
-
-test("WaitGroup add-done (check)", async () => {
-	let res = false;
-	const {WaitGroup} = await import("./lib/inter.js"),
-	      wg = new WaitGroup();
-	wg.onComplete(() => res = true);
-	wg.add();
-	return !res;
+	return res === 1;
 });
 
 test("WaitGroup multi-add-done", async () => {
-	let res = false;
+	let res = 0;
 	const {WaitGroup} = await import("./lib/inter.js"),
 	      wg = new WaitGroup();
-	wg.onComplete(() => res = true);
+	wg.onComplete(() => res = 1);
+	res++;
 	wg.add();
+	res++;
 	wg.add();
+	res++;
 	wg.done();
+	res++;
 	wg.done();
-	return res;
-});
-
-test("WaitGroup multi-add-done (check)", async () => {
-	let res = false;
-	const {WaitGroup} = await import("./lib/inter.js"),
-	      wg = new WaitGroup();
-	wg.onComplete(() => res = true);
-	wg.add();
-	wg.add();
-	wg.done();
-	return !res;
+	return res === 1;
 });
 
 test("WaitGroup error-done", async () => {
@@ -313,26 +255,20 @@ test("WaitGroup error-done", async () => {
 });
 
 test("WaitGroup multi-error-done", async () => {
-	let res = false;
+	let res = 0;
 	const {WaitGroup} = await import("./lib/inter.js"),
 	      wg = new WaitGroup();
-	wg.onComplete(() => res = true);
+	res++;
+	wg.onComplete(() => res = 1);
+	res++;
 	wg.add();
+	res++;
 	wg.add();
+	res++;
 	wg.error();
+	res++;
 	wg.error();
-	return res;
-});
-
-test("WaitGroup multi-error-done (check)", async () => {
-	let res = false;
-	const {WaitGroup} = await import("./lib/inter.js"),
-	      wg = new WaitGroup();
-	wg.onComplete(() => res = true);
-	wg.add();
-	wg.add();
-	wg.error();
-	return !res;
+	return res === 1;
 });
 
 test("WaitGroup onUpdate", async () => {
