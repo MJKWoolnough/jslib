@@ -651,3 +651,28 @@ test("event signal", async () => {
 	      e = event(fn, 0, ac.signal);
 	return e[0] === fn && e[1].capture === false && e[1].once === false && e[1].passive === false && e[1].signal === ac.signal && e[2] === false;
 });
+
+// -- createDocumentFragment
+
+test("createDocumentFragment", async () => {
+	const {createDocumentFragment} = await import("./lib/dom.js");
+	return createDocumentFragment() instanceof DocumentFragment;
+});
+
+test("createDocumentFragment string append", async () => {
+	const {createDocumentFragment} = await import("./lib/dom.js");
+	return createDocumentFragment("Text").textContent === "Text";
+});
+
+test("createDocumentFragment node append", async () => {
+	const {createDocumentFragment} = await import("./lib/dom.js"),
+	      div = document.createElement("div");
+	return createDocumentFragment(div).firstChild === div;
+});
+
+test("createDocumentFragment array append", async () => {
+	const {createDocumentFragment} = await import("./lib/dom.js"),
+	      div = document.createElement("div"),
+	      df = createDocumentFragment(["Text", div]);
+	return df.firstChild instanceof Text && df.firstChild.textContent === "Text" && df.lastChild === div;
+});
