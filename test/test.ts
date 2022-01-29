@@ -565,3 +565,10 @@ test("amendNode append HTMLCollection", async () => {
 	      div2 = amendNode(document.createElement("div"), div1.children);
 	return div2.firstChild === span1 && div2.children[1] === span2 && div2.lastChild === span3;
 });
+
+test("amendNode property set + append", async () => {
+	const {amendNode} = await import("./lib/dom.js"),
+	      span = document.createElement("span"),
+	      div = amendNode(document.createElement("div"), {"property": "value"}, span);
+	return div.getAttribute("property") === "value" && div.firstChild === span;
+});
