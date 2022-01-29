@@ -572,3 +572,69 @@ test("amendNode property set + append", async () => {
 	      div = amendNode(document.createElement("div"), {"property": "value"}, span);
 	return div.getAttribute("property") === "value" && div.firstChild === span;
 });
+
+// -- event
+
+test("event capture", async () => {
+	const {event, eventCapture} = await import("./lib/dom.js"),
+	      fn = () => {},
+	      e = event(fn, eventCapture);
+	return e[0] === fn && e[1].capture === true && e[1].once === false && e[1].passive === false && e[1].signal === undefined && e[2] === false;
+});
+
+test("event capture remove", async () => {
+	const {event, eventCapture, eventRemove} = await import("./lib/dom.js"),
+	      fn = () => {},
+	      e = event(fn, eventCapture | eventRemove);
+	return e[0] === fn && e[1].capture === true && e[1].once === false && e[1].passive === false && e[1].signal === undefined && e[2] === true;
+});
+
+test("event once", async () => {
+	const {event, eventOnce} = await import("./lib/dom.js"),
+	      fn = {"handleEvent": () => {}},
+	      e = event(fn, eventOnce);
+	return e[0] === fn && e[1].capture === false && e[1].once === true && e[1].passive === false && e[1].signal === undefined && e[2] === false;
+});
+
+test("event once remove", async () => {
+	const {event, eventOnce, eventRemove} = await import("./lib/dom.js"),
+	      fn = {"handleEvent": () => {}},
+	      e = event(fn, eventOnce | eventRemove);
+	return e[0] === fn && e[1].capture === false && e[1].once === true && e[1].passive === false && e[1].signal === undefined && e[2] === true;
+});
+
+test("event passive", async () => {
+	const {event, eventPassive} = await import("./lib/dom.js"),
+	      fn = function () {},
+	      e = event(fn, eventPassive);
+	return e[0] === fn && e[1].capture === false && e[1].once === false && e[1].passive === true && e[1].signal === undefined && e[2] === false;
+});
+
+test("event once remove", async () => {
+	const {event, eventPassive, eventRemove} = await import("./lib/dom.js"),
+	      fn = function () {},
+	      e = event(fn, eventPassive | eventRemove);
+	return e[0] === fn && e[1].capture === false && e[1].once === false && e[1].passive === true && e[1].signal === undefined && e[2] === true;
+});
+
+test("event all", async () => {
+	const {event, eventCapture, eventOnce, eventPassive} = await import("./lib/dom.js"),
+	      fn = {"handleEvent": function () {}},
+	      e = event(fn, eventCapture | eventOnce | eventPassive);
+	return e[0] === fn && e[1].capture === true && e[1].once === true && e[1].passive === true && e[1].signal === undefined && e[2] === false;
+});
+
+test("event all remove", async () => {
+	const {event, eventCapture, eventOnce, eventPassive, eventRemove} = await import("./lib/dom.js"),
+	      fn = {"handleEvent": function () {}},
+	      e = event(fn, eventCapture | eventOnce | eventPassive | eventRemove);
+	return e[0] === fn && e[1].capture === true && e[1].once === true && e[1].passive === true && e[1].signal === undefined && e[2] === true;
+});
+
+test("event signal", async () => {
+	const {event} = await import("./lib/dom.js"),
+	      fn = () => {},
+	      ac = new AbortController(),
+	      e = event(fn, 0, ac.signal);
+	return e[0] === fn && e[1].capture === false && e[1].once === false && e[1].passive === false && e[1].signal === ac.signal && e[2] === false;
+});
