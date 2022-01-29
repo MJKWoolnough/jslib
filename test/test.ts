@@ -504,3 +504,64 @@ test("amendNode event EventListenerObject remove", async () => {
 	div.click();
 	return res === 0;
 });
+
+test("amendNode string child", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), "Test String").innerText === "Test String";
+});
+
+test("amendNode array string children", async () => {
+	const {amendNode} = await import("./lib/dom.js");
+	return amendNode(document.createElement("div"), ["Test", " String"]).innerText === "Test String";
+});
+
+test("amendNode append node child", async () => {
+	const {amendNode} = await import("./lib/dom.js"),
+	      span = document.createElement("span"),
+	      div = amendNode(document.createElement("div"), span);
+	return div.firstChild === span && div.lastChild === span;
+});
+
+test("amendNode append node array", async () => {
+	const {amendNode} = await import("./lib/dom.js"),
+	      span1 = document.createElement("span"),
+	      span2 = document.createElement("span"),
+	      div = amendNode(document.createElement("div"), [span1, span2]);
+	return div.firstChild === span1 && div.lastChild === span2;
+});
+
+test("amendNode append string + node", async () => {
+	const {amendNode} = await import("./lib/dom.js"),
+	      span = document.createElement("span"),
+	      div = amendNode(document.createElement("div"), ["Text", span]);
+	return div.firstChild instanceof Text && div.firstChild.textContent === "Text" && div.lastChild === span;
+});
+
+test("amendNode append multi-array", async () => {
+	const {amendNode} = await import("./lib/dom.js"),
+	      span1 = document.createElement("span"),
+	      span2 = document.createElement("span"),
+	      span3 = document.createElement("span"),
+	      div = amendNode(document.createElement("div"), [span1, [span2, span3]]);
+	return div.firstChild === span1 && div.children[1] === span2 && div.lastChild === span3;
+});
+
+test("amendNode append NodeList", async () => {
+	const {amendNode} = await import("./lib/dom.js"),
+	      span1 = document.createElement("span"),
+	      span2 = document.createElement("span"),
+	      span3 = document.createElement("span"),
+	      div1 = amendNode(document.createElement("div"), [span1, [span2, span3]]),
+	      div2 = amendNode(document.createElement("div"), div1.childNodes);
+	return div2.firstChild === span1 && div2.children[1] === span2 && div2.lastChild === span3;
+});
+
+test("amendNode append HTMLCollection", async () => {
+	const {amendNode} = await import("./lib/dom.js"),
+	      span1 = document.createElement("span"),
+	      span2 = document.createElement("span"),
+	      span3 = document.createElement("span"),
+	      div1 = amendNode(document.createElement("div"), [span1, [span2, span3]]),
+	      div2 = amendNode(document.createElement("div"), div1.children);
+	return div2.firstChild === span1 && div2.children[1] === span2 && div2.lastChild === span3;
+});
