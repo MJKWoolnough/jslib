@@ -8,7 +8,7 @@ const childrenArr = (node, children) => {
 	} else if (children instanceof Node) {
 		node.appendChild(children);
 	} else if (children instanceof NodeList) {
-		for (const c of children) {
+		for (const c of Array.from(children)) {
 			node.appendChild(c);
 		}
 	}
