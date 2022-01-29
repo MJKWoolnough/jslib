@@ -505,6 +505,19 @@ test("amendNode event EventListenerObject remove", async () => {
 	return res === 0;
 });
 
+
+test("amendNode event signal", async () => {
+	let res = 0;
+	const {amendNode} = await import("./lib/dom.js"),
+	      ac = new AbortController(),
+	      div = amendNode(document.createElement("div"), {"onclick": [() => res++, {"signal": ac.signal}, false]});
+	div.click();
+	div.click();
+	ac.abort();
+	div.click();
+	return res === 2;
+});
+
 test("amendNode string child", async () => {
 	const {amendNode} = await import("./lib/dom.js");
 	return amendNode(document.createElement("div"), "Test String").innerText === "Test String";
