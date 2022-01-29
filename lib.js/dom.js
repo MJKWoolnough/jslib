@@ -7,7 +7,7 @@ const childrenArr = (node, children) => {
 		}
 	} else if (children instanceof Node) {
 		node.appendChild(children);
-	} else if (children instanceof NodeList) {
+	} else if (children instanceof NodeList || children instanceof HTMLCollection) {
 		for (const c of Array.from(children)) {
 			node.appendChild(c);
 		}
@@ -24,7 +24,7 @@ const childrenArr = (node, children) => {
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object;
 
 export const amendNode = (node, properties, children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node) {
 		children = properties;
 	} else if (typeof properties === "object") {
 		for (const [k, prop] of Object.entries(properties)) {

@@ -16,7 +16,7 @@ type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | Ev
 
 export type Props = Record<string, PropValue>;
 
-export type Children = string | Node | Children[] | NodeList;
+export type Children = string | Node | Children[] | NodeList | HTMLCollection;
 
 export interface DOMBind<T extends Node> {
 	(properties?: Props, children?: Children): T;
@@ -32,7 +32,7 @@ const childrenArr = (node: Node, children: Children) => {
 		}
 	} else if (children instanceof Node) {
 		node.appendChild(children);
-	} else if (children instanceof NodeList) {
+	} else if (children instanceof NodeList || children instanceof HTMLCollection) {
 		for (const c of Array.from(children)) {
 			node.appendChild(c);
 		}
@@ -49,7 +49,7 @@ const childrenArr = (node: Node, children: Children) => {
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object;
 
 export const amendNode: mElement = (node: Node, properties?: Props | Children, children?: Children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof Node) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node) {
 		children = properties;
 	} else if (typeof properties === "object") {
 		for (const [k, prop] of Object.entries(properties)) {
