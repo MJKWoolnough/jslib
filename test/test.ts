@@ -21,7 +21,6 @@ declare const pageLoad: Promise<void>;
 		      libCom = document.createElement("span");
 		let libTotalNum = 0,
 	 	    libCompleteNum = 0;
-		libDet.toggleAttribute("open", true);
 		for (const [section, tests] of Object.entries(libTests)) {
 			const sectionDet = libDet.appendChild(document.createElement("details")),
 			      sectionSum = sectionDet.appendChild(document.createElement("summary")),
@@ -29,7 +28,6 @@ declare const pageLoad: Promise<void>;
 			      ul = sectionDet.appendChild(document.createElement("ul"));
 			let sectionTotalNum = 0,
 			    sectionCompleteNum = 0;
-			sectionDet.toggleAttribute("open", true);
 			for (const [desc, test] of Object.entries(tests)) {
 				sectionTotalNum++;
 				libTotalNum++;
@@ -43,6 +41,9 @@ declare const pageLoad: Promise<void>;
 						sectionCom.innerText = (++sectionCompleteNum)+"";
 						libCom.innerText = (++libCompleteNum)+"";
 						completeSpan.innerText = (++completeNum)+"";
+					} else {
+						sectionDet.toggleAttribute("open", true);
+						libDet.toggleAttribute("open", true);
 					}
 				}).catch(handleError);
 			}
