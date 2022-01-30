@@ -2,13 +2,7 @@ declare const pageLoad: Promise<void>;
 
 ((data: Record<string, Record<string, Record<string, () => Promise<boolean>>>>) => {
 	const completeSpan = document.createElement("span"),
-	      totalSpan = document.createElement("span"),
 	      df = document.createDocumentFragment();
-	df.append("Tests: ", completeSpan, "/", totalSpan);
-	pageLoad.then(() => {
-		document.body.innerText = "";
-		document.body.append(df);
-	});
 	let completeNum = 0,
 	    totalNum = 0;
 	for (const [library, libTests] of Object.entries(data)) {
@@ -50,7 +44,10 @@ declare const pageLoad: Promise<void>;
 		}
 		libSum.append(library + ": ", libCom, "/" + libTotalNum);
 	}
-	totalSpan.innerText = totalNum+"";
+	pageLoad.then(() => {
+		document.body.innerText = "";
+		document.body.append("Tests: ", completeSpan, "/", totalNum+"", df);
+	});
 })({
 	"inter.js": {
 		"Pipe": {
