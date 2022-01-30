@@ -5,11 +5,11 @@ declare const pageLoad: Promise<void>;
 	      totalSpan = document.createElement("span"),
 	      df = document.createDocumentFragment();
 	df.append("Tests: ", completeSpan, "/", totalSpan);
-	let p = pageLoad.then(() => {
+	pageLoad.then(() => {
 		document.body.innerText = "";
 		document.body.append(df);
-	    }),
-	    completeNum = 0,
+	});
+	let completeNum = 0,
 	    totalNum = 0;
 	for (const [library, libTests] of Object.entries(data)) {
 		const libDet = df.appendChild(document.createElement("details")),
@@ -31,8 +31,7 @@ declare const pageLoad: Promise<void>;
 				const li = ul.appendChild(document.createElement("li"));
 				li.innerText = desc;
 				li.setAttribute("title", test.toString());
-				p = p.finally(async () => {
-					const pass = await test();
+				test().then(pass => {
 					li.setAttribute("class", pass ? "pass" : "fail");
 					if (pass) {
 						sectionCom.innerText = (++sectionCompleteNum)+"";
