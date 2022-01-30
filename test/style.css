@@ -36,3 +36,7 @@ li.fail:before {
 	color: #000;
 	content: "FAIL";
 }
+
+details > details {
+	margin-left: 1em;
+}
