@@ -53,7 +53,6 @@ declare const pageLoad: Promise<void>;
 	}
 	totalSpan.innerText = totalNum+"";
 })({
-	"init": {"pageLoad": {"pageLoad": () => Promise.resolve(true)}},
 	"inter.js": {
 		"Pipe": {
 			"Send/Receive": async () => {
