@@ -1,11 +1,7 @@
 declare const pageLoad: Promise<void>;
 
 ((data: Record<string, Record<string, Record<string, () => Promise<boolean>>>>) => {
-	const handleError = (e: any) => {
-		console.log(e);
-		alert(e instanceof Error ? e.message : e instanceof Error ? e.message : e);
-	      },
-	      completeSpan = document.createElement("span"),
+	const completeSpan = document.createElement("span"),
 	      totalSpan = document.createElement("span"),
 	      df = document.createDocumentFragment();
 	df.append("Tests: ", completeSpan, "/", totalSpan);
@@ -15,7 +11,7 @@ declare const pageLoad: Promise<void>;
 	    }),
 	    completeNum = 0,
 	    totalNum = 0;
-	for (const [lib, libTests] of Object.entries(data)) {
+	for (const [library, libTests] of Object.entries(data)) {
 		const libDet = df.appendChild(document.createElement("details")),
 		      libSum = libDet.appendChild(document.createElement("summary")),
 		      libCom = document.createElement("span");
@@ -45,11 +41,14 @@ declare const pageLoad: Promise<void>;
 						sectionDet.toggleAttribute("open", true);
 						libDet.toggleAttribute("open", true);
 					}
-				}).catch(handleError);
+				}).catch((error: any) => {
+					console.log({library, section, error});
+					alert(`Error in library ${library}, section ${section}: check console for details`);
+				});
 			}
 			sectionSum.append(section + ": ", sectionCom, "/" + sectionTotalNum);
 		}
-		libSum.append(lib + ": ", libCom, "/" + libTotalNum);
+		libSum.append(library + ": ", libCom, "/" + libTotalNum);
 	}
 	totalSpan.innerText = totalNum+"";
 })({
