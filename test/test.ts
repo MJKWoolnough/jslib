@@ -30,6 +30,7 @@ declare const pageLoad: Promise<void>;
 				totalNum++;
 				const li = ul.appendChild(document.createElement("li"));
 				li.innerText = desc;
+				li.setAttribute("title", test.toString());
 				p = p.finally(async () => {
 					const pass = await test();
 					li.setAttribute("class", pass ? "pass" : "fail");
