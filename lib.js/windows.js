@@ -370,13 +370,12 @@ export class WindowElement extends BaseElement {
 			focusingWindow = this;
 			const s = this.#slot,
 			      {scrollTop, scrollLeft} = s,
-			      scrolls = scrollTop || scrollLeft ? [[s, scrollTop, scrollLeft]] : [];
-			for (const elm of walkNode(this, true)) {
-				if (elm instanceof Element) {
-					const {scrollTop, scrollLeft} = elm;
-					if (scrollTop || scrollLeft) {
-						scrolls.push([elm, scrollTop, scrollLeft]);
-					}
+			      scrolls = scrollTop || scrollLeft ? [[s, scrollTop, scrollLeft]] : [],
+			      ni = document.createNodeIterator(this, NodeFilter.SHOW_ELEMENT);
+			for (let elm = ni.nextNode(); elm; elm = ni.nextNode()) {
+				const {scrollTop, scrollLeft} = elm;
+				if (scrollTop || scrollLeft) {
+					scrolls.push([elm, scrollTop, scrollLeft]);
 				}
 			}
 			amendNode(this.parentNode, this);

@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import {amendNode, autoFocus, event, eventCapture, walkNode} from './dom.js';
+import {amendNode, autoFocus, event, eventCapture} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 import {ns as svgNS} from './svg.js';
 
@@ -600,13 +600,12 @@ export class WindowElement extends BaseElement {
 			focusingWindow = this;
 			const s = this.#slot,
 			      {scrollTop, scrollLeft} = s,
-			      scrolls: [Element, number, number][] = scrollTop || scrollLeft ? [[s, scrollTop, scrollLeft]] : [];
-			for (const elm of walkNode(this, true)) {
-				if (elm instanceof Element) {
-					const {scrollTop, scrollLeft} = elm;
-					if (scrollTop || scrollLeft) {
-						scrolls.push([elm, scrollTop, scrollLeft]);
-					}
+			      scrolls: [Element, number, number][] = scrollTop || scrollLeft ? [[s, scrollTop, scrollLeft]] : [],
+			      ni = document.createNodeIterator(this, NodeFilter.SHOW_ELEMENT);
+			for (let elm = ni.nextNode() as Element | null; elm; elm = ni.nextNode() as Element | null) {
+				const {scrollTop, scrollLeft} = elm;
+				if (scrollTop || scrollLeft) {
+					scrolls.push([elm, scrollTop, scrollLeft]);
 				}
 			}
 			amendNode(this.parentNode, this);
