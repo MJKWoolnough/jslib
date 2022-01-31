@@ -25,12 +25,12 @@
 			    sectionCompleteNum = 0,
 			    sectionFails = 0;
 			sectionFail.setAttribute("class", "fails");
-			for (const [desc, test] of Object.entries(tests)) {
+			for (const [description, test] of Object.entries(tests)) {
 				sectionTotalNum++;
 				libTotalNum++;
 				totalNum++;
 				const li = ul.appendChild(document.createElement("li"));
-				li.innerText = desc;
+				li.innerText = description;
 				li.setAttribute("title", test.toString());
 				test().then(pass => {
 					li.setAttribute("class", pass ? "pass" : "fail");
@@ -46,7 +46,7 @@
 						failSpan.innerText = (++failNum)+"";
 					}
 				}).catch((error: any) => {
-					console.log({library, section, error});
+					console.log({library, section, description, error});
 					alert(`Error in library ${library}, section ${section}: check console for details`);
 				});
 			}
