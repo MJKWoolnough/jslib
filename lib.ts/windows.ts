@@ -598,11 +598,9 @@ export class WindowElement extends BaseElement {
 		}
 		if (this.parentNode && this.nextElementSibling) {
 			focusingWindow = this;
-			const s = this.#slot,
-			      {scrollTop, scrollLeft} = s,
-			      scrolls: [Element, number, number][] = scrollTop || scrollLeft ? [[s, scrollTop, scrollLeft]] : [],
+			const scrolls: [Element, number, number][] = [],
 			      ni = document.createNodeIterator(this, NodeFilter.SHOW_ELEMENT);
-			for (let elm = ni.nextNode() as Element | null; elm; elm = ni.nextNode() as Element | null) {
+			for (let elm = this.#slot as Element | null; elm; elm = ni.nextNode() as Element | null) {
 				const {scrollTop, scrollLeft} = elm;
 				if (scrollTop || scrollLeft) {
 					scrolls.push([elm, scrollTop, scrollLeft]);
