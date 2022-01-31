@@ -1,5 +1,3 @@
-declare const pageLoad: Promise<void>;
-
 ((data: Record<string, Record<string, Record<string, () => Promise<boolean>>>>) => {
 	const completeSpan = document.createElement("span"),
 	      failSpan = document.createElement("span"),
@@ -56,7 +54,7 @@ declare const pageLoad: Promise<void>;
 		}
 		libSum.append(library + ": ", libCom, "/" + libTotalNum, libFail);
 	}
-	pageLoad.then(() => document.body.replaceChildren("Tests: ", completeSpan, "/", totalNum+"", failSpan, df));
+	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", completeSpan, "/", totalNum+"", failSpan, df));
 })({
 	"inter.js": {
 		"Pipe": {
