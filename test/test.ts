@@ -44,10 +44,7 @@ declare const pageLoad: Promise<void>;
 		}
 		libSum.append(library + ": ", libCom, "/" + libTotalNum);
 	}
-	pageLoad.then(() => {
-		document.body.innerText = "";
-		document.body.append("Tests: ", completeSpan, "/", totalNum+"", df);
-	});
+	pageLoad.then(() => document.body.replaceChildren("Tests: ", completeSpan, "/", totalNum+"", df));
 })({
 	"inter.js": {
 		"Pipe": {
