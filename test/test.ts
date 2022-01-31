@@ -622,6 +622,43 @@
 				      df = createDocumentFragment(["Text", div]);
 				return df.firstChild instanceof Text && df.firstChild.textContent === "Text" && df.lastChild === div;
 			}
+		},
+		"clearNode": {
+			"empty": async () => {
+				const {clearNode} = await import("./lib/dom.js"),
+				      n = document.createElement("div");
+				n.append(document.createElement("div"), document.createElement("div"));
+				clearNode(n);
+				return n.childNodes.length === 0;
+			},
+			"empty with string": async () => {
+				const {clearNode} = await import("./lib/dom.js"),
+				      n = document.createElement("div");
+				n.append(document.createElement("div"), document.createElement("div"));
+				clearNode(n, "TEXT");
+				return n.textContent === "TEXT";
+			},
+			"empty with params + string": async () => {
+				const {clearNode} = await import("./lib/dom.js"),
+				      n = document.createElement("div");
+				n.append(document.createElement("div"), document.createElement("div"));
+				clearNode(n, {"property": "value"}, "TEXT");
+				return n.getAttribute("property") === "value" && n.textContent === "TEXT";
+			},
+			"empty with node": async () => {
+				const {clearNode} = await import("./lib/dom.js"),
+				      n = document.createElement("div");
+				n.append(document.createElement("div"), document.createElement("div"));
+				clearNode(n, document.createElement("span"));
+				return n.firstChild instanceof HTMLSpanElement;
+			},
+			"empty with params + node": async () => {
+				const {clearNode} = await import("./lib/dom.js"),
+				      n = document.createElement("div");
+				n.append(document.createElement("div"), document.createElement("div"));
+				clearNode(n, {"property": "value"}, document.createElement("span"));
+				return n.getAttribute("property") === "value" && n.firstChild instanceof HTMLSpanElement;
+			}
 		}
 	}
 });
