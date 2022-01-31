@@ -38,12 +38,6 @@ const childrenArr = (node: Node, children: Children) => {
 		}
 	}
       },
-      deepestChild = (node: Node) => {
-	while (node.firstChild) {
-		node = node.firstChild;
-	}
-	return node;
-      },
       isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function),
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object;
@@ -128,13 +122,4 @@ autoFocus = <T extends HTMLElement | SVGElement>(node: T, inputSelect = true) =>
 		}
 	}, 0);
 	return node;
-},
-walkNode = function* (elm: Node, self = false): Generator<Node, true | undefined> {
-	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode!) {
-		while (yield e) {}
-	}
-	if (self) {
-		while (yield elm) {}
-	}
-	return;
 };

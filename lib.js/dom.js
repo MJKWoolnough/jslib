@@ -13,12 +13,6 @@ const childrenArr = (node, children) => {
 		}
 	}
       },
-      deepestChild = node => {
-	while (node.firstChild) {
-		node = node.firstChild;
-	}
-	return node;
-      },
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || (prop instanceof Object && prop.handleEvent instanceof Function),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object;
@@ -103,12 +97,4 @@ autoFocus = (node, inputSelect = true) => {
 		}
 	}, 0);
 	return node;
-},
-walkNode = function* (elm, self) {
-	for (let e = deepestChild(elm); e !== elm; e = e.nextSibling ? deepestChild(e.nextSibling) : e.parentNode) {
-		while (yield e) {}
-	}
-	if (self) {
-		while (yield elm) {}
-	}
 };
