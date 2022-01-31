@@ -41,3 +41,18 @@ li.fail:before {
 details > details {
 	margin-left: 1em;
 }
+
+.fails:empty {
+	display: none;
+}
+
+.fails {
+	color: #f00;
+}
+
+.fails:before {
+	display: inline-block;
+	content: "FAIL(S): ";
+	margin-left: 1em;
+	margin-right: 0.5em;
+}
