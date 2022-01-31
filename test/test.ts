@@ -659,6 +659,33 @@
 				clearNode(n, {"property": "value"}, document.createElement("span"));
 				return n.getAttribute("property") === "value" && n.firstChild instanceof HTMLSpanElement;
 			}
+		},
+		"autoFocus": {
+			"focus()": async () => {
+				let fn = (_b: boolean) => {};
+				const {autoFocus} = await import("./lib/dom.js"),
+				      p = new Promise<boolean>(sFn => fn = sFn),
+				      focusElement = class extends HTMLElement {
+					focus() {fn(true);}
+				      };
+				customElements.define("focus-element", focusElement);
+				autoFocus(new focusElement());
+				window.setTimeout(() => fn(false), 1000);
+				return p;
+			},
+			"select()": async () => {
+				let fn = (_b: boolean) => {};
+				const {autoFocus} = await import("./lib/dom.js"),
+				      p = new Promise<boolean>(sFn => fn = sFn),
+				      selectElement = class extends HTMLInputElement {
+					focus() {}
+					select() {fn(true);}
+				      };
+				customElements.define("select-element", selectElement, {"extends": 'input'});
+				autoFocus(new selectElement());
+				window.setTimeout(() => fn(false), 1000);
+				return p;
+			}
 		}
 	}
 });
