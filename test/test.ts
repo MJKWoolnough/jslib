@@ -306,8 +306,9 @@
 				const {amendNode} = await import("./lib/dom.js");
 				return amendNode(document.createElement("span")) instanceof HTMLSpanElement;
 			},
-			"no property": () => {
-				return Promise.resolve(document.createElement("div").getAttribute("property") === null);
+			"no property": async () => {
+				const {amendNode} = await import("./lib/dom.js");
+				return amendNode(document.createElement("div")).getAttribute("property") === null;
 			},
 			"string property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
@@ -647,44 +648,44 @@
 			},
 			"empty with node": async () => {
 				const {clearNode} = await import("./lib/dom.js"),
-				      n = document.createElement("div");
+				      n = document.createElement("div"),
+				      s = document.createElement("span");
 				n.append(document.createElement("div"), document.createElement("div"));
-				clearNode(n, document.createElement("span"));
-				return n.firstChild instanceof HTMLSpanElement;
+				clearNode(n, s);
+				return n.firstChild === s;
 			},
 			"empty with params + node": async () => {
 				const {clearNode} = await import("./lib/dom.js"),
-				      n = document.createElement("div");
+				      n = document.createElement("div"),
+				      s = document.createElement("span");
 				n.append(document.createElement("div"), document.createElement("div"));
-				clearNode(n, {"property": "value"}, document.createElement("span"));
-				return n.getAttribute("property") === "value" && n.firstChild instanceof HTMLSpanElement;
+				clearNode(n, {"property": "value"}, s);
+				return n.getAttribute("property") === "value" && n.firstChild === s;
 			}
 		},
 		"autoFocus": {
 			"focus()": async () => {
-				let fn = (_b: boolean) => {};
-				const {autoFocus} = await import("./lib/dom.js"),
-				      p = new Promise<boolean>(sFn => fn = sFn),
-				      focusElement = class extends HTMLElement {
-					focus() {fn(true);}
-				      };
-				customElements.define("focus-element", focusElement);
-				autoFocus(new focusElement());
-				window.setTimeout(() => fn(false), 1000);
-				return p;
+				const {autoFocus} = await import("./lib/dom.js");
+				return new Promise<boolean>(fn => {
+					class focusElement extends HTMLElement {
+						focus() {fn(true);}
+					}
+					customElements.define("focus-element", focusElement);
+					autoFocus(new focusElement());
+					window.setTimeout(() => fn(false), 1000);
+				});
 			},
 			"select()": async () => {
-				let fn = (_b: boolean) => {};
-				const {autoFocus} = await import("./lib/dom.js"),
-				      p = new Promise<boolean>(sFn => fn = sFn),
-				      selectElement = class extends HTMLInputElement {
-					focus() {}
-					select() {fn(true);}
-				      };
-				customElements.define("select-element", selectElement, {"extends": 'input'});
-				autoFocus(new selectElement());
-				window.setTimeout(() => fn(false), 1000);
-				return p;
+				const {autoFocus} = await import("./lib/dom.js");
+				return new Promise<boolean>(fn => {
+					class selectElement extends HTMLInputElement {
+						focus() {}
+						select() {fn(true);}
+					}
+					customElements.define("select-element", selectElement, {"extends": "input"});
+					autoFocus(new selectElement());
+					window.setTimeout(() => fn(false), 1000);
+				});
 			}
 		}
 	}
