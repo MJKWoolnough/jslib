@@ -2,22 +2,31 @@ declare const pageLoad: Promise<void>;
 
 ((data: Record<string, Record<string, Record<string, () => Promise<boolean>>>>) => {
 	const completeSpan = document.createElement("span"),
+	      failSpan = document.createElement("span"),
 	      df = document.createDocumentFragment();
 	let completeNum = 0,
-	    totalNum = 0;
+	    totalNum = 0,
+	    failNum = 0;
+	failSpan.setAttribute("class", "fails");
 	for (const [library, libTests] of Object.entries(data)) {
 		const libDet = df.appendChild(document.createElement("details")),
 		      libSum = libDet.appendChild(document.createElement("summary")),
-		      libCom = document.createElement("span");
+		      libCom = document.createElement("span"),
+		      libFail = document.createElement("span");
 		let libTotalNum = 0,
-	 	    libCompleteNum = 0;
+		    libCompleteNum = 0,
+		    libFails = 0;
+		libFail.setAttribute("class", "fails");
 		for (const [section, tests] of Object.entries(libTests)) {
 			const sectionDet = libDet.appendChild(document.createElement("details")),
 			      sectionSum = sectionDet.appendChild(document.createElement("summary")),
 			      sectionCom = document.createElement("span"),
+			      sectionFail = document.createElement("span"),
 			      ul = sectionDet.appendChild(document.createElement("ul"));
 			let sectionTotalNum = 0,
-			    sectionCompleteNum = 0;
+			    sectionCompleteNum = 0,
+			    sectionFails = 0;
+			sectionFail.setAttribute("class", "fails");
 			for (const [desc, test] of Object.entries(tests)) {
 				sectionTotalNum++;
 				libTotalNum++;
@@ -34,17 +43,20 @@ declare const pageLoad: Promise<void>;
 					} else {
 						sectionDet.toggleAttribute("open", true);
 						libDet.toggleAttribute("open", true);
+						sectionFail.innerText = (++sectionFails)+"";
+						libFail.innerText = (++libFails)+"";
+						failSpan.innerText = (++failNum)+"";
 					}
 				}).catch((error: any) => {
 					console.log({library, section, error});
 					alert(`Error in library ${library}, section ${section}: check console for details`);
 				});
 			}
-			sectionSum.append(section + ": ", sectionCom, "/" + sectionTotalNum);
+			sectionSum.append(section + ": ", sectionCom, "/" + sectionTotalNum, sectionFail);
 		}
-		libSum.append(library + ": ", libCom, "/" + libTotalNum);
+		libSum.append(library + ": ", libCom, "/" + libTotalNum, libFail);
 	}
-	pageLoad.then(() => document.body.replaceChildren("Tests: ", completeSpan, "/", totalNum+"", df));
+	pageLoad.then(() => document.body.replaceChildren("Tests: ", completeSpan, "/", totalNum+"", failSpan, df));
 })({
 	"inter.js": {
 		"Pipe": {
