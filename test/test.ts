@@ -32,7 +32,11 @@
 				const li = ul.appendChild(document.createElement("li"));
 				li.innerText = description;
 				li.setAttribute("title", test.toString());
-				test().then(pass => {
+				test().catch(error => {
+					console.log({library, section, description, error});
+					alert(`Error in library ${library}, section ${section}: check console for details`);
+					return false;
+				}).then(pass => {
 					li.setAttribute("class", pass ? "pass" : "fail");
 					if (pass) {
 						sectionCom.innerText = (++sectionCompleteNum)+"";
@@ -45,9 +49,6 @@
 						libFail.innerText = (++libFails)+"";
 						failSpan.innerText = (++failNum)+"";
 					}
-				}).catch(error => {
-					console.log({library, section, description, error});
-					alert(`Error in library ${library}, section ${section}: check console for details`);
 				});
 			}
 			sectionSum.append(section + ": ", sectionCom, "/" + sectionTotalNum, sectionFail);
