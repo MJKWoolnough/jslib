@@ -763,7 +763,6 @@
 		"svgData": {
 			"svg to string": async () => {
 				const {g, rect, svg, svgData} = await import("./lib/svg.js");
-				console.log(svgData(svg({"viewBox": "0 0 100 100"}, g(rect({"width": 100, "height": 200})))));
 				return svgData(svg({"viewBox": "0 0 100 100"}, g(rect({"width": 100, "height": 200})))) === "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%3E%3Crect%20width%3D%22100%22%20height%3D%22200%22%3E%3C%2Frect%3E%3C%2Fg%3E%3C%2Fsvg%3E";
 			}
 		}
