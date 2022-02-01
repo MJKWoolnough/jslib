@@ -34,7 +34,7 @@
 				li.setAttribute("title", test.toString());
 				test().catch(error => {
 					console.log({library, section, description, error});
-					alert(`Error in library ${library}, section ${section}: check console for details`);
+					alert(`Error in library ${library}, section ${section}, test "${description}": check console for details`);
 					return false;
 				}).then(pass => {
 					li.setAttribute("class", pass ? "pass" : "fail");
