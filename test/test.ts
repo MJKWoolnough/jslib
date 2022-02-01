@@ -668,26 +668,25 @@
 		"autoFocus": {
 			"focus()": async () => {
 				const {autoFocus} = await import("./lib/dom.js");
-				return new Promise<boolean>(fn => {
-					class focusElement extends HTMLElement {
-						focus() {fn(true);}
-					}
-					customElements.define("focus-element", focusElement);
-					autoFocus(new focusElement());
-					window.setTimeout(() => fn(false), 1000);
-				});
+				let res = 0;
+				class focusElement extends HTMLElement {
+					focus() {res++;}
+					select() {res *= 2;}
+				}
+				customElements.define("focus-element", focusElement);
+				autoFocus(new focusElement());
+				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 1), 100));
 			},
 			"select()": async () => {
 				const {autoFocus} = await import("./lib/dom.js");
-				return new Promise<boolean>(fn => {
-					class selectElement extends HTMLInputElement {
-						focus() {}
-						select() {fn(true);}
-					}
-					customElements.define("select-element", selectElement, {"extends": "input"});
-					autoFocus(new selectElement());
-					window.setTimeout(() => fn(false), 1000);
-				});
+				let res = 0;
+				class selectElement extends HTMLInputElement {
+					focus() {res++;}
+					select() {res *= 2;}
+				}
+				customElements.define("select-element", selectElement, {"extends": "input"});
+				autoFocus(new selectElement());
+				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 2), 100));
 			}
 		}
 	}
