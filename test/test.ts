@@ -724,5 +724,47 @@
 				return span() instanceof HTMLSpanElement;
 			}
 		}
+	},
+	"svg.js": {
+		"elements": {
+			"a": async () => {
+				const {a} = await import("./lib/svg.js");
+				return a() instanceof SVGAElement;
+			},
+			"a with child": async () => {
+				const {a} = await import("./lib/svg.js"),
+				      child = a();
+				return a(child).firstChild === child;
+			},
+			"a with props": async () => {
+				const {a} = await import("./lib/svg.js");
+				return a({"property": "value"}).getAttribute("property") === "value";
+			},
+			"a with props + child": async () => {
+				const {a} = await import("./lib/svg.js"),
+				      child = a(),
+				      e = a({"property": "value"}, child);
+				return e.getAttribute("property") === "value" && e.firstChild === child;
+			},
+			"g": async () => {
+				const {g} = await import("./lib/svg.js");
+				return g() instanceof SVGGElement;
+			},
+			"path": async () => {
+				const {path} = await import("./lib/svg.js");
+				return path() instanceof SVGPathElement;
+			},
+			"rect": async () => {
+				const {rect} = await import("./lib/svg.js");
+				return rect() instanceof SVGRectElement;
+			}
+		},
+		"svgData": {
+			"svg to string": async () => {
+				const {g, rect, svg, svgData} = await import("./lib/svg.js");
+				console.log(svgData(svg({"viewBox": "0 0 100 100"}, g(rect({"width": 100, "height": 200})))));
+				return svgData(svg({"viewBox": "0 0 100 100"}, g(rect({"width": 100, "height": 200})))) === "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%3E%3Crect%20width%3D%22100%22%20height%3D%22200%22%3E%3C%2Frect%3E%3C%2Fg%3E%3C%2Fsvg%3E";
+			}
+		}
 	}
 });
