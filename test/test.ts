@@ -45,7 +45,7 @@
 						libFail.innerText = (++libFails)+"";
 						failSpan.innerText = (++failNum)+"";
 					}
-				}).catch((error: any) => {
+				}).catch(error => {
 					console.log({library, section, description, error});
 					alert(`Error in library ${library}, section ${section}: check console for details`);
 				});
