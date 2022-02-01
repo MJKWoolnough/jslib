@@ -689,5 +689,40 @@
 				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 2), 100));
 			}
 		}
+	},
+	"html.js": {
+		"elements": {
+			"a": async () => {
+				const {a} = await import("./lib/html.js");
+				return a() instanceof HTMLAnchorElement;
+			},
+			"a with child": async () => {
+				const {a} = await import("./lib/html.js"),
+				      child = a();
+				return a(child).firstChild === child;
+			},
+			"a with props": async () => {
+				const {a} = await import("./lib/html.js");
+				return a({"property": "value"}).getAttribute("property") === "value";
+			},
+			"a with props + child": async () => {
+				const {a} = await import("./lib/html.js"),
+				      child = a(),
+				      e = a({"property": "value"}, child);
+				return e.getAttribute("property") === "value" && e.firstChild === child;
+			},
+			"div": async () => {
+				const {div} = await import("./lib/html.js");
+				return div() instanceof HTMLDivElement;
+			},
+			"img": async () => {
+				const {img} = await import("./lib/html.js");
+				return img() instanceof HTMLImageElement;
+			},
+			"span": async () => {
+				const {span} = await import("./lib/html.js");
+				return span() instanceof HTMLSpanElement;
+			}
+		}
 	}
 });
