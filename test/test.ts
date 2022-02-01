@@ -54,7 +54,7 @@
 		}
 		libSum.append(library + ": ", libCom, "/" + libTotalNum, libFail);
 	}
-	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", completeSpan, "/", totalNum+"", failSpan, df));
+	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", completeSpan, "/" + totalNum, failSpan, df));
 })({
 	"inter.js": {
 		"Pipe": {
