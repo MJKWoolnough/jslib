@@ -299,12 +299,14 @@
 	"dom.js": {
 		"amendNode": {
 			"type test (div)": async () => {
-				const {amendNode} = await import("./lib/dom.js");
-				return amendNode(document.createElement("div")) instanceof HTMLDivElement;
+				const {amendNode} = await import("./lib/dom.js"),
+				      div = document.createElement("div");
+				return amendNode(div) === div && div instanceof HTMLDivElement;
 			},
 			"type test (span)": async () => {
-				const {amendNode} = await import("./lib/dom.js");
-				return amendNode(document.createElement("span")) instanceof HTMLSpanElement;
+				const {amendNode} = await import("./lib/dom.js"),
+				      span = document.createElement("span");
+				return amendNode(span) === span && span instanceof HTMLSpanElement;
 			},
 			"no property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
