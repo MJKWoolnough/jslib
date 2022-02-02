@@ -801,7 +801,11 @@
 			"JSON number array echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
 				return HTTPRequest("/echo", {"method": "POST", "data": "[123, 456]", "response": "json"}).then(data => data instanceof Array && data.length === 2 && data[0] === 123 && data[1] === 456);
-			}
+			},
+			"XML echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST", "data": "<xml><elm property=\"value\" /></xml>", "response": "xml"}).then(doc => doc instanceof XMLDocument && doc.children[0] && doc.children[0].localName === "xml" && doc.children[0].children[0] && doc.children[0].children[0].localName === "elm" && doc.children[0].children[0].getAttribute("property") === "value");
+			},
 		}
 	}
 });
