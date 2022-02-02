@@ -17,6 +17,7 @@ func main() {
 func run() error {
 	m := http.NewServeMux()
 	m.Handle("/", http.FileServer(http.Dir("./")))
+	m.Handle("/static", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("123")) }))
 	m.Handle("/echo", http.HandlerFunc(echo))
 	return http.ListenAndServe(":8080", m)
 }
