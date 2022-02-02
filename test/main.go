@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+
+	"golang.org/x/net/websocket"
 )
 
 func main() {
@@ -44,5 +46,6 @@ func run() error {
 			PostForm:      r.PostForm,
 		})
 	}))
+	m.Handle("/socket", websocket.Handler(func(conn *websocket.Conn) { io.Copy(conn, conn) }))
 	return http.ListenAndServe(":8080", m)
 }
