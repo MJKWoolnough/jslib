@@ -61,6 +61,7 @@ export const HTTPRequest = (url: string, props: properties = {}) => new Promise(
 		break;
 	case "xml":
 		xh.overrideMimeType("text/xml");
+		xh.responseType = "document"
 		break;
 	case "document":
 	case "blob":

@@ -50,6 +50,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		break;
 	case "xml":
 		xh.overrideMimeType("text/xml");
+		xh.responseType = "document";
 		break;
 	case "document":
 	case "blob":
