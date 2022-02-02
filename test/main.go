@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 )
 
@@ -19,6 +21,7 @@ func run() error {
 	m.Handle("/", http.FileServer(http.Dir("./")))
 	m.Handle("/static", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("123")) }))
 	m.Handle("/echo", http.HandlerFunc(echo))
+	m.Handle("/request", http.HandlerFunc(request))
 	return http.ListenAndServe(":8080", m)
 }
 
@@ -29,4 +32,21 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	}
 	io.Copy(w, r.Body)
 	r.Body.Close()
+}
+
+func request(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	json.NewEncoder(w).Encode(struct {
+		Method        string      `json:"method"`
+		Headers       http.Header `json:"headers"`
+		ContentLength int64       `json:"contentLength"`
+		Form          url.Values  `json:"form"`
+		PostForm      url.Values  `json:"postForm"`
+	}{
+		Method:        r.Method,
+		Headers:       r.Header,
+		ContentLength: r.ContentLength,
+		Form:          r.Form,
+		PostForm:      r.PostForm,
+	})
 }
