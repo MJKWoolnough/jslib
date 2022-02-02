@@ -771,5 +771,37 @@
 				return svgData(svg) === "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%3E%3Crect%20width%3D%22100%22%20height%3D%2250%22%3E%3C%2Frect%3E%3C%2Fg%3E%3C%2Fsvg%3E";
 			}
 		}
+	},
+	"conn.js": {
+		"HTTPRequest": {
+			"GET": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/static").then(data => data === "123");
+			},
+			"blank GET echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo").then(data => data === "");
+			},
+			"blank GET data echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"data": "BAD"}).then(data => data === "");
+			},
+			"blank POST echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST"}).then(data => data === "");
+			},
+			"simple echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST", "data": "123"}).then(data => data === "123");
+			},
+			"JSON number echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST", "data": "123", "response": "json"}).then(data => data === 123);
+			},
+			"JSON number array echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST", "data": "[123, 456]", "response": "json"}).then(data => data instanceof Array && data.length === 2 && data[0] === 123 && data[1] === 456);
+			}
+		}
 	}
 });
