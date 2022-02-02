@@ -50,6 +50,7 @@ func run() error {
 		})
 	}))
 	m.Handle("/socket", websocket.Handler(func(conn *websocket.Conn) { io.Copy(conn, conn) }))
+	m.Handle("/socket-close", websocket.Handler(func(conn *websocket.Conn) { conn.Close() }))
 	m.Handle("/rpc", websocket.Handler(func(conn *websocket.Conn) {
 		var jrpc *jsonrpc.Server
 		jrpc = jsonrpc.New(conn, jsonrpc.HandlerFunc(func(method string, data json.RawMessage) (interface{}, error) {
