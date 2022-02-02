@@ -34,14 +34,16 @@ func run() error {
 	m.Handle("/request", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		json.NewEncoder(w).Encode(struct {
-			Method        string      `json:"method"`
-			Headers       http.Header `json:"headers"`
-			ContentLength int64       `json:"contentLength"`
-			Form          url.Values  `json:"form"`
-			PostForm      url.Values  `json:"postForm"`
+			Method        string     `json:"method"`
+			Auth          string     `json:"auth"`
+			ContentType   string     `json:"contentType"`
+			ContentLength int64      `json:"contentLength"`
+			Form          url.Values `json:"form"`
+			PostForm      url.Values `json:"postForm"`
 		}{
 			Method:        r.Method,
-			Headers:       r.Header,
+			Auth:          r.Header.Get("Authorization"),
+			ContentType:   r.Header.Get("Content-Type"),
 			ContentLength: r.ContentLength,
 			Form:          r.Form,
 			PostForm:      r.PostForm,
