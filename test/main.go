@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"golang.org/x/net/websocket"
+	"vimagination.zapto.org/jsonrpc"
 )
 
 func main() {
@@ -47,5 +48,28 @@ func run() error {
 		})
 	}))
 	m.Handle("/socket", websocket.Handler(func(conn *websocket.Conn) { io.Copy(conn, conn) }))
+	m.Handle("/rpc", websocket.Handler(func(conn *websocket.Conn) {
+		var jrpc *jsonrpc.Server
+		jrpc = jsonrpc.New(conn, jsonrpc.HandlerFunc(func(method string, data json.RawMessage) (interface{}, error) {
+			switch method {
+			case "static":
+				return "123", nil
+			case "echo":
+				return data, nil
+			case "broadcast":
+				jrpc.Send(jsonrpc.Response{
+					ID:     -1,
+					Result: data,
+				})
+				return true, nil
+			}
+			return nil, jsonrpc.Error{
+				Code:    1,
+				Message: "unknown endpoint",
+				Data:    method,
+			}
+		}))
+		jrpc.Handle()
+	}))
 	return http.ListenAndServe(":8080", m)
 }
