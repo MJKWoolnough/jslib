@@ -806,6 +806,26 @@
 				const {HTTPRequest} = await import("./lib/conn.js");
 				return HTTPRequest("/echo", {"method": "POST", "data": "<xml><elm property=\"value\" /></xml>", "response": "xml"}).then(doc => doc instanceof XMLDocument && doc.children[0] && doc.children[0].localName === "xml" && doc.children[0].children[0] && doc.children[0].children[0].localName === "elm" && doc.children[0].children[0].getAttribute("property") === "value");
 			},
+			"Text simple echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST", "data": "123", "response": "text"}).then(data => data === "123");
+			},
+			"Blob echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST", "data": "123", "response": "blob"}).then(blob => blob.text().then(text => text === "123"));
+			},
+			"ArrayBuffer echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST", "data": "123", "response": "arraybuffer"}).then(ab => ab.byteLength === 3 && new Uint8Array(ab).toString() === "49,50,51");
+			},
+			"Content-Type override": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST", "data": "<xml><elm property=\"value\" /></xml>", "type": "application/xml", "response": "xh"}).then(xh => xh.getResponseHeader("Content-Type") === "application/xml");
+			},
+			"Document echo": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/echo", {"method": "POST", "data": "<xml><elm property=\"value\" /></xml>", "response": "document", "type": "text/xml"}).then(doc => doc instanceof Document && doc.children[0] && doc.children[0].localName === "xml" && doc.children[0].children[0] && doc.children[0].children[0].localName === "elm" && doc.children[0].children[0].getAttribute("property") === "value");
+			},
 		}
 	}
 });
