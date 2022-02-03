@@ -5,15 +5,24 @@ type properties = {
 	user?: string;
 	password?: string;
 	headers?: object;
-	type?: string;
+	type?: "text" | "xml" | "json" | "blob" | "arraybuffer" | "xh";
 	response?: string;
 	onprogress?: (event: ProgressEvent) => void;
 	data?: XMLHttpRequestBodyInit;
 }
 
+interface requestReturn {
+	(url: string, props: properties & {"response": "text"}): Promise<string>;
+	(url: string, props: properties & {"response": "xml" | "document"}): Promise<XMLDocument>;
+	(url: string, props: properties & {"response": "blob"}): Promise<Blob>;
+	(url: string, props: properties & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
+	(url: string, props: properties & {"response": "xh"}): Promise<XMLHttpRequest>;
+	(url: string, props?: properties): Promise<any>;
+}
+
 const once = {"once": true};
 
-export const HTTPRequest = (url: string, props: properties = {}) => new Promise((successFn, errorFn) => {
+export const HTTPRequest: requestReturn = (url: string, props: properties = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
 	xh.open(
 		props["method"] !== undefined ? props["method"] : "GET",
