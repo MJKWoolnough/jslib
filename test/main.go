@@ -65,6 +65,9 @@ func run() error {
 					Result: data,
 				})
 				return true, nil
+			case "close":
+				conn.Close()
+				return nil, nil
 			}
 			return nil, jsonrpc.Error{
 				Code:    1,
