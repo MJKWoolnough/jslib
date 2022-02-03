@@ -13,12 +13,12 @@ type properties = {
 }
 
 interface requestReturn {
-	(url: string, props: properties & {"response": "text"}): Promise<string>;
+	(url: string, props?: properties & {"response"?: "text" | ""}): Promise<string>;
 	(url: string, props: properties & {"response": "xml" | "document"}): Promise<XMLDocument>;
 	(url: string, props: properties & {"response": "blob"}): Promise<Blob>;
 	(url: string, props: properties & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
 	(url: string, props: properties & {"response": "xh"}): Promise<XMLHttpRequest>;
-	(url: string, props?: properties): Promise<any>;
+	(url: string, props: properties & {"response": "json"}): Promise<any>;
 }
 
 const once = {"once": true};
