@@ -46,6 +46,7 @@ export class Subscription<T> {
 	#success: (fn: (data: T) => void) => void;
 	#error: (fn: (data: any) => void) => void;
 	#cancel = () => {};
+	#cancelBind?: () => void;
 	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: () => void) => void) => void) {
 		const [successSend, successReceive] = new Pipe<T>().bind(),
 		      [errorSend, errorReceive] = new Pipe<any>().bind();
@@ -55,8 +56,8 @@ export class Subscription<T> {
 	}
 	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
 		const success = this.#success,
-		      error = this.#error;
-		return new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: () => void) => void) => {
+		      error = this.#error,
+		      s = new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: () => void) => void) => {
 			success(successFn instanceof Function ? (data: T) => {
 				try {
 					sFn(successFn(data));
@@ -71,8 +72,10 @@ export class Subscription<T> {
 					eFn(e);
 				}
 			} : eFn);
-			cFn(() => this.#cancel());
+			cFn(this.#cancelBind ?? (this.#cancelBind = () => this.#cancel()));
 		});
+		s.#cancelBind = s.#cancel;
+		return s;
 	}
 	cancel() {
 		this.#cancel();

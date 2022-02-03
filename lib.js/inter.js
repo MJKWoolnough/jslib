@@ -40,6 +40,7 @@ export class Subscription {
 	#success;
 	#error;
 	#cancel = () => {};
+	#cancelBind;
 	constructor(fn) {
 		const [successSend, successReceive] = new Pipe().bind(),
 		      [errorSend, errorReceive] = new Pipe().bind();
@@ -49,8 +50,8 @@ export class Subscription {
 	}
 	then(successFn, errorFn) {
 		const success = this.#success,
-		      error = this.#error;
-		return new Subscription((sFn, eFn, cFn) => {
+		      error = this.#error,
+		      s = new Subscription((sFn, eFn, cFn) => {
 			success(successFn instanceof Function ? data => {
 				try {
 					sFn(successFn(data));
@@ -65,8 +66,10 @@ export class Subscription {
 					eFn(e);
 				}
 			} : eFn);
-			cFn(() => this.#cancel());
+			cFn(this.#cancelBind ?? (this.#cancelBind = () => this.#cancel()));
 		});
+		s.#cancelBind = s.#cancel;
+		return s;
 	}
 	cancel() {
 		this.#cancel();
