@@ -49,17 +49,15 @@ export class Subscription {
 		this.#error = errorReceive;
 	}
 	then(successFn, errorFn) {
-		const success = this.#success,
-		      error = this.#error,
-		      s = new Subscription((sFn, eFn, cFn) => {
-			success(successFn instanceof Function ? data => {
+		const s = new Subscription((sFn, eFn, cFn) => {
+			this.#success(successFn instanceof Function ? data => {
 				try {
 					sFn(successFn(data));
 				} catch (e) {
 					eFn(e);
 				}
 			} : sFn);
-			error(errorFn instanceof Function ? data => {
+			this.#error(errorFn instanceof Function ? data => {
 				try {
 					sFn(errorFn(data));
 				} catch (e) {

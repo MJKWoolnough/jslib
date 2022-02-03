@@ -55,17 +55,15 @@ export class Subscription<T> {
 		this.#error = errorReceive;
 	}
 	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
-		const success = this.#success,
-		      error = this.#error,
-		      s = new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: () => void) => void) => {
-			success(successFn instanceof Function ? (data: T) => {
+		const s = new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: () => void) => void) => {
+			this.#success(successFn instanceof Function ? (data: T) => {
 				try {
 					sFn(successFn(data));
 				} catch (e) {
 					eFn(e);
 				}
 			} : sFn as any);
-			error(errorFn instanceof Function ? (data: any) => {
+			this.#error(errorFn instanceof Function ? (data: any) => {
 				try {
 					sFn(errorFn(data));
 				} catch (e) {
