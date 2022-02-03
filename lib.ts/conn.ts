@@ -5,7 +5,7 @@ type properties = {
 	user?: string;
 	password?: string;
 	headers?: object;
-	type?: "text" | "xml" | "json" | "blob" | "arraybuffer" | "xh";
+	type?: "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
 	response?: string;
 	onprogress?: (event: ProgressEvent) => void;
 	data?: XMLHttpRequestBodyInit;
@@ -42,19 +42,7 @@ export const HTTPRequest: requestReturn = (url: string, props: properties = {}) 
 	xh.addEventListener("readystatechange", () => {
 		if (xh.readyState === 4) {
 			if (xh.status === 200) {
-				switch (props["response"]) {
-				case "text":
-					successFn(xh.responseText);
-					break;
-				case "json":
-					successFn(JSON.parse(xh.responseText));
-					break;
-				case "xh":
-					successFn(xh);
-					break;
-				default:
-					successFn(xh.response);
-				}
+				successFn(props["response"] === "xh" ? xh : xh.response);
 			} else {
 				errorFn(new Error(xh.responseText));
 			}
@@ -67,13 +55,12 @@ export const HTTPRequest: requestReturn = (url: string, props: properties = {}) 
 	case "text":
 		xh.overrideMimeType("text/plain");
 		break;
-	case "json":
-		xh.overrideMimeType("application/json");
-		break;
 	case "xml":
 		xh.overrideMimeType("text/xml");
 		xh.responseType = "document"
 		break;
+	case "json":
+		xh.overrideMimeType("application/json");
 	case "document":
 	case "blob":
 	case "arraybuffer":

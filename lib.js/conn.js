@@ -22,19 +22,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 	xh.addEventListener("readystatechange", () => {
 		if (xh.readyState === 4) {
 			if (xh.status === 200) {
-				switch (props["response"]) {
-				case "text":
-					successFn(xh.responseText);
-					break;
-				case "json":
-					successFn(JSON.parse(xh.responseText));
-					break;
-				case "xh":
-					successFn(xh);
-					break;
-				default:
-					successFn(xh.response);
-				}
+				successFn(props["response"] === "xh" ? xh : xh.response);
 			} else {
 				errorFn(new Error(xh.responseText));
 			}
@@ -47,13 +35,12 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 	case "text":
 		xh.overrideMimeType("text/plain");
 		break;
-	case "json":
-		xh.overrideMimeType("application/json");
-		break;
 	case "xml":
 		xh.overrideMimeType("text/xml");
 		xh.responseType = "document";
 		break;
+	case "json":
+		xh.overrideMimeType("application/json");
 	case "document":
 	case "blob":
 	case "arraybuffer":
