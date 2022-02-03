@@ -32,7 +32,9 @@ export const HTTPRequest: requestReturn = (url: string, props: properties = {}) 
 		props["password"] !== undefined ? props["password"] : null
 	);
 	if (props.hasOwnProperty("headers") && typeof props["headers"] === "object") {
-		Object.entries(props["headers"]).forEach(([header, value]) => xh.setRequestHeader(header, value));
+		for (const [header, value] of Object.entries(props["headers"])) {
+			xh.setRequestHeader(header, value);
+		}
 	}
 	if (props["type"] !== undefined) {
 		xh.setRequestHeader("Content-Type", props["type"]);
