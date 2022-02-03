@@ -5,8 +5,8 @@ type properties = {
 	user?: string;
 	password?: string;
 	headers?: object;
-	type?: "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
-	response?: string;
+	type?: string;
+	response?: "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
 	onprogress?: (event: ProgressEvent) => void;
 	data?: XMLHttpRequestBodyInit;
 }
