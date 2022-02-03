@@ -25,11 +25,11 @@ const once = {"once": true};
 export const HTTPRequest: requestReturn = (url: string, props: properties = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
 	xh.open(
-		props["method"] !== undefined ? props["method"] : "GET",
+		props["method"] ?? "GET",
 		url,
 		true,
-		props["user"] !== undefined ? props["user"] : null,
-		props["password"] !== undefined ? props["password"] : null
+		props["user"] ?? null,
+		props["password"] ?? null
 	);
 	if (props.hasOwnProperty("headers") && typeof props["headers"] === "object") {
 		for (const [header, value] of Object.entries(props["headers"])) {
