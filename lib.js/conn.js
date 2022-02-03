@@ -28,8 +28,11 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 			}
 		}
 	});
-	if (props["onprogress"] !== undefined) {
-		xh.upload.addEventListener("progress", props["onprogress"]);
+	if (props["onuploadprogress"]) {
+		xh.upload.addEventListener("progress", props["onuploadprogress"]);
+	}
+	if (props["ondownloadprogress"]) {
+		xh.addEventListener("progress", props["ondownloadprogress"]);
 	}
 	switch (props["response"]) {
 	case "text":

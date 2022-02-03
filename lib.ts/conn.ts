@@ -7,7 +7,8 @@ type properties = {
 	headers?: object;
 	type?: string;
 	response?: "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
-	onprogress?: (event: ProgressEvent) => void;
+	onuploadprogress?: (event: ProgressEvent) => void;
+	ondownloadprogress?: (event: ProgressEvent) => void;
 	data?: XMLHttpRequestBodyInit;
 }
 
@@ -48,8 +49,11 @@ export const HTTPRequest: requestReturn = (url: string, props: properties = {}) 
 			}
 		}
 	});
-	if (props["onprogress"] !== undefined) {
-		xh.upload.addEventListener("progress", props["onprogress"]);
+	if (props["onuploadprogress"]) {
+		xh.upload.addEventListener("progress", props["onuploadprogress"]);
+	}
+	if (props["ondownloadprogress"]) {
+		xh.addEventListener("progress", props["ondownloadprogress"]);
 	}
 	switch (props["response"]) {
 	case "text":
