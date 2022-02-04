@@ -1,4 +1,3 @@
-import type {WSConn} from './conn.js';
 import {WS} from './conn.js';
 import {Subscription} from './inter.js';
 
@@ -32,13 +31,19 @@ export class RPCError {
 	}
 }
 
-class RPC {
-	#c: WSConn | null;
+interface Conn {
+	close: () => void;
+	send: (data: string) => void;
+	when: (sFn: (data: {data: string}) => void, eFn: (error: string) => void) => void;
+}
+
+export class RPC {
+	#c: Conn | null;
 	#v: number;
 	#id: number = 0;
 	#r = new Map<number, handler>();
 	#a = new Map<number, Set<handler>>();
-	constructor(conn: WSConn, version: number) {
+	constructor(conn: Conn, version: 1 | 1.1 | 2) {
 		this.#c = conn;
 		this.#v = version;
 		conn.when(({data}) => {
