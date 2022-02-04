@@ -46,7 +46,10 @@ export class RPC {
 	constructor(conn: Conn, version: 1 | 1.1 | 2) {
 		this.#c = conn;
 		this.#v = version;
-		conn.when(({data}) => {
+		this.#connInit();
+	}
+	#connInit() {
+		this.#c?.when(({data}) => {
 			const message = JSON.parse(data) as MessageData,
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
 			      e = message.error,
@@ -71,6 +74,11 @@ export class RPC {
 				}
 			}
 		});
+	}
+	reconnect(conn: Conn) {
+		this.#c?.close();
+		this.#c = conn;
+		this.#connInit();
 	}
 	request<T = any>(method: string, data?: any) {
 		const c = this.#c;
