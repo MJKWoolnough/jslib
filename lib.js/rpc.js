@@ -48,7 +48,7 @@ class RPC {
 					r[i](m);
 				}
 			}
-		}, (err) => {
+		}, err => {
 			this.close();
 			const e = new RPCError(-999, err);
 			for (const [, r] of this.#r) {
