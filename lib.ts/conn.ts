@@ -83,11 +83,11 @@ WS = (url: string) => new Promise<WSConn>((successFn, errorFn) => {
 });
 
 export class WSConn extends WebSocket {
-	when<T = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: string) => any) {
+	when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: string) => U) {
 		return new Subscription<MessageEvent>((sFn, eFn, cFn) => {
 			const w = this,
 			      ac = new AbortController(),
-			      o: AddEventListenerOptions = {"signal": ac.signal},
+			      o = {"signal": ac.signal},
 			      end = () => ac.abort();
 			w.addEventListener("message", sFn, o);
 			w.addEventListener("error", (e: Event) => eFn((e as ErrorEvent).error), o);
@@ -98,6 +98,6 @@ export class WSConn extends WebSocket {
 				end();
 			}, o);
 			cFn(end);
-		}).then<T, any>(ssFn, eeFn);
+		}).then<T, U>(ssFn, eeFn);
 	}
 }
