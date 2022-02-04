@@ -81,9 +81,6 @@ class RPC {
 		}) : Promise.reject("RPC Closed");
 	}
 	await(id) {
-		if (!this.#c) {
-			return Promise.reject("RPC Closed");
-		}
 		const h = [noop, noop],
 		      a = this.#a,
 		      s = a.get(id) ?? set(a, id, new Set()),

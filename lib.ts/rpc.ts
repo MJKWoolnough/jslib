@@ -95,9 +95,6 @@ export class RPC {
 		}) : Promise.reject("RPC Closed");
 	}
 	await<T = any>(id: number) {
-		if (!this.#c) {
-			return Promise.reject("RPC Closed");
-		}
 		const h: handler = [noop, noop],
 		      a = this.#a,
 		      s = a.get(id) ?? set(a, id, new Set<handler>()),
