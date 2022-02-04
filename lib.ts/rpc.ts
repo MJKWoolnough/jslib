@@ -86,7 +86,7 @@ export class RPC {
 		return c ? new Promise<T>((sFn, eFn) => {
 			const id = this.#id++,
 			      v = this.#v;
-			this.#r.set(id, [sFn, eFn])
+			this.#r.set(id, [sFn, eFn]);
 			c.send(JSON.stringify({
 				"jsonrpc": v.toFixed(1),
 				id,
