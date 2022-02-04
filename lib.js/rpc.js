@@ -88,13 +88,13 @@ class RPC {
 		return p;
 	}
 	subscribe(id) {
-		return this.#c ? new Subscription((sFn, eFn, cFn) => {
+		return new Subscription((sFn, eFn, cFn) => {
 			const h = [sFn, eFn],
 			      a = this.#a,
 			      s = a.get(id) ?? set(a, id, new Set());
 			s.add(h);
 			cFn(() => s.delete(h));
-		}) : new Subscription((_, eFn) => eFn("RPC Closed"));
+		});
 	}
 	close() {
 		this.#c?.close();

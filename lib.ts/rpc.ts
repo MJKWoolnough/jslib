@@ -97,13 +97,13 @@ class RPC {
 		return p;
 	}
 	subscribe<T = any>(id: number) {
-		return this.#c ? new Subscription<T>((sFn, eFn, cFn) => {
+		return new Subscription<T>((sFn, eFn, cFn) => {
 			const h: handler = [sFn, eFn],
 			      a = this.#a,
 			      s = a.get(id) ?? set(a, id, new Set<handler>());
 			s.add(h);
 			cFn(() => s.delete(h));
-		}) : new Subscription<never>((_, eFn) => eFn("RPC Closed"));
+		});
 	}
 	close() {
 		this.#c?.close();
