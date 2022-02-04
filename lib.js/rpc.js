@@ -68,7 +68,7 @@ class RPC {
 	}
 	request(method, data) {
 		const c = this.#c;
-		return c ?  new Promise((sFn, eFn) => {
+		return c ? new Promise((sFn, eFn) => {
 			const id = this.#id++,
 			      v = this.#v;
 			this.#r.set(id, [sFn, eFn])
