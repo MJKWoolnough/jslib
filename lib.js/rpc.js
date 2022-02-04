@@ -3,7 +3,8 @@ import {Subscription} from './inter.js';
 
 const noop = () => {},
       noops = [noop, noop],
-      set = (m, id, s) => {
+      newSet = (m, id) => {
+	const s = new Set();
 	m.set(id, s);
 	return s;
       };
@@ -83,7 +84,7 @@ class RPC {
 	await(id) {
 		const h = [noop, noop],
 		      a = this.#a,
-		      s = a.get(id) ?? set(a, id, new Set()),
+		      s = a.get(id) ?? newSet(a, id),
 		      p = new Promise((sFn, eFn) => {
 			h[0] = sFn;
 			h[1] = eFn;
@@ -96,7 +97,7 @@ class RPC {
 		return new Subscription((sFn, eFn, cFn) => {
 			const h = [sFn, eFn],
 			      a = this.#a,
-			      s = a.get(id) ?? set(a, id, new Set());
+			      s = a.get(id) ?? newSet(a, id);
 			s.add(h);
 			cFn(() => s.delete(h));
 		});

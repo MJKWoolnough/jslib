@@ -11,7 +11,8 @@ type handler = [(data: any) => void, (data: RPCError) => void];
 
 const noop = () => {},
       noops = [noop, noop],
-      set = (m: Map<number, Set<handler>>, id: number, s: Set<handler>) => {
+      newSet = (m: Map<number, Set<handler>>, id: number) => {
+	const s = new Set<handler>();
 	m.set(id, s);
 	return s;
       };
@@ -97,7 +98,7 @@ export class RPC {
 	await<T = any>(id: number) {
 		const h: handler = [noop, noop],
 		      a = this.#a,
-		      s = a.get(id) ?? set(a, id, new Set<handler>()),
+		      s = a.get(id) ?? newSet(a, id),
 		      p = new Promise<T>((sFn, eFn) => {
 			h[0] = sFn;
 			h[1] = eFn;
@@ -110,7 +111,7 @@ export class RPC {
 		return new Subscription<T>((sFn, eFn, cFn) => {
 			const h: handler = [sFn, eFn],
 			      a = this.#a,
-			      s = a.get(id) ?? set(a, id, new Set<handler>());
+			      s = a.get(id) ?? newSet(a, id);
 			s.add(h);
 			cFn(() => s.delete(h));
 		});
