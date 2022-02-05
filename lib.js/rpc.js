@@ -31,11 +31,11 @@ class RPC {
 	#r = new Map();
 	#a = new Map();
 	constructor(conn, version) {
-		this.#c = conn;
 		this.#v = version;
-		this.#connInit();
+		this.#connInit(conn);
 	}
-	#connInit() {
+	#connInit(conn) {
+		this.#c = conn;
 		this.#c?.when(({data}) => {
 			const message = JSON.parse(data),
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
@@ -64,8 +64,7 @@ class RPC {
 	}
 	reconnect(conn) {
 		this.#c?.close();
-		this.#c = conn;
-		this.#connInit();
+		this.#connInit(conn);
 	}
 	request(method, data) {
 		const c = this.#c;

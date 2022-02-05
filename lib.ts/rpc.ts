@@ -39,17 +39,17 @@ interface Conn {
 }
 
 export class RPC {
-	#c: Conn | null;
+	#c?: Conn | null;
 	#v: number;
 	#id: number = 0;
 	#r = new Map<number, handler>();
 	#a = new Map<number, Set<handler>>();
 	constructor(conn: Conn, version: 1 | 1.1 | 2) {
-		this.#c = conn;
 		this.#v = version;
-		this.#connInit();
+		this.#connInit(conn);
 	}
-	#connInit() {
+	#connInit(conn: Conn) {
+		this.#c = conn;
 		this.#c?.when(({data}) => {
 			const message = JSON.parse(data) as MessageData,
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
@@ -78,8 +78,7 @@ export class RPC {
 	}
 	reconnect(conn: Conn) {
 		this.#c?.close();
-		this.#c = conn;
-		this.#connInit();
+		this.#connInit(conn);
 	}
 	request<T = any>(method: string, data?: any) {
 		const c = this.#c;
