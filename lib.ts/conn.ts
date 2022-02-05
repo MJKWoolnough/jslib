@@ -28,9 +28,7 @@ export const HTTPRequest: requestReturn = (url: string, props: properties = {}) 
 	xh.open(
 		props["method"] ?? "GET",
 		url,
-		true,
-		props["user"] ?? null,
-		props["password"] ?? null
+		true
 	);
 	if (props.hasOwnProperty("headers") && typeof props["headers"] === "object") {
 		for (const [header, value] of Object.entries(props["headers"])) {
@@ -39,6 +37,9 @@ export const HTTPRequest: requestReturn = (url: string, props: properties = {}) 
 	}
 	if (props["type"] !== undefined) {
 		xh.setRequestHeader("Content-Type", props["type"]);
+	}
+	if (props["user"] || props["password"]) {
+		xh.setRequestHeader("Authorization", "Basic " + btoa(`${props["user"] ?? ""}:${props["password"] ?? ""}`));
 	}
 	xh.addEventListener("readystatechange", () => {
 		if (xh.readyState === 4) {
