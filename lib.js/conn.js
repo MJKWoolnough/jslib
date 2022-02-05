@@ -72,9 +72,9 @@ export class WSConn extends WebSocket {
 			w.addEventListener("message", sFn, o);
 			w.addEventListener("error", e => eFn(e.error), o);
 			w.addEventListener("close", e => {
-				if (!e.wasClean) {
-					eFn(new Error(e.reason));
-				}
+				const err = new Error(e.reason);
+				err.name = "CloseError";
+				eFn(err);
 				end();
 			}, o);
 			cFn(end);
