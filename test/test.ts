@@ -6,6 +6,7 @@
 	    totalNum = 0,
 	    failNum = 0;
 	failSpan.setAttribute("class", "fails");
+	completeSpan.innerText = "0";
 	for (const [library, libTests] of Object.entries(data)) {
 		const libDet = df.appendChild(document.createElement("details")),
 		      libSum = libDet.appendChild(document.createElement("summary")),
@@ -15,6 +16,7 @@
 		    libCompleteNum = 0,
 		    libFails = 0;
 		libFail.setAttribute("class", "fails");
+		libCom.innerText = "0";
 		for (const [section, tests] of Object.entries(libTests)) {
 			const sectionDet = libDet.appendChild(document.createElement("details")),
 			      sectionSum = sectionDet.appendChild(document.createElement("summary")),
@@ -25,6 +27,7 @@
 			    sectionCompleteNum = 0,
 			    sectionFails = 0;
 			sectionFail.setAttribute("class", "fails");
+			sectionCom.innerText = "0";
 			for (const [description, test] of Object.entries(tests)) {
 				sectionTotalNum++;
 				libTotalNum++;
