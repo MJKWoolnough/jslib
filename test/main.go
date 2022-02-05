@@ -35,11 +35,11 @@ func run() error {
 		r.ParseForm()
 		json.NewEncoder(w).Encode(struct {
 			Method        string     `json:"method"`
-			Auth          string     `json:"auth"`
-			ContentType   string     `json:"contentType"`
-			ContentLength int64      `json:"contentLength"`
-			Form          url.Values `json:"form"`
-			PostForm      url.Values `json:"postForm"`
+			Auth          string     `json:"auth,omitempty"`
+			ContentType   string     `json:"contentType,omitempty"`
+			ContentLength int64      `json:"contentLength,omitempty"`
+			Form          url.Values `json:"form,omitempty"`
+			PostForm      url.Values `json:"postForm,omitempty"`
 		}{
 			Method:        r.Method,
 			Auth:          r.Header.Get("Authorization"),
