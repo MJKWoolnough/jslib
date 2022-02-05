@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -33,6 +34,7 @@ func run() error {
 	}))
 	m.Handle("/request", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
+		postData, _ := ioutil.ReadAll(r.Body)
 		json.NewEncoder(w).Encode(struct {
 			Method        string     `json:"method"`
 			Auth          string     `json:"auth,omitempty"`
@@ -40,6 +42,7 @@ func run() error {
 			ContentLength int64      `json:"contentLength,omitempty"`
 			Form          url.Values `json:"form,omitempty"`
 			PostForm      url.Values `json:"postForm,omitempty"`
+			PostData      string     `json:"postData,omitempty"`
 		}{
 			Method:        r.Method,
 			Auth:          r.Header.Get("Authorization"),
@@ -47,6 +50,7 @@ func run() error {
 			ContentLength: r.ContentLength,
 			Form:          r.Form,
 			PostForm:      r.PostForm,
+			PostData:      string(postData),
 		})
 	}))
 	m.Handle("/socket", websocket.Handler(func(conn *websocket.Conn) { io.Copy(conn, conn) }))
