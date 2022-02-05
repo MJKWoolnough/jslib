@@ -826,6 +826,33 @@
 				const {HTTPRequest} = await import("./lib/conn.js");
 				return HTTPRequest("/echo", {"method": "POST", "data": "<xml><elm property=\"value\" /></xml>", "response": "document", "type": "text/xml"}).then(doc => doc instanceof Document && doc.children[0] && doc.children[0].localName === "xml" && doc.children[0].children[0] && doc.children[0].children[0].localName === "elm" && doc.children[0].children[0].getAttribute("property") === "value");
 			},
+			"GET request": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/request").then(data => data === `{"method":"GET"}`+"\n");
+			},
+			"POST request": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/request", {"method": "post"}).then(data => data === `{"method":"POST"}`+"\n");
+			},
+			"Username/Password": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/request", {"user": "username", "password": "password"}).then(data => data === `{"method":"GET","auth":"Basic ${btoa("username:password")}"}`+"\n");
+			},
+			"GET string data": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/request?a=123&b=456").then(data => data === `{"method":"GET","form":{"a":["123"],"b":["456"]}}`+"\n");
+			},
+			"POST string data": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js");
+				return HTTPRequest("/request", {"method": "post", "data": "123"}).then(data => data === `{"method":"POST","contentType":"text/plain;charset=UTF-8","contentLength":3,"postData":"123"}`+"\n");
+			},
+			"POST form data": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js"),
+				      fd = new FormData();
+				fd.set("name", "value");
+				fd.set("username", "password");
+				return HTTPRequest("/request", {"method": "post", "type": "application/x-www-form-urlencoded", "data": new URLSearchParams(fd as any).toString()}).then(data => data === `{"method":"POST","contentType":"application/x-www-form-urlencoded","contentLength":28,"form":{"name":["value"],"username":["password"]},"postForm":{"name":["value"],"username":["password"]}}`+"\n");
+			}
 		}
 	}
 });
