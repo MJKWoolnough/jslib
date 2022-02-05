@@ -899,5 +899,93 @@
 				});
 			}
 		}
+	},
+	"rpc.js": {
+		"RPC": {
+			"static test": async () => {
+				const {default: rpc} = await import("./lib/rpc.js"),
+				      {protocol, host} = window.location;
+				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => rpc.request("static").then(d => d === "123"));
+			},
+			"echo test": async () => {
+				const {default: rpc} = await import("./lib/rpc.js"),
+				      {protocol, host} = window.location;
+				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => rpc.request("echo", "456").then(d => d === "456"));
+			},
+			"broadcast test": async () => {
+				const {default: rpc} = await import("./lib/rpc.js"),
+				      {protocol, host} = window.location;
+				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => {
+					let fn = (_b: boolean) => {},
+					    res = 0;
+					rpc.await(-1).then(data => res += +(data === "123"));
+					rpc.request("broadcast", "123").then(d => {
+						if (d) {
+							res *= 2;
+						}
+						fn(res === 2);
+					});
+					return new Promise<boolean>(sFn => fn = sFn);
+				});
+			},
+			"broadcast test, double recieve": async () => {
+				const {default: rpc} = await import("./lib/rpc.js"),
+				      {protocol, host} = window.location;
+				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => {
+					let fn = (_b: boolean) => {},
+					    res = 0;
+					rpc.await(-1).then(data => res += +(data === "123"));
+					rpc.await(-1).then(data => res += +(data === "123"));
+					rpc.request("broadcast", "123").then(d => {
+						if (d) {
+							res *= 2;
+						}
+						fn(res === 4);
+					});
+					return new Promise<boolean>(sFn => fn = sFn);
+				});
+			},
+			"broadcast test, subscribed": async () => {
+				const {default: rpc} = await import("./lib/rpc.js"),
+				      {protocol, host} = window.location;
+				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => {
+					let fn = (_b: boolean) => {},
+					    res = 0;
+					rpc.subscribe(-1).then(data => res += +(data === "123"));
+					rpc.request("broadcast", "123").then(d => {
+						if (d) {
+							res *= 2;
+						}
+						rpc.request("broadcast", "123").then(d => {
+							if (d) {
+								res *= 2;
+							}
+							fn(res === 6);
+						});
+					});
+					return new Promise<boolean>(sFn => fn = sFn);
+				});
+			},
+			"endpoint error": async () => {
+				const {default: rpc} = await import("./lib/rpc.js"),
+				      {protocol, host} = window.location;
+				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => rpc.request("unknown").then(() => false).catch(() => true));
+			},
+			"close test": async () => {
+				const {default: rpc} = await import("./lib/rpc.js"),
+				      {protocol, host} = window.location;
+				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => rpc.request("close").then(() => false).catch(() => true));
+			},
+			"close all test": async () => {
+				const {default: rpc} = await import("./lib/rpc.js"),
+				      {protocol, host} = window.location;
+				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => {
+					let res = 0;
+					rpc.await(-1).catch(() => res++);
+					rpc.await(-2).catch(() => res++);
+					return rpc.request("close").then(() => false).catch(() => new Promise<boolean>(sFn => window.setTimeout(() => sFn(res === 2), 0)));
+				});
+			}
+		}
 	}
 });
