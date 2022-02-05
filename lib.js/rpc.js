@@ -90,7 +90,7 @@ class RPC {
 			h[1] = eFn;
 			s.add(h);
 		      });
-		p.finally(() => s.delete(h));
+		p.finally(() => s.delete(h)).catch(() => {});
 		return p;
 	}
 	subscribe(id) {
