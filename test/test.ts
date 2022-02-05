@@ -853,6 +853,51 @@
 				fd.set("username", "password");
 				return HTTPRequest("/request", {"method": "post", "type": "application/x-www-form-urlencoded", "data": new URLSearchParams(fd as any).toString()}).then(data => data === `{"method":"POST","contentType":"application/x-www-form-urlencoded","contentLength":28,"form":{"name":["value"],"username":["password"]},"postForm":{"name":["value"],"username":["password"]}}`+"\n");
 			}
+		},
+		"WS": {
+			"simple echo": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {protocol, host} = window.location;
+				return WS(`ws${protocol.slice(4)}//${host}/socket`).then(ws => {
+					let fn = (_b: boolean) => {};
+					ws.when(({data}) => fn(data === "123"), () => fn(false));
+					ws.send("123");
+					return new Promise<boolean>(sFn => fn = sFn);
+				});
+			},
+			"double echo": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {protocol, host} = window.location;
+				return WS(`ws${protocol.slice(4)}//${host}/socket`).then(ws => {
+					let fn = (_b: boolean) => {},
+					    r = 0,
+					    s = 0;
+					ws.when(({data}) => {
+						r++;
+						if (data === "123") {
+							s++;
+						} else if (data === "456") {
+							s *= 2;
+						}
+						if (r === 2) {
+							fn(s === 2)
+						}
+					}, () => fn(false));
+					ws.send("123");
+					ws.send("456");
+					return new Promise<boolean>(sFn => fn = sFn);
+				});
+			},
+			"error test": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {protocol, host} = window.location;
+				return WS(`ws${protocol.slice(4)}//${host}/socket-close`).then(ws => {
+					let fn = (_b: boolean) => {};
+					ws.when(() => fn(false), () => fn(true));
+					ws.send("123");
+					return new Promise<boolean>(sFn => fn = sFn);
+				});
+			}
 		}
 	}
 });
