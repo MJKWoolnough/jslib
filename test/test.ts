@@ -80,6 +80,17 @@
 				p.send(2);
 				return num === 6;
 			},
+			"Send/Multi-receive same fn": async () => {
+				const {Pipe} = await import("./lib/inter.js"),
+				      p = new Pipe<number>(),
+				      fn = (v: number) => num += v;
+				let num = 0;
+				p.receive(fn);
+				p.receive(fn);
+				p.receive(fn);
+				p.send(2);
+				return num === 6;
+			},
 			"Remove": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      p = new Pipe<number>(),
@@ -88,6 +99,18 @@
 				p.receive(fn);
 				p.receive(v => num += v);
 				p.receive(v => num += v);
+				p.remove(fn);
+				p.send(2);
+				return num === 4;
+			},
+			"Remove same fn": async () => {
+				const {Pipe} = await import("./lib/inter.js"),
+				      p = new Pipe<number>(),
+				      fn = (v: number) => num += v;
+				let num = 0;
+				p.receive(fn);
+				p.receive(fn);
+				p.receive(fn);
 				p.remove(fn);
 				p.send(2);
 				return num === 4;
