@@ -81,22 +81,10 @@ export class Subscription {
 			throw error;
 		});
 	}
-	static merge(...subs) {
-		return new Subscription((success, error, cancel) => {
-			for (const s of subs) {
-				s.then(success, error);
-			}
-			cancel(Subscription.canceller(...subs));
-		});
-	}
-	static splitCancel(s) {
+	splitCancel() {
 		const success = new Pipe(),
 		      error = new Pipe();
-		s.then(data => {
-			success.send(data);
-		}, err => {
-			error.send(err);
-		});
+		this.then(data => success.send(data), err => error.send(err));
 		return () => new Subscription((sFn, eFn, cancelFn) => {
 			success.receive(sFn);
 			error.receive(eFn);
@@ -104,6 +92,14 @@ export class Subscription {
 				success.remove(sFn);
 				error.remove(eFn);
 			});
+		});
+	}
+	static merge(...subs) {
+		return new Subscription((success, error, cancel) => {
+			for (const s of subs) {
+				s.then(success, error);
+			}
+			cancel(Subscription.canceller(...subs));
 		});
 	}
 	static canceller(...subs) {

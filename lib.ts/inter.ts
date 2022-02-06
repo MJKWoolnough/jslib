@@ -87,22 +87,10 @@ export class Subscription<T> {
 			throw error;
 		});
 	}
-	static merge<T>(...subs: Subscription<T>[]) {
-		return new Subscription<T>((success: (data: T) => void, error: (data: any) => void, cancel: (data: () => void) => void) => {
-			for (const s of subs) {
-				s.then(success, error);
-			}
-			cancel(Subscription.canceller(...subs));
-		});
-	}
-	static splitCancel<T>(s: Subscription<T>): () => Subscription<T> {
+	splitCancel() {
 		const success = new Pipe<T>(),
 		      error = new Pipe<any>();
-		s.then(data => {
-			success.send(data);
-		}, err => {
-			error.send(err);
-		});
+		this.then(data => success.send(data), err => error.send(err));
 		return () => new Subscription<T>((sFn, eFn, cancelFn) => {
 			success.receive(sFn);
 			error.receive(eFn);
@@ -110,6 +98,14 @@ export class Subscription<T> {
 				success.remove(sFn);
 				error.remove(eFn);
 			});
+		});
+	}
+	static merge<T>(...subs: Subscription<T>[]) {
+		return new Subscription<T>((success: (data: T) => void, error: (data: any) => void, cancel: (data: () => void) => void) => {
+			for (const s of subs) {
+				s.then(success, error);
+			}
+			cancel(Subscription.canceller(...subs));
 		});
 	}
 	static canceller(...subs: canceller[]) {
