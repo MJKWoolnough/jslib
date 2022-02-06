@@ -88,15 +88,15 @@ export class Subscription<T> {
 		});
 	}
 	splitCancel() {
-		const success = new Pipe<T>(),
-		      error = new Pipe<any>();
-		this.then(data => success.send(data), err => error.send(err));
+		const [successSend, successReceive, successRemove] = new Pipe<T>().bind(),
+		      [errorSend, errorReceive, errorRemove] = new Pipe<any>().bind();
+		this.then(successSend, errorSend);
 		return () => new Subscription<T>((sFn, eFn, cancelFn) => {
-			success.receive(sFn);
-			error.receive(eFn);
+			successReceive(sFn);
+			errorReceive(eFn);
 			cancelFn(() => {
-				success.remove(sFn);
-				error.remove(eFn);
+				successRemove(sFn);
+				errorRemove(eFn);
 			});
 		});
 	}
