@@ -55,7 +55,7 @@ export class Subscription<T> {
 		this.#error = errorReceive;
 	}
 	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
-		const s = new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void, cFn: (data: () => void) => void) => {
+		const s = new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void) => {
 			this.#success(successFn instanceof Function ? (data: T) => {
 				try {
 					sFn(successFn(data));
@@ -70,9 +70,8 @@ export class Subscription<T> {
 					eFn(e);
 				}
 			} : eFn);
-			cFn(this.#cancelBind ?? (this.#cancelBind = () => this.#cancel()));
 		});
-		s.#cancelBind = s.#cancel;
+		s.#cancelBind = s.#cancel = this.#cancelBind ?? (this.#cancelBind = () => this.#cancel());
 		return s;
 	}
 	cancel() {

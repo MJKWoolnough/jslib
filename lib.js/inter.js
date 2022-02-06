@@ -49,7 +49,7 @@ export class Subscription {
 		this.#error = errorReceive;
 	}
 	then(successFn, errorFn) {
-		const s = new Subscription((sFn, eFn, cFn) => {
+		const s = new Subscription((sFn, eFn) => {
 			this.#success(successFn instanceof Function ? data => {
 				try {
 					sFn(successFn(data));
@@ -64,9 +64,8 @@ export class Subscription {
 					eFn(e);
 				}
 			} : eFn);
-			cFn(this.#cancelBind ?? (this.#cancelBind = () => this.#cancel()));
 		});
-		s.#cancelBind = s.#cancel;
+		s.#cancelBind = s.#cancel = this.#cancelBind ?? (this.#cancelBind = () => this.#cancel());
 		return s;
 	}
 	cancel() {
