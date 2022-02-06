@@ -59,12 +59,12 @@ export class Requester<T, U extends any[] = any[]> {
 export class Subscription<T> {
 	#success: (fn: (data: T) => void) => void;
 	#error: (fn: (data: any) => void) => void;
-	#cancel = () => {};
+	#cancel?: () => void;
 	#cancelBind?: () => void;
 	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: () => void) => void) => void) {
 		const [successSend, successReceive] = new Pipe<T>().bind(3),
 		      [errorSend, errorReceive] = new Pipe<any>().bind(3);
-		fn(successSend, errorSend, (data: () => void) => this.#cancel = data);
+		fn(successSend, errorSend, (fn: () => void) => this.#cancel = fn);
 		this.#success = successReceive;
 		this.#error = errorReceive;
 	}
@@ -85,11 +85,11 @@ export class Subscription<T> {
 				}
 			} : eFn);
 		});
-		s.#cancelBind = s.#cancel = this.#cancelBind ?? (this.#cancelBind = () => this.#cancel());
+		s.#cancelBind = s.#cancel = this.#cancelBind ?? (this.#cancelBind = () => this.#cancel?.());
 		return s;
 	}
 	cancel() {
-		this.#cancel();
+		this.#cancel?.();
 	}
 	catch<TResult = never>(errorFn: (data: any) => TResult): Subscription<T | TResult> {
 		return this.then(undefined, errorFn);

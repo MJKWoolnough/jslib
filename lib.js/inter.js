@@ -46,12 +46,12 @@ export class Requester {
 export class Subscription {
 	#success;
 	#error;
-	#cancel = () => {};
+	#cancel;
 	#cancelBind;
 	constructor(fn) {
 		const [successSend, successReceive] = new Pipe().bind(3),
 		      [errorSend, errorReceive] = new Pipe().bind(3);
-		fn(successSend, errorSend, data => this.#cancel = data);
+		fn(successSend, errorSend, fn => this.#cancel = fn);
 		this.#success = successReceive;
 		this.#error = errorReceive;
 	}
@@ -72,11 +72,11 @@ export class Subscription {
 				}
 			} : eFn);
 		});
-		s.#cancelBind = s.#cancel = this.#cancelBind ?? (this.#cancelBind = () => this.#cancel());
+		s.#cancelBind = s.#cancel = this.#cancelBind ?? (this.#cancelBind = () => this.#cancel?.());
 		return s;
 	}
 	cancel() {
-		this.#cancel();
+		this.#cancel?.();
 	}
 	catch(errorFn) {
 		return this.then(undefined, errorFn);
