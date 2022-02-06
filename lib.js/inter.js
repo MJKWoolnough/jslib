@@ -16,7 +16,7 @@ export class Pipe {
 		return this.#out.delete(fn);
 	}
 	bind() {
-		return [data => this.send(data), fn => this.receive(fn)];
+		return [data => this.send(data), fn => this.receive(fn), fn => this.cancel(fn)];
 	}
 }
 

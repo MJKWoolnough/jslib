@@ -22,7 +22,7 @@ export class Pipe<T> {
 		return this.#out.delete(fn);
 	}
 	bind() {
-		return [(data: T) => this.send(data), (fn: (data: T) => void) => this.receive(fn)] as const;
+		return [(data: T) => this.send(data), (fn: (data: T) => void) => this.receive(fn), (fn: (data: T) => void) => this.remove(fn)] as const;
 	}
 }
 
