@@ -22,8 +22,8 @@ export class Pipe {
 			this.#out.delete(fn);
 		}
 	}
-	bind() {
-		return [data => this.send(data), fn => this.receive(fn), fn => this.cancel(fn)];
+	bind(bindmask = 7) {
+		return [bindmask&1 ? data => this.send(data) : undefined, bindmask&2 ? fn => this.receive(fn) : undefined, bindmask&4 ? fn => this.remove(fn) : undefined];
 	}
 }
 
@@ -49,8 +49,8 @@ export class Subscription {
 	#cancel = () => {};
 	#cancelBind;
 	constructor(fn) {
-		const [successSend, successReceive] = new Pipe().bind(),
-		      [errorSend, errorReceive] = new Pipe().bind();
+		const [successSend, successReceive] = new Pipe().bind(3),
+		      [errorSend, errorReceive] = new Pipe().bind(3);
 		fn(successSend, errorSend, data => this.#cancel = data);
 		this.#success = successReceive;
 		this.#error = errorReceive;

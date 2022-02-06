@@ -28,8 +28,15 @@ export class Pipe<T> {
 			this.#out.delete(fn);
 		}
 	}
-	bind() {
-		return [(data: T) => this.send(data), (fn: (data: T) => void) => this.receive(fn), (fn: (data: T) => void) => this.remove(fn)] as const;
+	bind(bindmask: 1): [(data: T) => void, undefined, undefined];
+	bind(bindmask: 2): [undefined, (fn: (data: T) => void) => void, undefined];
+	bind(bindmask: 3): [(data: T) => void, (fn: (data: T) => void) => void, undefined];
+	bind(bindmask: 4): [undefined, undefined, (fn: (data: T) => void) => void];
+	bind(bindmask: 5): [(data: T) => void, undefined, (fn: (data: T) => void) => void];
+	bind(bindmask: 6): [undefined, (fn: (data: T) => void) => void, (fn: (data: T) => void) => void];
+	bind(bindmask?: 7): [(data: T) => void, (fn: (data: T) => void) => void, (fn: (data: T) => void) => void];
+	bind(bindmask = 7) {
+		return [bindmask&1 ? (data: T) => this.send(data) : undefined, bindmask&2 ? (fn: (data: T) => void) => this.receive(fn) : undefined, bindmask&4 ? (fn: (data: T) => void) => this.remove(fn) : undefined] as const;
 	}
 }
 
@@ -55,8 +62,8 @@ export class Subscription<T> {
 	#cancel = () => {};
 	#cancelBind?: () => void;
 	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: () => void) => void) => void) {
-		const [successSend, successReceive] = new Pipe<T>().bind(),
-		      [errorSend, errorReceive] = new Pipe<any>().bind();
+		const [successSend, successReceive] = new Pipe<T>().bind(3),
+		      [errorSend, errorReceive] = new Pipe<any>().bind(3);
 		fn(successSend, errorSend, (data: () => void) => this.#cancel = data);
 		this.#success = successReceive;
 		this.#error = errorReceive;
