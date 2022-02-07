@@ -118,20 +118,13 @@ export class Subscription<T> {
 			for (const s of subs) {
 				s.then(success, error);
 			}
-			cancel(Subscription.canceller(...subs));
+			cancel(() => {
+				for(const s of subs) {
+					s.cancel();
+				}
+			});
 		});
 	}
-	static canceller(...subs: canceller[]) {
-		return () => {
-			for (const s of subs) {
-				s.cancel();
-			}
-		};
-	}
-}
-
-interface canceller {
-	cancel: () => void;
 }
 
 export class WaitGroup {

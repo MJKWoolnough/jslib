@@ -105,15 +105,12 @@ export class Subscription {
 			for (const s of subs) {
 				s.then(success, error);
 			}
-			cancel(Subscription.canceller(...subs));
+			cancel(() => {
+				for(const s of subs) {
+					s.cancel();
+				}
+			});
 		});
-	}
-	static canceller(...subs) {
-		return () => {
-			for (const s of subs) {
-				s.cancel();
-			}
-		}
 	}
 }
 
