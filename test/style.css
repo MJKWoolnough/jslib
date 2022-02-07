@@ -1,5 +1,7 @@
 html, body {
 	margin: 0;
+	background-color: #fff;
+	color: #000;
 }
 
 ul {
@@ -40,6 +42,10 @@ li.fail:before {
 
 details > details {
 	margin-left: 1em;
+}
+
+summary:hover {
+	background-color: #ddd;
 }
 
 .fails:empty {
