@@ -21,7 +21,8 @@ interface requestReturn {
 	(url: string, props: properties & {"response": "json"}): Promise<any>;
 }
 
-const once = {"once": true};
+const once = {"once": true},
+      base = new URL(window.location+"");
 
 export const HTTPRequest: requestReturn = (url: string, props: properties = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
@@ -84,6 +85,9 @@ WS = (url: string) => new Promise<WSConn>((successFn, errorFn) => {
 });
 
 export class WSConn extends WebSocket {
+	constructor(url: string, protocols?: string | string[]) {
+		super(new URL(url, base), protocols);
+	}
 	when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: string) => U) {
 		return new Subscription<MessageEvent>((sFn, eFn, cFn) => {
 			const w = this,
@@ -102,3 +106,5 @@ export class WSConn extends WebSocket {
 		}).then<T, U>(ssFn, eeFn);
 	}
 }
+
+base.protocol = base.protocol === "https" ? "wss" : "ws";

@@ -1,6 +1,7 @@
 import {Subscription} from './inter.js';
 
-const once = {"once": true};
+const once = {"once": true},
+      base = new URL(window.location+"");
 
 export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
@@ -63,6 +64,9 @@ WS = url => new Promise((successFn, errorFn) => {
 });
 
 export class WSConn extends WebSocket {
+	constructor(url, protocols) {
+		super(new URL(url, base), protocols);
+	}
 	when(ssFn, eeFn) {
 		return new Subscription((sFn, eFn, cFn) => {
 			const w = this,
@@ -81,3 +85,5 @@ export class WSConn extends WebSocket {
 		}).then(ssFn, eeFn);
 	}
 }
+
+base.protocol = base.protocol === "https" ? "wss" : "ws";
