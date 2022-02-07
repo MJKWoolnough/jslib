@@ -160,7 +160,7 @@
 				const {Pipe} = await import("./lib/inter.js"),
 				      b = new Pipe().bind(7);
 				return b[0] instanceof Function && b[1] instanceof Function && b[2] instanceof Function;
-			},
+			}
 		},
 		"Requester": {
 			"Respond/Request value": async () => {
@@ -282,6 +282,28 @@
 				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).then(() => {}).cancel();
 				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).then(() => {});
 				return res === 1;
+			},
+			"splitCancel": async () => {
+				let res = 0,
+				    success = (_n: number) => {},
+				    error = (_n: number) => {};
+				const {Subscription} = await import("./lib/inter.js"),
+				      sc = new Subscription<number>((sFn, eFn, cFn) => {
+					      success = sFn;
+					      error = eFn;
+					      cFn(() => res = -999);
+				      }).splitCancel(),
+				      first = sc().then(n => res += n * 2, n => res += n * 3),
+				      second = sc().then(n => res += n * 5, n => res += n * 7);
+				success(1);
+				error(2);
+				first.cancel();
+				success(3);
+				error(4)
+				second.cancel();
+				success(5);
+				error(6);
+				return res === 70;
 			}
 		},
 		"WaitGroup": {
