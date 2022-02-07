@@ -35,7 +35,7 @@ export class Pipe<T> {
 	bind(bindmask: 5): [(data: T) => void, undefined, (fn: (data: T) => void) => void];
 	bind(bindmask: 6): [undefined, (fn: (data: T) => void) => void, (fn: (data: T) => void) => void];
 	bind(bindmask?: 7): [(data: T) => void, (fn: (data: T) => void) => void, (fn: (data: T) => void) => void];
-	bind(bindmask = 7) {
+	bind(bindmask: 1 | 2 | 3 | 4 | 5 | 6 | 7 = 7) {
 		return [bindmask&1 ? (data: T) => this.send(data) : undefined, bindmask&2 ? (fn: (data: T) => void) => this.receive(fn) : undefined, bindmask&4 ? (fn: (data: T) => void) => this.remove(fn) : undefined] as const;
 	}
 }
