@@ -117,12 +117,50 @@
 			},
 			"Bind": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
-				      [send, receive] = new Pipe<boolean>().bind();
-				let res: boolean = false;
-				receive(v => res = v);
-				send(true);
-				return res;
-			}
+				      [send, receive, remove] = new Pipe<number>().bind(),
+				      fn = (v: number) => res += v;
+				let res = 0;
+				receive(fn);
+				send(2);
+				remove(fn);
+				send(1);
+				return res === 2;
+			},
+			"Bind (1)": async () => {
+				const {Pipe} = await import("./lib/inter.js"),
+				      b = new Pipe().bind(1);
+				return b[0] instanceof Function && b[1] === undefined && b[2] === undefined;
+			},
+			"Bind (2)": async () => {
+				const {Pipe} = await import("./lib/inter.js"),
+				      b = new Pipe().bind(2);
+				return b[0] === undefined && b[1] instanceof Function && b[2] === undefined;
+			},
+			"Bind (3)": async () => {
+				const {Pipe} = await import("./lib/inter.js"),
+				      b = new Pipe().bind(3);
+				return b[0] instanceof Function && b[1] instanceof Function && b[2] === undefined;
+			},
+			"Bind (4)": async () => {
+				const {Pipe} = await import("./lib/inter.js"),
+				      b = new Pipe().bind(4);
+				return b[0] === undefined && b[1] === undefined && b[2] instanceof Function;
+			},
+			"Bind (5)": async () => {
+				const {Pipe} = await import("./lib/inter.js"),
+				      b = new Pipe().bind(5);
+				return b[0] instanceof Function && b[1] === undefined && b[2] instanceof Function;
+			},
+			"Bind (6)": async () => {
+				const {Pipe} = await import("./lib/inter.js"),
+				      b = new Pipe().bind(6);
+				return b[0] === undefined && b[1] instanceof Function && b[2] instanceof Function;
+			},
+			"Bind (7)": async () => {
+				const {Pipe} = await import("./lib/inter.js"),
+				      b = new Pipe().bind(7);
+				return b[0] instanceof Function && b[1] instanceof Function && b[2] instanceof Function;
+			},
 		},
 		"Requester": {
 			"Respond/Request value": async () => {
