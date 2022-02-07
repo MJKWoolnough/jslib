@@ -882,9 +882,8 @@
 		},
 		"WS": {
 			"simple echo": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {protocol, host} = window.location;
-				return WS(`ws${protocol.slice(4)}//${host}/socket`).then(ws => {
+				const {WS} = await import("./lib/conn.js");
+				return WS("/socket").then(ws => {
 					let fn = (_b: boolean) => {};
 					ws.when(({data}) => fn(data === "123"), () => fn(false));
 					ws.send("123");
@@ -892,9 +891,8 @@
 				});
 			},
 			"double echo": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {protocol, host} = window.location;
-				return WS(`ws${protocol.slice(4)}//${host}/socket`).then(ws => {
+				const {WS} = await import("./lib/conn.js");
+				return WS("/socket").then(ws => {
 					let fn = (_b: boolean) => {},
 					    r = 0,
 					    s = 0;
@@ -915,9 +913,8 @@
 				});
 			},
 			"error test": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {protocol, host} = window.location;
-				return WS(`ws${protocol.slice(4)}//${host}/socket-close`).then(ws => {
+				const {WS} = await import("./lib/conn.js");
+				return WS("/socket-close").then(ws => {
 					let fn = (_b: boolean) => {};
 					ws.when(() => fn(false), () => fn(true));
 					ws.send("123");
@@ -929,19 +926,16 @@
 	"rpc.js": {
 		"RPC": {
 			"static test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js"),
-				      {protocol, host} = window.location;
-				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => rpc.request("static").then(d => d === "123"));
+				const {default: rpc} = await import("./lib/rpc.js");
+				return rpc("/rpc", 1.1).then(rpc => rpc.request("static").then(d => d === "123"));
 			},
 			"echo test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js"),
-				      {protocol, host} = window.location;
-				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => rpc.request("echo", "456").then(d => d === "456"));
+				const {default: rpc} = await import("./lib/rpc.js");
+				return rpc("/rpc", 1.1).then(rpc => rpc.request("echo", "456").then(d => d === "456"));
 			},
 			"broadcast test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js"),
-				      {protocol, host} = window.location;
-				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => {
+				const {default: rpc} = await import("./lib/rpc.js");
+				return rpc("/rpc", 1.1).then(rpc => {
 					let fn = (_b: boolean) => {},
 					    res = 0;
 					rpc.await(-1).then(data => res += +(data === "123"));
@@ -955,9 +949,8 @@
 				});
 			},
 			"broadcast test, double recieve": async () => {
-				const {default: rpc} = await import("./lib/rpc.js"),
-				      {protocol, host} = window.location;
-				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => {
+				const {default: rpc} = await import("./lib/rpc.js");
+				return rpc("/rpc", 1.1).then(rpc => {
 					let fn = (_b: boolean) => {},
 					    res = 0;
 					rpc.await(-1).then(data => res += +(data === "123"));
@@ -972,9 +965,8 @@
 				});
 			},
 			"broadcast test, subscribed": async () => {
-				const {default: rpc} = await import("./lib/rpc.js"),
-				      {protocol, host} = window.location;
-				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => {
+				const {default: rpc} = await import("./lib/rpc.js");
+				return rpc("/rpc", 1.1).then(rpc => {
 					let fn = (_b: boolean) => {},
 					    res = 0;
 					rpc.subscribe(-1).then(data => res += +(data === "123"));
@@ -993,19 +985,16 @@
 				});
 			},
 			"endpoint error": async () => {
-				const {default: rpc} = await import("./lib/rpc.js"),
-				      {protocol, host} = window.location;
-				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => rpc.request("unknown").then(() => false).catch(() => true));
+				const {default: rpc} = await import("./lib/rpc.js");
+				return rpc("/rpc", 1.1).then(rpc => rpc.request("unknown").then(() => false).catch(() => true));
 			},
 			"close test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js"),
-				      {protocol, host} = window.location;
-				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => rpc.request("close").then(() => false).catch(() => true));
+				const {default: rpc} = await import("./lib/rpc.js");
+				return rpc("/rpc", 1.1).then(rpc => rpc.request("close").then(() => false).catch(() => true));
 			},
 			"close all test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js"),
-				      {protocol, host} = window.location;
-				return rpc(`ws${protocol.slice(4)}//${host}/rpc`, 1.1).then(rpc => {
+				const {default: rpc} = await import("./lib/rpc.js");
+				return rpc("/rpc", 1.1).then(rpc => {
 					let res = 0;
 					rpc.await(-1).catch(() => res++);
 					rpc.await(-2).catch(() => res++);
