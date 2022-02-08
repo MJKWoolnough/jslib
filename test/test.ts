@@ -326,6 +326,32 @@
 				success(5);
 				error(6);
 				return res === 700;
+			},
+			"merge": async () => {
+				let firstSuccess: (n: number) => void,
+				    firstError: (e: any) => void,
+				    secondSuccess: (s: string) => void,
+				    secondError: (e: any) => void,
+				    res = 0;
+				const {Subscription} = await import("./lib/inter.js"),
+				      s = Subscription.merge<number | string>(
+					new Subscription<number>((sFn, eFn, cFn) => {
+						firstSuccess = sFn;
+						firstError = eFn;
+						cFn(() => res *= 3);
+					}),
+					new Subscription<string>((sFn, eFn, cFn) => {
+						secondSuccess = sFn;
+						secondError = eFn;
+						cFn(() => res *= 5);
+					})
+				      ).then(n => res += typeof n === "string" ? n.length : n, e => res *= e);
+				firstSuccess!(1);
+				firstError!(2);
+				secondSuccess!("123");
+				secondError!(3);
+				s.cancel();
+				return res === 225;
 			}
 		},
 		"WaitGroup": {
