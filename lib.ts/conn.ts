@@ -26,11 +26,7 @@ const once = {"once": true},
 
 export const HTTPRequest: requestReturn = (url: string, props: properties = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
-	xh.open(
-		props["method"] ?? "GET",
-		url,
-		true
-	);
+	xh.open(props["method"] ?? "GET", url);
 	if (props.hasOwnProperty("headers") && typeof props["headers"] === "object") {
 		for (const [header, value] of Object.entries(props["headers"])) {
 			xh.setRequestHeader(header, value);
