@@ -10,9 +10,6 @@ const noop = () => {},
       };
 
 export class RPCError {
-	code;
-	message;
-	data;
 	constructor(code, message, data) {
 		this.code = code;
 		this.message = message;
@@ -24,9 +21,8 @@ export class RPCError {
 	}
 }
 
-class RPC {
+export class RPC {
 	#c;
-	#v;
 	#id = 0;
 	#r = new Map();
 	#a = new Map();
