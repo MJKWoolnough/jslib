@@ -40,12 +40,10 @@ interface Conn {
 
 export class RPC {
 	#c?: Conn | null;
-	#v: number;
 	#id: number = 0;
 	#r = new Map<number, handler>();
 	#a = new Map<number, Set<handler>>();
-	constructor(conn: Conn, version: 1 | 1.1 | 2) {
-		this.#v = version;
+	constructor(conn: Conn) {
 		this.#connInit(conn);
 	}
 	#connInit(conn: Conn) {
@@ -80,17 +78,15 @@ export class RPC {
 		this.#c?.close();
 		this.#connInit(conn);
 	}
-	request<T = any>(method: string, data?: any) {
+	request<T = any>(method: string, params?: any) {
 		const c = this.#c;
 		return c ? new Promise<T>((sFn, eFn) => {
-			const id = this.#id++,
-			      v = this.#v;
+			const id = this.#id++;
 			this.#r.set(id, [sFn, eFn]);
 			c.send(JSON.stringify({
-				"jsonrpc": v.toFixed(1),
 				id,
 				method,
-				"params": v === 1 ? [data] : data
+				params
 			}));
 		}) : Promise.reject("RPC Closed");
 	}
@@ -121,4 +117,4 @@ export class RPC {
 	}
 }
 
-export default (path: string, version: 1 | 1.1 | 2 = 1) => WS(path).then(c => new RPC(c, version));
+export default (path: string) => WS(path).then(c => new RPC(c));

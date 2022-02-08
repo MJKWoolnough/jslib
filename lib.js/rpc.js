@@ -30,8 +30,7 @@ class RPC {
 	#id = 0;
 	#r = new Map();
 	#a = new Map();
-	constructor(conn, version) {
-		this.#v = version;
+	constructor(conn) {
 		this.#connInit(conn);
 	}
 	#connInit(conn) {
@@ -66,17 +65,15 @@ class RPC {
 		this.#c?.close();
 		this.#connInit(conn);
 	}
-	request(method, data) {
+	request(method, params) {
 		const c = this.#c;
 		return c ? new Promise((sFn, eFn) => {
-			const id = this.#id++,
-			      v = this.#v;
+			const id = this.#id++;
 			this.#r.set(id, [sFn, eFn]);
 			c.send(JSON.stringify({
-				"jsonrpc": v.toFixed(1),
 				id,
 				method,
-				"params": v === 1 ? [data] : data
+				params
 			}));
 		}) : Promise.reject("RPC Closed");
 	}
@@ -107,4 +104,4 @@ class RPC {
 	}
 }
 
-export default (path, version = 1) => WS(path).then(c => new RPC(c, version));
+export default path => WS(path).then(c => new RPC(c));
