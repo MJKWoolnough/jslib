@@ -100,16 +100,22 @@ export class Subscription<T> {
 			throw error;
 		});
 	}
-	splitCancel() {
+	splitCancel(cancelOnEmpty = false) {
 		const [successSend, successReceive, successRemove] = new Pipe<T>().bind(),
 		      [errorSend, errorReceive, errorRemove] = new Pipe<any>().bind();
+		let n = 0;
 		this.then(successSend, errorSend);
 		return () => new Subscription<T>((sFn, eFn, cancelFn) => {
 			successReceive(sFn);
 			errorReceive(eFn);
+			n++;
 			cancelFn(() => {
 				successRemove(sFn);
 				errorRemove(eFn);
+				cancelFn(() => {});
+				if (!--n && cancelOnEmpty) {
+					this.cancel();
+				}
 			});
 		});
 	}
