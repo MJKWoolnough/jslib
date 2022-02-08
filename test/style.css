@@ -65,4 +65,5 @@ summary:hover {
 
 summary {
 	cursor: pointer;
+	user-select: none;
 }
