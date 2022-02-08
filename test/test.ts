@@ -1035,15 +1035,15 @@
 		"RPC": {
 			"static test": async () => {
 				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc", 1.1).then(rpc => rpc.request("static").then(d => d === "123"));
+				return rpc("/rpc").then(rpc => rpc.request("static").then(d => d === "123"));
 			},
 			"echo test": async () => {
 				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc", 1.1).then(rpc => rpc.request("echo", "456").then(d => d === "456"));
+				return rpc("/rpc").then(rpc => rpc.request("echo", "456").then(d => d === "456"));
 			},
 			"broadcast test": async () => {
 				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc", 1.1).then(rpc => {
+				return rpc("/rpc").then(rpc => {
 					let fn = (_b: boolean) => {},
 					    res = 0;
 					rpc.await(-1).then(data => res += +(data === "123"));
@@ -1058,7 +1058,7 @@
 			},
 			"broadcast test, double recieve": async () => {
 				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc", 1.1).then(rpc => {
+				return rpc("/rpc").then(rpc => {
 					let fn = (_b: boolean) => {},
 					    res = 0;
 					rpc.await(-1).then(data => res += +(data === "123"));
@@ -1074,7 +1074,7 @@
 			},
 			"broadcast test, subscribed": async () => {
 				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc", 1.1).then(rpc => {
+				return rpc("/rpc").then(rpc => {
 					let fn = (_b: boolean) => {},
 					    res = 0;
 					rpc.subscribe(-1).then(data => res += +(data === "123"));
@@ -1094,15 +1094,15 @@
 			},
 			"endpoint error": async () => {
 				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc", 1.1).then(rpc => rpc.request("unknown").then(() => false).catch(() => true));
+				return rpc("/rpc").then(rpc => rpc.request("unknown").then(() => false).catch(() => true));
 			},
 			"close test": async () => {
 				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc", 1.1).then(rpc => rpc.request("close").then(() => false).catch(() => true));
+				return rpc("/rpc").then(rpc => rpc.request("close").then(() => false).catch(() => true));
 			},
 			"close all test": async () => {
 				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc", 1.1).then(rpc => {
+				return rpc("/rpc").then(rpc => {
 					let res = 0;
 					rpc.await(-1).catch(() => res++);
 					rpc.await(-2).catch(() => res++);
