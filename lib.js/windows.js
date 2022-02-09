@@ -294,9 +294,9 @@ export class WindowElement extends BaseElement {
 				this.#icon = img({"part": "icon", "src": defaultIcon}),
 				this.#title = span({"part": "title"}),
 				div({"part": "controls"}, [
-					button({"part": "close", "onclick": () => this.close()}),
-					this.#maximise = button({"part": "maximise", "onclick": () => this.toggleAttribute("maximised")}),
-					button({"part": "minimise", "onclick": () => this.toggleAttribute("minimised")}),
+					button({"part": "close", "title": lang["CLOSE"], "onclick": () => this.close()}),
+					this.#maximise = button({"part": "maximise", "title": lang["MAXIMISE"], "onclick": () => this.toggleAttribute("maximised")}),
+					button({"part": "minimise", "title": lang["MINIMISE"], "onclick": () => this.toggleAttribute("minimised")}),
 					this.#extra = span()
 				])
 			]),
