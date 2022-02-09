@@ -930,11 +930,11 @@
 			},
 			"JSON number echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
-				return HTTPRequest("/echo", {"method": "POST", "data": "123", "response": "json"}).then(data => data === 123);
+				return HTTPRequest<number>("/echo", {"method": "POST", "data": "123", "response": "json"}).then(data => data === 123);
 			},
 			"JSON number array echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
-				return HTTPRequest("/echo", {"method": "POST", "data": "[123, 456]", "response": "json"}).then(data => data instanceof Array && data.length === 2 && data[0] === 123 && data[1] === 456);
+				return HTTPRequest<[number, number]>("/echo", {"method": "POST", "data": "[123, 456]", "response": "json"}).then(data => data instanceof Array && data.length === 2 && data[0] === 123 && data[1] === 456);
 			},
 			"XML echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
