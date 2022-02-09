@@ -9,6 +9,12 @@ type MessageData = {
 
 type handler = [(data: any) => void, (data: RPCError) => void];
 
+interface Conn {
+	close: () => void;
+	send: (data: string) => void;
+	when: (sFn: (data: {data: string}) => void, eFn: (error: string) => void) => void;
+}
+
 const noop = () => {},
       noops = [noop, noop],
       newSet = (m: Map<number, Set<handler>>, id: number) => {
@@ -30,12 +36,6 @@ export class RPCError {
 	toString() {
 		return this.message;
 	}
-}
-
-interface Conn {
-	close: () => void;
-	send: (data: string) => void;
-	when: (sFn: (data: {data: string}) => void, eFn: (error: string) => void) => void;
 }
 
 export class RPC {
