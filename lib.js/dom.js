@@ -27,7 +27,7 @@ export const amendNode = (node, properties, children) => {
 					const arr = prop instanceof Array;
 					node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 				}
-			} else if (node instanceof HTMLElement || elem instanceof SVGElement) {
+			} else if (node instanceof HTMLElement || node instanceof SVGElement) {
 				if (prop instanceof Array || prop instanceof DOMTokenList) {
 					if (k === "class" && prop.length) {
 						for (let c of prop) {
