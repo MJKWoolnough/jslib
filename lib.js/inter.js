@@ -1,25 +1,23 @@
 export class Pipe {
-	#out = new Map();
+	#out = [];
 	send(data) {
-		for (const [o, n] of this.#out) {
-			for (let i = 0; i < n; i++) {
-				o(data);
-			}
+		for (const fn of this.#out) {
+			fn(data);
 		}
 	}
 	receive(fn) {
 		if (fn instanceof Function) {
-			this.#out.set(fn, (this.#out.get(fn) ?? 0) + 1);
+			this.#out.push(fn);
 		} else if (fn !== null && fn !== undefined) {
 			throw new TypeError("pipe.receive requires function type");
 		}
 	}
 	remove(fn) {
-		const n = (this.#out.get(fn) ?? 1) - 1;
-		if (n) {
-			this.#out.set(fn, n);
-		} else {
-			this.#out.delete(fn);
+		for (const [i, afn] of this.#out.entries()) {
+			if (afn === fn) {
+				this.#out.splice(i, 1);
+				return;
+			}
 		}
 	}
 	bind(bindmask = 7) {

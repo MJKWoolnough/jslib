@@ -5,27 +5,25 @@ export type WaitInfo = {
 }
 
 export class Pipe<T> {
-	#out = new Map<(data: T) => void, number>();
+	#out: ((data: T) => void)[] = [];
 	send(data: T) {
-		for (const [o, n] of this.#out) {
-			for (let i = 0; i < n; i++) {
-				o(data);
-			}
+		for (const fn of this.#out) {
+			fn(data);
 		}
 	}
 	receive(fn: (data: T) => void) {
 		if (fn instanceof Function) {
-			this.#out.set(fn, (this.#out.get(fn) ?? 0) + 1);
+			this.#out.push(fn);
 		} else if (fn !== null && fn !== undefined) {
 			throw new TypeError("pipe.receive requires function type");
 		}
 	}
 	remove(fn: (data: T) => void) {
-		const n = (this.#out.get(fn) ?? 1) - 1;
-		if (n) {
-			this.#out.set(fn, n);
-		} else {
-			this.#out.delete(fn);
+		for (const [i, afn] of this.#out.entries()) {
+			if (afn === fn) {
+				this.#out.splice(i, 1);
+				return;
+			}
 		}
 	}
 	bind(bindmask: 1): [(data: T) => void, undefined, undefined];
