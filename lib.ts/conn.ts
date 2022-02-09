@@ -59,7 +59,7 @@ export const HTTPRequest: requestReturn = <T = any>(url: string, props: Properti
 		break;
 	case "xml":
 		xh.overrideMimeType("text/xml");
-		xh.responseType = "document"
+		xh.responseType = "document";
 		break;
 	case "json":
 		xh.overrideMimeType("application/json");
