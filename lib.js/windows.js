@@ -335,12 +335,12 @@ export class WindowElement extends BaseElement {
 		case "window-icon":
 			amendNode(this.#icon, {"src": newValue ?? defaultIcon});
 			break;
-		case "maximise":
+		case "maximised":
 			amendNode(this.#maximise, {"title": newValue === null ? lang["MAXIMISE"] : lang["RESTORE"]});
 		}
 	}
 	static get observedAttributes() {
-		return ["maximise", "window-icon", "window-title"];
+		return ["maximised", "window-icon", "window-title"];
 	}
 	addWindow(w) {
 		if (!this.parentNode) {
