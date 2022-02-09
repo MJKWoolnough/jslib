@@ -18,13 +18,13 @@ interface requestReturn {
 	(url: string, props: properties & {"response": "blob"}): Promise<Blob>;
 	(url: string, props: properties & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
 	(url: string, props: properties & {"response": "xh"}): Promise<XMLHttpRequest>;
-	(url: string, props: properties & {"response": "json"}): Promise<any>;
+	<T = any>(url: string, props: properties & {"response": "json"}): Promise<T>;
 }
 
 const once = {"once": true},
       base = new URL(window.location+"");
 
-export const HTTPRequest: requestReturn = (url: string, props: properties = {}) => new Promise((successFn, errorFn) => {
+export const HTTPRequest: requestReturn = <T = any>(url: string, props: properties = {}): Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest> => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
 	xh.open(props["method"] ?? "GET", url);
 	if (props.hasOwnProperty("headers") && typeof props["headers"] === "object") {
