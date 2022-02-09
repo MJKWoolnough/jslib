@@ -1,6 +1,6 @@
 import {Subscription} from './inter.js';
 
-type properties = {
+export type Properties = {
 	method?: string;
 	user?: string;
 	password?: string;
@@ -13,18 +13,18 @@ type properties = {
 }
 
 interface requestReturn {
-	(url: string, props?: properties & {"response"?: "text" | ""}): Promise<string>;
-	(url: string, props: properties & {"response": "xml" | "document"}): Promise<XMLDocument>;
-	(url: string, props: properties & {"response": "blob"}): Promise<Blob>;
-	(url: string, props: properties & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
-	(url: string, props: properties & {"response": "xh"}): Promise<XMLHttpRequest>;
-	<T = any>(url: string, props: properties & {"response": "json"}): Promise<T>;
+	(url: string, props?: Properties & {"response"?: "text" | ""}): Promise<string>;
+	(url: string, props: Properties & {"response": "xml" | "document"}): Promise<XMLDocument>;
+	(url: string, props: Properties & {"response": "blob"}): Promise<Blob>;
+	(url: string, props: Properties & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
+	(url: string, props: Properties & {"response": "xh"}): Promise<XMLHttpRequest>;
+	<T = any>(url: string, props: Properties & {"response": "json"}): Promise<T>;
 }
 
 const once = {"once": true},
       base = new URL(window.location+"");
 
-export const HTTPRequest: requestReturn = <T = any>(url: string, props: properties = {}): Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest> => new Promise((successFn, errorFn) => {
+export const HTTPRequest: requestReturn = <T = any>(url: string, props: Properties = {}): Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest> => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
 	xh.open(props["method"] ?? "GET", url);
 	if (props.hasOwnProperty("headers") && typeof props["headers"] === "object") {
