@@ -1235,5 +1235,94 @@
 				return ret === 2;
 			}
 		}
+	},
+	"bbcode_tags.js": {
+		"simple tags": {
+			"b": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b]TEXT[/b]").firstElementChild!.outerHTML === `<span style="font-weight: bold">TEXT</span>`;
+			},
+			"i": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[i]TEXT[/i]").firstElementChild!.outerHTML === `<span style="font-style: italic">TEXT</span>`;
+			},
+			"u": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[u]TEXT[/u]").firstElementChild!.outerHTML === `<span style="text-decoration: underline">TEXT</span>`;
+			},
+			"s": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[s]TEXT[/s]").firstElementChild!.outerHTML === `<span style="text-decoration: line-through">TEXT</span>`;
+			},
+			"left": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[left]TEXT[/left]").firstElementChild!.outerHTML === `<div style="text-align: left">TEXT</div>`;
+			},
+			"centre": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[centre]TEXT[/centre]").firstElementChild!.outerHTML === `<div style="text-align: center">TEXT</div>`;
+			},
+			"center": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[center]TEXT[/center]").firstElementChild!.outerHTML === `<div style="text-align: center">TEXT</div>`;
+			},
+			"right": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[right]TEXT[/right]").firstElementChild!.outerHTML === `<div style="text-align: right">TEXT</div>`;
+			},
+			"justify": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[justify]TEXT[/justify]").firstElementChild!.outerHTML === `<div style="text-align: justify">TEXT</div>`;
+			},
+			"full": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[full]TEXT[/full]").firstElementChild!.outerHTML === `<div style="text-align: justify">TEXT</div>`;
+			},
+			"h1": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[h1]TEXT[/h1]").firstElementChild!.outerHTML === `<h1>TEXT</h1>`;
+			},
+			"h2": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[h2]TEXT[/h2]").firstElementChild!.outerHTML === `<h2>TEXT</h2>`;
+			},
+			"h3": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[h3]TEXT[/h3]").firstElementChild!.outerHTML === `<h3>TEXT</h3>`;
+			},
+			"h4": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[h4]TEXT[/h4]").firstElementChild!.outerHTML === `<h4>TEXT</h4>`;
+			},
+			"h5": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[h5]TEXT[/h5]").firstElementChild!.outerHTML === `<h5>TEXT</h5>`;
+			},
+			"h6": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[h6]TEXT[/h6]").firstElementChild!.outerHTML === `<h6>TEXT</h6>`;
+			},
+			"hr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[hr][/hr]").firstElementChild!.outerHTML === `<hr>`;
+			}
+		}
 	}
 });
