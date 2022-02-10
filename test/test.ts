@@ -1137,6 +1137,93 @@
 				let ret = false;
 				bbcode({[(await import("./lib/bbcode.js")).text]: (_n: Node, t: string) => ret = t === "ABC 123"}, "ABC 123");
 				return ret;
+			},
+			"simple token check": async () => {
+				const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
+				let ret = false;
+				bbcode({
+					"a": (_n: Node, t: any) => {
+						const tk = t.next(true).value;
+						if (isOpenTag(tk)) {
+							ret = tk.tagName === "a";
+						}
+					},
+					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+				}, "[a]");
+				return ret;
+			},
+			"simple token with attr check": async () => {
+				const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
+				let ret = false;
+				bbcode({
+					"a": (_n: Node, t: any) => {
+						const tk = t.next(true).value;
+						if (isOpenTag(tk)) {
+							ret = tk.tagName === "a" && tk.attr === "b";
+						}
+					},
+					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+				}, "[a=b]");
+				return ret;
+			},
+			"simple token with close check": async () => {
+				const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
+				let ret = false;
+				bbcode({
+					"a": (_n: Node, t: any) => {
+						let tk = t.next(true).value;
+						if (isOpenTag(tk) && tk.tagName === "a") {
+							tk = t.next().value;
+							if (isCloseTag(tk)) {
+								ret = tk.tagName === "d";
+							}
+						}
+					},
+					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+				}, "[a][/d]");
+				return ret;
+			},
+			"simple token with attr and close check": async () => {
+				const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
+				let ret = false;
+				bbcode({
+					"a": (_n: Node, t: any) => {
+						let tk = t.next(true).value;
+						if (isOpenTag(tk) && tk.tagName === "a" && tk.attr === "bc") {
+							tk = t.next().value;
+							if (isCloseTag(tk)) {
+								ret = tk.tagName === "d";
+							}
+						}
+					},
+					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+				}, "[a=bc][/d]");
+				return ret;
+			},
+			"multi-token check": async () => {
+				const {default: bbcode, isCloseTag, isOpenTag, isString} = await import("./lib/bbcode.js");
+				let ret = false;
+				bbcode({
+					"a": (_n: Node, t: any) => {
+						const checks = [
+							[isOpenTag, (tk: any) => tk.tagName === "a" && tk.attr === "bc"],
+							[isOpenTag, (tk: any) => tk.tagName === "d"],
+							[isOpenTag, (tk: any) => tk.tagName === "e" && tk.attr === "12\n3"],
+							[isString, (data: any) => data === "TEXT"],
+							[isCloseTag, (tk: any) => tk.tagName === "e"],
+							[isString, (data: any) => data === "MORE\nTEXT"],
+							[isCloseTag, (tk: any) => tk.tagName === "d"],
+							[isCloseTag, (tk: any) => tk.tagName === "a"]
+						] as [Function, Function][];
+						ret = true;
+						for (let tk = t.next(true).value; tk; tk = t.next().value) {
+							const [typeCheck, valueCheck] = checks.shift()!;
+							ret &&= typeCheck(tk) && valueCheck(tk);
+						}
+					},
+					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+				}, "[a=bc][d][e=12\n3]TEXT[/e]MORE\nTEXT[/d][/a]");
+				return ret;
 			}
 		}
 	}
