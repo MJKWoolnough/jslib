@@ -1123,5 +1123,21 @@
 				});
 			}
 		}
+	},
+	"bbcode.js": {
+		"tokeniser": {
+			"text": async () => {
+				const bbcode = (await import("./lib/bbcode.js")).default;
+				let ret = false;
+				bbcode({[(await import("./lib/bbcode.js")).text]: (_n: Node, t: string) => ret = t === " "}, " ");
+				return ret;
+			},
+			"long text": async () => {
+				const bbcode = (await import("./lib/bbcode.js")).default;
+				let ret = false;
+				bbcode({[(await import("./lib/bbcode.js")).text]: (_n: Node, t: string) => ret = t === "ABC 123"}, "ABC 123");
+				return ret;
+			}
+		}
 	}
 });
