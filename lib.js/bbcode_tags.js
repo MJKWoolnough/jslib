@@ -19,7 +19,7 @@ const simple = (fn, style) => (n, t, p) => {
 	}
       };
 
-export const b = simple(span, "font-weight: bold;"),
+export const b = simple(span, "font-weight: bold"),
 i = simple(span, "font-style: italic"),
 u = simple(span, "text-decoration: underline"),
 s = simple(span, "text-decoration: line-through"),

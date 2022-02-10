@@ -21,7 +21,7 @@ const simple = (fn: DOMBind<Node>, style?: string) => (n: Node, t: Tokeniser, p:
 	}
       };
 
-export const b = simple(span, "font-weight: bold;"),
+export const b = simple(span, "font-weight: bold"),
 i = simple(span, "font-style: italic"),
 u = simple(span, "text-decoration: underline"),
 s = simple(span, "text-decoration: line-through"),
