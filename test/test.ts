@@ -986,6 +986,13 @@
 				fd.set("name", "value");
 				fd.set("username", "password");
 				return HTTPRequest("/request", {"method": "post", "type": "application/x-www-form-urlencoded", "data": new URLSearchParams(fd as any).toString()}).then(data => data === `{"method":"POST","contentType":"application/x-www-form-urlencoded","contentLength":28,"form":{"name":["value"],"username":["password"]},"postForm":{"name":["value"],"username":["password"]}}`+"\n");
+			},
+			"aborter": async () => {
+				const {HTTPRequest} = await import("./lib/conn.js"),
+				      ac = new AbortController(),
+				      ret = HTTPRequest("/static", {"signal": ac.signal}).then(() => false, () => true);
+				ac.abort();
+				return ret;
 			}
 		},
 		"WS": {
