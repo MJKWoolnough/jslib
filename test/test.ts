@@ -1224,6 +1224,15 @@
 					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 				}, "[a=bc][d][e=12\n3]TEXT[/e]MORE\nTEXT[/d][/a]");
 				return ret;
+			},
+			"process check": async () => {
+				const {default: bbcode, process} = await import("./lib/bbcode.js"),
+				      base = {
+					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+				      };
+				let ret = 0;
+				bbcode(Object.assign({"a": (n: Node, t: any) => process(n, t, Object.assign({"b": () => ret++}, base), "a")}, base), "[b][a][b][b][/a][b]");
+				return ret === 2;
 			}
 		}
 	}
