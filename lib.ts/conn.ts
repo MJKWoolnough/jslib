@@ -10,6 +10,7 @@ export type Properties = {
 	onuploadprogress?: (event: ProgressEvent) => void;
 	ondownloadprogress?: (event: ProgressEvent) => void;
 	data?: XMLHttpRequestBodyInit;
+	signal?: AbortSignal;
 }
 
 interface requestReturn {
@@ -68,6 +69,12 @@ export const HTTPRequest: requestReturn = <T = any>(url: string, props: Properti
 	case "arraybuffer":
 		xh.responseType = props["response"];
 		break;
+	}
+	if (props["signal"]) {
+		props["signal"].addEventListener("abort", () => {
+			xh.abort();
+			errorFn(new Error("Aborted"));
+		}, {"once": true});
 	}
 	xh.send(props["data"] ?? null);
 }),

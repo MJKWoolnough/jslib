@@ -48,6 +48,12 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		xh.responseType = props["response"];
 		break;
 	}
+	if (props["signal"]) {
+		props["signal"].addEventListener("abort", () => {
+			xh.abort();
+			errorFn(new Error("Aborted"));
+		}, {"once": true});
+	}
 	xh.send(props["data"] ?? null);
 }),
 WS = url => new Promise((successFn, errorFn) => {
