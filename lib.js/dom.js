@@ -20,6 +20,10 @@ const childrenArr = (node, children) => {
 export const amendNode = (node, properties, children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node) {
 		children = properties;
+	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
+		for (const prop of properties) {
+			node.setAttributeNode(prop.cloneNode());
+		}
 	} else if (typeof properties === "object") {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (isEventObject(prop)) {

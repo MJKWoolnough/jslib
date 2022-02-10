@@ -14,7 +14,7 @@ type EventArray = [EventListenerOrEventListenerObject, AddEventListenerOptions, 
 
 type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | undefined;
 
-export type Props = Record<string, PropValue>;
+export type Props = Record<string, PropValue> | NamedNodeMap;
 
 export type Children = string | Node | Children[] | NodeList | HTMLCollection;
 
@@ -45,6 +45,10 @@ const childrenArr = (node: Node, children: Children) => {
 export const amendNode: mElement = (node: Node, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node) {
 		children = properties;
+	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
+		for (const prop of properties) {
+			node.setAttributeNode(prop.cloneNode() as Attr);
+		}
 	} else if (typeof properties === "object") {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (isEventObject(prop)) {
