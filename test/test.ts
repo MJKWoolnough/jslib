@@ -681,6 +681,12 @@
 				      span = document.createElement("span"),
 				      div = amendNode(document.createElement("div"), {"property": "value"}, span);
 				return div.getAttribute("property") === "value" && div.firstChild === span;
+			},
+			"set property NamedNodeMap": async () => {
+				const {amendNode} = await import("./lib/dom.js"),
+				      span = amendNode(document.createElement("span"), {"property": "value", "property2": 2}),
+				      div = amendNode(document.createElement("div"), span.attributes);
+				return div.getAttribute("property") === "value" && span.getAttribute("property") === "value" && div.getAttribute("property2") === "2" && span.getAttribute("property2") === "2";
 			}
 		},
 		"event": {
