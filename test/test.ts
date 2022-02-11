@@ -1319,6 +1319,28 @@
 				return bbcode(all, "[h6]TEXT[/h6]").firstElementChild!.outerHTML === `<h6>TEXT</h6>`;
 			}
 		},
+		"text": {
+			"simple text": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b]TEXT").firstElementChild!.innerHTML === `TEXT`;
+			},
+			"new line": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b]\n").firstElementChild!.innerHTML === `<br>`;
+			},
+			"new lines": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b]\n\n").firstElementChild!.innerHTML === `<br><br>`;
+			},
+			"text with lines": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b]a\nb\nc").firstElementChild!.innerHTML === `a<br>b<br>c`;
+			}
+		},
 		"basic tags": {
 			"hr": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
