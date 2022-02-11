@@ -56,7 +56,11 @@ size = (n: Node, t: Tokeniser, p: Parsers) => {
 font = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
-		process(tk.attr ? n.appendChild(span({"style": {"font-family": tk.attr}})) : n, t, p, tk.tagName);
+		if (tk.attr) {
+			amendNode(n, process(span({"style": {"font-family": tk.attr}}), t, p, tk.tagName));
+		} else {
+			p[textSymbol](n, tk.fullText);
+		}
 	}
 },
 h1 = simple(ah1),
