@@ -63,10 +63,7 @@ h3 = simple(ah3),
 h4 = simple(ah4),
 h5 = simple(ah5),
 h6 = simple(ah6),
-hr = (n, t, p) => {
-	amendNode(n, ahr());
-	process(n, t, p);
-},
+hr = n => amendNode(n, ahr()),
 url = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {

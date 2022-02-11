@@ -65,10 +65,7 @@ h3 = simple(ah3),
 h4 = simple(ah4),
 h5 = simple(ah5),
 h6 = simple(ah6),
-hr = (n: Node, t: Tokeniser, p: Parsers) => {
-	amendNode(n, ahr());
-	process(n, t, p);
-},
+hr = (n: Node) => amendNode(n, ahr()),
 url = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
