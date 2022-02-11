@@ -1317,11 +1317,13 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[h6]TEXT[/h6]").firstElementChild!.outerHTML === `<h6>TEXT</h6>`;
-			},
+			}
+		},
+		"basic tags": {
 			"hr": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[hr][/hr]").firstElementChild!.outerHTML === `<hr>`;
+				return bbcode(all, "[b][hr][/b]").firstElementChild!.innerHTML === `<hr>`;
 			}
 		}
 	}
