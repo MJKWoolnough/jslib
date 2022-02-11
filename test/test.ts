@@ -1431,6 +1431,26 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][size=size]TEXT[/size]").firstElementChild!.innerHTML === `[size=size]TEXT[/size]`;
+			},
+			"font with no attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][font]TEXT[/font]").firstElementChild!.innerHTML === `[font]TEXT[/font]`;
+			},
+			"font with font attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][font=arial]TEXT[/font]").firstElementChild!.innerHTML === `<span style="font-family: arial;">TEXT</span>`;
+			},
+			"font with multiple fonts attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][font=arial, times]TEXT[/font]").firstElementChild!.innerHTML === `<span style="font-family: arial, times;">TEXT</span>`;
+			},
+			"font with nonsense attr (XSS)": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][font=arial;\"><XSS>]TEXT[/font]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
 			}
 		}
 	}
