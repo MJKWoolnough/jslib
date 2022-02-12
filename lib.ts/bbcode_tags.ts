@@ -80,8 +80,9 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 				p[textSymbol](n, tk.fullText);
 			}
 		} else {
-			const u = textContents(t, tk.tagName);
-			if (u) {
+			const u = textContents(t, tk.tagName),
+			      endTag = t.next(true).value;
+			if (u && endTag && isCloseTag(endTag)) {
 				try {
 					amendNode(n, a({"href": (new URL(u, window.location.href)).href}, u));
 					return;
@@ -89,7 +90,6 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 			}
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, u);
-			const endTag = t.next(true).value;
 			if (endTag && isCloseTag(endTag)) {
 				p[textSymbol](n, endTag.fullText);
 			}
