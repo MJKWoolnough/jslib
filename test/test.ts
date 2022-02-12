@@ -1492,6 +1492,16 @@
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][url=//#]TEXT[/url]").firstElementChild!.innerHTML === `[url=//#]TEXT[/url]`;
 			},
+			"url empty attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url=][/url]").firstElementChild!.innerHTML === `[url=][/url]`;
+			},
+			"url no url": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url][/url]").firstElementChild!.innerHTML === `[url][/url]`;
+			},
 			"audio with path url": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
