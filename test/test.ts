@@ -1502,6 +1502,16 @@
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][url][/url]").firstElementChild!.innerHTML === `[url][/url]`;
 			},
+			"url no end tag with attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url=http://example.com/]EXAMPLE").firstElementChild!.innerHTML === `<a href="http://example.com/">EXAMPLE</a>`;
+			},
+			"url no end tag with no attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url]http://example.com").firstElementChild!.innerHTML === `[url]http://example.com`;
+			},
 			"audio with path url": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
