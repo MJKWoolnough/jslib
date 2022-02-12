@@ -1451,6 +1451,46 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][font=arial;\"><XSS>]TEXT[/font]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
+			},
+			"url no attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/TEXT">TEXT</a>`;
+			},
+			"url no attr, same protocol": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url]//example.com/test/[/url]").firstElementChild!.innerHTML === `<a href="${window.location.protocol}//example.com/test/">//example.com/test/</a>`;
+			},
+			"url no attr, full URL": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url]https://example.com/test2/[/url]").firstElementChild!.innerHTML === `<a href="https://example.com/test2/">https://example.com/test2/</a>`;
+			},
+			"url path attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url=test]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/test">TEXT</a>`;
+			},
+			"url same protocol attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url=//example.com/test/]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.protocol}//example.com/test/">TEXT</a>`;
+			},
+			"url full url attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url=https://example.com/test2/]TEXT[/url]").firstElementChild!.innerHTML === `<a href="https://example.com/test2/">TEXT</a>`;
+			},
+			"url invalid text": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url]//#[/url]").firstElementChild!.innerHTML === `[url]//#[/url]`;
+			},
+			"url invalid attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][url=//#]TEXT[/url]").firstElementChild!.innerHTML === `[url=//#]TEXT[/url]`;
 			}
 		}
 	}
