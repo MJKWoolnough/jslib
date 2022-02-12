@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"golang.org/x/net/websocket"
@@ -85,6 +87,12 @@ func run() error {
 			}
 		}))
 		jrpc.Handle()
+	}))
+	audio, _ := base64.StdEncoding.DecodeString("UklGRiwAAABXQVZFZm10IBAAAAABAAIARKwAABCxAgAEABAAZGF0YQgAAAAAAAAAAAD//w==")
+	m.Handle("/AUDIO", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "audio/wav")
+		w.Header().Add("Content-Length", strconv.FormatUint(uint64(len(audio)), 10))
+		w.Write(audio)
 	}))
 	return http.ListenAndServe(":8080", m)
 }
