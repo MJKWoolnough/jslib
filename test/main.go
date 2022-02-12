@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	"golang.org/x/net/websocket"
 	"vimagination.zapto.org/jsonrpc"
@@ -53,10 +54,14 @@ func run() error {
 			PostData:      string(postData),
 		})
 	}))
-	m.Handle("/socket", websocket.Handler(func(conn *websocket.Conn) { io.Copy(conn, conn) }))
+	m.Handle("/socket", websocket.Handler(func(conn *websocket.Conn) {
+		conn.SetDeadline(time.Now().Add(time.Second * 60))
+		io.Copy(conn, conn)
+	}))
 	m.Handle("/socket-close", websocket.Handler(func(conn *websocket.Conn) { conn.Close() }))
 	m.Handle("/rpc", websocket.Handler(func(conn *websocket.Conn) {
 		var jrpc *jsonrpc.Server
+		conn.SetDeadline(time.Now().Add(time.Second * 60))
 		jrpc = jsonrpc.New(conn, jsonrpc.HandlerFunc(func(method string, data json.RawMessage) (interface{}, error) {
 			switch method {
 			case "static":
