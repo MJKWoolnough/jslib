@@ -94,5 +94,11 @@ func run() error {
 		w.Header().Add("Content-Length", strconv.FormatUint(uint64(len(audio)), 10))
 		w.Write(audio)
 	}))
+	image, _ := base64.StdEncoding.DecodeString("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVR4AWNoAAAAggCBTBfX3wAAAABJRU5ErkJggg==")
+	m.Handle("/IMAGE", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "image/png")
+		w.Header().Add("Content-Length", strconv.FormatUint(uint64(len(image)), 10))
+		w.Write(image)
+	}))
 	return http.ListenAndServe(":8080", m)
 }
