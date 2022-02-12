@@ -1491,7 +1491,37 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][url=//#]TEXT[/url]").firstElementChild!.innerHTML === `[url=//#]TEXT[/url]`;
-			}
+			},
+			"audio with path url": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][audio]AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="${window.location.origin}/AUDIO" controls=""></audio>`;
+			},
+			"audio with same protocol url": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][audio]//example.com/AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="${window.location.protocol}//example.com/AUDIO" controls=""></audio>`;
+			},
+			"audio with full url": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][audio]https://example.com/AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="https://example.com/AUDIO" controls=""></audio>`;
+			},
+			"audio with invalid url": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][audio]//#[/audio]").firstElementChild!.innerHTML === `[audio]//#[/audio]`;
+			},
+			"audio with no url": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][audio][/audio]").firstElementChild!.innerHTML === `[audio][/audio]`;
+			},
+			"audio with no end tag": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][audio]https://example.com/AUDIO").firstElementChild!.innerHTML === `[audio]https://example.com/AUDIO`;
+			},
 		}
 	}
 });
