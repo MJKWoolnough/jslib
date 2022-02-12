@@ -81,15 +81,17 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 			}
 		} else {
 			const u = textContents(t, tk.tagName);
-			try {
-				amendNode(n, a({"href": (new URL(u, window.location.href)).href}, u));
-			} catch {
-				p[textSymbol](n, tk.fullText);
-				p[textSymbol](n, u);
-				const endTag = t.next(true).value;
-				if (endTag && isCloseTag(endTag)) {
-					p[textSymbol](n, endTag.fullText);
-				}
+			if (u) {
+				try {
+					amendNode(n, a({"href": (new URL(u, window.location.href)).href}, u));
+					return;
+				} catch {}
+			}
+			p[textSymbol](n, tk.fullText);
+			p[textSymbol](n, u);
+			const endTag = t.next(true).value;
+			if (endTag && isCloseTag(endTag)) {
+				p[textSymbol](n, endTag.fullText);
 			}
 		}
 	}
