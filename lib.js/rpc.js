@@ -39,6 +39,7 @@ export class RPC {
 			      m = e ? new RPCError(e.code, e.message, e.data) : message.result;
 			if (id >= 0) {
 				(this.#r.get(id) ?? noops)[i](m);
+				this.#r.delete(id);
 			} else {
 				for (const r of this.#a.get(id) ?? []) {
 					r[i](m);
