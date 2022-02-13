@@ -1,4 +1,3 @@
-import {WS} from './conn.js';
 import {Subscription} from './inter.js';
 
 type MessageData = {
@@ -117,5 +116,3 @@ export class RPC {
 		this.#c = null;
 	}
 }
-
-export default (path: string) => WS(path).then(c => new RPC(c));

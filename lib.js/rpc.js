@@ -1,4 +1,3 @@
-import {WS} from './conn.js';
 import {Subscription} from './inter.js';
 
 const noop = () => {},
@@ -100,5 +99,3 @@ export class RPC {
 		this.#c = null;
 	}
 }
-
-export default path => WS(path).then(c => new RPC(c));
