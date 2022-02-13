@@ -1379,6 +1379,16 @@
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][colour=green]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: green;">TEXT</span>`;
 			},
+			"colour with rgb": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][colour=rgb(1, 2, 3)]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(1, 2, 3);">TEXT</span>`;
+			},
+			"colour with rgba": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][colour=rgba(1, 2, 3, 0.4)]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgba(1, 2, 3, 0.4);">TEXT</span>`;
+			},
 			"colour with nonsense (XSS)": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
@@ -1403,6 +1413,16 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][color=green]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: green;">TEXT</span>`;
+			},
+			"color with rgb": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][color=rgb(1, 2, 3)]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(1, 2, 3);">TEXT</span>`;
+			},
+			"color with rgba": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][color=rgba(1, 2, 3, 0.4)]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgba(1, 2, 3, 0.4);">TEXT</span>`;
 			},
 			"color with nonsense (XSS)": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
