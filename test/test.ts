@@ -1047,16 +1047,20 @@
 	"rpc.js": {
 		"RPC": {
 			"static test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc").then(rpc => rpc.request("static").then(d => d === "123"));
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => new RPC(ws).request("static").then(d => d === "123"));
 			},
 			"echo test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc").then(rpc => rpc.request("echo", "456").then(d => d === "456"));
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => new RPC(ws).request("echo", "456").then(d => d === "456"));
 			},
 			"broadcast test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc").then(rpc => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => {
+					const rpc = new RPC(ws);
 					let fn = (_b: boolean) => {},
 					    res = 0;
 					rpc.await(-1).then(data => res += +(data === "123"));
@@ -1070,8 +1074,10 @@
 				});
 			},
 			"broadcast test, double recieve": async () => {
-				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc").then(rpc => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => {
+					const rpc = new RPC(ws);
 					let fn = (_b: boolean) => {},
 					    res = 0;
 					rpc.await(-1).then(data => res += +(data === "123"));
@@ -1086,8 +1092,10 @@
 				});
 			},
 			"broadcast test, subscribed": async () => {
-				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc").then(rpc => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => {
+					const rpc = new RPC(ws);
 					let fn = (_b: boolean) => {},
 					    res = 0;
 					rpc.subscribe(-1).then(data => res += +(data === "123"));
@@ -1106,16 +1114,20 @@
 				});
 			},
 			"endpoint error": async () => {
-				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc").then(rpc => rpc.request("unknown").then(() => false).catch(() => true));
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => new RPC(ws).request("unknown").then(() => false).catch(() => true));
 			},
 			"close test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc").then(rpc => rpc.request("close").then(() => false).catch(() => true));
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => new RPC(ws).request("close").then(() => false).catch(() => true));
 			},
 			"close all test": async () => {
-				const {default: rpc} = await import("./lib/rpc.js");
-				return rpc("/rpc").then(rpc => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => {
+					const rpc = new RPC(ws);
 					let res = 0;
 					rpc.await(-1).catch(() => res++);
 					rpc.await(-2).catch(() => res++);
