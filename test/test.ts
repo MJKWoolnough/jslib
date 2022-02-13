@@ -1351,6 +1351,11 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b]a\nb\nc").firstElementChild!.innerHTML === `a<br>b<br>c`;
+			},
+			"text with non-tag": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b]a\n[c]b\nc[/c]").firstElementChild!.innerHTML === `a<br>[c]b<br>c[/c]`;
 			}
 		},
 		"basic tags": {
