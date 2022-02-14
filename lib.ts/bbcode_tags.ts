@@ -290,11 +290,11 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 			type = tk.attr;
 		}
 		const l = type === "" ? ul() : ol({type}),
-		      lname = tk.tagName;
+			{tagName} = tk;
 		let currItem: HTMLLIElement | null = null;
 		while (true) {
 			const tk = t.next().value;
-			if (!tk || (isCloseTag(tk) && tk.tagName === lname)) {
+			if (!tk || (isCloseTag(tk) && tk.tagName === tagName)) {
 				break;
 			}
 			if (isString(tk)) {

@@ -288,11 +288,11 @@ list = (n, t, p) => {
 			type = tk.attr;
 		}
 		const l = type === "" ? ul() : ol({type}),
-		      lname = tk.tagName;
+			{tagName} = tk;
 		let currItem = null;
 		while (true) {
 			const tk = t.next().value;
-			if (!tk || (isCloseTag(tk) && tk.tagName === lname)) {
+			if (!tk || (isCloseTag(tk) && tk.tagName === tagName)) {
 				break;
 			}
 			if (isString(tk)) {
