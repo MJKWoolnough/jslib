@@ -177,7 +177,8 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 	if (tk && isOpenTag(tk)) {
 		const tableHeader: HTMLTableRowElement[] = [],
 		      tableBody: HTMLTableRowElement[] = [],
-		      tableFooter: HTMLTableRowElement[] = [];
+		      tableFooter: HTMLTableRowElement[] = [],
+		      {tagName} = tk;
 		let state = 0, // 1 - tr, 2 - thead, 4 -> tbody, 8 -> tfoot
 		    hasHeader = false,
 		    hasBody = false,
@@ -235,7 +236,7 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 					}
 				}
 			} else if (isCloseTag(tk)) {
-				if (tk.tagName === "table") {
+				if (tk.tagName === tagName) {
 					amendNode(n, atable([
 						tableHeader.length > 0 ? thead(tableHeader) : [],
 						tableBody.length > 0 ? tbody(tableBody) : [],
