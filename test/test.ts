@@ -1703,6 +1703,26 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
+			},
+			"quote empty, no attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][quote][/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote></blockquote></fieldset>`;
+			},
+			"quote just text no attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][quote]TEXT[/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote>TEXT</blockquote></fieldset>`;
+			},
+			"quote with tags no attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][quote]TEXT[code]MORE TEXT[/code][/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote>TEXT<pre>MORE TEXT</pre></blockquote></fieldset>`;
+			},
+			"quote just text with attr": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][quote=NAME]TEXT[/quote]").firstElementChild!.innerHTML === `<fieldset><legend>NAME</legend><blockquote>TEXT</blockquote></fieldset>`;
 			}
 		}
 	}
