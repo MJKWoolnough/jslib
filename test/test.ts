@@ -1683,6 +1683,26 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][img=10xa]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10">`;
+			},
+			"code with no inner text": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][code][/code]").firstElementChild!.innerHTML === `<pre></pre>`;
+			},
+			"code with just text": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][code]TEXT[/code]").firstElementChild!.innerHTML === `<pre>TEXT</pre>`;
+			},
+			"code with text and tags": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i][/code]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
+			},
+			"code with no end tag": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
 			}
 		}
 	}
