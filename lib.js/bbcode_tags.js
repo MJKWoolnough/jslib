@@ -235,11 +235,13 @@ table = (n, t, p) => {
 				}
 			} else if (isCloseTag(tk)) {
 				if (tk.tagName === tagName) {
-					amendNode(n, atable([
-						tableHeader.length > 0 ? thead(tableHeader) : [],
-						tableBody.length > 0 ? tbody(tableBody) : [],
-						tableFooter.length > 0 ? tfoot(tableFooter) : []
-					]));
+					if (hasHeader || hasBody || hasFooter) {
+						amendNode(n, atable([
+							hasHeader ? thead(tableHeader) : [],
+							hasBody ? tbody(tableBody) : [],
+							hasFooter ? tfoot(tableFooter) : []
+						]));
+					}
 					return;
 				} else if ((state&1) === 1 && tk.tagName === "tr") {
 					state ^= 1;
