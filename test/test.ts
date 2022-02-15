@@ -909,6 +909,15 @@
 				rect.setAttribute("width", "100");
 				rect.setAttribute("height", "50");
 				return svgData(svg) === "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%3E%3Crect%20width%3D%22100%22%20height%3D%2250%22%3E%3C%2Frect%3E%3C%2Fg%3E%3C%2Fsvg%3E";
+			},
+			"symbol to string": async () => {
+				const {ns, svgData} = await import("./lib/svg.js"),
+				      svg = document.createElementNS(ns, "symbol"),
+				      rect = svg.appendChild(document.createElement("g")).appendChild(document.createElement("rect"));
+				svg.setAttribute("viewBox", "0 0 100 100");
+				rect.setAttribute("width", "100");
+				rect.setAttribute("height", "50");
+				return svgData(svg) === "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%3E%3Crect%20width%3D%22100%22%20height%3D%2250%22%3E%3C%2Frect%3E%3C%2Fg%3E%3C%2Fsvg%3E";
 			}
 		}
 	},
