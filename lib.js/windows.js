@@ -155,13 +155,13 @@ class BaseElement extends HTMLElement {
 				"window-title": title,
 				"hide-maximise": "true",
 				"onremove": () => resolve(false)
-			}, [
+			      }, [
 				div(message),
 				div({"style": "text-align: center"}, autoFocus(button({"onclick": () => {
 					resolve(true);
 					w.remove();
 				}}, lang["OK"])))
-			]);
+			      ]);
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
@@ -173,7 +173,7 @@ class BaseElement extends HTMLElement {
 				"window-title": title,
 				"hide-maximise": "true",
 				"onremove": () => resolve(false)
-			}, [
+			      }, [
 				div(message),
 				div({"style": "text-align: center"}, [
 					autoFocus(button({"onclick": () => {
@@ -182,7 +182,7 @@ class BaseElement extends HTMLElement {
 					}}, lang["OK"])),
 					button({"onclick": () => w.remove()}, lang["CANCEL"])
 				])
-			]);
+			      ]);
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
