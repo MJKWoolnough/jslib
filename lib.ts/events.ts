@@ -142,10 +142,10 @@ for (const [evt, fn] of [
 		if (button !== 0 && button !== 1 && button !== 2) {
 			return;
 		}
-		for (const [, event] of mouseUp[button]) {
+		for (const [id, event] of mouseUp[button]) {
 			event(e);
+			mouseMove.delete(id);
 		}
-		mouseMove.clear();
 		mouseUp[button].clear();
 	}],
 	["blur", () => {
