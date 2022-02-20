@@ -6,7 +6,7 @@ export type Properties = {
 	password?: string;
 	headers?: object;
 	type?: string;
-	response?: "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
+	response?: "" | "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
 	onuploadprogress?: (event: ProgressEvent) => void;
 	ondownloadprogress?: (event: ProgressEvent) => void;
 	data?: XMLHttpRequestBodyInit;
