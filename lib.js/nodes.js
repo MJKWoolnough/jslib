@@ -123,14 +123,13 @@ const sortNodes = (root, n) => {
 export class NodeArray {
 	#root;
 	constructor(h, s = noSort, elements = []) {
-		const root = this.#root = {s, h, l: 0, o: 1},
-		      p = new Proxy(this, proxyObj);
+		const root = this.#root = {s, h, l: 0, o: 1};
 		Object.defineProperty(this, realTarget, {"value": this});
 		root.p = root.n = root;
 		for (const item of elements) {
 			addItemAfter(root, root.p, item);
 		}
-		return p;
+		return new Proxy(this, proxyObj);
 	}
 	get [node]() {
 		return this[realTarget].#root.h;

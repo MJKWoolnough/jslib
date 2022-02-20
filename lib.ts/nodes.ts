@@ -162,14 +162,13 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	#root: Root<T, H>;
 	[realTarget]: this;
 	constructor(h: H, s: sortFunc<T> = noSort, elements: Iterable<T> = []) {
-		const root = this.#root = {s, h, l: 0, o: 1} as Root<T, H>,
-		      p = new Proxy<NodeArray<T, H>>(this, proxyObj);
+		const root = this.#root = {s, h, l: 0, o: 1} as Root<T, H>;
 		Object.defineProperty(this, realTarget, {"value": this});
 		root.p = root.n = root;
 		for (const item of elements) {
 			addItemAfter(root, root.p, item);
 		}
-		return p;
+		return new Proxy<NodeArray<T, H>>(this, proxyObj);
 	}
 	get [node]() {
 		return this[realTarget].#root.h;
