@@ -81,7 +81,7 @@ export const amendNode: mElement = (node: Node, properties?: Props | Children, c
 					node.setAttribute(k, prop.toString());
 				}
 			}
-		};
+		}
 	}
 	if (typeof children === "string" && !node.firstChild) {
 		node.textContent = children;

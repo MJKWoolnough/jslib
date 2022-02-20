@@ -56,7 +56,7 @@ export const amendNode = (node, properties, children) => {
 					node.setAttribute(k, prop.toString());
 				}
 			}
-		};
+		}
 	}
 	if (typeof children === "string" && !node.firstChild) {
 		node.textContent = children;
