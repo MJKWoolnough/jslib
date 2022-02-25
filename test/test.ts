@@ -699,6 +699,42 @@
 				      span = amendNode(document.createElement("span"), {"property": "value", "property2": 2}),
 				      div = amendNode(document.createElement("div"), span.attributes);
 				return div.getAttribute("property") === "value" && span.getAttribute("property") === "value" && div.getAttribute("property2") === "2" && span.getAttribute("property2") === "2";
+			},
+			"non-node event setting": async () => {
+				let res = 0;
+				const {amendNode} = await import("./lib/dom.js");
+				amendNode(window, {"onevent": () => res++});
+				window.dispatchEvent(new CustomEvent("event"));
+				window.dispatchEvent(new CustomEvent("event"));
+				return res === 2;
+			},
+			"non-node event setting with once": async () => {
+				let res = 0;
+				const {amendNode} = await import("./lib/dom.js");
+				amendNode(window, {"onevent": [() => res++, {"once": true}, false]});
+				window.dispatchEvent(new CustomEvent("event"));
+				window.dispatchEvent(new CustomEvent("event"));
+				return res === 1;
+			},
+			"non-node event setting with signal": async () => {
+				let res = 0;
+				const {amendNode} = await import("./lib/dom.js"),
+				      ac = new AbortController();
+				amendNode(window, {"onevent": [() => res++, {"signal": ac.signal}, false]});
+				window.dispatchEvent(new CustomEvent("event"));
+				ac.abort();
+				window.dispatchEvent(new CustomEvent("event"));
+				return res === 1;
+			},
+			"non-node event setting with remove": async () => {
+				let res = 0;
+				const {amendNode} = await import("./lib/dom.js"),
+				      fn = () => res++;
+				amendNode(window, {"onevent": fn});
+				window.dispatchEvent(new CustomEvent("event"));
+				amendNode(window, {"onevent": [fn, {}, true]});
+				window.dispatchEvent(new CustomEvent("event"));
+				return res === 1;
 			}
 		},
 		"event": {
