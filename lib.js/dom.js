@@ -58,10 +58,12 @@ export const amendNode = (node, properties, children) => {
 			}
 		}
 	}
-	if (typeof children === "string" && !node.firstChild) {
-		node.textContent = children;
-	} else if (children) {
-		childrenArr(node, children);
+	if (node instanceof Node) {
+		if (typeof children === "string" && !node.firstChild) {
+			node.textContent = children;
+		} else if (children) {
+			childrenArr(node, children);
+		}
 	}
 	return node;
 },

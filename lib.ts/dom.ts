@@ -3,6 +3,7 @@ interface ToString {
 }
 
 interface mElement {
+	<T extends EventTarget>(element: T, properties: Record<`on${string}`, EventListenerObject | EventArray | Function>): T;
 	<T extends Node>(element: T, properties?: Props, children?: Children): T;
 	<T extends Node>(element: T, children?: Children): T;
 	<T extends Node>(element: T, properties?: Props | Children, children?: Children): T;
@@ -42,7 +43,7 @@ const childrenArr = (node: Node, children: Children) => {
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object;
 
-export const amendNode: mElement = (node: Node, properties?: Props | Children, children?: Children) => {
+export const amendNode: mElement = (node: Node | EventTarget, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
@@ -83,10 +84,12 @@ export const amendNode: mElement = (node: Node, properties?: Props | Children, c
 			}
 		}
 	}
-	if (typeof children === "string" && !node.firstChild) {
-		node.textContent = children;
-	} else if (children) {
-		childrenArr(node, children);
+	if (node instanceof Node) {
+		if (typeof children === "string" && !node.firstChild) {
+			node.textContent = children;
+		} else if (children) {
+			childrenArr(node, children);
+		}
 	}
 	return node;
 },
