@@ -1,6 +1,6 @@
 import {isCloseTag, isOpenTag, isString, process, text as textSymbol} from './bbcode.js';
 import {amendNode} from './dom.js';
-import {a, br, audio as aaudio, div, blockquote, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, ol, pre, span, table as atable, tbody, td, tfoot, thead, th, tr, ul} from './html.js';
+import {a, br, audio as aaudio, div, blockquote, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, mark, ol, pre, span, table as atable, tbody, td, tfoot, thead, th, tr, ul} from './html.js';
 
 const simple = (fn, style) => (n, t, p) => {
 	const tk = t.next(true).value;
@@ -29,6 +29,7 @@ center = centre,
 right = simple(div, "text-align: right"),
 justify = simple(div, "text-align: justify"),
 full = justify,
+highlight = simple(mark),
 colour = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -354,6 +355,7 @@ all = Object.freeze({
 	h4,
 	h5,
 	h6,
+	highlight,
 	hr,
 	url,
 	audio,
