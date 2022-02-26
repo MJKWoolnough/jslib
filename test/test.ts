@@ -1386,6 +1386,11 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[h6]TEXT[/h6]").firstElementChild!.outerHTML === `<h6>TEXT</h6>`;
+			},
+			"highlight": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[highlight]TEXT[/highlight]").firstElementChild!.outerHTML === `<mark>TEXT</mark>`;
 			}
 		},
 		"text": {
