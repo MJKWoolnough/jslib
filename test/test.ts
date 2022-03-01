@@ -1766,6 +1766,8 @@
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
 			},
+		},
+		"complex tags": {
 			"quote empty, no attr": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
