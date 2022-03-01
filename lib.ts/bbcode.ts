@@ -1,4 +1,22 @@
-const parseText = function* (text: string): Tokeniser {
+const tags: string[] = [""],
+      sendTag = function *(t: OpenTag | CloseTag | string): Tokeniser {
+	if (isOpenTag(t)) {
+		while (true) {
+			switch (yield t) {
+			default:
+				return;
+			case 1:
+				tags.unshift(t.tagName);
+			case true:
+			}
+		}
+	} else if (isCloseTag(t) && tags[0] === t.tagName) {
+		tags.pop();
+		while ((yield undefined!) !== 1) {}
+	}
+	while (yield t) {}
+      },
+      parseText = function* (text: string): Tokeniser {
 	let last = 0;
 	for (let pos = 0; pos < text.length; pos++) {
 		if (text.charAt(pos) === '[') {
@@ -14,23 +32,20 @@ const parseText = function* (text: string): Tokeniser {
 					continue;
 				} else if (c === 93 && pos > start + +end + 1) { // ']'
 					if (last !== start) {
-						const t = text.slice(last, start);
-						while (yield t) {}
+						yield *sendTag(text.slice(last, start));
 					}
-					const t = Object.freeze(end ? {
+					last = pos+1;
+					yield *sendTag(Object.freeze(end ? {
 						"tagName": text.slice(start+2, pos).toLowerCase(),
 						"fullText": text.slice(start, pos+1)
 					} : {
 						"tagName": text.slice(start+1, pos).toLowerCase(),
 						"attr": null,
 						"fullText": text.slice(start, pos+1)
-					});
-					last = pos+1;
-					while (yield t) {}
+					}));
 				} else if (c === 61 && !end && pos > start + 1) { // '='
 					if (last !== start) {
-						const t = text.slice(last, start);
-						while (yield t) {}
+						yield *sendTag(text.slice(last, start));
 					}
 					const startAttr = pos;
 					let attr = "";
@@ -69,20 +84,19 @@ const parseText = function* (text: string): Tokeniser {
 						}
 						attr = text.slice(startAttr+1, pos);
 					}
-					const t = Object.freeze({
+					last = pos+1;
+					yield *sendTag(Object.freeze({
 						"tagName": text.slice(start+1, startAttr).toLowerCase(),
 						attr,
 						"fullText": text.slice(start, pos+1)
-					});
-					last = pos+1;
-					while (yield t) {}
+					}));
 				}
 				break;
 			}
 		}
 	}
 	if (last < text.length) {
-		while(yield text.slice(last)) {}
+		yield *sendTag(text.slice(last));
 	}
       };
 
@@ -125,7 +139,7 @@ export type CloseTag = {
 	fullText: string;
 }
 
-export type Tokeniser = Generator<OpenTag | CloseTag | string, void, true | undefined>;
+export type Tokeniser = Generator<OpenTag | CloseTag | string, void, true | 1 | undefined>;
 
 export type TagFn = (node: Node, t: Tokeniser, p: Parsers) => void;
 
