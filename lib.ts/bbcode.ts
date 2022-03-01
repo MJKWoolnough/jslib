@@ -1,4 +1,4 @@
-const tags: string[] = [""],
+const tags: string[] = [],
       sendTag = function *(t: OpenTag | CloseTag | string): Tokeniser {
 	if (isOpenTag(t)) {
 		while (true) {
@@ -17,6 +17,7 @@ const tags: string[] = [""],
 	while (yield t) {}
       },
       parseText = function* (text: string): Tokeniser {
+	tags.splice(0, tags.length, "");
 	let last = 0;
 	for (let pos = 0; pos < text.length; pos++) {
 		if (text.charAt(pos) === '[') {
