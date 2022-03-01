@@ -270,12 +270,13 @@ table = (n, t, p) => {
 	}
 },
 quote = (n, t, p) => {
-	const tk = t.next(true).value;
+	const tk = t.next(1).value;
 	if (tk && isOpenTag(tk)) {
 		amendNode(n, fieldset([
 			tk.attr ? legend(tk.attr) : [],
 			process(blockquote(), t, p, tk.tagName)
 		]));
+		t.next(1);
 	}
 },
 list = (n, t, p) => {
