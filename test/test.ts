@@ -1324,6 +1324,101 @@
 				}, `[a="bc"][b=""][c="\\""][d="]"]`);
 				return ret;
 			},
+			"isolation": async () => {
+				const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
+				let ret = false;
+				bbcode({
+					"a": (_n: Node, t: any) => {
+						let tk = t.next(1).value;
+						if (!isOpenTag(tk) || tk.tagName !== "a") {
+							return;
+						}
+						t.next();
+						tk = t.next(1).value;
+						if (!isOpenTag(tk) || tk.tagName !== "b") {
+							return;
+						}
+						t.next();
+						tk = t.next(1).value;
+						if (!isOpenTag(tk) || tk.tagName !== "b") {
+							return;
+						}
+						t.next();
+						tk = t.next(1).value;
+						if (!isOpenTag(tk) || tk.tagName !== "c") {
+							return;
+						}
+						tk = t.next().value;
+						if (!isOpenTag(tk) || tk.tagName !== "d") {
+							return;
+						}
+						tk = t.next().value;
+						if (!isOpenTag(tk) || tk.tagName !== "e") {
+							return;
+						}
+						for (let i = 0; i < 10; i++) {
+							if (t.next().value) {
+								return;
+							}
+						}
+						tk = t.next(1).value;
+						if (!isCloseTag(tk) || tk.tagName !== "c") {
+							return;
+						}
+						tk = t.next().value;
+						if (!isOpenTag(tk) || tk.tagName !== "f") {
+							return;
+						}
+						for (let i = 0; i < 10; i++) {
+							if (t.next().value) {
+								return;
+							}
+						}
+						tk = t.next(1).value;
+						if (!isCloseTag(tk) || tk.tagName !== "b") {
+							return;
+						}
+						tk = t.next().value;
+						if (!isOpenTag(tk) || tk.tagName !== "g") {
+							return;
+						}
+						tk = t.next().value;
+						if (!isOpenTag(tk) || tk.tagName !== "h") {
+							return;
+						}
+						for (let i = 0; i < 10; i++) {
+							if (t.next().value) {
+								return;
+							}
+						}
+						tk = t.next(1).value;
+						if (!isCloseTag(tk) || tk.tagName !== "b") {
+							return;
+						}
+						for (let i = 0; i < 10; i++) {
+							if (t.next().value) {
+								return;
+							}
+						}
+						tk = t.next(1).value;
+						if (!isCloseTag(tk) || tk.tagName !== "a") {
+							return;
+						}
+						tk = t.next().value;
+						if (!isOpenTag(tk) || tk.tagName !== "i") {
+							return;
+						}
+						for (let i = 0; i < 10; i++) {
+							if (t.next().value) {
+								return;
+							}
+						}
+						ret = true;
+					},
+					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+				}, `[a][b][b][c][d][e][/c][f][/b][g][h][/b][/a][i]`);
+				return ret;
+			}
 		}
 	},
 	"bbcode_tags.js": {
