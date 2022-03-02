@@ -1302,7 +1302,28 @@
 				let ret = 0;
 				bbcode(Object.assign({"a": (n: Node, t: any) => process(n, t, Object.assign({"b": () => ret++}, base), "a")}, base), "[b][a][b][b][/a][b]");
 				return ret === 2;
-			}
+			},
+			"quoted attr": async () => {
+				const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
+				let ret = false;
+				bbcode({
+					"a": (_n: Node, t: any) => {
+						const checks = [
+							[isOpenTag, (tk: any) => tk.tagName === "a" && tk.attr === "bc"],
+							[isOpenTag, (tk: any) => tk.tagName === "b" && tk.attr === ""],
+							[isOpenTag, (tk: any) => tk.tagName === "c" && tk.attr === "\""],
+							[isOpenTag, (tk: any) => tk.tagName === "d" && tk.attr === "]"]
+						] as [Function, Function][];
+						ret = true;
+						for (let tk = t.next(true).value; tk; tk = t.next().value) {
+							const [typeCheck, valueCheck] = checks.shift()!;
+							ret &&= typeCheck(tk) && valueCheck(tk);
+						}
+					},
+					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+				}, `[a="bc"][b=""][c="\\""][d="]"]`);
+				return ret;
+			},
 		}
 	},
 	"bbcode_tags.js": {
