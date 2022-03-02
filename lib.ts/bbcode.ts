@@ -71,7 +71,7 @@ const parseText = function* (text: string): Tokeniser {
 						});
 						if (end) {
 							if (tags[0] === t.tagName) {
-								tags.pop();
+								tags.shift();
 								while ((yield undefined!) !== 1) {}
 							}
 							while (yield t) {}
