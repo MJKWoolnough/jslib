@@ -1,5 +1,5 @@
 const parseText = function* (text) {
-	const tags = [""];
+	const tags = [];
 	let last = 0;
 	for (let pos = 0; pos < text.length; pos++) {
 		if (text.charAt(pos) === '[') {

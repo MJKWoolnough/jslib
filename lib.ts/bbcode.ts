@@ -1,5 +1,5 @@
 const parseText = function* (text: string): Tokeniser {
-	const tags = [""];
+	const tags: string[] = [];
 	let last = 0;
 	for (let pos = 0; pos < text.length; pos++) {
 		if (text.charAt(pos) === '[') {
