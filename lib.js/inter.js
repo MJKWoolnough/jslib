@@ -116,6 +116,17 @@ export class Subscription {
 			});
 		});
 	}
+	static bind(bindmask = 7) {
+		let successFn,
+		    errorFn,
+		    cancelFn;
+		const s = new Subscription((sFn, eFn, cFn) => {
+			successFn = sFn;
+			errorFn = eFn;
+			cancelFn = cFn;
+		});
+		return [s, bindmask&1 ? successFn : undefined, bindmask&2 ? errorFn : undefined, bindmask&4 ? cancelFn : undefined];
+	}
 }
 
 export class WaitGroup {

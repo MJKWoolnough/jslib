@@ -129,6 +129,24 @@ export class Subscription<T> {
 			});
 		});
 	}
+	static bind<T>(bindmask: 1): [Subscription<T>, (data: T) => void, undefined, undefined];
+	static bind<T>(bindmask: 2): [Subscription<T>, undefined, (data: any) => void, undefined];
+	static bind<T>(bindmask: 3): [Subscription<T>, (data: T) => void, (data: any) => void, undefined];
+	static bind<T>(bindmask: 4): [Subscription<T>, undefined, undefined, (data: () => void) => void];
+	static bind<T>(bindmask: 5): [Subscription<T>, (data: T) => void, undefined, (data: () => void) => void];
+	static bind<T>(bindmask: 6): [Subscription<T>, undefined, (data: any) => void, (data: () => void) => void];
+	static bind<T>(bindmask?: 7): [Subscription<T>, (data: T) => void, (data: any) => void, (data: () => void) => void];
+	static bind<T>(bindmask: 1 | 2 | 3 | 4 | 5 | 6 | 7 = 7) {
+		let successFn: (data: T) => void,
+		    errorFn: (data: any) => void,
+		    cancelFn: (data: () => void) => void;
+		const s = new Subscription<T>((sFn, eFn, cFn) => {
+			successFn = sFn;
+			errorFn = eFn;
+			cancelFn = cFn;
+		});
+		return [s, bindmask&1 ? successFn! : undefined, bindmask&2 ? errorFn! : undefined, bindmask&4 ? cancelFn! : undefined];
+	}
 }
 
 export class WaitGroup {
