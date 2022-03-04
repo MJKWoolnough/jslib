@@ -352,6 +352,54 @@
 				secondError!(3);
 				s.cancel();
 				return res === 225;
+			},
+			"bind (1)": async () => {
+				const {Subscription} = await import("./lib/inter.js"),
+				      [s, sFn, eFn, cFn] = Subscription.bind(1);
+				return s instanceof Subscription && sFn instanceof Function && eFn === undefined && cFn === undefined;
+			},
+			"bind (2)": async () => {
+				const {Subscription} = await import("./lib/inter.js"),
+				      [s, sFn, eFn, cFn] = Subscription.bind(2);
+				return s instanceof Subscription && sFn === undefined && eFn instanceof Function && cFn === undefined;
+			},
+			"bind (3)": async () => {
+				const {Subscription} = await import("./lib/inter.js"),
+				      [s, sFn, eFn, cFn] = Subscription.bind(3);
+				return s instanceof Subscription && sFn instanceof Function && eFn instanceof Function && cFn === undefined;
+			},
+			"bind (4)": async () => {
+				const {Subscription} = await import("./lib/inter.js"),
+				      [s, sFn, eFn, cFn] = Subscription.bind(4);
+				return s instanceof Subscription && sFn === undefined && eFn === undefined && cFn instanceof Function;
+			},
+			"bind (5)": async () => {
+				const {Subscription} = await import("./lib/inter.js"),
+				      [s, sFn, eFn, cFn] = Subscription.bind(5);
+				return s instanceof Subscription && sFn instanceof Function && eFn === undefined && cFn instanceof Function;
+			},
+			"bind (6)": async () => {
+				const {Subscription} = await import("./lib/inter.js"),
+				      [s, sFn, eFn, cFn] = Subscription.bind(6);
+				return s instanceof Subscription && sFn === undefined && eFn instanceof Function && cFn instanceof Function;
+			},
+			"bind (7)": async () => {
+				const {Subscription} = await import("./lib/inter.js"),
+				      [s, sFn, eFn, cFn] = Subscription.bind(7);
+				return s instanceof Subscription && sFn instanceof Function && eFn instanceof Function && cFn instanceof Function;
+			},
+			"bind": async () => {
+				const {Subscription} = await import("./lib/inter.js"),
+				      [s, sFn, eFn, cFn] = Subscription.bind<number>();
+				let res = 0;
+				cFn(() => res++);
+				s.then(num => res *= num, num => res %= num).cancel();
+				sFn(2);
+				sFn(3);
+				eFn(4);
+				s.cancel();
+				sFn(5);
+				return res === 15;
 			}
 		},
 		"WaitGroup": {
