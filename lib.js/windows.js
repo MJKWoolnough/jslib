@@ -230,7 +230,11 @@ export class ShellElement extends BaseElement {
 		]);
 	}
 	addWindow(w) {
-		amendNode(this, w);
+		if (w.parentNode !== this) {
+			amendNode(this, w);
+		} else if (w.nextElementSibling) {
+			w.focus();
+		}
 		return true;
 	}
 	realignWindows() {
