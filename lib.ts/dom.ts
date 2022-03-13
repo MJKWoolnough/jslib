@@ -9,11 +9,13 @@ interface mElement {
 	<T extends Node>(element: T, properties?: Props | Children, children?: Children): T;
 }
 
+type ClassObj = Record<string, boolean | null>;
+
 type StyleObj = Record<string, ToString | undefined> | CSSStyleDeclaration;
 
 type EventArray = [EventListenerOrEventListenerObject, AddEventListenerOptions, boolean];
 
-type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | undefined;
+type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | ClassObj | undefined;
 
 export type Props = Record<string, PropValue> | NamedNodeMap;
 
@@ -41,6 +43,7 @@ const childrenArr = (node: Node, children: Children) => {
       },
       isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function),
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
+      isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object,
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object;
 
 export const amendNode: mElement = (node: Node | EventTarget, properties?: Props | Children, children?: Children) => {
@@ -58,7 +61,11 @@ export const amendNode: mElement = (node: Node | EventTarget, properties?: Props
 					node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 				}
 			} else if (node instanceof HTMLElement || node instanceof SVGElement) {
-				if (prop instanceof Array || prop instanceof DOMTokenList) {
+				if (typeof prop === "boolean") {
+					node.toggleAttribute(k, prop);
+				} else if (prop === undefined) {
+					node.removeAttribute(k);
+				} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 					if (k === "class" && prop.length) {
 						for (let c of prop) {
 							const f = c.slice(0, 1),
@@ -66,10 +73,10 @@ export const amendNode: mElement = (node: Node | EventTarget, properties?: Props
 							node.classList.toggle(m ? c : c.slice(1), m);
 						}
 					}
-				} else if (typeof prop === "boolean") {
-					node.toggleAttribute(k, prop);
-				} else if (prop === undefined) {
-					node.removeAttribute(k);
+				} else if (k === "class" && isClassObj(prop)) {
+					for (const k in prop) {
+						node.classList.toggle(k, prop[k] ?? undefined);
+					}
 				} else if (k === "style" && isStyleObj(prop)) {
 					for (const [k, p] of prop instanceof CSSStyleDeclaration ? Array.from(prop, k => [k, prop.getPropertyValue(k)]) : Object.entries(prop)) {
 						if (p === undefined) {
