@@ -564,6 +564,10 @@
 				amendNode(div, {"class": ["~class2", "~class3"]});
 				return amendNode(document.createElement("div"), {"class": div.classList}).getAttribute("class") === "class1 class3";
 			},
+			"class toggle with object": async () => {
+				const {amendNode} = await import("./lib/dom.js");
+				return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2", "class3"]}), {"class": {"class2": false, "class3": null, "class4": true, "class5": null}}).getAttribute("class") === "class1 class4 class5";
+			},
 			"style set string": async () => {
 				const {amendNode} = await import("./lib/dom.js");
 				return amendNode(document.createElement("div"), {"style": "font-size: 2em; color: rgb(255, 0, 0);"}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
