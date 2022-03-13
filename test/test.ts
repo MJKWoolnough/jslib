@@ -553,16 +553,12 @@
 				return amendNode(document.createElement("div"), {"class": div.classList}).getAttribute("class") === "class1 class2";
 			},
 			"class set/unset classes": async () => {
-				const {amendNode} = await import("./lib/dom.js"),
-				      div = amendNode(document.createElement("div"), {"class": ["class1", "class2"]});
-				amendNode(div, {"class": ["!class2", "class3"]});
-				return amendNode(document.createElement("div"), {"class": div.classList}).getAttribute("class") === "class1 class3";
+				const {amendNode} = await import("./lib/dom.js");
+				return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2"]}), {"class": ["!class2", "class3"]}).getAttribute("class") === "class1 class3";
 			},
 			"class toggle classes": async () => {
-				const {amendNode} = await import("./lib/dom.js"),
-				      div = amendNode(document.createElement("div"), {"class": ["class1", "class2"]});
-				amendNode(div, {"class": ["~class2", "~class3"]});
-				return amendNode(document.createElement("div"), {"class": div.classList}).getAttribute("class") === "class1 class3";
+				const {amendNode} = await import("./lib/dom.js");
+				return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2"]}), {"class": ["~class2", "~class3"]}).getAttribute("class") === "class1 class3";
 			},
 			"class toggle with object": async () => {
 				const {amendNode} = await import("./lib/dom.js");
