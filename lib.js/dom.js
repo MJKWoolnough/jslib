@@ -25,7 +25,7 @@ export const amendNode = (node, properties, children) => {
 		for (const prop of properties) {
 			node.setAttributeNode(prop.cloneNode());
 		}
-	} else if (typeof properties === "object") {
+	} else if (node && typeof properties === "object") {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (isEventObject(prop)) {
 				if (k.startsWith("on") && node instanceof EventTarget) {

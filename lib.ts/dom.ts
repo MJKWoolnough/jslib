@@ -6,7 +6,7 @@ interface mElement {
 	<T extends EventTarget>(element: T, properties: Record<`on${string}`, EventListenerObject | EventArray | Function>): T;
 	<T extends Node>(element: T, properties?: Props, children?: Children): T;
 	<T extends Node>(element: T, children?: Children): T;
-	<T extends Node>(element: T, properties?: Props | Children, children?: Children): T;
+	<T extends Node>(element?: T | null, properties?: Props | Children, children?: Children): T;
 }
 
 type ClassObj = Record<string, boolean | null>;
@@ -46,14 +46,14 @@ const childrenArr = (node: Node, children: Children) => {
       isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object,
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object;
 
-export const amendNode: mElement = (node: Node | EventTarget, properties?: Props | Children, children?: Children) => {
+export const amendNode: mElement = (node?: Node | EventTarget | null, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
 		for (const prop of properties) {
 			node.setAttributeNode(prop.cloneNode() as Attr);
 		}
-	} else if (typeof properties === "object") {
+	} else if (node && typeof properties === "object") {
 		for (const [k, prop] of Object.entries(properties)) {
 			if (isEventObject(prop)) {
 				if (k.startsWith("on") && node instanceof EventTarget) {
