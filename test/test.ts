@@ -2036,6 +2036,66 @@
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][list][*]TEXT[*][b]BOLD TEXT[/b][*][u]MORE [i]TEXT[/i][/u][/list]").firstElementChild!.innerHTML === `<ul><li>TEXT</li><li><span style="font-weight: bold">BOLD TEXT</span></li><li><span style="text-decoration: underline">MORE <span style="font-style: italic">TEXT</span></span></li></ul>`;
+			},
+			"table tag empty": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][/table]").firstElementChild!.innerHTML === ``;
+			},
+			"table with empty row": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][tr][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr></tr></tbody></table>`;
+			},
+			"table with empty cell": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][tr][td][/td][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td></td></tr></tbody></table>`;
+			},
+			"table with missing end row tag": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][tr][td][/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td></td></tr></tbody></table>`;
+			},
+			"table with missing end cell tag": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][tr][td][/tr][/table]").firstElementChild!.innerHTML === ``;
+			},
+			"table with missing end cell and row tag": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][tr][td][/table]").firstElementChild!.innerHTML === ``;
+			},
+			"table with multiple cells": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][tr][td]A[/td][td]B[/td][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td>A</td><td>B</td></tr></tbody></table>`;
+			},
+			"table with multiple rows and cells": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][tr][td][h1]A[/h1][/td][td]B[/td][/tr][tr][td]C[/td][td]D[/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td><h1>A</h1></td><td>B</td></tr><tr><td>C</td><td>D</td></tr></tbody></table>`;
+			},
+			"table with multiple rows, cells, and header cells": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][tr][th]1st[/th][td][h1]A[/h1][/td][td]B[/td][/tr][tr][th]2nd[/th][td]C[/td][td]D[/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><th>1st</th><td><h1>A</h1></td><td>B</td></tr><tr><th>2nd</th><td>C</td><td>D</td></tr></tbody></table>`;
+			},
+			"table with header": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][thead][tr][th]A[/th][/tr][tr][td]B[/td][/tr][/thead][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th></tr><tr><td>B</td></tr></thead></table>`;
+			},
+			"table with footer": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][tfoot][tr][th]A[/th][/tr][tr][td]B[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><tfoot><tr><th>A</th></tr><tr><td>B</td></tr></tfoot></table>`;
+			},
+			"table with everything": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all} = await import("./lib/bbcode_tags.js");
+				return bbcode(all, "[b][table][thead][tr][th]A[/th][th]B[/th][/tr][/thead][tbody][tr][td]1[/td][td]2[/td][/tr][/tbody][tfoot][tr][td]I[/td][td]II[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody><tfoot><tr><td>I</td><td>II</td></tr></tfoot></table>`;
 			}
 		}
 	}
