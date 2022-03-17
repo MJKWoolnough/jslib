@@ -54,7 +54,8 @@ export const amendNode: mElement = (node?: Node | EventTarget | null, properties
 			node.setAttributeNode(prop.cloneNode() as Attr);
 		}
 	} else if (node && typeof properties === "object") {
-		for (const [k, prop] of Object.entries(properties)) {
+		for (const k in properties) {
+			const prop = properties[k as keyof Props];
 			if (isEventObject(prop)) {
 				if (k.startsWith("on") && node instanceof EventTarget) {
 					const arr = prop instanceof Array;
