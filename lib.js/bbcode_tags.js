@@ -203,7 +203,7 @@ table = (n, t, p) => {
 					}
 					break;
 				case "tfoot":
-					if (hasFooter) {
+					if (!hasFooter) {
 						hasFooter = true;
 						state = 8;
 					}

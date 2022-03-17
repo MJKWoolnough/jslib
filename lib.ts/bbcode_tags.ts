@@ -205,7 +205,7 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 					}
 					break;
 				case "tfoot":
-					if (hasFooter) {
+					if (!hasFooter) {
 						hasFooter = true;
 						state = 8;
 					}
