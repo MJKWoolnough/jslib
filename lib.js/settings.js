@@ -1,7 +1,5 @@
-import {Pipe} from './inter.js';
-
 class Setting {
-	#pipe = new Pipe();
+	#fns = [];
 	constructor(name, value) {
 		this.name = name;
 		this.value = value;
@@ -16,7 +14,9 @@ class Setting {
 		} else {
 			window.localStorage.setItem(this.name, s);
 		}
-		this.#pipe.send(v);
+		for (const fn of this.#fns) {
+			fn(v);
+		}
 		return this;
 	}
 	remove() {
@@ -25,7 +25,7 @@ class Setting {
 	}
 	wait(fn) {
 		fn(this.value);
-		this.#pipe.receive(fn);
+		this.#fns.push(fn);
 		return this;
 	}
 }

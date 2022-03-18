@@ -1,9 +1,7 @@
-import {Pipe} from './inter.js';
-
 abstract class Setting<T> {
 	name: string;
 	value: T;
-	#pipe = new Pipe<T>();
+	#fns: ((value: T) => void)[] = [];
 	constructor(name: string, value: T) {
 		this.name = name;
 		this.value = value;
@@ -18,7 +16,9 @@ abstract class Setting<T> {
 		} else {
 			window.localStorage.setItem(this.name, s);
 		}
-		this.#pipe.send(v);
+		for (const fn of this.#fns) {
+			fn(v);
+		}
 		return this;
 	}
 	remove() {
@@ -27,7 +27,7 @@ abstract class Setting<T> {
 	}
 	wait(fn: (value: T) => void) {
 		fn(this.value);
-		this.#pipe.receive(fn);
+		this.#fns.push(fn);
 		return this;
 	}
 }
