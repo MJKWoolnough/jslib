@@ -28,9 +28,11 @@ export class DragTransfer {
 }
 
 export class DragFiles {
+	#mimes;
 	constructor(...mimes) {
-		this.mimes = Object.freeze(mimes);
+		this.#mimes = Object.freeze(mimes);
 	}
+	get mimes() { return this.#mimes; }
 	asForm(e, name) {
 		const f = new FormData();
 		if (e.dataTransfer) {
@@ -43,7 +45,7 @@ export class DragFiles {
 	is(e) {
 		if (e.dataTransfer?.types.includes("Files")) {
 			for (const i of e.dataTransfer.items) {
-				if (i["kind"] !== "file" || !this.mimes.includes(i["type"])) {
+				if (i["kind"] !== "file" || !this.#mimes.includes(i["type"])) {
 					return false;
 				}
 			}
