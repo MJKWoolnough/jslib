@@ -6,7 +6,7 @@ class Setting {
 	}
 	s(v) {
 		return v + "";
-	};
+	}
 	set(v) {
 		const s = this.s(this.value = v);
 		if (s === null) {

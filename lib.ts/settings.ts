@@ -8,7 +8,7 @@ abstract class Setting<T> {
 	}
 	s(v: T): string | null {
 		return v + "";
-	};
+	}
 	set(v: T) {
 		const s = this.s(this.value = v);
 		if (s === null) {
