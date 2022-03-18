@@ -10,11 +10,7 @@ interface CheckedDT<T> extends DragTransfer<T> {
 	get(e: DragEvent): T;
 }
 
-interface Is {
-	is(e: DragEvent): boolean;
-}
-
-type EffectRecord = Partial<Record<"none" | "copy" | "link" | "move", Is[]>>;
+type Effect = typeof DataTransfer.prototype.dropEffect;
 
 export class DragTransfer<T = any> {
 	#data = new Map<string, Transfer<T>>();
@@ -72,12 +68,12 @@ export class DragFiles {
 	}
 }
 
-export const setDragEffect = (effects: EffectRecord) => (e: DragEvent) => {
+export const setDragEffect = (effects: Partial<Record<Effect, (DragTransfer | DragFiles)[]>>) => (e: DragEvent) => {
 	for (const effect in effects) {
-		for (const key of effects[effect as keyof EffectRecord] ?? []) {
+		for (const key of effects[effect as Effect] ?? []) {
 			if (key.is(e)) {
 				e.preventDefault();
-				e.dataTransfer!.dropEffect = effect as keyof EffectRecord;
+				e.dataTransfer!.dropEffect = effect as Effect;
 				return true;
 			}
 		}
