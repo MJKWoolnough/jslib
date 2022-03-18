@@ -59,7 +59,7 @@ export class DragFiles {
 		}
 		return f;
 	}
-	is (e: DragEvent): e is CheckedDragEvent {
+	is(e: DragEvent): e is CheckedDragEvent {
 		if (e.dataTransfer?.types.includes("Files")) {
 			for (const i of e.dataTransfer.items) {
 				if (i["kind"] !== "file" || !this.mimes.includes(i["type"])) {

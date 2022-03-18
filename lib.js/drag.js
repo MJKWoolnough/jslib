@@ -40,7 +40,7 @@ export class DragFiles {
 		}
 		return f;
 	}
-	is (e) {
+	is(e) {
 		if (e.dataTransfer?.types.includes("Files")) {
 			for (const i of e.dataTransfer.items) {
 				if (i["kind"] !== "file" || !this.mimes.includes(i["type"])) {
