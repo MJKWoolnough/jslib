@@ -42,8 +42,9 @@ export class BoolSetting extends Setting<boolean> {
 }
 
 export class IntSetting extends Setting<number> {
-	constructor(name: string, starting = "0") {
-		super(name, parseInt(window.localStorage.getItem(name) || starting));
+	constructor(name: string, starting = 0) {
+		const n = parseInt(window.localStorage.getItem(name) ?? "");
+		super(name, isNaN(n) ? starting : n);
 	}
 }
 
