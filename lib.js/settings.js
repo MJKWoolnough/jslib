@@ -40,9 +40,9 @@ export class BoolSetting extends Setting {
 }
 
 export class IntSetting extends Setting {
-	constructor(name, starting = 0) {
+	constructor(name, starting = 0, min = -Infinity, max = Infinity) {
 		const n = parseInt(window.localStorage.getItem(name) ?? "");
-		super(name, isNaN(n) ? starting : n);
+		super(name, isNaN(n) || n < min || n > max ? starting : n);
 	}
 }
 

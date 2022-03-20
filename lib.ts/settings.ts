@@ -42,9 +42,9 @@ export class BoolSetting extends Setting<boolean> {
 }
 
 export class IntSetting extends Setting<number> {
-	constructor(name: string, starting = 0) {
+	constructor(name: string, starting = 0, min = -Infinity, max = Infinity) {
 		const n = parseInt(window.localStorage.getItem(name) ?? "");
-		super(name, isNaN(n) ? starting : n);
+		super(name, isNaN(n) || n < min || n > max ? starting : n);
 	}
 }
 
