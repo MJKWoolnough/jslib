@@ -48,6 +48,13 @@ export class IntSetting extends Setting<number> {
 	}
 }
 
+export class NumberSetting extends Setting<number> {
+	constructor(name: string, starting = 0, min = -Infinity, max = Infinity) {
+		const n = parseFloat(window.localStorage.getItem(name) ?? "");
+		super(name, isNaN(n) || n < min || n > max ? starting : n);
+	}
+}
+
 export class StringSetting extends Setting<string> {
 	constructor(name: string, starting = "") {
 		super(name, window.localStorage.getItem(name) ?? starting);
