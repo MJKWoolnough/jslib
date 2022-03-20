@@ -40,16 +40,30 @@ export class BoolSetting extends Setting {
 }
 
 export class IntSetting extends Setting {
+	#min;
+	#max;
 	constructor(name, starting = 0, min = -Infinity, max = Infinity) {
 		const n = parseInt(window.localStorage.getItem(name) ?? "");
 		super(name, isNaN(n) || n < min || n > max ? starting : n);
+		this.#min = min;
+		this.#max = max;
+	}
+	set(v) {
+		return Number.isInteger(v) && v >= this.#min && v <= this.#max ? super.set(v) : this;
 	}
 }
 
 export class NumberSetting extends Setting {
+	#min;
+	#max;
 	constructor(name, starting = 0, min = -Infinity, max = Infinity) {
 		const n = parseFloat(window.localStorage.getItem(name) ?? "");
 		super(name, isNaN(n) || n < min || n > max ? starting : n);
+		this.#min = min;
+		this.#max = max;
+	}
+	set(v) {
+		return v >= this.#min && v <= this.#max ? super.set(v) : this;
 	}
 }
 

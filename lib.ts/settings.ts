@@ -42,16 +42,30 @@ export class BoolSetting extends Setting<boolean> {
 }
 
 export class IntSetting extends Setting<number> {
+	#min: number;
+	#max: number;
 	constructor(name: string, starting = 0, min = -Infinity, max = Infinity) {
 		const n = parseInt(window.localStorage.getItem(name) ?? "");
 		super(name, isNaN(n) || n < min || n > max ? starting : n);
+		this.#min = min;
+		this.#max = max;
+	}
+	set(v: number) {
+		return Number.isInteger(v) && v >= this.#min && v <= this.#max ? super.set(v) : this;
 	}
 }
 
 export class NumberSetting extends Setting<number> {
+	#min: number;
+	#max: number;
 	constructor(name: string, starting = 0, min = -Infinity, max = Infinity) {
 		const n = parseFloat(window.localStorage.getItem(name) ?? "");
 		super(name, isNaN(n) || n < min || n > max ? starting : n);
+		this.#min = min;
+		this.#max = max;
+	}
+	set(v: number) {
+		return v >= this.#min && v <= this.#max ? super.set(v) : this;
 	}
 }
 
