@@ -1,18 +1,22 @@
 class Setting {
+	#name;
+	#value;
 	#fns = [];
 	constructor(name, value) {
-		this.name = name;
-		this.value = value;
+		this.#name = name;
+		this.#value = value;
 	}
+	get name() { return this.#name; }
+	get value() { return this.#value; }
 	s(v) {
 		return v + "";
 	}
 	set(v) {
-		const s = this.s(this.value = v);
+		const s = this.s(this.#value = v);
 		if (s === null) {
-			window.localStorage.removeItem(this.name);
+			window.localStorage.removeItem(this.#name);
 		} else {
-			window.localStorage.setItem(this.name, s);
+			window.localStorage.setItem(this.#name, s);
 		}
 		for (const fn of this.#fns) {
 			fn(v);
@@ -20,11 +24,11 @@ class Setting {
 		return this;
 	}
 	remove() {
-		window.localStorage.removeItem(this.name);
+		window.localStorage.removeItem(this.#name);
 		return this;
 	}
 	wait(fn) {
-		fn(this.value);
+		fn(this.#value);
 		this.#fns.push(fn);
 		return this;
 	}
