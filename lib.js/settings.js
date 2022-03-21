@@ -75,16 +75,17 @@ export class StringSetting extends Setting {
 
 export class JSONSetting extends Setting {
 	constructor(name, starting, validator) {
-		super(name, starting);
 		const s = window.localStorage.getItem(name);
+		let value = starting;
 		if (s) {
 			try {
 				const v = JSON.parse(s);
 				if (validator(v)) {
-					this.value = v;
+					value = v;
 				}
 			} catch {}
 		}
+		super(name, value);
 	}
 	s(v) {
 		return JSON.stringify(v);
