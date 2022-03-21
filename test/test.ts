@@ -2098,5 +2098,82 @@
 				return bbcode(all, "[b][table][thead][tr][th]A[/th][th]B[/th][/tr][/thead][tbody][tr][td]1[/td][td]2[/td][/tr][/tbody][tfoot][tr][td]I[/td][td]II[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody><tfoot><tr><td>I</td><td>II</td></tr></tfoot></table>`;
 			}
 		}
+	},
+	"settings.js": {
+		"BoolSetting": {
+			"get": async () => {
+				const {BoolSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_BoolSetting_1";
+				let v = new BoolSetting(name).value === false;
+				window.localStorage.setItem(name, "");
+				v &&= new BoolSetting(name).value === true;
+				window.localStorage.removeItem(name);
+				v &&= new BoolSetting(name).value === false;
+				return v;
+			},
+			"set": async () => {
+				const {BoolSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_BoolSetting_2",
+				      bs = new BoolSetting(name);
+				let b = bs.value === false && window.localStorage.getItem(name) === null;
+				bs.set(false);
+				b &&= bs.value === false && window.localStorage.getItem(name) === null;
+				bs.set(true);
+				b &&= bs.value === true && window.localStorage.getItem(name) === "";
+				bs.set(false);
+				b &&= bs.value === false && window.localStorage.getItem(name) === null;
+				return b;
+			},
+			"remove": async () => {
+				const {BoolSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_BoolSetting_3";
+				new BoolSetting(name).set(true).remove();
+				return window.localStorage.getItem(name) === null;
+			},
+			"name": async () => {
+				const {BoolSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_BoolSetting_4";
+				return new BoolSetting(name).name === name;
+			},
+			"wait": async () => {
+				let num = 0,
+				    v = true;
+				const {BoolSetting} = await import("./lib/settings.js"),
+				      bs = new BoolSetting("SETTINGS_BoolSetting_5").wait(b => {
+					      const needed = num === 3 || num === 4;
+					      num++;
+					      v &&= b === needed;
+				      });
+				bs.set(false);
+				bs.set(false);
+				bs.set(true);
+				bs.set(true);
+				bs.set(false);
+				return v;
+			},
+			"multi-wait": async () => {
+				let numv = 0,
+				    numw = 0,
+				    v = true,
+				    w = true;
+				const {BoolSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_BoolSetting_6",
+				      bs = new BoolSetting(name).wait(b => {
+					      const needed = numv === 3 || numv === 4;
+					      numv++;
+					      v &&= b === needed;
+				      }).wait(b => {
+					      const needed = numw === 3 || numw === 4;
+					      numw++;
+					      w &&= b === needed;
+				      });
+				bs.set(false);
+				bs.set(false);
+				bs.set(true);
+				bs.set(true);
+				bs.set(false);
+				return v && w;
+			}
+		}
 	}
 });
