@@ -2174,6 +2174,109 @@
 				bs.set(false);
 				return v && w;
 			}
+		},
+		"IntSetting": {
+			"get": async () => {
+				const {IntSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_IntSetting_1";
+				let v = new IntSetting(name).value === 0;
+				window.localStorage.setItem(name, "1");
+				v &&= new IntSetting(name).value === 1;
+				window.localStorage.setItem(name, "2");
+				v &&= new IntSetting(name).value === 2;
+				window.localStorage.setItem(name, "-3");
+				v &&= new IntSetting(name).value === -3;
+				window.localStorage.setItem(name, "a");
+				v &&= new IntSetting(name).value === 0;
+				v &&= new IntSetting(name, 1).value === 1;
+				window.localStorage.removeItem(name);
+				v &&= new IntSetting(name).value === 0;
+				return v;
+			},
+			"set": async () => {
+				const {IntSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_IntSetting_2",
+				      is = new IntSetting(name);
+				let b = is.value === 0 && window.localStorage.getItem(name) === null;
+				is.set(1);
+				b &&= is.value === 1 && window.localStorage.getItem(name) === "1";
+				is.set(-2);
+				b &&= is.value === -2 && window.localStorage.getItem(name) === "-2";
+				is.set(0);
+				b &&= is.value === 0 && window.localStorage.getItem(name) === "0";
+				is.set(0.5);
+				b &&= is.value === 0 && window.localStorage.getItem(name) === "0";
+				window.localStorage.removeItem(name);
+				return b;
+			},
+			"remove": async () => {
+				const {IntSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_IntSetting_3";
+				new IntSetting(name).set(1).remove();
+				return window.localStorage.getItem(name) === null;
+			},
+			"name": async () => {
+				const {IntSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_IntSetting_4";
+				return new IntSetting(name).name === name;
+			},
+			"wait": async () => {
+				let num = 0,
+				    v = true;
+				const {IntSetting} = await import("./lib/settings.js"),
+				      is = new IntSetting("SETTINGS_IntSetting_5").wait(i => {
+					const r = num++;
+					if (r&1) {
+						v &&= i === r;
+					} else {
+						v &&= i === -r;
+					}
+				      });
+				is.set(1);
+				is.set(-2);
+				is.set(3);
+				is.remove();
+				return v;
+			},
+			"multi-wait": async () => {
+				let numv = 0,
+				    numw = 0,
+				    v = true,
+				    w = true;
+				const {IntSetting} = await import("./lib/settings.js"),
+				      is = new IntSetting("SETTINGS_IntSetting_6").wait(i => {
+					const r = numv++;
+					if (r&1) {
+						v &&= i === r;
+					} else {
+						v &&= i === -r;
+					}
+				      }).wait(i => {
+					const r = numw++;
+					if (r&1) {
+						w &&= i === r;
+					} else {
+						w &&= i === -r;
+					}
+				      });
+				is.set(1);
+				is.set(-2);
+				is.set(3);
+				is.remove();
+				return v && w;
+			},
+			"min/max": async () => {
+				const {IntSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_IntSetting_7";
+				window.localStorage.setItem(name, "1");
+				let v = new IntSetting(name, -1, -10, 5).value === 1;
+				v &&= new IntSetting(name, 3, 2, 10).value === 3;
+				v &&= new IntSetting(name, -1, -2, 0).value === -1;
+				v &&= new IntSetting(name, 0, -1, 1).set(2).value === 1;
+				v &&= new IntSetting(name, 0, -1, 1).set(0.5).value === 1;
+				window.localStorage.removeItem(name);
+				return v;
+			}
 		}
 	}
 });
