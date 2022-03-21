@@ -2277,6 +2277,109 @@
 				window.localStorage.removeItem(name);
 				return v;
 			}
+		},
+		"NumberSetting": {
+			"get": async () => {
+				const {NumberSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_NumberSetting_1";
+				let v = new NumberSetting(name).value === 0;
+				window.localStorage.setItem(name, "1");
+				v &&= new NumberSetting(name).value === 1;
+				window.localStorage.setItem(name, "2.5");
+				v &&= new NumberSetting(name).value === 2.5;
+				window.localStorage.setItem(name, "-3.1");
+				v &&= new NumberSetting(name).value === -3.1;
+				window.localStorage.setItem(name, "a");
+				v &&= new NumberSetting(name).value === 0;
+				v &&= new NumberSetting(name, 1).value === 1;
+				window.localStorage.removeItem(name);
+				v &&= new NumberSetting(name).value === 0;
+				return v;
+			},
+			"set": async () => {
+				const {NumberSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_NumberSetting_2",
+				      ns = new NumberSetting(name);
+				let b = ns.value === 0 && window.localStorage.getItem(name) === null;
+				ns.set(1);
+				b &&= ns.value === 1 && window.localStorage.getItem(name) === "1";
+				ns.set(-2);
+				b &&= ns.value === -2 && window.localStorage.getItem(name) === "-2";
+				ns.set(0);
+				b &&= ns.value === 0 && window.localStorage.getItem(name) === "0";
+				ns.set(0.5);
+				b &&= ns.value === 0.5 && window.localStorage.getItem(name) === "0.5";
+				window.localStorage.removeItem(name);
+				return b;
+			},
+			"remove": async () => {
+				const {NumberSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_NumberSetting_3";
+				new NumberSetting(name).set(1).remove();
+				return window.localStorage.getItem(name) === null;
+			},
+			"name": async () => {
+				const {NumberSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_NumberSetting_4";
+				return new NumberSetting(name).name === name;
+			},
+			"wait": async () => {
+				let num = 0,
+				    v = true;
+				const {NumberSetting} = await import("./lib/settings.js"),
+				      ns = new NumberSetting("SETTINGS_IntSetting_5", -0.5).wait(i => {
+					const r = num++;
+					if (r&1) {
+						v &&= i === r + 0.5;
+					} else {
+						v &&= i === -r - 0.5;
+					}
+				      });
+				ns.set(1.5);
+				ns.set(-2.5);
+				ns.set(3.5);
+				ns.remove();
+				return v;
+			},
+			"multi-wait": async () => {
+				let numv = 0,
+				    numw = 0,
+				    v = true,
+				    w = true;
+				const {NumberSetting} = await import("./lib/settings.js"),
+				      ns = new NumberSetting("SETTINGS_NumberSetting_6", -0.5).wait(i => {
+					const r = numv++;
+					if (r&1) {
+						v &&= i === r + 0.5;
+					} else {
+						v &&= i === -r - 0.5;
+					}
+				      }).wait(i => {
+					const r = numw++;
+					if (r&1) {
+						w &&= i === r + 0.5;
+					} else {
+						w &&= i === -r - 0.5;
+					}
+				      });
+				ns.set(1.5);
+				ns.set(-2.5);
+				ns.set(3.5);
+				ns.remove();
+				return v && w;
+			},
+			"min/max": async () => {
+				const {NumberSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_NumberSetting_7";
+				window.localStorage.setItem(name, "1.5");
+				let v = new NumberSetting(name, -1, -10, 5).value === 1.5;
+				v &&= new NumberSetting(name, 3.5, 2, 10).value === 3.5;
+				v &&= new NumberSetting(name, -1, -2, 0).value === -1;
+				v &&= new NumberSetting(name, 0, -1, 2).set(2.5).value === 1.5;
+				v &&= new NumberSetting(name, 0, -1, 1).set(0.5).value === 0.5;
+				window.localStorage.removeItem(name);
+				return v;
+			}
 		}
 	}
 });
