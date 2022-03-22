@@ -2380,6 +2380,85 @@
 				window.localStorage.removeItem(name);
 				return v;
 			}
+		},
+		"StringSetting": {
+			"get": async () => {
+				const {StringSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_StringSetting_1";
+				let v = new StringSetting(name).value === "";
+				window.localStorage.setItem(name, "A");
+				v &&= new StringSetting(name).value === "A";
+				window.localStorage.removeItem(name);
+				v &&= new StringSetting(name).value === "";
+				return v;
+			},
+			"set": async () => {
+				const {StringSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_BoolSetting_2",
+				      ss = new StringSetting(name);
+				let b = ss.value === "" && window.localStorage.getItem(name) === null;
+				ss.set("");
+				b &&= ss.value === "" && window.localStorage.getItem(name) === "";
+				ss.set("A");
+				b &&= ss.value === "A" && window.localStorage.getItem(name) === "A";
+				ss.set("B");
+				b &&= ss.value === "B" && window.localStorage.getItem(name) === "B";
+				ss.set("");
+				b &&= ss.value === "" && window.localStorage.getItem(name) === "";
+				window.localStorage.removeItem(name);
+				return b;
+			},
+			"remove": async () => {
+				const {StringSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_StringSetting_3";
+				new StringSetting(name).set("A").remove();
+				return window.localStorage.getItem(name) === null;
+			},
+			"name": async () => {
+				const {StringSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_StringSetting_4";
+				return new StringSetting(name).name === name;
+			},
+			"wait": async () => {
+				let num = 0,
+				    v = true;
+				const {StringSetting} = await import("./lib/settings.js"),
+				      ss = new StringSetting("SETTINGS_StringSetting_5").wait(s => {
+					      v &&= s === (num ? String.fromCharCode(num + 64) : "")
+					      num++;
+				      });
+				ss.set("A");
+				ss.set("B");
+				ss.set("C");
+				ss.set("D");
+				ss.set("E");
+				ss.set("F");
+				ss.remove();
+				return v;
+			},
+			"multi-wait": async () => {
+				let numv = 0,
+				    numw = 0,
+				    v = true,
+				    w = true;
+				const {StringSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_StringSetting_6",
+				      ss = new StringSetting(name).wait(s => {
+					      v &&= s === (numv ? String.fromCharCode(numv + 64) : "")
+					      numv++;
+				      }).wait(s => {
+					      w &&= s === (numw ? String.fromCharCode(numw + 64) : "")
+					      numw++;
+				      });
+				ss.set("A");
+				ss.set("B");
+				ss.set("C");
+				ss.set("D");
+				ss.set("E");
+				ss.set("F");
+				ss.remove();
+				return v && w;
+			}
 		}
 	}
 });
