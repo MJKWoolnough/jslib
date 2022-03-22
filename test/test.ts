@@ -2459,6 +2459,88 @@
 				ss.remove();
 				return v && w;
 			}
+		},
+		"JSONSetting": {
+			"get": async () => {
+				const {JSONSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_JSONSetting_1",
+				      def = {"A": 1},
+				      check = (o: any): o is typeof def => o instanceof Object && typeof o.A === "number";
+				let v = new JSONSetting(name, def, check).value.A === 1;
+				window.localStorage.setItem(name, "{\"A\":2}");
+				v &&= new JSONSetting(name, def, check).value.A === 2;
+				window.localStorage.setItem(name, "{\"B\":2}");
+				v &&= new JSONSetting(name, def, check).value.A === 1;
+				window.localStorage.setItem(name, "{\"A\":3}");
+				v &&= new JSONSetting(name, def, check).value.A === 3;
+				window.localStorage.removeItem(name);
+				v &&= new JSONSetting(name, def, check).value.A === 1;
+				return v;
+			},
+			"set": async () => {
+				type O = {
+					A: number;
+				}
+				const {JSONSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_JSONSetting_2",
+				      ss = new JSONSetting(name, {"A": 1} as O, (o: any): o is O => o instanceof Object && typeof o.A === "number");
+				let b = ss.value.A === 1 && window.localStorage.getItem(name) === null;
+				ss.set({"A": 1});
+				b &&= ss.value.A === 1 && window.localStorage.getItem(name) === "{\"A\":1}";
+				ss.set({"A": 2});
+				b &&= ss.value.A === 2 && window.localStorage.getItem(name) === "{\"A\":2}";
+				window.localStorage.removeItem(name);
+				return b;
+			},
+			"remove": async () => {
+				type O = {
+					A: number;
+				}
+				const {JSONSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_JSONSetting_3";
+				new JSONSetting(name, {"A": 1} as O, (o: any): o is O => o instanceof Object && typeof o.A === "number").set({"A": 2}).remove();;
+				return window.localStorage.getItem(name) === null;
+			},
+			"name": async () => {
+				type O = {
+					A: number;
+				}
+				const {JSONSetting} = await import("./lib/settings.js"),
+				      name = "SETTINGS_JSONSetting_4";
+				return new JSONSetting(name, {"A": 1} as O, (o: any): o is O => o instanceof Object && typeof o.A === "number").name === name;
+			},
+			"wait": async () => {
+				type O = {
+					A: number;
+				}
+				let num = 0,
+				    v = true;
+				const {JSONSetting} = await import("./lib/settings.js"),
+				      js = new JSONSetting("SETTINGS_JSONSetting_5", {"A": 1}, (o: any): o is O => o instanceof Object && typeof o.A === "number").wait(o => v &&= o.A === ++num);
+				js.set({"A": 2});
+				js.set({"A": 3});
+				js.set({"A": 4});
+				js.set({"A": 5});
+				js.remove();
+				return v;
+			},
+			"multi-wait": async () => {
+				type O = {
+					A: number;
+				}
+				let numv = 0,
+				    numw = 0,
+				    v = true,
+				    w = true;
+				const {JSONSetting} = await import("./lib/settings.js"),
+				      js = new JSONSetting("SETTINGS_JSONSetting_5", {"A": 1}, (o: any): o is O => o instanceof Object && typeof o.A === "number").wait(o => v &&= o.A === ++numv).wait(o => w &&= o.A === ++numw);
+				js.set({"A": 2});
+				js.set({"A": 3});
+				js.set({"A": 4});
+				js.set({"A": 5});
+				js.remove();
+				return v && w;
+			}
 		}
 	}
 });
