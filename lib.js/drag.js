@@ -55,12 +55,14 @@ export class DragFiles {
 }
 
 export const setDragEffect = effects => e => {
-	for (const effect in effects) {
-		for (const key of effects[effect] ?? []) {
-			if (key.is(e)) {
-				e.preventDefault();
-				e.dataTransfer.dropEffect = effect;
-				return true;
+	if (e.dataTransfer) {
+		for (const effect in effects) {
+			for (const key of effects[effect] ?? []) {
+				if (key.is(e)) {
+					e.preventDefault();
+					e.dataTransfer.dropEffect = effect;
+					return true;
+				}
 			}
 		}
 	}

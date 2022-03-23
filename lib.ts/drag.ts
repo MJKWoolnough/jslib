@@ -69,12 +69,14 @@ export class DragFiles {
 }
 
 export const setDragEffect = (effects: Partial<Record<Effect, (DragTransfer | DragFiles)[]>>) => (e: DragEvent) => {
-	for (const effect in effects) {
-		for (const key of effects[effect as Effect] ?? []) {
-			if (key.is(e)) {
-				e.preventDefault();
-				e.dataTransfer!.dropEffect = effect as Effect;
-				return true;
+	if (e.dataTransfer) {
+		for (const effect in effects) {
+			for (const key of effects[effect as Effect] ?? []) {
+				if (key.is(e)) {
+					e.preventDefault();
+					e.dataTransfer.dropEffect = effect as Effect;
+					return true;
+				}
 			}
 		}
 	}
