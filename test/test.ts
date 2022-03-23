@@ -2137,42 +2137,42 @@
 			},
 			"wait": async () => {
 				let num = 0,
-				    v = true;
+				    v = 0;
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      bs = new BoolSetting("SETTINGS_BoolSetting_5").wait(b => {
 					      const needed = num === 3 || num === 4;
 					      num++;
-					      v &&= b === needed;
+					      v += +(b === needed);
 				      });
 				bs.set(false);
 				bs.set(false);
 				bs.set(true);
 				bs.set(true);
 				bs.set(false);
-				return v;
+				return v === 6;
 			},
 			"multi-wait": async () => {
 				let numv = 0,
 				    numw = 0,
-				    v = true,
-				    w = true;
+				    v = 0,
+				    w = 0;
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_BoolSetting_6",
 				      bs = new BoolSetting(name).wait(b => {
 					      const needed = numv === 3 || numv === 4;
 					      numv++;
-					      v &&= b === needed;
+					      v += +(b === needed);
 				      }).wait(b => {
 					      const needed = numw === 3 || numw === 4;
 					      numw++;
-					      w &&= b === needed;
+					      w += +(b === needed);
 				      });
 				bs.set(false);
 				bs.set(false);
 				bs.set(true);
 				bs.set(true);
 				bs.set(false);
-				return v && w;
+				return v === 6 && w === 6;
 			}
 		},
 		"IntSetting": {
@@ -2222,48 +2222,48 @@
 			},
 			"wait": async () => {
 				let num = 0,
-				    v = true;
+				    v = 0;
 				const {IntSetting} = await import("./lib/settings.js"),
 				      is = new IntSetting("SETTINGS_IntSetting_5").wait(i => {
 					const r = num++;
 					if (r&1) {
-						v &&= i === r;
+						v += +(i === r);
 					} else {
-						v &&= i === -r;
+						v += +(i === -r);
 					}
 				      });
 				is.set(1);
 				is.set(-2);
 				is.set(3);
 				is.remove();
-				return v;
+				return v === 4;
 			},
 			"multi-wait": async () => {
 				let numv = 0,
 				    numw = 0,
-				    v = true,
-				    w = true;
+				    v = 0,
+				    w = 0;
 				const {IntSetting} = await import("./lib/settings.js"),
 				      is = new IntSetting("SETTINGS_IntSetting_6").wait(i => {
 					const r = numv++;
 					if (r&1) {
-						v &&= i === r;
+						v += +(i === r);
 					} else {
-						v &&= i === -r;
+						v += +(i === -r);
 					}
 				      }).wait(i => {
 					const r = numw++;
 					if (r&1) {
-						w &&= i === r;
+						w += +(i === r);
 					} else {
-						w &&= i === -r;
+						w += +(i === -r);
 					}
 				      });
 				is.set(1);
 				is.set(-2);
 				is.set(3);
 				is.remove();
-				return v && w;
+				return v === 4 && w === 4;
 			},
 			"min/max": async () => {
 				const {IntSetting} = await import("./lib/settings.js"),
@@ -2325,48 +2325,48 @@
 			},
 			"wait": async () => {
 				let num = 0,
-				    v = true;
+				    v = 0;
 				const {NumberSetting} = await import("./lib/settings.js"),
 				      ns = new NumberSetting("SETTINGS_IntSetting_5", -0.5).wait(i => {
 					const r = num++;
 					if (r&1) {
-						v &&= i === r + 0.5;
+						v += +(i === r + 0.5);
 					} else {
-						v &&= i === -r - 0.5;
+						v += +(i === -r - 0.5);
 					}
 				      });
 				ns.set(1.5);
 				ns.set(-2.5);
 				ns.set(3.5);
 				ns.remove();
-				return v;
+				return v === 4;
 			},
 			"multi-wait": async () => {
 				let numv = 0,
 				    numw = 0,
-				    v = true,
-				    w = true;
+				    v = 0,
+				    w = 0;
 				const {NumberSetting} = await import("./lib/settings.js"),
 				      ns = new NumberSetting("SETTINGS_NumberSetting_6", -0.5).wait(i => {
 					const r = numv++;
 					if (r&1) {
-						v &&= i === r + 0.5;
+						v += +(i === r + 0.5);
 					} else {
-						v &&= i === -r - 0.5;
+						v += +(i === -r - 0.5);
 					}
 				      }).wait(i => {
 					const r = numw++;
 					if (r&1) {
-						w &&= i === r + 0.5;
+						w += +(i === r + 0.5);
 					} else {
-						w &&= i === -r - 0.5;
+						w += +(i === -r - 0.5);
 					}
 				      });
 				ns.set(1.5);
 				ns.set(-2.5);
 				ns.set(3.5);
 				ns.remove();
-				return v && w;
+				return v === 4 && w === 4;
 			},
 			"min/max": async () => {
 				const {NumberSetting} = await import("./lib/settings.js"),
@@ -2421,10 +2421,10 @@
 			},
 			"wait": async () => {
 				let num = 0,
-				    v = true;
+				    v = 0;
 				const {StringSetting} = await import("./lib/settings.js"),
 				      ss = new StringSetting("SETTINGS_StringSetting_5").wait(s => {
-					      v &&= s === (num ? String.fromCharCode(num + 64) : "")
+					      v += +(s === (num ? String.fromCharCode(num + 64) : ""));
 					      num++;
 				      });
 				ss.set("A");
@@ -2434,20 +2434,20 @@
 				ss.set("E");
 				ss.set("F");
 				ss.remove();
-				return v;
+				return v === 7;
 			},
 			"multi-wait": async () => {
 				let numv = 0,
 				    numw = 0,
-				    v = true,
-				    w = true;
+				    v = 0,
+				    w = 0;
 				const {StringSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_StringSetting_6",
 				      ss = new StringSetting(name).wait(s => {
-					      v &&= s === (numv ? String.fromCharCode(numv + 64) : "")
+					      v += +(s === (numv ? String.fromCharCode(numv + 64) : ""));
 					      numv++;
 				      }).wait(s => {
-					      w &&= s === (numw ? String.fromCharCode(numw + 64) : "")
+					      w += +(s === (numw ? String.fromCharCode(numw + 64) : ""));
 					      numw++;
 				      });
 				ss.set("A");
@@ -2457,7 +2457,7 @@
 				ss.set("E");
 				ss.set("F");
 				ss.remove();
-				return v && w;
+				return v === 7 && w === 7;
 			}
 		},
 		"JSONSetting": {
@@ -2514,15 +2514,15 @@
 					A: number;
 				}
 				let num = 0,
-				    v = true;
+				    v = 0;
 				const {JSONSetting} = await import("./lib/settings.js"),
-				      js = new JSONSetting("SETTINGS_JSONSetting_5", {"A": 1}, (o: any): o is O => o instanceof Object && typeof o.A === "number").wait(o => v &&= o.A === ++num);
+				      js = new JSONSetting("SETTINGS_JSONSetting_5", {"A": 1}, (o: any): o is O => o instanceof Object && typeof o.A === "number").wait(o => v += +(o.A === ++num));
 				js.set({"A": 2});
 				js.set({"A": 3});
 				js.set({"A": 4});
 				js.set({"A": 5});
 				js.remove();
-				return v;
+				return v === 5;
 			},
 			"multi-wait": async () => {
 				type O = {
@@ -2530,16 +2530,16 @@
 				}
 				let numv = 0,
 				    numw = 0,
-				    v = true,
-				    w = true;
+				    v = 0,
+				    w = 0;
 				const {JSONSetting} = await import("./lib/settings.js"),
-				      js = new JSONSetting("SETTINGS_JSONSetting_5", {"A": 1}, (o: any): o is O => o instanceof Object && typeof o.A === "number").wait(o => v &&= o.A === ++numv).wait(o => w &&= o.A === ++numw);
+				      js = new JSONSetting("SETTINGS_JSONSetting_5", {"A": 1}, (o: any): o is O => o instanceof Object && typeof o.A === "number").wait(o => v += +(o.A === ++numv)).wait(o => w += +(o.A === ++numw));
 				js.set({"A": 2});
 				js.set({"A": 3});
 				js.set({"A": 4});
 				js.set({"A": 5});
 				js.remove();
-				return v && w;
+				return v === 5 && w === 5;
 			}
 		}
 	}
