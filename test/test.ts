@@ -2542,5 +2542,47 @@
 				return v === 5 && w === 5;
 			}
 		}
+	},
+	"drag.js": {
+		"DragTransfer": {
+			"register": async () => {
+				const {DragTransfer} = await import("./lib/drag.js"),
+				      dt = new DragTransfer<number>(""),
+				      t = {"transfer": () => 1};
+				return dt.register(t) === "0" && dt.register(t) === "1" && dt.register(t) === "2";
+			},
+			"get": async () => {
+				const {DragTransfer} = await import("./lib/drag.js"),
+				      dt = new DragTransfer<number>(""),
+				      k1 = dt.register({"transfer": () => 1}),
+				      k2 = dt.register({"transfer": () => 2});
+				return dt.get({"dataTransfer": {"getData": () => k1}} as any as DragEvent) === 1 && dt.get({"dataTransfer": {"getData": () => k2}} as any as DragEvent) === 2 && dt.get({"dataTransfer": {"getData": () => ""}} as any as DragEvent) === undefined;
+			},
+			"set": async () => {
+				const {DragTransfer} = await import("./lib/drag.js"),
+				      dt = new DragTransfer<number>(""),
+				      e = {"dataTransfer": {"setData": () => ret++, "setDragImage": () => ret *= 3}} as any as DragEvent;
+				let ret = 0;
+				dt.set(e, "");
+				dt.set(e, "", document.createElement("div"));
+				return ret === 6;
+			},
+			"deregister": async () => {
+				const {DragTransfer} = await import("./lib/drag.js"),
+				      dt = new DragTransfer<number>(""),
+				      k = dt.register({"transfer": () => 1}),
+				      e = {"dataTransfer": {"getData": () => k}} as any as DragEvent,
+				      v = +(dt.get(e) === 1) + +(dt.get(e) === 1);
+				dt.deregister(k);
+				return v === 2 && dt.get(e) === undefined;
+			},
+			"is": async () => {
+				const {DragTransfer} = await import("./lib/drag.js"),
+				      dt1 = new DragTransfer("A"),
+				      dt2 = new DragTransfer("B"),
+				      e = {"dataTransfer": {"types": ["A"]}} as any as DragEvent;
+				return dt1.is(e) && !dt2.is(e);
+			}
+		}
 	}
 });
