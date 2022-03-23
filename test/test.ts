@@ -2604,6 +2604,23 @@
 				       !f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "file", "type": "text/plain"}, {"kind": "file", "type": "not/some/mime"}]}} as any as DragEvent) &&
 				       !f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "tile", "type": "text/plain"}]}} as any as DragEvent);
 			}
+		},
+		"setDragEffect": {
+			"setDragEffect": async () => {
+				const {DragFiles, DragTransfer, setDragEffect} = await import("./lib/drag.js"),
+				      fn = setDragEffect({"link": [new DragFiles("text/plain"), new DragTransfer("A")], "copy": [new DragTransfer("B")]});
+				let icon = "",
+				    v = 0;
+				v += +(fn({"preventDefault": () => {}, "dataTransfer": {set dropEffect(e: string) {icon = e}, "types": ["Files"], "items": [{"kind": "file", "type": "text/plain"}]}} as any as DragEvent) && icon === "link");
+				icon = "";
+				v += +(!fn({"preventDefault": () => {}, "dataTransfer": {set dropEffect(e: string) {icon = e}, "types": ["Tiles"], "items": [{"kind": "file", "type": "text/plain"}]}} as any as DragEvent) && icon === "");
+				v += +(fn({"preventDefault": () => {}, "dataTransfer": {set dropEffect(e: string) {icon = e}, "types": ["A"], "items": []}} as any as DragEvent) && icon === "link");
+				icon = "";
+				v += +(fn({"preventDefault": () => {}, "dataTransfer": {set dropEffect(e: string) {icon = e}, "types": ["B"], "items": []}} as any as DragEvent) && icon === "copy");
+				icon = "";
+				v += +(!fn({"preventDefault": () => {}, "dataTransfer": {set dropEffect(e: string) {icon = e}, "types": ["C"], "items": []}} as any as DragEvent) && icon === "");
+				return v === 5;
+			}
 		}
 	}
 });
