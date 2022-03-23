@@ -2583,6 +2583,27 @@
 				      e = {"dataTransfer": {"types": ["A"]}} as any as DragEvent;
 				return dt1.is(e) && !dt2.is(e);
 			}
+		},
+		"DragFiles": {
+			"asForm": async () => {
+				const {DragFiles} = await import("./lib/drag.js"),
+				      file1 = new File(["A"], "a.txt"),
+				      file2 = new File(["B"], "b.tst"),
+				      f = new DragFiles("text/plain").asForm({"dataTransfer": {"files": [file1, file2]}} as any as DragEvent, "field"),
+				      fd = f.getAll("field");
+				return fd[0] === file1 && fd[1] === file2;
+			},
+			"is": async () => {
+				const {DragFiles} = await import("./lib/drag.js"),
+				      f = new DragFiles("text/plain", "some/mime");
+				return f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "file", "type": "text/plain"}]}} as any as DragEvent) &&
+				       f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "file", "type": "some/mime"}]}} as any as DragEvent) &&
+				       f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "file", "type": "text/plain"}, {"kind": "file", "type": "some/mime"}]}} as any as DragEvent) &&
+				       !f.is({"dataTransfer": {"types": ["Tiles"], "items": []}} as any as DragEvent) &&
+				       !f.is({"dataTransfer": {"types": ["Tiles"], "items": [{"kind": "file", "type": "text/plain"}]}} as any as DragEvent) &&
+				       !f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "file", "type": "text/plain"}, {"kind": "file", "type": "not/some/mime"}]}} as any as DragEvent) &&
+				       !f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "tile", "type": "text/plain"}]}} as any as DragEvent);
+			}
 		}
 	}
 });
