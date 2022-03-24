@@ -2622,5 +2622,25 @@
 				return v === 5;
 			}
 		}
+	},
+	"events.js": {
+		"mouseX/mouseY": {
+			"mouse coords": async () => {
+				const m = await import("./lib/events.js");
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 100, "clientY": 100}));
+				let {mouseX, mouseY} = m;
+				if (mouseX !== 100 || mouseY !== 100) {
+					return false;
+				}
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 9000, "clientY": 3000}));
+				({mouseX, mouseY} = m);
+				if (mouseX !== 9000 || mouseY !== 3000) {
+					return false;
+				}
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 0, "clientY": 0}));
+				({mouseX, mouseY} = m);
+				return mouseX === 0 && mouseY === 0;
+			}
+		}
 	}
 });
