@@ -2825,6 +2825,98 @@
 				stop();
 				return res === 61;
 			}
+		},
+		"mouseDragEvent": {
+			"drag 0": async () => {
+				let res = 0;
+				const {mouseDragEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				stop();
+				return res === 73;
+			},
+			"drag 1": async () => {
+				let res = 0;
+				const {mouseDragEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseDragEvent(1, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				stop();
+				return res === 73;
+			},
+			"drag 2": async () => {
+				let res = 0;
+				const {mouseDragEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseDragEvent(2, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				stop();
+				return res === 73;
+			},
+			"drag 0 (without stop)": async () => {
+				let res = 0;
+				const {mouseDragEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				stop(false);
+				return res === 27;
+			},
+			"drag 0 (with mouseup)": async () => {
+				let res = 0;
+				const {mouseDragEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				window.dispatchEvent(new MouseEvent("mouseup", {"button": 1, "clientX": 15, "clientY": 5}));
+				window.dispatchEvent(new MouseEvent("mouseup", {"button": 2, "clientX": 20, "clientY": 6}));
+				window.dispatchEvent(new MouseEvent("mouseup", {"button": 0, "clientX": 10, "clientY": 4}));
+				stop(false);
+				return res === 105;
+			},
+			"drag 0 (with multiple mouseup)": async () => {
+				let res = 0;
+				const {mouseDragEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				window.dispatchEvent(new MouseEvent("mouseup", {"button": 0, "clientX": 10, "clientY": 4}));
+				window.dispatchEvent(new MouseEvent("mouseup", {"button": 1, "clientX": 15, "clientY": 5}));
+				window.dispatchEvent(new MouseEvent("mouseup", {"button": 2, "clientX": 20, "clientY": 6}));
+				window.dispatchEvent(new MouseEvent("mouseup", {"button": 0, "clientX": 25, "clientY": 7}));
+				stop(false);
+				return res === 105;
+			},
+			"drag 0 (with multiple start)": async () => {
+				let res = 0;
+				const {mouseDragEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				stop(false);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				stop();
+				return res === 73;
+			},
+			"drag 0 (with post stop event)": async () => {
+				let res = 0;
+				const {mouseDragEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				stop();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
+				return res === 73;
+			}
 		}
 	}
 });
