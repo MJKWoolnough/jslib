@@ -2779,6 +2779,30 @@
 				stop();
 				return res === 18;
 			}
+		},
+		"mouseMoveEvent": {
+			"move": async () => {
+				let res = 0;
+				const {mouseMoveEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseMoveEvent((e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, () => res++);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
+				stop();
+				return res === 60;
+			},
+			"move (no stop run)": async () => {
+				let res = 0;
+				const {mouseMoveEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseMoveEvent((e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, () => res++);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
+				stop(false);
+				return res === 59;
+			}
 		}
 	}
 });
