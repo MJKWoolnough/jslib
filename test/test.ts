@@ -2951,6 +2951,31 @@
 				stop(false);
 				return res === 73;
 			}
+		},
+		"hasKeyEvent": {
+			"hasKeyEvent": async () => {
+				let res = 0;
+				const {hasKeyEvent, keyEvent} = await import("./lib/events.js"),
+				      key1 = "Custom17",
+				      [start1, stop1] = keyEvent(key1, () => {}),
+				      key2 = "Custom18",
+				      [start2, stop2] = keyEvent(key2, undefined, () => {}),
+				      key3 = "Custom19",
+				      [start3, stop3] = keyEvent(key2, () => {}, () => {});
+				start1();
+				start2();
+				start3();
+				res += +(hasKeyEvent(key1));
+				res += +(hasKeyEvent(key2));
+				res += +(hasKeyEvent(key3));
+				stop1();
+				res += +(!hasKeyEvent(key1));
+				stop2();
+				res += +(!hasKeyEvent(key2));
+				stop3();
+				res += +(!hasKeyEvent(key3));
+				return res === 4;
+			}
 		}
 	}
 });
