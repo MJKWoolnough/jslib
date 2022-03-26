@@ -2641,6 +2641,144 @@
 				({mouseX, mouseY} = m);
 				return mouseX === 0 && mouseY === 0;
 			}
+		},
+		"keyEvent": {
+			"single key keyEvent": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom1",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop();
+				return res === 3;
+			},
+			"single key keyEvent (after stop)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom1",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				return res === 3;
+			},
+			"single key keyEvent (no stop)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom2",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop(false);
+				return res === 1;
+			},
+			"single key keyEvent (double down)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom3",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop();
+				return res === 3;
+			},
+			"single key keyEvent (double stop)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom4",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop();
+				stop();
+				return res === 3;
+			},
+			"single key keyEvent (with up)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom2",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				stop();
+				return res === 3;
+			},
+			"single key keyEvent (multiple times)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom2",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop();
+				return res === 12;
+			},
+			"single key keyEvent (multiple times with once)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom2",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3, true);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop();
+				return res === 3;
+			},
+			"single key keyEvent (restarted)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom2",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3, true);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop();
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop();
+				return res === 12;
+			},
+			"multi key keyEvent": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom5",
+				      key2 = "Custom6",
+				      [start, stop] = keyEvent([key, key2], () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				stop();
+				return res === 3;
+			},
+			"multi key keyEvent (other key)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom7",
+				      key2 = "Custom8",
+				      [start, stop] = keyEvent([key, key2], () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {"key": key2}));
+				stop();
+				return res === 3;
+			},
+			"multi key keyEvent (both keys)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom7",
+				      key2 = "Custom8",
+				      [start, stop] = keyEvent([key, key2], () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {"key": key2}));
+				stop();
+				return res === 18;
+			}
 		}
 	}
 });
