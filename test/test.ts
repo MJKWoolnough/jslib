@@ -4,7 +4,8 @@
 	      df = document.createDocumentFragment();
 	let completeNum = 0,
 	    totalNum = 0,
-	    failNum = 0;
+	    failNum = 0,
+	    opened = false;
 	failSpan.setAttribute("class", "fails");
 	completeSpan.innerText = "0";
 	for (const [library, libTests] of Object.entries(data)) {
@@ -59,6 +60,12 @@
 		libSum.append(library + ": ", libCom, "/" + libTotalNum, libFail);
 	}
 	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", completeSpan, "/" + totalNum, failSpan, df));
+	window.addEventListener("keypress", (e: KeyboardEvent) => {
+		if (e.key === "o") {
+			opened = !opened;
+			Array.from(document.getElementsByTagName("details"), e => e.toggleAttribute("open", opened));
+		}
+	});
 })({
 	"inter.js": {
 		"Pipe": {
