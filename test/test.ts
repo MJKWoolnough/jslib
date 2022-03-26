@@ -2785,6 +2785,17 @@
 				window.dispatchEvent(new KeyboardEvent("keydown", {"key": key2}));
 				stop();
 				return res === 18;
+			},
+			"single key keyEvent (with blur)": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom16",
+				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				window.dispatchEvent(new FocusEvent("blur"));
+				stop(false);
+				return res === 3;
 			}
 		},
 		"mouseMoveEvent": {
@@ -2824,6 +2835,18 @@
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
 				stop();
 				return res === 61;
+			},
+			"move (with blur)": async () => {
+				let res = 0;
+				const {mouseMoveEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseMoveEvent((e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, () => res++);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
+				window.dispatchEvent(new FocusEvent("blur"));
+				stop(false);
+				return res === 60;
 			}
 		},
 		"mouseDragEvent": {
@@ -2915,6 +2938,17 @@
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				stop();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
+				return res === 73;
+			},
+			"drag 0 (with blur)": async () => {
+				let res = 0;
+				const {mouseDragEvent} = await import("./lib/events.js"),
+				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+				start();
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
+				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
+				window.dispatchEvent(new FocusEvent("blur"));
+				stop(false);
 				return res === 73;
 			}
 		}
