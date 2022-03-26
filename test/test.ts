@@ -2663,7 +2663,7 @@
 			"single key keyEvent (after stop)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom1",
+				      key = "Custom2",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -2674,7 +2674,7 @@
 			"single key keyEvent (no stop)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom2",
+				      key = "Custom3",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -2685,7 +2685,7 @@
 			"single key keyEvent (double down)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom3",
+				      key = "Custom4",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -2696,7 +2696,7 @@
 			"single key keyEvent (double stop)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom4",
+				      key = "Custom5",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -2707,7 +2707,7 @@
 			"single key keyEvent (with up)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom2",
+				      key = "Custom6",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -2718,7 +2718,7 @@
 			"single key keyEvent (multiple times)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom2",
+				      key = "Custom7",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -2730,7 +2730,7 @@
 			"single key keyEvent (multiple times with once)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom2",
+				      key = "Custom8",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3, true);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -2742,7 +2742,7 @@
 			"single key keyEvent (restarted)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom2",
+				      key = "Custom9",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3, true);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -2755,8 +2755,8 @@
 			"multi key keyEvent": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom5",
-				      key2 = "Custom6",
+				      key = "Custom10",
+				      key2 = "Custom11",
 				      [start, stop] = keyEvent([key, key2], () => res++, () => res *= 3);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -2766,8 +2766,8 @@
 			"multi key keyEvent (other key)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom7",
-				      key2 = "Custom8",
+				      key = "Custom12",
+				      key2 = "Custom13",
 				      [start, stop] = keyEvent([key, key2], () => res++, () => res *= 3);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {"key": key2}));
@@ -2777,8 +2777,8 @@
 			"multi key keyEvent (both keys)": async () => {
 				let res = 0;
 				const {keyEvent} = await import("./lib/events.js"),
-				      key = "Custom7",
-				      key2 = "Custom8",
+				      key = "Custom14",
+				      key2 = "Custom15",
 				      [start, stop] = keyEvent([key, key2], () => res++, () => res *= 3);
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
