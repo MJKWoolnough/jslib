@@ -187,13 +187,13 @@ abstract class BaseElement extends HTMLElement {
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
-	prompt(title: string, message: string, defaultValue?: string, icon?: string) {
+	prompt(title: string, message: string, defaultValue = "", icon?: string) {
 		return new Promise<string|null>((resolve, reject) => {
 			const ok = () => {
 				resolve(data.value);
 				w.remove();
 			      },
-			      data = autoFocus(input({"value": defaultValue || "", "onkeydown": (e: KeyboardEvent) => {
+			      data = autoFocus(input({"value": defaultValue, "onkeydown": (e: KeyboardEvent) => {
 				switch (e.key) {
 				case "Enter":
 					ok();

@@ -186,13 +186,13 @@ class BaseElement extends HTMLElement {
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
-	prompt(title, message, defaultValue, icon) {
+	prompt(title, message, defaultValue = "", icon) {
 		return new Promise((resolve, reject) => {
 			const ok = () => {
 				resolve(data.value);
 				w.remove();
 			      },
-			      data = autoFocus(input({"value": defaultValue || "", "onkeydown": e => {
+			      data = autoFocus(input({"value": defaultValue, "onkeydown": e => {
 				switch (e.key) {
 				case "Enter":
 					ok();
