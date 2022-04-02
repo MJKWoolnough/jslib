@@ -37,11 +37,7 @@ const held = new Set(),
 			}
 		}
 	}
-	if (down) {
-		held.add(key);
-	} else {
-		held.delete(key);
-	}
+	held[down ? "add" : "delete"](key);
       };
 
 export let mouseX = 0,
