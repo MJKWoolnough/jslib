@@ -29,7 +29,7 @@ const held = new Set<string>(),
       ],
       keyEventFn = (down: boolean, e: KeyboardEvent) => {
 	const {key, target} = e;
-	if (down && (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || held.has(key))) {
+	if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || held.has(key) === down) {
 		return;
 	}
 	const events = (down ? downs : ups).get(key);
