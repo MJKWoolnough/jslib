@@ -29,19 +29,18 @@ const held = new Set<string>(),
       ],
       keyEventFn = (down: boolean, e: KeyboardEvent) => {
 	const {key, target} = e;
-	if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || held.has(key) === down) {
-		return;
-	}
-	const events = (down ? downs : ups).get(key);
-	if (events) {
-		for (const [id, [event, once]] of events) {
-			event(e);
-			if (once) {
-				events.delete(id);
+	if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || held.has(key) === down)) {
+		const events = (down ? downs : ups).get(key);
+		if (events) {
+			for (const [id, [event, once]] of events) {
+				event(e);
+				if (once) {
+					events.delete(id);
+				}
 			}
 		}
+		held[down ? "add" : "delete"](key);
 	}
-	held[down ? "add" : "delete"](key);
       };
 
 export let mouseX = 0,
