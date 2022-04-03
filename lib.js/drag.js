@@ -36,6 +36,7 @@ export class DragFiles {
 	asForm(e, name) {
 		const f = new FormData();
 		if (e.dataTransfer) {
+			e.preventDefault();
 			for (const file of e.dataTransfer.files) {
 				f.append(name, file);
 			}
