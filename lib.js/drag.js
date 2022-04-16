@@ -2,6 +2,7 @@ export class DragTransfer {
 	#data = new Map();
 	#nextID = 0;
 	#format;
+	#last = "";
 	constructor(format) {
 		this.#format = format;
 	}
@@ -11,9 +12,11 @@ export class DragTransfer {
 		return key;
 	}
 	get(e) {
-		return this.#data.get(e.dataTransfer?.getData(this.#format) ?? "")?.transfer();
+		e.preventDefault();
+		return this.#data.get(e.dataTransfer?.getData(this.#format) || this.#last)?.transfer();
 	}
 	set(e, key, icon, xOffset = -5, yOffset = -5) {
+		this.#last = key;
 		e.dataTransfer?.setData(this.#format, key);
 		if (icon) {
 			e.dataTransfer?.setDragImage(icon, xOffset, yOffset);
@@ -21,6 +24,9 @@ export class DragTransfer {
 	}
 	deregister(key) {
 		this.#data.delete(key);
+		if (this.#last === key) {
+			this.#last = "";
+		}
 	}
 	is(e) {
 		return e.dataTransfer?.types.includes(this.#format) ?? false;

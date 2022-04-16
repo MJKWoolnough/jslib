@@ -16,6 +16,7 @@ export class DragTransfer<T = any> {
 	#data = new Map<string, Transfer<T>>();
 	#nextID = 0;
 	#format: string;
+	#last = "";
 	constructor(format: string) {
 		this.#format = format;
 	}
@@ -25,9 +26,11 @@ export class DragTransfer<T = any> {
 		return key;
 	}
 	get(e: DragEvent): T | undefined {
-		return this.#data.get(e.dataTransfer?.getData(this.#format) ?? "")?.transfer();
+		e.preventDefault();
+		return this.#data.get(e.dataTransfer?.getData(this.#format) || this.#last)?.transfer();
 	}
 	set(e: DragEvent, key: string, icon?: HTMLDivElement, xOffset = -5, yOffset = -5) {
+		this.#last = key;
 		e.dataTransfer?.setData(this.#format, key);
 		if (icon) {
 			e.dataTransfer?.setDragImage(icon, xOffset, yOffset);
@@ -35,6 +38,9 @@ export class DragTransfer<T = any> {
 	}
 	deregister(key: string) {
 		this.#data.delete(key);
+		if (this.#last === key) {
+			this.#last = "";
+		}
 	}
 	is(e: DragEvent): this is CheckedDT<T> {
 		return e.dataTransfer?.types.includes(this.#format) ?? false;
