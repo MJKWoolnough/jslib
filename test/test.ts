@@ -2562,8 +2562,9 @@
 				const {DragTransfer} = await import("./lib/drag.js"),
 				      dt = new DragTransfer<number>(""),
 				      k1 = dt.register({"transfer": () => 1}),
-				      k2 = dt.register({"transfer": () => 2});
-				return dt.get({"dataTransfer": {"getData": () => k1}} as any as DragEvent) === 1 && dt.get({"dataTransfer": {"getData": () => k2}} as any as DragEvent) === 2 && dt.get({"dataTransfer": {"getData": () => ""}} as any as DragEvent) === undefined;
+				      k2 = dt.register({"transfer": () => 2}),
+				      preventDefault = () => {};
+				return dt.get({"dataTransfer": {"getData": () => k1}, preventDefault} as any as DragEvent) === 1 && dt.get({"dataTransfer": {"getData": () => k2}, preventDefault} as any as DragEvent) === 2 && dt.get({"dataTransfer": {"getData": () => ""}, preventDefault} as any as DragEvent) === undefined;
 			},
 			"set": async () => {
 				const {DragTransfer} = await import("./lib/drag.js"),
@@ -2578,7 +2579,7 @@
 				const {DragTransfer} = await import("./lib/drag.js"),
 				      dt = new DragTransfer<number>(""),
 				      k = dt.register({"transfer": () => 1}),
-				      e = {"dataTransfer": {"getData": () => k}} as any as DragEvent,
+				      e = {"dataTransfer": {"getData": () => k}, "preventDefault": () => {}} as any as DragEvent,
 				      v = +(dt.get(e) === 1) + +(dt.get(e) === 1);
 				dt.deregister(k);
 				return v === 2 && dt.get(e) === undefined;
@@ -2596,7 +2597,7 @@
 				const {DragFiles} = await import("./lib/drag.js"),
 				      file1 = new File(["A"], "a.txt"),
 				      file2 = new File(["B"], "b.tst"),
-				      f = new DragFiles("text/plain").asForm({"dataTransfer": {"files": [file1, file2]}} as any as DragEvent, "field"),
+				      f = new DragFiles("text/plain").asForm({"dataTransfer": {"files": [file1, file2]}, "preventDefault": () => {}} as any as DragEvent, "field"),
 				      fd = f.getAll("field");
 				return fd[0] === file1 && fd[1] === file2;
 			},
