@@ -43,7 +43,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 	return amendNode(l, {"class": "contextMenu", "oncontextremove": () => {
 		closeFn();
 		if (selected >= 0) {
-			l.childNodes[selected].classList.remove("contextSelected");
+			amendNode(l.childNodes[selected], {"class": ["!contextSelected"]});
 			selected = -1;
 		}
 	}, "tabindex": "-1", "onkeydown": e => {
@@ -53,7 +53,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			mode = 1;
 		case "ArrowUp":
 			if (selected >= 0) {
-				l.childNodes[selected].classList.remove("contextSelected");
+				amendNode(l.childNodes[selected], {"class": ["!contextSelected"]});
 			}
 			for (let a = 0; a < list.length; a++) {
 				selected += mode;
@@ -63,7 +63,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 					selected = 0;
 				}
 				if (!l.childNodes[selected].classList.contains("contextDisabled")) {
-					l.childNodes[selected].classList.add("contextSelected");
+					amendNode(l.childNodes[selected], {"class": ["contextSelected"]});
 					break;
 				}
 			}
@@ -96,7 +96,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			e.stopPropagation();
 			e.stopImmediatePropagation();
 			if (selected >= 0) {
-				l.childNodes[selected].classList.remove("contextSelected");
+				amendNode(l.childNodes[selected], {"class": ["!contextSelected"]});
 			}
 			if (i.length === 1) {
 				selected = i[0];
@@ -112,7 +112,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 					selected = i[0];
 				};
 			}
-			l.childNodes[selected].classList.add("contextSelected");
+			amendNode(l.childNodes[selected], {"class": ["contextSelected"]});
 		}
 		return false;
 	      }, "onblur": () => {
@@ -158,7 +158,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 						l.focus();
 					});
 					if (selected >= 0) {
-						l.childNodes[selected].classList.remove("contextSelected");
+						amendNode(l.childNodes[selected], {"class": ["!contextSelected"]});
 						selected = -1;
 					}
 				}
@@ -182,7 +182,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				"onmouseover": function(e) {
 					setTO(ctx, openFn.bind(this, e))
 					if (selected >= 0) {
-						l.childNodes[selected].classList.remove("contextSelected");
+						amendNode(l.childNodes[selected], {"class": ["!contextSelected"]});
 						selected = -1;
 					}
 				},
