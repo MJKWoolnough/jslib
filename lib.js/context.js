@@ -22,17 +22,12 @@ const mousedownEvent = new MouseEvent("mousedown"),
       },
       placeList = (ctx, coords, list) => {
 	clearTO(ctx);
-	list.style.setProperty("top", "0");
-	list.style.setProperty("left", "0");
-	ctx.c.appendChild(list);
+	amendNode(ctx.c, amendNode(list, {"style": {"top": 0, "left": 0}}));
 	let top = coords[0][1] + list.clientHeight <= ctx.c.clientHeight ? coords[0][1] : coords[1][1] - list.clientHeight;
 	if (top < 0) {
 		top = 0;
 	}
-	list.style.setProperty("left", (coords[0][0] + list.clientWidth <= ctx.c.clientWidth ? coords[0][0] : coords[1][0] - list.clientWidth) + "px");
-	list.style.setProperty("top", top + "px");
-	ctx.f = list;
-	autoFocus(list);
+	ctx.f = autoFocus(amendNode(list, {"style": {"top": top + "px", "left": (coords[0][0] + list.clientWidth <= ctx.c.clientWidth ? coords[0][0] : coords[1][0] - list.clientWidth) + "px"}}));
       },
       list2HTML = (ctx, list, last) => {
 	let open = null,
