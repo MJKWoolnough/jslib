@@ -169,7 +169,7 @@ export class ShellElement extends BaseShellElement {
 						return;
 					}
 					if (!windowData.has(w) && !w.hasAttribute("window-hide")) {
-						const item = taskbar.appendChild(li({"onclick": () => {
+						const item = li({"onclick": () => {
 							if (w.hasAttribute("minimised")) {
 								amendNode(w, {"minimised": false});
 								w.focus();
@@ -190,7 +190,8 @@ export class ShellElement extends BaseShellElement {
 						      }}, [
 							img({"part": "icon", "src": w.getAttribute("window-icon") || undefined, "title": w.getAttribute("window-title") ?? undefined}),
 							span({"part": "title"}, w.getAttribute("window-title") || "")
-						      ]));
+						      ]);
+						amendNode(taskbar, item);
 						windowData.set(w, item);
 						amendNode(w, {"onremove": event(() => {
 							windowData.delete(w);
