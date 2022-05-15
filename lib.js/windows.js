@@ -321,7 +321,7 @@ export class WindowElement extends BaseElement {
 		const p = this.#parent,
 		      c = this.#child;
 		if (p) {
-			p.#slot.classList.toggle("hasChild", false);
+			amendNode(this.#slot, {"class": ["!hasChild"]});
 			p.#child = null;
 			this.#parent = null;
 		}
@@ -356,7 +356,7 @@ export class WindowElement extends BaseElement {
 		}
 		this.#child = w;
 		w.#parent = this;
-		this.#slot.classList.toggle("hasChild", true);
+		p.#slot.classList.toggle("hasChild", false);
 		amendNode(this.parentNode, w);
 		return true;
 	}
