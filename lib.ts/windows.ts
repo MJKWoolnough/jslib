@@ -591,7 +591,8 @@ export class WindowElement extends BaseElement {
 		return true;
 	}
 	addControlButton(icon: string, onclick: (this: WindowElement) => void, title?: string) {
-		const b = this.#extra.appendChild(button({"style": {"background-image": `url(${JSON.stringify(icon)})`}, "onclick": () => onclick.call(this), title}));
+		const b = button({"style": {"background-image": `url(${JSON.stringify(icon)})`}, "onclick": () => onclick.call(this), title});
+		amendNode(this.#extra, b);
 		return () => b.remove();
 	}
 	focus() {
