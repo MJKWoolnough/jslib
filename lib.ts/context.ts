@@ -88,11 +88,7 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
       placeList = (ctx: Ctx, coords: Coords, list: HTMLUListElement) => {
 	clearTO(ctx);
 	amendNode(ctx.c, amendNode(list, {"style": {"top": 0, "left": 0}}));
-	let top = coords[0][1] + list.clientHeight <= ctx.c.clientHeight ? coords[0][1] : coords[1][1] - list.clientHeight;
-	if (top < 0) {
-		top = 0;
-	}
-	ctx.f = autoFocus(amendNode(list, {"style": {"top": top + "px", "left": (coords[0][0] + list.clientWidth <= ctx.c.clientWidth ? coords[0][0] : coords[1][0] - list.clientWidth) + "px"}}));
+	ctx.f = autoFocus(amendNode(list, {"style": {"top": Math.max(coords[0][1] + list.clientHeight <= ctx.c.clientHeight ? coords[0][1] : coords[1][1] - list.clientHeight, 0) + "px", "left": (coords[0][0] + list.clientWidth <= ctx.c.clientWidth ? coords[0][0] : coords[1][0] - list.clientWidth) + "px"}}));
       },
       list2HTML = (ctx: Ctx, list: LList, last?: HTMLUListElement): HTMLUListElement => {
 	let open: HTMLUListElement | null = null,
