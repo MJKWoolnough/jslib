@@ -3,10 +3,7 @@ import {div, li, span, style, ul} from './html.js';
 
 pageLoad.then(() => document.head.appendChild(style({"type": "text/css"}, `.contextMenu{position:absolute;background-color:#ddd;color:#000;list-style:none;padding-left:0;margin:0;user-select:none;outline:0}.contextMenu li:not(.contextDisabled):hover,.contextSelected{background-color:#aaa}.contextSubMenu:after{content:"»"}.contextMenu span{text-decoration:underline}.contextDisabled{color:#aaa}.contextClearer{position:absolute;top:0;left:0;bottom:0;right:0}`)));
 
-const mousedownEvent = new MouseEvent("mousedown"),
-      keydownEvent = new KeyboardEvent("keydown", {"key": "ArrowDown"}),
-      closeEvent = new CustomEvent("contextremove"),
-      IsItem = item => item.action !== undefined,
+const IsItem = item => item.action !== undefined,
       setTO = (ctx, fn) => {
 	clearTO(ctx);
 	ctx.t = window.setTimeout(() => {
@@ -74,7 +71,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			}
 		case "Enter":
 			if (selected >= 0) {
-				l.childNodes[selected].dispatchEvent(mousedownEvent);
+				l.childNodes[selected].dispatchEvent(new MouseEvent("mousedown"));
 			}
 			break;
 		case "ArrowLeft":
@@ -100,7 +97,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			}
 			if (i.length === 1) {
 				selected = i[0];
-				l.childNodes[selected].dispatchEvent(mousedownEvent);
+				l.childNodes[selected].dispatchEvent(new MouseEvent("mousedown"));
 			} else {
 				if (!i.some(j => {
 					if (j > selected) {
@@ -172,7 +169,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				open = childMenu;
 				placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
 				if (!e.isTrusted) {
-					childMenu.dispatchEvent(keydownEvent);
+					childMenu.dispatchEvent(new KeyboardEvent("keydown", {"key": "ArrowDown"}));
 				}
 			      },
 			      childMenu = amendNode(list2HTML(ctx, e.list, l), {"class": "contextMenu " + (e.classes || "")});
@@ -212,7 +209,7 @@ export default (c, coords, list, d = 0) => new Promise(resolve => {
 	      cc = c.appendChild(div({"class": "contextClearer", "tabindex": -1, "onfocus": () => cc.remove()}));
 	new MutationObserver(mutations => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 		if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
-			n.dispatchEvent(closeEvent);
+			n.dispatchEvent(new CustomEvent("contextremove"));
 		}
 	}))).observe(c, {"childList": true, "subtree": true});
 	placeList(ctx, [coords, coords], root);

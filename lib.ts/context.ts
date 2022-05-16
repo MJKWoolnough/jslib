@@ -71,10 +71,7 @@ export type List = (Item | Menu | List)[];
 
 type LList = (Item | Menu)[];
 
-const mousedownEvent = new MouseEvent("mousedown"),
-      keydownEvent = new KeyboardEvent("keydown", {"key": "ArrowDown"}),
-      closeEvent = new CustomEvent("contextremove"),
-      IsItem = (item: Item | Menu): item is Item => (item as Item).action !== undefined,
+const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== undefined,
       setTO = (ctx: Ctx, fn: () => any) => {
 	clearTO(ctx);
 	ctx.t = window.setTimeout(() => {
@@ -142,7 +139,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			}
 		case "Enter":
 			if (selected >= 0) {
-				(l.childNodes[selected] as HTMLLIElement).dispatchEvent(mousedownEvent);
+				(l.childNodes[selected] as HTMLLIElement).dispatchEvent(new MouseEvent("mousedown"));
 			}
 			break;
 		case "ArrowLeft":
@@ -168,7 +165,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 			}
 			if (i.length === 1) {
 				selected = i[0];
-				(l.childNodes[selected] as HTMLLIElement).dispatchEvent(mousedownEvent);
+				(l.childNodes[selected] as HTMLLIElement).dispatchEvent(new MouseEvent("mousedown"));
 			} else {
 				if (!i.some(j => {
 					if (j > selected) {
@@ -240,7 +237,7 @@ const mousedownEvent = new MouseEvent("mousedown"),
 				open = childMenu;
 				placeList(ctx, [[parentLeft + this.offsetWidth, parentTop + this.offsetTop], [parentLeft, parentTop + this.offsetTop + this.offsetHeight]], childMenu);
 				if (!e.isTrusted) {
-					childMenu.dispatchEvent(keydownEvent);
+					childMenu.dispatchEvent(new KeyboardEvent("keydown", {"key": "ArrowDown"}));
 				}
 			      },
 			      childMenu = amendNode(list2HTML(ctx, e.list, l), {"class": "contextMenu " + (e.classes || "")});
@@ -280,7 +277,7 @@ export default (c: Element, coords: [number, number], list: List, d: number = 0)
 	      cc = c.appendChild(div({"class": "contextClearer", "tabindex": -1, "onfocus": () => cc.remove()}));
 	new MutationObserver((mutations: MutationRecord[]) => mutations.forEach(m => Array.from(m.removedNodes).forEach(n => {
 		if (n instanceof HTMLUListElement && n.classList.contains("contextMenu")) {
-			n.dispatchEvent(closeEvent);
+			n.dispatchEvent(new CustomEvent("contextremove"));
 		}
 	}))).observe(c, {"childList": true, "subtree": true});
 	placeList(ctx, [coords, coords], root);
