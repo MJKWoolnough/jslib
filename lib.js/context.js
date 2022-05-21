@@ -173,13 +173,13 @@ const IsItem = item => item.action !== undefined,
 			params = {
 				"onmousedown": openFn,
 				"onmouseover": function(e) {
-					setTO(ctx, openFn.bind(this, e))
+					setTO(ctx, openFn.bind(this, e));
 					if (selected >= 0) {
 						amendNode(l.childNodes[selected], {"class": ["!contextSelected"]});
 						selected = -1;
 					}
 				},
-				"onmouseout": () => clearTO(ctx),
+				"onmouseout": () => clearTO(ctx)
 			};
 		}
 		if (e.id) {

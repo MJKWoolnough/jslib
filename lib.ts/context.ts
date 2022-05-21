@@ -241,13 +241,13 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 			params = {
 				"onmousedown": openFn,
 				"onmouseover": function(this: HTMLLIElement, e: MouseEvent) {
-					setTO(ctx, openFn.bind(this, e))
+					setTO(ctx, openFn.bind(this, e));
 					if (selected >= 0) {
 						amendNode(l.childNodes[selected], {"class": ["!contextSelected"]});
 						selected = -1;
 					}
 				},
-				"onmouseout": () => clearTO(ctx),
+				"onmouseout": () => clearTO(ctx)
 			};
 		}
 		if (e.id) {
