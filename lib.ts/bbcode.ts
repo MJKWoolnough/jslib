@@ -134,7 +134,7 @@ export type OpenTag = {
 }
 
 export type CloseTag = {
-	tagName: string
+	tagName: string;
 	fullText: string;
 }
 
