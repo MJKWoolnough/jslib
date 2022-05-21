@@ -277,7 +277,7 @@ export class ShellElement extends BaseElement {
 
 export class DesktopElement extends HTMLElement {
 	constructor() {
-		super()
+		super();
 		amendNode(this, {"slot": "desktop"});
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, ":host{position:absolute;top:0;left:0;bottom:0;right:0}"),
