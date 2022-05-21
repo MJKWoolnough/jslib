@@ -76,7 +76,7 @@ const IsItem = (item: Item | Menu): item is Item => (item as Item).action !== un
 	clearTO(ctx);
 	ctx.t = window.setTimeout(() => {
 		ctx.t = -1;
-		fn()
+		fn();
 	}, ctx.d);
       },
       clearTO = (ctx: Ctx) => {

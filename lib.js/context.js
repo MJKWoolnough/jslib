@@ -8,7 +8,7 @@ const IsItem = item => item.action !== undefined,
 	clearTO(ctx);
 	ctx.t = window.setTimeout(() => {
 		ctx.t = -1;
-		fn()
+		fn();
 	}, ctx.d);
       },
       clearTO = ctx => {
