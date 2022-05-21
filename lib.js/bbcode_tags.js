@@ -193,7 +193,7 @@ table = (n, t, p) => {
 				case "thead":
 					if (!hasHeader) {
 						hasHeader = true;
-						state = 2
+						state = 2;
 					}
 					break;
 				case "tbody":
