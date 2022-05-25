@@ -1,7 +1,7 @@
 import type {Children, Props} from './dom.js';
 import {amendNode, clearNode, event, eventOnce} from './dom.js';
 import {div, li, slot, style, ul} from './html.js';
-import {ShellElement as BaseShellElement, DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows} from './windows.js';
+import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage, windows} from './windows.js';
 
 export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows};
 
