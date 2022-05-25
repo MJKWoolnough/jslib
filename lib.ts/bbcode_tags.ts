@@ -2,7 +2,7 @@ import type {Parsers, Tokeniser} from './bbcode.js';
 import type {DOMBind} from './dom.js';
 import {isCloseTag, isOpenTag, isString, process, text as textSymbol} from './bbcode.js';
 import {amendNode} from './dom.js';
-import {a, br, audio as aaudio, div, blockquote, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, mark, ol, pre, span, table as atable, tbody, td, tfoot, thead, th, tr, ul} from './html.js';
+import {a, audio as aaudio, blockquote, br, div, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, mark, ol, pre, span, table as atable, tbody, td, tfoot, th, thead, tr, ul} from './html.js';
 
 const simple = (fn: DOMBind<Node>, style?: string) => (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
