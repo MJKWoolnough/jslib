@@ -2,7 +2,7 @@ import type {Children, Props} from './dom.js';
 import contextPlace, {item as contextItem} from './context.js';
 import {amendNode, event, eventOnce} from './dom.js';
 import {div, img, li, slot, span, style, ul} from './html.js';
-import {ShellElement as BaseShellElement, DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows} from './windows.js';
+import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage, windows} from './windows.js';
 
 export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows};
 
