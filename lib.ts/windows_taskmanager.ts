@@ -38,12 +38,12 @@ export class ShellElement extends BaseShellElement {
 			switch (attributeName) {
 			case "window-icon":
 				if (data.item) {
-					amendNode(data.item.firstChild!, {"window-icon": target.getAttribute("window-icon") ?? undefined});
+					amendNode(data.item.firstChild, {"window-icon": target.getAttribute("window-icon") ?? undefined});
 				}
 				break;
 			case "window-title":
 				if (data.item) {
-					amendNode(data.item.firstChild!, {"window-title": target.getAttribute("window-title") || ""});
+					amendNode(data.item.firstChild, {"window-title": target.getAttribute("window-title") || ""});
 				}
 				break;
 			case "minimised":
@@ -51,7 +51,7 @@ export class ShellElement extends BaseShellElement {
 					return;
 				}
 				if (data.item) {
-					amendNode(data.item.firstChild!, {"maximised": true});
+					amendNode(data.item.firstChild, {"maximised": true});
 					return;
 				}
 				for (const i of taskbar.children) {
