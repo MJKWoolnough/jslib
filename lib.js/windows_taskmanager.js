@@ -42,6 +42,7 @@ export class ShellElement extends BaseShellElement {
 				break;
 			case "minimised":
 				if (!target.hasAttribute("minimised")) {
+					amendNode(data.item?.firstChild, {"maximised": false});
 					return;
 				}
 				if (data.item) {
