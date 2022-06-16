@@ -596,6 +596,7 @@ export class WindowElement extends BaseElement {
 		return () => b.remove();
 	}
 	focus() {
+		this.toggleAttribute("minimised", false);
 		const c = this.#child;
 		if (c) {
 			c.focus();
