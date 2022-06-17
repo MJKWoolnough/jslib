@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import {amendNode, autoFocus, event, eventCapture} from './dom.js';
+import {amendNode, autoFocus, clearNode, event, eventCapture} from './dom.js';
 import {button, div, img, input, slot, span, style} from './html.js';
 import {ns as svgNS} from './svg.js';
 
@@ -564,7 +564,7 @@ export class WindowElement extends BaseElement {
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		switch (name) {
 		case "window-title":
-			this.#title.textContent = newValue ?? "";
+			clearNode(this.#title, {"title": newValue ?? ""}, newValue ?? "");
 			break;
 		case "window-icon":
 			amendNode(this.#icon, {"src": newValue ?? defaultIcon});
