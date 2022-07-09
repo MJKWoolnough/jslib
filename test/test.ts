@@ -306,7 +306,7 @@
 				error(2);
 				first.cancel();
 				success(3);
-				error(4)
+				error(4);
 				second.cancel();
 				success(5);
 				error(6);
@@ -328,7 +328,7 @@
 				error(2);
 				first.cancel();
 				success(3);
-				error(4)
+				error(4);
 				second.cancel();
 				success(5);
 				error(6);
