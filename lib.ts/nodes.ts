@@ -510,6 +510,15 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		}
 		return count;
 	}
+	reSet(k: K, j: K) {
+		const root = this.#root,
+		      i = root.m.get(k);
+		if (i) {
+			this.delete(j);
+			i.k = j;
+			root.m.set(j, i);
+		}
+	}
 	reverse() {
 		reverse(this.#root);
 		return this;
