@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -37,7 +36,7 @@ func run() error {
 	}))
 	m.Handle("/request", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
-		postData, _ := ioutil.ReadAll(r.Body)
+		postData, _ := io.ReadAll(r.Body)
 		json.NewEncoder(w).Encode(struct {
 			Method        string     `json:"method"`
 			Auth          string     `json:"auth,omitempty"`
