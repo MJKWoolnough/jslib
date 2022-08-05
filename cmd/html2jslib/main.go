@@ -235,11 +235,7 @@ type indentPrinter struct {
 	io.Writer
 }
 
-var (
-	indent       = []byte{'	'}
-	newLine      = []byte{'\n'}
-	commaNewLine = []byte{',', '\n'}
-)
+var indent = []byte{'	'}
 
 func (i *indentPrinter) Write(p []byte) (int, error) {
 	var (
