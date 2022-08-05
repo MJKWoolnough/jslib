@@ -138,8 +138,8 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	o.Write([]byte{';'})
-	return nil
+	_, err = o.Write([]byte{';'})
+	return err
 }
 
 type element struct {
