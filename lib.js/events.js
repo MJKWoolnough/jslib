@@ -53,7 +53,7 @@ export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
 	const id = nextKeyID++,
 	      keydown = [onkeydown, once],
 	      keyup = [onkeyup, once],
-	      keys = typeof key === "string" ? [key] : key;
+	      keys = (typeof key === "string" ? [key] : key).filter(k => !!k);
 	return [
 		() => {
 			for (const key of keys) {

@@ -51,7 +51,7 @@ export const keyEvent = (key: string | string[], onkeydown?: KeyFn, onkeyup?: Ke
 	const id = nextKeyID++,
 	      keydown: [KeyFn, boolean] = [onkeydown!, once],
 	      keyup: [KeyFn, boolean] = [onkeyup!, once],
-	      keys = typeof key === "string" ? [key] : key;
+	      keys = (typeof key === "string" ? [key] : key).filter(k => !!k);
 	return [
 		() => {
 			for (const key of keys) {
