@@ -17,7 +17,9 @@ type EventArray = [EventListenerOrEventListenerObject, AddEventListenerOptions, 
 
 type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | ClassObj | undefined;
 
-export type Props = Record<string, PropValue> | NamedNodeMap;
+export type PropsObject = Record<string, PropValue>;
+
+export type Props = PropsObject | NamedNodeMap;
 
 export type Children = string | Node | Children[] | NodeList | HTMLCollection;
 
