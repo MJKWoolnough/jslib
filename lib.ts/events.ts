@@ -8,15 +8,16 @@ let nextKeyID = 0,
     nextMouseID = 0;
 
 const maxMouseButton = 16,
+      mods = {
+	"altKey": false,
+	"ctrlKey": false,
+	"metaKey": false,
+	"shiftKey": false
+      },
       held = new Set<string>(),
       downs = new Map<string, Map<number, [KeyFn, boolean]>>(),
       ups = new Map<string, Map<number, [KeyFn, boolean]>>(),
-      e = <T = MouseEventInit | KeyboardEventInit>(o: T): EventModifierInit => Object.assign(o, {
-	"ctrlKey": held.has("Control"),
-	"shiftKey": held.has("Shift"),
-	"altKey": held.has("Alt"),
-	"metaKey": held.has("OS")
-      }),
+      e = <T = MouseEventInit | KeyboardEventInit>(o: T): EventModifierInit => Object.assign(o, mods),
       ke = (event: "down" | "up", key: string) => new KeyboardEvent(`key${event}`, e({key})),
       me = (button: MouseButton) => new MouseEvent(`mouseup`, e({
 	button,
@@ -28,6 +29,10 @@ const maxMouseButton = 16,
       mouseLeave = new Map<number, () => void>(),
       mouseUp = Array.from({"length": maxMouseButton}, _ => new Map<number, MouseFn>()),
       keyEventFn = (down: boolean, e: KeyboardEvent) => {
+	mods.altKey = e.altKey
+	mods.ctrlKey = e.ctrlKey;
+	mods.metaKey = e.metaKey;
+	mods.shiftKey = e.shiftKey;
 	const {key, target} = e;
 	if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || held.has(key) === down)) {
 		const events = (down ? downs : ups).get(key);

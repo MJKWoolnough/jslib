@@ -2,20 +2,16 @@ let nextKeyID = 0,
     nextMouseID = 0;
 
 const maxMouseButton = 16,
+      mods = {
+	"altKey": false,
+	"ctrlKey": false,
+	"metaKey": false,
+	"shiftKey": false
+      },
       held = new Set(),
       downs = new Map(),
       ups = new Map(),
-      k = key => ({
-	"enumerable": true,
-	"get": () => held.has(key)
-      }),
-      keys = Object.defineProperties({}, {
-	"ctrlKey": k("Control"),
-	"shiftKey": k("Shift"),
-	"altKey": k("Alt"),
-	"metaKey": k("OS")
-      }),
-      e = o => Object.assign(o, keys),
+      e = o => Object.assign(o, mods),
       ke = (event, key) => new KeyboardEvent(`key${event}`, e({key})),
       me = button => new MouseEvent(`mouseup`, e({
 	button,
@@ -26,7 +22,11 @@ const maxMouseButton = 16,
       mouseMove = new Map(),
       mouseLeave = new Map(),
       mouseUp = Array.from({"length": maxMouseButton}, _ => new Map()),
-      keyEventFn = (down, e) => {
+      keyEventFn = (down: boolean, e: KeyboardEvent) => {
+	mods.altKey = e.altKey
+	mods.ctrlKey = e.ctrlKey;
+	mods.metaKey = e.metaKey;
+	mods.shiftKey = e.shiftKey;
 	const {key, target} = e;
 	if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || held.has(key) === down)) {
 		const events = (down ? downs : ups).get(key);
@@ -40,7 +40,6 @@ const maxMouseButton = 16,
 		}
 		held[down ? "add" : "delete"](key);
 	}
-	held[down ? "add" : "delete"](key);
       };
 
 export let mouseX = 0,
