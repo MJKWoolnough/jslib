@@ -1,7 +1,8 @@
 let nextKeyID = 0,
     nextMouseID = 0;
 
-const held = new Set(),
+const maxMouseButton = 16,
+      held = new Set(),
       downs = new Map(),
       ups = new Map(),
       k = key => ({
@@ -24,11 +25,7 @@ const held = new Set(),
       })),
       mouseMove = new Map(),
       mouseLeave = new Map(),
-      mouseUp = [
-	new Map(),
-	new Map(),
-	new Map()
-      ],
+      mouseUp = Array.from({"length": maxMouseButton}, _ => new Map()),
       keyEventFn = (down, e) => {
 	const {key, target} = e;
 	if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || held.has(key) === down)) {
@@ -137,7 +134,7 @@ for (const [evt, fn] of [
 	}],
 	["mouseup", e => {
 		const {button} = e;
-		if (button !== 0 && button !== 1 && button !== 2) {
+		if (button < 0 || button >= maxMouseButton || !Number.isInteger(button)) {
 			return;
 		}
 		for (const [id, event] of mouseUp[button]) {
@@ -160,7 +157,7 @@ for (const [evt, fn] of [
 			}
 			held.delete(key);
 		}
-		for (let button = 0; button < 3; button++) {
+		for (let button = 0; button < maxMouseButton; button++) {
 			if (mouseUp[button].size) {
 				const e = me(button);
 				for (const [, event] of mouseUp[button]) {

@@ -2,10 +2,13 @@ type KeyFn = (e: KeyboardEvent) => void;
 
 type MouseFn = (e: MouseEvent) => void;
 
+type MouseButton = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
+
 let nextKeyID = 0,
     nextMouseID = 0;
 
-const held = new Set<string>(),
+const maxMouseButton = 16,
+      held = new Set<string>(),
       downs = new Map<string, Map<number, [KeyFn, boolean]>>(),
       ups = new Map<string, Map<number, [KeyFn, boolean]>>(),
       e = <T = MouseEventInit | KeyboardEventInit>(o: T): EventModifierInit => Object.assign(o, {
@@ -15,7 +18,7 @@ const held = new Set<string>(),
 	"metaKey": held.has("OS")
       }),
       ke = (event: "down" | "up", key: string) => new KeyboardEvent(`key${event}`, e({key})),
-      me = (button: 0 | 1 | 2) => new MouseEvent(`mouseup`, e({
+      me = (button: MouseButton) => new MouseEvent(`mouseup`, e({
 	button,
 	"clientX": mouseX,
 	"clientY": mouseY,
@@ -23,11 +26,7 @@ const held = new Set<string>(),
       })),
       mouseMove = new Map<number, MouseFn>(),
       mouseLeave = new Map<number, () => void>(),
-      mouseUp = [
-	new Map<number, MouseFn>(),
-	new Map<number, MouseFn>(),
-	new Map<number, MouseFn>()
-      ],
+      mouseUp = Array.from({"length": maxMouseButton}, _ => new Map<number, MouseFn>()),
       keyEventFn = (down: boolean, e: KeyboardEvent) => {
 	const {key, target} = e;
 	if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || held.has(key) === down)) {
@@ -104,7 +103,7 @@ mouseMoveEvent = (onmousemove: MouseFn, onend?: () => void) => {
 		}
 	] as const;
 },
-mouseDragEvent = (button: 0 | 1 | 2, onmousemove?: MouseFn, onmouseup: MouseFn = () => {}) => {
+mouseDragEvent = (button: MouseButton, onmousemove?: MouseFn, onmouseup: MouseFn = () => {}) => {
 	const id = nextMouseID++;
 	return [
 		() => {
@@ -135,7 +134,7 @@ for (const [evt, fn] of [
 	}],
 	["mouseup", (e: MouseEvent) => {
 		const {button} = e;
-		if (button !== 0 && button !== 1 && button !== 2) {
+		if (button < 0 || button >= maxMouseButton || !Number.isInteger(button)) {
 			return;
 		}
 		for (const [id, event] of mouseUp[button]) {
@@ -158,9 +157,9 @@ for (const [evt, fn] of [
 			}
 			held.delete(key);
 		}
-		for (let button = 0; button < 3; button++) {
+		for (let button = 0; button < maxMouseButton; button++) {
 			if (mouseUp[button].size) {
-				const e = me(button as 0 | 1 | 2);
+				const e = me(button as MouseButton);
 				for (const [, event] of mouseUp[button]) {
 					event(e);
 				}
