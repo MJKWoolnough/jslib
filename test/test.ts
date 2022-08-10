@@ -3335,6 +3335,40 @@
 				const {default: Fraction} = await import("./lib/fraction.js");
 				return new Fraction(2n, 3n).div(new Fraction(2n, 5n)).cmp(new Fraction(10n, 6n)) === 0;
 			}
+		},
+		"min": {
+			"0, 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(Fraction.zero, Fraction.zero).cmp(Fraction.zero) === 0;
+			},
+			"0, 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(Fraction.zero, Fraction.one).cmp(Fraction.zero) === 0;
+			},
+			"1, 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(Fraction.one, Fraction.zero).cmp(Fraction.zero) === 0;
+			},
+			"1, 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(Fraction.one, Fraction.one).cmp(Fraction.one) === 0;
+			},
+			"1, 2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(Fraction.one, new Fraction(2n)).cmp(Fraction.one) === 0;
+			},
+			"-1, 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(new Fraction(-1n), Fraction.zero).cmp(new Fraction(-1n)) === 0;
+			},
+			"-1, 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(new Fraction(-1n), Fraction.one).cmp(new Fraction(-1n)) === 0;
+			},
+			"-1, 2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(new Fraction(-1n), new Fraction(2n)).cmp(new Fraction(-1n)) === 0;
+			}
 		}
 	}
 });
