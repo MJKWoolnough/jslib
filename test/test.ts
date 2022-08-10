@@ -3289,6 +3289,52 @@
 				const {default: Fraction} = await import("./lib/fraction.js");
 				return new Fraction(2n, 3n).mul(new Fraction(2n, 5n)).cmp(new Fraction(4n, 15n)) === 0;
 			}
+		},
+		"div": {
+			"0 / 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.zero.div(Fraction.zero).isNaN();
+			},
+			"0 / 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.zero.div(Fraction.one).cmp(Fraction.zero) === 0;
+			},
+			"1 / 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.one.div(Fraction.zero).isNaN();
+			},
+			"1 / 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.one.div(Fraction.one).cmp(Fraction.one) === 0;
+			},
+			"1 / 2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.one.div(new Fraction(2n)).cmp(new Fraction(1n, 2n)) === 0;
+			},
+			"-1 / 2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(-1n).div(new Fraction(2n)).cmp(new Fraction(-1n, 2n)) === 0;
+			},
+			"-1 / -2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(-1n).div(new Fraction(-2n)).cmp(new Fraction(1n, 2n)) === 0;
+			},
+			"1/2 / 1/2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(1n, 2n).div(new Fraction(1n, 2n)).cmp(Fraction.one) === 0;
+			},
+			"1/2 / 1/3": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(1n, 2n).div(new Fraction(1n, 3n)).cmp(new Fraction(3n, 2n)) === 0;
+			},
+			"1/2 / 1/-3": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(1n, 2n).div(new Fraction(1n, -3n)).cmp(new Fraction(-3n, 2n)) === 0;
+			},
+			"2/3 / 2/5": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(2n, 3n).div(new Fraction(2n, 5n)).cmp(new Fraction(10n, 6n)) === 0;
+			}
 		}
 	}
 });
