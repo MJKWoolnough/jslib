@@ -3041,6 +3041,28 @@
 				const {default: Fraction} = await import("./lib/fraction.js");
 				return isNaN(Fraction.NaN.cmp(Fraction.one));
 			}
+		},
+		"isNaN": {
+			"NaN": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.NaN.isNaN();
+			},
+			"0 / 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(0n, 0n).isNaN();
+			},
+			"1 / 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(1n, 0n).isNaN();
+			},
+			"2 / 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(2n, 0n).isNaN();
+			},
+			"-1 / 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(-1n, 0n).isNaN();
+			}
 		}
 	}
 });
