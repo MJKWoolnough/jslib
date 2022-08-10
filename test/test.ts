@@ -2978,5 +2978,69 @@
 				return res === 4;
 			}
 		}
+	},
+	"fraction.js": {
+		"comparison": {
+			"0 == 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.zero.cmp(Fraction.zero) === 0;
+			},
+			"1 == 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.one.cmp(Fraction.one) === 0;
+			},
+			"0 < 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.zero.cmp(Fraction.one) === -1;
+			},
+			"1 > 0": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.one.cmp(Fraction.zero) === 1;
+			},
+			"2 == 2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js")
+				return new Fraction(2n).cmp(new Fraction(2n)) === 0;
+			},
+			"1 < 2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js")
+				return Fraction.one.cmp(new Fraction(2n)) === -1;
+			},
+			"2 > 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js")
+				return new Fraction(2n).cmp(Fraction.one) === 1;
+			},
+			"-1 < 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(-1n).cmp(Fraction.one) === -1;
+			},
+			"1 > -1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.one.cmp(new Fraction(-1n)) === 1;
+			},
+			"1 == 2/2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.one.cmp(new Fraction(2n, 2n)) === 0;
+			},
+			"2 == 6/3": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(2n).cmp(new Fraction(6n, 3n)) === 0;
+			},
+			"-3 == -12/4": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(-3n).cmp(new Fraction(-12n, 4n)) === 0;
+			},
+			"3 == -12/-4": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(3n).cmp(new Fraction(-12n, -4n)) === 0;
+			},
+			"1 ~= NaN": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return isNaN(Fraction.one.cmp(Fraction.NaN));
+			},
+			"NaN ~= 1": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return isNaN(Fraction.NaN.cmp(Fraction.one));
+			}
+		}
 	}
 });
