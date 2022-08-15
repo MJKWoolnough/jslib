@@ -12,14 +12,17 @@ class Setting {
 		return v + "";
 	}
 	set(v) {
-		const s = this.s(this.#value = v);
-		if (s === null) {
-			window.localStorage.removeItem(this.#name);
-		} else {
-			window.localStorage.setItem(this.#name, s);
-		}
-		for (const fn of this.#fns) {
-			fn(v);
+		const old = this.#value,
+		      s = this.s(this.#value = v);
+		if (this.#value !== old) {
+			if (s === null) {
+				window.localStorage.removeItem(this.#name);
+			} else {
+				window.localStorage.setItem(this.#name, s);
+			}
+			for (const fn of this.#fns) {
+				fn(v);
+			}
 		}
 		return this;
 	}
