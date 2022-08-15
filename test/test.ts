@@ -2401,7 +2401,7 @@
 			},
 			"set": async () => {
 				const {StringSetting} = await import("./lib/settings.js"),
-				      name = "SETTINGS_BoolSetting_2",
+				      name = "SETTINGS_StringSetting_2",
 				      ss = new StringSetting(name);
 				let b = ss.value === "" && window.localStorage.getItem(name) === null;
 				ss.set("");
