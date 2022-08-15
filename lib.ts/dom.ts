@@ -28,6 +28,10 @@ export interface DOMBind<T extends Node> {
 	(children?: Children): T;
 }
 
+interface FocusElement {
+	focus(): void;
+}
+
 const childrenArr = (node: Node, children: Children) => {
 	if (typeof children === "string") {
 		node.appendChild(document.createTextNode(children));
@@ -131,7 +135,7 @@ clearNode: mElement = (node: Node, properties?: Props | Children, children?: Chi
 	}
 	return amendNode(node, properties, children);
 },
-autoFocus = <T extends HTMLElement | SVGElement>(node: T, inputSelect = true) => {
+autoFocus = <T extends FocusElement>(node: T, inputSelect = true) => {
 	window.setTimeout(() => {
 		node.focus();
 		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
