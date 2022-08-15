@@ -2147,7 +2147,7 @@
 				    v = 0;
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      bs = new BoolSetting("SETTINGS_BoolSetting_5").wait(b => {
-					      const needed = num === 3 || num === 4;
+					      const needed = num === 2 || num === 5;
 					      num++;
 					      v += +(b === needed);
 				      });
@@ -2156,7 +2156,8 @@
 				bs.set(true);
 				bs.set(true);
 				bs.set(false);
-				return v === 6;
+				bs.set(true);
+				return v === 3;
 			},
 			"multi-wait": async () => {
 				let numv = 0,
@@ -2166,11 +2167,11 @@
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_BoolSetting_6",
 				      bs = new BoolSetting(name).wait(b => {
-					      const needed = numv === 3 || numv === 4;
+					      const needed = numv === 2 || numv === 5;
 					      numv++;
 					      v += +(b === needed);
 				      }).wait(b => {
-					      const needed = numw === 3 || numw === 4;
+					      const needed = numw === 2 || numw === 5;
 					      numw++;
 					      w += +(b === needed);
 				      });
@@ -2179,7 +2180,8 @@
 				bs.set(true);
 				bs.set(true);
 				bs.set(false);
-				return v === 6 && w === 6;
+				bs.set(true);
+				return v === 3 && w === 3;
 			}
 		},
 		"IntSetting": {
@@ -2405,7 +2407,7 @@
 				      ss = new StringSetting(name);
 				let b = ss.value === "" && window.localStorage.getItem(name) === null;
 				ss.set("");
-				b &&= ss.value === "" && window.localStorage.getItem(name) === "";
+				b &&= ss.value === "" && window.localStorage.getItem(name) === null;
 				ss.set("A");
 				b &&= ss.value === "A" && window.localStorage.getItem(name) === "A";
 				ss.set("B");
