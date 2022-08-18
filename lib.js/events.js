@@ -40,6 +40,13 @@ const maxMouseButton = 16,
 		}
 		held[down ? "add" : "delete"](key);
 	}
+      },
+      getMap = (m, k) => {
+	let a = m.get(k);
+	if (!a) {
+		m.set(k, a = new Map());
+	}
+	return a;
       };
 
 export let mouseX = 0,
@@ -59,19 +66,11 @@ export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
 						onkeydown(ke("down", key));
 					}
 					if (!kh || !once) {
-						let m = downs.get(key);
-						if (!m) {
-							downs.set(key, m = new Map());
-						}
-						m.set(id, keydown);
+						getMap(downs, key).set(id, keydown);
 					}
 				}
 				if (onkeyup) {
-					let m = ups.get(key);
-					if (!m) {
-						ups.set(key, m = new Map());
-					}
-					m.set(id, keyup);
+					getMap(ups, key).set(id, keyup);
 				}
 			}
 		},
