@@ -1,5 +1,4 @@
-let nextKeyID = 0,
-    nextMouseID = 0;
+let nextMouseID = 0;
 
 const maxMouseButton = 16,
       mods = {
@@ -44,10 +43,10 @@ const maxMouseButton = 16,
       },
       processEvents = (e, events) => {
 	if (events) {
-		for (const [id, [event, once]] of events) {
-			event(e);
-			if (once) {
-				events.delete(id);
+		for (const event of events) {
+			event[0](e);
+			if (event[1]) {
+				events.delete(event);
 			}
 		}
 	}
@@ -84,10 +83,10 @@ const maxMouseButton = 16,
 	}
 	return combinationString(k);
       },
-      getMap = (m, k) => {
+      getSet = (m, k) => {
 	let a = m.get(k);
 	if (!a) {
-		m.set(k, a = new Map());
+		m.set(k, a = new Set());
 	}
 	return a;
       };
@@ -96,8 +95,7 @@ export let mouseX = 0,
 mouseY = 0;
 
 export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
-	const id = nextKeyID++,
-	      keydown = [onkeydown, once],
+	const keydown = [onkeydown, once],
 	      keyup = [onkeyup, once],
 	      keys = (typeof key === "string" ? [key] : key).filter(k => !!k).map(parseCombination);
 	return [
@@ -110,19 +108,19 @@ export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
 						onkeydown(ke("down", key));
 					}
 					if (!kh || !once) {
-						getMap(downs, kc).set(id, keydown);
+						getSet(downs, kc).add(keydown);
 					}
 				}
 				if (onkeyup) {
-					getMap(ups, kc).set(id, keyup);
+					getSet(ups, kc).add(keyup);
 				}
 			}
 		},
 		(now = true) => {
 			for (const kc of keys) {
-				const toRun = now && held.has(kc) ? ups.get(kc)?.get(id)?.[0] : null;
-				downs.get(kc)?.delete(id);
-				ups.get(kc)?.delete(id);
+				const toRun = now && held.has(kc) && ups.get(kc)?.has(keyup) ? keyup[0] : null;
+				downs.get(kc)?.delete(keydown);
+				ups.get(kc)?.delete(keyup);
 				toRun?.(ke("up", kc));
 			}
 		}
@@ -195,16 +193,7 @@ for (const [evt, fn] of [
 	}],
 	["blur", () => {
 		for (const key of held) {
-			const events = ups.get(key);
-			if (events && events.size) {
-				const e = ke("up", key);
-				for (const [id, [event, once]] of events) {
-					event(e);
-					if (once) {
-						events.delete(id);
-					}
-				}
-			}
+			processEvents(ke("up", key), ups.get(key));
 			held.delete(key);
 		}
 		for (let button = 0; button < maxMouseButton; button++) {

@@ -4,8 +4,7 @@ type MouseFn = (e: MouseEvent) => void;
 
 type MouseButton = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
 
-let nextKeyID = 0,
-    nextMouseID = 0;
+let nextMouseID = 0;
 
 const maxMouseButton = 16,
       mods = {
@@ -15,8 +14,8 @@ const maxMouseButton = 16,
 	"shiftKey": false
       },
       held = new Set<string>(),
-      downs = new Map<string, Map<number, [KeyFn, boolean]>>(),
-      ups = new Map<string, Map<number, [KeyFn, boolean]>>(),
+      downs = new Map<string, Set<[KeyFn, boolean]>>(),
+      ups = new Map<string, Set<[KeyFn, boolean]>>(),
       e = <T = MouseEventInit | KeyboardEventInit>(o: T): EventModifierInit => Object.assign(o, mods),
       ke = (event: "down" | "up", key: string) => new KeyboardEvent(`key${event}`, e({key})),
       me = (button: MouseButton) => new MouseEvent(`mouseup`, e({
@@ -48,12 +47,12 @@ const maxMouseButton = 16,
 		held.add(kc);
 	}
       },
-      processEvents = (e: KeyboardEvent, events?: Map<number, [KeyFn, boolean]>) => {
+      processEvents = (e: KeyboardEvent, events?: Set<[KeyFn, boolean]>) => {
 	if (events) {
-		for (const [id, [event, once]] of events) {
-			event(e);
-			if (once) {
-				events.delete(id);
+		for (const event of events) {
+			event[0](e);
+			if (event[1]) {
+				events.delete(event);
 			}
 		}
 	}
@@ -90,10 +89,10 @@ const maxMouseButton = 16,
 	}
 	return combinationString(k);
       },
-      getMap = <K, L, T>(m: Map<K, Map<L, T>>, k: K) => {
+      getSet = <K, T>(m: Map<K, Set<T>>, k: K) => {
 	let a = m.get(k);
 	if (!a) {
-		m.set(k, a = new Map<L, T>());
+		m.set(k, a = new Set<T>());
 	}
 	return a;
       };
@@ -102,8 +101,7 @@ export let mouseX = 0,
 mouseY = 0;
 
 export const keyEvent = (key: string | string[], onkeydown?: KeyFn, onkeyup?: KeyFn, once = false) => {
-	const id = nextKeyID++,
-	      keydown: [KeyFn, boolean] = [onkeydown!, once],
+	const keydown: [KeyFn, boolean] = [onkeydown!, once],
 	      keyup: [KeyFn, boolean] = [onkeyup!, once],
 	      keys = (typeof key === "string" ? [key] : key).filter(k => !!k).map(parseCombination);
 	return [
@@ -116,19 +114,19 @@ export const keyEvent = (key: string | string[], onkeydown?: KeyFn, onkeyup?: Ke
 						onkeydown(ke("down", key));
 					}
 					if (!kh || !once) {
-						getMap(downs, kc).set(id, keydown);
+						getSet(downs, kc).add(keydown);
 					}
 				}
 				if (onkeyup) {
-					getMap(ups, kc).set(id, keyup);
+					getSet(ups, kc).add(keyup);
 				}
 			}
 		},
 		(now = true) => {
 			for (const kc of keys) {
-				const toRun = now && held.has(kc) ? ups.get(kc)?.get(id)?.[0] : null;
-				downs.get(kc)?.delete(id);
-				ups.get(kc)?.delete(id);
+				const toRun = now && held.has(kc) && ups.get(kc)?.has(keyup) ? keyup[0] : null;
+				downs.get(kc)?.delete(keydown);
+				ups.get(kc)?.delete(keyup);
 				toRun?.(ke("up", kc));
 			}
 		}
@@ -201,16 +199,7 @@ for (const [evt, fn] of [
 	}],
 	["blur", () => {
 		for (const key of held) {
-			const events = ups.get(key);
-			if (events && events.size) {
-				const e = ke("up", key);
-				for (const [id, [event, once]] of events) {
-					event(e);
-					if (once) {
-						events.delete(id);
-					}
-				}
-			}
+			processEvents(ke("up", key), ups.get(key));
 			held.delete(key);
 		}
 		for (let button = 0; button < maxMouseButton; button++) {
