@@ -28,24 +28,67 @@ const maxMouseButton = 16,
       mouseMove = new Map<number, MouseFn>(),
       mouseLeave = new Map<number, () => void>(),
       mouseUp = Array.from({"length": maxMouseButton}, _ => new Map<number, MouseFn>()),
-      keyEventFn = (down: boolean, e: KeyboardEvent) => {
-	mods.altKey = e.altKey
-	mods.ctrlKey = e.ctrlKey;
-	mods.metaKey = e.metaKey;
-	mods.shiftKey = e.shiftKey;
-	const {key, target} = e;
-	if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || held.has(key) === down)) {
-		const events = (down ? downs : ups).get(key);
-		if (events) {
-			for (const [id, [event, once]] of events) {
-				event(e);
-				if (once) {
-					events.delete(id);
-				}
+      keyEventFn = (down: boolean, ev: KeyboardEvent) => {
+	mods.altKey = ev.altKey
+	mods.ctrlKey = ev.ctrlKey;
+	mods.metaKey = ev.metaKey;
+	mods.shiftKey = ev.shiftKey;
+	const {key, target} = ev,
+	      kc = combinationString(e({key}));
+	if (!down) {
+		const tfs = kc.slice(0, 4);
+		for (const k of held) {
+			if (!k.startsWith(tfs) || k.slice(4) === key) {
+				processEvents(ev, ups.get(k));
+				held.delete(k);
 			}
 		}
-		held[down ? "add" : "delete"](key);
+	} else if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) && !held.has(kc)) {
+		processEvents(ev, downs.get(kc));
+		held.add(kc);
 	}
+      },
+      processEvents = (e: KeyboardEvent, events?: Map<number, [KeyFn, boolean]>) => {
+	if (events) {
+		for (const [id, [event, once]] of events) {
+			event(e);
+			if (once) {
+				events.delete(id);
+			}
+		}
+	}
+      },
+      tf = ["T", "F"],
+      combinationString = (k: KeyboardEventInit) => tf[+!k.altKey] + tf[+!k.ctrlKey] + tf[+!k.metaKey] + tf[+!k.shiftKey] + (k.key ?? ""),
+      parseCombination = (keyComb: string) => {
+	const parts = keyComb.split("+").map(p => p.trim()),
+	      k = {
+		"altKey": false,
+		"ctrlKey": false,
+		"metaKey": false,
+		"shiftKey": false,
+		"key": parts[parts.length-1]
+	      };
+	for (const mod of parts) {
+		switch (mod.toLowerCase()) {
+		case "alt":
+			k.altKey = true;
+			break;
+		case "control":
+		case "ctrl":
+			k.ctrlKey = true;
+			break;
+		case "command":
+		case "meta":
+		case "super":
+		case "windows":
+			k.metaKey = true;
+			break;
+		case "shift":
+			k.shiftKey = true;
+		}
+	}
+	return combinationString(k);
       },
       getMap = <K, L, T>(m: Map<K, Map<L, T>>, k: K) => {
 	let a = m.get(k);
@@ -62,30 +105,31 @@ export const keyEvent = (key: string | string[], onkeydown?: KeyFn, onkeyup?: Ke
 	const id = nextKeyID++,
 	      keydown: [KeyFn, boolean] = [onkeydown!, once],
 	      keyup: [KeyFn, boolean] = [onkeyup!, once],
-	      keys = (typeof key === "string" ? [key] : key).filter(k => !!k);
+	      keys = (typeof key === "string" ? [key] : key).filter(k => !!k).map(parseCombination);
 	return [
 		() => {
-			for (const key of keys) {
+			for (const kc of keys) {
 				if (onkeydown) {
-					const kh = held.has(key);
-					if (kh) {
+					const kh = held.has(kc),
+					      key = kc.slice(4);
+					if (kh && kc === combinationString(e({key}))) {
 						onkeydown(ke("down", key));
 					}
 					if (!kh || !once) {
-						getMap(downs, key).set(id, keydown);
+						getMap(downs, kc).set(id, keydown);
 					}
 				}
 				if (onkeyup) {
-					getMap(ups, key).set(id, keyup);
+					getMap(ups, kc).set(id, keyup);
 				}
 			}
 		},
 		(now = true) => {
-			for (const key of keys) {
-				const toRun = now && held.has(key) ? ups.get(key)?.get(id)?.[0] : null;
-				downs.get(key)?.delete(id);
-				ups.get(key)?.delete(id);
-				toRun?.(ke("up", key));
+			for (const kc of keys) {
+				const toRun = now && held.has(kc) ? ups.get(kc)?.get(id)?.[0] : null;
+				downs.get(kc)?.delete(id);
+				ups.get(kc)?.delete(id);
+				toRun?.(ke("up", kc));
 			}
 		}
 	] as const;
@@ -124,7 +168,15 @@ mouseDragEvent = (button: MouseButton, onmousemove?: MouseFn, onmouseup: MouseFn
 		}
 	] as const;
 },
-hasKeyEvent = (key: string) => !!(downs.get(key)?.size || ups.get(key)?.size);
+hasKeyEvent = (key: string) => {
+	const kc = parseCombination(key);
+	for (const evs of [downs, ups]) {
+		if (evs.get(kc)?.size) {
+			return true;
+		}
+	}
+	return false;
+};
 
 for (const [evt, fn] of [
 	["keydown", (e: KeyboardEvent) => keyEventFn(true, e)],
