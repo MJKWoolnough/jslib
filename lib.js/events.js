@@ -22,7 +22,7 @@ const maxMouseButton = 16,
       mouseMove = new Map(),
       mouseLeave = new Map(),
       mouseUp = Array.from({"length": maxMouseButton}, _ => new Map()),
-      keyEventFn = (down: boolean, e: KeyboardEvent) => {
+      keyEventFn = (down, e) => {
 	mods.altKey = e.altKey
 	mods.ctrlKey = e.ctrlKey;
 	mods.metaKey = e.metaKey;
