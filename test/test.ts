@@ -2801,6 +2801,113 @@
 				return res === 3;
 			}
 		},
+		"key combinations": {
+			"Ctrl+ single key keyEvent": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom20",
+				      [start, stop] = keyEvent("Ctrl+"+key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, ctrlKey: false}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, ctrlKey: true}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, ctrlKey: false}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				return res === 3;
+			},
+			"Shift+": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom21",
+				      [start, stop] = keyEvent("Shift+"+key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, shiftKey: true}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, shiftKey: false}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, shiftKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				stop(false);
+				return res === 12;
+			},
+			"Alt+": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom22",
+				      [start, stop] = keyEvent("Alt+"+key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: false}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: false}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				return res === 3;
+			},
+			"Meta+": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom23",
+				      [start, stop] = keyEvent("Meta+"+key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, metaKey: true}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, metaKey: true}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, metaKey: false}));
+				stop();
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				return res === 12;
+			},
+			"All mods": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom24",
+				      [start, stop] = keyEvent("Alt+Control+Shift+Super+"+key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, metaKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, shiftKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, ctrlKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, ctrlKey: true, metaKey: true, shiftKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, metaKey: true, shiftKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, ctrlKey: true, metaKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, ctrlKey: true, metaKey: true, shiftKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, ctrlKey: true, metaKey: true, shiftKey: true}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, ctrlKey: true, metaKey: true, shiftKey: true}));
+				stop(false);
+				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, ctrlKey: true, metaKey: true, shiftKey: true}));
+				return res === 40;
+			},
+		},
 		"mouseMoveEvent": {
 			"move": async () => {
 				let res = 0;
