@@ -3085,6 +3085,33 @@
 				stop3();
 				res += +(!hasKeyEvent(key3));
 				return res === 4;
+			},
+			"hasKeyEvent + mods": async () => {
+				let res = 0;
+				const {hasKeyEvent, keyEvent} = await import("./lib/events.js"),
+				      key1 = "Custom25",
+				      [start1, stop1] = keyEvent(key1, () => {}),
+				      key2 = "Custom26",
+				      [start2, stop2] = keyEvent(key2, undefined, () => {}),
+				      key3 = "Custom27",
+				      [start3, stop3] = keyEvent("Ctrl+"+key2, () => {}, () => {});
+				start1();
+				start2();
+				start3();
+				res += +(hasKeyEvent(key1));
+				res += +(hasKeyEvent(key2));
+				res += +(hasKeyEvent(key3));
+				stop1();
+				res += +(!hasKeyEvent(key1));
+				stop2();
+				res += +(!hasKeyEvent(key2));
+				stop3();
+				res += +(!hasKeyEvent(key3));
+				res *= 2;
+				start3();
+				res += +(hasKeyEvent("Ctrl+"+key2));
+				stop3();
+				return res === 11;
 			}
 		}
 	},
