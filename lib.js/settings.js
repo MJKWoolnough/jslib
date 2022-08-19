@@ -14,7 +14,7 @@ class Setting {
 	set(v) {
 		const old = this.#value,
 		      s = this.s(this.#value = v);
-		if (this.#value !== old) {
+		if (this.#value !== old || this.#value instanceof Object) {
 			if (s === null) {
 				window.localStorage.removeItem(this.#name);
 			} else {
