@@ -2,7 +2,7 @@ type KeyFn = (e: KeyboardEvent) => void;
 
 type MouseFn = (e: MouseEvent) => void;
 
-type MouseButton = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
+type MouseButton = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
 
 let nextMouseID = 0;
 
@@ -28,7 +28,7 @@ const maxMouseButton = 16,
       mouseLeave = new Map<number, () => void>(),
       mouseUp = Array.from({"length": maxMouseButton}, _ => new Map<number, MouseFn>()),
       keyEventFn = (down: boolean, ev: KeyboardEvent) => {
-	mods.altKey = ev.altKey
+	mods.altKey = ev.altKey;
 	mods.ctrlKey = ev.ctrlKey;
 	mods.metaKey = ev.metaKey;
 	mods.shiftKey = ev.shiftKey;
