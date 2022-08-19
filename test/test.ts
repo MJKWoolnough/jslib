@@ -2906,7 +2906,7 @@
 				stop(false);
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, ctrlKey: true, metaKey: true, shiftKey: true}));
 				return res === 40;
-			},
+			}
 		},
 		"mouseMoveEvent": {
 			"move": async () => {
