@@ -3134,15 +3134,15 @@
 				return Fraction.one.cmp(Fraction.zero) === 1;
 			},
 			"2 == 2": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js")
+				const {default: Fraction} = await import("./lib/fraction.js");
 				return new Fraction(2n).cmp(new Fraction(2n)) === 0;
 			},
 			"1 < 2": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js")
+				const {default: Fraction} = await import("./lib/fraction.js");
 				return Fraction.one.cmp(new Fraction(2n)) === -1;
 			},
 			"2 > 1": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js")
+				const {default: Fraction} = await import("./lib/fraction.js");
 				return new Fraction(2n).cmp(Fraction.one) === 1;
 			},
 			"-1 < 1": async () => {
