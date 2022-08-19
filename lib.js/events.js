@@ -29,9 +29,9 @@ const maxMouseButton = 16,
 	const {key, target} = ev,
 	      kc = combinationString(e({key}));
 	if (!down) {
-		const tfs = kc.slice(0, 4);
+		const tfs = kc.charAt(0);
 		for (const k of held) {
-			if (!k.startsWith(tfs) || k.slice(4) === key) {
+			if (!k.startsWith(tfs) || k.slice(1) === key) {
 				processEvents(ev, ups.get(k));
 				held.delete(k);
 			}
@@ -51,8 +51,7 @@ const maxMouseButton = 16,
 		}
 	}
       },
-      tf = ["T", "F"],
-      combinationString = k => tf[+!k.altKey] + tf[+!k.ctrlKey] + tf[+!k.metaKey] + tf[+!k.shiftKey] + (k.key ?? ""),
+      combinationString = (k: KeyboardEventInit) => (+!k.altKey + 2* +!k.ctrlKey + 4 * +!k.metaKey + 8 * +!k.shiftKey).toString(16) + (k.key ?? ""),
       parseCombination = keyComb => {
 	const parts = keyComb.split("+").map(p => p.trim()),
 	      k = {
@@ -103,7 +102,7 @@ export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
 			for (const kc of keys) {
 				if (onkeydown) {
 					const kh = held.has(kc),
-					      key = kc.slice(4);
+					      key = kc.slice(1);
 					if (kh && kc === combinationString(e({key}))) {
 						onkeydown(ke("down", key));
 					}
