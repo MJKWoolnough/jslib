@@ -28,4 +28,4 @@ for f; do
 	scanFile "$(realpath "$f")";
 done;
 
-echo "$tags" | tr ',' '\n' | grep -v "^$" | grep -v "ns" | sort | uniq | tr '\n' ' ' | sed -e 's/ $//';
+echo "$tags" | tr ',' '\n' | grep -v "^$" | grep -v "^ns$" | sort | uniq | tr '\n' ' ' | sed -e 's/ $//';
