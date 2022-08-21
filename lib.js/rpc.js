@@ -29,8 +29,7 @@ export class RPC {
 		this.#connInit(conn);
 	}
 	#connInit(conn) {
-		this.#c = conn;
-		this.#c?.when(({data}) => {
+		(this.#c = conn).when(({data}) => {
 			const message = JSON.parse(data),
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
 			      e = message.error,
