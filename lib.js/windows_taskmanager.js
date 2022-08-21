@@ -68,7 +68,7 @@ export class ShellElement extends BaseShellElement {
 		      })),
 		      taskbar = ul();
 		amendNode(this.attachShadow({"mode": "closed"}), [
-			style({"type": "text/css"}, ":host{display:block;position:relative;overflow:hidden;width:var(--shell-width,100%);height:var(--shell-height,100%)}::slotted(windows-window:last-of-type){--overlay-on:none}:host>ul{list-style:none;padding:0;display:grid;position:absolute;transform:scaleY(-1);grid-gap:5px;grid-template-columns:repeat(auto-fit,200px);width:100%;bottom:0;left:0}:host>ul>li{transform:scaleY(-1)}:host>ul>li>windows-window:not([maximised]){visibility:hidden}:host>ul>li>windows-window{min-height:auto;position:static;--overlay-on:none}"),
+			style({"type": "text/css"}, ":host{display:block;position:relative;overflow:hidden;width:var(--shell-width,100%);height:var(--shell-height,100%)}::slotted(windows-window:last-of-type){--overlay-on:none}:host>ul{list-style:none;padding:0;display:grid;position:absolute;transform:scaleY(-1);grid-gap:5px;grid-template-columns:repeat(auto-fit,200px);width:100%;bottom:0;left:0;pointer-events:none}:host>ul>li{transform:scaleY(-1);pointer-events:auto}:host>ul>li>windows-window:not([maximised]){visibility:hidden}:host>ul>li>windows-window{min-height:auto;position:static;--overlay-on:none}"),
 			slot({"name": "desktop"}),
 			taskbar,
 			div(slot({"onslotchange": function() {

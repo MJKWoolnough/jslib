@@ -98,10 +98,12 @@ export class ShellElement extends BaseShellElement {
 	width: 100%;
 	bottom: 0;
 	left: 0;
+	pointer-events: none;
 }
 
 :host > ul > li {
 	transform: scaleY(-1);
+	pointer-events: auto;
 }
 
 :host > ul > li > windows-window:not([maximised]) {
