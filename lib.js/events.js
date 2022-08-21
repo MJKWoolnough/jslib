@@ -64,6 +64,7 @@ const maxMouseButton = 16,
 	for (const mod of parts) {
 		switch (mod.toLowerCase()) {
 		case "alt":
+		case "option":
 			k.altKey = true;
 			break;
 		case "control":
