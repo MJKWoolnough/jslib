@@ -443,6 +443,9 @@ export class NodeMap {
 		return true;
 	}
 	keyAt(pos) {
+		while (pos < 0) {
+			pos += this.#root.l;
+		}
 		for (let curr = this.#root.n; curr.i; pos--, curr = curr.n) {
 			if (pos === 0) {
 				return curr.k;

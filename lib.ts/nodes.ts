@@ -490,6 +490,9 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return true;
 	}
 	keyAt(pos: number) {
+		while (pos < 0) {
+			pos += this.#root.l;
+		}
 		for (let curr = this.#root.n; curr.i; pos--, curr = curr.n) {
 			if (pos === 0) {
 				return (curr as KeyedItemNode<K, T>).k;
