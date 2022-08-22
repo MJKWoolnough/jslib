@@ -1,6 +1,6 @@
 # JSLib
 
-JSLib is a collection of lightweight JavaScript/Typescript modules.
+JSLib is a collection of lightweight JavaScript/Typescript modules and scripts for web development.
 
 # Modules
 
