@@ -52,6 +52,8 @@ This module contains a full BBCode parser, allowing for custom tags and text han
 
 This module contains many standard BBCode tags parsers, and a default text processor.
 
+This module directly imports the `bbcode`, `dom`, and `html` modules.
+
 |  Export       |  Description  |
 |---------------|---------------|
 | all           | An object which contains all of the tag processors and the text processor. |
@@ -84,6 +86,8 @@ This module contains many standard BBCode tags parsers, and a default text proce
 ## conn
 
 The conn module contains some convenience wrappers around XMLHTTPRequest and WebSocket.
+
+This module directly imports the `inter` module.
 
 |  Tags       |  Description  |
 |-------------|---------------|
