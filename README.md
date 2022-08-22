@@ -25,7 +25,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules.
 | [windows_taskbar](#windows_taskbar)         | Custom Element that lists Windows on a TaskBar. |
 | [windows_taskmanager](#windows_taskmanager) | Custom Element that allows minimisation of Windows. |
 
-## bbcode
+## <a name="bbcode">bbcode</a>
 
 This module contains a full BBCode parser, allowing for custom tags and text handling.
 
@@ -48,7 +48,7 @@ This module contains a full BBCode parser, allowing for custom tags and text han
 | TagFn     | A function that takes a Node, a Tokeniser, and a Parsers object. This function should process tokens from the Tokeniser, appending to the Node, until it's tag data finishes. This function should return nothing. |
 | Tokeniser | This type is a generator that will yield a token, which will either be a CloseTag, OpenTag, or string. When calling next on this Generator, you can pass in *true* to the *next* method retrieve the last token generated. If you pass in *1* to the *next* method, when it has just outputted an OpenTag, the processor will not move passed the corresponding CloseTag until *1* is again passed to the *next* method. |
 
-## bbcode_tags
+## <a name="bbcode_tags">bbcode_tags</a>
 
 This module contains many standard BBCode tags parsers, and a default text processor.
 
@@ -83,7 +83,7 @@ This module directly imports the `bbcode`, `dom`, and `html` modules.
 | u             | The *u* tag sets underline on the contained data. |
 | url           | The *url* tag creates an HTMLAnchorElement, with the href set to the attribute, wrapping the contained data. If no attribute is set, the URL is taken from the containing data. |
 
-## conn
+## <a name="conn">conn</a>
 
 The conn module contains some convenience wrappers around XMLHTTPRequest and WebSocket.
 
