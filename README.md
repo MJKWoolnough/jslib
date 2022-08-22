@@ -80,3 +80,14 @@ This module contains many standard BBCode tags parsers, and a default text proce
 | table         | The *table* tag is used to create an HTMLTableElement. This table allows *thead*, *tbody*, *tfoot*, *tr*, *th*, and *td*, all of which act like their HTML counterparts. |
 | u             | The *u* tag sets underline on the contained data. |
 | url           | The *url* tag creates an HTMLAnchorElement, with the href set to the attribute, wrapping the contained data. If no attribute is set, the URL is taken from the containing data. |
+
+## conn
+
+The conn module contains some convenience wrappers around XMLHTTPRequest and WebSocket.
+
+|  Tags       |  Description  |
+|-------------|---------------|
+| HTTPRequest | The function provides a promise base wrapper to XMLHTTPRequest. It takes a URL and an optional Properties object. |
+| Properties  | This object modifies an HTTPRequest. It allows setting of the following:<br>`method`: which can change the request method.<br>`user`: allows the setting of a Basic Authorization username.<br>`password`: allows the settings of a Basic Authorization password.<br>`headers`: an object to allow the setting or arbitrary headers.<br>`type`: sets the Content-Type of the request.<br>`response`: this determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the XMLHTTPRequest object as a response.<br>`onuploadprogress`: this sets an event handler to monitor any upload progress.<br>`ondownloadprogress`: this sets an event handler to monitor any download process.<br>`data`: this is an XMLHttpRequestBodyInit and is send as the body of the request.<br>`signal`: an AbortSignal to be used to cancel any request. |
+| WS          | This function provides a Promise bases initialiser for WSConn. |
+| WSConn      | This class extends the WebSocket class, allowing a relative URL to be used, and providing a Subscription based `when` method. |
