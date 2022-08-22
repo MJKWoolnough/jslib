@@ -47,3 +47,36 @@ This module contains a full BBCode parser, allowing for custom tags and text han
 | Parsers   | An Object, which contains the tag parsers for specific tags and the text processor. This object **must** contain the text Symbol, specifying a text formatting function, which takes a Node to be appended to, and the string to be formatted. In addition, this object should contain string keys, which correspond to tag names, the values of which should be TagFn's. |
 | TagFn     | A function that takes a Node, a Tokeniser, and a Parsers object. This function should process tokens from the Tokeniser, appending to the Node, until it's tag data finishes. This function should return nothing. |
 | Tokeniser | This type is a generator that will yield a token, which will either be a CloseTag, OpenTag, or string. When calling next on this Generator, you can pass in *true* to the *next* method retrieve the last token generated. If you pass in *1* to the *next* method, when it has just outputted an OpenTag, the processor will not move passed the corresponding CloseTag until *1* is again passed to the *next* method. |
+
+## bbcode_tags
+
+This module contains many standard BBCode tags parsers, and a default text processor.
+
+|  Export       |  Description  |
+|---------------|---------------|
+| all           | An object which contains all of the tag processors and the text processor. |
+| text          | A text processor that converts all line breaks into HTMLBRElement's. |
+| *             | All remaining exports are tag processors |
+
+|  Tags         |  Description  |
+|---------------|---------------|
+| audio         | The *audio* tag processes its inner text as a URL and creates an HTMLAudoElement. |
+| b             | The *b* tag sets bold on the contained data. |
+| centre/center | The *centre* and *center* tags center the contained data. |
+| colour/color  | The *colour* and *color* tags set the attribute of the tag as the font colour of the contained data. |
+| font          | The *font* tag sets the font of the contained data. |
+| full/justify  | The *full* and *justify* tags sets full alignment for the contained data. |
+| h1...h6       | Tags *h1*, *h2*, *h3*, *h4*, *h5*, and *h6* create HTMLHeadingElement's around the contained data. |
+| highlight     | The *highlight* tag highlights the contained data. |
+| hr            | The *hr* tag inserts a horizontal rule, and has no Closing Tag. |
+| i             | The *i* tag sets italic on the contained data. |
+| img           | The *img* tag processes the contained text as a URL for an HTMLImageElement, and can optionally use the attribute to set the width and height of the image. The format for the attribute is `w`x`h` where either `w` or `h` can be omitted. |
+| left          | The *left* tag sets left alignment for the contained data. |
+| list          | The *list* tag creates a new list. The attribute determines what type of list, with no attribute resulting in an HTMLUListElement, and any of `a`, `A`, `i`, `I`, and `1` resulting in an HTMLOListElement with the type set the the specified value. Any children of the list should be wrapped in `[*] [/*]` tags, though the closing tag can be omitted. |
+| quote         | The *quote* tag creates a HTMLQuoteElement around the contained data. Any attribute is created as an HTMLLegendElement as the first child. |
+| right         | The *right* tag sets right alignment for the contained data. |
+| s             | The *s* tag sets strike-through on the contained data. |
+| size          | The *size* tag must have an attribute, which must be a number (0\<s<=100) and is used to determine the font-size (s/10em) on the contained data. |
+| table         | The *table* tag is used to create an HTMLTableElement. This table allows *thead*, *tbody*, *tfoot*, *tr*, *th*, and *td*, all of which act like their HTML counterparts. |
+| u             | The *u* tag sets underline on the contained data. |
+| url           | The *url* tag creates an HTMLAnchorElement, with the href set to the attribute, wrapping the contained data. If no attribute is set, the URL is taken from the containing data. |
