@@ -6,24 +6,24 @@ JSLib is a collection of lightweight JavaScript/Typescript modules.
 
 |  Module             |  Description  |
 |---------------------|---------------|
-| bbcode              | A BBCode parser. |
-| bbcode_tags         | A collection of BBCode tags. |
-| conn                | Convenience wrappers around XMLHTTPRequest and WebSocket. |
-| context             | Library for creating right-click menus. Needs rewriting. |
-| dom                 | Functions for manipulating the DOM. |
-| drag                | Library for making browser Drag'n'Drop easier to use. |
-| events              | Functions to simplify starting & stopping global keyboard and mouse events. |
-| fraction            | An infinity precision fractional math type. |
-| html                | Functions to create HTML elements. |
-| inter               | Classes to provide different type of internal communication. |
-| load                | Used for initialisation. |
-| nodes               | Classes for handling of collections of DOM Nodes. |
-| rpc                 | JSONRPC implementation. |
-| settings            | Type-safe wrappers around localStorage. |
-| svg                 | Functions to create SVG elements. |
-| windows             | Custom Elements that act as application Windows. |
-| windows_taskbar     | Custom Element that lists Windows on a TaskBar. |
-| windows_taskmanager | Custom Element that allows minimisation of Windows. |
+| [bbcode](#bbcode)                           | A BBCode parser. |
+| [bbcode_tags](#bbcode_tags)                 | A collection of BBCode tags. |
+| [conn](#conn)                               | Convenience wrappers around XMLHTTPRequest and WebSocket. |
+| [context](#context)                         | Library for creating right-click menus. Needs rewriting. |
+| [dom](#dom)                                 | Functions for manipulating the DOM. |
+| [drag](#drag)                               | Library for making browser Drag'n'Drop easier to use. |
+| [events](#events)                           | Functions to simplify starting & stopping global keyboard and mouse events. |
+| [fraction](#fraction)                       | An infinity precision fractional math type. |
+| [html](#html)                               | Functions to create HTML elements. |
+| [inter](#inter)                             | Classes to provide different type of internal communication. |
+| [load](#load)                               | Used for initialisation. |
+| [nodes](#nodes)                             | Classes for handling of collections of DOM Nodes. |
+| [rpc](#rpc)                                 | JSONRPC implementation. |
+| [settings](#settings)]                      | Type-safe wrappers around localStorage. |
+| [svg](#svg)                                 | Functions to create SVG elements. |
+| [windows](#windows)                         | Custom Elements that act as application Windows. |
+| [windows_taskbar](#windows_taskbar)         | Custom Element that lists Windows on a TaskBar. |
+| [windows_taskmanager](#windows_taskmanager) | Custom Element that allows minimisation of Windows. |
 
 ## bbcode
 
