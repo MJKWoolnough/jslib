@@ -204,6 +204,16 @@ This module directly imports the `dom` module.
 
 ## <a name="load">load</a>
 
+The load module should be included in a seperate HTML script element on the page, , and it creates two globally accessible features, which can be added to a TypeScript file with the following declarations:
+
+declare const pageLoad: Promise<void>;
+declare const include: (url: string) => Promise<Object>;
+
+|  Property  |  Description  |
+|------------|---------------|
+| include    | This function is an alias for the import function, but will be used by jspacker for all importing. |
+| pageLoad   | This is a Promise which is resolved when the page finished loading. |
+
 ## <a name="nodes">nodes</a>
 
 ## <a name="rpc">rpc</a>
