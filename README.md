@@ -212,6 +212,17 @@ This module directly imports the `dom` module.
 
 ## <a name="svg">svg</a>
 
+The svg module exports function for the create of SVGElements.
+
+This module directly imports the `dom` module.
+
+|  Export  |  Description  |
+|----------|---------------|
+| ns       | This constant contains the XMLNamespace of HTMLElements. |
+| a animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect set script stop style svg symbol text textPath title tspan use view | Each of these exports is a function which can take either a Props param and a Children param, or just a Children param, both as defined in the `dom` module, returning an SVGElement of the exported name, with the attributes and children set. |
+| switche     | This function is as above, for the `switch` SVGElement. |
+| svgData     | This function takes either a SVGSVGElement or a SVGSymbolElement and returns a URL encoded SVG data string. |
+
 ## <a name="windows">windows</a>
 
 ## <a name="windows_taskbar">windows_taskbar</a>
