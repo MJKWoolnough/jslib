@@ -109,6 +109,24 @@ This module directly imports the `inter` module.
 
 ## <a name="context">context</a>
 
+The context module has functions to create custom context menus. This module is due for a rewrite, so the current API may change.
+
+This module directly import the `dom` and `html` modules, and relies on the `load`.
+
+|  Export   |  Description  |
+|-----------|---------------|
+| (default) | this function takes a parent Element, an array of a pair of coords for a starting position of the menu, and a List. |
+| item      | this function takes a name, action and an optional object containing the optional fields of the `Item` type, and creates an `Item`. |
+| menu      | this function takes a name, list and an optional object containing the optional fields of the `Menu` type, and creates an `Menu`.
+
+### Types
+
+|  Export  |  Description  |
+|----------|---------------|
+| Item     | This type represents a menu item, containing the following fields:<br>`action`: a function, called with no params, is called when the item is activated.<br>`classes`: an optional string of classes that are set on the menu item.<br>`disabled`: an optional boolean to disable the item.<br>`id`: an optional string to be set as the id of the menu item.<br>`name`: this string is the content of the item. |
+| List     | This type is a recursive array of Items and Menus. |
+| Menu     | This type represents a menu item, containing the following fields:<br>`classes`: an optional string of classes that are set on the menu item.<br>`disabled`: an optional boolean to disable the item.<br>`id`: an optional string to be set as the id of the menu item.<br>`list`: an array of Item and Menu elements that are a submenu.<br>`name`: this string is the content of the item. |
+
 ## <a name="dom">dom</a>
 
 ## <a name="events">events</a>
