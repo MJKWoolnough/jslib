@@ -193,7 +193,8 @@ const IsItem = item => item.action !== undefined,
 	}));
       };
 
-export const item = (name, action, options = {}) => Object.assign({name, action}, options), menu = (name, list, options = {}) => Object.assign({name, list: list.flat(Infinity)}, options);
+export const item = (name, action, options = {}) => Object.assign({name, action}, options),
+menu = (name, list, options = {}) => Object.assign({name, list: list.flat(Infinity)}, options);
 
 export default (c, coords, list, d = 0) => new Promise(resolve => {
 	const ctx = {c, r: data => {
