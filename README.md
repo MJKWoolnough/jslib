@@ -168,6 +168,26 @@ The event module is used for easy creation of global events.
 
 ## <a name="fraction">fraction</a>
 
+The fraction module exports a default class to act as a fractional, infinite precision number type.
+
+|  Field       |  Description  |
+|--------------|---------------|
+| (construcor) | The constructor of the default class take a BigNum numerator and an optional BigNum denominator. |
+| add/sub      | These methods add or subtract the passed Fraction to/from the Fraction. |
+| cmp          | This method returns -1 if the Fraction is less than the passed Fraction, 0 if the Fraction is equal to the passed Fraction, 1 if the Fraction is greater than the passed Fraction, or NaN if either the Fraction or passed Fraction are NaN. |
+| div/mul      | These methods divide or multiple Fraction param by the passed Fraction param. |
+| isNaN        | This method returns true if the Fraction is NaN. |
+| sign         | This method returns 1 if the Fraction is positive, -1 if the Fraction is negative, and NaN if the value is NaN. |
+| toFloat      | This method returns a float representation of the Fraction to 5 decimal places. |
+
+|  Static Field  |  Description  |
+|----------------|---------------|
+| max            | This function takes two Fraction types and returns the larger of the two. |
+| min            | This function takes two Fraction types and returns the smaller of the two. |
+| NaN            | This field is a Fraction representing the NaN value. |
+| one            | This field is a Fraction representing 1. |
+| zero           | This field is a Fraction representing 0. |
+
 ## <a name="html">html</a>
 
 ## <a name="inter">inter</a>
