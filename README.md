@@ -154,6 +154,18 @@ The dom module can be used to manipulate DOM elements.
 
 ## <a name="events">events</a>
 
+The event module is used for easy creation of global events.
+
+|  Export        |  Description  |
+|----------------|---------------|
+| hasKeyEvent    | This function returns true if any function is currently active for the passed key. |
+| keyEvent       | This function takes a key combination or array of key combinations, an optional KeyboardEvent function to act as the keydown event handler, an optional KeyboardEvent function to act as the keyup handler, and an optional boolean (default false) to determine if the event only runs one time per activateion. The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function. The key combinations are strings which can contain key names as determined by the KeyboardEvent.key value, and can be prefixed by any number of the following: `Alt+`, `Option+`, `Control+`, `Ctrl+`, `Command+`, `Meta+`, `Super+`, `Windows+`, and `Shift+`. |
+| mouseDragEvent | This function takes a mouse button (0..15), an optional MouseEvent function to act as the mousemove event handler, and an optional function to be run on mouseup. The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function. |
+| mouseMoveEvent | This function takes a MouseEvent function and an option function which will be run when the event deactivates. The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function. |
+| mouseX         | The current X coordinate of the mouse. |
+| mouseY         | The current Y coordinate of the mouse. |
+
+
 ## <a name="fraction">fraction</a>
 
 ## <a name="html">html</a>
