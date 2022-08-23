@@ -129,6 +129,29 @@ This module directly import the `dom` and `html` modules, and relies on the `loa
 
 ## <a name="dom">dom</a>
 
+The dom module can be used to manipulate DOM elements.
+
+|  Export                |  Description  |
+|------------------------|---------------|
+| amendNode              | This function takes a Node or EventTarget, and either a Props and Children params, or just a Children param. It returns the passed Node or EventTarger with the changes applied. |
+| autoFocus              | This function queues a focus method call to the passed element, and will call select on any HTMLInputElement or HTMLTextAreaElement, unless false is passed as the second param. |
+| clearNode              | This function acts similarly to amendNode, but clears the element of children before adding more. |
+| createDocumentFragment | This function takes an optional Children param and returns a DocumentFragment that contains the children. |
+| event                  | This functions takes a Function or EventListenerObject, and a bitmask created from the below values to set event options. Optionally, a third param, an AbortSignal, can be passed to set the `signal` event property. |
+| eventCapture           | Can be passed to the event function to set the `capture` property on an event. |
+| eventOnce              | Can be passed to the event function to set the `once` property on an event. |
+| eventPassive           | Can be passed to the event function to set the `passive` property on an event. |
+| eventRemove            | Can be passed to the event function to set the event to be removed. |
+
+### Types
+
+|  Export     |  Description  |
+|-------------|---------------|
+| Children    | This type is a string, Node, NodeList, HTMLCollection, or a recursive array of those. |
+| DOMBind     | This type represents a binding of either amendNode or clearNode with the first param bound. |
+| Props       | A PropsObject or NamedNodeMap. |
+| PropsObject | An object of strings to values to be set. The key determines what type the value should be.<br>`on*`: used to set events. Can be a Function, EventListenerObject, or the output of the event function.<br>`class`: An array of strings, or a DOMTokenList, to be used to toggle classes. If a class begins with a `!`, the class will be removed, if the class begins with a `~`, the class will be toggles, otherwise the class will be set.<br>`style`: A CSSStyleDeclaration can be used to set the style directly, or an Object can be used to set individual style properties.<br>For any key, a string or any object with a toString method can be used to set the field explicitly, a number can be used and converted to a string, a boolean can be used to toggle an attribute, and a undefined value can be used to remove an attribute. |
+
 ## <a name="events">events</a>
 
 ## <a name="fraction">fraction</a>
