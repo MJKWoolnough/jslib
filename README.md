@@ -4,8 +4,8 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 
 # Modules
 
-|  Module             |  Description  |
-|---------------------|---------------|
+|  Module                                     |  Description  |
+|---------------------------------------------|---------------|
 | [bbcode](#bbcode)                           | A BBCode parser. |
 | [bbcode_tags](#bbcode_tags)                 | A collection of BBCode tags. |
 | [conn](#conn)                               | Convenience wrappers around XMLHTTPRequest and WebSocket. |
