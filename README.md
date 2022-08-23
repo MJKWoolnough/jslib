@@ -190,6 +190,16 @@ The fraction module exports a default class to act as a fractional, infinite pre
 
 ## <a name="html">html</a>
 
+The html module exports function for the create of HTMLElements.
+
+This module directly imports the `dom` module.
+
+|  Export  |  Description  |
+|----------|---------------|
+| ns       | This constant contains the XMLNamespace of HTMLElements. |
+| a abbr address area article aside audio b base bdi bdo blockquote body br button canvas caption cite code col colgroup data datalist dd del details dfn dialog dir div dl dt em embed fieldset figcaption figure font footer form frame frameset h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd label legend li link main map mark marquee menu meta meter nav noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script section select slot small source span strong style sub summary sup table tbody td template textarea tfoot th thead time title tr track u ul video wbr | Each of these exports is a function which can take either a Props param and a Children param, or just a Children param, both as defined in the `dom` module, returning an HTMLElement of the exported name, with the attributes and children set. |
+| vare     | This function is as above, for the `var` HTMLElement. |
+
 ## <a name="inter">inter</a>
 
 ## <a name="load">load</a>
