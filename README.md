@@ -38,26 +38,130 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 
 ## <a name="bbcode">bbcode</a>
 
-This module contains a full BBCode parser, allowing for custom tags and text handling.
+This module contains a full [BBCode](https://en.wikipedia.org/wiki/BBCode) parser, allowing for custom tags and text handling.
 
-|  Export    |  Description  |
-|------------|---------------|
-| (default)  | This function takes a Parsers object and a string to be parsed, returning a DocumentFragment that contains the parsed structure. |
-| isOpenTag  | Intended for tag parsers, this function takes a token that is outputted by a Tokeniser and returns true if the token is an OpenTag. |
-| isCloseTag | Intended for tag parsers, this function takes a token that is outputted by a Tokeniser and returns true if the token is an CloseTag. |
-| isString   | Intended for tag parsers, this function takes a token that is outputted by a Tokeniser and returns true if the token is a string. |
-| process    | Intended for tag parsers, this function takes a Node, a Tokeniser, a Parsers object and a closing tag name. It will run the tokeniser, handling tags according to the Parsers object, attaching the results to the passed Node, until it reaches a Closing Tag matching the name specified, when it will return the original Node passed. |
-| text       | A Symbol used to indicate the text processor in the Parsers type passed to the (default) parsing function. |
+|  Export    |  Type  | Description  |
+|------------|--------|--------------|
+| [(default)](#bbcode_default) | Function | This function is the main BBCode parsing function. |
+| [CloseTag](#bbcode_closetag) | Type | The type represents a closing tag. |
+| [isCloseTag](#bbcode_isCloseTag) | Function | Intended for tag parsers, this function determines if a token is a [CloseTag](#bbcode_closetag). |
+| [isOpenTag](#bbcode_isOpenTag) | Function | Intended for tag parsers, this function determines if a token is an [OpenTag](#bbcode_opentag). |
+| [isString](#bbcode_isString) | Function | Intended for tag parsers, this function determines if a token is a string. |
+| [OpenTag](#bbcode_opentag) | Type | The type represents an opening tag. |
+| [Parsers](#bbcode_parsers) | Type | This type is an object containing the handlers for various tag types. |
+| [process](#bbcode_process) | Function | Intended for tag parsers, appends parse BBCode to the passed Node. |
+| [TagFn](#bbcode_tagfn) | Type | A type representing a tag handler. |
+| text | Symbol | A Symbol used to indicate the text processor in the Parsers type passed to the [(default)](#bbcode_default) parsing function. |
+| [Tokeniser](#bbcode_tokeniser) | Type | Intended for tag parsers, this type represents the token generator. |
 
-### Types
+### <a name="bbcode_default">(default)</a>
 
-|  Export   |  Description  |
-|-----------|---------------|
-| CloseTag  | The type of a Closing Tag, an Object that contains a tagName (string) field, the name of the tag, and a fullText (string) field, that contains the entire text of the closing tag. |
-| OpenTag   | The type of an Opening Tag, an Object that contains a tagName (string) field, the name of the tag, an attr (string \| null) field, which contains any attribute on the tag or null if there is no attribute, and a fullText (string) field, that contains the entire text of the opening tag. |
-| Parsers   | An Object, which contains the tag parsers for specific tags and the text processor. This object **must** contain the text Symbol, specifying a text formatting function, which takes a Node to be appended to, and the string to be formatted. In addition, this object should contain string keys, which correspond to tag names, the values of which should be TagFn's. |
-| TagFn     | A function that takes a Node, a Tokeniser, and a Parsers object. This function should process tokens from the Tokeniser, appending to the Node, until it's tag data finishes. This function should return nothing. |
-| Tokeniser | This type is a generator that will yield a token, which will either be a CloseTag, OpenTag, or string. When calling next on this Generator, you can pass in *true* to the *next* method retrieve the last token generated. If you pass in *1* to the *next* method, when it has just outputted an OpenTag, the processor will not move passed the corresponding CloseTag until *1* is again passed to the *next* method. |
+```typescript
+(parsers: Parsers, text: string) => DocumentFragment;
+```
+This function parses the given text according, handling the tags with the given parsers, and appending all generated Nodes to a DocumentFragment, which is returned.
+
+### <a name="bbcode_closetag">CloseTag</a>
+
+```typescript
+{
+	tagName: string;
+	fullText: string;
+}
+```
+The tagName is the simply the name of the tag being closed.
+
+The fullText is the entire parsed text of the closing tag. This can be useful when skipping over tags and you just wish to print the unparsed text.
+
+Example: `[b]Text[/b]` will result in:
+```typescript
+{
+	tagName: "b",
+	fullText: "[/b]"
+}
+```
+
+### <a name="bbcode_isclosetag">isCloseTag</a>
+
+```typescript
+(t: OpenTag | CloseTag | string) => t is CloseTag;
+```
+This function returns true when passed a [CloseTag](#bbcode_closetag).
+
+### <a name="bbcode_isopentag">isOpenTag</a>
+
+```typescript
+(t: OpenTag | CloseTag | string) => t is OpenTag;
+```
+This function returns true when passed an [OpenTag](#bbcode_opentag).
+
+### <a name="bbcode_isstring">isString</a>
+
+```typescript
+(t: OpenTag | CloseTag | string) => t is string;
+```
+This function returns true when passed a string.
+
+### <a name="bbcode_opentag">OpenTag</a>
+
+```typescript
+{
+	tagName: string;
+	attr: string;
+	fullText: string;
+}
+```
+The tagName is the simply the name of the tag being opened.
+
+The attr is any attribute that was supplied with the opening tag.
+
+The fullText is the entire parsed text of the opening tag. This can be useful when skipping over tags and you just wish to print the unparsed text.
+
+Example: `[b]Text[/b]` will result in:
+```typescript
+{
+	tagName: "b",
+	fullText: "[b]"
+}
+```
+
+Example: `[colour=#f00]Text[/colour]` will result in:
+```typescript
+{
+	tagName: "colour",
+	attr: "#f00",
+	fullText: "[colour=#f00]"
+}
+```
+### <a name="bbcode_parsers">Parsers</a>
+```typescript
+{
+	[key: string]: TagFn;
+	[text]: (node: Node, t: string) => void;
+}
+```
+
+This type represents an Object, which contains the tag parsers for specific tags and the text processor. This object **must** contain the text Symbol, specifying a text formatting function, which takes a Node to be appended to, and the string to be formatted. In addition, this object should contain string keys, which correspond to tag names, the values of which should be [TagFn](#bbcode_tagfn)s.
+
+### <a name="bbcode_process">process</a>
+```typescript
+<T extends Node>(node: T, t: Tokeniser, p: Parsers, closeTag?: string) => T;
+```
+Intended for tag parsers, this function takes a Node, a [Tokeniser](#bbcode_tokeniser), a [Parsers](#bbcode_parsers) object and a closing tag name. It will run the tokeniser, handling tags according to the [Parsers](#bbcode_parsers) object, attaching the results to the passed Node, until it reaches a [CloseTag](#bbcode_closetag) matching the name specified, when it will return the original Node passed.
+
+### <a name="bbcode_tagfn">tagFn</a>
+```typescript
+(node: Node, t: Tokeniser, p: Parsers) => void;
+```
+
+A function that takes a Node, a [Tokeniser](#bbcode_tokeniser), and a [Parsers](#bbcode_parsers) object. This function should process tokens from the [Tokeniser](#bbcode_tokeniser), appending to the Node, until its tag data finishes. This function should return nothing.
+
+### <a name="bbcode_tokeniser">Tokeniser</a>
+```typescript
+Generator<OpenTag | CloseTag | string, void, true | 1 | undefined>;
+```
+
+This type is a generator that will yield a token, which will either be a [CloseTag](#bbcode_closetag), [OpenTag](#bbcode_opentag), or string. When calling next on this Generator, you can pass in *true* to the *next* method retrieve the last token generated. If you pass in *1* to the *next* method, when it has just outputted an [OpenTag](#bbcode_opentag), the processor will not move passed the corresponding [CloseTag](#bbcode_closetag) until *1* is again passed to the *next* method.
 
 ## <a name="bbcode_tags">bbcode_tags</a>
 
