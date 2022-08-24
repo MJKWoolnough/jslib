@@ -100,7 +100,7 @@ The conn module contains some convenience wrappers around XMLHTTPRequest and Web
 
 This module directly imports the `inter` module.
 
-|  Tags       |  Description  |
+|  Exports    |  Description  |
 |-------------|---------------|
 | HTTPRequest | The function provides a promise base wrapper to XMLHTTPRequest. It takes a URL and an optional Properties object. |
 | Properties  | This object modifies an HTTPRequest. It allows setting of the following:<br>`method`: which can change the request method.<br>`user`: allows the setting of a Basic Authorization username.<br>`password`: allows the settings of a Basic Authorization password.<br>`headers`: an object to allow the setting or arbitrary headers.<br>`type`: sets the Content-Type of the request.<br>`response`: this determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the XMLHTTPRequest object as a response.<br>`onuploadprogress`: this sets an event handler to monitor any upload progress.<br>`ondownloadprogress`: this sets an event handler to monitor any download process.<br>`data`: this is an XMLHttpRequestBodyInit and is send as the body of the request.<br>`signal`: an AbortSignal to be used to cancel any request. |
