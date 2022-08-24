@@ -278,21 +278,95 @@ This method acts like the [then](#inter_subscription_then) method of the [Subscr
 
 The context module has functions to create custom context menus. This module is due for a rewrite, so the current API may change.
 
-This module directly import the `dom` and `html` modules, and relies on the `load`.
+This module directly import the [dom](#dom) and [html](#html) modules, and relies on the [load](#load) module.
 
-|  Export   |  Description  |
-|-----------|---------------|
-| (default) | this function takes a parent Element, an array of a pair of coords for a starting position of the menu, and a List. |
-| item      | this function takes a name, action and an optional object containing the optional fields of the `Item` type, and creates an `Item`. |
-| menu      | this function takes a name, list and an optional object containing the optional fields of the `Menu` type, and creates an `Menu`.
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [(default)](#context_default) | Function | This function produces a context menu, with mouse and keyboard navigation. |
+| [item](#context_item) | Function | This function creates a menu item. |
+| [Item](#context_item_type) | Type | This type represents a menu item. |
+| [List](#context_list) | Type | This type is a recursive array of [Item](#context_item_type)s and [Menu](#content_menu_item)s. |
+| [menu](#context_menu) | Function | This function creates a submenu item.
+| [Menu](#context_menu_item) | Type | This type represents a submenu item. |
 
-### Types
+### <a name="context_default">(default)</a>
+```typescript
+(base: Element, coords: [number, number], list: List) => Promise<any>;
+```
+The default export function creates a Context Menu in the base element at the coords provided. The menu is filled with the items denoted by the [List](#context_list).
 
-|  Export  |  Description  |
+### <a name="context_item">item</a>
+```typescript
+(name: string, action: () => any, options: Options = {}) => Item;
+```
+This helper creates an [Item](#context_item_type) with the name and action set, with the [Options](#context_options) provided.
+
+### <a name="context_item_type">Item</a>
+```typescript
+{
+	classes?: string;
+	id?: string;
+	disabled?: boolean;
+	name: string;
+	action: () => any;
+}
+```
+
+This type represents an item of a menu. The `classes`, `id`, and `disabled` fields are defined in the [Options](#context_options) type.
+
+|  Field  |  Description  |
+|---------|---------------|
+| name    | This is the name in the item element. |
+| action  | This is a function that will be called when an item is activated. It's return will be the return value of the Promise return by the [(default)](#context_default) function. |
+
+
+### <a name="context_list">List</a>
+```typescript
+(Item | Menu | List)[];
+```
+
+This type is a recursive array of Items and Menus.
+
+### <a name="context_menu">menu</a>
+```typescript
+(name: string, list: List, options: Options = {})
+```
+
+This helper creates an [Menu](#context_menu_type) with the name set, and with the [Options](#context_options) provided.
+
+### <a name="context_menu_type">Menu</a>
+```typescript
+{
+	classes?: string;
+	id?: string;
+	disabled?: boolean;
+	name: string;
+	list: (Item | Menu)[];
+}
+```
+
+This type represents a submenu of a menu. The `classes`, `id`, and `disabled` fields are defined in the [Options](#context_options) type.
+
+|  Field  |  Description  |
+|---------|---------------|
+| name    | This is the name in the item element. |
+| list    | This is an array of the elements of the submenu |
+
+### <a name="context_options">Options</a>
+```typescript
+{
+	classes?: string;
+	id?: string;
+	disabled?: boolean;
+}
+```
+
+This unexported type represents the options passed to the [item](#context_item) and [menu](#context_menu) functions.
+|  Field   |  Description  |
 |----------|---------------|
-| Item     | This type represents a menu item, containing the following fields:<br>`action`: a function, called with no params, is called when the item is activated.<br>`classes`: an optional string of classes that are set on the menu item.<br>`disabled`: an optional boolean to disable the item.<br>`id`: an optional string to be set as the id of the menu item.<br>`name`: this string is the content of the item. |
-| List     | This type is a recursive array of Items and Menus. |
-| Menu     | This type represents a menu item, containing the following fields:<br>`classes`: an optional string of classes that are set on the menu item.<br>`disabled`: an optional boolean to disable the item.<br>`id`: an optional string to be set as the id of the menu item.<br>`list`: an array of Item and Menu elements that are a submenu.<br>`name`: this string is the content of the item. |
+| classes  | This sets classes on the item or submenu elements.
+| id       | This sets an ID on the item or submenu element.
+| disabled | This disabled an item or submenu element.
 
 ## <a name="dom">dom</a>
 
