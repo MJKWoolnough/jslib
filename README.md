@@ -19,7 +19,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [load](#load)                               | Used for initialisation. |
 | [nodes](#nodes)                             | Classes for handling of collections of DOM Nodes. |
 | [rpc](#rpc)                                 | JSONRPC implementation. |
-| [settings](#settings)]                      | Type-safe wrappers around localStorage. |
+| [settings](#settings)                       | Type-safe wrappers around localStorage. |
 | [svg](#svg)                                 | Functions to create SVG elements. |
 | [windows](#windows)                         | Custom Elements that act as application Windows. |
 | [windows_taskbar](#windows_taskbar)         | Custom Element that lists Windows on a TaskBar. |
