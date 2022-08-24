@@ -165,15 +165,15 @@ This type is a generator that will yield a token, which will either be a [CloseT
 
 ## <a name="bbcode_tags">bbcode_tags</a>
 
-This module contains many standard BBCode tags parsers, and a default text processor.
+This module contains many standard [BBCode](https://en.wikipedia.org/wiki/BBCode) tags parsers, and a default text processor.
 
-This module directly imports the `bbcode`, `dom`, and `html` modules.
+This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#html) modules.
 
-|  Export       |  Description  |
-|---------------|---------------|
-| all           | An object which contains all of the tag processors and the text processor. |
-| text          | A text processor that converts all line breaks into HTMLBRElement's. |
-| *             | All remaining exports are tag processors |
+|  Export       |  Type    |  Description  |
+|---------------|----------|---------------|
+| all           | [Parsers](#bbcode_parsers) | An object which contains all of the tag processors and the text processor. |
+| text          | Function | A text processor that converts all line breaks into HTMLBRElement's. |
+| *             | [TagFn](#bbcode_tagfn) | All remaining exports are tag processors |
 
 |  Tags         |  Description  |
 |---------------|---------------|
