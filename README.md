@@ -202,14 +202,77 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 
 The conn module contains some convenience wrappers around XMLHTTPRequest and WebSocket.
 
-This module directly imports the `inter` module.
+This module directly imports the [inter](#inter) module.
 
-|  Exports    |  Description  |
-|-------------|---------------|
-| HTTPRequest | The function provides a promise base wrapper to XMLHTTPRequest. It takes a URL and an optional Properties object. |
-| Properties  | This object modifies an HTTPRequest. It allows setting of the following:<br>`method`: which can change the request method.<br>`user`: allows the setting of a Basic Authorization username.<br>`password`: allows the settings of a Basic Authorization password.<br>`headers`: an object to allow the setting or arbitrary headers.<br>`type`: sets the Content-Type of the request.<br>`response`: this determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the XMLHTTPRequest object as a response.<br>`onuploadprogress`: this sets an event handler to monitor any upload progress.<br>`ondownloadprogress`: this sets an event handler to monitor any download process.<br>`data`: this is an XMLHttpRequestBodyInit and is send as the body of the request.<br>`signal`: an AbortSignal to be used to cancel any request. |
-| WS          | This function provides a Promise bases initialiser for WSConn. |
-| WSConn      | This class extends the WebSocket class, allowing a relative URL to be used, and providing a Subscription based `when` method. |
+|  Exports  |  Type  |  Description  |
+|-----------|--------|---------------|
+| [HTTPRequest](#conn_httprequest) | Function | The function provides a promise base wrapper to XMLHTTPRequest. |
+| [Properties](#conn_properties) | Type | This object is passed to a HTTPRequest to modify its options. |
+| [WS](#conn_ws) | Function | This function provides a Promise based initialiser for WSConn. |
+| [WSConn](#conn_wsconn) | Class | This class extends the WebSocket class. |
+
+### <a name="conn_httprequest">HTTPRequest</a>
+```typescript
+interface {
+	(url: string, props?: Properties & {"response"?: "text" | ""}): Promise<string>;
+	(url: string, props: Properties & {"response": "xml" | "document"}): Promise<XMLDocument>;
+	(url: string, props: Properties & {"response": "blob"}): Promise<Blob>;
+	(url: string, props: Properties & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
+	(url: string, props: Properties & {"response": "xh"}): Promise<XMLHttpRequest>;
+	<T = any>(url: string, props: Properties & {"response": "json"}): Promise<T>;
+}
+```
+
+In its simplest incarnation, this function takes a URL a returns a Promise which will return the string response from that URL. However, the passed [Properties](#conn_properties) object can modify both how the request is sent and the response interpreted.
+
+### <a name="conn_properties">Properties</a>
+```typescript
+{
+	method?: string;
+	user?: string;
+	password?: string;
+	headers?: object;
+	type?: string;
+	response?: "" | "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
+	onuploadprogress?: (event: ProgressEvent) => void;
+	ondownloadprogress?: (event: ProgressEvent) => void;
+	data?: XMLHttpRequestBodyInit;
+	signal?: AbortSignal;
+}
+```
+
+This object modifies an HTTPRequest. It allows setting of the following:
+|  Field            |  Description  |
+|-------------------|---------------|
+| method            | Can change the request method. |
+| user              | Allows the setting of a Basic Authorization username.  |
+| password          | Allows the settings of a Basic Authorization password. |
+| headers           | An object to allow the setting or arbitrary headers. |
+| type              | Sets the Content-Type of the request. |
+| response          | This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the XMLHTTPRequest object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object. |
+| onuploadprogress  | This sets an event handler to monitor any upload progress. |
+|ondownloadprogress | This sets an event handler to monitor any download process. |
+| data              | This is an XMLHttpRequestBodyInit and is send as the body of the request. |
+| signal            | An AbortSignal to be used to cancel any request. |
+
+### <a name="conn_ws">WS</a>
+
+```typescript
+(url: string) => new Promise<WSConn>;
+```
+
+This function takes a url and returns a Promise which will resolve with an initiated [WSConn](#conn_wsconn) on a successful connection.
+
+### <a name="conn_wsconn">WSConn</a>
+
+WSConn extends the WebSocket class, allowing for the passed URL to be relative to the current URL.
+
+In addition, it adds a method:
+```typescript
+when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: string) => U) => Subscription<MessageEvent>;
+```
+
+This method acts like the [then](#inter_subscription_then) method of the [Subscription](#inter_subscription) class from the [inter](#inter) module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error string. The method returns a [Subscription](#inter_subscription) object with the success and error functions set to those provided.
 
 ## <a name="context">context</a>
 
