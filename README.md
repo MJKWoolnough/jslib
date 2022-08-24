@@ -372,26 +372,101 @@ This unexported type represents the options passed to the [item](#context_item) 
 
 The dom module can be used to manipulate DOM elements.
 
-|  Export                |  Description  |
-|------------------------|---------------|
-| amendNode              | This function takes a Node or EventTarget, and either a Props and Children params, or just a Children param. It returns the passed Node or EventTarger with the changes applied. |
-| autoFocus              | This function queues a focus method call to the passed element, and will call select on any HTMLInputElement or HTMLTextAreaElement, unless false is passed as the second param. |
-| clearNode              | This function acts similarly to amendNode, but clears the element of children before adding more. |
-| createDocumentFragment | This function takes an optional Children param and returns a DocumentFragment that contains the children. |
-| event                  | This functions takes a Function or EventListenerObject, and a bitmask created from the below values to set event options. Optionally, a third param, an AbortSignal, can be passed to set the `signal` event property. |
-| eventCapture           | Can be passed to the event function to set the `capture` property on an event. |
-| eventOnce              | Can be passed to the event function to set the `once` property on an event. |
-| eventPassive           | Can be passed to the event function to set the `passive` property on an event. |
-| eventRemove            | Can be passed to the event function to set the event to be removed. |
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [amendNode](#dom_amendnode) | Function | This convenience function modifies a Node or EventTarget. |
+| [autoFocus](#dom-autofocus) | Function | This function queues a focus method call to the passed element. |
+| <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom-amendnode) except that it clears any children before amending. |
+| [Children](#dom_children) | Type | This type is a string, Node, NodeList, HTMLCollection, or a recursive array of those. |
+| [createDocumentFragment](#dom_createdocumentfragment) | Function | This convenience function creates a DocumentFragment. |
+| [DOMBind](#dom_dombind) | Type | This type represents a binding of either [amendNode](#dom_amendnode) or [clearNode](#dom_clearnode) with the first param bound. |
+| [event](#dom_event) | Function | This helper function helps with setting up events for [amendNode](#dom_amendnode). |
+| eventCapture | Number | Can be passed to the [event](#dom_event) function to set the `capture` property on an event. |
+| eventOnce | Number | Can be passed to the [event](#dom_event) function to set the `once` property on an event. |
+| eventPassive | Number| Can be passed to the [event](#dom_event) function to set the `passive` property on an event. |
+| eventRemove | Number | Can be passed to the [event](#dom_event) function to set the event to be removed. |
+| <a name="dom_props">Props</a> | Type | A [PropsObject](#dom_propsobject) or NamedNodeMap. |
+| [PropsObject](#dom_propsobject) | Type | This object is used to set attributes and events on a Node or EventTarget with the [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode) functions. |
 
-### Types
+### <a name="dom_amendnode">amendNode</a>
+```typescript
+interface {
+	<T extends EventTarget>(element: T, properties: Record<`on${string}`, EventListenerObject | EventArray | Function>): T;
+	<T extends Node>(element: T, properties?: Props, children?: Children): T;
+	<T extends Node>(element: T, children?: Children): T;
+	<T extends Node>(element?: T | null, properties?: Props | Children, children?: Children): T;
+}
+```
 
-|  Export     |  Description  |
-|-------------|---------------|
-| Children    | This type is a string, Node, NodeList, HTMLCollection, or a recursive array of those. |
-| DOMBind     | This type represents a binding of either amendNode or clearNode with the first param bound. |
-| Props       | A PropsObject or NamedNodeMap. |
-| PropsObject | An object of strings to values to be set. The key determines what type the value should be.<br>`on*`: used to set events. Can be a Function, EventListenerObject, or the output of the event function.<br>`class`: An array of strings, or a DOMTokenList, to be used to toggle classes. If a class begins with a `!`, the class will be removed, if the class begins with a `~`, the class will be toggles, otherwise the class will be set.<br>`style`: A CSSStyleDeclaration can be used to set the style directly, or an Object can be used to set individual style properties.<br>For any key, a string or any object with a toString method can be used to set the field explicitly, a number can be used and converted to a string, a boolean can be used to toggle an attribute, and a undefined value can be used to remove an attribute. |
+This fuction is used to set attributes and children on Nodes, and events on Nodes and other EventTargets.
+
+If the element passed is a HTMLElement or SVGElement, then a properties param is processed, applying attributes as per the [PropsObject](#dom_propsobject) type. Likewise, any events are set or unset on a passed EventTarget, as per the [PropsObject](#dom_propsobject) type.
+
+For any Node, the children are set according to the [Children](#dom_children) value.
+
+This function returns the element passed to it.
+
+NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with window.open().
+
+### <a name="dom_autofocus">autoFocus</a>
+```typescript
+<T extends FocusElement>(node: T, inputSelect = true) => T;
+```
+
+This queues a focus method call to the passed element, and will call select on any HTMLInputElement or HTMLTextAreaElement, unless false is passed as the second param.
+
+### <a name="dom_children">Children</a>
+```typescript
+string | Node | NodeList | HTMLCollection | Children[];
+```
+
+This type is a string, Node, NodeList, HTMLCollection, or a recursive array of those.
+
+### <a name="dom_createdocumentfragment">createDocumentFragment</a>
+```typescript
+(children?: Children) => DocumentFragment;
+```
+
+This function creates a DocumentFragment that contains any [Children](#dom_children) passed to it, as with [amendNode](#dom_amendnode).
+
+### <a name="dom_dombind">DOMBind</a>
+```typescript
+interface <T extends Node> {
+	(properties?: Props, children?: Children): T;
+	(children?: Children): T;
+}
+```
+
+This utility type is useful for any function that wants to call amendNode or clearNode with the first param set by that function, as used in the [html](#html), [svg](#svg), and [windows](#windows) modules.
+
+### <a name="dom_event">event</a>
+```typescript
+(fn: Function | EventListenerObject, options: number, signal?: AbortSignal): EventArray;
+```
+
+This helper function is used to create [EventArray](#dom_eventarray)s.
+
+The options param is a bitmask created by ORing together the eventOnce, eventCapture, eventPassive, and eventRemove constants, as per need.
+
+### <a name="dom_eventarray">EventArray</a>
+```typescript
+[EventListenerOrEventListenerObject, AddEventListenerOptions, boolean];
+```
+
+This type can be used to set events with [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode). The boolean is true if the event is to be removed.
+
+### <a name="dom_propsobject">PropsObject</a>
+```typescript
+Record<string, ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | ClassObj | undefined>;
+```
+
+The keys of this type refer to the attribute names that are to be set. The key determines what type the value should be.
+|  Key  |  Description  |
+|-------|---------------|
+| `on*` | Used to set events. Can be a Function, EventListenerObject, or [EventArray](#dom_eventarray).|
+| `class` | An array of strings, or a DOMTokenList, to be used to toggle classes. If a class begins with a `!`, the class will be removed, if the class begins with a `~`, the class will be toggles, otherwise the class will be set. |
+| `style` | A CSSStyleDeclaration can be used to set the style directly, or an Object can be used to set individual style properties. |
+| `*` | For any key, a string or any object with a toString method can be used to set the field explicitly, a number can be used and converted to a string, a boolean can be used to toggle an attribute, and a undefined value can be used to remove an attribute. |
 
 ## <a name="events">events</a>
 
