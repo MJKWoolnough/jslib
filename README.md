@@ -59,6 +59,7 @@ This module contains a full [BBCode](https://en.wikipedia.org/wiki/BBCode) parse
 ```typescript
 (parsers: Parsers, text: string) => DocumentFragment;
 ```
+
 This function parses the given text according, handling the tags with the given parsers, and appending all generated Nodes to a DocumentFragment, which is returned.
 
 ### <a name="bbcode_closetag">CloseTag</a>
@@ -69,6 +70,7 @@ This function parses the given text according, handling the tags with the given 
 	fullText: string;
 }
 ```
+
 The tagName is the simply the name of the tag being closed.
 
 The fullText is the entire parsed text of the closing tag. This can be useful when skipping over tags and you just wish to print the unparsed text.
@@ -86,6 +88,7 @@ Example: `[b]Text[/b]` will result in:
 ```typescript
 (t: OpenTag | CloseTag | string) => t is CloseTag;
 ```
+
 This function returns true when passed a [CloseTag](#bbcode_closetag).
 
 ### <a name="bbcode_isopentag">isOpenTag</a>
@@ -93,6 +96,7 @@ This function returns true when passed a [CloseTag](#bbcode_closetag).
 ```typescript
 (t: OpenTag | CloseTag | string) => t is OpenTag;
 ```
+
 This function returns true when passed an [OpenTag](#bbcode_opentag).
 
 ### <a name="bbcode_isstring">isString</a>
@@ -100,6 +104,7 @@ This function returns true when passed an [OpenTag](#bbcode_opentag).
 ```typescript
 (t: OpenTag | CloseTag | string) => t is string;
 ```
+
 This function returns true when passed a string.
 
 ### <a name="bbcode_opentag">OpenTag</a>
@@ -111,6 +116,7 @@ This function returns true when passed a string.
 	fullText: string;
 }
 ```
+
 The tagName is the simply the name of the tag being opened.
 
 The attr is any attribute that was supplied with the opening tag.
@@ -133,6 +139,7 @@ Example: `[colour=#f00]Text[/colour]` will result in:
 	fullText: "[colour=#f00]"
 }
 ```
+
 ### <a name="bbcode_parsers">Parsers</a>
 ```typescript
 {
@@ -147,6 +154,7 @@ This type represents an Object, which contains the tag parsers for specific tags
 ```typescript
 <T extends Node>(node: T, t: Tokeniser, p: Parsers, closeTag?: string) => T;
 ```
+
 Intended for tag parsers, this function takes a Node, a [Tokeniser](#bbcode_tokeniser), a [Parsers](#bbcode_parsers) object and a closing tag name. It will run the tokeniser, handling tags according to the [Parsers](#bbcode_parsers) object, attaching the results to the passed Node, until it reaches a [CloseTag](#bbcode_closetag) matching the name specified, when it will return the original Node passed.
 
 ### <a name="bbcode_tagfn">tagFn</a>
@@ -256,7 +264,6 @@ This object modifies an HTTPRequest. It allows setting of the following:
 | signal            | An AbortSignal to be used to cancel any request. |
 
 ### <a name="conn_ws">WS</a>
-
 ```typescript
 (url: string) => new Promise<WSConn>;
 ```
@@ -293,12 +300,14 @@ This module directly import the [dom](#dom) and [html](#html) modules, and relie
 ```typescript
 (base: Element, coords: [number, number], list: List) => Promise<any>;
 ```
+
 The default export function creates a Context Menu in the base element at the coords provided. The menu is filled with the items denoted by the [List](#context_list).
 
 ### <a name="context_item">item</a>
 ```typescript
 (name: string, action: () => any, options: Options = {}) => Item;
 ```
+
 This helper creates an [Item](#context_item_type) with the name and action set, with the [Options](#context_options) provided.
 
 ### <a name="context_item_type">Item</a>
