@@ -494,23 +494,147 @@ The event module is used for easy creation of global events.
 
 The fraction module exports a default class to act as a fractional, infinite precision number type.
 
-|  Field       |  Description  |
-|--------------|---------------|
-| (construcor) | The constructor of the default class take a BigNum numerator and an optional BigNum denominator. |
-| add/sub      | These methods add or subtract the passed Fraction to/from the Fraction. |
-| cmp          | This method returns -1 if the Fraction is less than the passed Fraction, 0 if the Fraction is equal to the passed Fraction, 1 if the Fraction is greater than the passed Fraction, or NaN if either the Fraction or passed Fraction are NaN. |
-| div/mul      | These methods divide or multiple Fraction param by the passed Fraction param. |
-| isNaN        | This method returns true if the Fraction is NaN. |
-| sign         | This method returns 1 if the Fraction is positive, -1 if the Fraction is negative, and NaN if the value is NaN. |
-| toFloat      | This method returns a float representation of the Fraction to 5 decimal places. |
+|  Field  |  Type   |  Description  |
+|---------|---------|---------------|
+| [add](#fraction_add) | Method | Adds fractions together. |
+| [cmp](#fraction_cmp) | Method | Compares two Fractions. |
+| [constructor](#fraction_constructor) | Method | Creates new Fractions. |
+| [div](#fraction_div) | Method | Divide one Fraction by another. |
+| [isNaN](#fraction_isnan) | Method | Determines if a Fraction is NotANumber. |
+| [max](#fraction_max) | Static Method | Get the larger of two Fractions. |
+| [min](#fraction_min) | Static Method | Get the smaller of two Fractions. |
+| [mul](#fraction_mul) | Method | Multiply Fractions together. |
+| NaN | Static Fraction | A Fraction representing NaN. |
+| one | Static Fraction | A Fraction representing 1. |
+| [sign](#fraction_sign) | Method | Returns the sign of the Fraction. |
+| [sub](#fraction_sub) | Method | Subtract one Fraction from another. |
+| [toFloat](#fraction_tofloat) | Method | Converts a Fraction to a Number. |
+| zero | Static Fraction | A Fraction representing 0. |
 
-|  Static Field  |  Description  |
-|----------------|---------------|
-| max            | This function takes two Fraction types and returns the larger of the two. |
-| min            | This function takes two Fraction types and returns the smaller of the two. |
-| NaN            | This field is a Fraction representing the NaN value. |
-| one            | This field is a Fraction representing 1. |
-| zero           | This field is a Fraction representing 0. |
+### <a name="fraction_add">add</a>
+```typescript
+class Fraction {
+	add(num: Fraction) => Fraction;
+}
+```
+
+The add method creates a new Fraction with the values set as the result of the addition of the two Fraction values.
+
+### <a name="fraction_cmp">cmp</a>
+```typescript
+class Fraction {
+	cmp(num: Fraction) => number;
+}
+```
+
+The cmp method compares the base Fractions (A) to the passed Fraction (B), resulting in the following:
+
+|  Comparison  |  Return Value  |
+|--------------|----------------|
+| A < B        | -1             |
+| A == B       | 0              |
+| A > B        | 1              |
+| isNaN(A)     | NaN            |
+| isNaN(B)     | NaN            |
+
+### <a name="fraction_constructor">constructor</a>
+```typescript
+class Fraction {
+	constructor(numerator: bigint, denominator: bigint = 1n);
+}
+```
+
+The constructor of Fraction takes a BigInt numerator and an optional BigInt denominator and returns a Fraction accordingly. A zero (0n) denominator would create a Fraction equivelant of NaN.
+
+### <a name="fraction_div">div</a>
+```typescript
+class Fraction {
+	div(num: Fraction) => Fraction;
+}
+```
+
+The div method creates a new Fraction with the values set as the result of the base Fraction divided by the passed Fraction.
+
+For example:
+```typescript
+(new Fraction(2n)).div(new Fraction(3n) =~ new Fraction(2n, 3n);
+```
+
+### <a name="fraction_isnan">isNaN</a>
+```typescript
+class Fraction {
+	isNaN() => boolean;
+}
+```
+
+The isNaN method returns true if the Fraction is equivelant to NaN, which is when the denominator is equal to zero.
+
+### <a name="fraction_max">max</a>
+```typescript
+class Fraction {
+	static max(a: Fraction, b: Fraction) => Fraction;
+}
+```
+
+This static method returns the larger of the two passed Fraction, or NaN is either param is equivelant to NaN.
+
+### <a name="fraction_min">min</a>
+```typescript
+class Fraction {
+	static min(a: Fraction, b: Fraction) => Fraction;
+}
+```
+
+This static method returns the smaller of the two passed Fraction, or NaN is either param is equivelant to NaN.
+
+### <a name="fraction_mul">mul</a>
+```typescript
+class Fraction {
+	mul(num: Fraction) => Fraction;
+}
+```
+
+The div method creates a new Fraction with the values set as the result of the base Fraction multiplied by the passed Fraction.
+
+### <a name="fraction_sign">sign</a>
+```typescript
+class Fraction {
+	sign() => number;
+}
+```
+
+The sign method returns a number indicating the sign of the value:
+
+|  Fraction Value  |  Return Value  |
+|------------------|----------------|
+| < 0              | -1             |
+| = 0              | 0              |
+| > 1              | 1              |
+| NaN              | NaN            |
+
+### <a name="fraction_sub">sub</a>
+```typescript
+class Fraction {
+	sub(num: Fraction) => Fraction;
+}
+```
+
+The sub method creates a new Fraction with the values set as the result of the passed Fraction subtracted from the base Fraction.
+
+
+For example:
+```typescript
+(new Fraction(3n)).sub(new Fraction(2n) =~ new Fraction(1n);
+```
+
+### <a name="fraction_tofloat">toFloat</a>
+```typescript
+class Fraction {
+	toFloat() => number;
+}
+```
+
+The toFloat method returns a normal javascript number representation of the Fraction value, to 5 decimal places.
 
 ## <a name="html">html</a>
 
