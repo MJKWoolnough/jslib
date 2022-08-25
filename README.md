@@ -168,7 +168,7 @@ A function that takes a Node, a [Tokeniser](#bbcode_tokeniser), and a [Parsers](
 Generator<OpenTag | CloseTag | string, void, true | 1 | undefined>;
 ```
 
-This type is a generator that will yield a token, which will either be a [CloseTag](#bbcode_closetag), [OpenTag](#bbcode_opentag), or string. When calling next on this Generator, you can pass in *true* to the *next* method retrieve the last token generated. If you pass in *1* to the *next* method, when it has just outputted an [OpenTag](#bbcode_opentag), the processor will not move passed the corresponding [CloseTag](#bbcode_closetag) until *1* is again passed to the *next* method.
+This type is a generator that will yield a token, which will either be a [CloseTag](#bbcode_closetag), [OpenTag](#bbcode_opentag), or string. When calling next on this Generator, you can pass in *true* to the *next* method retrieve the last token generated. If you pass in `1` to the `next` method, when it has just outputted an [OpenTag](#bbcode_opentag), the processor will not move passed the corresponding [CloseTag](#bbcode_closetag) until `1` is again passed to the `next` method.
 
 ## <a name="bbcode_tags">bbcode_tags</a>
 
