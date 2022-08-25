@@ -652,7 +652,7 @@ This module directly imports the [dom](#dom) module.
 
 ## <a name="load">load</a>
 
-The load module should be included in a seperate HTML script element on the page, , and it creates two globally accessible features, which can be added to a TypeScript file with the following declarations:
+The load module should be included in a separate HTML script element on the page, , and it creates two globally accessible features, which can be added to a TypeScript file with the following declarations:
 
 declare const pageLoad: Promise<void>;
 declare const include: (url: string) => Promise<Object>;
