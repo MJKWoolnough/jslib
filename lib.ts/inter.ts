@@ -39,7 +39,7 @@ export class Pipe<T> {
 }
 
 export class Requester<T, U extends any[] = any[]> {
-	#responder?: ((...data: any) => any) | any;
+	#responder?: ((...data: U) => T) | T;
 	request(...data: U): T {
 		const r = this.#responder;
 		if (r === undefined) {
