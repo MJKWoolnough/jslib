@@ -197,6 +197,14 @@ export class NodeArray {
 		}
 		return -1;
 	}
+	findLast(callback, thisArg) {
+		for (const [index, item] of entries(this[realTarget].#root, 0, -1)) {
+			if (callback.call(thisArg, item, index, this)) {
+				return item;
+			}
+		}
+		return undefined;
+	}
 	flat(depth) {
 		return Array.from(this.values()).flat(depth);
 	}

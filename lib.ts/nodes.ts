@@ -237,6 +237,14 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return -1;
 	}
+	findLast(callback: Callback<T, any, this>, thisArg?: any) {
+		for (const [index, item] of entries(this[realTarget].#root, 0, -1)) {
+			if (callback.call(thisArg, item, index, this)) {
+				return item;
+			}
+		}
+		return undefined;
+	}
 	flat<D extends number = 1>(depth?: D) {
 		return Array.from(this.values()).flat(depth) as FlatArray<any[], D>;
 	}
