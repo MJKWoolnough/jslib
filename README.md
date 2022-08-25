@@ -949,6 +949,186 @@ declare const include: (url: string) => Promise<Object>;
 
 ## <a name="nodes">nodes</a>
 
+The nodes module contains Classes for aiding in the accessing of DOM Nodes.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| <a name="nodes_node">node</a> | Symbol | This Symbol is used to specify the Node of a type. |
+| [NodeArray](#nodes_nodearray) | Class | This Class provides Array-like access to DOM Nodes. |
+| [NodeMap](#nodes_nodemap) | Class | This Class provides Map-like access to DOM Nodes. |
+| noSort | Function | A sorting function that does no sorting. |
+| stringSort | Function | A function to sort strings. |
+
+### <a name="nodes_nodearray">NodeArray</a>
+
+This class provides Array-like access to DOM Nodes, allowing them to be sorted and accessed via position-based indexes.
+
+This type implements all fields and methods of the Array interface, except for the following changes:
+
+|  Field  |  Type  |  Differences |
+|---------|--------|--------------|
+| [node]  | Node   | New field to access base Node. |
+| concat | Method | Returns a normal Array, not a NodeArray. |
+| [constructor](#nodes_nodearray_constructor) | Constructor | Takes very different params to initialise a NodeArray. |
+| copyWithin | Method | Not applicable and throws an error. |
+| fill | Method | Not applicable and throws an error. |
+| filterRemove | Method | New method that works like `filter` but also removes the filtered items. |
+| [from](#nodes_nodearray_from) | Static Method | Takes very different params to initialise a NodeArray. |
+| [reverse](#nodes_nodearray_reverse) | Method | Reverses the sorting of the [Item](#nodes_item)s. |
+| slice | Method | Returns a normal Array, not a NodeArray. |
+| [sort](#nodes_nodearray_sort) | Method | Sorts the [Item](#nodes_item)s. |
+
+#### <a name="nodes_nodearray_constructor">constructor</a>
+```typescript
+class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
+	constructor(parent: H, sort: (a: T, b: T) => number = noSort, elements: Iterable<T> = []);
+}
+```
+
+The NodeArray constructor takes a parent element, onto which all [Item](https://stackedit.io/app#nodes_item) elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
+
+The sorting function is used to order [Item](#nodes_item)s as they are inserted.
+
+The NodeArray type is wrapped with a Proxy to implement Array-like indexing.
+
+#### <a name="nodes_nodearray_from">from</a>
+```typescript
+class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
+	static from<_, H extends Node = Node>(parent: H) => NodeArray<Item, H>;
+	static from<T extends Item, H extends Node = Node>(parent: H, itemFn: (node: Node) => T|undefined) => NodeArray<T, H>;
+	static from<T extends Item = Item, H extends Node = Node>(parent: H, itemFn = (n: Node) => ({[node]: n})) => NodeArray<T, H>;
+}
+```
+
+This function will create a NodeArray from the given parent Node, iterating over every child and running the itemFn to generate an [Item](#nodes_item)  to be append to the NodeArray.
+
+#### <a name="nodes_nodearray_reverse">reverse</a>
+```typescript
+class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
+	reverse() => void;
+}
+```
+
+The reverse method reverse the position of each [Item](#nodes_item) and reverses the sorting algorithm.
+
+#### <a name="nodes_nodearray_sort">sort</a>
+```typescript
+class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
+	sort(compareFunction?: (a: T, b: T) => number) => NodeArray<T>;
+}
+```
+
+The sort method works much like the Array sort method, but new items will be inserted according to the sorting function provided.
+
+Running this function with no param will result in the NodeArray being re-sorted according to the existing sorting function.
+
+### <a name="nodes_nodemap">NodeMap</a>
+
+This class provides Map-like access to DOM Nodes, allowing them to be sorted and accessed via keys.
+
+This type implements all fields and methods of the Map interface, except for the following changes:
+
+|  Field  |  Type  |  Differences |
+|---------|--------|--------------|
+| [node]  | Node   | New field to access base Node. |
+| [constructor](#nodes_nodemap_constructor) | Constructor | Takes very different params to initialise a NodeMap. |
+| [insertAfter](#nodes_nodemap_insertAfter) | Method | Inserts an [Item](#nodes_item) after another. |
+| [insertBefore](#nodes_nodemap_insertbefore) | Method | Inserts an [Item](#nodes_item) before another. |
+| [keyAt](#nodes_nodemap_keyat) | Method | Returns the key of the [Item](#nodes_item) at the specified position. |
+| [position](#nodes_nodemap_position) | Method | Returns the position of the [Item](#nodes_item) specified by the key. |
+| [reSet](#nodes_nodemap_reset) | Method | Changes the key for an item. |
+| [reverse](#nodes_nodemap_reverse) | Method | Reverses the sorting of the [Item](#nodes_item)s. |
+| [sort](#nodes_nodemap_sort) | Method | Sorts the [Item](#nodes_item)s. |
+
+#### <a name="nodes_nodemap_constructor">constructor</a>
+```typescript
+class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	constructor(parent: H, sort: (a: T, b: T) => number = noSort, entries: Iterable<[K, T]> = []);
+}
+```
+
+The NodeMap constructor takes a parent element, onto which all [Item](https://stackedit.io/app#nodes_item) elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
+
+The sorting function is used to order [Item](https://stackedit.io/app#nodes_item)s as they are inserted.
+
+#### <a name="nodes_nodemap_insertafter">insertAfter</a>
+```typescript
+class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	insertAfter(k: K, item: T, after: K) => boolean;
+}
+```
+
+The insertAfter method will insert a new [Item](#nodes_item) after the [Item](#nodes_item) denoted by the `after` key.
+
+The method will return true unless the `after` key cannot be found, in which case it will return false.
+
+#### <a name="nodes_nodemap_insertbefore">insertBefore</a>
+```typescript
+class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	insertBefore(k: K, item: T, before: K) => boolean;
+}
+```
+
+The insertBefore method will insert a new [Item](#nodes_item) before the [Item](#nodes_item) denoted by the `before` key.
+
+The method will return true unless the `before` key cannot be found, in which case it will return false.
+
+#### <a name="nodes_nodemap_keyAt">keyAt</a>
+```typescript
+class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	keyAt(pos: number) => T | undefined;
+}
+```
+
+The keyAt method returns the position of the key in within the sorted [Item](#nodes_item). It returns undefined if there is nothing at the specified position.
+
+#### <a name="nodes_nodemap_position">position</a>
+```typescript
+class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	position(key: K) => number;
+}
+```
+
+The position method returns the current sorted position of the [Item](#nodes_item) described by the key.
+
+#### <a name="nodes_nodemap_reset">reSet</a>
+```typescript
+class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	reSet(k: K, j: K) => void;
+}
+```
+
+The reset method changes the key assigned to an [Item](#nodes_item) without performing any sorting.
+
+#### <a name="nodes_nodemap_reverse">reverse</a>
+```typescript
+class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	reverse() => void;
+}
+```
+
+The reverse method reverse the position of each [Item](#nodes_item) and reverses the sorting algorithm.
+
+#### <a name="nodes_nodemap_sort">sort</a>
+```typescript
+class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
+	sort(compareFunction?: (a: T, b: T) => number) => NodeMap<T>;
+}
+```
+
+The sort method sorts the [Item](#nodes_item) s, and new items will be inserted according to the sorting function provided.
+
+Running this function with no param will result in the NodeMap being re-sorted according to the existing sorting function.
+
+### <a name="nodes_item">Item</a>
+```typescript
+interface {
+	[node]: Node;
+}
+```
+
+This unexported type satifies any type has used the [node](#nodes_node) Symbol to delegate a Node element.
+
 ## <a name="rpc">rpc</a>
 
 ## <a name="settings">settings</a>
