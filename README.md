@@ -1141,10 +1141,10 @@ This module directly imports the [dom](#dom) module.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
-| ns       | String | This constant contains the XMLNamespace of SVGElements. |
+| ns | String | This constant contains the XMLNamespace of SVGElements. |
 | a animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect set script stop style svg symbol text textPath title tspan use view | [DOMBind](#dom_dombind) | Each of these exports is a function which can take either a [Props](#dom_props) param and a [Children](#dom_children) param, or just a [Children](#dom_children) param, both as defined in the [dom](#dom) module, returning an SVGElement of the exported name, with the attributes and children set. |
-| switche     | [DOMBind](#dom_dombind) | This function is as above, for the `switch` SVGElement. |
-| svgData     | Function | This function takes either a SVGSVGElement or a SVGSymbolElement and returns a URL encoded SVG data string. |
+| switche | [DOMBind](#dom_dombind) | This function is as above, for the `switch` SVGElement. |
+| svgData | Function | This function takes either a SVGSVGElement or a SVGSymbolElement and returns a URL encoded SVG data string. |
 
 ## <a name="windows">windows</a>
 
