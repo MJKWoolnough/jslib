@@ -985,7 +985,7 @@ class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 }
 ```
 
-The NodeArray constructor takes a parent element, onto which all [Item](https://stackedit.io/app#nodes_item) elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
+The NodeArray constructor takes a parent element, onto which all [Item](#nodes_item) elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
 
 The sorting function is used to order [Item](#nodes_item)s as they are inserted.
 
@@ -1047,9 +1047,9 @@ class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
 }
 ```
 
-The NodeMap constructor takes a parent element, onto which all [Item](https://stackedit.io/app#nodes_item) elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
+The NodeMap constructor takes a parent element, onto which all [Item](#nodes_item) elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
 
-The sorting function is used to order [Item](https://stackedit.io/app#nodes_item)s as they are inserted.
+The sorting function is used to order [Item](#nodes_item)s as they are inserted.
 
 #### <a name="nodes_nodemap_insertafter">insertAfter</a>
 ```typescript
