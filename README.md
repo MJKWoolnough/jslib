@@ -650,6 +650,291 @@ This module directly imports the [dom](#dom) module.
 
 ## <a name="inter">inter</a>
 
+The inter module provides classes to aid with communication between otherwise unrelated modules.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [Pipe](#inter_pipe) | Class | A simple communication class for sending data to multiple clients. |
+| [Requester](#inter_requester) | Class | A simple communication class for multiple clients to request data from a server. |
+| [Subscription](#inter_subscription) | Class | This class provides a multi-firing version of a Promise. |
+| [WaitGroup](#inter_waitgroup) | Class | This Class updates clients on the status of multiple threads of operation. |
+| [WaitInfo](#inter_waitinfo) | Type | This type is the info delivered to clients of WaitGroup. |
+
+### <a name="inter_pipe">Pipe</a>
+
+The Pipe Class is used to pass values to multiple registered functions, and contains the following methods:
+
+|  Method  |  Description  |
+|----------|---------------|
+| [bind](#inter_pipe_bind) | This method can create simple bound functions for the receive, remove, and send methods. |
+| [receive](#inter_pipe_receive) | The method is used to register a function to receive data from the Pipe. |
+| [remove](#inter_pipe_remove) | The method is used to unregister a function on the Pipe. |
+| [send](#inter_pipe_send) |  This method sends data to all registered functions on the Pipe. |
+
+#### <a name="inter_pipe_bind">bind</a>
+```typescript
+class Pipe<T> {
+	bind(bindmask: 1) => [(data: T) => void, undefined, undefined];
+	bind(bindmask: 2) => [undefined, (fn: (data: T) => void) => void, undefined];
+	bind(bindmask: 3) => [(data: T) => void, (fn: (data: T) => void) => void, undefined];
+	bind(bindmask: 4) => [undefined, undefined, (fn: (data: T) => void) => void];
+	bind(bindmask: 5) => [(data: T) => void, undefined, (fn: (data: T) => void) => void];
+	bind(bindmask: 6) => [undefined, (fn: (data: T) => void) => void, (fn: (data: T) => void) => void];
+	bind(bindmask?: 7) => [(data: T) => void, (fn: (data: T) => void) => void, (fn: (data: T) => void) => void];
+}
+```
+
+This method returns an Array of functions bound to the send, receive, and remove methods of the Pipe Class. The bindmask determines which methods are bound.
+
+|  Mask Bit Value  |  Method  |
+|------------------|----------|
+| 1                | [send](#inter_pipe_send) |
+| 2                | [receive](#inter_pipe_receive) |
+| 4                | [remove](#inter_pipe_remove) |
+
+The return will return the following:
+[*send bound function*,  *receive bound function*, *remove bound function*]
+
+#### <a name="inter_pipe_receive">receive</a>
+```typescript
+class Pipe<T> {
+	receive(fn: (data: T) => void) => void;
+}
+```
+
+The passed function will be registered on the Pipe and will receive any future values sent along it.
+
+NB: The same function can be set multiple times, and will be for each time it is set.
+
+#### <a name="inter_pipe_remove">remove</a>
+```typescript
+class Pipe<T> {
+	remove(fn: (data: T) => void) => void;
+}
+```
+
+The passed function will be unregistered from the Pipe and will no longer receive values sent along it.
+
+NB: If the function is registered multiple times, only a single entry will be unregistered.
+
+#### <a name="inter_pipe_send">send</a>
+```typescript
+class Pipe<T> {
+	send(data: T) => void;
+}
+```
+
+This function sends the data passed to any functions registered on the Pipe.
+
+### <a name="inter_requester">Requester</a>
+
+The Requester Class is used to allow a server to set a function or value for multiple clients to query and contains the following methods:
+
+|  Method  |  Description  |
+|----------|---------------|
+| [request](#inter_requester_request) | This method is used to request data from the Requester object. |
+| [responder](#inter_requester_responder) | This method is used to set either a responder function or value on the Requester object. |
+
+#### <a name="inter_requester_request">request</a>
+```typescript
+class Requester<T, U extends any[] = any[]> {
+	request(...data: U) => T;
+}
+```
+
+The request method sends data to a set responder and receives a response. Will throw an error if no responder is set.
+
+#### <a name="inter_requester_responder">responder</a>
+```typescript
+class Requester<T, U extends any[] = any[]> {
+	responder(f: ((...data: U) => T) | T) => void;
+}
+```
+
+The responder method sets either the function that will respond to any request, or the value that will be the response to any request.
+
+### <a name="inter_subscription">Subscription</a>
+
+The Subscription Class is similar to the Promise class, but any success and error functions can be called multiple times.
+
+
+|  Method  |  Type  |  Description  |
+|----------|--------|---------------|
+| [bind](#inter_subscription_bind) | Static Method | This method binds the then, error, and cancel functions. |
+| [cancel](#inter_subscription_cancel) | Method | This method sends a cancel signal up the Subscription chain. |
+| [catch](#inter_subscription_catch) | Method | This method acts like the Promise.catch method. |
+| [constructor](#inter_subscription_constructor) | Constructor | This constructs a new Subscription. |
+| [finally](#inter_subscription_finally) | Method | This method acts like the Promise.finally method. |
+| [merge](#inter_subscription_merge) | Static Method | This combines several Subscriptions into one. |
+| [splitCancel](#inter_subscription_splitcancel) | Method | This method set all child Subscription objects to remove themselves from this Subscription using the cancel method. |
+| [then](#inter_subscription_then) | Method | This method acts like the Promise.then method. |
+
+#### <a name="inter_subscription_bind">bind</a>
+```typescript
+class Subscription<T> {
+	static bind<T>(bindmask: 1) => [Subscription<T>, (data: T) => void, undefined, undefined];
+	static bind<T>(bindmask: 2) => [Subscription<T>, undefined, (data: any) => void, undefined];
+	static bind<T>(bindmask: 3) => [Subscription<T>, (data: T) => void, (data: any) => void, undefined];
+	static bind<T>(bindmask: 4) => [Subscription<T>, undefined, undefined, (data: () => void) => void];
+	static bind<T>(bindmask: 5) => [Subscription<T>, (data: T) => void, undefined, (data: () => void) => void];
+	static bind<T>(bindmask: 6) => [Subscription<T>, undefined, (data: any) => void, (data: () => void) => void]; 
+	static bind<T>(bindmask?: 7) => [Subscription<T>, (data: T) => void, (data: any) => void, (data: () => void) => void];
+}
+```
+
+This method returns an Array of functions bound to the then, error, and cancel methods of the Subscription Class. The bindmask determines which methods are bound.
+
+|  Mask Bit Value  |  Method  |
+|------------------|----------|
+| 1                | [then](#inter_subscription_then) |
+| 2                | [error](#inter_subscription_error) |
+| 4                | [cancel](#inter_subscription_cancel) |
+
+The return will return the following:
+[*then bound function*,  *error bound function*, *cancel bound function*]
+
+#### <a name="inter_subscription_cancel">cancel</a>
+```typescript
+class Subscription<T> {
+	cancel() => void;
+}
+```
+
+This method sends a signal up the Subscription chain to the cancel function set during the construction of the original Subscription.
+
+#### <a name="inter_subscription_catch">catch</a>
+```typescript
+class Subscription<T> {
+	catch<TResult = never>(errorFn: (data: any) => TResult) => Subscription<T | TResult>;
+}
+```
+
+The catch method act similarly to the catch method of the Promise class, except that it can be activated multiple times.
+
+#### <a name="inter_subscription_constructor">constructor</a>
+```typescript
+class Subscription<T> {
+	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: () => void) => void) => void)
+}
+```
+
+The constructor of the Subscription class takes a function that receives success, error, and cancel functions.
+
+The success function can be called multiple times and will send any params in the call on to any 'then' functions.
+
+The error function can be called multiple times and will send any params in the call on to any 'catch' functions.
+
+The cancel function can be called at any time with a function to deal with any cancel signals generated by this Subscription object, or any child Subscription objects.
+
+#### <a name="inter_subscription_finally">finally</a>
+```typescript
+class Subscription<T> {
+	finally(afterFn: () => void) => Subscription<T>
+}
+```
+
+The finally method act similarly to the finally method of the Promise class, except that it can be activated multiple times.
+
+#### <a name="inter_subscription_merge">merge</a>
+```typescript
+class Subscription<T> {
+	static merge<T>(...subs: Subscription<T>[]) => Subscription<T>;
+}
+```
+
+The merge static method combines any number of Subscription objects into a single subscription, so that all parent success and catch calls are combined, and any cancel signal will be sent to all parents.
+
+#### <a name="inter_subscription_splitcancel">splitCancel</a>
+```typescript
+class Subscription<T> {
+	splitCancel(cancelOnEmpty = false) => () => Subscription<T>;
+}
+```
+
+This method creates a break in the cancel signal chain, so that any cancel signal simply removes that Subscription from it's parent.
+
+The cancelOnEmpty flag, when true, will send an actual cancel signal all the way up the chain when called on the last split child.
+
+#### <a name="inter_subscription_then">then</a>
+```typescript
+class Subscription<T> {
+		then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) => Subscription<TResult1 | TResult2>;
+}
+```
+
+The then method act similarly to the then method of the Promise class, except that it can be activated multiple times.
+
+### <a name="inter_waitgroup">WaitGroup</a>
+
+The WaitGroup Class is used to wait for multiple asynchronous taks to complete.
+
+|  Method  |  Type  |  Description  |
+|----------|--------|---------------|
+| [add](#inter_waitgroup_add) | Method | Adds to the number of tasks. |
+| [done](#inter_waitgroup_done) | Method | Adds to the number of complete tasks. |
+| [error](#inter_waitgroup_error) | Method | Adds to the number of failed tasks. |
+| [onComplete](#inter_waitgroup_oncomplete) | Method | Callback method to be run on completion of all tasks. |
+| [onupdate](#inter_waitgroup_onupdate) | Method | Callback method to be run on any change. |
+
+#### <a name="inter_waitgroup_add">add</a>
+```typescript
+class WaitGroup {
+	add() => void;
+}
+```
+
+This method adds to the number of registered tasks.
+
+#### <a name="inter_waitgroup_donn">done</a>
+```typescript
+class WaitGroup {
+	done() => void;
+}
+```
+
+This method adds to the number of complete tasks.
+
+#### <a name="inter_waitgroup_error">error</a>
+```typescript
+class WaitGroup {
+	error() => void;
+}
+```
+
+This method adds to the number of failed tasks.
+
+#### <a name="inter_waitgroup_oncomplete">onComplete</a>
+```typescript
+class WaitGroup {
+	onComplete(fn: (wi: WaitInfo) => void) => () => void;
+}
+```
+
+This method registers a function to run when all registered tasks are complete, successfully or otherwise.
+
+This method returns a function to unregister the supplied function.
+
+#### <a name="inter_waitgroup_onupdate">onUpdate</a>
+```typescript
+class WaitGroup {
+	onUpdate(fn: (wi: WaitInfo) => void) => () => void;
+}
+```
+
+This method registers a function to run whenever a task is added, completed, or failed.
+
+This method returns a function to unregister the supplied function.
+
+### <a name="inter_waitinfo">WaitInfo</a>
+
+The WaitInfo type contains the following data:
+
+|  Field  |  Type  |  Description  |
+|---------|--------|---------------|
+| done    | number | The number of complete tasks. |
+| errors  | number | The number of failed tasks. |
+| waits   | number | The total number of registered tasks. |
+
 ## <a name="load">load</a>
 
 The load module should be included in a separate HTML script element on the page, , and it creates two globally accessible features, which can be added to a TypeScript file with the following declarations:
