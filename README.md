@@ -1150,4 +1150,4 @@ This module directly imports the [dom](#dom) module.
 
 ## <a name="windows_taskbar">windows_taskbar</a>
 
-## <a name="windows_manager">windows_manager</a>
+## <a name="windows_taskmanager">windows_taskmanager</a>
