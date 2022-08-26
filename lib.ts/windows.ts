@@ -432,7 +432,7 @@ export class WindowElement extends BaseElement {
 	right: 0;
 }
 
-:host([resizeable]) > div:nth-child(5) {
+:host([resizable]) > div:nth-child(5) {
 	top: var(calc(--window-resize), -2px);
 	left: var(calc(--window-resize), -2px);
 	bottom: var(calc(--window-resize), -2px);
