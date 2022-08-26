@@ -1336,6 +1336,201 @@ This module directly imports the [dom](#dom) module.
 
 ## <a name="windows">windows</a>
 
+The windows module adds custom elements to implement a windowing system.
+
+This module directly imports the [dom](#dom), [html](#html), and [svg](#svg) modules.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| <a name="windows_defaulticon">defaultIcon</a> | String | The current default window icon. |
+| desktop | Function | A [DOMBind](#dom_dombind) that creates a DesktopElement. Registered with customElements as `windows-desktop`. |
+| <a name="windows_desktopelement">DesktopElement</a> | Class | This class creates a desktop-like space with a [ShellElement](#windows_shellelement). |
+| setDefaultIcon | Function | This function sets the deaultIcon variable. |
+| [setLanguage](#windows_setlanguage) | Function | Sets the language items used by the [ShellElement](#windows_shellelement) and [WindowElement](#windows_windowelement) classes. |
+| shell | Function | A [DOMBind](#dom_dombind) that creates a ShellElement. |
+| [ShellElement](#windows_shellelement) | Class | A class to create a shell for [WindowElement](#windows_windowelement)s to exist within. Extends [BaseElement](#windows_baseelement). Registered with customElements as `windows-shell`. |
+| windows | Function | A [DOMBind](#dom_dombind) that creates a WindowElement. |
+| [WindowElement](#windows_windowelement) | Class | This class represents a movable window with user specified contents. Extends [BaseElement](#windows_baseelement). Registered with customElements as `windows-window`. |
+
+### <a name="windows_baseelement">BaseElement</a>
+
+This unexported class provides some methods for both [WindowElement](#windows_windowelement) and [ShellElement](#windows_shellelement).
+
+|  Method  |  Description  |
+|----------|---------------|
+| [alert](#windows_baseelement_alert) | Creates a popup message window.
+| [confirm](#windows_baseelement_confirm) | Creates a popup confirmation window. |
+| [prompt](#windows_baseelement_prompt) | Creates a popup window that asks for input. |
+
+#### <a name="windows_baseelement_alert">alert</a>
+```typescript
+class BaseElement extends HTMLElement {
+	alert(title: string, message: string, icon?: string) => Promise<boolean>;
+}
+```
+
+The alert method adds an `alert`-like window to the [WindowElement](#windows_windowelement) or [ShellElement](#windows_shellelement) it was called upon.
+
+The button text is set to the `OK` field of the language object, which can be set with [setLanguage](#windows_setlanguage).
+
+The returned Promise will resolve to true if the button is clicked, and false if the dialog window was closed.
+
+#### <a name="windows_baseelement_confirm">confirm</a>
+```typescript
+class BaseElement extends HTMLElement {
+	confirm(title: string, message: string, icon?: string) => Promise<boolean>;
+}
+```
+
+The confirm method adds a `confirm`-like window to the [WindowElement](#windows_windowelement) or [ShellElement](#windows_shellelement) it was called upon.
+
+The text of the two buttons is set to the `OK` and `CANCEL` fields of the language object, which can be set with [setLanguage](#windows_setlanguage).
+
+The returned Promise will resolve to true if the `OK` button is clicked, and false if the `CANCEL` button was clicked or the dialog window was closed.
+
+#### <a name="windows_baseelement_prompt">prompt</a>
+```typescript
+class BaseElement extends HTMLElement {
+	prompt(title: string, message: string, defaultValue = "", icon?: string) => Promise<string | null>;
+}
+```
+
+The prompt method adds a `prompt`-like window to the [WindowElement](#windows_windowelement) or [ShellElement](#windows_shellelement) it was called upon.
+
+The button text is set to the `OK` field of the language object, which can be set with [setLanguage](#windows_setlanguage).
+
+The returned Promise will resolve to the text entered if the `OK` button is clicked, or null if the dialog window was closed.
+
+### <a name="windows_setlanguage">setLanguage</a>
+```typescript
+(language: {
+	CANCEL?: string;
+	CLOSE?: string;
+	MAXIMISE?: string;
+	MINIMISE?: string;
+	OK?: string;
+	RESTORE?: string;
+}) => void;
+```
+
+The setLanguage function sets the language items used by the [ShellElement](#windows_shellelement) and [WindowElement](#windows_windowelement) classes.
+
+### <a name="windows_shellelement">ShellElement</a>
+
+The ShellElement class is a CustomElement that can contain a single [DesktopElement](#windows_desktopelement) and any number of  [WindowElement](#windows_windowelement)s.
+
+
+This element handles the follow attributes.
+
+|  Attribute     |  Type  |  Description  |
+|----------------|--------|---------------|
+| -\-shell-height | Number | Used to specify the internal height of the `Shell`. |
+| -\-shell-width  | Number | Used to specify the internal width of the `Shell`. |
+
+In addition to the methods provided by [BaseElement](#windows_baseelement), the following methods are provided:
+
+|  Method        |  Description  |
+|----------------|---------------|
+| addWindow      | Adds a [WindowElement](#windows_windowelement) to the Shell and focuses it. |
+| realignWindows | Repositions all [WindowElements](#windows_windowelement) within the Shell to make sure they are all visible. |
+
+### <a name="windows_windowelement">WindowElement</a>
+
+The WindowElement class is a CustomElement that be added to a [ShellElement](#windows_shellelement) to provide a window-like interface to the contents of the element.
+
+The [ShellElement](#windows_shellelement) will determine whether `Windows` can be minimised and how they are handled when they are. The [ShellElement](#windows_shellelement) of this module disables minimising. It can be enabled by using the ShellElement of either the [windows_taskbar](#windows_taskbar) or [windows_taskmanager](#windows_taskmanager) modules.
+
+This element handles the follow attributes:
+
+|  Attribute       |  Type  |  Description  |
+|------------------|--------|---------------|
+| -\-window-height | Number | CSS: Specifies the height of the `Window`. |
+| -\-window-left   | Number | CSS: Specifies the `x` coordinate of the `Window`. |
+| -\-window-top    | Number | CSS: Specifies the `y` coordinate of the `Window`. |
+| -\-window-width  | Number | CSS: Specifies the width of the `Window`. |
+| hide-close       | Toggle | Hides the `Close` button. |
+| hide-maximise    | Toggle | Hides the `Maximise` button. |
+| hide-minimise    | Toggle | Hides the `Minimise` button. |
+| hide-titlebar    | Toggle | Hides the titlebar. |
+| maximised        | Toggle | The window will expand to the size of the [ShellElement](#windows_shellelement). |
+| minimised        | Toggle | The window will be hidden and it will be up to the shell to allow restoring it. |
+| resizable        | Toggle | Allows the `Window` to be resized. |
+| window-icon      | String | Sets the window icon. |
+| window-title     | String | Sets the window title. |
+
+Hover text on the default buttons can be modified via the [setLanguage](#windows_setlanguage) function.
+
+The following entries affect this element:
+
+|  Entry     |  Default Value  |  Description  |
+|------------|-----------------|---------------|
+| `CLOSE`    | "Close"         | Hover text on the 'Close Window' button. |
+| `MAXIMISE` | "Maximise"      | Hover text on the 'Maximise Window' button. |
+| `MINIMISE` | "Minimise"      | Hover text on the 'Minimise Window' button. |
+| `RESTORE`  | "Restore"       | Hover text on the 'Restore Window' button. |
+
+The following customs events can be dispatched:
+
+|  Event  |  Description  |
+|---------|---------------|
+| close   | Dispatched when either the `Close` button is clicked or the [close](#windows_windowelement_close) method is called. |
+| moved   | Dispatched when the `Window` is dragged around within the shell. |
+| remove  | Dispatched when the `Window` is removed from the DOM. |
+| resized | Dispatched when the `Window` is resized. |
+
+In addition to the methods provided by [BaseElement](#windows_baseelement), the following methods are provided:
+
+|  Method  |  Description  |
+|----------|---------------|
+| [addControlButton](#windows_windowelement_addcontrolbutton) | Adds an additional, custom control button to the titlebar. |
+| [addWindow](#windows_windowelement_addwindow) | Adds a [WindowElement](#windows_windowelement) to the `Window` as a child window. |
+| [close](#windows_windowelement_close) | Closes the `Window`. |
+| [focus](#windows_windowelement_focus) | Brings the `Window` to the top of the window stack on the [ShellElement](#windows_shellelement). |
+
+### <a name="windows_windowelement_addcontrolbutton">addControlButton</a>
+```typescript
+class WindowElement extends BaseElement {
+	addControlButton(icon: string, onclick: (this: WindowElement) => void, title?: string) => () => void;
+}
+```
+
+The addControlButton method adds additional buttons to the titlebar of the `Window`.
+
+The returned function can be called to remove the button.
+
+### <a name="windows_windowelement_addwindow">addWindow</a>
+```typescript
+class WindowElement extends BaseElement {
+	addWindow(w: WindowElement) => boolean;
+}
+```
+
+The addWindow method adds a `Window` as a child. If there is already a child, it is added as a child of that `Window`.
+
+Returns true if the `Window` was added, false otherwise.
+
+### <a name="windows_windowelement_close">close</a>
+```typescript
+class WindowElement extends BaseElement {
+	close() => boolean;
+}
+```
+
+The close method will attempt to close the `Window`. If the `Window` has a child, that will be focussed instead.
+
+When attempting to close, a cancellable `close` event is dispatched to the WindowElement.  If the event is cancelled, the `Window` will remain open.
+
+Returns true if the `Window` was closed, false otherwise.
+
+### <a name="windows_windowelement_focus">focus</a>
+```typescript
+class WindowElement extends BaseElement {
+	focus() => void;
+}
+```
+
+The focus method will bring the unset a minimise attribute and bring the deepest child to the top of the window stack.
+
 ## <a name="windows_taskbar">windows_taskbar</a>
 
 ## <a name="windows_taskmanager">windows_taskmanager</a>
