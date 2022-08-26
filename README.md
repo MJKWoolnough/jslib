@@ -1234,6 +1234,93 @@ The subscribe method will wait for a message with a matching ID, which must be n
 
 ## <a name="settings">settings</a>
 
+The settings module exports convenience classes around the window.localStorage API.
+
+|  Export  |  Description  |
+|----------|---------------|
+| BoolSetting | Class for storing Boolean values, which simply applies typing to the unexported base [Setting](#settings_setting) class. |
+| [IntSetting](#settings_intsetting) | Class for storing Integer values. |
+| [JSONSetting](#settings_jsonsetting) | Class for storing JSON values. |
+| [NumberSetting](#settings_numbersetting) | Class for storing Number values. |
+| [StringSetting](#settings_stringsetting) | Class for storing String values. |
+
+### <a name="settings_boolsetting">BoolSetting</a>
+```typescript
+class BoolSetting extends Setting<boolean> {
+	constructor(name: string);
+}
+```
+The BoolSetting class `constructor` just takes a name, and otherwise just extends the base [Setting](#settings_setting) class with the `boolean` type.
+
+### <a name="settings_intsetting">IntSetting</a>
+```typescript
+class IntSetting extends Setting<number> {
+	constructor(name: string, starting = 0, min = -Infinity, max = Infinity);
+}
+```
+
+The IntSetting class extends the `constructor` of [Setting](#settings_setting) to, in addition to the string name and optional number starting value, take optional min and max numbers to be used for validation.
+
+In addition, the `set` method will validate any values passed to it, making sure they value is an integer and satisfies the follow inequality:
+
+`min <= value <= max`
+
+Otherwise this class just extends the base [Setting](#settings_setting) class with the `number` type.
+
+### <a name="settings_jsonsetting">JSONSetting</a>
+```typescript
+class JSONSetting<T> extends Setting<T> {
+	constructor(name: string, starting: T, validator: (v: any) => v is T);
+}
+```
+
+The JSONSetting class extends the `constructor` of [Setting](#settings_setting) to, in addition to the string name and default starting value, takes a required validator function to confirm the retrieved value is of type `T`.
+
+Otherwise this class just extends the base [Setting](#settings_setting) class with the `T` type.
+
+### <a name="settings_numbersetting">NumberSetting</a>
+```typescript
+class NumberSetting extends Setting<number> {
+	constructor(name: string, starting = 0, min = -Infinity, max = Infinity);
+}
+```
+
+The NumberSetting class extends the `constructor` of [Setting](#settings_setting) to, in addition to the string name and optional number starting value, take optional min and max numbers to be used for validation.
+
+In addition, the `set` method will validate any values passed to it, making sure the value satisfies the follow inequality:
+
+`min <= value <= max`
+
+Otherwise this class just extends the base [Setting](#settings_setting) class with the `number` type.
+
+### <a name="settings_setting">Setting</a>
+
+The unexported Setting class is extended by the various typed child Setting classes.
+
+All methods return `this` to allow for method chaining.
+
+|  Field  |  Type  |  Description  |
+|-------------|-------------|---------------|
+| constructor | Constructor | Takes a setting string name and a starting value of a type defined by the child class. |
+| name        | String      | The name of the setting. |
+| remove      | Method      | Removes the setting from localStorage. |
+| set         | Method      | Sets a new value to a Setting. |
+| value       | T           | The value of the setting, type defined by the child class. |
+| [wait](#settings_setting_wait) | Method | Registers a function to receive updated values. |
+
+### <a name="settings_setting_wait">wait</a>
+```typescript
+class Setting<T> {
+	wait(fn: (value: T) => void) => Setting<T>;
+}
+```
+
+The wait method takes a function to be called on every setting value change. It will be immediately called with the current value.
+
+### <a name="settings_stringsetting">StringSetting</a>
+
+The StringSetting class simply extends the [Setting](#settings_setting) class with a default of empty string ("").
+
 ## <a name="svg">svg</a>
 
 The svg module exports function for the create of SVGElements.
