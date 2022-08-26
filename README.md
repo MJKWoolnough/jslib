@@ -1541,3 +1541,12 @@ The windows_taskbar module provides a replacement for the [windows](#windows) mo
 | ShellElement | Class    | A drop-in replacement for the [windows](#windows) module [ShellElement](#windows_shellelement). Registered with customElements as `windows-shell-taskbar`. |
 
 ## <a name="windows_taskmanager">windows_taskmanager</a>
+
+The windows_taskmanager module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that allows `Windows` to be minimised within the shell, appearing as just the title-bar at the bottom of the shell.
+
+NB: Any [custom control buttons](#windows_windowelement_addcontrolbutton) will not be displayed on the title-bar while minimised.
+
+|  Export      |  Type    |  Description |
+|--------------|----------|--------------|
+| shell        | Function | A [DOMBind](#dom_dombind) that creates a ShellElement. |
+| ShellElement | Class    | A drop-in replacement for the [windows](#windows) module [ShellElement](#windows_shellelement). Registered with customElements as `windows-shell-taskmanager`. |
