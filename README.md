@@ -480,15 +480,56 @@ The keys of this type refer to the attribute names that are to be set. The key d
 
 The event module is used for easy creation of global events.
 
-|  Export        |  Description  |
-|----------------|---------------|
-| hasKeyEvent    | This function returns true if any function is currently active for the passed key. |
-| keyEvent       | This function takes a key combination or array of key combinations, an optional KeyboardEvent function to act as the keydown event handler, an optional KeyboardEvent function to act as the keyup handler, and an optional boolean (default false) to determine if the event only runs one time per activateion. The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function. The key combinations are strings which can contain key names as determined by the KeyboardEvent.key value, and can be prefixed by any number of the following: `Alt+`, `Option+`, `Control+`, `Ctrl+`, `Command+`, `Meta+`, `Super+`, `Windows+`, and `Shift+`. |
-| mouseDragEvent | This function takes a mouse button (0..15), an optional MouseEvent function to act as the mousemove event handler, and an optional function to be run on mouseup. The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function. |
-| mouseMoveEvent | This function takes a MouseEvent function and an option function which will be run when the event deactivates. The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function. |
-| mouseX         | The current X coordinate of the mouse. |
-| mouseY         | The current Y coordinate of the mouse. |
+|  Export        |  Type  |  Description  |
+|----------------|--------|---------------|
+| [hasKeyEvent](#events_haskeyevent) | Method | This function returns true if any function is currently active for the passed key. |
+| [keyEvent](#events_keyevent) | Method | Used for setting up keyboard event handlers. |
+| [mouseDragEvent](#events_mousedragevent) | Method | Used to handle mouse drag events. |
+| [mouseMoveEvent](#events_mousemoveevent) | Method | Used to handle mouse move events. |
+| mouseX | Number | The current X coordinate of the mouse. |
+| mouseY | Number | The current Y coordinate of the mouse. |
 
+### <a name="events_haskeyevent">hasKeyEvent</a>
+```typescript
+(key: string) => boolean;
+```
+
+This function returns true if any function is currently active for the passed key.
+
+### <a name="events_keyevent">keyEvent</a>
+```typescript
+(key: string | string[], onkeydown?: (e: KeyboardEvent) => void, onkeyup?: (e: KeyboardEvent) => void, once = false) => [() => void, (now = true) => void];
+```
+
+This function takes a key combination or array of key combinations, an optional KeyboardEvent function to act as the keydown event handler, an optional KeyboardEvent function to act as the keyup handler, and an optional boolean (default false) to determine if the event only runs one time per activation.
+
+The key combinations are strings which can contain key names as determined by the KeyboardEvent.key value, and can be prefixed by any number of the following: `Alt+`, `Option+`, `Control+`, `Ctrl+`, `Command+`, `Meta+`, `Super+`, `Windows+`, and `Shift+`.
+
+The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function.
+
+NB: If the window loses focus, the module will generate a keyup event. This can be detected be checking the Event.isTrusted field.
+
+### <a name="events_mousedragevent">mouseDragEvent</a>
+```typescript
+(button: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15, onmousemove?: (e: MouseEvent) => void, onmouseup: (e: MouseEvent) => void = () => {}) => [() => void, (now = true) => void];
+```
+
+This function takes a mouse button (0..15), an optional MouseEvent function to act as the mousemove event handler, and an optional function to be run on mouseup.
+
+The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any mouseup event handler unless false is passed into the function.
+
+NB: If the window loses focus, the module will generate a mouseup event. This can be detected be checking the Event.isTrusted field.
+
+### <a name="events_mousemoveevent">mouseMoveEvent</a>
+```typescript
+(onmousemove: (e: MouseEvent) => void, onend?: () => void) => [() => void, (now = true) => void];
+```
+
+This function takes a MouseEvent function and an optional function which will be run when the event deactivates.
+
+The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any mouseup event handler unless false is passed into the function.
+
+NB: If the window loses focus, the module will run the onend function.
 
 ## <a name="fraction">fraction</a>
 
