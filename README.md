@@ -8,7 +8,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 |---------------------------------------------|---------------|
 | [bbcode](#bbcode)                           | A BBCode parser. |
 | [bbcode_tags](#bbcode_tags)                 | A collection of BBCode tags. |
-| [conn](#conn)                               | Convenience wrappers around XMLHTTPRequest and WebSocket. |
+| [conn](#conn)                               | Convenience wrappers around [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket). |
 | [context](#context)                         | Library for creating right-click menus. Needs rewriting. |
 | [dom](#dom)                                 | Functions for manipulating the DOM. |
 | [drag](#drag)                               | Library for making browser Drag'n'Drop easier to use. |
@@ -48,9 +48,9 @@ This module contains a full [BBCode](https://en.wikipedia.org/wiki/BBCode) parse
 | [isString](#bbcode_isString) | Function | Intended for tag parsers, this function determines if a token is a string. |
 | [OpenTag](#bbcode_opentag) | Type | The type represents an opening tag. |
 | [Parsers](#bbcode_parsers) | Type | This type is an object containing the handlers for various tag types. |
-| [process](#bbcode_process) | Function | Intended for tag parsers, appends parse BBCode to the passed Node. |
+| [process](#bbcode_process) | Function | Intended for tag parsers, appends parse BBCode to the passed [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node). |
 | [TagFn](#bbcode_tagfn) | Type | A type representing a tag handler. |
-| text | Symbol | A Symbol used to indicate the text processor in the Parsers type passed to the [(default)](#bbcode_default) parsing function. |
+| text | Symbol | A [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) used to indicate the text processor in the Parsers type passed to the [(default)](#bbcode_default) parsing function. |
 | [Tokeniser](#bbcode_tokeniser) | Type | Intended for tag parsers, this type represents the token generator. |
 
 ### <a name="bbcode_default">(default)</a>
@@ -59,7 +59,7 @@ This module contains a full [BBCode](https://en.wikipedia.org/wiki/BBCode) parse
 (parsers: Parsers, text: string) => DocumentFragment;
 ```
 
-This function parses the given text according, handling the tags with the given parsers, and appending all generated Nodes to a DocumentFragment, which is returned.
+This function parses the given text according, handling the tags with the given parsers, and appending all generated [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s to a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), which is returned.
 
 ### <a name="bbcode_closetag">CloseTag</a>
 
@@ -147,21 +147,21 @@ Example: `[colour=#f00]Text[/colour]` will result in:
 }
 ```
 
-This type represents an Object, which contains the tag parsers for specific tags and the text processor. This object **must** contain the text Symbol, specifying a text formatting function, which takes a Node to be appended to, and the string to be formatted. In addition, this object should contain string keys, which correspond to tag names, the values of which should be [TagFn](#bbcode_tagfn)s.
+This type represents an Object, which contains the tag parsers for specific tags and the text processor. This object **must** contain the text [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol), specifying a text formatting function, which takes a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) to be appended to, and the string to be formatted. In addition, this object should contain string keys, which correspond to tag names, the values of which should be [TagFn](#bbcode_tagfn)s.
 
 ### <a name="bbcode_process">process</a>
 ```typescript
 <T extends Node>(node: T, t: Tokeniser, p: Parsers, closeTag?: string) => T;
 ```
 
-Intended for tag parsers, this function takes a Node, a [Tokeniser](#bbcode_tokeniser), a [Parsers](#bbcode_parsers) object and a closing tag name. It will run the tokeniser, handling tags according to the [Parsers](#bbcode_parsers) object, attaching the results to the passed Node, until it reaches a [CloseTag](#bbcode_closetag) matching the name specified, when it will return the original Node passed.
+Intended for tag parsers, this function takes a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), a [Tokeniser](#bbcode_tokeniser), a [Parsers](#bbcode_parsers) object and a closing tag name. It will run the tokeniser, handling tags according to the [Parsers](#bbcode_parsers) object, attaching the results to the passed [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), until it reaches a [CloseTag](#bbcode_closetag) matching the name specified, when it will return the original [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) passed.
 
 ### <a name="bbcode_tagfn">tagFn</a>
 ```typescript
 (node: Node, t: Tokeniser, p: Parsers) => void;
 ```
 
-A function that takes a Node, a [Tokeniser](#bbcode_tokeniser), and a [Parsers](#bbcode_parsers) object. This function should process tokens from the [Tokeniser](#bbcode_tokeniser), appending to the Node, until its tag data finishes. This function should return nothing.
+A function that takes a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), a [Tokeniser](#bbcode_tokeniser), and a [Parsers](#bbcode_parsers) object. This function should process tokens from the [Tokeniser](#bbcode_tokeniser), appending to the [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), until its tag data finishes. This function should return nothing.
 
 ### <a name="bbcode_tokeniser">Tokeniser</a>
 ```typescript
@@ -207,16 +207,16 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 
 ## <a name="conn">conn</a>
 
-The conn module contains some convenience wrappers around XMLHTTPRequest and WebSocket.
+The conn module contains some convenience wrappers around [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket).
 
 This module directly imports the [inter](#inter) module.
 
 |  Exports  |  Type  |  Description  |
 |-----------|--------|---------------|
-| [HTTPRequest](#conn_httprequest) | Function | The function provides a promise base wrapper to XMLHTTPRequest. |
+| [HTTPRequest](#conn_httprequest) | Function | The function provides a promise base wrapper to [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest). |
 | [Properties](#conn_properties) | Type | This object is passed to a HTTPRequest to modify its options. |
-| [WS](#conn_ws) | Function | This function provides a Promise based initialiser for WSConn. |
-| [WSConn](#conn_wsconn) | Class | This class extends the WebSocket class. |
+| [WS](#conn_ws) | Function | This function provides a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) based initialiser for WSConn. |
+| [WSConn](#conn_wsconn) | Class | This class extends the [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) class. |
 
 ### <a name="conn_httprequest">HTTPRequest</a>
 ```typescript
@@ -230,7 +230,7 @@ interface {
 }
 ```
 
-In its simplest incarnation, this function takes a URL a returns a Promise which will return the string response from that URL. However, the passed [Properties](#conn_properties) object can modify both how the request is sent and the response interpreted.
+In its simplest incarnation, this function takes a URL a returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which will return the string response from that URL. However, the passed [Properties](#conn_properties) object can modify both how the request is sent and the response interpreted.
 
 ### <a name="conn_properties">Properties</a>
 ```typescript
@@ -256,22 +256,22 @@ This object modifies an HTTPRequest. It allows setting of the following:
 | password          | Allows the settings of a Basic Authorization password. |
 | headers           | An object to allow the setting or arbitrary headers. |
 | type              | Sets the Content-Type of the request. |
-| response          | This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the XMLHTTPRequest object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object. |
+| response          | This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the [XMLHTTPRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object. |
 | onuploadprogress  | This sets an event handler to monitor any upload progress. |
 |ondownloadprogress | This sets an event handler to monitor any download process. |
-| data              | This is an XMLHttpRequestBodyInit and is send as the body of the request. |
-| signal            | An AbortSignal to be used to cancel any request. |
+| data              | This is an [XMLHttpRequestBodyInit](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send#body) and is send as the body of the request. |
+| signal            | An [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to be used to cancel any request. |
 
 ### <a name="conn_ws">WS</a>
 ```typescript
 (url: string) => new Promise<WSConn>;
 ```
 
-This function takes a url and returns a Promise which will resolve with an initiated [WSConn](#conn_wsconn) on a successful connection.
+This function takes a url and returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which will resolve with an initiated [WSConn](#conn_wsconn) on a successful connection.
 
 ### <a name="conn_wsconn">WSConn</a>
 
-WSConn extends the WebSocket class, allowing for the passed URL to be relative to the current URL.
+WSConn extends the [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) class, allowing for the passed URL to be relative to the current URL.
 
 In addition, it adds a method:
 ```typescript
@@ -325,7 +325,7 @@ This type represents an item of a menu. The `classes`, `id`, and `disabled` fiel
 |  Field  |  Description  |
 |---------|---------------|
 | name    | This is the name in the item element. |
-| action  | This is a function that will be called when an item is activated. It's return will be the return value of the Promise return by the [(default)](#context_default) function. |
+| action  | This is a function that will be called when an item is activated. It's return will be the return value of the [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) return by the [(default)](#context_default) function. |
 
 
 ### <a name="context_list">List</a>
@@ -382,19 +382,19 @@ The dom module can be used to manipulate DOM elements.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
-| [amendNode](#dom_amendnode) | Function | This convenience function modifies a Node or EventTarget. |
+| [amendNode](#dom_amendnode) | Function | This convenience function modifies a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget. |
 | [autoFocus](#dom-autofocus) | Function | This function queues a focus method call to the passed element. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom-amendnode) except that it clears any children before amending. |
-| [Children](#dom_children) | Type | This type is a string, Node, NodeList, HTMLCollection, or a recursive array of those. |
-| [createDocumentFragment](#dom_createdocumentfragment) | Function | This convenience function creates a DocumentFragment. |
+| [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), or a recursive array of those. |
+| [createDocumentFragment](#dom_createdocumentfragment) | Function | This convenience function creates a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment). |
 | [DOMBind](#dom_dombind) | Type | This type represents a binding of either [amendNode](#dom_amendnode) or [clearNode](#dom_clearnode) with the first param bound. |
 | [event](#dom_event) | Function | This helper function helps with setting up events for [amendNode](#dom_amendnode). |
 | eventCapture | Number | Can be passed to the [event](#dom_event) function to set the `capture` property on an event. |
 | eventOnce | Number | Can be passed to the [event](#dom_event) function to set the `once` property on an event. |
 | eventPassive | Number| Can be passed to the [event](#dom_event) function to set the `passive` property on an event. |
 | eventRemove | Number | Can be passed to the [event](#dom_event) function to set the event to be removed. |
-| <a name="dom_props">Props</a> | Type | A [PropsObject](#dom_propsobject) or NamedNodeMap. |
-| [PropsObject](#dom_propsobject) | Type | This object is used to set attributes and events on a Node or EventTarget with the [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode) functions. |
+| <a name="dom_props">Props</a> | Type | A [PropsObject](#dom_propsobject) or [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap). |
+| [PropsObject](#dom_propsobject) | Type | This object is used to set attributes and events on a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget with the [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode) functions. |
 
 ### <a name="dom_amendnode">amendNode</a>
 ```typescript
@@ -406,36 +406,36 @@ interface {
 }
 ```
 
-This fuction is used to set attributes and children on Nodes, and events on Nodes and other EventTargets.
+This fuction is used to set attributes and children on [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s, and events on [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s and other [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget)s.
 
-If the element passed is a HTMLElement or SVGElement, then a properties param is processed, applying attributes as per the [PropsObject](#dom_propsobject) type. Likewise, any events are set or unset on a passed EventTarget, as per the [PropsObject](#dom_propsobject) type.
+If the element passed is a [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) or [SVGElement](https://developer.mozilla.org/en-US/docs/Web/API/SVGElement), then a properties param is processed, applying attributes as per the [PropsObject](#dom_propsobject) type. Likewise, any events are set or unset on a passed [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), as per the [PropsObject](#dom_propsobject) type.
 
 For any Node, the children are set according to the [Children](#dom_children) value.
 
 This function returns the element passed to it.
 
-NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with window.open().
+NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with [window.open()](https://developer.mozilla.org/en-US/docs/Web/API/Window/open)
 
 ### <a name="dom_autofocus">autoFocus</a>
 ```typescript
 <T extends FocusElement>(node: T, inputSelect = true) => T;
 ```
 
-This queues a focus method call to the passed element, and will call select on any HTMLInputElement or HTMLTextAreaElement, unless false is passed as the second param.
+This queues a focus method call to the passed element, and will call select on any [HTMLInputElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement) or [HTMLTextAreaElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement), unless false is passed as the second param.
 
 ### <a name="dom_children">Children</a>
 ```typescript
 string | Node | NodeList | HTMLCollection | Children[];
 ```
 
-This type is a string, Node, NodeList, HTMLCollection, or a recursive array of those.
+This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), or a recursive array of those.
 
 ### <a name="dom_createdocumentfragment">createDocumentFragment</a>
 ```typescript
 (children?: Children) => DocumentFragment;
 ```
 
-This function creates a DocumentFragment that contains any [Children](#dom_children) passed to it, as with [amendNode](#dom_amendnode).
+This function creates a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) that contains any [Children](#dom_children) passed to it, as with [amendNode](#dom_amendnode).
 
 ### <a name="dom_dombind">DOMBind</a>
 ```typescript
@@ -445,7 +445,7 @@ interface <T extends Node> {
 }
 ```
 
-This utility type is useful for any function that wants to call amendNode or clearNode with the first param set by that function, as used in the [html](#html), [svg](#svg), and [windows](#windows) modules.
+This utility type is useful for any function that wants to call [amendNode](#dom_amendNode) or [clearNode](#dom_clearnode) with the first param set by that function, as used in the [html](#html), [svg](#svg), and [windows](#windows) modules.
 
 ### <a name="dom_event">event</a>
 ```typescript
@@ -468,12 +468,13 @@ This type can be used to set events with [amendNode](#dom_amendnode) and [clearN
 Record<string, ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | ClassObj | undefined>;
 ```
 
-The keys of this type refer to the attribute names that are to be set. The key determines what type the value should be.
+The keys of this type refer to the attribute names that are to be set. The key determines what type the value should be:
+
 |  Key  |  Description  |
 |-------|---------------|
-| `on*` | Used to set events. Can be a Function, EventListenerObject, or [EventArray](#dom_eventarray).|
-| `class` | An array of strings, or a DOMTokenList, to be used to toggle classes. If a class begins with a `!`, the class will be removed, if the class begins with a `~`, the class will be toggles, otherwise the class will be set. |
-| `style` | A CSSStyleDeclaration can be used to set the style directly, or an Object can be used to set individual style properties. |
+| `on*` | Used to set events. Can be a Function, [EventListenerObject](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#the_event_listener_callback), or [EventArray](#dom_eventarray).|
+| `class` | An array of strings, or a [DOMTokenList](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList), to be used to toggle classes. If a class begins with a `!`, the class will be removed, if the class begins with a `~`, the class will be toggles, otherwise the class will be set. |
+| `style` | A [CSSStyleDeclaration](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration) can be used to set the style directly, or an Object can be used to set individual style properties. |
 | `*` | For any key, a string or any object with a toString method can be used to set the field explicitly, a number can be used and converted to a string, a boolean can be used to toggle an attribute, and a undefined value can be used to remove an attribute. |
 
 ## <a name="events">events</a>
@@ -501,31 +502,31 @@ This function returns true if any function is currently active for the passed ke
 (key: string | string[], onkeydown?: (e: KeyboardEvent) => void, onkeyup?: (e: KeyboardEvent) => void, once = false) => [() => void, (now = true) => void];
 ```
 
-This function takes a key combination or array of key combinations, an optional KeyboardEvent function to act as the keydown event handler, an optional KeyboardEvent function to act as the keyup handler, and an optional boolean (default false) to determine if the event only runs one time per activation.
+This function takes a key combination or array of key combinations, an optional [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent) function to act as the keydown event handler, an optional [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent) function to act as the keyup handler, and an optional boolean (default false) to determine if the event only runs one time per activation.
 
-The key combinations are strings which can contain key names as determined by the KeyboardEvent.key value, and can be prefixed by any number of the following: `Alt+`, `Option+`, `Control+`, `Ctrl+`, `Command+`, `Meta+`, `Super+`, `Windows+`, and `Shift+`.
+The key combinations are strings which can contain key names as determined by the [KeyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value, and can be prefixed by any number of the following: `Alt+`, `Option+`, `Control+`, `Ctrl+`, `Command+`, `Meta+`, `Super+`, `Windows+`, and `Shift+`.
 
 The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function.
 
-NB: If the window loses focus, the module will generate a keyup event. This can be detected be checking the Event.isTrusted field.
+NB: If the window loses focus, the module will generate a keyup event. This can be detected be checking the [Event.isTrusted](https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted) field.
 
 ### <a name="events_mousedragevent">mouseDragEvent</a>
 ```typescript
 (button: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15, onmousemove?: (e: MouseEvent) => void, onmouseup: (e: MouseEvent) => void = () => {}) => [() => void, (now = true) => void];
 ```
 
-This function takes a mouse button (0..15), an optional MouseEvent function to act as the mousemove event handler, and an optional function to be run on mouseup.
+This function takes a mouse button (0..15), an optional [MouseEvent](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent) function to act as the mousemove event handler, and an optional function to be run on mouseup.
 
 The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any mouseup event handler unless false is passed into the function.
 
-NB: If the window loses focus, the module will generate a mouseup event. This can be detected be checking the Event.isTrusted field.
+NB: If the window loses focus, the module will generate a mouseup event. This can be detected be checking the [Event.isTrusted](https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted) field.
 
 ### <a name="events_mousemoveevent">mouseMoveEvent</a>
 ```typescript
 (onmousemove: (e: MouseEvent) => void, onend?: () => void) => [() => void, (now = true) => void];
 ```
 
-This function takes a MouseEvent function and an optional function which will be run when the event deactivates.
+This function takes a [MouseEvent](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent) function and an optional function which will be run when the event deactivates.
 
 The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any mouseup event handler unless false is passed into the function.
 
@@ -545,7 +546,7 @@ The fraction module exports a default class to act as a fractional, infinite pre
 | [max](#fraction_max) | Static Method | Get the larger of two Fractions. |
 | [min](#fraction_min) | Static Method | Get the smaller of two Fractions. |
 | [mul](#fraction_mul) | Method | Multiply Fractions together. |
-| NaN | Static Fraction | A Fraction representing NaN. |
+| NaN | Static Fraction | A Fraction representing [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN). |
 | one | Static Fraction | A Fraction representing 1. |
 | [sign](#fraction_sign) | Method | Returns the sign of the Fraction. |
 | [sub](#fraction_sub) | Method | Subtract one Fraction from another. |
@@ -585,7 +586,7 @@ class Fraction {
 }
 ```
 
-The constructor of Fraction takes a BigInt numerator and an optional BigInt denominator and returns a Fraction accordingly. A zero (0n) denominator would create a Fraction equivelant of NaN.
+The constructor of Fraction takes a [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) numerator and an optional [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) denominator and returns a Fraction accordingly. A zero (0n) denominator would create a Fraction equivalant of [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
 
 ### <a name="fraction_div">div</a>
 ```typescript
@@ -608,7 +609,7 @@ class Fraction {
 }
 ```
 
-The isNaN method returns true if the Fraction is equivelant to NaN, which is when the denominator is equal to zero.
+The isNaN method returns true if the Fraction is equivalant to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN), which is when the denominator is equal to zero.
 
 ### <a name="fraction_max">max</a>
 ```typescript
@@ -617,7 +618,7 @@ class Fraction {
 }
 ```
 
-This static method returns the larger of the two passed Fraction, or NaN is either param is equivelant to NaN.
+This static method returns the larger of the two passed Fraction, or [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN) is either param is equivalant to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
 
 ### <a name="fraction_min">min</a>
 ```typescript
@@ -626,7 +627,7 @@ class Fraction {
 }
 ```
 
-This static method returns the smaller of the two passed Fraction, or NaN is either param is equivelant to NaN.
+This static method returns the smaller of the two passed Fraction, or [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN) is either param is equivalant to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
 
 ### <a name="fraction_mul">mul</a>
 ```typescript
@@ -679,15 +680,15 @@ The toFloat method returns a normal javascript number representation of the Frac
 
 ## <a name="html">html</a>
 
-The html module exports function for the create of HTMLElements.
+The html module exports function for the creation of [HTMLElements](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement).
 
 This module directly imports the [dom](#dom) module.
 
 |  Export  |  Type | Description  |
 |----------|-------|--------------|
 | ns | String | This constant contains the XMLNamespace of HTMLElements. |
-| a abbr address area article aside audio b base bdi bdo blockquote body br button canvas caption cite code col colgroup data datalist dd del details dfn dialog dir div dl dt em embed fieldset figcaption figure font footer form frame frameset h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd label legend li link main map mark marquee menu meta meter nav noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script section select slot small source span strong style sub summary sup table tbody td template textarea tfoot th thead time title tr track u ul video wbr | [DOMBind](#dom_dombind) | Each of these exports is a function which can take either a [Props](#dom_props) param and a [Children](#dom_children) param, or just a [Children](#dom_children) param, both as defined in the [dom](#dom) module, returning an HTMLElement of the exported name, with the attributes and children set. |
-| vare | [DOMBind](#dom_dombind) | This function is as above, for the `var` HTMLElement. |
+| [a](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a) [abbr](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr) [address](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/address) [area](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area) [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/article) [aside](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/aside) [audio](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio) [b](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/b) [base](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) [bdi](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/bdi) [bdo](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/bdo) [blockquote](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/blockquote) [body](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body) [br](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/br) [button](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button) [canvas](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) [caption](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption) [cite](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/cite) [code](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/code) [col](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/col) [colgroup](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/colgroup) [data](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/data) [datalist](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist) [dd](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dd) [del](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/del) [details](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details) [dfn](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dfn) [dialog](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog) [dir](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dir) [div](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div) [dl](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dl) [dt](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dt) [em](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/em) [embed](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/embed) [fieldset](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/fieldset) [figcaption](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/figcaption) [figure](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/figure) [font](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/font) [footer](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/footer) [form](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form) [frame](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/frame) [frameset](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/frameset) [h1](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/h1) [h2](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/h2) [h3](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/h3) [h4](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/h4) [h5](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/h5) [h6](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/h6) [head](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/head) [header](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/header) [hgroup](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/hgroup) [hr](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/hr) [html](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/html) [i](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/i) [iframe](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe) [img](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img) [input](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) [ins](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ins) [kbd](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd) [label](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label) [legend](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/legend) [li](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/li) [link](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link) [main](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/main) [map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/map) [mark](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark) [marquee](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/marquee) [menu](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/menu) [meta](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta) [meter](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meter) [nav](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/nav) [noscript](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/noscript) [object](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object) [ol](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ol) [optgroup](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/optgroup) [option](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option) [output](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/output) [p](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/p) [param](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/param) [picture](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/picture) [pre](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre) [progress](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/progress) [q](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/q) [rp](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/rp) [rt](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/rt) [ruby](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ruby) [s](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/s) [samp](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/samp) [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) [section](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/section) [select](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select) [slot](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot) [small](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/small) [source](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source) [span](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/span) [strong](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/strong) [style](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style) [sub](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sub) [summary](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/summary) [sup](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sup) [table](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table) [tbody](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tbody) [td](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td) [template](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template) [textarea](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea) [tfoot](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tfoot) [th](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th) [thead](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/thead) [time](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/time) [title](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title) [tr](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tr) [track](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/track) [u](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/u) [ul](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ul) [video](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video) [wbr](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/wbr) | [DOMBind](#dom_dombind) | Each of these exports is a function which can take either a [Props](#dom_props) param and a [Children](#dom_children) param, or just a [Children](#dom_children) param, both as defined in the [dom](#dom) module, returning an HTMLElement of the exported name, with the attributes and children set. |
+| vare | [DOMBind](#dom_dombind) | This function is as above, for the [var](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/var) [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement). |
 
 ## <a name="inter">inter</a>
 
@@ -697,7 +698,7 @@ The inter module provides classes to aid with communication between otherwise un
 |----------|--------|---------------|
 | [Pipe](#inter_pipe) | Class | A simple communication class for sending data to multiple clients. |
 | [Requester](#inter_requester) | Class | A simple communication class for multiple clients to request data from a server. |
-| [Subscription](#inter_subscription) | Class | This class provides a multi-firing version of a Promise. |
+| [Subscription](#inter_subscription) | Class | This class provides a multi-firing version of a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise). |
 | [WaitGroup](#inter_waitgroup) | Class | This Class updates clients on the status of multiple threads of operation. |
 | [WaitInfo](#inter_waitinfo) | Type | This type is the info delivered to clients of WaitGroup. |
 
@@ -796,19 +797,18 @@ The responder method sets either the function that will respond to any request, 
 
 ### <a name="inter_subscription">Subscription</a>
 
-The Subscription Class is similar to the Promise class, but any success and error functions can be called multiple times.
-
+The Subscription Class is similar to the [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) class, but any success and error functions can be called multiple times.
 
 |  Method  |  Type  |  Description  |
 |----------|--------|---------------|
 | [bind](#inter_subscription_bind) | Static Method | This method binds the then, error, and cancel functions. |
 | [cancel](#inter_subscription_cancel) | Method | This method sends a cancel signal up the Subscription chain. |
-| [catch](#inter_subscription_catch) | Method | This method acts like the Promise.catch method. |
+| [catch](#inter_subscription_catch) | Method | This method acts like the [Promise.catch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch) method. |
 | [constructor](#inter_subscription_constructor) | Constructor | This constructs a new Subscription. |
-| [finally](#inter_subscription_finally) | Method | This method acts like the Promise.finally method. |
+| [finally](#inter_subscription_finally) | Method | This method acts like the [Promise.finally](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally) method. |
 | [merge](#inter_subscription_merge) | Static Method | This combines several Subscriptions into one. |
 | [splitCancel](#inter_subscription_splitcancel) | Method | This method set all child Subscription objects to remove themselves from this Subscription using the cancel method. |
-| [then](#inter_subscription_then) | Method | This method acts like the Promise.then method. |
+| [then](#inter_subscription_then) | Method | This method acts like the [Promise.then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) method. |
 
 #### <a name="inter_subscription_bind">bind</a>
 ```typescript
@@ -850,7 +850,7 @@ class Subscription<T> {
 }
 ```
 
-The catch method act similarly to the catch method of the Promise class, except that it can be activated multiple times.
+The catch method act similarly to the catch method of the [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) class, except that it can be activated multiple times.
 
 #### <a name="inter_subscription_constructor">constructor</a>
 ```typescript
@@ -874,7 +874,7 @@ class Subscription<T> {
 }
 ```
 
-The finally method act similarly to the finally method of the Promise class, except that it can be activated multiple times.
+The finally method act similarly to the finally method of the [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) class, except that it can be activated multiple times.
 
 #### <a name="inter_subscription_merge">merge</a>
 ```typescript
@@ -903,7 +903,7 @@ class Subscription<T> {
 }
 ```
 
-The then method act similarly to the then method of the Promise class, except that it can be activated multiple times.
+The then method act similarly to the then method of the [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) class, except that it can be activated multiple times.
 
 ### <a name="inter_waitgroup">WaitGroup</a>
 
@@ -978,37 +978,37 @@ The WaitInfo type contains the following data:
 
 ## <a name="load">load</a>
 
-The load module should be included in a separate HTML script element on the page, , and it creates two globally accessible features, which can be added to a TypeScript file with the following declarations:
+The load module should be included in a separate HTML script element on the page, and it creates two globally accessible features, which can be added to a TypeScript file with the following declarations:
 
 declare const pageLoad: Promise<void>;
 declare const include: (url: string) => Promise<Object>;
 
 |  Property  |  Description  |
 |------------|---------------|
-| include    | This function is an alias for the import function, but will be used by jspacker for all importing. |
-| pageLoad   | This is a Promise which is resolved when the page finished loading. |
+| include    | This function is an alias for the import function, but will be used by [jspacker](https://vimagination.zapto.org/jspacker/) for all importing. |
+| pageLoad   | This is a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which is resolved when the page finished loading. |
 
 ## <a name="nodes">nodes</a>
 
-The nodes module contains Classes for aiding in the accessing of DOM Nodes.
+The nodes module contains Classes for aiding in the accessing of DOM [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
-| <a name="nodes_node">node</a> | Symbol | This Symbol is used to specify the Node of a type. |
-| [NodeArray](#nodes_nodearray) | Class | This Class provides Array-like access to DOM Nodes. |
-| [NodeMap](#nodes_nodemap) | Class | This Class provides Map-like access to DOM Nodes. |
+| <a name="nodes_node">node</a> | Symbol | This [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) is used to specify the [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) of a type. |
+| [NodeArray](#nodes_nodearray) | Class | This Class provides [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)-like access to DOM [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s. |
+| [NodeMap](#nodes_nodemap) | Class | This Class provides [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)-like access to DOM [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s. |
 | noSort | Function | A sorting function that does no sorting. |
 | stringSort | Function | A function to sort strings. |
 
 ### <a name="nodes_nodearray">NodeArray</a>
 
-This class provides Array-like access to DOM Nodes, allowing them to be sorted and accessed via position-based indexes.
+This class provides [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)-like access to DOM [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s, allowing them to be sorted and accessed via position-based indexes.
 
-This type implements all fields and methods of the Array interface, except for the following changes:
+This type implements all fields and methods of the [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) interface, except for the following changes:
 
 |  Field  |  Type  |  Differences |
 |---------|--------|--------------|
-| [node]  | Node   | New field to access base Node. |
+| [node]  | Node   | New field to access base [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node). |
 | concat | Method | Returns a normal Array, not a NodeArray. |
 | [constructor](#nodes_nodearray_constructor) | Constructor | Takes very different params to initialise a NodeArray. |
 | copyWithin | Method | Not applicable and throws an error. |
@@ -1030,7 +1030,7 @@ The NodeArray constructor takes a parent element, onto which all [Item](#nodes_i
 
 The sorting function is used to order [Item](#nodes_item)s as they are inserted.
 
-The NodeArray type is wrapped with a Proxy to implement Array-like indexing.
+The NodeArray type is wrapped with a Proxy to implement [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)-like indexing.
 
 #### <a name="nodes_nodearray_from">from</a>
 ```typescript
@@ -1041,7 +1041,7 @@ class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 }
 ```
 
-This function will create a NodeArray from the given parent Node, iterating over every child and running the itemFn to generate an [Item](#nodes_item)  to be append to the NodeArray.
+This function will create a NodeArray from the given parent [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), iterating over every child and running the itemFn to generate an [Item](#nodes_item)  to be append to the NodeArray.
 
 #### <a name="nodes_nodearray_reverse">reverse</a>
 ```typescript
@@ -1059,19 +1059,19 @@ class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 }
 ```
 
-The sort method works much like the Array sort method, but new items will be inserted according to the sorting function provided.
+The sort method works much like the [Array.sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) method, but new items will be inserted according to the sorting function provided.
 
 Running this function with no param will result in the NodeArray being re-sorted according to the existing sorting function.
 
 ### <a name="nodes_nodemap">NodeMap</a>
 
-This class provides Map-like access to DOM Nodes, allowing them to be sorted and accessed via keys.
+This class provides [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)-like access to DOM [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s, allowing them to be sorted and accessed via keys.
 
-This type implements all fields and methods of the Map interface, except for the following changes:
+This type implements all fields and methods of the [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) interface, except for the following changes:
 
 |  Field  |  Type  |  Differences |
 |---------|--------|--------------|
-| [node]  | Node   | New field to access base Node. |
+| [node]  | Node   | New field to access base [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node). |
 | [constructor](#nodes_nodemap_constructor) | Constructor | Takes very different params to initialise a NodeMap. |
 | [insertAfter](#nodes_nodemap_insertAfter) | Method | Inserts an [Item](#nodes_item) after another. |
 | [insertBefore](#nodes_nodemap_insertbefore) | Method | Inserts an [Item](#nodes_item) before another. |
@@ -1168,7 +1168,7 @@ interface {
 }
 ```
 
-This unexported type satifies any type has used the [node](#nodes_node) Symbol to delegate a Node element.
+This unexported type satifies any type has used the [node](#nodes_node) [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) to delegate a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) element.
 
 ## <a name="rpc">rpc</a>
 
@@ -1234,7 +1234,7 @@ The subscribe method will wait for a message with a matching ID, which must be n
 
 ## <a name="settings">settings</a>
 
-The settings module exports convenience classes around the window.localStorage API.
+The settings module exports convenience classes around the [window.localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) API.
 
 |  Export  |  Description  |
 |----------|---------------|
@@ -1330,9 +1330,9 @@ This module directly imports the [dom](#dom) module.
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
 | ns | String | This constant contains the XMLNamespace of SVGElements. |
-| a animate animateMotion animateTransform circle clipPath defs desc ellipse feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix feDiffuseLighting feDisplacementMap feDistantLight feFlood feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile feTurbulence filter foreignObject g image line linearGradient marker mask metadata mpath path pattern polygon polyline radialGradient rect set script stop style svg symbol text textPath title tspan use view | [DOMBind](#dom_dombind) | Each of these exports is a function which can take either a [Props](#dom_props) param and a [Children](#dom_children) param, or just a [Children](#dom_children) param, both as defined in the [dom](#dom) module, returning an SVGElement of the exported name, with the attributes and children set. |
-| switche | [DOMBind](#dom_dombind) | This function is as above, for the `switch` SVGElement. |
-| svgData | Function | This function takes either a SVGSVGElement or a SVGSymbolElement and returns a URL encoded SVG data string. |
+| [a](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/a) [animate](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animate) [animateMotion](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateMotion) [animateTransform](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateTransform) [circle](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle) [clipPath](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath) [defs](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/defs) [desc](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/desc) [ellipse](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse) [feBlend](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feBlend) [feColorMatrix](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix) [feComponentTransfer](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComponentTransfer) [feComposite](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComposite) [feConvolveMatrix](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feConvolveMatrix) [feDiffuseLighting](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDiffuseLighting) [feDisplacementMap](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDisplacementMap) [feDistantLight](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDistantLight) [feFlood](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFlood) [feFuncA](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncA) [feFuncB](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncB) [feFuncG](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncG) [feFuncR](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncR) [feGaussianBlur](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feGaussianBlur) [feImage](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feImage) [feMerge](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMerge) [feMergeNode](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMergeNode) [feMorphology](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMorphology) [feOffset](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feOffset) [fePointLight](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/fePointLight) [feSpecularLighting](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpecularLighting) [feSpotLight](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpotLight) [feTile](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTile) [feTurbulence](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTurbulence) [filter](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/filter) [foreignObject](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/foreignObject) [g](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g) [image](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/image) [line](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/line) [linearGradient](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/linearGradient) [marker](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/marker) [mask](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mask) [metadata](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/metadata) [mpath](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mpath) [path](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path) [pattern](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern) [polygon](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polygon) [polyline](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polyline) [radialGradient](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/radialGradient) [rect](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect) [set](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/set) [script](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/script) [stop](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/stop) [style](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/style) [svg](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg) [symbol](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/symbol) [text](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text) [textPath](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/textPath) [title](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title) [tspan](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tspan) [use](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use) [view](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/view) | [DOMBind](#dom_dombind) | Each of these exports is a function which can take either a [Props](#dom_props) param and a [Children](#dom_children) param, or just a [Children](#dom_children) param, both as defined in the [dom](#dom) module, returning an SVGElement of the exported name, with the attributes and children set. |
+| switche | [DOMBind](#dom_dombind) | This function is as above, for the [switch](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/switch) SVGElement. |
+| svgData | Function | This function takes either a [SVGSVGElement](https://developer.mozilla.org/en-US/docs/Web/API/SVGSVGElement) or a [SVGSymbolElement](https://developer.mozilla.org/en-US/docs/Web/API/SVGSymbolElement) and returns a URL encoded SVG data string. |
 
 ## <a name="windows">windows</a>
 
@@ -1369,11 +1369,11 @@ class BaseElement extends HTMLElement {
 }
 ```
 
-The alert method adds an `alert`-like window to the [WindowElement](#windows_windowelement) or [ShellElement](#windows_shellelement) it was called upon.
+The alert method adds an [alert](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert)-like window to the [WindowElement](#windows_windowelement) or [ShellElement](#windows_shellelement) it was called upon.
 
 The button text is set to the `OK` field of the language object, which can be set with [setLanguage](#windows_setlanguage).
 
-The returned Promise will resolve to true if the button is clicked, and false if the dialog window was closed.
+The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) will resolve to true if the button is clicked, and false if the dialog window was closed.
 
 #### <a name="windows_baseelement_confirm">confirm</a>
 ```typescript
@@ -1382,11 +1382,11 @@ class BaseElement extends HTMLElement {
 }
 ```
 
-The confirm method adds a `confirm`-like window to the [WindowElement](#windows_windowelement) or [ShellElement](#windows_shellelement) it was called upon.
+The confirm method adds a [confirm](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm)-like window to the [WindowElement](#windows_windowelement) or [ShellElement](#windows_shellelement) it was called upon.
 
 The text of the two buttons is set to the `OK` and `CANCEL` fields of the language object, which can be set with [setLanguage](#windows_setlanguage).
 
-The returned Promise will resolve to true if the `OK` button is clicked, and false if the `CANCEL` button was clicked or the dialog window was closed.
+The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) will resolve to true if the `OK` button is clicked, and false if the `CANCEL` button was clicked or the dialog window was closed.
 
 #### <a name="windows_baseelement_prompt">prompt</a>
 ```typescript
@@ -1395,11 +1395,11 @@ class BaseElement extends HTMLElement {
 }
 ```
 
-The prompt method adds a `prompt`-like window to the [WindowElement](#windows_windowelement) or [ShellElement](#windows_shellelement) it was called upon.
+The prompt method adds a [prompt](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt)-like window to the [WindowElement](#windows_windowelement) or [ShellElement](#windows_shellelement) it was called upon.
 
 The button text is set to the `OK` field of the language object, which can be set with [setLanguage](#windows_setlanguage).
 
-The returned Promise will resolve to the text entered if the `OK` button is clicked, or null if the dialog window was closed.
+The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) will resolve to the text entered if the `OK` button is clicked, or null if the dialog window was closed.
 
 ### <a name="windows_setlanguage">setLanguage</a>
 ```typescript
