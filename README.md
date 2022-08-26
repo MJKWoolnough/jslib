@@ -1172,6 +1172,66 @@ This unexported type satifies any type has used the [node](#nodes_node) Symbol t
 
 ## <a name="rpc">rpc</a>
 
+The rpc module implements a JSON RPC class.
+
+This module directly imports the [inter](#inter) module.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [RPC](#rpc_rpc) | Class | A connection neutral JSON RPC class. |
+| <a name="rpc_rpcerror">RPCError</a> | Class | This class is the error type for RPC, and contains a `code` number, `message` string, and a data field for any addition information of the error. |
+
+### <a name="rpc_rpc_conn">Conn</a>
+```typescript
+interface {
+	close: () => void;
+	send: (data: string) => void;
+	when: (sFn: (data: {data: string}) => void, eFn: (error: string) => void) => void;
+}
+```
+
+This unexported type is the interface used by [RPC](#rpc_rpc) to send and receive data. This is implemented by [WSConn](#conn_wsconn).
+
+### <a name="rpc_rpc">RPC</a>
+
+|  Method  |  Description  |
+|----------|---------------|
+| [await](#rpc_rpc_await) | Used to wait for a specific message. |
+| close | Closes the RPC connection. |
+| constructor | Creates an RPC object with a [Conn](#rpc_conn). |
+| reconnect | Reuses the RPC object with a new [Conn](#rpc_conn). |
+| [request](#rpc_rpc_request) | Calls a remote procedure and waits for a response. |
+| [subscribe](#rpc_rpc_subscribe) | Returns data each time a message with a specific ID is received. |
+
+#### <a name="rpc_rpc_await">await</a>
+```typescript
+class RPC {
+	await<T = any>(id: number) => Promise<T>;
+}
+```
+
+The await method will wait for a message with a matching ID, which must be negative, and resolve the promise with the data that message contains.
+
+#### <a name="rpc_rpc_request">request</a>
+```typescript
+class RPC {
+	request<T = any>(method: string, params?: any) => Promise<T>;
+}
+```
+
+The request method calls the remote procedure named by the `method` param, and sends the `params` data, JSON encoded, to it.
+
+The Promise will resolve with the returned data from from the remote procedure call.
+
+#### <a name="rpc_rpc_subscribe">subscribe</a>
+```typescript
+class RPC {
+	subscribe<T = any>(id: number) => Subscription<T>;
+}
+```
+
+The subscribe method will wait for a message with a matching ID, which must be negative, and resolve the [Subscription](#inter_subscription) with the data that message contains for each message with that ID.
+
 ## <a name="settings">settings</a>
 
 ## <a name="svg">svg</a>
