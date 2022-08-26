@@ -1,3 +1,5 @@
+const s = Symbol("s");
+
 abstract class Setting<T> {
 	#name: string;
 	#value: T;
@@ -8,17 +10,17 @@ abstract class Setting<T> {
 	}
 	get name() { return this.#name; }
 	get value() { return this.#value; }
-	s(v: T): string | null {
+	[s](v: T): string | null {
 		return v + "";
 	}
 	set(v: T) {
 		const old = this.#value,
-		      s = this.s(this.#value = v);
+		      sv = this[s](this.#value = v);
 		if (this.#value !== old || this.#value instanceof Object) {
-			if (s === null) {
+			if (sv === null) {
 				window.localStorage.removeItem(this.#name);
 			} else {
-				window.localStorage.setItem(this.#name, s);
+				window.localStorage.setItem(this.#name, sv);
 			}
 			for (const fn of this.#fns) {
 				fn(v);
@@ -41,7 +43,7 @@ export class BoolSetting extends Setting<boolean> {
 	constructor(name: string) {
 		super(name, window.localStorage.getItem(name) !== null);
 	}
-	s(b: boolean) {
+	[s](b: boolean) {
 		return b ? "" : null;
 	}
 }
@@ -94,7 +96,7 @@ export class JSONSetting<T> extends Setting<T> {
 		}
 		super(name, value);
 	}
-	s(v: T) {
+	[s](v: T) {
 		return JSON.stringify(v);
 	}
 }

@@ -1,3 +1,5 @@
+const s = Symbol("s");
+
 class Setting {
 	#name;
 	#value;
@@ -8,17 +10,17 @@ class Setting {
 	}
 	get name() { return this.#name; }
 	get value() { return this.#value; }
-	s(v) {
+	[s](v) {
 		return v + "";
 	}
 	set(v) {
 		const old = this.#value,
-		      s = this.s(this.#value = v);
+		      sv = this[s](this.#value = v);
 		if (this.#value !== old || this.#value instanceof Object) {
-			if (s === null) {
+			if (sv === null) {
 				window.localStorage.removeItem(this.#name);
 			} else {
-				window.localStorage.setItem(this.#name, s);
+				window.localStorage.setItem(this.#name, sv);
 			}
 			for (const fn of this.#fns) {
 				fn(v);
@@ -41,7 +43,7 @@ export class BoolSetting extends Setting {
 	constructor(name) {
 		super(name, window.localStorage.getItem(name) !== null);
 	}
-	s(b) {
+	[s](b) {
 		return b ? "" : null;
 	}
 }
@@ -94,7 +96,7 @@ export class JSONSetting extends Setting {
 		}
 		super(name, value);
 	}
-	s(v) {
+	[s](v) {
 		return JSON.stringify(v);
 	}
 }
