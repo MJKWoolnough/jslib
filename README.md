@@ -1533,4 +1533,11 @@ The focus method will bring the unset a minimise attribute and bring the deepest
 
 ## <a name="windows_taskbar">windows_taskbar</a>
 
+The windows_taskbar module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that provides a taskbar for `Windows` to be managed from and allows the `Windows` to be minimised.
+
+|  Export      |  Type    |  Description |
+|--------------|----------|--------------|
+| shell        | Function | A [DOMBind](#dom_dombind) that creates a ShellElement. |
+| ShellElement | Class    | A drop-in replacement for the [windows](#windows) module [ShellElement](#windows_shellelement). Registered with customElements as `windows-shell-taskbar`. |
+
 ## <a name="windows_taskmanager">windows_taskmanager</a>
