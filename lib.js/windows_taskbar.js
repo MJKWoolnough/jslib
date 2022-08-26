@@ -76,6 +76,6 @@ export class ShellElement extends BaseShellElement {
 	}
 }
 
-customElements.define("windows-shell-taskmanager", ShellElement);
+customElements.define("windows-shell-taskbar", ShellElement);
 
 export const shell = (props, children) => amendNode(new ShellElement(), props, children);
