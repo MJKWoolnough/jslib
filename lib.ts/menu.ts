@@ -1,9 +1,13 @@
 import type {Children, Props} from './dom.js';
 import {amendNode} from './dom.js';
+import {slot} from './html.js';
 
 export class MenuElement extends HTMLElement {
 	constructor() {
 		super();
+		amendNode(this.attachShadow({"mode": "closed"}), [
+			slot({"name": "menu-item"})
+		]);
 	}
 }
 
