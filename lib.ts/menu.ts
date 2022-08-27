@@ -10,12 +10,32 @@ export class MenuElement extends HTMLElement {
 export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
+		amendNode(this, {"slot": "menu-item"});
+
+	}
+	attributeChangedCallback(name: string, _: string, newValue: string) {
+		if (name === "slot" && newValue !== "menu-item") {
+			amendNode(this, {"slot": "menu-item"});
+		}
+	}
+	static get observedAttributes() {
+		return ["slot"];
 	}
 }
 
 export class SubMenuElement extends HTMLElement {
 	constructor() {
 		super();
+		amendNode(this, {"slot": "menu-item"});
+
+	}
+	attributeChangedCallback(name: string, _: string, newValue: string) {
+		if (name === "slot" && newValue !== "menu-item") {
+			amendNode(this, {"slot": "menu-item"});
+		}
+	}
+	static get observedAttributes() {
+		return ["slot"];
 	}
 }
 
