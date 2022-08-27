@@ -5,9 +5,18 @@ import {slot} from './html.js';
 export class MenuElement extends HTMLElement {
 	constructor() {
 		super();
+		amendNode(this, {"slot": "menu"});
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			slot({"name": "menu-item"})
 		]);
+	}
+	attributeChangedCallback(name: string, _: string, newValue: string) {
+		if (name === "slot" && newValue !== "menu") {
+			amendNode(this, {"slot": "menu"});
+		}
+	}
+	static get observedAttributes() {
+		return ["slot"];
 	}
 }
 
@@ -37,6 +46,9 @@ export class SubMenuElement extends HTMLElement {
 		if (name === "slot" && newValue !== "menu-item") {
 			amendNode(this, {"slot": "menu-item"});
 		}
+		amendNode(this.attachShadow({"mode": "closed"}), [
+			slot({"name": "menu-item"})
+		]);
 	}
 	static get observedAttributes() {
 		return ["slot"];
