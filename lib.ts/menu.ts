@@ -4,6 +4,10 @@ import {slot, style} from './html.js';
 
 const updateItems = Symbol("addItem");
 
+interface Updater extends Node {
+	[updateItems]?: () => void;
+}
+
 export class MenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
 	constructor() {
@@ -22,14 +26,10 @@ export class MenuElement extends HTMLElement {
 		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
 	}
 	connectedCallback() {
-		if (this.parentNode instanceof SubMenuElement) {
-			this.parentNode[updateItems]();
-		}
+		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 	disconnectedCallback() {
-		if (this.parentNode instanceof MenuElement || this.parentNode instanceof SubMenuElement) {
-			this.parentNode[updateItems]();
-		}
+		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 	static get observedAttributes() {
 		return ["slot"];
@@ -42,14 +42,10 @@ export class ItemElement extends HTMLElement {
 		amendNode(this, {"slot": "menu-item"});
 	}
 	connectedCallback() {
-		if (this.parentNode instanceof MenuElement || this.parentNode instanceof SubMenuElement) {
-			this.parentNode[updateItems]();
-		}
+		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 	disconnectedCallback() {
-		if (this.parentNode instanceof MenuElement || this.parentNode instanceof SubMenuElement) {
-			this.parentNode[updateItems]();
-		}
+		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 }
 
@@ -80,14 +76,10 @@ export class SubMenuElement extends HTMLElement {
 		}
 	}
 	connectedCallback() {
-		if (this.parentNode instanceof MenuElement) {
-			this.parentNode[updateItems]();
-		}
+		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 	disconnectedCallback() {
-		if (this.parentNode instanceof MenuElement) {
-			this.parentNode[updateItems]();
-		}
+		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 }
 
