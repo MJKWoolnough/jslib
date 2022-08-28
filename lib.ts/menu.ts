@@ -40,16 +40,27 @@ export class ItemElement extends HTMLElement {
 
 export class SubMenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
+	#m: MenuElement | null = null;
 	constructor() {
 		super();
 		amendNode(this, {"slot": "menu-item"});
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot());
 	}
 	[updateItems]() {
+		let set = false;
+		this.#m = null;
 		for (const c of this.children) {
-			if (c instanceof ItemElement) {
+			if (c instanceof ItemElement && !set) {
 				this.#s.assign(c);
-				return;
+				if (this.#m) {
+					return;
+				}
+				set = true;
+			} else if (c instanceof MenuElement && !this.#m) {
+				this.#m = c;
+				if (set) {
+					return;
+				}
 			}
 		}
 	}
