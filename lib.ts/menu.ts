@@ -21,11 +21,6 @@ export class MenuElement extends HTMLElement {
 	[updateItems]() {
 		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
 	}
-	attributeChangedCallback(name: string, _: string, newValue: string) {
-		if (name === "slot" && newValue !== "menu") {
-			amendNode(this, {"slot": "menu"});
-		}
-	}
 	static get observedAttributes() {
 		return ["slot"];
 	}
@@ -37,17 +32,26 @@ export class ItemElement extends HTMLElement {
 		amendNode(this, {"slot": "menu-item"});
 	}
 	connectedCallback() {
-		if (this.parentNode instanceof MenuElement) {
+		if (this.parentNode instanceof MenuElement || this.parentNode instanceof SubMenuElement) {
 			this.parentNode[updateItems]();
 		}
 	}
 }
 
 export class SubMenuElement extends HTMLElement {
+	#s: HTMLSlotElement;
 	constructor() {
 		super();
 		amendNode(this, {"slot": "menu-item"});
-		amendNode(this.attachShadow({"mode": "closed"}), slot());
+		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot());
+	}
+	[updateItems]() {
+		for (const c of this.children) {
+			if (c instanceof ItemElement) {
+				this.#s.assign(c);
+				return;
+			}
+		}
 	}
 	connectedCallback() {
 		if (this.parentNode instanceof MenuElement) {
