@@ -1,12 +1,17 @@
 import type {Children, Props} from './dom.js';
 import {amendNode} from './dom.js';
-import {slot} from './html.js';
+import {slot, style} from './html.js';
 
 export class MenuElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this, {"slot": "menu"});
 		amendNode(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, `
+:host {
+	display: block;
+}
+			`),
 			slot({"name": "menu-item"})
 		]);
 	}
@@ -24,7 +29,14 @@ export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this, {"slot": "menu-item"});
-
+		amendNode(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, `
+:host {
+	display: block;
+}
+			`),
+			slot()
+		]);
 	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		if (name === "slot" && newValue !== "menu-item") {
@@ -47,6 +59,11 @@ export class SubMenuElement extends HTMLElement {
 			amendNode(this, {"slot": "menu-item"});
 		}
 		amendNode(this.attachShadow({"mode": "closed"}), [
+			style({"type": "text/css"}, `
+:host {
+	display: block;
+}
+			`),
 			slot({"name": "menu-item"})
 		]);
 	}
