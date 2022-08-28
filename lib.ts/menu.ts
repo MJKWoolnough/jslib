@@ -26,6 +26,11 @@ export class MenuElement extends HTMLElement {
 			this.parentNode[updateItems]();
 		}
 	}
+	disconnectedCallback() {
+		if (this.parentNode instanceof MenuElement || this.parentNode instanceof SubMenuElement) {
+			this.parentNode[updateItems]();
+		}
+	}
 	static get observedAttributes() {
 		return ["slot"];
 	}
@@ -37,6 +42,11 @@ export class ItemElement extends HTMLElement {
 		amendNode(this, {"slot": "menu-item"});
 	}
 	connectedCallback() {
+		if (this.parentNode instanceof MenuElement || this.parentNode instanceof SubMenuElement) {
+			this.parentNode[updateItems]();
+		}
+	}
+	disconnectedCallback() {
 		if (this.parentNode instanceof MenuElement || this.parentNode instanceof SubMenuElement) {
 			this.parentNode[updateItems]();
 		}
@@ -70,6 +80,11 @@ export class SubMenuElement extends HTMLElement {
 		}
 	}
 	connectedCallback() {
+		if (this.parentNode instanceof MenuElement) {
+			this.parentNode[updateItems]();
+		}
+	}
+	disconnectedCallback() {
 		if (this.parentNode instanceof MenuElement) {
 			this.parentNode[updateItems]();
 		}
