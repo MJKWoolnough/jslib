@@ -21,6 +21,11 @@ export class MenuElement extends HTMLElement {
 	[updateItems]() {
 		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
 	}
+	connectedCallback() {
+		if (this.parentNode instanceof SubMenuElement) {
+			this.parentNode[updateItems]();
+		}
+	}
 	static get observedAttributes() {
 		return ["slot"];
 	}
