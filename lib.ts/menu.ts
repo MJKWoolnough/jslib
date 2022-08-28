@@ -18,7 +18,7 @@ export class MenuElement extends HTMLElement {
 :host, ::slotted(context-item), ::slotted(context-submenu){
 	display: block;
 }
-			`),
+`),
 			this.#s = slot()
 		]);
 	}
