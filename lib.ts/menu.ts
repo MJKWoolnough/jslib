@@ -8,7 +8,7 @@ export class MenuElement extends HTMLElement {
 		amendNode(this, {"slot": "menu"});
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
-:host {
+:host, ::slotted(context-item), ::slotted(context-submenu){
 	display: block;
 }
 			`),
@@ -29,14 +29,6 @@ export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this, {"slot": "menu-item"});
-		amendNode(this.attachShadow({"mode": "closed"}), [
-			style({"type": "text/css"}, `
-:host {
-	display: block;
-}
-			`),
-			slot()
-		]);
 	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		if (name === "slot" && newValue !== "menu-item") {
@@ -58,14 +50,7 @@ export class SubMenuElement extends HTMLElement {
 		if (name === "slot" && newValue !== "menu-item") {
 			amendNode(this, {"slot": "menu-item"});
 		}
-		amendNode(this.attachShadow({"mode": "closed"}), [
-			style({"type": "text/css"}, `
-:host {
-	display: block;
-}
-			`),
-			slot({"name": "menu-item"})
-		]);
+		amendNode(this.attachShadow({"mode": "closed"}), slot({"name": "menu-item"}));
 	}
 	static get observedAttributes() {
 		return ["slot"];
