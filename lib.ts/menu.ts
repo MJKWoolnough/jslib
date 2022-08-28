@@ -12,7 +12,6 @@ export class MenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
 	constructor() {
 		super();
-		amendNode(this, {"slot": "menu"});
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			style({"type": "text/css"}, `
 :host, ::slotted(context-item), ::slotted(context-submenu){
@@ -39,7 +38,6 @@ export class MenuElement extends HTMLElement {
 export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
-		amendNode(this, {"slot": "menu-item"});
 	}
 	connectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
@@ -54,7 +52,6 @@ export class SubMenuElement extends HTMLElement {
 	#m: MenuElement | null = null;
 	constructor() {
 		super();
-		amendNode(this, {"slot": "menu-item"});
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot());
 	}
 	[updateItems]() {
