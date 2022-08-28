@@ -2,18 +2,24 @@ import type {Children, Props} from './dom.js';
 import {amendNode} from './dom.js';
 import {slot, style} from './html.js';
 
+const updateItems = Symbol("addItem");
+
 export class MenuElement extends HTMLElement {
+	#s: HTMLSlotElement;
 	constructor() {
 		super();
 		amendNode(this, {"slot": "menu"});
-		amendNode(this.attachShadow({"mode": "closed"}), [
+		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			style({"type": "text/css"}, `
 :host, ::slotted(context-item), ::slotted(context-submenu){
 	display: block;
 }
 			`),
-			slot({"name": "menu-item"})
+			this.#s = slot()
 		]);
+	}
+	[updateItems]() {
+		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
 	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		if (name === "slot" && newValue !== "menu") {
@@ -30,13 +36,10 @@ export class ItemElement extends HTMLElement {
 		super();
 		amendNode(this, {"slot": "menu-item"});
 	}
-	attributeChangedCallback(name: string, _: string, newValue: string) {
-		if (name === "slot" && newValue !== "menu-item") {
-			amendNode(this, {"slot": "menu-item"});
+	connectedCallback() {
+		if (this.parentNode instanceof MenuElement) {
+			this.parentNode[updateItems]();
 		}
-	}
-	static get observedAttributes() {
-		return ["slot"];
 	}
 }
 
@@ -44,16 +47,12 @@ export class SubMenuElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this, {"slot": "menu-item"});
-
+		amendNode(this.attachShadow({"mode": "closed"}), slot());
 	}
-	attributeChangedCallback(name: string, _: string, newValue: string) {
-		if (name === "slot" && newValue !== "menu-item") {
-			amendNode(this, {"slot": "menu-item"});
+	connectedCallback() {
+		if (this.parentNode instanceof MenuElement) {
+			this.parentNode[updateItems]();
 		}
-		amendNode(this.attachShadow({"mode": "closed"}), slot({"name": "menu-item"}));
-	}
-	static get observedAttributes() {
-		return ["slot"];
 	}
 }
 
