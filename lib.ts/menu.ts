@@ -43,6 +43,9 @@ export class ItemElement extends HTMLElement {
 	disconnectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
+	select() {
+		this.dispatchEvent(new CustomEvent("select"));
+	}
 }
 
 export class SubMenuElement extends HTMLElement {
