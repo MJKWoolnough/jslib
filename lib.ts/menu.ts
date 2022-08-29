@@ -60,6 +60,7 @@ export class ItemElement extends HTMLElement {
 
 export class SubMenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
+	#p: HTMLSlotElement;
 	#m: MenuElement | null = null;
 	constructor() {
 		super();
@@ -69,7 +70,8 @@ export class SubMenuElement extends HTMLElement {
 	display: block;
 }
 `),
-			this.#s = slot()
+			this.#s = slot(),
+			this.#p = slot()
 		]);
 	}
 	[updateItems]() {
@@ -97,6 +99,9 @@ export class SubMenuElement extends HTMLElement {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 	select() {
+		if (this.#m) {
+			this.#p.assign(this.#m);
+		}
 	}
 }
 
