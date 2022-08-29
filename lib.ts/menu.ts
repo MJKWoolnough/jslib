@@ -14,7 +14,7 @@ export class MenuElement extends HTMLElement {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			style({"type": "text/css"}, `
-:host, ::slotted(context-item), ::slotted(context-submenu){
+:host, ::slotted(context-item), ::slotted(context-submenu) {
 	display: block;
 }
 `),
