@@ -16,6 +16,7 @@ export class MenuElement extends HTMLElement {
 			style({"type": "text/css"}, `
 :host, ::slotted(context-item), ::slotted(context-submenu) {
 	display: block;
+	user-select: none;
 }
 `),
 			this.#s = slot()
