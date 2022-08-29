@@ -54,7 +54,11 @@ export class ItemElement extends HTMLElement {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 	select() {
-		this.dispatchEvent(new CustomEvent("select"));
+		if (this.parentNode instanceof SubMenuElement) {
+			this.parentNode.select();
+		} else {
+			this.dispatchEvent(new CustomEvent("select"));
+		}
 	}
 }
 
