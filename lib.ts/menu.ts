@@ -24,7 +24,7 @@ export class MenuElement extends HTMLElement {
 		amendNode(this, {"onclick": (e: MouseEvent) => {
 			let t = e.target as ParentNode | null;
 			while (t && t !== this) {
-				if (t instanceof ItemElement) {
+				if (t instanceof ItemElement || t instanceof SubMenuElement) {
 					t.select();
 					break;
 				}
@@ -95,6 +95,8 @@ export class SubMenuElement extends HTMLElement {
 	}
 	disconnectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
+	}
+	select() {
 	}
 }
 
