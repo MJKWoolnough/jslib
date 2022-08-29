@@ -21,6 +21,16 @@ export class MenuElement extends HTMLElement {
 `),
 			this.#s = slot()
 		]);
+		amendNode(this, {"onclick": (e: MouseEvent) => {
+			let t = e.target as ParentNode | null;
+			while (t && t !== this) {
+				if (t instanceof ItemElement) {
+					t.select();
+					break;
+				}
+				t = t.parentNode;
+			}
+		}});
 	}
 	[updateItems]() {
 		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
