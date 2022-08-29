@@ -52,7 +52,14 @@ export class SubMenuElement extends HTMLElement {
 	#m: MenuElement | null = null;
 	constructor() {
 		super();
-		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot());
+		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
+			style({"type": "text/css"}, `
+::slotted(context-item) {
+	display: block;
+}
+`),
+			this.#s = slot()
+		]);
 	}
 	[updateItems]() {
 		let set = false;
