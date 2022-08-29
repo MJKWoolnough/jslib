@@ -37,9 +37,6 @@ export class MenuElement extends HTMLElement {
 }
 
 export class ItemElement extends HTMLElement {
-	constructor() {
-		super();
-	}
 	connectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
