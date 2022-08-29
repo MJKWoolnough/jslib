@@ -14,7 +14,7 @@ export class MenuElement extends HTMLElement {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			style({"type": "text/css"}, `
-:host, ::slotted(context-item), ::slotted(context-submenu) {
+:host, ::slotted(menu-item), ::slotted(menu-submenu) {
 	display: block;
 	user-select: none;
 }
@@ -52,7 +52,7 @@ export class SubMenuElement extends HTMLElement {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			style({"type": "text/css"}, `
-::slotted(context-item) {
+::slotted(menu-item) {
 	display: block;
 }
 `),
@@ -85,9 +85,9 @@ export class SubMenuElement extends HTMLElement {
 	}
 }
 
-customElements.define("context-menu", MenuElement);
-customElements.define("context-item", ItemElement);
-customElements.define("context-submenu", SubMenuElement);
+customElements.define("menu-menu", MenuElement);
+customElements.define("menu-item", ItemElement);
+customElements.define("menu-submenu", SubMenuElement);
 
 export const menu = (props?: Props | Children, children?: Children) => amendNode(new MenuElement(), props, children),
 item = (props?: Props | Children, children?: Children) => amendNode(new ItemElement(), props, children),
