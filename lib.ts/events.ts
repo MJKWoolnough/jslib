@@ -16,7 +16,7 @@ const maxMouseButton = 16,
       held = new Set<string>(),
       downs = new Map<string, Set<[KeyFn, boolean]>>(),
       ups = new Map<string, Set<[KeyFn, boolean]>>(),
-      e = <T = MouseEventInit | KeyboardEventInit>(o: T): EventModifierInit => Object.assign(o, mods),
+      e = <T extends MouseEventInit | KeyboardEventInit>(o: T): EventModifierInit => Object.assign(o, mods),
       ke = (event: "down" | "up", key: string) => new KeyboardEvent(`key${event}`, e({key})),
       me = (button: MouseButton) => new MouseEvent(`mouseup`, e({
 	button,
