@@ -160,7 +160,7 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
 
 export class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 	#root: Root<T, H>;
-	[realTarget]: this;
+	[realTarget]!: this;
 	constructor(h: H, s: sortFunc<T> = noSort, elements: Iterable<T> = []) {
 		const root = this.#root = {s, h, l: 0, o: 1} as Root<T, H>;
 		Object.defineProperty(this, realTarget, {"value": this});
