@@ -10,6 +10,8 @@ interface Updater extends Node {
 
 export class MenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
+	#x = 0;
+	#y = 0;
 	constructor() {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
@@ -32,11 +34,30 @@ export class MenuElement extends HTMLElement {
 			}
 		}});
 	}
+	attributeChangedCallback(name: string, _: string, newValue: string) {
+		const v = parseInt(newValue);
+		if (!isNaN(v)) {
+			switch (name) {
+			case "x":
+				this.#x = v;
+				break;
+			case "y":
+				this.#y = v;
+			}
+		}
+	}
+	static get observedAttributes() {
+		return ["x", "y"];
+	}
 	[updateItems]() {
 		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
 	}
 	connectedCallback() {
-		(this.parentNode as Updater | null)?.[updateItems]?.();
+		if (this.parentNode instanceof MenuElement || this.parentNode instanceof SubMenuElement) {
+			this.parentNode[updateItems]();
+		} else {
+			amendNode(this, {"style": {"position": "absolute", "left": this.#x + "px", "top": this.#y + "px"}});
+		}
 	}
 	disconnectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
