@@ -16,7 +16,10 @@ export class MenuElement extends HTMLElement {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			style({"type": "text/css"}, `
-:host, ::slotted(menu-item), ::slotted(menu-submenu) {
+:host {
+	display: inline-block;
+}
+::slotted(menu-item), ::slotted(menu-submenu) {
 	display: block;
 	user-select: none;
 }
