@@ -58,6 +58,7 @@ export class MenuElement extends HTMLElement {
 	[blur]() {
 		setTimeout(() => {
 			if (!this.contains(document.activeElement)) {
+				(this.parentNode as Updater | null)?.[blur]?.();
 				this.remove();
 			}
 		});
@@ -141,6 +142,14 @@ export class SubMenuElement extends HTMLElement {
 	select() {
 		if (this.#m) {
 			this.#p.assign(this.#m);
+		}
+	}
+	focus() {
+		for (const c of this.children) {
+			if (c instanceof ItemElement) {
+				c.focus();
+				return;
+			}
 		}
 	}
 	[blur]() {
