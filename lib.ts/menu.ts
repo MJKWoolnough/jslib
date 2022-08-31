@@ -56,7 +56,7 @@ export class MenuElement extends HTMLElement {
 		if (this.parentNode instanceof SubMenuElement) {
 			this.parentNode[updateItems]();
 		} else {
-			amendNode(this, {"style": {"position": "absolute", "max-width": this.offsetParent!.clientWidth + "px", "max-height": this.offsetParent!.clientHeight + "px", "left": Math.max(this.#x + this.clientWidth < this.offsetParent!.clientWidth ? this.#x : this.#x - this.clientWidth) + "px", "top": Math.max(this.#y + this.clientHeight < this.offsetParent!.clientHeight ? this.#y : this.#y - this.clientHeight, 0) + "px"}});
+			amendNode(this, {"style": {"position": "absolute", "max-width": this.offsetParent!.clientWidth + "px", "max-height": this.offsetParent!.clientHeight + "px", "left": Math.max(this.#x + this.clientWidth < this.offsetParent!.clientWidth ? this.#x : this.#x - this.clientWidth, 0) + "px", "top": Math.max(this.#y + this.clientHeight < this.offsetParent!.clientHeight ? this.#y : this.#y - this.clientHeight, 0) + "px"}});
 		}
 	}
 	disconnectedCallback() {
