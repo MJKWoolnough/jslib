@@ -53,7 +53,7 @@ export class MenuElement extends HTMLElement {
 		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
 	}
 	connectedCallback() {
-		if (this.parentNode instanceof MenuElement || this.parentNode instanceof SubMenuElement) {
+		if (this.parentNode instanceof SubMenuElement) {
 			this.parentNode[updateItems]();
 		} else {
 			amendNode(this, {"style": {"position": "absolute", "max-width": this.offsetParent!.clientWidth + "px", "max-height": this.offsetParent!.clientHeight + "px", "left": Math.max(this.#x + this.clientWidth < this.offsetParent!.clientWidth ? this.#x : this.#x - this.clientWidth) + "px", "top": Math.max(this.#y + this.clientHeight < this.offsetParent!.clientHeight ? this.#y : this.#y - this.clientHeight, 0) + "px"}});
