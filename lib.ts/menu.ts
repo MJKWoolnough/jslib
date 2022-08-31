@@ -68,6 +68,10 @@ export class MenuElement extends HTMLElement {
 }
 
 export class ItemElement extends HTMLElement {
+	constructor() {
+		super();
+		amendNode(this, {"tabindex": -1});
+	}
 	connectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
