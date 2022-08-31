@@ -2,7 +2,8 @@ import type {Children, Props} from './dom.js';
 import {amendNode} from './dom.js';
 import {slot, style} from './html.js';
 
-const updateItems = Symbol("addItem");
+const updateItems = Symbol("addItem"),
+      blur = Symbol("blur");
 
 interface Updater extends Node {
 	[updateItems]?: () => void;
@@ -18,6 +19,7 @@ export class MenuElement extends HTMLElement {
 			style({"type": "text/css"}, `
 :host {
 	display: inline-block;
+	outline: none;
 }
 ::slotted(menu-item), ::slotted(menu-submenu) {
 	display: block;
@@ -35,7 +37,7 @@ export class MenuElement extends HTMLElement {
 				}
 				t = t.parentNode;
 			}
-		}});
+		}, "tabindex": -1, "onblur": () => this[blur]()});
 	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		const v = parseInt(newValue);
@@ -52,6 +54,9 @@ export class MenuElement extends HTMLElement {
 	static get observedAttributes() {
 		return ["x", "y"];
 	}
+	[blur]() {
+		this.remove();
+	}
 	[updateItems]() {
 		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
 	}
@@ -59,6 +64,7 @@ export class MenuElement extends HTMLElement {
 		if (this.parentNode instanceof SubMenuElement) {
 			this.parentNode[updateItems]();
 		} else {
+			this.focus();
 			amendNode(this, {"style": {"position": "absolute", "max-width": this.offsetParent!.clientWidth + "px", "max-height": this.offsetParent!.clientHeight + "px", "left": Math.max(this.#x + this.clientWidth < this.offsetParent!.clientWidth ? this.#x : this.#x - this.clientWidth, 0) + "px", "top": Math.max(this.#y + this.clientHeight < this.offsetParent!.clientHeight ? this.#y : this.#y - this.clientHeight, 0) + "px"}});
 		}
 	}
