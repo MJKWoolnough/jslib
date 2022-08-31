@@ -7,6 +7,7 @@ const updateItems = Symbol("addItem"),
 
 interface Updater extends Node {
 	[updateItems]?: () => void;
+	[blur]?: () => void;
 }
 
 export class MenuElement extends HTMLElement {
@@ -55,7 +56,11 @@ export class MenuElement extends HTMLElement {
 		return ["x", "y"];
 	}
 	[blur]() {
-		this.remove();
+		setTimeout(() => {
+			if (!this.contains(document.activeElement)) {
+				this.remove();
+			}
+		});
 	}
 	[updateItems]() {
 		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
@@ -76,7 +81,7 @@ export class MenuElement extends HTMLElement {
 export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
-		amendNode(this, {"tabindex": -1});
+		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as Updater | null)?.[blur]?.()});
 	}
 	connectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
@@ -137,6 +142,9 @@ export class SubMenuElement extends HTMLElement {
 		if (this.#m) {
 			this.#p.assign(this.#m);
 		}
+	}
+	[blur]() {
+		(this.parentNode as Updater | null)?.[blur]?.();
 	}
 }
 
