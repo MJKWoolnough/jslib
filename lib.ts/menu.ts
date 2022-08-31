@@ -41,9 +41,6 @@ export class MenuElement extends HTMLElement {
 	disconnectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
-	static get observedAttributes() {
-		return ["slot"];
-	}
 }
 
 export class ItemElement extends HTMLElement {
