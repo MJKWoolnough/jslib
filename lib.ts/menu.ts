@@ -106,8 +106,8 @@ export class ItemElement extends HTMLElement {
 	select() {
 		if (this.parentNode instanceof SubMenuElement) {
 			this.parentNode.select();
-		} else {
-			this.dispatchEvent(new CustomEvent("select"));
+		} else if (this.dispatchEvent(new CustomEvent("select", {"cancelable": true}))) {
+			this.blur();
 		}
 	}
 }
