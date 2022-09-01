@@ -19,8 +19,14 @@ export class MenuElement extends HTMLElement {
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			style({"type": "text/css"}, `
 :host {
-	display: inline-block;
 	outline: none;
+}
+:host(:not([scroll])) {
+	display: inline-flex;
+	flex-flow: column wrap;
+}
+:host([scroll]) {
+	overflow-y: scroll;
 }
 ::slotted(menu-item), ::slotted(menu-submenu) {
 	display: block;
@@ -70,8 +76,15 @@ export class MenuElement extends HTMLElement {
 		if (this.parentNode instanceof SubMenuElement) {
 			this.parentNode[updateItems]();
 		} else {
-			this.focus();
-			amendNode(this, {"style": {"position": "absolute", "max-width": this.offsetParent!.clientWidth + "px", "max-height": this.offsetParent!.clientHeight + "px", "left": Math.max(this.#x + this.clientWidth < this.offsetParent!.clientWidth ? this.#x : this.#x - this.clientWidth, 0) + "px", "top": Math.max(this.#y + this.clientHeight < this.offsetParent!.clientHeight ? this.#y : this.#y - this.clientHeight, 0) + "px"}});
+			const {offsetParent} = this;
+			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}});
+
+			setTimeout(() => {
+				const scroll = this.hasAttribute("scroll"),
+				      width = scroll ? this.offsetWidth : this.scrollWidth + this.scrollWidth - this.clientWidth;
+				amendNode(this, {"style": {"visibility": undefined, "position": "absolute", "width": this.hasAttribute("scroll") ? undefined : width + "px", "left": Math.max(this.#x + width < offsetParent!.clientWidth ? this.#x : this.#x - width, 0) + "px", "top": Math.max(this.#y + this.offsetHeight < offsetParent!.clientHeight ? this.#y : this.#y - this.offsetHeight, 0) + "px"}});
+				this.focus();
+			});
 		}
 	}
 	disconnectedCallback() {
