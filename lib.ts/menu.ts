@@ -64,8 +64,11 @@ export class MenuElement extends HTMLElement {
 	[blur]() {
 		setTimeout(() => {
 			if (!this.contains(document.activeElement)) {
-				(this.parentNode as Updater | null)?.[blur]?.();
-				this.remove();
+				if (this.parentNode instanceof SubMenuElement) {
+					this.parentNode[blur]();
+				} else {
+					this.remove();
+				}
 			}
 		});
 	}
@@ -166,6 +169,7 @@ export class SubMenuElement extends HTMLElement {
 		}
 	}
 	[blur]() {
+		this.#p.assign();
 		(this.parentNode as Updater | null)?.[blur]?.();
 	}
 }
