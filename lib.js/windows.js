@@ -329,7 +329,7 @@ export class WindowElement extends BaseElement {
 			c.remove();
 			this.#child = null;
 		}
-		this.dispatchEvent(new CustomEvent("remove", {"cancelable": false}));
+		this.dispatchEvent(new CustomEvent("remove"));
 	}
 	attributeChangedCallback(name, _, newValue) {
 		switch (name) {
