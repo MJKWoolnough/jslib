@@ -35,16 +35,7 @@ export class MenuElement extends HTMLElement {
 `),
 			this.#s = slot()
 		]);
-		amendNode(this, {"onclick": (e: MouseEvent) => {
-			let t = e.target as ParentNode | null;
-			while (t && t !== this) {
-				if (t instanceof ItemElement || t instanceof SubMenuElement) {
-					t.select();
-					break;
-				}
-				t = t.parentNode;
-			}
-		}, "tabindex": -1, "onblur": () => this[blur]()});
+		amendNode(this, {"tabindex": -1, "onblur": () => this[blur]()});
 	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		const v = parseInt(newValue);
@@ -98,7 +89,7 @@ export class MenuElement extends HTMLElement {
 export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
-		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as Updater | null)?.[blur]?.()});
+		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as Updater | null)?.[blur]?.(), "onclick": () => this.select()});
 	}
 	connectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
