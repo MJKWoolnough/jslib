@@ -84,7 +84,7 @@ export class MenuElement extends HTMLElement {
 
 			setTimeout(() => {
 				const scroll = this.hasAttribute("scroll"),
-				      width = scroll ? this.offsetWidth : this.scrollWidth + this.scrollWidth - this.clientWidth;
+				      width = scroll ? this.offsetWidth : this.scrollWidth * 2 - this.clientWidth;
 				amendNode(this, {"style": {"visibility": undefined, "position": "absolute", "width": this.hasAttribute("scroll") ? undefined : width + "px", "left": Math.max(this.#x + width < offsetParent!.clientWidth ? this.#x : this.#x - width, 0) + "px", "top": Math.max(this.#y + this.offsetHeight < offsetParent!.clientHeight ? this.#y : this.#y - this.offsetHeight, 0) + "px"}});
 				this.focus();
 			});
@@ -172,7 +172,7 @@ export class SubMenuElement extends HTMLElement {
 			this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}}));
 			setTimeout(() => {
 				const scroll = m.hasAttribute("scroll"),
-				      width = scroll ? m.offsetWidth : m.scrollWidth + m.scrollWidth - m.clientWidth;
+				      width = scroll ? m.offsetWidth : m.scrollWidth * 2 - m.clientWidth;
 				amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": scroll ? undefined : width + "px", "left": Math.max(x + width < offsetParent!.clientWidth ? x : x - width, 0) - xShift + "px", "top": Math.max(y + this.offsetHeight < offsetParent!.clientHeight ? y : y - this.offsetHeight, 0) - yShift + "px"}});
 				this.#f = true;
 				m.focus();
