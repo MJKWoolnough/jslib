@@ -3,7 +3,8 @@ import {amendNode} from './dom.js';
 import {slot, style} from './html.js';
 
 const updateItems = Symbol("addItem"),
-      blur = Symbol("blur");
+      blur = Symbol("blur"),
+      disconnect = Symbol("disconnect");
 
 interface Updater extends Node {
 	[updateItems]?: () => void;
@@ -83,6 +84,11 @@ export class MenuElement extends HTMLElement {
 	}
 	disconnectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
+		for (const c of this.children) {
+			if (c instanceof SubMenuElement) {
+				c[disconnect]();
+			}
+		}
 	}
 }
 
@@ -186,6 +192,14 @@ export class SubMenuElement extends HTMLElement {
 			this.#p.assign();
 			(this.parentNode as Updater | null)?.[blur]?.();
 		}
+	}
+	[disconnect]() {
+		for (const c of this.#m?.children ?? []) {
+			if (c instanceof SubMenuElement) {
+				c[disconnect]();
+			}
+		}
+		this.#p.assign();
 	}
 }
 
