@@ -124,7 +124,10 @@ export class SubMenuElement extends HTMLElement {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			style({"type": "text/css"}, `
-::slotted(menu-item) {
+:host {
+	position: relative;
+}
+::slotted(menu-item), ::slotted(menu-menu) {
 	display: block;
 }
 `),
@@ -162,9 +165,7 @@ export class SubMenuElement extends HTMLElement {
 			let offsetParent = this.offsetParent,
 			    xShift = 0,
 			    yShift = 0;
-			const x = 0,
-			      y = 0;
-			while (offsetParent instanceof MenuElement) {
+			while (offsetParent instanceof MenuElement || offsetParent instanceof SubMenuElement) {
 				xShift += offsetParent.offsetLeft;
 				yShift += offsetParent.offsetTop;
 				offsetParent = offsetParent.offsetParent;
@@ -172,8 +173,8 @@ export class SubMenuElement extends HTMLElement {
 			this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}}));
 			setTimeout(() => {
 				const scroll = m.hasAttribute("scroll"),
-				      width = scroll ? m.offsetWidth : m.scrollWidth * 2 - m.clientWidth;
-				amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": scroll ? undefined : width + "px", "left": Math.max(x + width < offsetParent!.clientWidth ? x : x - width, 0) - xShift + "px", "top": Math.max(y + this.offsetHeight < offsetParent!.clientHeight ? y : y - this.offsetHeight, 0) - yShift + "px"}});
+				      width = scroll ? m.offsetWidth : Math.max(m.offsetWidth, m.scrollWidth) * 2 - m.clientWidth;
+				amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": scroll ? undefined : width + "px", "left": Math.max(xShift + width + this.offsetWidth < offsetParent!.clientWidth ? this.offsetWidth : -width, -xShift) + "px", "top": Math.max(yShift + m.offsetHeight < offsetParent!.clientHeight ? 0 : this.offsetHeight - m.offsetHeight, -yShift) + "px"}});
 				this.#f = true;
 				m.focus();
 			});
