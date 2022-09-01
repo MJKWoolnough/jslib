@@ -119,6 +119,7 @@ export class SubMenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
 	#p: HTMLSlotElement;
 	#m: MenuElement | null = null;
+	#f = false;
 	constructor() {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
@@ -157,7 +158,25 @@ export class SubMenuElement extends HTMLElement {
 	}
 	select() {
 		if (this.#m) {
-			this.#p.assign(this.#m);
+			const m = this.#m;
+			let offsetParent = this.offsetParent,
+			    xShift = 0,
+			    yShift = 0;
+			const x = 0,
+			      y = 0;
+			while (offsetParent instanceof MenuElement) {
+				xShift += offsetParent.offsetLeft;
+				yShift += offsetParent.offsetTop;
+				offsetParent = offsetParent.offsetParent;
+			}
+			this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}}));
+			setTimeout(() => {
+				const scroll = m.hasAttribute("scroll"),
+				      width = scroll ? m.offsetWidth : m.scrollWidth + m.scrollWidth - m.clientWidth;
+				amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": scroll ? undefined : width + "px", "left": Math.max(x + width < offsetParent!.clientWidth ? x : x - width, 0) - xShift + "px", "top": Math.max(y + this.offsetHeight < offsetParent!.clientHeight ? y : y - this.offsetHeight, 0) - yShift + "px"}});
+				this.#f = true;
+				m.focus();
+			});
 		}
 	}
 	focus() {
@@ -169,8 +188,12 @@ export class SubMenuElement extends HTMLElement {
 		}
 	}
 	[blur]() {
-		this.#p.assign();
-		(this.parentNode as Updater | null)?.[blur]?.();
+		if (this.#f) {
+			this.#f = false;
+		} else {
+			this.#p.assign();
+			(this.parentNode as Updater | null)?.[blur]?.();
+		}
 	}
 }
 
