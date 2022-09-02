@@ -45,6 +45,11 @@ export class MenuElement extends HTMLElement {
 					(document.activeElement as HTMLElement | null)?.blur?.();
 				}
 				break;
+			case "Enter":
+				if (document.activeElement instanceof ItemElement) {
+					document.activeElement.select();
+				}
+				break;
 			}
 			e.stopPropagation();
 		}});
