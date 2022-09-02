@@ -50,6 +50,25 @@ export class MenuElement extends HTMLElement {
 					document.activeElement.select();
 				}
 				break;
+			case "ArrowRight":
+				if (document.activeElement instanceof ItemElement && document.activeElement.parentNode instanceof SubMenuElement) {
+					const s = document.activeElement.parentNode;
+					s.select();
+					setTimeout(() => {
+						for (const c of s.children) {
+							if (c instanceof MenuElement) {
+								for (const d of c.children) {
+									if (d instanceof ItemElement || d instanceof SubMenuElement) {
+										d.focus();
+										break;
+									}
+								}
+								break;
+							}
+						}
+					})
+				}
+				break;
 			}
 			e.stopPropagation();
 		}});
