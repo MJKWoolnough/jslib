@@ -71,6 +71,11 @@ export class MenuElement extends HTMLElement {
 					})
 				}
 				break;
+			case "ArrowDown":
+				this.#sibling(1);
+				break;
+			case "ArrowUp":
+				this.#sibling(-1);
 			}
 			e.stopPropagation();
 		}});
@@ -89,6 +94,33 @@ export class MenuElement extends HTMLElement {
 	}
 	static get observedAttributes() {
 		return ["x", "y"];
+	}
+	#sibling(dir: 1 | -1) {
+		let selected = document.activeElement;
+		if (this.children.length === 0 || !selected) {
+			return;
+		}
+		if (selected === this) {
+			selected = this[dir === 1 ? "lastChild" : "firstChild"] as Element;
+		} else if (selected.parentNode instanceof SubMenuElement) {
+			selected = selected.parentNode;
+		}
+		while (!(selected instanceof ItemElement || selected instanceof SubMenuElement)) {
+			if (!selected.parentNode) {
+				return;
+			}
+			selected = selected.parentNode as Element;
+		}
+		while (true) {
+			selected = selected[dir === 1 ? "nextSibling" : "previousSibling"] as Element;
+			if (selected === null) {
+				selected = this[dir === 1 ? "firstChild" : "lastChild"] as Element;
+			}
+			if (selected instanceof ItemElement || selected instanceof SubMenuElement) {
+				selected.focus();
+				return;
+			}
+		}
 	}
 	[blur]() {
 		setTimeout(() => {
