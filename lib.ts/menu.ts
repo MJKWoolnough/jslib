@@ -21,13 +21,8 @@ export class MenuElement extends HTMLElement {
 			style({"type": "text/css"}, `
 :host {
 	outline: none;
-}
-:host(:not([scroll])) {
 	display: inline-flex;
 	flex-flow: column wrap;
-}
-:host([scroll]) {
-	overflow-y: scroll;
 }
 ::slotted(menu-item), ::slotted(menu-submenu) {
 	display: block;
@@ -75,9 +70,8 @@ export class MenuElement extends HTMLElement {
 			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}});
 
 			setTimeout(() => {
-				const scroll = this.hasAttribute("scroll"),
-				      width = scroll ? this.offsetWidth : this.scrollWidth * 2 - this.clientWidth;
-				amendNode(this, {"style": {"visibility": undefined, "position": "absolute", "width": scroll ? undefined : width + "px", "left": Math.max(this.#x + width < offsetParent!.clientWidth ? this.#x : this.#x - width, 0) + "px", "top": Math.max(this.#y + this.offsetHeight < offsetParent!.clientHeight ? this.#y : this.#y - this.offsetHeight, 0) + "px"}});
+				const width = this.scrollWidth * 2 - this.clientWidth;
+				amendNode(this, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(this.#x + width < offsetParent!.clientWidth ? this.#x : this.#x - width, 0) + "px", "top": Math.max(this.#y + this.offsetHeight < offsetParent!.clientHeight ? this.#y : this.#y - this.offsetHeight, 0) + "px"}});
 				this.focus();
 			});
 		}
@@ -169,9 +163,8 @@ export class SubMenuElement extends HTMLElement {
 			}
 			this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}}));
 			setTimeout(() => {
-				const scroll = m.hasAttribute("scroll"),
-				      width = scroll ? m.offsetWidth : Math.max(m.offsetWidth, m.scrollWidth) * 2 - m.clientWidth;
-				amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": scroll ? undefined : width + "px", "left": Math.max(xShift + width + this.offsetWidth < offsetParent!.clientWidth ? this.offsetWidth : -width, -xShift) + "px", "top": Math.max(yShift + m.offsetHeight < offsetParent!.clientHeight ? 0 : this.offsetHeight - m.offsetHeight, -yShift) + "px"}});
+				const width = Math.max(m.offsetWidth, m.scrollWidth) * 2 - m.clientWidth;
+				amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(xShift + width + this.offsetWidth < offsetParent!.clientWidth ? this.offsetWidth : -width, -xShift) + "px", "top": Math.max(yShift + m.offsetHeight < offsetParent!.clientHeight ? 0 : this.offsetHeight - m.offsetHeight, -yShift) + "px"}});
 				this.#f = true;
 				m.focus();
 			});
