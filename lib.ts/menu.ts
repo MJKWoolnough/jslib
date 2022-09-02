@@ -31,7 +31,23 @@ export class MenuElement extends HTMLElement {
 `),
 			this.#s = slot()
 		]);
-		amendNode(this, {"tabindex": -1, "onblur": () => this[blur]()});
+		amendNode(this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": (e: KeyboardEvent) => {
+			switch (e.key) {
+			case "Escape":
+				if (this.parentNode instanceof SubMenuElement) {
+					for (const c of this.parentNode.children) {
+						if (c instanceof ItemElement) {
+							c.focus();
+							break;
+						}
+					}
+				} else {
+					(document.activeElement as HTMLElement | null)?.blur?.();
+				}
+				break;
+			}
+			e.stopPropagation();
+		}});
 	}
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		const v = parseInt(newValue);
