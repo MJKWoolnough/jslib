@@ -71,6 +71,8 @@ export class MenuElement extends HTMLElement {
 					})
 				}
 				break;
+			case "Tab":
+				e.preventDefault();
 			case "ArrowDown":
 				this.#sibling(1);
 				break;
