@@ -165,7 +165,11 @@ export class MenuElement extends HTMLElement {
 export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
-		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as Updater | null)?.[blur]?.(), "onclick": () => this.select()});
+		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as Updater | null)?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
+			if (document.activeElement !== this) {
+				this.focus();
+			}
+		}});
 	}
 	connectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
