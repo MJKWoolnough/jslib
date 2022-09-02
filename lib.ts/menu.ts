@@ -237,6 +237,7 @@ export class SubMenuElement extends HTMLElement {
 				yShift += offsetParent.offsetTop;
 				offsetParent = offsetParent.offsetParent;
 			}
+			amendNode(this, {"open": true});
 			this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}}));
 			setTimeout(() => {
 				const width = Math.max(m.offsetWidth, m.scrollWidth) * 2 - m.clientWidth;
@@ -258,6 +259,7 @@ export class SubMenuElement extends HTMLElement {
 		if (this.#f) {
 			this.#f = false;
 		} else {
+			amendNode(this, {"open": false});
 			this.#p.assign();
 			(this.parentNode as Updater | null)?.[blur]?.();
 		}
@@ -268,6 +270,7 @@ export class SubMenuElement extends HTMLElement {
 				c[disconnect]();
 			}
 		}
+		amendNode(this, {"open": false});
 		this.#p.assign();
 	}
 }
