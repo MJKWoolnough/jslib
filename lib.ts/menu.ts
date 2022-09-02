@@ -70,7 +70,7 @@ export class MenuElement extends HTMLElement {
 			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}});
 
 			setTimeout(() => {
-				const width = this.scrollWidth * 2 - this.clientWidth;
+				const width = Math.max(this.offsetWidth, this.scrollWidth) * 2 - this.clientWidth;
 				amendNode(this, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(this.#x + width < offsetParent!.clientWidth ? this.#x : this.#x - width, 0) + "px", "top": Math.max(this.#y + this.offsetHeight < offsetParent!.clientHeight ? this.#y : this.#y - this.offsetHeight, 0) + "px"}});
 				this.focus();
 			});
