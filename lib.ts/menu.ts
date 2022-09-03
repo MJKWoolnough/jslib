@@ -193,7 +193,7 @@ export class SubMenuElement extends MenuItem {
 :host {
 	position: relative;
 }
-::slotted(menu-item), ::slotted(menu-menu) {
+::slotted(menu-item) {
 	display: block;
 }
 `),
