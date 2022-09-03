@@ -2,6 +2,10 @@ import type {Children, Props} from './dom.js';
 import {amendNode} from './dom.js';
 import {slot, style} from './html.js';
 
+export type MenuItems = ItemElement | SubMenuElement | MenuItems[];
+
+export type SubMenuItems = ItemElement | MenuElement | SubMenuItems[];
+
 const updateItems = Symbol("addItem"),
       blur = Symbol("blur"),
       disconnect = Symbol("disconnect");
@@ -283,6 +287,6 @@ customElements.define("menu-menu", MenuElement);
 customElements.define("menu-item", ItemElement);
 customElements.define("menu-submenu", SubMenuElement);
 
-export const menu = (props?: Props | Children, children?: Children) => amendNode(new MenuElement(), props, children),
+export const menu = (props?: Props | MenuItems, children?: MenuItems) => amendNode(new MenuElement(), props, children),
 item = (props?: Props | Children, children?: Children) => amendNode(new ItemElement(), props, children),
-submenu = (props?: Props | Children, children?: Children) => amendNode(new SubMenuElement(), props, children);
+submenu = (props?: Props | SubMenuItems, children?: SubMenuItems) => amendNode(new SubMenuElement(), props, children);
