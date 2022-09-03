@@ -17,6 +17,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [html](#html)                               | Functions to create HTML elements. |
 | [inter](#inter)                             | Classes to provide different type of internal communication. |
 | [load](#load)                               | Used for initialisation. |
+| [menu](#menu)                               | Library for creating right-click menus. |
 | [nodes](#nodes)                             | Classes for handling of collections of DOM Nodes. |
 | [rpc](#rpc)                                 | JSONRPC implementation. |
 | [settings](#settings)                       | Type-safe wrappers around localStorage. |
@@ -987,6 +988,41 @@ declare const include: (url: string) => Promise<Object>;
 |------------|---------------|
 | include    | This function is an alias for the import function, but will be used by [jspacker](https://vimagination.zapto.org/jspacker/) for all importing. |
 | pageLoad   | This is a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which is resolved when the page finished loading. |
+
+## <a name="menu">menu</a>
+
+The menu module adds custom elements to create context-menus.
+
+This module directly imports the [dom](#dom) and [html](#html) modules.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| item | Function | A [DOMBind](#dom_dombind) that creates an [ItemElement](#menu_itemelement). |
+| [ItemElement](#menu_itemelement) | Class | Defines a menu item. |
+| menu | Function | A [DOMBind](#dom_dombind) that creates a [MenuElement](#menu_menuelement). |
+| [MenuElement](#menu_menuelement) | Class | Defines a menu. |
+| MenuItems | Type | Type of children applicable to a [MenuElement](#menu_menuelement). Allows [ItemElement](#menu_itemelement), [SubMenuElement](#menu_submenuelement), and recursive arrays of both. |
+| submenu | Function | A [DOMBind](#dom_dombind) that creates a [SubMenuElement](menu_submenuelement). |
+| [SubMenuElement](#menu_submenuelement) | Defines a submenu. |
+| SubMenuItems | Type | Type of children applicable to a [SubMenuElement](#menu_submenuelement). Allows [ItemElement](#menu_itemelement), [MenuElement](#menu_menuelement), and recursive arrays of both. |
+
+### <a name="menu_itemelement">ItemElement</a>
+
+The ItemElement class represents items within a menu. It can be used either directly in a [MenuElement](#menu_menuelement), or in a [SubMenuElement](#menu_submenuelement) as its representative element. It can contain any structure, which will be what appears in the menu.
+
+This defines the action of the element with a custom 'select' event, which is called when the element is selected. Unless the 'select' event cancels the event (preventDefault) the menu will close after the event is executed.
+
+### <a name="menu_menuelement">MenuElement</a>
+
+The MenuElement class represents a context-menu that is displayed as a hovering list on the page. It can contain any number of [ItemElement](#menu_itemelement)s and [SubMenuElement](#menu_submenuelement)s, which will be the elements of the list.
+
+When the MenuElement is attached to the DOM (non-[SubMenuElement](#menu_submenuelement)) is will use any 'x' and 'y' attributes on the element to determine the location of the menu on screen. It will attempt to place, within the [offsetParent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent), the top-left corner of the menu at the 'x' and 'y' coordinates specified, but will try the right corners if there is not enough space to the left and the bottom corners if there is not enough space below. If there is not enough space for the menu, the fallback coordinates for both attributes is 0, 0.
+
+### <a name="menu_SubMenuelement">SubMenuElement</a>
+
+The SubMenuElement class defines an element which is a MenuItem. It It should contain a single [ItemElement](#menu_itemelement) and a single [MenuElement](#menu_menuelement).
+
+The ItemElement will be displayed in the parent [MenuElement](#menu_menuelement) and the child MenuElement will be the menu that is displayed when this element is selected. The placement works similarly to that of [MenuElement](#menu_menuelement), in that it will attempt to put the top-left corner of the new menu at the top-right of the SubMenuElement selected, moving up as necessary, and will move to the left of the SubMenuElement is there is not enough space to the right.
 
 ## <a name="nodes">nodes</a>
 
