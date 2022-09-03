@@ -63,7 +63,7 @@ export class MenuElement extends HTMLElement {
 						for (const c of s.children) {
 							if (c instanceof MenuElement) {
 								for (const d of c.children) {
-									if (d instanceof ItemElement || d instanceof SubMenuElement) {
+									if (d instanceof MenuItem) {
 										d.focus();
 										break;
 									}
@@ -95,7 +95,7 @@ export class MenuElement extends HTMLElement {
 		} else if (selected.parentNode instanceof SubMenuElement) {
 			selected = selected.parentNode;
 		}
-		while (!(selected instanceof ItemElement || selected instanceof SubMenuElement)) {
+		while (!(selected instanceof MenuItem)) {
 			if (!selected.parentNode) {
 				return;
 			}
@@ -106,7 +106,7 @@ export class MenuElement extends HTMLElement {
 			if (selected === null) {
 				selected = this[dir === 1 ? "firstChild" : "lastChild"] as Element;
 			}
-			if (selected instanceof ItemElement || selected instanceof SubMenuElement) {
+			if (selected instanceof MenuItem) {
 				selected.focus();
 				return;
 			}
@@ -124,7 +124,7 @@ export class MenuElement extends HTMLElement {
 		});
 	}
 	[updateItems]() {
-		this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement));
+		this.#s.assign(...Array.from(this.children).filter(e => e instanceof MenuItem));
 	}
 	connectedCallback() {
 		if (this.parentNode instanceof SubMenuElement) {
@@ -161,7 +161,16 @@ export class MenuElement extends HTMLElement {
 	}
 }
 
-export class ItemElement extends HTMLElement {
+abstract class MenuItem extends HTMLElement {
+	connectedCallback() {
+		(this.parentNode as Updater | null)?.[updateItems]?.();
+	}
+	disconnectedCallback() {
+		(this.parentNode as Updater | null)?.[updateItems]?.();
+	}
+}
+
+export class ItemElement extends MenuItem {
 	constructor() {
 		super();
 		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as Updater | null)?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
@@ -169,12 +178,6 @@ export class ItemElement extends HTMLElement {
 				this.focus();
 			}
 		}});
-	}
-	connectedCallback() {
-		(this.parentNode as Updater | null)?.[updateItems]?.();
-	}
-	disconnectedCallback() {
-		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 	select() {
 		if (this.parentNode instanceof SubMenuElement) {
@@ -185,7 +188,7 @@ export class ItemElement extends HTMLElement {
 	}
 }
 
-export class SubMenuElement extends HTMLElement {
+export class SubMenuElement extends MenuItem {
 	#s: HTMLSlotElement;
 	#p: HTMLSlotElement;
 	#m: MenuElement | null = null;
@@ -222,12 +225,6 @@ export class SubMenuElement extends HTMLElement {
 				}
 			}
 		}
-	}
-	connectedCallback() {
-		(this.parentNode as Updater | null)?.[updateItems]?.();
-	}
-	disconnectedCallback() {
-		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 	select() {
 		if (this.#m) {
