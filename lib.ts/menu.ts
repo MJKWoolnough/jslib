@@ -8,7 +8,9 @@ export type SubMenuItems = ItemElement | MenuElement | SubMenuItems[];
 
 const updateItems = Symbol("addItem"),
       blur = Symbol("blur"),
-      disconnect = Symbol("disconnect");
+      disconnect = Symbol("disconnect"),
+      itemElement = Symbol("itemElement"),
+      menuElement = Symbol("menuElement");
 
 interface Updater extends Node {
 	[updateItems]?: () => void;
@@ -42,12 +44,7 @@ export class MenuElement extends HTMLElement {
 				}
 			case "ArrowLeft":
 				if (this.parentNode instanceof SubMenuElement) {
-					for (const c of this.parentNode.children) {
-						if (c instanceof ItemElement) {
-							c.focus();
-							break;
-						}
-					}
+					this.parentNode[itemElement]()?.focus();
 				}
 				break;
 			case "Enter":
@@ -60,18 +57,13 @@ export class MenuElement extends HTMLElement {
 					const s = document.activeElement.parentNode;
 					s.select();
 					setTimeout(() => {
-						for (const c of s.children) {
-							if (c instanceof MenuElement) {
-								for (const d of c.children) {
-									if (d instanceof MenuItem) {
-										d.focus();
-										break;
-									}
-								}
+						for (const c of s[menuElement]?.()?.children ?? []) {
+							if (c instanceof MenuItem) {
+								c.focus();
 								break;
 							}
 						}
-					})
+					});
 				}
 				break;
 			case "Tab":
@@ -192,6 +184,7 @@ export class SubMenuElement extends MenuItem {
 	#s: HTMLSlotElement;
 	#p: HTMLSlotElement;
 	#m: MenuElement | null = null;
+	#i: ItemElement | null = null;
 	#f = false;
 	constructor() {
 		super();
@@ -209,21 +202,26 @@ export class SubMenuElement extends MenuItem {
 		]);
 	}
 	[updateItems]() {
-		let set = false;
+		this.#i = null;
 		this.#m = null;
 		for (const c of this.children) {
-			if (c instanceof ItemElement && !set) {
-				this.#s.assign(c);
+			if (!this.#i && c instanceof ItemElement) {
+				this.#s.assign(this.#i = c);
 				if (this.#m) {
 					return;
 				}
-				set = true;
-			} else if (c instanceof MenuElement && !this.#m) {
+			} else if (!this.#m && c instanceof MenuElement) {
 				this.#m = c;
-				if (set) {
+				if (this.#i) {
 					return;
 				}
 			}
+		}
+		if (!this.#i) {
+			this.#s.assign();
+		}
+		if (!this.#m) {
+			this.#p.assign();
 		}
 	}
 	select() {
@@ -247,13 +245,14 @@ export class SubMenuElement extends MenuItem {
 			});
 		}
 	}
+	[itemElement]() {
+		return this.#i;
+	}
+	[menuElement]() {
+		return this.#m;
+	}
 	focus() {
-		for (const c of this.children) {
-			if (c instanceof ItemElement) {
-				c.focus();
-				return;
-			}
-		}
+		this.#i?.focus();
 	}
 	[blur]() {
 		if (this.#f) {
