@@ -53,15 +53,13 @@ export class MenuElement extends HTMLElement {
 				}
 				break;
 			case "ArrowRight":
-				if (document.activeElement instanceof ItemElement && document.activeElement.parentNode instanceof SubMenuElement) {
-					const s = document.activeElement.parentNode;
+				const s = document.activeElement?.parentNode;
+				if (document.activeElement instanceof ItemElement && s instanceof SubMenuElement) {
 					s.select();
 					setTimeout(() => {
-						for (const c of s[menuElement]?.()?.children ?? []) {
-							if (c instanceof MenuItem) {
-								c.focus();
-								break;
-							}
+						const m = s[menuElement]();
+						if (m) {
+							(m.#s.assignedNodes()[0] as MenuItem | undefined)?.focus();
 						}
 					});
 				}
