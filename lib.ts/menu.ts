@@ -94,10 +94,7 @@ export class MenuElement extends HTMLElement {
 			selected = selected.parentNode as Element;
 		}
 		while (true) {
-			selected = selected[dir === 1 ? "nextSibling" : "previousSibling"] as Element;
-			if (selected === null) {
-				selected = this[dir === 1 ? "firstChild" : "lastChild"] as Element;
-			}
+			selected = (selected[dir === 1 ? "nextSibling" : "previousSibling"] ?? this[dir === 1 ? "firstChild" : "lastChild"]) as Element;
 			if (selected instanceof MenuItem) {
 				selected.focus();
 				return;
