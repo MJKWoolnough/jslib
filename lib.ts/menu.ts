@@ -17,8 +17,6 @@ interface Updater extends Node {
 
 export class MenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
-	#x = 0;
-	#y = 0;
 	#c?: Function;
 	constructor() {
 		super();
@@ -87,21 +85,6 @@ export class MenuElement extends HTMLElement {
 			e.stopPropagation();
 		}});
 	}
-	attributeChangedCallback(name: string, _: string, newValue: string) {
-		const v = parseInt(newValue);
-		if (!isNaN(v)) {
-			switch (name) {
-			case "x":
-				this.#x = v;
-				break;
-			case "y":
-				this.#y = v;
-			}
-		}
-	}
-	static get observedAttributes() {
-		return ["x", "y"];
-	}
 	#sibling(dir: 1 | -1) {
 		let selected = document.activeElement;
 		if (this.children.length === 0 || !selected) {
@@ -152,12 +135,14 @@ export class MenuElement extends HTMLElement {
 					this.remove();
 				}
 			}, eventCapture)});
-			const {offsetParent} = this;
+			const {offsetParent} = this,
+			      x = parseInt(this.getAttribute("x") ?? "0") || 0,
+			      y = parseInt(this.getAttribute("y") ?? "0") || 0;
 			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}});
 
 			setTimeout(() => {
 				const width = Math.max(this.offsetWidth, this.scrollWidth) * 2 - this.clientWidth;
-				amendNode(this, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(this.#x + width < offsetParent!.clientWidth ? this.#x : this.#x - width, 0) + "px", "top": Math.max(this.#y + this.offsetHeight < offsetParent!.clientHeight ? this.#y : this.#y - this.offsetHeight, 0) + "px"}});
+				amendNode(this, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(x + width < offsetParent!.clientWidth ? x : x - width, 0) + "px", "top": Math.max(y + this.offsetHeight < offsetParent!.clientHeight ? y : y - this.offsetHeight, 0) + "px"}});
 				this.focus();
 			});
 		}
