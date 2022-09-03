@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import {amendNode} from './dom.js';
+import {amendNode, event, eventCapture, eventRemove} from './dom.js';
 import {slot, style} from './html.js';
 
 export type MenuItems = ItemElement | SubMenuElement | MenuItems[];
@@ -19,6 +19,7 @@ export class MenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
 	#x = 0;
 	#y = 0;
+	#c?: Function;
 	constructor() {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
@@ -146,6 +147,11 @@ export class MenuElement extends HTMLElement {
 		if (this.parentNode instanceof SubMenuElement) {
 			this.parentNode[updateItems]();
 		} else {
+			amendNode(window, {"onmousedown": event(this.#c = (e: MouseEvent) => {
+				if (!this.contains(e.target as Node)) {
+					this.remove();
+				}
+			}, eventCapture)});
 			const {offsetParent} = this;
 			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}});
 
@@ -157,6 +163,10 @@ export class MenuElement extends HTMLElement {
 		}
 	}
 	disconnectedCallback() {
+		if (this.#c) {
+			amendNode(window, {"onmousedown": event(this.#c, eventCapture | eventRemove)});
+			this.#c = undefined;
+		}
 		(this.parentNode as Updater | null)?.[updateItems]?.();
 		for (const c of this.children) {
 			if (c instanceof SubMenuElement) {
