@@ -77,7 +77,7 @@ export class MenuElement extends HTMLElement {
 	}
 	#sibling(dir: 1 | -1) {
 		let selected = document.activeElement;
-		if (this.children.length === 0 || !selected) {
+		if (!this.#s.assignedNodes().length || !selected) {
 			return;
 		}
 		if (selected === this) {
