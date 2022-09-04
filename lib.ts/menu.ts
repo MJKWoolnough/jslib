@@ -197,14 +197,14 @@ export class SubMenuElement extends MenuItem {
 		}
 	}
 	select() {
-		if (this.#m) {
-			const m = this.#m;
+		const m = this.#m;
+		if (m) {
 			let offsetParent = this.offsetParent,
 			    xShift = 0,
 			    yShift = 0;
 			while (offsetParent instanceof MenuElement || offsetParent instanceof SubMenuElement) {
-				xShift += offsetParent.offsetLeft;
-				yShift += offsetParent.offsetTop;
+				xShift += offsetParent.offsetLeft - offsetParent.clientWidth + offsetParent.offsetWidth;
+				yShift += offsetParent.offsetTop - offsetParent.clientHeight + offsetParent.offsetHeight;
 				offsetParent = offsetParent.offsetParent;
 			}
 			amendNode(this, {"open": true});
