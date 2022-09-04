@@ -37,10 +37,11 @@ export class MenuElement extends HTMLElement {
 			this.#s = slot()
 		]);
 		amendNode(this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": (e: KeyboardEvent) => {
+			const da = document.activeElement;
 			switch (e.key) {
 			case "Escape":
 				if (!(this.parentNode instanceof SubMenuElement)) {
-					(document.activeElement as HTMLElement | null)?.blur?.();
+					(da as HTMLElement | null)?.blur?.();
 				}
 			case "ArrowLeft":
 				if (this.parentNode instanceof SubMenuElement) {
@@ -48,13 +49,13 @@ export class MenuElement extends HTMLElement {
 				}
 				break;
 			case "Enter":
-				if (document.activeElement instanceof ItemElement) {
-					document.activeElement.select();
+				if (da instanceof ItemElement) {
+					da.select();
 				}
 				break;
 			case "ArrowRight":
-				const s = document.activeElement?.parentNode;
-				if (document.activeElement instanceof ItemElement && s instanceof SubMenuElement) {
+				const s = da?.parentNode;
+				if (da instanceof ItemElement && s instanceof SubMenuElement) {
 					s.select();
 					setTimeout(() => {
 						const m = s[menuElement]();
