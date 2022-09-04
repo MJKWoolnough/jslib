@@ -126,7 +126,7 @@ export class MenuElement extends HTMLElement {
 			const {offsetParent} = this,
 			      x = parseInt(this.getAttribute("x") ?? "0") || 0,
 			      y = parseInt(this.getAttribute("y") ?? "0") || 0;
-			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}});
+			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}});
 
 			setTimeout(() => {
 				const width = Math.max(this.offsetWidth, this.scrollWidth) * 2 - this.clientWidth;
@@ -232,7 +232,7 @@ export class SubMenuElement extends MenuItem {
 				offsetParent = offsetParent.offsetParent;
 			}
 			amendNode(this, {"open": true});
-			this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-width": offsetParent!.clientWidth + "px", "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}}));
+			this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}}));
 			setTimeout(() => {
 				const width = Math.max(m.offsetWidth, m.scrollWidth) * 2 - m.clientWidth;
 				amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(xShift + width + this.offsetWidth < offsetParent!.clientWidth ? this.offsetWidth : -width, -xShift) + "px", "top": Math.max(yShift + m.offsetHeight < offsetParent!.clientHeight ? 0 : this.offsetHeight - m.offsetHeight, -yShift) + "px"}});
