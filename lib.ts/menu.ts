@@ -38,7 +38,6 @@ export class MenuElement extends HTMLElement {
 		]);
 		amendNode(this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": (e: KeyboardEvent) => {
 			const da = document.activeElement;
-			let up = true;
 			switch (e.key) {
 			case "Escape":
 				if (!(this.parentNode instanceof SubMenuElement)) {
@@ -69,33 +68,10 @@ export class MenuElement extends HTMLElement {
 			case "Tab":
 				e.preventDefault();
 			case "ArrowDown":
-				up = false;
 			case "ArrowUp":
-				const an = this.#s.assignedNodes() as MenuItem[];
-				if (an.length) {
-					if (this === da) {
-						an.at(up ? -1 : 0)?.focus();
-					} else {
-						let last = an.at(-1),
-						    next = false;
-						an.push(an[0]);
-						for (const c of an) {
-							if (next) {
-								last = c;
-								break;
-							}
-							if (c.contains(da)) {
-								if (up) {
-									break;
-								}
-								next = true;
-								continue;
-							}
-							last = c;
-						}
-						(last ?? an[0]) ?.focus();
-					}
-				}
+				const an = this.#s.assignedNodes() as MenuItem[],
+				      pos = an.findIndex(e => e.contains(da));
+				an.at(e.key === "ArrowUp" ? pos < 0 ? pos : pos - 1 : (pos + 1) % an.length)?.focus();
 			}
 			e.stopPropagation();
 		}});
