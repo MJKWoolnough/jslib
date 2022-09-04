@@ -65,7 +65,7 @@ const maxMouseButton = 16,
 		"ctrlKey": false,
 		"metaKey": false,
 		"shiftKey": false,
-		"key": parts[parts.length-1]
+		"key": parts.at(-1)
 	      };
 	for (const mod of parts) {
 		switch (mod.toLowerCase()) {
