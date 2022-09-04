@@ -2,7 +2,7 @@ import type {Children, Props} from './dom.js';
 import {amendNode, event, eventCapture, eventRemove} from './dom.js';
 import {slot, style} from './html.js';
 
-export type MenuItems = ItemElement | SubMenuElement | MenuItems[];
+export type MenuItems = MenuItem | MenuItems[];
 
 export type SubMenuItems = ItemElement | MenuElement | SubMenuItems[];
 
