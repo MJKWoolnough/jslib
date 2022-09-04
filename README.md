@@ -446,7 +446,7 @@ interface <T extends Node> {
 }
 ```
 
-This utility type is useful for any function that wants to call [amendNode](#dom_amendNode) or [clearNode](#dom_clearnode) with the first param set by that function, as used in the [html](#html), [svg](#svg), and [windows](#windows) modules.
+This utility type is useful for any function that wants to call [amendNode](#dom_amendNode) or [clearNode](#dom_clearnode) with the first param set by that function, as used in the [html](#html) and [svg](#svg) modules.
 
 ### <a name="dom_event">event</a>
 ```typescript
