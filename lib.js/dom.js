@@ -31,7 +31,7 @@ export const amendNode = (node, properties, children) => {
 			if (isEventObject(prop)) {
 				if (k.startsWith("on") && node instanceof EventTarget) {
 					const arr = prop instanceof Array;
-					node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.substr(2), arr ? prop[0] : prop, arr ? prop[1] : false);
+					node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.slice(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 				}
 			} else if (node instanceof HTMLElement || node instanceof SVGElement) {
 				if (typeof prop === "boolean") {
