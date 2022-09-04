@@ -1385,8 +1385,8 @@ This module directly imports the [dom](#dom), [html](#html), and [svg](#svg) mod
 | [setLanguage](#windows_setlanguage) | Function | Sets the language items used by the [ShellElement](#windows_shellelement) and [WindowElement](#windows_windowelement) classes. |
 | shell | Function | A [DOMBind](#dom_dombind) that creates a ShellElement. |
 | [ShellElement](#windows_shellelement) | Class | A class to create a shell for [WindowElement](#windows_windowelement)s to exist within. Extends [BaseElement](#windows_baseelement). Registered with customElements as `windows-shell`. |
-| windows | Function | A [DOMBind](#dom_dombind) that creates a WindowElement. |
 | [WindowElement](#windows_windowelement) | Class | This class represents a movable window with user specified contents. Extends [BaseElement](#windows_baseelement). Registered with customElements as `windows-window`. |
+| windows | Function | A [DOMBind](#dom_dombind) that creates a WindowElement. |
 
 ### <a name="windows_baseelement">BaseElement</a>
 
