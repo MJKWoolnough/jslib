@@ -38,6 +38,7 @@ export class MenuElement extends HTMLElement {
 		]);
 		amendNode(this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": (e: KeyboardEvent) => {
 			const da = document.activeElement;
+			let up = true;
 			switch (e.key) {
 			case "Escape":
 				if (!(this.parentNode instanceof SubMenuElement)) {
@@ -68,37 +69,36 @@ export class MenuElement extends HTMLElement {
 			case "Tab":
 				e.preventDefault();
 			case "ArrowDown":
-				this.#sibling(1);
-				break;
+				up = false;
 			case "ArrowUp":
-				this.#sibling(-1);
+				const an = this.#s.assignedNodes() as MenuItem[];
+				if (an.length) {
+					if (this === da) {
+						an.at(up ? -1 : 0)?.focus();
+					} else {
+						let last = an.at(-1),
+						    next = false;
+						an.push(an[0]);
+						for (const c of an) {
+							if (next) {
+								last = c;
+								break;
+							}
+							if (c.contains(da)) {
+								if (up) {
+									break;
+								}
+								next = true;
+								continue;
+							}
+							last = c;
+						}
+						(last ?? an[0]) ?.focus();
+					}
+				}
 			}
 			e.stopPropagation();
 		}});
-	}
-	#sibling(dir: 1 | -1) {
-		let selected = document.activeElement;
-		if (!this.#s.assignedNodes().length || !selected) {
-			return;
-		}
-		if (selected === this) {
-			selected = this[dir === 1 ? "lastChild" : "firstChild"] as Element;
-		} else if (selected.parentNode instanceof SubMenuElement) {
-			selected = selected.parentNode;
-		}
-		while (!(selected instanceof MenuItem)) {
-			if (!selected.parentNode) {
-				return;
-			}
-			selected = selected.parentNode as Element;
-		}
-		while (true) {
-			selected = (selected[dir === 1 ? "nextSibling" : "previousSibling"] ?? this[dir === 1 ? "firstChild" : "lastChild"]) as Element;
-			if (selected instanceof MenuItem) {
-				selected.focus();
-				return;
-			}
-		}
 	}
 	[blur]() {
 		setTimeout(() => {
