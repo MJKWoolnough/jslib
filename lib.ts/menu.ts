@@ -72,6 +72,13 @@ export class MenuElement extends HTMLElement {
 				const an = this.#s.assignedNodes() as MenuItem[],
 				      pos = an.findIndex(e => e.contains(da));
 				an.at(e.key === "ArrowUp" ? pos < 0 ? pos : pos - 1 : (pos + 1) % an.length)?.focus();
+				break;
+			default:
+				const ans = (this.#s.assignedNodes() as MenuItem[]).filter(i => i.getAttribute("key") === e.key);
+				ans.at((ans.findIndex(e => e.contains(da)) + 1) % ans.length)?.focus();
+				if (ans.length === 1) {
+					ans[0]?.select();
+				}
 			}
 			e.stopPropagation();
 		}});
@@ -132,6 +139,7 @@ abstract class MenuItem extends HTMLElement {
 	disconnectedCallback() {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
+	abstract select(): void;
 }
 
 export class ItemElement extends MenuItem {
