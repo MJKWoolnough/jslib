@@ -1010,7 +1010,9 @@ This module directly imports the [dom](#dom) and [html](#html) modules.
 
 The ItemElement class represents items within a menu. It can be used either directly in a [MenuElement](#menu_menuelement), or in a [SubMenuElement](#menu_submenuelement) as its representative element. It can contain any structure, which will be what appears in the menu.
 
-This defines the action of the element with a custom 'select' event, which is called when the element is selected. Unless the 'select' event cancels the event (preventDefault) the menu will close after the event is executed.
+The action of the element is defined with a custom 'select' event, which is called when the element is selected. Unless the 'select' event cancels the event (preventDefault) the menu will close after the event is executed.
+
+When used directly in a [MenuElement](#menu_menu_element), the 'key' attribute sets a possible quick access key, values of which should be one of the [Keyboard event key values](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values).
 
 ### <a name="menu_menuelement">MenuElement</a>
 
@@ -1023,6 +1025,8 @@ When the MenuElement is attached to the DOM (non-[SubMenuElement](#menu_submenue
 The SubMenuElement class defines an element which is a MenuItem. It It should contain a single [ItemElement](#menu_itemelement) and a single [MenuElement](#menu_menuelement).
 
 The ItemElement will be displayed in the parent [MenuElement](#menu_menuelement) and the child MenuElement will be the menu that is displayed when this element is selected. The placement works similarly to that of [MenuElement](#menu_menuelement), in that it will attempt to put the top-left corner of the new menu at the top-right of the SubMenuElement selected, moving up as necessary, and will move to the left of the SubMenuElement is there is not enough space to the right.
+
+The 'key' attribute sets a possible quick access key, values of which should be one of the [Keyboard event key values](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values).
 
 ## <a name="nodes">nodes</a>
 
