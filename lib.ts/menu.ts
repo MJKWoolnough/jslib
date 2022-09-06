@@ -215,7 +215,7 @@ export class SubMenuElement extends MenuItem {
 		if (!this.hasAttribute("disabled")) {
 			const m = this.#m;
 			if (m) {
-				let offsetParent = this.offsetParent,
+				let offsetParent: Element | null = this,
 				    xShift = 0,
 				    yShift = 0;
 				while (offsetParent instanceof MenuElement || offsetParent instanceof SubMenuElement) {
