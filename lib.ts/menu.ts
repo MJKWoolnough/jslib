@@ -69,12 +69,12 @@ export class MenuElement extends HTMLElement {
 				e.preventDefault();
 			case "ArrowDown":
 			case "ArrowUp":
-				const an = this.#s.assignedNodes() as MenuItem[],
+				const an = (this.#s.assignedNodes() as MenuItem[]).filter(e => !e.hasAttribute("disabled")),
 				      pos = an.findIndex(e => e.contains(da));
 				an.at(e.key === "ArrowUp" ? pos < 0 ? pos : pos - 1 : (pos + 1) % an.length)?.focus();
 				break;
 			default:
-				const ans = (this.#s.assignedNodes() as MenuItem[]).filter(i => i.getAttribute("key") === e.key);
+				const ans = (this.#s.assignedNodes() as MenuItem[]).filter(i => i.getAttribute("key") === e.key && !i.hasAttribute("disabled"));
 				ans.at((ans.findIndex(e => e.contains(da)) + 1) % ans.length)?.focus();
 				if (ans.length === 1) {
 					ans[0]?.select();
@@ -151,11 +151,18 @@ export class ItemElement extends MenuItem {
 			}
 		}});
 	}
+	focus() {
+		if (!this.hasAttribute("disabled") && (!(this.parentNode instanceof SubMenuElement) || !this.parentNode.hasAttribute("disabled"))) {
+			super.focus();
+		}
+	}
 	select() {
-		if (this.parentNode instanceof SubMenuElement) {
-			this.parentNode.select();
-		} else if (this.dispatchEvent(new CustomEvent("select", {"cancelable": true}))) {
-			this.blur();
+		if (!this.hasAttribute("disabled")) {
+			if (this.parentNode instanceof SubMenuElement) {
+				this.parentNode.select();
+			} else if (this.dispatchEvent(new CustomEvent("select", {"cancelable": true}))) {
+				this.blur();
+			}
 		}
 	}
 }
@@ -205,24 +212,26 @@ export class SubMenuElement extends MenuItem {
 		}
 	}
 	select() {
-		const m = this.#m;
-		if (m) {
-			let offsetParent = this.offsetParent,
-			    xShift = 0,
-			    yShift = 0;
-			while (offsetParent instanceof MenuElement || offsetParent instanceof SubMenuElement) {
-				xShift += offsetParent.offsetLeft - offsetParent.clientWidth + offsetParent.offsetWidth;
-				yShift += offsetParent.offsetTop - offsetParent.clientHeight + offsetParent.offsetHeight;
-				offsetParent = offsetParent.offsetParent;
+		if (!this.hasAttribute("disabled")) {
+			const m = this.#m;
+			if (m) {
+				let offsetParent = this.offsetParent,
+				    xShift = 0,
+				    yShift = 0;
+				while (offsetParent instanceof MenuElement || offsetParent instanceof SubMenuElement) {
+					xShift += offsetParent.offsetLeft - offsetParent.clientWidth + offsetParent.offsetWidth;
+					yShift += offsetParent.offsetTop - offsetParent.clientHeight + offsetParent.offsetHeight;
+					offsetParent = offsetParent.offsetParent;
+				}
+				amendNode(this, {"open": true});
+				this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}}));
+				setTimeout(() => {
+					const width = Math.max(m.offsetWidth, m.scrollWidth) * 2 - m.clientWidth;
+					amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(xShift + width + this.offsetWidth < offsetParent!.clientWidth ? this.offsetWidth : -width, -xShift) + "px", "top": Math.max(yShift + m.offsetHeight < offsetParent!.clientHeight ? 0 : this.offsetHeight - m.offsetHeight, -yShift) + "px"}});
+					this.#f = true;
+					m.focus();
+				});
 			}
-			amendNode(this, {"open": true});
-			this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}}));
-			setTimeout(() => {
-				const width = Math.max(m.offsetWidth, m.scrollWidth) * 2 - m.clientWidth;
-				amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(xShift + width + this.offsetWidth < offsetParent!.clientWidth ? this.offsetWidth : -width, -xShift) + "px", "top": Math.max(yShift + m.offsetHeight < offsetParent!.clientHeight ? 0 : this.offsetHeight - m.offsetHeight, -yShift) + "px"}});
-				this.#f = true;
-				m.focus();
-			});
 		}
 	}
 	[itemElement]() {
