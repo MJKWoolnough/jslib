@@ -1014,6 +1014,8 @@ The action of the element is defined with a custom 'select' event, which is call
 
 When used directly in a [MenuElement](#menu_menu_element), the 'key' attribute sets a possible quick access key, values of which should be one of the [Keyboard event key values](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values).
 
+When used directly in a [MenuElement](#menu_menu_element), the 'disable' attribute makes the item unselectable and unfocusable.
+
 ### <a name="menu_menuelement">MenuElement</a>
 
 The MenuElement class represents a context-menu that is displayed as a hovering list on the page. It can contain any number of [ItemElement](#menu_itemelement)s and [SubMenuElement](#menu_submenuelement)s, which will be the elements of the list.
@@ -1027,6 +1029,8 @@ The SubMenuElement class defines an element which is a MenuItem. It It should co
 The ItemElement will be displayed in the parent [MenuElement](#menu_menuelement) and the child MenuElement will be the menu that is displayed when this element is selected. The placement works similarly to that of [MenuElement](#menu_menuelement), in that it will attempt to put the top-left corner of the new menu at the top-right of the SubMenuElement selected, moving up as necessary, and will move to the left of the SubMenuElement is there is not enough space to the right.
 
 The 'key' attribute sets a possible quick access key, values of which should be one of the [Keyboard event key values](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values).
+
+The 'disable' attribute makes the item unselectable and unfocusable.
 
 ## <a name="nodes">nodes</a>
 
