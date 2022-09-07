@@ -110,7 +110,6 @@ export class MenuElement extends HTMLElement {
 			      x = parseInt(this.getAttribute("x") ?? "0") || 0,
 			      y = parseInt(this.getAttribute("y") ?? "0") || 0;
 			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-height": offsetParent!.clientHeight + "px", "visibility": "hidden"}});
-
 			setTimeout(() => {
 				const width = Math.max(this.offsetWidth, this.scrollWidth) * 2 - this.clientWidth;
 				amendNode(this, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(x + width < offsetParent!.clientWidth ? x : x - width, 0) + "px", "top": Math.max(y + this.offsetHeight < offsetParent!.clientHeight ? y : y - this.offsetHeight, 0) + "px"}});
