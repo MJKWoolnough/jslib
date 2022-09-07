@@ -136,7 +136,7 @@ abstract class MenuItem extends HTMLElement {
 		(this.parentNode as Updater | null)?.[updateItems]?.();
 	}
 	disconnectedCallback() {
-		(this.parentNode as Updater | null)?.[updateItems]?.();
+		this.connectedCallback();
 	}
 	abstract select(): void;
 }

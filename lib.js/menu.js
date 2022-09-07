@@ -116,7 +116,7 @@ class MenuItem extends HTMLElement {
 		this.parentNode?.[updateItems]?.();
 	}
 	disconnectedCallback() {
-		this.parentNode?.[updateItems]?.();
+		this.connectedCallback();
 	}
 }
 
