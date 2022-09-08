@@ -257,7 +257,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 	}
 	static from<_, H extends Node = Node>(n: H): NodeArray<Item, H>;
-	static from<T extends Item, H extends Node = Node>(n: H, itemFn: (node: Node) => T|undefined): NodeArray<T, H>;
+	static from<T extends Item, H extends Node = Node>(n: H, itemFn: (node: Node) => T | undefined): NodeArray<T, H>;
 	static from<T extends Item = Item, H extends Node = Node>(n: H, itemFn = noItemFn): NodeArray<T, H> {
 		const s = new NodeArray<T, H>(n),
 		      root = s.#root;
