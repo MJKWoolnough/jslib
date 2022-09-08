@@ -1,6 +1,6 @@
 import type {Children, Props} from './dom.js';
 import {amendNode, clearNode, event, eventOnce} from './dom.js';
-import {div, li, slot, style, ul} from './html.js';
+import {div, footer, slot, style} from './html.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage, windows} from './windows.js';
 
 export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows};
@@ -15,7 +15,7 @@ const windowObservations = {
       };
 
 type Sdata = {
-	item: HTMLLIElement|null;
+	item: HTMLDivElement | null;
 	state: boolean;
 }
 
@@ -56,13 +56,13 @@ export class ShellElement extends BaseShellElement {
 					return;
 				}
 				for (const i of taskbar.children) {
-					if (i.childElementCount === 0 && i instanceof HTMLLIElement) {
+					if (i.childElementCount === 0 && i instanceof HTMLDivElement) {
 						data.item = i;
 						break;
 					}
 				}
 				if (!data.item) {
-					amendNode(taskbar, data.item = li());
+					amendNode(taskbar, data.item = div());
 				}
 				const taskbarItem = windows({"window-icon": target.getAttribute("window-icon") ?? undefined, "window-title": target.getAttribute("window-title") ?? undefined, "hide-minimise": true, "maximised": true, "exportparts": "close, minimise, maximise, titlebar, title, controls, icon", "onclose": () => target.close(), "onremove": () => taskbarData.delete(taskbarItem)});
 				taskbarData.set(taskbarItem, target);
@@ -72,7 +72,7 @@ export class ShellElement extends BaseShellElement {
 				break;
 			}
 		      })),
-		      taskbar = ul();
+		      taskbar = footer();
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, `
 :host {
@@ -87,30 +87,28 @@ export class ShellElement extends BaseShellElement {
 	--overlay-on: none;
 }
 
-:host > ul {
-	list-style: none;
-	padding: 0;
-	display: grid;
+:host > footer {
+	display: flex;
 	position: absolute;
-	transform: scaleY(-1);
 	grid-gap: 5px;
-	grid-template-columns: repeat(auto-fit, 200px);
+	flex-wrap: wrap-reverse;
 	width: 100%;
 	bottom: 0;
 	left: 0;
 	pointer-events: none;
 }
 
-:host > ul > li {
-	transform: scaleY(-1);
+:host > footer > div {
+	width: 200px;
+	position: relative;
 	pointer-events: auto;
 }
 
-:host > ul > li > windows-window:not([maximised]) {
+:host > footer > div > windows-window:not([maximised]) {
 	visibility: hidden;
 }
 
-:host > ul > li > windows-window {
+:host > footer > div > windows-window {
 	min-height: auto;
 	position: static;
 	--overlay-on: none;
