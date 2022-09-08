@@ -61,7 +61,7 @@ export class MenuElement extends HTMLElement {
 			}
 			e.stopPropagation();
 		}});
-		new MutationObserver(() => this.#s.assign(...Array.from(this.children).filter(e => e instanceof MenuItem))).observe(this, {"childList": true});
+		new MutationObserver(() => this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement))).observe(this, {"childList": true});
 	}
 	[blur]() {
 		setTimeout(() => {
@@ -105,10 +105,7 @@ export class MenuElement extends HTMLElement {
 	}
 }
 
-class MenuItem extends HTMLElement {
-}
-
-export class ItemElement extends MenuItem {
+export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this, {"tabindex": -1, "onblur": () => this.parentNode?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
@@ -133,7 +130,7 @@ export class ItemElement extends MenuItem {
 	}
 }
 
-export class SubMenuElement extends MenuItem {
+export class SubMenuElement extends HTMLElement {
 	#s;
 	#p;
 	#m = null;

@@ -2,7 +2,7 @@ import type {Children, Props} from './dom.js';
 import {amendNode, event, eventCapture, eventRemove} from './dom.js';
 import {slot, style} from './html.js';
 
-export type MenuItems = MenuItem | MenuItems[];
+export type MenuItems = ItemElement | SubMenuElement | MenuItems[];
 
 export type SubMenuItems = ItemElement | MenuElement | SubMenuItems[];
 
@@ -54,7 +54,7 @@ export class MenuElement extends HTMLElement {
 					setTimeout(() => {
 						const m = s[menuElement]();
 						if (m) {
-							(m.#s.assignedNodes()[0] as MenuItem | undefined)?.focus();
+							(m.#s.assignedNodes()[0] as ItemElement | SubMenuElement | undefined)?.focus();
 						}
 					});
 				}
@@ -63,12 +63,12 @@ export class MenuElement extends HTMLElement {
 				e.preventDefault();
 			case "ArrowDown":
 			case "ArrowUp":
-				const an = (this.#s.assignedNodes() as MenuItem[]).filter(e => !e.hasAttribute("disabled")),
+				const an = (this.#s.assignedNodes() as (ItemElement | SubMenuElement)[]).filter(e => !e.hasAttribute("disabled")),
 				      pos = an.findIndex(e => e.contains(da));
 				an.at(e.key === "ArrowUp" ? pos < 0 ? pos : pos - 1 : (pos + 1) % an.length)?.focus();
 				break;
 			default:
-				const ans = (this.#s.assignedNodes() as MenuItem[]).filter(i => i.getAttribute("key") === e.key && !i.hasAttribute("disabled"));
+				const ans = (this.#s.assignedNodes() as (ItemElement | SubMenuElement)[]).filter(i => i.getAttribute("key") === e.key && !i.hasAttribute("disabled"));
 				ans.at((ans.findIndex(e => e.contains(da)) + 1) % ans.length)?.focus();
 				if (ans.length === 1) {
 					ans[0]?.select();
@@ -76,7 +76,7 @@ export class MenuElement extends HTMLElement {
 			}
 			e.stopPropagation();
 		}});
-		new MutationObserver(() => this.#s.assign(...Array.from(this.children).filter(e => e instanceof MenuItem))).observe(this, {"childList": true});
+		new MutationObserver(() => this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement))).observe(this, {"childList": true});
 	}
 	[blur]() {
 		setTimeout(() => {
@@ -120,11 +120,7 @@ export class MenuElement extends HTMLElement {
 	}
 }
 
-abstract class MenuItem extends HTMLElement {
-	abstract select(): void;
-}
-
-export class ItemElement extends MenuItem {
+export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as MenuElement | SubMenuElement | null)?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
@@ -149,7 +145,7 @@ export class ItemElement extends MenuItem {
 	}
 }
 
-export class SubMenuElement extends MenuItem {
+export class SubMenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
 	#p: HTMLSlotElement;
 	#m: MenuElement | null = null;
