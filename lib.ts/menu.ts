@@ -11,10 +11,6 @@ const blur = Symbol("blur"),
       itemElement = Symbol("itemElement"),
       menuElement = Symbol("menuElement");
 
-interface Updater extends Node {
-	[blur]?: () => void;
-}
-
 export class MenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
 	#c?: Function;
@@ -131,7 +127,7 @@ abstract class MenuItem extends HTMLElement {
 export class ItemElement extends MenuItem {
 	constructor() {
 		super();
-		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as Updater | null)?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
+		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as MenuElement | SubMenuElement | null)?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
 			if (document.activeElement !== this) {
 				this.focus();
 			}
@@ -235,7 +231,7 @@ export class SubMenuElement extends MenuItem {
 		} else {
 			amendNode(this, {"open": false});
 			this.#p.assign();
-			(this.parentNode as Updater | null)?.[blur]?.();
+			(this.parentNode as MenuElement | SubMenuElement | null)?.[blur]?.();
 		}
 	}
 	[disconnect]() {
