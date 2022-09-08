@@ -9,7 +9,6 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [bbcode](#bbcode)                           | A BBCode parser. |
 | [bbcode_tags](#bbcode_tags)                 | A collection of BBCode tags. |
 | [conn](#conn)                               | Convenience wrappers around [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket). |
-| [context](#context)                         | Library for creating right-click menus. Needs rewriting. |
 | [dom](#dom)                                 | Functions for manipulating the DOM. |
 | [drag](#drag)                               | Library for making browser Drag'n'Drop easier to use. |
 | [events](#events)                           | Functions to simplify starting & stopping global keyboard and mouse events. |
@@ -280,102 +279,6 @@ when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: string) =
 ```
 
 This method acts like the [then](#inter_subscription_then) method of the [Subscription](#inter_subscription) class from the [inter](#inter) module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error string. The method returns a [Subscription](#inter_subscription) object with the success and error functions set to those provided.
-
-## <a name="context">context</a>
-
-The context module has functions to create custom context menus. This module is due for a rewrite, so the current API may change.
-
-This module directly import the [dom](#dom) and [html](#html) modules, and relies on the [load](#load) module.
-
-|  Export  |  Type  |  Description  |
-|----------|--------|---------------|
-| [(default)](#context_default) | Function | This function produces a context menu, with mouse and keyboard navigation. |
-| [item](#context_item) | Function | This function creates a menu item. |
-| [Item](#context_item_type) | Type | This type represents a menu item. |
-| [List](#context_list) | Type | This type is a recursive array of [Item](#context_item_type)s and [Menu](#content_menu_item)s. |
-| [menu](#context_menu) | Function | This function creates a submenu item.
-| [Menu](#context_menu_item) | Type | This type represents a submenu item. |
-
-### <a name="context_default">(default)</a>
-```typescript
-(base: Element, coords: [number, number], list: List) => Promise<any>;
-```
-
-The default export function creates a Context Menu in the base element at the coords provided. The menu is filled with the items denoted by the [List](#context_list).
-
-### <a name="context_item">item</a>
-```typescript
-(name: string, action: () => any, options: Options = {}) => Item;
-```
-
-This helper creates an [Item](#context_item_type) with the name and action set, with the [Options](#context_options) provided.
-
-### <a name="context_item_type">Item</a>
-```typescript
-{
-	classes?: string;
-	id?: string;
-	disabled?: boolean;
-	name: string;
-	action: () => any;
-}
-```
-
-This type represents an item of a menu. The `classes`, `id`, and `disabled` fields are defined in the [Options](#context_options) type.
-
-|  Field  |  Description  |
-|---------|---------------|
-| name    | This is the name in the item element. |
-| action  | This is a function that will be called when an item is activated. It's return will be the return value of the [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) return by the [(default)](#context_default) function. |
-
-
-### <a name="context_list">List</a>
-```typescript
-(Item | Menu | List)[];
-```
-
-This type is a recursive array of Items and Menus.
-
-### <a name="context_menu">menu</a>
-```typescript
-(name: string, list: List, options: Options = {})
-```
-
-This helper creates an [Menu](#context_menu_type) with the name set, and with the [Options](#context_options) provided.
-
-### <a name="context_menu_type">Menu</a>
-```typescript
-{
-	classes?: string;
-	id?: string;
-	disabled?: boolean;
-	name: string;
-	list: (Item | Menu)[];
-}
-```
-
-This type represents a submenu of a menu. The `classes`, `id`, and `disabled` fields are defined in the [Options](#context_options) type.
-
-|  Field  |  Description  |
-|---------|---------------|
-| name    | This is the name in the item element. |
-| list    | This is an array of the elements of the submenu |
-
-### <a name="context_options">Options</a>
-```typescript
-{
-	classes?: string;
-	id?: string;
-	disabled?: boolean;
-}
-```
-
-This unexported type represents the options passed to the [item](#context_item) and [menu](#context_menu) functions.
-|  Field   |  Description  |
-|----------|---------------|
-| classes  | This sets classes on the item or submenu elements.
-| id       | This sets an ID on the item or submenu element.
-| disabled | This disabled an item or submenu element.
 
 ## <a name="dom">dom</a>
 
