@@ -6,14 +6,12 @@ export type MenuItems = MenuItem | MenuItems[];
 
 export type SubMenuItems = ItemElement | MenuElement | SubMenuItems[];
 
-const updateItems = Symbol("addItem"),
-      blur = Symbol("blur"),
+const blur = Symbol("blur"),
       disconnect = Symbol("disconnect"),
       itemElement = Symbol("itemElement"),
       menuElement = Symbol("menuElement");
 
 interface Updater extends Node {
-	[updateItems]?: () => void;
 	[blur]?: () => void;
 }
 
@@ -82,6 +80,7 @@ export class MenuElement extends HTMLElement {
 			}
 			e.stopPropagation();
 		}});
+		new MutationObserver(() => this.#s.assign(...Array.from(this.children).filter(e => e instanceof MenuItem))).observe(this, {"childList": true});
 	}
 	[blur]() {
 		setTimeout(() => {
@@ -94,13 +93,8 @@ export class MenuElement extends HTMLElement {
 			}
 		});
 	}
-	[updateItems]() {
-		this.#s.assign(...Array.from(this.children).filter(e => e instanceof MenuItem));
-	}
 	connectedCallback() {
-		if (this.parentNode instanceof SubMenuElement) {
-			this.parentNode[updateItems]();
-		} else {
+		if (!(this.parentNode instanceof SubMenuElement)) {
 			amendNode(window, {"onmousedown": event(this.#c = (e: MouseEvent) => {
 				if (!this.contains(e.target as Node)) {
 					this.remove();
@@ -122,7 +116,6 @@ export class MenuElement extends HTMLElement {
 			amendNode(window, {"onmousedown": event(this.#c, eventCapture | eventRemove)});
 			this.#c = undefined;
 		}
-		(this.parentNode as Updater | null)?.[updateItems]?.();
 		for (const c of this.children) {
 			if (c instanceof SubMenuElement) {
 				c[disconnect]();
@@ -132,12 +125,6 @@ export class MenuElement extends HTMLElement {
 }
 
 abstract class MenuItem extends HTMLElement {
-	connectedCallback() {
-		(this.parentNode as Updater | null)?.[updateItems]?.();
-	}
-	disconnectedCallback() {
-		this.connectedCallback();
-	}
 	abstract select(): void;
 }
 
@@ -186,29 +173,29 @@ export class SubMenuElement extends MenuItem {
 			this.#s = slot(),
 			this.#p = slot()
 		]);
-	}
-	[updateItems]() {
-		this.#i = null;
-		this.#m = null;
-		for (const c of this.children) {
-			if (!this.#i && c instanceof ItemElement) {
-				this.#s.assign(this.#i = c);
-				if (this.#m) {
-					return;
-				}
-			} else if (!this.#m && c instanceof MenuElement) {
-				this.#m = c;
-				if (this.#i) {
-					return;
+		new MutationObserver(() => {
+			this.#i = null;
+			this.#m = null;
+			for (const c of this.children) {
+				if (!this.#i && c instanceof ItemElement) {
+					this.#s.assign(this.#i = c);
+					if (this.#m) {
+						return;
+					}
+				} else if (!this.#m && c instanceof MenuElement) {
+					this.#m = c;
+					if (this.#i) {
+						return;
+					}
 				}
 			}
-		}
-		if (!this.#i) {
-			this.#s.assign();
-		}
-		if (!this.#m) {
-			this.#p.assign();
-		}
+			if (!this.#i) {
+				this.#s.assign();
+			}
+			if (!this.#m) {
+				this.#p.assign();
+			}
+		}).observe(this, {"childList": true});
 	}
 	select() {
 		if (!this.hasAttribute("disabled")) {
