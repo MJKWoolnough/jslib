@@ -454,11 +454,11 @@ To be used in [dragover](https://developer.mozilla.org/en-US/docs/Web/API/HTMLEl
 ### <a name="drag_dragtransfer_register">register</a>
 ```typescript
 export class DragTransfer<T = any> {
-	register(t: Transfer<T>): string;
+	register(t: Transfer<T> | () => T): string;
 }
 ```
 
-This method registers a [Transfer](#drag_transfer) object to this handler and returns a unique key for this objects format. The key can be used with both the [set](#drag_dragtransfer_set) and [deregister](#drag_dragtransfer_deregister) methods.
+This method registers a [Transfer](#drag_transfer) object, or a function that returns T, to this handler and returns a unique key for this objects format. The key can be used with both the [set](#drag_dragtransfer_set) and [deregister](#drag_dragtransfer_deregister) methods.
 
 ### <a name="drag_dragtransfer_set">set</a>
 ```typescript
