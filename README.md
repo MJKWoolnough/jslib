@@ -581,7 +581,7 @@ The fraction module exports a default class to act as a fractional, infinite pre
 |---------|---------|---------------|
 | [add](#fraction_add) | Method | Adds fractions together. |
 | [cmp](#fraction_cmp) | Method | Compares two Fractions. |
-| [constructor](#fraction_constructor) | Method | Creates new Fractions. |
+| [constructor](#fraction_constructor) | Constructor | Creates new Fractions. |
 | [div](#fraction_div) | Method | Divide one Fraction by another. |
 | [isNaN](#fraction_isnan) | Method | Determines if a Fraction is NotANumber. |
 | [max](#fraction_max) | Static Method | Get the larger of two Fractions. |
