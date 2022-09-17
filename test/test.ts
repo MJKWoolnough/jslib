@@ -2560,11 +2560,25 @@
 				      t = {"transfer": () => 1};
 				return dt.register(t) === "0" && dt.register(t) === "1" && dt.register(t) === "2";
 			},
+			"register fn": async () => {
+				const {DragTransfer} = await import("./lib/drag.js"),
+				      dt = new DragTransfer<number>(""),
+				      t = () => 1;
+				return dt.register(t) === "0" && dt.register(t) === "1" && dt.register(t) === "2";
+			},
 			"get": async () => {
 				const {DragTransfer} = await import("./lib/drag.js"),
 				      dt = new DragTransfer<number>(""),
 				      k1 = dt.register({"transfer": () => 1}),
 				      k2 = dt.register({"transfer": () => 2}),
+				      preventDefault = () => {};
+				return dt.get({"dataTransfer": {"getData": () => k1}, preventDefault} as any as DragEvent) === 1 && dt.get({"dataTransfer": {"getData": () => k2}, preventDefault} as any as DragEvent) === 2 && dt.get({"dataTransfer": {"getData": () => ""}, preventDefault} as any as DragEvent) === undefined;
+			},
+			"get fns": async () => {
+				const {DragTransfer} = await import("./lib/drag.js"),
+				      dt = new DragTransfer<number>(""),
+				      k1 = dt.register(() => 1),
+				      k2 = dt.register(() => 2),
 				      preventDefault = () => {};
 				return dt.get({"dataTransfer": {"getData": () => k1}, preventDefault} as any as DragEvent) === 1 && dt.get({"dataTransfer": {"getData": () => k2}, preventDefault} as any as DragEvent) === 2 && dt.get({"dataTransfer": {"getData": () => ""}, preventDefault} as any as DragEvent) === undefined;
 			},
