@@ -381,6 +381,143 @@ The keys of this type refer to the attribute names that are to be set. The key d
 | `style` | A [CSSStyleDeclaration](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration) can be used to set the style directly, or an Object can be used to set individual style properties. |
 | `*` | For any key, a string or any object with a toString method can be used to set the field explicitly, a number can be used and converted to a string, a boolean can be used to toggle an attribute, and a undefined value can be used to remove an attribute. |
 
+## <a name="drag">drag</a>
+
+The drag module aids with handling [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent)s, allowing the transfer of complex objects without having to resort to encoding as JSON.
+
+|  Export        |  Type  |  Description  |
+|----------------|--------|---------------|
+| [DragTransfer](#drag_dragtransfer) | Class | This class creates a management object for a particular class of dragged objects. |
+| [DragFiles](#drag_dragfiles) | Class | This class helps with dragged [File](https://developer.mozilla.org/en-US/docs/Web/API/File)s. |
+| [setDragEffect](#drag_setdrageffect | Function | This function creates a helper function with sets the drop effect icon in a [dragover](https://developer.mozilla.org/en-US/docs/Web/API/Document/dragover_event) event. |
+
+### <a name="drag_checkeddragevent">CheckedDragEvent</a>
+```typescript
+interface CheckedDragEvent extends DragEvent {
+	dataTransfer: DataTransfer;
+}
+```
+
+This unexported type is used by [DragFiles](#drag_dragfiles) [is](#drag_dragfiles_is) method to mark the [DataTransfer](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer) as existing on a [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent).
+
+### <a name="drag_checkeddt">CheckedDT</a>
+```typescript
+interface CheckedDT<T> extends DragTransfer<T> {
+	get(e: DragEvent): T;
+}
+```
+
+This unexported type is used by [DragTransfer](#drag_dragtransfer)s [is](#drag_dragtransfer_is) method to mark the DragTransfers [get](#drag_dragtransfer_get) method as guaranteed to return a T.
+
+### <a name="drag_dragtransfer">DragTransfer</a>
+
+The DragTransfer class is used to register and handle drag targets for drop targets to retrieve. It has the following methods:
+
+|  Method  |  Description  |
+|----------|---------------|
+| constructor | The `constructor` takes a format string which uniquely identifies the drag type, as per the [DataTransfer](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer)s [setData](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setData) method. |
+| [deregister](#drag_dragtransfer_deregister) | The method unregisters a [Transfer](#drag_transfer) type registered with the [register](#drag_dragtransfer_register) method. |
+| [get](#drag_dragtransfer_get) | The method is to be used during a [DragOver](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event) or [drop](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event) event to get a drag object. |
+| [is](#drag_dragtransfer_is) | This method determines if the dragged object is registered with this object. |
+| [register](#drag_dragtransfer_register) | This method is used to register objects for dragging. |
+| [set](#drag_dragtransfer_set) | The method is used during a [dragstart](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragstart_event) event to mark an object as being dragged. |
+
+### <a name="drag_dragtransfer_deregister">deregister</a>
+```typescript
+export class DragTransfer<T = any> {
+	deregister(key: string): void;
+}
+```
+
+This method takes the key returned from the [register](#drag_dragtransfer_register) method and stops it from being used as a drag target. Required for an item to be garbage collected.
+
+### <a name="drag_dragtransfer_get">get</a>
+```typescript
+export class DragTransfer<T = any> {
+	get(e: DragEvent): T | undefined;
+}
+```
+
+The get method finds the key associated with this objects format and returns the object linked to it, if available. Returns undefined if the DragEvent has not got this objects format registered, or the key is invalid.
+
+The [preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault) method of the [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent) object is called during this method.
+
+### <a name="drag_dragtransfer_is">is</a>
+```typescript
+export class DragTransfer<T = any> {
+	is(e: DragEvent): this is CheckedDT<T>;
+}
+```
+
+To be used in [dragover](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event) and [drop](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event) events, this method determines is the passed [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent)'s [DataTransfer.types](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types) array contains this objects format string, marking this object as a [CheckedDT](#drag_checkeddt) type.
+
+### <a name="drag_dragtransfer_register">register</a>
+```typescript
+export class DragTransfer<T = any> {
+	register(t: Transfer<T>): string;
+}
+```
+
+This method registers a [Transfer](#drag_transfer) object to this handler and returns a unique key for this objects format. The key can be used with both the [set](#drag_dragtransfer_set) and [deregister](#drag_dragtransfer_deregister) methods.
+
+### <a name="drag_dragtransfer_set">set</a>
+```typescript
+export class DragTransfer<T = any> {
+	set(e: DragEvent, key: string, icon?: HTMLDivElement, xOffset = -5, yOffset = -5): void;
+}
+```
+
+This method is used during a [dragstart](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragstart_event) to mark the object being dragged. Requires the [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event) and the key returned from the [register](#drag_dragtransfer_register) method, and optionally takes a drag icon [div](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDivElement) and x and y offsets from the cursor.
+
+## <a name="drag_dragfiles">DragFiles</a>
+
+This class allows for easier use of the [files](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/files) property of the [DataTransfer](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer) object.
+
+|  Field  |  Type  |  Description  |
+|---------|--------|---------------|
+| [asForm](#drag_dragfiles_asform) | Method | This method creates a [FormData](https://developer.mozilla.org/en-US/docs/Web/API/FormData) with passed files attached. |
+| constructor | Constructor | Takes a spread of mime types that this object will match files against. |
+| [is](#drag_dragfiles_is) | Method | This method determines if a [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event) contains files that match the allowed mime types. |
+| mimes | Array | This array is the list of mime types passed to the constructor. |
+
+### <a name="drag_dragfiles_asform">asForm</a>
+```typescript
+class DragFiles {
+	asForm(e: DragEvent, name: string): FormData;
+}
+```
+
+This method attaches all files on the [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event) to a returned [FormData](https://developer.mozilla.org/en-US/docs/Web/API/FormData) data object under the name provided.
+
+The [preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault) method of the [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent) object is called during this method.
+
+### <a name="drag_dragfiles_is">is</a>
+```typescript
+class DragFiles {
+	is(e: DragEvent): e is CheckedDragEvent;
+}
+```
+
+This method checks all items attached to the [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event), returning true is all items are files that match the mime types provided to the constructor, and false otherwise.
+
+This method also marks the DragEvent as a [CheckedDragEvent](#drag_checkdragevent) if it returns true.
+
+## <a name="drag_setdrageffect">setDragEffect</a>
+```typescript
+(effects: Partial<Record<typeof DataTransfer.prototype.dropEffect, (DragTransfer | DragFiles)[]>>) => (e: DragEvent) => boolean;
+```
+
+This method takes an object of dropEffect keys to arrays of [DragTransfer](#drag_dragtransfer) and [DragFiles](#drag_dragfiles) objects, and returns a function. The function is to be called during a [dragover](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event) event to set the dropEffect on the passed [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event). The icon set is determined by the first DragTransfer or DragFiles object whose format is set on the event.
+
+### <a name="drag_transfer">Transfer</a>
+```typescript
+interface Transfer<T> {
+	transfer(): T;
+}
+```
+
+The unexported Transfer interface describes an object that will transfer a T to a caller of [DragTransfer](#drag_dragtransfer)<T>.get.
+
 ## <a name="events">events</a>
 
 The event module is used for easy creation of global events.
