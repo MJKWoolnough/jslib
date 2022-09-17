@@ -2,6 +2,8 @@ interface Transfer<T> {
 	transfer(): T;
 }
 
+type TransferFunc<T> = () => T;
+
 interface CheckedDragEvent extends DragEvent {
 	dataTransfer: DataTransfer;
 }
@@ -13,21 +15,22 @@ interface CheckedDT<T> extends DragTransfer<T> {
 type Effect = typeof DataTransfer.prototype.dropEffect;
 
 export class DragTransfer<T = any> {
-	#data = new Map<string, Transfer<T>>();
+	#data = new Map<string, Transfer<T> | TransferFunc<T>>();
 	#nextID = 0;
 	#format: string;
 	#last = "";
 	constructor(format: string) {
 		this.#format = format;
 	}
-	register(t: Transfer<T>) {
+	register(t: Transfer<T> | TransferFunc<T>) {
 		const key = this.#nextID++ + "";
 		this.#data.set(key, t);
 		return key;
 	}
 	get(e: DragEvent): T | undefined {
 		e.preventDefault();
-		return this.#data.get(e.dataTransfer?.getData(this.#format) || this.#last)?.transfer();
+		const t = this.#data.get(e.dataTransfer?.getData(this.#format) || this.#last);
+		return t instanceof Function ? t() : t?.transfer();
 	}
 	set(e: DragEvent, key: string, icon?: HTMLDivElement, xOffset = -5, yOffset = -5) {
 		this.#last = key;
