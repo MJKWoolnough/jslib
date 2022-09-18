@@ -368,4 +368,10 @@ all = Object.freeze({
 	quote,
 	list,
 	[textSymbol]: text
-});
+}),
+none = (n: Node, t: Tokeniser, p: Parsers) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		process(n, t, p, tk.tagName);
+	}
+};

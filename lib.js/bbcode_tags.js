@@ -366,4 +366,10 @@ all = Object.freeze({
 	quote,
 	list,
 	[textSymbol]: text
-});
+}),
+none = (n, t, p) => {
+	const tk = t.next(true).value;
+	if (tk && isOpenTag(tk)) {
+		process(n, t, p, tk.tagName);
+	}
+};
