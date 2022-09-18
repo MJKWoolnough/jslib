@@ -1621,6 +1621,7 @@ The windows_taskbar module provides a replacement for the [windows](#windows) mo
 
 |  Export      |  Type    |  Description |
 |--------------|----------|--------------|
+| setLanguage  | Function | A replacement for the [setLanguage](#windows_setlanguage) function, which in addition to calling the original, sets the language entries used for the context menu for the items on the taskbar. The menu access keys are set to the first character of the entry. |
 | shell        | Function | A [DOMBind](#dom_dombind) that creates a ShellElement. |
 | ShellElement | Class    | A drop-in replacement for the [windows](#windows) module [ShellElement](#windows_shellelement). Registered with customElements as `windows-shell-taskbar`. |
 
