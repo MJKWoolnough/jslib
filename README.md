@@ -1617,7 +1617,7 @@ The focus method will bring the unset a minimise attribute and bring the deepest
 
 ## <a name="windows_taskbar">windows_taskbar</a>
 
-The windows_taskbar module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that provides a taskbar for `Windows` to be managed from and allows the `Windows` to be minimised.
+The windows_taskbar module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that provides a taskbar for `Windows` to be managed from and allows the `Windows` to be minimised. The exports are the same as the [windows](#windows) module, except for the changes below.
 
 |  Export      |  Type    |  Description |
 |--------------|----------|--------------|
@@ -1626,11 +1626,11 @@ The windows_taskbar module provides a replacement for the [windows](#windows) mo
 
 ## <a name="windows_taskmanager">windows_taskmanager</a>
 
-The windows_taskmanager module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that allows `Windows` to be minimised within the shell, appearing as just the title-bar at the bottom of the shell.
-
-NB: Any [custom control buttons](#windows_windowelement_addcontrolbutton) will not be displayed on the title-bar while minimised.
+The windows_taskmanager module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that allows `Windows` to be minimised within the shell, appearing as just the title-bar at the bottom of the shell.aThe exports are the same as the [windows](#windows) module, except for the changes below.
 
 |  Export      |  Type    |  Description |
 |--------------|----------|--------------|
 | shell        | Function | A [DOMBind](#dom_dombind) that creates a ShellElement. |
 | ShellElement | Class    | A drop-in replacement for the [windows](#windows) module [ShellElement](#windows_shellelement). Registered with customElements as `windows-shell-taskmanager`. |
+
+NB: Any [custom control buttons](#windows_windowelement_addcontrolbutton) will not be displayed on the title-bar while minimised.
