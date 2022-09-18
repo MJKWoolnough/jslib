@@ -1,15 +1,38 @@
 import type {Children, Props} from './dom.js';
 import {item, menu} from './menu.js';
-import {amendNode, event, eventOnce} from './dom.js';
-import {div, img, li, slot, span, style, ul} from './html.js';
-import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage, windows} from './windows.js';
+import {amendNode, clearNode, event, eventOnce} from './dom.js';
+import {div, img, li, slot, span, style, template, ul} from './html.js';
+import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage as setOtherLanguage, windows} from './windows.js';
 
-export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows};
+export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, windows};
 
 const windowObservations = {
 	"attributeFilter": ["window-icon", "window-title"],
 	"attributes": true
+      },
+      underline = {"style": "text-decoration: underline"},
+      close = template(),
+      minimise = template(),
+      restore = template(),
+      keys = {
+	"CLOSE": '',
+	"MINIMISE": '',
+	"RESTORE": ''
+      },
+      setMenuLang = (l: Parameters<typeof setOtherLanguage>[0]) => {
+	for (const [k, t] of [["CLOSE", close], ["MINIMISE", minimise], ["RESTORE", restore]] as const) {
+		const le = l[k];
+		if (le) {
+			clearNode(t, [span(underline, keys[k] = le.charAt(0)), le.slice(1)]);
+		}
+	}
       };
+
+setMenuLang({
+	"CLOSE": "Close",
+	"MINIMISE": "Minimise",
+	"RESTORE": "Restore",
+});
 
 export class ShellElement extends BaseShellElement {
 	constructor() {
@@ -181,11 +204,11 @@ export class ShellElement extends BaseShellElement {
 						      }, "oncontextmenu": (e: MouseEvent) => {
 							e.preventDefault();
 							amendNode(self, menu({"x": e.clientX, "y": e.clientY}, [
-								w.hasAttribute("minimised") ? item({"key": "r", "onselect": () => {
+								w.hasAttribute("minimised") ? item({"key": keys["RESTORE"], "onselect": () => {
 									amendNode(w, {"minimised": false});
 									w.focus();
-								}}, span([span({"style": "text-decoration underline"}, "R"), "estore"])) : item({"key": "m", "onselect": () => amendNode(w, {"minimised": true})}, span([span({"style": "text-decoration underline"}, "M"), "inimise"])),
-								item({"key": "c", "onselect": () => w.close()}, span([span({"style": "text-decoration underline"}, "C"), "lose"]))
+								}}, restore.content.cloneNode(true)) : item({"key": keys["MINIMISE"], "onselect": () => amendNode(w, {"minimised": true})}, minimise.content.cloneNode(true)),
+								item({"key": keys["CLOSE"], "onselect": () => w.close()}, close.content.cloneNode(true))
 							]));
 						      }}, [
 							img({"part": "icon", "src": w.getAttribute("window-icon") || undefined, "title": w.getAttribute("window-title") ?? undefined}),
@@ -207,4 +230,8 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskbar", ShellElement);
 
-export const shell = (props?: Props | Children, children?: Children) => amendNode(new ShellElement(), props, children);
+export const shell = (props?: Props | Children, children?: Children) => amendNode(new ShellElement(), props, children),
+setLanguage = (l: Parameters<typeof setOtherLanguage>[0]) => {
+	setOtherLanguage(l);
+	setMenuLang(l);
+};
