@@ -179,6 +179,7 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 |  Export       |  Type    |  Description  |
 |---------------|----------|---------------|
 | all           | [Parsers](#bbcode_parsers) | An object which contains all of the tag processors and the text processor. |
+| none          | [TagFn](#bbcode_tagfn) | A special tag processor that ignores the tag and continues processing the inner text. |
 | text          | Function | A text processor that converts all line breaks into HTMLBRElement's. |
 | *             | [TagFn](#bbcode_tagfn) | All remaining exports are tag processors |
 
