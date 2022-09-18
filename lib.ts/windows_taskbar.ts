@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import contextPlace, {item as contextItem} from './context.js';
+import {item, menu} from './menu.js';
 import {amendNode, event, eventOnce} from './dom.js';
 import {div, img, li, slot, span, style, ul} from './html.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage, windows} from './windows.js';
@@ -21,13 +21,13 @@ export class ShellElement extends BaseShellElement {
 			if (type !== "attributes" || !(target instanceof WindowElement)) {
 				return;
 			}
-			const item = windowData.get(target)!.firstChild!;
+			const itm = windowData.get(target)!.firstChild!;
 			switch (attributeName) {
 			case "window-icon":
-				amendNode(item, {"src": target.getAttribute("window-icon") ?? undefined});
+				amendNode(itm, {"src": target.getAttribute("window-icon") ?? undefined});
 				break;
 			case "window-title":
-				amendNode(item, target.getAttribute("window-title") ?? "");
+				amendNode(itm, target.getAttribute("window-title") ?? "");
 				break;
 			}
 		      }));
@@ -169,7 +169,7 @@ export class ShellElement extends BaseShellElement {
 						return;
 					}
 					if (!windowData.has(w) && !w.hasAttribute("window-hide")) {
-						const item = li({"onclick": () => {
+						const itm = li({"onclick": () => {
 							if (w.hasAttribute("minimised")) {
 								amendNode(w, {"minimised": false});
 								w.focus();
@@ -180,22 +180,22 @@ export class ShellElement extends BaseShellElement {
 							}
 						      }, "oncontextmenu": (e: MouseEvent) => {
 							e.preventDefault();
-							contextPlace(self, [e.clientX, e.clientY], [
-								w.hasAttribute("minimised") ? contextItem("&Restore", () => {
+							amendNode(self, menu({"x": e.clientX, "y": e.clientY}, [
+								w.hasAttribute("minimised") ? item({"key": "r", "onselect": () => {
 									amendNode(w, {"minimised": false});
 									w.focus();
-								}) : contextItem("&Minimise", () => amendNode(w, {"minimised": true})),
-								contextItem("&Close", () => w.close())
-							]);
+								}}, span([span({"style": "text-decoration underline"}, "R"), "estore"])) : item({"key": "m", "onselect": () => amendNode(w, {"minimised": true})}, span([span({"style": "text-decoration underline"}, "M"), "inimise"])),
+								item({"key": "c", "onselect": () => w.close()}, span([span({"style": "text-decoration underline"}, "C"), "lose"]))
+							]));
 						      }}, [
 							img({"part": "icon", "src": w.getAttribute("window-icon") || undefined, "title": w.getAttribute("window-title") ?? undefined}),
 							span({"part": "title"}, w.getAttribute("window-title") || "")
 						      ]);
-						amendNode(taskbar, item);
-						windowData.set(w, item);
+						amendNode(taskbar, itm);
+						windowData.set(w, itm);
 						amendNode(w, {"onremove": event(() => {
 							windowData.delete(w);
-							item.remove();
+							itm.remove();
 						}, eventOnce)});
 						windowObserver.observe(w, windowObservations);
 					}
