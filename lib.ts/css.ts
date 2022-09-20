@@ -21,7 +21,7 @@ export class CSS {
 	#class = 0;
 	#id = 0;
 	constructor(prefix?: string) {
-		this.#prefix = prefix ?? "";
+		this.#prefix = (prefix ?? "") + "_";
 	}
 	add(id: string, def: Def) {
 		if (!(id = normalise(id))) {
