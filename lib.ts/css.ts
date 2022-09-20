@@ -12,7 +12,7 @@ interface Def {
 
 type innerDef = Record<string, Value | ValueFn>;
 
-const simplify = (id: string) => id,
+const normalise = (id: string) => id,
       isDef = (v: Value | Def | ValueFn): v is Def => Object.getPrototypeOf(v) === Object.prototype;
 
 export class CSS {
@@ -27,7 +27,9 @@ export class CSS {
 		this.#prefix = prefix ?? "";
 	}
 	add(id: string, def: Def) {
-		id = simplify(id);
+		if (!(id = normalise(id))) {
+			return;
+		}
 		let o = this.#data.get(id);
 		if (!o) {
 			this.#data.set(id, o = {});
