@@ -13,7 +13,7 @@ interface Def {
 type innerDef = Record<string, Value | ValueFn>;
 
 const simplify = (id: string) => id,
-      isDef = (v: Value | Def | ValueFn): v is Def => v instanceof Object;
+      isDef = (v: Value | Def | ValueFn): v is Def => Object.getPrototypeOf(v) === Object.prototype;
 
 export class CSS {
 	#style: HTMLStyleElement;
