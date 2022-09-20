@@ -16,14 +16,11 @@ const normalise = (id: string) => id,
       isDef = (v: Value | Def | ValueFn): v is Def => Object.getPrototypeOf(v) === Object.prototype;
 
 export class CSS {
-	#style: HTMLStyleElement;
 	#data = new Map<string, innerDef>();
 	#prefix: string;
 	#class = 0;
 	#id = 0;
 	constructor(prefix?: string) {
-		this.#style = document.createElement("style");
-		this.#style.setAttribute("type", "text/css");
 		this.#prefix = prefix ?? "";
 	}
 	add(id: string, def: Def) {
@@ -48,6 +45,12 @@ export class CSS {
 	}
 	id(def: Def) {
 		return new Identifier(this, "#" + this.#prefix + this.#id++).add(def);
+	}
+	render() {
+		const s = document.createElement("style");
+		s.setAttribute("type", "text/css");
+		// render data -> s
+		return s;
 	}
 }
 
