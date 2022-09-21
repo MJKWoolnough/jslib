@@ -101,7 +101,7 @@ export class CSS {
 			}
 		}
 	}
-	class(def: Def) {
+	className(def: Def) {
 		return new Identifier(this, "." + this.#classPrefix + this.#class++).add(def);
 	}
 	id(def: Def) {
