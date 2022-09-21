@@ -12,7 +12,59 @@ interface Def {
 
 type innerDef = Record<string, Value | ValueFn>;
 
-const normalise = (id: string) => id,
+const normalise = (id: string) => {
+	id = id.trim();
+	let string = "";
+	for (let i = 0; i < id.length; i++) {
+		const c = id.charAt(i);
+		switch (c) {
+		case '"':
+		case "'":
+			string = c === string ? "" : c;
+			break;
+		case "\\":
+			i++;
+			break;
+		default:
+			if (!string && !c.trim()) {
+				let end = false;
+				for (let j = i + 1; j < id.length; j++ ) {
+					switch (id.charAt(j).trim()) {
+					case '+':
+					case '>':
+					case '~':
+					case '|':
+					case ',':
+					case '(':
+					case '[':
+						end = true;
+					case ')':
+					case ']':
+						id = id.slice(0, i) + id.slice(j);
+						i++;
+					case '':
+						break;
+					default:
+						if (i + 1 !== j) {
+							id = id.slice(0, i+1) + id.slice(j);
+						}
+					}
+				}
+				if (end) {
+					for (let j = i + 1; j < id.length; j++ ) {
+						if (id.charAt(j).trim()) {
+							if (i + 1 !== j) {
+								id = id.slice(0, i+1) + id.slice(j);
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	return id;
+      },
       isDef = (v: Value | Def | ValueFn): v is Def => Object.getPrototypeOf(v) === Object.prototype;
 
 export class CSS {
