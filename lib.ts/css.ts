@@ -73,11 +73,13 @@ export class CSS {
 	#data = new Map<string, innerDef>();
 	#idPrefix: string;
 	#classPrefix: string;
-	#class = 0;
-	#id = 0;
-	constructor(prefix = "") {
+	#id: number;
+	#class: number;
+	constructor(prefix = "", idStart = 0, classStart = 0) {
 		this.#idPrefix = idRE.test(prefix) ? prefix : "_";
 		this.#classPrefix = classRE.test(prefix) ? prefix : "_";
+		this.#id = idStart;
+		this.#class = classStart;
 	}
 	add(id: string | Identifier, def: Def) {
 		if (id instanceof Identifier) {
