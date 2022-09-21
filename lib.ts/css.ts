@@ -141,4 +141,10 @@ const normalise = (id: string) => {
       },
       isDef = (v: Value | Def | ValueFn): v is Def => Object.getPrototypeOf(v) === Object.prototype,
       idRE = /^[_a-z0-9\-\240-\377]+/i,
-      classRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i;
+      classRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
+      defaultCSS = new CSS();
+
+export const add = defaultCSS.add.bind(defaultCSS),
+className = defaultCSS.className.bind(defaultCSS),
+id = defaultCSS.id.bind(defaultCSS),
+render = defaultCSS.render.bind(defaultCSS);
