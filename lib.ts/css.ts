@@ -75,7 +75,10 @@ export class CSS {
 	constructor(prefix?: string) {
 		this.#prefix = (prefix ?? "") + "_";
 	}
-	add(id: string, def: Def) {
+	add(id: string | Identifier, def: Def) {
+		if (id instanceof Identifier) {
+			id = id.toString();
+		}
 		if (!(id = normalise(id))) {
 			return;
 		}
