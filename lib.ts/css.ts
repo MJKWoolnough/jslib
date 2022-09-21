@@ -101,7 +101,15 @@ export class CSS {
 	render() {
 		const s = document.createElement("style");
 		s.setAttribute("type", "text/css");
-		// render data -> s
+		let data = "";
+		for (const [specifier, style] of this.#data) {
+			data += specifier+"{";
+			for (const [ident, value] of Object.entries(style)) {
+				data += `${ident}:${value instanceof Function ? value() : value};`;
+			}
+			data += "}";
+		}
+		s.innerText = data;
 		return s;
 	}
 }
