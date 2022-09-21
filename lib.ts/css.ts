@@ -44,10 +44,10 @@ export class CSS {
 			}
 		}
 	}
-	className(def: Def) {
+	className(def: Def = {}) {
 		return new Identifier(this, "." + this.#classPrefix + this.#class++).add(def);
 	}
-	id(def: Def) {
+	id(def: Def = {}) {
 		return new Identifier(this, "#" + this.#idPrefix + this.#id++).add(def);
 	}
 	render() {
