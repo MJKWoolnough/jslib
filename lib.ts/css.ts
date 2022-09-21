@@ -65,15 +65,19 @@ const normalise = (id: string) => {
 	}
 	return id;
       },
-      isDef = (v: Value | Def | ValueFn): v is Def => Object.getPrototypeOf(v) === Object.prototype;
+      isDef = (v: Value | Def | ValueFn): v is Def => Object.getPrototypeOf(v) === Object.prototype,
+      idRE = /^[_a-z0-9\-\240-\377]+/i,
+      classRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i;
 
 export class CSS {
 	#data = new Map<string, innerDef>();
-	#prefix: string;
+	#idPrefix: string;
+	#classPrefix: string;
 	#class = 0;
 	#id = 0;
-	constructor(prefix?: string) {
-		this.#prefix = (prefix ?? "") + "_";
+	constructor(prefix = "") {
+		this.#idPrefix = idRE.test(prefix) ? prefix : "_";
+		this.#classPrefix = classRE.test(prefix) ? prefix : "_";
 	}
 	add(id: string | Identifier, def: Def) {
 		if (id instanceof Identifier) {
@@ -96,10 +100,10 @@ export class CSS {
 		}
 	}
 	class(def: Def) {
-		return new Identifier(this, "." + this.#prefix + this.#class++).add(def);
+		return new Identifier(this, "." + this.#classPrefix + this.#class++).add(def);
 	}
 	id(def: Def) {
-		return new Identifier(this, "#" + this.#prefix + this.#id++).add(def);
+		return new Identifier(this, "#" + this.#idPrefix + this.#id++).add(def);
 	}
 	render() {
 		const s = document.createElement("style");
