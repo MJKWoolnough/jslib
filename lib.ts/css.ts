@@ -55,11 +55,14 @@ export class CSS {
 		s.setAttribute("type", "text/css");
 		let data = "";
 		for (const [specifier, style] of this.#data) {
-			data += specifier+"{";
-			for (const [ident, value] of Object.entries(style)) {
-				data += `${ident}:${value instanceof Function ? value() : value};`;
+			const e = Object.entries(style);
+			if (e.length) {
+				data += specifier+"{";
+				for (const [ident, value] of e) {
+					data += `${ident}:${value instanceof Function ? value() : value};`;
+				}
+				data += "}";
 			}
-			data += "}";
 		}
 		s.innerText = data;
 		return s;
