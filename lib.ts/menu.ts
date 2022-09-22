@@ -1,6 +1,5 @@
-import type {Children, Props} from './dom.js';
-import {amendNode, event, eventCapture, eventRemove} from './dom.js';
-import {slot, style} from './html.js';
+import {amendNode, bindElement, event, eventCapture, eventRemove} from './dom.js';
+import {ns, slot, style} from './html.js';
 
 export type MenuItems = ItemElement | SubMenuElement | MenuItems[];
 
@@ -245,6 +244,6 @@ customElements.define("menu-menu", MenuElement);
 customElements.define("menu-item", ItemElement);
 customElements.define("menu-submenu", SubMenuElement);
 
-export const menu = (props?: Props | MenuItems, children?: MenuItems) => amendNode(new MenuElement(), props, children),
-item = (props?: Props | Children, children?: Children) => amendNode(new ItemElement(), props, children),
-submenu = (props?: Props | SubMenuItems, children?: SubMenuItems) => amendNode(new SubMenuElement(), props, children);
+export const menu = bindElement<MenuElement>(ns, "menu-menu"),
+item = bindElement<ItemElement>(ns, "menu-item"),
+submenu = bindElement<SubMenuElement>(ns, "menu-submenu");

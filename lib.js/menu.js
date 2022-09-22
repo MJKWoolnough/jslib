@@ -1,5 +1,5 @@
-import {amendNode, event, eventCapture, eventRemove} from './dom.js';
-import {slot, style} from './html.js';
+import {amendNode, bindElement, event, eventCapture, eventRemove} from './dom.js';
+import {ns, slot, style} from './html.js';
 
 const blur = Symbol("blur"),
       disconnect = Symbol("disconnect"),
@@ -223,6 +223,6 @@ customElements.define("menu-menu", MenuElement);
 customElements.define("menu-item", ItemElement);
 customElements.define("menu-submenu", SubMenuElement);
 
-export const menu = (props, children) => amendNode(new MenuElement(), props, children),
-item = (props, children) => amendNode(new ItemElement(), props, children),
-submenu = (props, children) => amendNode(new SubMenuElement(), props, children);
+export const menu = bindElement(ns, "menu-menu"),
+item = bindElement(ns, "menu-item"),
+submenu = bindElement(ns, "menu-submenu");
