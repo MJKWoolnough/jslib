@@ -1,5 +1,5 @@
-import {amendNode, autoFocus, clearNode, event, eventCapture} from './dom.js';
-import {button, div, img, input, slot, span, style} from './html.js';
+import {amendNode, autoFocus, bindElement,. clearNode, event, eventCapture} from './dom.js';
+import {button, div, img, input, ns, slot, span, style} from './html.js';
 import {ns as svgNS} from './svg.js';
 
 const resizeWindow = (w, direction, e) => {
@@ -405,9 +405,9 @@ customElements.define("windows-shell", ShellElement);
 customElements.define("windows-desktop", DesktopElement);
 customElements.define("windows-window", WindowElement);
 
-export const shell = (props, children) => amendNode(new ShellElement(), props, children),
-desktop = (props, children) => amendNode(new DesktopElement(), props, children),
-windows = (props, children) => amendNode(new WindowElement(), props, children),
+export const shell = bindElement(ns, "windows-shell"),
+desktop = bindElement(ns, "windows-desktop"),
+windows = bindElement(ns, "windows-window"),
 setDefaultIcon = icon => defaultIcon = icon,
 setLanguage = l => {Object.assign(lang, l)};
 
