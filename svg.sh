@@ -22,8 +22,8 @@ fi;
 
 if [ -n "$ts" ]; then
 	(
-		echo "import type {Children, DOMBind, Props} from './dom.js';";
-		echo "import {amendNode} from './dom.js';";
+		echo "import type {DOMBind} from './dom.js';";
+		echo "import {amendNode, bindElement} from './dom.js';";
 		echo -en "\nexport const ns = \"http://www.w3.org/2000/svg\",\nsvgData = (s: SVGSVGElement | SVGSymbolElement) => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + (s instanceof SVGSVGElement ? s.outerHTML.slice(4) : s.outerHTML.slice(7, -7) + \"svg>\")),\n[";
 		first=true;
 		for tag in $tags; do
@@ -38,7 +38,7 @@ if [ -n "$ts" ]; then
 				echo -n "$tag";
 			fi;
 		done;
-		echo -n "] = \"$tags\".split(\" \").map(e => (props?: Props | Children, children?: Children) => amendNode(document.createElementNS(ns, e), props, children)) as [";
+		echo -n "] = \"$tags\".split(\" \").map(e => bindElement(ns, e)) as [";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -63,7 +63,7 @@ fi;
 
 if [ -n "$js" ]; then
 	(
-		echo "import {amendNode} from './dom.js';";
+		echo "import {bindElement} from './dom.js';";
 		echo -en "\nexport const ns = \"http://www.w3.org/2000/svg\",\nsvgData = s => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + (s instanceof SVGSVGElement ? s.outerHTML.slice(4) : s.outerHTML.slice(7, -7) + \"svg>\")),\n[";
 		first=true;
 		for tag in $tags; do
@@ -78,6 +78,6 @@ if [ -n "$js" ]; then
 				echo -n "$tag";
 			fi;
 		done;
-		echo "] = \"$tags\".split(\" \").map(e => (props, children) => amendNode(document.createElementNS(ns, e), props, children));";
+		echo "] = \"$tags\".split(\" \").map(e => bindElement(ns, e));";
 	) > "$js";
 fi;
