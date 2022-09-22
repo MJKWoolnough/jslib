@@ -1,6 +1,6 @@
 import {item, menu} from './menu.js';
-import {amendNode, clearNode, event, eventOnce} from './dom.js';
-import {div, img, li, slot, span, style, template, ul} from './html.js';
+import {amendNode, bindElement, clearNode, event, eventOnce} from './dom.js';
+import {div, img, li, ns, slot, span, style, template, ul} from './html.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage as setOtherLanguage, windows} from './windows.js';
 
 export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, windows};
@@ -101,7 +101,7 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskbar", ShellElement);
 
-export const shell = (props, children) => amendNode(new ShellElement(), props, children),
+export const shell = bindElement(ns, "windows-shell-taskbar"),
 setLanguage = l => {
 	setOtherLanguage(l);
 	setMenuLang(l);
