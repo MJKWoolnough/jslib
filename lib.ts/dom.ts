@@ -107,7 +107,7 @@ export const amendNode: mElement = (node?: Node | EventTarget | null, properties
 	}
 	return node;
 },
-bindElement = <T extends Element>(ns: string, value: string) => (props?: Props | Children, children?: Children) => amendNode(document.createElementNS(ns, value) as T, props, children),
+bindElement = <T extends Element>(ns: string, value: string) => Object.defineProperty((props?: Props | Children, children?: Children) => amendNode(document.createElementNS(ns, value) as T, props, children), "name", {value}),
 eventOnce = 1,
 eventCapture = 2,
 eventPassive = 4,

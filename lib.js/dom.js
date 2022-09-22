@@ -73,7 +73,7 @@ export const amendNode = (node, properties, children) => {
 	}
 	return node;
 },
-bindElement = value => (props, children) => amendNode(document.createElementNS(ns, value), props, children),
+bindElement = value => Object.defineProperty((props, children) => amendNode(document.createElement(value), props, children), "name", {value}),
 eventOnce = 1,
 eventCapture = 2,
 eventPassive = 4,
