@@ -1,5 +1,5 @@
 import type {DOMBind} from './dom.js';
-import {amendNode, bindElement} from './dom.js';
+import {bindElement} from './dom.js';
 
 export const ns = "http://www.w3.org/2000/svg",
 svgData = (s: SVGSVGElement | SVGSymbolElement) => "data:image/svg+xml," + encodeURIComponent("<svg xmlns=\"" + ns + "\"" + (s instanceof SVGSVGElement ? s.outerHTML.slice(4) : s.outerHTML.slice(7, -7) + "svg>")),

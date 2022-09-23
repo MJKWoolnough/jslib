@@ -23,7 +23,7 @@ fi;
 if [ -n "$ts" ]; then
 	(
 		echo "import type {DOMBind} from './dom.js';";
-		echo "import {amendNode, bindElement} from './dom.js';";
+		echo "import {bindElement} from './dom.js';";
 		echo -en "\nexport const ns = \"http://www.w3.org/2000/svg\",\nsvgData = (s: SVGSVGElement | SVGSymbolElement) => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + (s instanceof SVGSVGElement ? s.outerHTML.slice(4) : s.outerHTML.slice(7, -7) + \"svg>\")),\n[";
 		first=true;
 		for tag in $tags; do
