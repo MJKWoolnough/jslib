@@ -1,6 +1,6 @@
-import {item, menu} from './menu.js';
 import {amendNode, bindElement, clearNode, event, eventOnce} from './dom.js';
 import {div, img, li, ns, slot, span, style, template, ul} from './html.js';
+import {item, menu} from './menu.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage as setOtherLanguage, windows} from './windows.js';
 
 export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, windows};
