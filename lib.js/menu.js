@@ -15,7 +15,7 @@ export class MenuElement extends HTMLElement {
 			style({"type": "text/css"}, ":host{outline:0;display:inline-flex;flex-flow:column wrap}::slotted(menu-item),::slotted(menu-submenu){display:block;user-select:none}"),
 			this.#s = slot()
 		]);
-		amendNode(this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": e => {
+		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": e => {
 			const da = document.activeElement;
 			switch (e.key) {
 			case "Escape":
@@ -108,7 +108,7 @@ export class MenuElement extends HTMLElement {
 export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
-		amendNode(this, {"tabindex": -1, "onblur": () => this.parentNode?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
+		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this.parentNode?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
 			if (document.activeElement !== this) {
 				this.focus();
 			}

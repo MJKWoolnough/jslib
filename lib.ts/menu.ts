@@ -29,7 +29,7 @@ export class MenuElement extends HTMLElement {
 `),
 			this.#s = slot()
 		]);
-		amendNode(this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": (e: KeyboardEvent) => {
+		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": (e: KeyboardEvent) => {
 			const da = document.activeElement;
 			switch (e.key) {
 			case "Escape":
@@ -122,7 +122,7 @@ export class MenuElement extends HTMLElement {
 export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
-		amendNode(this, {"tabindex": -1, "onblur": () => (this.parentNode as MenuElement | SubMenuElement | null)?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
+		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => (this.parentNode as MenuElement | SubMenuElement | null)?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
 			if (document.activeElement !== this) {
 				this.focus();
 			}
