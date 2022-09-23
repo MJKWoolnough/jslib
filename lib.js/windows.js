@@ -260,7 +260,7 @@ export class ShellElement extends BaseElement {
 export class DesktopElement extends HTMLElement {
 	constructor() {
 		super();
-		amendNode(this, {"slot": "desktop"});
+		setTimeout(amendNode, 0, this, {"slot": "desktop"});
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			style({"type": "text/css"}, ":host{position:absolute;top:0;left:0;bottom:0;right:0}"),
 			slot({"slot": "desktop"})
@@ -307,7 +307,7 @@ export class WindowElement extends BaseElement {
 			this.#slot = div(slot()),
 			div({onclick})
 		]);
-		amendNode(this, {"onmousedown": event(onclick, eventCapture)});
+		setTimeout(amendNode, 0, this, {"onmousedown": event(onclick, eventCapture)});
 	}
 	connectedCallback() {
 		if (focusingWindow === this) {
