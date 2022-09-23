@@ -30,7 +30,7 @@ const windowObservations = {
 setMenuLang({
 	"CLOSE": "Close",
 	"MINIMISE": "Minimise",
-	"RESTORE": "Restore",
+	"RESTORE": "Restore"
 });
 
 export class ShellElement extends BaseShellElement {
