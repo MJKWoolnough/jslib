@@ -290,6 +290,7 @@ The dom module can be used to manipulate DOM elements.
 | [amendNode](#dom_amendnode) | Function | This convenience function modifies a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget. |
 | [autoFocus](#dom_autofocus) | Function | This function queues a focus method call to the passed element. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom-amendnode) except that it clears any children before amending. |
+| [bindElement](#dom_bindelement) | Function | This function simplifies binding of [amendNode](#dom_amendnode). |
 | [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), or a recursive array of those. |
 | [createDocumentFragment](#dom_createdocumentfragment) | Function | This convenience function creates a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment). |
 | [DOMBind](#dom_dombind) | Type | This type represents a binding of either [amendNode](#dom_amendnode) or [clearNode](#dom_clearnode) with the first param bound. |
@@ -327,6 +328,13 @@ NB: Due to how this function uses instanceof to determine what can be applied to
 ```
 
 This queues a focus method call to the passed element, and will call select on any [HTMLInputElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement) or [HTMLTextAreaElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement), unless false is passed as the second param.
+
+### <a name="dom_bindelement">bindElement</a>
+```typescript
+<T extends Element>(ns: string, value: string) => DOMBind<T>;
+```
+
+This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.
 
 ### <a name="dom_children">Children</a>
 ```typescript
