@@ -24,16 +24,13 @@ export class CSS {
 		this.#id = idStart;
 		this.#class = classStart;
 	}
-	add(id: string | Identifier, def: Def) {
-		if (id instanceof Identifier) {
-			id = id.toString();
-		}
-		if (!(id = normalise(id))) {
+	add(selector: string, def: Def) {
+		if (!(selector = normalise(selector))) {
 			return;
 		}
-		let o = this.#data.get(id);
+		let o = this.#data.get(selector);
 		if (!o) {
-			this.#data.set(id, o = {});
+			this.#data.set(selector, o = {});
 		}
 		for (const key in def) {
 			const v = def[key];
@@ -44,11 +41,11 @@ export class CSS {
 			}
 		}
 	}
-	className(def: Def = {}) {
-		return new Identifier(this, "." + this.#classPrefix + this.#class++).add(def);
+	className() {
+		return "." + this.#classPrefix + this.#class++;
 	}
-	id(def: Def = {}) {
-		return new Identifier(this, "#" + this.#idPrefix + this.#id++).add(def);
+	id() {
+		return "#" + this.#idPrefix + this.#id++;
 	}
 	render() {
 		const s = document.createElement("style");
@@ -66,26 +63,6 @@ export class CSS {
 		}
 		s.innerText = data;
 		return s;
-	}
-}
-
-class Identifier {
-	#ident: string;
-	#css: CSS;
-	constructor(parent: CSS, ident: string) {
-		this.#css = parent;
-		this.#ident = ident;
-	}
-	set(key: string, value: Value) {
-		this.#css.add(this.#ident, {[key]: value});
-		return this;
-	}
-	add(def: Def) {
-		this.#css.add(this.#ident, def);
-		return this;
-	}
-	toString() {
-		return this.#ident;
 	}
 }
 
