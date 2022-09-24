@@ -67,7 +67,7 @@ export class CSS {
 }
 
 const afterSpace = "])+>~|,([=",
-      beforeSpace = afterSpace.slice(2) + "\"'",
+      beforeSpace = "+>~|,([=\"'",
       normalise = (id: string) => {
 	id = id.trim();
 	let string = "";
