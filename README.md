@@ -9,6 +9,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [bbcode](#bbcode)                           | A BBCode parser. |
 | [bbcode_tags](#bbcode_tags)                 | A collection of BBCode tags. |
 | [conn](#conn)                               | Convenience wrappers around [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket). |
+| [css](#css)                                 | A simple CSS management library. |
 | [dom](#dom)                                 | Functions for manipulating the DOM. |
 | [drag](#drag)                               | Library for making browser Drag'n'Drop easier to use. |
 | [events](#events)                           | Functions to simplify starting & stopping global keyboard and mouse events. |
@@ -280,6 +281,93 @@ when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: string) =
 ```
 
 This method acts like the [then](#inter_subscription_then) method of the [Subscription](#inter_subscription) class from the [inter](#inter) module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error string. The method returns a [Subscription](#inter_subscription) object with the success and error functions set to those provided.
+
+## <a name="css">css</a>
+
+This module contains a simple class for generating CSS style elements.
+
+|  Export   |  Type    |  Description  |
+|-----------|----------|---------------|
+| [(default)](#css_css)| Class | The CSS class handles a collection of CSS declarations to be rendered into a [style](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style) element. |
+| add       | Function | The [add](#css_css_add) method of a default instance of the default [CSS](#css_css) class. |
+| id        | Function | The [id](#css_css_id) method of a default instance of the default [CSS](#css_css) class. |
+| render    | Function | The [render](#css_css_render) method of a default instance of the default [CSS](#css_css) class. |
+
+### <a name="css_css">CSS</a>
+
+|  Method  |  Description  |
+|----------|---------------|
+| [add](#css_css_add) | A method to add a CSS declaration. |
+| [constructor](#css_css_constructor) | Used to create a new instance of the class. |
+| [id](#css_css_id) | Creates a unique ID within this instance. |
+| [render](#css_css_render) | Compiles all of the CSS declarations into a [style](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style) element. |
+
+#### <a name="css_css_add">add</a>
+```typescript
+class CSS {
+	add(selector: string, def: Def): this;
+}
+```
+
+This method takes a CSS selector string and a [Def](#css_def) object containing all of the style information. The CSS instance if returned for simple method chaining.
+
+#### <a name="css_css_constructor">constructor</a>
+```typescript
+class CSS {
+	constructor(prefix = "", idStart = 0);
+}
+```
+
+The constructor takes an optional prefix, which will be applied to all returns from the [id](#css_css_id) method. It will default to the underscore character if it is not provided or if the prefix given is not allowed for classes or IDs.
+
+The idStart param defines the starting ID for returns from the [id](#css_css_id) method.
+
+#### <a name="css_css_id">id</a>
+```typescript
+class CSS {
+	id(): string;
+}
+```
+
+This method will return sequential unique ids to be used as either class names or element IDs. The prefix of the string will be as provided to the [constructor](#css_css_constructor) and the suffix will be an increasing number starting at the value provided to the [constructor](#css_css_constructor).
+
+#### <a name="css_css_render">render</a>
+```typescript
+class CSS {
+	render(): HTMLStyleElement;
+}
+```
+
+This method generates a new [HTMLStyleElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLStyleElement) that contains all of the data currently supplied to the class.
+
+### <a name="css_def">Def</a>
+```typescript
+interface Def {
+	[key: string]: Value | Def | ValueFn;
+}
+```
+
+This unexported interface defines the structure of the CSS data provided to the [add](#css_css_add) method.
+
+The key can refer to property name or an extended selector.
+
+When the key is a property name, the value will be either a [Value](#css_value) type or a [ValueFn](#css_value) type.
+
+When the key is an extended selector, it will be appended to the current selector and processed as in a call to the [add](#css_css_add) method with the value Def.
+
+### <a name="css_value">Value</a>
+```typescript
+type Value = string | number | ToString;
+```
+
+This unexported type represents a CSS value, as either a string, number or any object with the toString [method](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toString).
+
+### <a name="css_valuefn">ValueFn</a>
+```typescript
+type ValueFn = () => Value;
+```
+
+This unexported type represents a dynamic CSS value, and will be called during a call to the [render](#css_css_render) method.
 
 ## <a name="dom">dom</a>
 
