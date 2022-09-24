@@ -35,7 +35,7 @@ export class CSS {
 		for (const key in def) {
 			const v = def[key];
 			if (isDef(v)) {
-				this.add(id + key, v);
+				this.add(selector + key, v);
 			} else {
 				o[key] = v;
 			}
