@@ -107,6 +107,6 @@ const afterSpace = "])+>~|,([=",
       idRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
       defaultCSS = new CSS();
 
-export const add = defaultCSS.add.bind(defaultCSS),
-id = defaultCSS.id.bind(defaultCSS),
-render = defaultCSS.render.bind(defaultCSS);
+export const add = (selector: string, def: Def) => defaultCSS.add(selector, def),
+id = () => defaultCSS.id(),
+render = () => defaultCSS.render();
