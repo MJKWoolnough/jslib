@@ -15,14 +15,10 @@ type innerDef = Record<string, Value | ValueFn>;
 export class CSS {
 	#data = new Map<string, innerDef>();
 	#idPrefix: string;
-	#classPrefix: string;
 	#id: number;
-	#class: number;
-	constructor(prefix = "", idStart = 0, classStart = 0) {
+	constructor(prefix = "", idStart = 0) {
 		this.#idPrefix = idRE.test(prefix) ? prefix : "_";
-		this.#classPrefix = classRE.test(prefix) ? prefix : "_";
 		this.#id = idStart;
-		this.#class = classStart;
 	}
 	add(selector: string, def: Def) {
 		if (!(selector = normalise(selector))) {
@@ -40,9 +36,6 @@ export class CSS {
 				o[key] = v;
 			}
 		}
-	}
-	className() {
-		return this.#classPrefix + this.#class++;
 	}
 	id() {
 		return this.#idPrefix + this.#id++;
@@ -111,11 +104,9 @@ const afterSpace = "])+>~|,([=",
 	return id;
       },
       isDef = (v: Value | Def | ValueFn): v is Def => Object.getPrototypeOf(v) === Object.prototype,
-      idRE = /^[_a-z0-9\-\240-\377]+/i,
-      classRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
+      idRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
       defaultCSS = new CSS();
 
 export const add = defaultCSS.add.bind(defaultCSS),
-className = defaultCSS.className.bind(defaultCSS),
 id = defaultCSS.id.bind(defaultCSS),
 render = defaultCSS.render.bind(defaultCSS);
