@@ -12,7 +12,7 @@ interface Def {
 
 type innerDef = Record<string, Value | ValueFn>;
 
-export class CSS {
+export default class CSS {
 	#data = new Map<string, innerDef>();
 	#idPrefix: string;
 	#id: number;
