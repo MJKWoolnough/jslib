@@ -66,48 +66,39 @@ export class CSS {
 	}
 }
 
-const normalise = (id: string) => {
+const afterSpace = "])+>~|,([=",
+      beforeSpace = afterSpace.slice(2) + "\"'",
+      normalise = (id: string) => {
 	id = id.trim();
 	let string = "";
 	for (let i = 0; i < id.length; i++) {
 		const c = id.charAt(i);
 		switch (c) {
-		case '"':
-		case "'":
-			string = c === string ? "" : c;
-			break;
 		case "\\":
 			i++;
 			break;
+		case '"':
+		case "'":
+			string = c === string ? "" : c;
 		default:
-			if (!string && !c.trim()) {
-				let end = false;
-				for (let j = i + 1; j < id.length; j++ ) {
-					switch (id.charAt(j).trim()) {
-					case '+':
-					case '>':
-					case '~':
-					case '|':
-					case ',':
-					case '(':
-					case '[':
-						end = true;
-					case ')':
-					case ']':
-						id = id.slice(0, i) + id.slice(j);
-						i++;
-					case '':
-						break;
-					default:
-						if (i + 1 !== j) {
-							id = id.slice(0, i+1) + id.slice(j);
+			if (!string) {
+				if (!c.trim()) {
+					for (let j = i + 1; j < id.length; j++) {
+						const c = id.charAt(j).trim();
+						if (c) {
+							if (afterSpace.includes(c)) {
+								i--;
+							}
+							if (i+1 !== j) {
+								id = id.slice(0, i+1) + id.slice(j);
+							}
+							break;
 						}
 					}
-				}
-				if (end) {
-					for (let j = i + 1; j < id.length; j++ ) {
+				} else if (beforeSpace.includes(c)) {
+					for (let j = i+1; j < id.length; j++) {
 						if (id.charAt(j).trim()) {
-							if (i + 1 !== j) {
+							if (i+1 !== j) {
 								id = id.slice(0, i+1) + id.slice(j);
 							}
 							break;
