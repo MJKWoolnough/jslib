@@ -21,21 +21,21 @@ export class CSS {
 		this.#id = idStart;
 	}
 	add(selector: string, def: Def) {
-		if (!(selector = normalise(selector))) {
-			return;
-		}
-		let o = this.#data.get(selector);
-		if (!o) {
-			this.#data.set(selector, o = {});
-		}
-		for (const key in def) {
-			const v = def[key];
-			if (isDef(v)) {
-				this.add(selector + key, v);
-			} else {
-				o[key] = v;
+		if (selector = normalise(selector)) {
+			let o = this.#data.get(selector);
+			if (!o) {
+				this.#data.set(selector, o = {});
+			}
+			for (const key in def) {
+				const v = def[key];
+				if (isDef(v)) {
+					this.add(selector + key, v);
+				} else {
+					o[key] = v;
+				}
 			}
 		}
+		return this;
 	}
 	id() {
 		return this.#idPrefix + this.#id++;
