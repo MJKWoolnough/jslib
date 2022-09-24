@@ -42,10 +42,10 @@ export class CSS {
 		}
 	}
 	className() {
-		return "." + this.#classPrefix + this.#class++;
+		return this.#classPrefix + this.#class++;
 	}
 	id() {
-		return "#" + this.#idPrefix + this.#id++;
+		return this.#idPrefix + this.#id++;
 	}
 	render() {
 		const s = document.createElement("style");
