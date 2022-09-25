@@ -42,7 +42,7 @@ export default class CSS {
 	id() {
 		return this.#idPrefix + this.#id++;
 	}
-	render() {
+	toString() {
 		let data = "";
 		for (const [specifier, style] of this.#data) {
 			const e = Object.entries(style);
@@ -54,7 +54,10 @@ export default class CSS {
 				data += "}";
 			}
 		}
-		return style({"type": "text/css"}, data);
+		return data;
+	}
+	render() {
+		return style({"type": "text/css"}, this+"");
 	}
 }
 
