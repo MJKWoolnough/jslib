@@ -17,7 +17,7 @@ export default class CSS {
 			for (const key in def) {
 				const v = def[key];
 				if (isDef(v)) {
-					this.add(selector + key, v);
+					this.add(join(selector, key), v);
 				} else {
 					o[key] = v;
 				}
@@ -90,6 +90,45 @@ const afterSpace = "])+>~|,([=",
 		}
 	}
 	return id;
+      },
+      split = selector => {
+	const stack = [],
+	      parts = [];
+	let pos = 0;
+	for (let i = 0; i < selector.length; i++) {
+		const c = selector.charAt(i);
+		if (c === '"' || c === "'") {
+			for (i++; i < selector.length; i++) {
+				const d = selector.charAt(i);
+				if (d === "\'") {
+					i++;
+				} else if (d === c) {
+					break;
+				}
+			}
+		} else if (c === "," && !stack.length) {
+			parts.push(selector.slice(pos, i));
+			pos = i + 1;
+		} else if (c === stack.at(-1)) {
+			stack.pop();
+		} else if (c === "[") {
+			stack.push("]");
+		} else if (c === "(") {
+			stack.push(")");
+		}
+	}
+	parts.push(selector.slice(pos, selector.length));
+	return parts;
+      },
+      join = (selector, add) => {
+	const addParts = split(add);
+	let out = "";
+	for (const part of split(selector)) {
+		for (const addPart of addParts) {
+			out += (out.length ? "," : "") + part + addPart;
+		}
+	}
+	return out;
       },
       isDef = v => Object.getPrototypeOf(v) === Object.prototype,
       idRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
