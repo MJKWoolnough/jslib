@@ -1,3 +1,5 @@
+import {style} from './html.js';
+
 export default class CSS {
 	#data = new Map();
 	#idPrefix;
@@ -27,8 +29,6 @@ export default class CSS {
 		return this.#idPrefix + this.#id++;
 	}
 	render() {
-		const s = document.createElement("style");
-		s.setAttribute("type", "text/css");
 		let data = "";
 		for (const [specifier, style] of this.#data) {
 			const e = Object.entries(style);
@@ -40,8 +40,7 @@ export default class CSS {
 				data += "}";
 			}
 		}
-		s.innerText = data;
-		return s;
+		return style({"type": "text/css"}, data);
 	}
 }
 
