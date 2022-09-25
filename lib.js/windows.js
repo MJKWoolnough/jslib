@@ -1,4 +1,4 @@
-import {amendNode, autoFocus, bindElement,. clearNode, event, eventCapture} from './dom.js';
+import {amendNode, autoFocus, bindElement, clearNode, event, eventCapture} from './dom.js';
 import {button, div, img, input, ns, slot, span, style} from './html.js';
 import {ns as svgNS} from './svg.js';
 
