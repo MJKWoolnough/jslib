@@ -1,3 +1,4 @@
+import CSS from './css.js';
 import {amendNode, bindElement, event, eventCapture, eventRemove} from './dom.js';
 import {ns, slot, style} from './html.js';
 
@@ -8,7 +9,20 @@ export type SubMenuItems = ItemElement | MenuElement | SubMenuItems[];
 const blur = Symbol("blur"),
       disconnect = Symbol("disconnect"),
       itemElement = Symbol("itemElement"),
-      menuElement = Symbol("menuElement");
+      menuElement = Symbol("menuElement"),
+      menuStyle = new CSS().add(":host", {
+	"outline": "none",
+	"display": "inline-flex",
+	"flex-flow": "column wrap"
+      }).add("::slotted(menu-item),::slotted(menu-submenu)", {
+	"display": "block",
+	"user-select": "none"
+      }) + "",
+      submenuStyle = new CSS().add(":host", {
+	"position": "relative"
+      }).add("::slotted(menu-item)", {
+	"display": "block"
+      }) + "";
 
 export class MenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
@@ -16,17 +30,7 @@ export class MenuElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			style({"type": "text/css"}, `
-:host {
-	outline: none;
-	display: inline-flex;
-	flex-flow: column wrap;
-}
-::slotted(menu-item), ::slotted(menu-submenu) {
-	display: block;
-	user-select: none;
-}
-`),
+			style({"type": "text/css"}, menuStyle),
 			this.#s = slot()
 		]);
 		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": (e: KeyboardEvent) => {
@@ -153,14 +157,7 @@ export class SubMenuElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			style({"type": "text/css"}, `
-:host {
-	position: relative;
-}
-::slotted(menu-item) {
-	display: block;
-}
-`),
+			style({"type": "text/css"}, submenuStyle),
 			this.#s = slot(),
 			this.#p = slot()
 		]);
