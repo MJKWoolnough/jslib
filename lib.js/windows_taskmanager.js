@@ -1,3 +1,4 @@
+import CSS from './css.js';
 import {amendNode, bindElement, clearNode, event, eventOnce} from './dom.js';
 import {div, footer, ns, slot, style} from './html.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage, windows} from './windows.js';
@@ -11,7 +12,40 @@ const windowObservations = {
       taskbarObservations = {
 	"attributeFilter": ["maximised"],
 	"attributes": true
-      };
+      },
+      shellStyle = new CSS().add(":host", {
+	"display": "block",
+	"position": "relative",
+	"overflow": "hidden",
+	"width": "var(--shell-width, 100%)",
+	"height": "var(--shell-height, 100%)",
+	">footer": {
+		"display": "flex",
+		"position": "absolute",
+		"grid-gap": "5px",
+		"flex-wrap": "wrap-reverse",
+		"width": "100%",
+		"bottom": 0,
+		"left": 0,
+		"pointer-events": "none",
+		">div": {
+			"width": "200px",
+			"position": "relative",
+			"pointer-events": "auto",
+			">windows-window": {
+				"min-height": "auto",
+				"position": "static",
+				"--overlay-on": "none",
+				":not([maximised])": {
+					"visibility": "hidden"
+				}
+			}
+		}
+
+	}
+      }).add("::slotted(windows-window:last-of-type)", {
+	      "--overlay-on": "none"
+      }) + "";
 
 export class ShellElement extends BaseShellElement {
 	constructor() {
@@ -68,7 +102,7 @@ export class ShellElement extends BaseShellElement {
 		      })),
 		      taskbar = footer();
 		amendNode(this.attachShadow({"mode": "closed"}), [
-			style({"type": "text/css"}, ":host{display:block;position:relative;overflow:hidden;width:var(--shell-width,100%);height:var(--shell-height,100%)}::slotted(windows-window:last-of-type){--overlay-on:none}:host>footer{display:flex;position:absolute;grid-gap:5px;flex-wrap:wrap-reverse;width:100%;bottom:0;left:0;pointer-events:none}:host>footer>div{width:200px;position:relative;pointer-events:auto}:host>footer>div>windows-window:not([maximised]){visibility:hidden}:host>footer>div>windows-window{min-height:auto;position:static;--overlay-on:none}"),
+			style({"type": "text/css"}, shellStyle),
 			slot({"name": "desktop"}),
 			taskbar,
 			div(slot({"onslotchange": function() {
