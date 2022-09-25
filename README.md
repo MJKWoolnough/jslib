@@ -286,6 +286,8 @@ This method acts like the [then](#inter_subscription_then) method of the [Subscr
 
 This module contains a simple class for generating CSS style elements.
 
+This module directly imports the [html](#html) module, and indirectly imports the [dom](#dom) module.
+
 |  Export   |  Type    |  Description  |
 |-----------|----------|---------------|
 | [(default)](#css_css)| Class | The CSS class handles a collection of CSS declarations to be rendered into a [style](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style) element. |
