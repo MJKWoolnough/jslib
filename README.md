@@ -293,6 +293,7 @@ This module directly imports the [html](#html) module, and indirectly imports th
 | [(default)](#css_css)| Class | The CSS class handles a collection of CSS declarations to be rendered into a [style](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style) element. |
 | add       | Function | The [add](#css_css_add) method of a default instance of the default [CSS](#css_css) class. |
 | id        | Function | The [id](#css_css_id) method of a default instance of the default [CSS](#css_css) class. |
+| ids       | Function | The [ids](#css_css_id) method of a default instance of the default [CSS](#css_css) class. |
 | render    | Function | The [render](#css_css_render) method of a default instance of the default [CSS](#css_css) class. |
 
 ### <a name="css_css">CSS</a>
@@ -302,6 +303,7 @@ This module directly imports the [html](#html) module, and indirectly imports th
 | [add](#css_css_add) | A method to add a CSS declaration. |
 | [constructor](#css_css_constructor) | Used to create a new instance of the class. |
 | [id](#css_css_id) | Creates a unique ID within this instance. |
+| [id](#css_css_ids) | Creates multiple unique IDs within this instance. |
 | [render](#css_css_render) | Compiles all of the CSS declarations into a [style](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style) element. |
 | toString | Returns the CSS declarations as a compiled string. |
 
@@ -333,6 +335,15 @@ class CSS {
 ```
 
 This method will return sequential unique ids to be used as either class names or element IDs. The prefix of the string will be as provided to the [constructor](#css_css_constructor) and the suffix will be an increasing number starting at the value provided to the [constructor](#css_css_constructor).
+
+#### <a name="css_css_ids">id</a>
+```typescript
+class CSS {
+	ids(n: number): string[];
+}
+```
+
+This method will return a number (n) of unique ids, as per the [id](#css_css_id) method.
 
 #### <a name="css_css_render">render</a>
 ```typescript
