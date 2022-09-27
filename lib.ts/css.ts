@@ -14,6 +14,8 @@ interface Def {
 
 type innerDef = Record<string, Value | ValueFn>;
 
+type IDs<N extends number, U extends string[] = []> = U['length'] extends N ? U : IDs<N, [string, ...U]>;
+
 export default class CSS {
 	#data = new Map<string, innerDef>();
 	#idPrefix: string;
@@ -41,6 +43,9 @@ export default class CSS {
 	}
 	id() {
 		return this.#idPrefix + this.#id++;
+	}
+	ids<N extends number>(length: N) {
+		return Array.from({length}, _ => this.id()) as IDs<N>;
 	}
 	toString() {
 		let data = "";
@@ -150,4 +155,5 @@ const afterSpace = "])+>~|,([=",
 
 export const add = (selector: string, def: Def) => defaultCSS.add(selector, def),
 id = () => defaultCSS.id(),
+ids = <N extends number>(n: N) => defaultCSS.ids(n) as IDs<N>,
 render = () => defaultCSS.render();

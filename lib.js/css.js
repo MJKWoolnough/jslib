@@ -28,6 +28,9 @@ export default class CSS {
 	id() {
 		return this.#idPrefix + this.#id++;
 	}
+	ids(length) {
+		return Array.from({length}, _ => this.id());
+	}
 	toString() {
 		let data = "";
 		for (const [specifier, style] of this.#data) {
@@ -136,4 +139,5 @@ const afterSpace = "])+>~|,([=",
 
 export const add = (selector, def) => defaultCSS.add(selector, def),
 id = () => defaultCSS.id(),
+ids = n => defaultCSS.ids(n),
 render = () => defaultCSS.render();
