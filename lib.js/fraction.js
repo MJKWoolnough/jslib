@@ -44,7 +44,7 @@ export default class Fraction {
 	sign() {
 		return !this.#denominator ? NaN : !this.#numerator ? 0 : this.#numerator < 0n ? -1 : 1;
 	}
-	toFloat() {
+	[Symbol.toPrimitive]() {
 		if (!this.#denominator) {
 			return NaN;
 		}
