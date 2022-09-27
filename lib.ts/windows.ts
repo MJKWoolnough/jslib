@@ -149,7 +149,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 	"position": "relative",
 	"overflow": "hidden",
 	"width": "var(--shell-width, 100%)",
-	"height": "var(--shell-height, 100%)",
+	"height": "var(--shell-height, 100%)"
       }).add("::slotted(windows-window)", {
 	"--taskmanager-on": "none"
       }).add("::slotted(windows-window:last-of-type)", {
@@ -324,7 +324,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"background-size": "1em 1em",
 				"width": "calc(1em + 8px)",
 				"height": "calc(1em + 8px)"
-			},
+			}
 		},
 		":nth-child(4)": {
 			"user-select": "contain",
