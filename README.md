@@ -1133,7 +1133,7 @@ declare const include: (url: string) => Promise<Object>;
 
 The menu module adds custom elements to create context-menus.
 
-This module directly imports the [dom](#dom) and [html](#html) modules.
+This module directly imports the [css](#css), [dom](#dom) and [html](#html) modules.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
@@ -1522,7 +1522,7 @@ This module directly imports the [dom](#dom) module.
 
 The windows module adds custom elements to implement a windowing system.
 
-This module directly imports the [dom](#dom), [html](#html), and [svg](#svg) modules.
+This module directly imports the [css](#css), [dom](#dom), [html](#html), and [svg](#svg) modules.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
@@ -1719,6 +1719,8 @@ The focus method will bring the unset a minimise attribute and bring the deepest
 
 The windows_taskbar module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that provides a taskbar for `Windows` to be managed from and allows the `Windows` to be minimised. The exports are the same as the [windows](#windows) module, except for the changes below.
 
+This module directly imports the [css](#css), [dom](#dom),[html](#html), [menu](#menu) and [windows](#windows) modules.
+
 |  Export      |  Type    |  Description |
 |--------------|----------|--------------|
 | setLanguage  | Function | A replacement for the [setLanguage](#windows_setlanguage) function, which in addition to calling the original, sets the language entries used for the context menu for the items on the taskbar. The menu access keys are set to the first character of the entry. |
@@ -1728,6 +1730,8 @@ The windows_taskbar module provides a replacement for the [windows](#windows) mo
 ## <a name="windows_taskmanager">windows_taskmanager</a>
 
 The windows_taskmanager module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that allows `Windows` to be minimised within the shell, appearing as just the title-bar at the bottom of the shell.aThe exports are the same as the [windows](#windows) module, except for the changes below.
+
+This module directly imports the [css](#css), [dom](#dom),[html](#html), and [windows](#windows) modules.
 
 |  Export      |  Type    |  Description |
 |--------------|----------|--------------|
