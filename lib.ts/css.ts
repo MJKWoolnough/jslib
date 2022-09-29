@@ -6,10 +6,8 @@ interface ToString {
 
 type Value = string | number | ToString;
 
-type ValueFn = () => Value;
-
 interface Def {
-	[key: string]: Value | Def | ValueFn;
+	[key: string]: Value | Def;
 }
 
 type IDs<N extends number, U extends string[] = []> = U['length'] extends N ? U : IDs<N, [string, ...U]>;
@@ -31,7 +29,7 @@ export default class CSS {
 				if (isDef(v)) {
 					this.add(join(selector, key), v);
 				} else {
-					data += `${key}:${v instanceof Function ? v() : v};`;
+					data += `${key}:${v};`;
 				}
 			}
 			this.#data = d + data + "}" + this.#data.slice(d.length);
@@ -91,7 +89,7 @@ const split = (selector: string) => {
 	}
 	return out;
       },
-      isDef = (v: Value | Def | ValueFn): v is Def => Object.getPrototypeOf(v) === Object.prototype,
+      isDef = (v: Value | Def): v is Def => Object.getPrototypeOf(v) === Object.prototype,
       idRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
       defaultCSS = new CSS();
 

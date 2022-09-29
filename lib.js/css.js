@@ -16,7 +16,7 @@ export default class CSS {
 				if (isDef(v)) {
 					this.add(join(selector, key), v);
 				} else {
-					data += `${key}:${v instanceof Function ? v() : v};`;
+					data += `${key}:${v};`;
 				}
 			}
 			this.#data = d + data + "}" + this.#data.slice(d.length);
