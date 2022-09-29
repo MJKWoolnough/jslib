@@ -357,7 +357,7 @@ This method generates a new [HTMLStyleElement](https://developer.mozilla.org/en-
 ### <a name="css_def">Def</a>
 ```typescript
 interface Def {
-	[key: string]: Value | Def | ValueFn;
+	[key: string]: Value | Def;
 }
 ```
 
@@ -365,7 +365,7 @@ This unexported interface defines the structure of the CSS data provided to the 
 
 The key can refer to property name or an extended selector.
 
-When the key is a property name, the value will be either a [Value](#css_value) type or a [ValueFn](#css_value) type.
+When the key is a property name, the value will be a [Value](#css_value) type.
 
 When the key is an extended selector, it will be logically appended to the current selector and processed as in a call to the [add](#css_css_add) method with the value Def. The logical appending splits both the parent and extended selectors at the ',' seperator and concatenates all pairs together, seperated by ',' seperators.
 
@@ -375,13 +375,6 @@ type Value = string | number | ToString;
 ```
 
 This unexported type represents a CSS value, as either a string, number or any object with the toString [method](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toString).
-
-### <a name="css_valuefn">ValueFn</a>
-```typescript
-type ValueFn = () => Value;
-```
-
-This unexported type represents a dynamic CSS value, and will be called during a call to the [render](#css_css_render) method.
 
 ## <a name="dom">dom</a>
 
