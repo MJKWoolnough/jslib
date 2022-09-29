@@ -367,7 +367,7 @@ The key can refer to property name or an extended selector.
 
 When the key is a property name, the value will be either a [Value](#css_value) type or a [ValueFn](#css_value) type.
 
-When the key is an extended selector, it will be appended to the current selector and processed as in a call to the [add](#css_css_add) method with the value Def.
+When the key is an extended selector, it will be logically appended to the current selector and processed as in a call to the [add](#css_css_add) method with the value Def. The logical appending splits both the parent and extended selectors at the ',' seperator and concatenates all pairs together, seperated by ',' seperators.
 
 ### <a name="css_value">Value</a>
 ```typescript
