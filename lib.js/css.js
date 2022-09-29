@@ -46,7 +46,7 @@ const split = selector => {
 		if (c === '"' || c === "'") {
 			for (i++; i < selector.length; i++) {
 				const d = selector.charAt(i);
-				if (d === "\'") {
+				if (d === "\\") {
 					i++;
 				} else if (d === c) {
 					break;
