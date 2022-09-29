@@ -1738,6 +1738,16 @@ This module directly imports the [css](#css), [dom](#dom),[html](#html), [menu](
 | shell        | Function | A [DOMBind](#dom_dombind) that creates a ShellElement. |
 | ShellElement | Class    | A drop-in replacement for the [windows](#windows) module [ShellElement](#windows_shellelement). Registered with customElements as `windows-shell-taskbar`. |
 
+The ShellElement class can accept the following attributes:
+
+|  Attribute  |  Description  |
+|-------------|---------------|
+| autohide    | When set this attribute will hide the taskbar when it is not being hovered over. |
+| side        | When set to one of left, right, or top, is used to change the side on which the taskbar will reside. It defaults to the bottom. |
+| hide        | This attribute can be set to one of icon or title, which will hide either the icon or the text title of the window on the taskbar. |
+
+In addition the taskbar-size style var can be used to set the width (or height, if vertical) of the taskbar.
+
 ## <a name="windows_taskmanager">windows_taskmanager</a>
 
 The windows_taskmanager module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that allows `Windows` to be minimised within the shell, appearing as just the title-bar at the bottom of the shell.aThe exports are the same as the [windows](#windows) module, except for the changes below.
