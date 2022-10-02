@@ -1,4 +1,5 @@
 import {style} from './html.js';
+
 export default class CSS {
 	#data = "";
 	#idPrefix;
