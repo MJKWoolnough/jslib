@@ -76,4 +76,4 @@ export const setDragEffect = effects => e => {
 		}
 	}
 	return false;
-}
+};
