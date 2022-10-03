@@ -51,7 +51,7 @@ const maxMouseButton = 16,
 		}
 	}
       },
-      combinationString = k => (+!k.altKey + 2* +!k.ctrlKey + 4 * +!k.metaKey + 8 * +!k.shiftKey).toString(16) + (k.key ?? ""),
+      combinationString = k => (+!k.altKey + 2 * +!k.ctrlKey + 4 * +!k.metaKey + 8 * +!k.shiftKey).toString(16) + (k.key ?? ""),
       parseCombination = keyComb => {
 	const parts = keyComb.split("+").map(p => p.trim()),
 	      k = {
