@@ -14,7 +14,7 @@ export class DragTransfer {
 	get(e) {
 		e.preventDefault();
 		const t = this.#data.get(e.dataTransfer?.getData(this.#format) || this.#last);
-		return t instanceof Function ? t() : t?.transfer(this.#format);
+		return t instanceof Function ? t() : t?.transfer();
 	}
 	set(e, key, icon, xOffset = -5, yOffset = -5) {
 		this.#last = key;
