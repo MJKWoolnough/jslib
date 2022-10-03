@@ -184,7 +184,7 @@ const resizeWindow = (w, direction, e) => {
 		"bottom": 0,
 		"width": "auto",
 		"height": "auto",
-		"> div:nth-child(3) > div > button:nth-of-type(2)": {
+		">div:nth-child(3)>div>button:nth-of-type(2)": {
 			"background-image": `url('data:image/svg+xml,%3Csvg viewBox="0 0 15 13" xmlns="${svgNS}"%3E%3Cpath d="M1,5 h8 v-1 h-8 v8 h8 v-8 m-3,0 v-3 h8 v8 h-5 m5,-7 h-8" stroke="%23000" fill="none" /%3E%3C/svg%3E')`
 		}
 	},
