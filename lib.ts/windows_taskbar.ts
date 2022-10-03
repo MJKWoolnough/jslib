@@ -141,7 +141,6 @@ const windowObservations = {
 	"padding-bottom": "var(--taskbar-size, 4em)"
       }) + "";
 
-
 setMenuLang({
 	"CLOSE": "Close",
 	"MINIMISE": "Minimise",
