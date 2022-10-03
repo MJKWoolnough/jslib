@@ -2104,6 +2104,13 @@
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][table][thead][tr][th]A[/th][th]B[/th][/tr][/thead][tbody][tr][td]1[/td][td]2[/td][/tr][/tbody][tfoot][tr][td]I[/td][td]II[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody><tfoot><tr><td>I</td><td>II</td></tr></tfoot></table>`;
 			}
+		},
+		"none": {
+			"none": async () => {
+				const {default: bbcode} = await import("./lib/bbcode.js"),
+				      {all, none} = await import("./lib/bbcode_tags.js");
+				return bbcode(Object.assign({none}, all), "[b][none]Stuff[hr]More Stuff[/none]").firstElementChild!.innerHTML === `Stuff<hr>More Stuff`;
+			}
 		}
 	},
 	"settings.js": {
