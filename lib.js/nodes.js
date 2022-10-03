@@ -467,7 +467,7 @@ export class NodeMap {
 	position(key) {
 		const root = this.#root;
 		let count = -1,
-		    curr = (root.m.get(key) ?? root);
+		    curr = root.m.get(key) ?? root;
 		while (curr !== root) {
 			curr = curr.p;
 			count++;
