@@ -3638,6 +3638,28 @@
 				const {default: CSS} = await import("./lib/css.js");
 				return new CSS().add("div, a", {"b": 0, " > span": {"a": 1}}) + "" === "div, a{b:0;}div > span, a > span{a:1;}";
 			}
+		},
+		"ids": {
+			"basic ids": async () => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      css = new CSS();
+				return css.id() === "_0" && css.id() === "_1" && css.id() === "_2";
+			},
+			"prefixed ids": async () => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      css = new CSS("ID_");
+				return css.id() === "ID_0" && css.id() === "ID_1" && css.id() === "ID_2";
+			},
+			"different start": async () => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      css = new CSS("", 10);
+				return css.id() === "_10" && css.id() === "_11" && css.id() === "_12";
+			},
+			"multiple ids": async () => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      ids = new CSS().ids(3);
+				return ids[0] === "_0" && ids[1] === "_1" && ids[2] === "_2";
+			}
 		}
 	}
 });
