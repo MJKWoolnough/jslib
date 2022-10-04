@@ -67,6 +67,17 @@
 		}
 	});
 })({
+	"load.js": {
+		"pageLoad": {
+			"pageLoad": async () => {
+				const {default: pageLoad} = await import("./lib/load.js");
+				return Promise.race([
+					pageLoad,
+					new Promise(sFn => setTimeout(() => sFn(false), 10000))
+				]).then(v => v !== false);
+			}
+		}
+	},
 	"inter.js": {
 		"Pipe": {
 			"Send/Receive": async () => {
