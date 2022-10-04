@@ -11,7 +11,7 @@ export default class CSS {
 	add(selector, def) {
 		if (selector.trim()) {
 			const d = this.#data;
-			let data = `${selector}{`;
+			let data = "";
 			for (const key in def) {
 				const v = def[key];
 				if (isDef(v)) {
@@ -20,7 +20,9 @@ export default class CSS {
 					data += `${key}:${v};`;
 				}
 			}
-			this.#data = d + data + "}" + this.#data.slice(d.length);
+			if (data) {
+				this.#data = d + selector + "{" + data + "}" + this.#data.slice(d.length);
+			}
 		}
 		return this;
 	}
