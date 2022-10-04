@@ -3600,6 +3600,20 @@
 				const {default: CSS} = await import("./lib/css.js");
 				return new CSS().add("a", {"a": 0, "b": 1, "c": 2}) + "" === "a{a:0;b:1;c:2;}";
 			}
+		},
+		"complex selectors": {
+			"div a": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("div a", {"a": 0}) + "" === "div a{a:0;}";
+			},
+			"div a:not(:hover)": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("div a:not(:hover)", {"a": 0}) + "" === "div a:not(:hover){a:0;}";
+			},
+			"div + span > a:hover::before": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("div + span > a:hover::before", {"a": 0}) + "" === "div + span > a:hover::before{a:0;}";
+			}
 		}
 	}
 });
