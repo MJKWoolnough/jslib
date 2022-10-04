@@ -3624,6 +3624,20 @@
 				const {default: CSS} = await import("./lib/css.js");
 				return new CSS().add("span, ul > li, label + input", {"a": 0}) + "" === "span, ul > li, label + input{a:0;}";
 			}
+		},
+		"combined selectors": {
+			"div span, a span": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("div, a", {" span": {"a": 0}}) + "" === "div span, a span{a:0;}";
+			},
+			"div + span, a + span": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("div, a", {" + span": {"a": 0}}) + "" === "div + span, a + span{a:0;}";
+			},
+			"div, a, div > span, a > span": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("div, a", {"b": 0, " > span": {"a": 1}}) + "" === "div, a{b:0;}div > span, a > span{a:1;}";
+			}
 		}
 	}
 });
