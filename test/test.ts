@@ -3561,5 +3561,45 @@
 				return Fraction.max(new Fraction(-1n), new Fraction(2n)).cmp(new Fraction(2n)) === 0;
 			}
 		}
+	},
+	"css.js": {
+		"compound selectors": {
+			"empty": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("", {"a": 0}) + "" === "";
+			},
+			"a": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("a", {"a": 0}) + "" === "a{a:0;}";
+			},
+			"a:hover": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("a:hover", {"a": 0}) + "" === "a:hover{a:0;}";
+			},
+			"div.className": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("div.className", {"a": 0}) + "" === "div.className{a:0;}";
+			},
+			"#IDHERE": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("#IDHERE", {"a":0}) + "" === "#IDHERE{a:0;}";
+			},
+			"ul::before": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("ul::before", {"a": 0}) + "" === "ul::before{a:0;}";
+			},
+			"input[disabled]": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("input[disabled]", {"a": 0}) + "" === "input[disabled]{a:0;}";
+			},
+			"no properties": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("a", {}) + "" === "";
+			},
+			"multiple properties": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("a", {"a": 0, "b": 1, "c": 2}) + "" === "a{a:0;b:1;c:2;}";
+			}
+		}
 	}
 });
