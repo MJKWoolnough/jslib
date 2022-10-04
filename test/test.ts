@@ -3614,6 +3614,16 @@
 				const {default: CSS} = await import("./lib/css.js");
 				return new CSS().add("div + span > a:hover::before", {"a": 0}) + "" === "div + span > a:hover::before{a:0;}";
 			}
+		},
+		"multiple selectors": {
+			"div, a": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("div, a", {"a": 0}) + "" === "div, a{a:0;}";
+			},
+			"span, ul > li, label + input": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add("span, ul > li, label + input", {"a": 0}) + "" === "span, ul > li, label + input{a:0;}";
+			}
 		}
 	}
 });
