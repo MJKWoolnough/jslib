@@ -1123,15 +1123,7 @@ The WaitInfo type contains the following data:
 
 ## <a name="load">load</a>
 
-The load module should be included in a separate HTML script element on the page, and it creates two globally accessible features, which can be added to a TypeScript file with the following declarations:
-
-declare const pageLoad: Promise<void>;
-declare const include: (url: string) => Promise<Object>;
-
-|  Property  |  Description  |
-|------------|---------------|
-| include    | This function is an alias for the import function, but will be used by [jspacker](https://vimagination.zapto.org/jspacker/) for all importing. |
-| pageLoad   | This is a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which is resolved when the page finished loading. |
+The load module contains a single default export, a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which is resolved when the page finished loading.
 
 ## <a name="menu">menu</a>
 
