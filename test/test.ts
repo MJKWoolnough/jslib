@@ -3671,6 +3671,23 @@
 				      ids = new CSS().ids(3);
 				return ids[0] === "_0" && ids[1] === "_1" && ids[2] === "_2";
 			}
+		},
+		"query": {
+			"@supports": async () => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      css = new CSS();
+				return css.query("@supports (display: flex)", {
+				}) + "" === "@supports (display: flex){}";
+			},
+			"@media": async () => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      css = new CSS();
+				return css.query("@media screen and (min-width: 900px)", {
+					"article": {
+						"padding": "1rem 3rem"
+					}
+				}) + "" === "@media screen and (min-width: 900px){article{padding:1rem 3rem;}}";
+			}
 		}
 	}
 });
