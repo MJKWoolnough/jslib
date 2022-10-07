@@ -38,6 +38,14 @@ export default class CSS {
 		}
 		return this;
 	}
+	query(query: string, defs: Record<string, Def>) {
+		this.#data += query + "{";
+		for (const selector in defs) {
+			this.add(selector, defs[selector]);
+		}
+		this.#data += "}";
+		return this;
+	}
 	id() {
 		return this.#idPrefix + this.#id++;
 	}
@@ -96,6 +104,7 @@ const split = (selector: string) => {
       defaultCSS = new CSS();
 
 export const add = (selector: string, def: Def) => defaultCSS.add(selector, def),
+query = (query: string, defs: Record<string, Def>) => defaultCSS.query(query, defs),
 id = () => defaultCSS.id(),
 ids = <N extends number>(n: N) => defaultCSS.ids(n) as IDs<N>,
 render = () => defaultCSS.render();

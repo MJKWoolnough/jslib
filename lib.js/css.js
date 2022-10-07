@@ -26,6 +26,14 @@ export default class CSS {
 		}
 		return this;
 	}
+	query(query, defs) {
+		this.#data += query + "{";
+		for (const selector in defs) {
+			this.add(selector, defs[selector]);
+		}
+		this.#data += "}";
+		return this;
+	}
 	id() {
 		return this.#idPrefix + this.#id++;
 	}
@@ -84,6 +92,7 @@ const split = selector => {
       defaultCSS = new CSS();
 
 export const add = (selector, def) => defaultCSS.add(selector, def),
+query = (query, defs) => defaultCSS.query(query, defs),
 id = () => defaultCSS.id(),
 ids = n => defaultCSS.ids(n),
 render = () => defaultCSS.render();
