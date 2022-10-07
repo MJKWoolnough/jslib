@@ -303,7 +303,7 @@ This module directly imports the [html](#html) module, and indirectly imports th
 | [add](#css_css_add) | A method to add a CSS declaration. |
 | [constructor](#css_css_constructor) | Used to create a new instance of the class. |
 | [id](#css_css_id) | Creates a unique ID within this instance. |
-| [id](#css_css_ids) | Creates multiple unique IDs within this instance. |
+| [ids](#css_css_ids) | Creates multiple unique IDs within this instance. |
 | [render](#css_css_render) | Compiles all of the CSS declarations into a [style](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style) element. |
 | toString | Returns the CSS declarations as a compiled string. |
 
