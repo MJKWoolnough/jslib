@@ -21,7 +21,7 @@ const windowObservations = {
       },
       setMenuLang = l => {
 	for (const [k, t] of [["CLOSE", close], ["MINIMISE", minimise], ["RESTORE", restore]]) {
-		const le = l[k];
+		const le = l[k] + "";
 		if (le) {
 			clearNode(t, [span(underline, keys[k] = le.charAt(0)), le.slice(1)]);
 		}
