@@ -1,3 +1,4 @@
+import type {Bind} from './dom.js';
 import CSS from './css.js';
 import {amendNode, autoFocus, bindElement, clearNode, event, eventCapture} from './dom.js';
 import {button, div, img, input, ns, slot, span, style} from './html.js';
@@ -137,12 +138,12 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 	}, 0, signal)});
       },
       lang = {
-	"CANCEL": "Cancel",
-	"CLOSE": "Close",
-	"MAXIMISE": "Maximise",
-	"MINIMISE": "Minimise",
-	"OK": "Ok",
-	"RESTORE": "Restore"
+	"CANCEL": "Cancel" as string | Bind,
+	"CLOSE": "Close" as string | Bind,
+	"MAXIMISE": "Maximise" as string | Bind,
+	"MINIMISE": "Minimise" as string | Bind,
+	"OK": "Ok" as string | Bind,
+	"RESTORE": "Restore" as string | Bind
       },
       shellStyle = new CSS().add(":host", {
 	"display": "block",
@@ -350,7 +351,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 let focusingWindow: WindowElement | null = null, dragging = false;
 
 abstract class BaseElement extends HTMLElement {
-	alert(title: string, message: string, icon?: string) {
+	alert(title: string | Bind, message: string | Bind, icon?: string | Bind) {
 		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
 				"window-hide": true,
@@ -368,7 +369,7 @@ abstract class BaseElement extends HTMLElement {
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
-	confirm(title: string, message: string, icon?: string) {
+	confirm(title: string | Bind, message: string | Bind, icon?: string | Bind) {
 		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
 				"window-hide": true,
@@ -389,7 +390,7 @@ abstract class BaseElement extends HTMLElement {
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
-	prompt(title: string, message: string, defaultValue = "", icon?: string) {
+	prompt(title: string | Bind, message: string | Bind, defaultValue = "", icon?: string | Bind) {
 		return new Promise<string|null>((resolve, reject) => {
 			const ok = () => {
 				resolve(data.value);
@@ -564,7 +565,7 @@ export class WindowElement extends BaseElement {
 		amendNode(this.parentNode, w);
 		return true;
 	}
-	addControlButton(icon: string, onclick: (this: WindowElement) => void, title?: string) {
+	addControlButton(icon: string, onclick: (this: WindowElement) => void, title?: string | Bind) {
 		const b = button({"style": {"background-image": `url(${JSON.stringify(icon)})`}, "onclick": () => onclick.call(this), title});
 		amendNode(this.#extra, b);
 		return () => b.remove();
