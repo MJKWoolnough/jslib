@@ -943,6 +943,45 @@
 				autoFocus(new selectElement());
 				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 2), 100));
 			}
+		},
+		"bind": {
+			"bind text": async () => {
+				const {amendNode, bind} = await import("./lib/dom.js"),
+				      text = bind("HELLO"),
+				      elm = amendNode(document.createElement("div"), text),
+				      start = elm.textContent;
+				text.value = "GOODBYE";
+				return start === "HELLO" && elm.textContent === "GOODBYE";
+			},
+			"bind text (multiple)": async () => {
+				const {amendNode, bind} = await import("./lib/dom.js"),
+				      text = bind("HELLO"),
+				      elm = amendNode(document.createElement("div"), text),
+				      elm2 = amendNode(document.createElement("div"), ["Other ", text, " Text"]),
+				      start = elm.textContent,
+				      start2 = elm2.textContent;
+				text.value = "GOODBYE";
+				return start === "HELLO" && start2 == "Other HELLO Text" && elm.textContent === "GOODBYE" && elm2.textContent === "Other GOODBYE Text";
+			},
+			"bind attr": async () => {
+				const {amendNode, bind} = await import("./lib/dom.js"),
+				      attr = bind("FIRST"),
+				      elm = amendNode(document.createElement("div"), {"TEST": attr}),
+				      start = elm.getAttribute("TEST");
+				attr.value = "SECOND";
+				return start === "FIRST" && elm.getAttribute("TEST") === "SECOND";
+			},
+			"bind attr (multiple)": async () => {
+				const {amendNode, bind} = await import("./lib/dom.js"),
+				      attr = bind("FIRST"),
+				      elm = amendNode(document.createElement("div"), {"TEST": attr, "TEST2": attr}),
+				      elm2 = amendNode(document.createElement("div"), {"TEST3": attr}),
+				      start = elm.getAttribute("TEST"),
+				      start2 = elm.getAttribute("TEST2"),
+				      start3 = elm2.getAttribute("TEST3");
+				attr.value = "SECOND";
+				return start === "FIRST" && start2 === "FIRST" && start3 === "FIRST" && elm.getAttribute("TEST") === "SECOND" && elm.getAttribute("TEST2") === "SECOND" && elm2.getAttribute("TEST3") === "SECOND";
+			}
 		}
 	},
 	"html.js": {
