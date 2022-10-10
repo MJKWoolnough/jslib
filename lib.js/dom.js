@@ -1,5 +1,7 @@
 const childrenArr = (node, children) => {
-	if (typeof children === "string") {
+	if (children instanceof Bind) {
+		node.appendChild(children[getText]());
+	} else if (typeof children === "string") {
 		node.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
 		for (const c of children) {
@@ -16,10 +18,46 @@ const childrenArr = (node, children) => {
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || (prop instanceof Object && prop.handleEvent instanceof Function),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object,
-      isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object;
+      isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object,
+      getText = Symbol("getText"),
+      setAttr = Symbol("setAttr");
+
+export class Bind {
+	#value;
+	#set = new Set();
+	constructor(v) {
+		this.#value = v;
+	}
+	get value() { return this.#value; }
+	set value(v) {
+		if (this.#value !== v) {
+			this.#value = v;
+			const text = this+"";
+			for (const wr of this.#set) {
+				const ref = wr.deref();
+				if (ref) {
+					ref.textContent = text;
+				} else {
+					this.#set.delete(wr);
+				}
+			}
+		}
+	}
+	[getText]() {
+		const t = new Text(this+"");
+		this.#set.add(new WeakRef(t));
+		return t;
+	}
+	[setAttr](a) {
+		this.#set.add(new WeakRef(a));
+	}
+	toString() {
+		return this.#value.toString();
+	}
+}
 
 export const amendNode = (node, properties, children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Bind) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
 		for (const prop of properties) {
@@ -60,6 +98,9 @@ export const amendNode = (node, properties, children) => {
 					}
 				} else {
 					node.setAttribute(k, prop.toString());
+					if (prop instanceof Bind) {
+						prop[setAttr](node.getAttributeNode(k));
+					}
 				}
 			}
 		}
@@ -110,4 +151,5 @@ autoFocus = (node, inputSelect = true) => {
 		}
 	}, 0);
 	return node;
-};
+},
+bind = v => new Bind(v);

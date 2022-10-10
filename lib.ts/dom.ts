@@ -21,7 +21,7 @@ export type PropsObject = Record<string, PropValue>;
 
 export type Props = PropsObject | NamedNodeMap;
 
-export type Children = string | Node | Children[] | NodeList | HTMLCollection;
+export type Children = string | Node | Children[] | NodeList | HTMLCollection | Bind<ToString>;
 
 export interface DOMBind<T extends Node> {
 	(properties?: Props, children?: Children): T;
@@ -33,7 +33,9 @@ interface FocusElement {
 }
 
 const childrenArr = (node: Node, children: Children) => {
-	if (typeof children === "string") {
+	if (children instanceof Bind) {
+		node.appendChild(children[getText]());
+	} else if (typeof children === "string") {
 		node.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
 		for (const c of children) {
@@ -50,10 +52,46 @@ const childrenArr = (node: Node, children: Children) => {
       isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function),
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object,
-      isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object;
+      isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object,
+      getText = Symbol("getText"),
+      setAttr = Symbol("setAttr");
+
+export class Bind<T extends ToString = ToString> {
+	#value: T;
+	#set = new Set<WeakRef<Text|Attr>>();
+	constructor(v: T) {
+		this.#value = v;
+	}
+	get value() { return this.#value; }
+	set value(v: T) {
+		if (this.#value !== v) {
+			this.#value = v;
+			const text = this+"";
+			for (const wr of this.#set) {
+				const ref = wr.deref();
+				if (ref) {
+					ref.textContent = text;
+				} else {
+					this.#set.delete(wr);
+				}
+			}
+		}
+	}
+	[getText]() {
+		const t = new Text(this+"");
+		this.#set.add(new WeakRef(t));
+		return t;
+	}
+	[setAttr](a: Attr) {
+		this.#set.add(new WeakRef(a));
+	}
+	toString() {
+		return this.#value.toString();
+	}
+}
 
 export const amendNode: mElement = (node?: Node | EventTarget | null, properties?: Props | Children, children?: Children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Bind) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
 		for (const prop of properties) {
@@ -94,6 +132,9 @@ export const amendNode: mElement = (node?: Node | EventTarget | null, properties
 					}
 				} else {
 					node.setAttribute(k, prop.toString());
+					if (prop instanceof Bind) {
+						prop[setAttr](node.getAttributeNode(k)!);
+					}
 				}
 			}
 		}
@@ -144,4 +185,5 @@ autoFocus = <T extends FocusElement>(node: T, inputSelect = true) => {
 		}
 	}, 0);
 	return node;
-};
+},
+bind = <T extends ToString>(v: T) => new Bind(v);
