@@ -1,6 +1,6 @@
 import CSS from './css.js';
-import {amendNode, bindElement, clearNode, event, eventOnce} from './dom.js';
-import {div, img, li, ns, slot, span, style, template, ul} from './html.js';
+import {amendNode, bindElement, event, eventOnce} from './dom.js';
+import {div, img, li, ns, slot, span, style, ul} from './html.js';
 import {item, menu} from './menu.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage as setOtherLanguage, windows} from './windows.js';
 
@@ -10,20 +10,16 @@ const windowObservations = {
 	"attributeFilter": ["window-icon", "window-title"],
 	"attributes": true
       },
-      underline = {"style": "text-decoration: underline"},
-      close = template(),
-      minimise = template(),
-      restore = template(),
-      keys = {
+      menuItems = {
 	"CLOSE": '',
 	"MINIMISE": '',
 	"RESTORE": ''
       },
       setMenuLang = l => {
-	for (const [k, t] of [["CLOSE", close], ["MINIMISE", minimise], ["RESTORE", restore]]) {
-		const le = l[k] + "";
+	for (const k of ["CLOSE", "MINIMISE", "RESTORE"]) {
+		const le = l[k];
 		if (le) {
-			clearNode(t, [span(underline, keys[k] = le.charAt(0)), le.slice(1)]);
+			menuItems[k] = le;
 		}
 	}
       },
@@ -189,11 +185,11 @@ export class ShellElement extends BaseShellElement {
 						      }, "oncontextmenu": e => {
 							e.preventDefault();
 							amendNode(self, menu({"x": e.clientX, "y": e.clientY}, [
-								w.hasAttribute("minimised") ? item({"key": keys["RESTORE"], "onselect": () => {
+								w.hasAttribute("minimised") ? item({"key": (menuItems["RESTORE"]+"").charAt(0), "onselect": () => {
 									amendNode(w, {"minimised": false});
 									w.focus();
-								}}, restore.content.cloneNode(true)) : item({"key": keys["MINIMISE"], "onselect": () => amendNode(w, {"minimised": true})}, minimise.content.cloneNode(true)),
-								item({"key": keys["CLOSE"], "onselect": () => w.close()}, close.content.cloneNode(true))
+								}}, menuItems["RESTORE"]) : item({"key": (menuItems["MINIMISE"]+"").charAt(0), "onselect": () => amendNode(w, {"minimised": true})}, menuItems["MINIMISE"]),
+								item({"key": (menuItems["CLOSE"]+"").charAt(0), "onselect": () => w.close()}, menuItems["CLOSE"])
 							]));
 						      }}, [
 							img({"part": "icon", "src": w.getAttribute("window-icon") || undefined, "title": w.getAttribute("window-title") ?? undefined}),
