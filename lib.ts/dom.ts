@@ -34,7 +34,9 @@ interface FocusElement {
 
 const childrenArr = (node: Node, children: Children) => {
 	if (children instanceof Bind) {
-		node.appendChild(children[getText]());
+		const t = new Text(children+"");
+		children[setNode](t);
+		node.appendChild(t);
 	} else if (typeof children === "string") {
 		node.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
@@ -53,12 +55,11 @@ const childrenArr = (node: Node, children: Children) => {
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object,
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object,
-      getText = Symbol("getText"),
-      setAttr = Symbol("setAttr");
+      setNode = Symbol("setNode");
 
 export class Bind<T extends ToString = ToString> {
 	#value: T;
-	#set = new Set<WeakRef<Text|Attr>>();
+	#set = new Set<WeakRef<Text | Attr>>();
 	constructor(v: T) {
 		this.#value = v;
 	}
@@ -77,13 +78,8 @@ export class Bind<T extends ToString = ToString> {
 			}
 		}
 	}
-	[getText]() {
-		const t = new Text(this+"");
-		this.#set.add(new WeakRef(t));
-		return t;
-	}
-	[setAttr](a: Attr) {
-		this.#set.add(new WeakRef(a));
+	[setNode](n: Text | Attr) {
+		this.#set.add(new WeakRef(n));
 	}
 	toString() {
 		return this.#value.toString();
@@ -133,7 +129,7 @@ export const amendNode: mElement = (node?: Node | EventTarget | null, properties
 				} else {
 					node.setAttribute(k, prop.toString());
 					if (prop instanceof Bind) {
-						prop[setAttr](node.getAttributeNode(k)!);
+						prop[setNode](node.getAttributeNode(k)!);
 					}
 				}
 			}

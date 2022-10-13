@@ -1,6 +1,8 @@
 const childrenArr = (node, children) => {
 	if (children instanceof Bind) {
-		node.appendChild(children[getText]());
+		const t = new Text(children+"");
+		children[setNode](t);
+		node.appendChild(t);
 	} else if (typeof children === "string") {
 		node.appendChild(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
@@ -19,8 +21,7 @@ const childrenArr = (node, children) => {
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object,
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object,
-      getText = Symbol("getText"),
-      setAttr = Symbol("setAttr");
+      setNode = Symbol("setNode");
 
 export class Bind {
 	#value;
@@ -43,13 +44,8 @@ export class Bind {
 			}
 		}
 	}
-	[getText]() {
-		const t = new Text(this+"");
-		this.#set.add(new WeakRef(t));
-		return t;
-	}
-	[setAttr](a) {
-		this.#set.add(new WeakRef(a));
+	[setNode](n) {
+		this.#set.add(new WeakRef(n));
 	}
 	toString() {
 		return this.#value.toString();
@@ -99,7 +95,7 @@ export const amendNode = (node, properties, children) => {
 				} else {
 					node.setAttribute(k, prop.toString());
 					if (prop instanceof Bind) {
-						prop[setAttr](node.getAttributeNode(k));
+						prop[setNode](node.getAttributeNode(k));
 					}
 				}
 			}
