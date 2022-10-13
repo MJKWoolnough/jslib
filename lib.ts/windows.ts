@@ -1,4 +1,4 @@
-import type {Bind} from './dom.js';
+import type {Bind, Children} from './dom.js';
 import CSS from './css.js';
 import {amendNode, autoFocus, bindElement, clearNode, event, eventCapture} from './dom.js';
 import {button, div, img, input, ns, slot, span, style} from './html.js';
@@ -351,7 +351,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 let focusingWindow: WindowElement | null = null, dragging = false;
 
 abstract class BaseElement extends HTMLElement {
-	alert(title: string | Bind, message: string | Bind, icon?: string | Bind) {
+	alert(title: string | Bind, message: Children, icon?: string | Bind) {
 		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
 				"window-hide": true,
@@ -369,7 +369,7 @@ abstract class BaseElement extends HTMLElement {
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
-	confirm(title: string | Bind, message: string | Bind, icon?: string | Bind) {
+	confirm(title: string | Bind, message: Children, icon?: string | Bind) {
 		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
 				"window-hide": true,
@@ -390,7 +390,7 @@ abstract class BaseElement extends HTMLElement {
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
-	prompt(title: string | Bind, message: string | Bind, defaultValue = "", icon?: string | Bind) {
+	prompt(title: string | Bind, message: Children, defaultValue = "", icon?: string | Bind) {
 		return new Promise<string|null>((resolve, reject) => {
 			const ok = () => {
 				resolve(data.value);
