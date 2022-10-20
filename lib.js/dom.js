@@ -1,5 +1,5 @@
 const childrenArr = (node, children) => {
-	if (children instanceof Bind) {
+	if (children instanceof Binder) {
 		const t = new Text(children+"");
 		children[setNode](t);
 		node.appendChild(t);
@@ -21,31 +21,64 @@ const childrenArr = (node, children) => {
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object,
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object,
-      setNode = Symbol("setNode");
+      setNode = Symbol("setNode"),
+      update = Symbol("update");
 
-export class Bind {
-	#value;
+class Binder {
 	#set = new Set();
+	[setNode](n) {
+		this.#set.add(new WeakRef(n));
+	}
+	[update]() {
+		const text = this+"";
+		for (const wr of this.#set) {
+			const ref = wr.deref();
+			if (ref) {
+				ref.textContent = text;
+			} else {
+				this.#set.delete(wr);
+			}
+		}
+	}
+}
+
+class TemplateBind extends Binder {
+	#strings;
+	#bindings;
+	constructor(strings, bindings) {
+		super();
+		this.#strings = strings;
+		this.#bindings = bindings;
+		for (const b of bindings) {
+			if (b instanceof Binder) {
+				b[setNode](this);
+			}
+		}
+	}
+	set textContent(_) {
+		this[update]();
+	}
+	toString() {
+		let str = "";
+		for (let i = 0; i < this.#strings.length; i++) {
+			str += this.#strings[i] + (this.#bindings[i] ?? "");
+		}
+		return str;
+	}
+}
+
+export class Bind extends Binder {
+	#value;
 	constructor(v) {
+		super();
 		this.#value = v;
 	}
 	get value() { return this.#value; }
 	set value(v) {
 		if (this.#value !== v) {
 			this.#value = v;
-			const text = this+"";
-			for (const wr of this.#set) {
-				const ref = wr.deref();
-				if (ref) {
-					ref.textContent = text;
-				} else {
-					this.#set.delete(wr);
-				}
-			}
+			this[update]();
 		}
-	}
-	[setNode](n) {
-		this.#set.add(new WeakRef(n));
 	}
 	toString() {
 		return this.#value.toString();
@@ -53,7 +86,7 @@ export class Bind {
 }
 
 export const amendNode = (node, properties, children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Bind) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
 		for (const prop of properties) {
@@ -94,7 +127,7 @@ export const amendNode = (node, properties, children) => {
 					}
 				} else {
 					node.setAttribute(k, prop.toString());
-					if (prop instanceof Bind) {
+					if (prop instanceof Binder) {
 						prop[setNode](node.getAttributeNode(k));
 					}
 				}
@@ -148,4 +181,16 @@ autoFocus = (node, inputSelect = true) => {
 	}, 0);
 	return node;
 },
-bind = v => new Bind(v);
+bind = (v, ...bindings) => {
+	if (v instanceof Array) {
+		if (v.length === 1 && bindings.length === 0) {
+			return new Bind(v[0]);
+		}
+		if (v.length !== bindings.length + 1){
+			return new SyntaxError("invalid tag call");
+		}
+		return new TemplateBind(v, bindings);
+	} else {
+		return new Bind<T>(v);
+	}
+};

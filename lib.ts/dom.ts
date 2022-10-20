@@ -21,7 +21,7 @@ export type PropsObject = Record<string, PropValue>;
 
 export type Props = PropsObject | NamedNodeMap;
 
-export type Children = string | Node | Children[] | NodeList | HTMLCollection | Bind<ToString>;
+export type Children = string | Node | Children[] | NodeList | HTMLCollection | Binder;
 
 export interface DOMBind<T extends Node> {
 	(properties?: Props, children?: Children): T;
@@ -32,8 +32,17 @@ interface FocusElement {
 	focus(): void;
 }
 
+interface TextContent {
+	textContent: string | null;
+}
+
+interface BindFn {
+	<T extends ToString = ToString>(t: T): Bind<T>;
+	(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]): Binder;
+}
+
 const childrenArr = (node: Node, children: Children) => {
-	if (children instanceof Bind) {
+	if (children instanceof Binder) {
 		const t = new Text(children+"");
 		children[setNode](t);
 		node.appendChild(t);
@@ -55,31 +64,65 @@ const childrenArr = (node: Node, children: Children) => {
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object,
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object,
-      setNode = Symbol("setNode");
+      setNode = Symbol("setNode"),
+      update = Symbol("update");
 
-export class Bind<T extends ToString = ToString> {
+abstract class Binder {
+	#set = new Set<WeakRef<TextContent>>();
+	[setNode](n: TextContent) {
+		this.#set.add(new WeakRef(n));
+	}
+	[update]() {
+		const text = this+"";
+		for (const wr of this.#set) {
+			const ref = wr.deref();
+			if (ref) {
+				ref.textContent = text;
+			} else {
+				this.#set.delete(wr);
+			}
+		}
+	}
+	abstract toString(): string;
+}
+
+class TemplateBind extends Binder {
+	#strings: TemplateStringsArray;
+	#bindings: (Bind | ToString)[];
+	constructor(strings: TemplateStringsArray, bindings: (Bind | ToString)[]) {
+		super();
+		this.#strings = strings;
+		this.#bindings = bindings;
+		for (const b of bindings) {
+			if (b instanceof Binder) {
+				b[setNode](this);
+			}
+		}
+	}
+	set textContent(_: string) {
+		this[update]();
+	}
+	toString() {
+		let str = "";
+		for (let i = 0; i < this.#strings.length; i++) {
+			str += this.#strings[i] + (this.#bindings[i] ?? "");
+		}
+		return str;
+	}
+}
+
+export class Bind<T extends ToString = ToString> extends Binder {
 	#value: T;
-	#set = new Set<WeakRef<Text | Attr>>();
 	constructor(v: T) {
+		super();
 		this.#value = v;
 	}
 	get value() { return this.#value; }
 	set value(v: T) {
 		if (this.#value !== v) {
 			this.#value = v;
-			const text = this+"";
-			for (const wr of this.#set) {
-				const ref = wr.deref();
-				if (ref) {
-					ref.textContent = text;
-				} else {
-					this.#set.delete(wr);
-				}
-			}
+			this[update]();
 		}
-	}
-	[setNode](n: Text | Attr) {
-		this.#set.add(new WeakRef(n));
 	}
 	toString() {
 		return this.#value.toString();
@@ -87,7 +130,7 @@ export class Bind<T extends ToString = ToString> {
 }
 
 export const amendNode: mElement = (node?: Node | EventTarget | null, properties?: Props | Children, children?: Children) => {
-	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Bind) {
+	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
 		for (const prop of properties) {
@@ -128,7 +171,7 @@ export const amendNode: mElement = (node?: Node | EventTarget | null, properties
 					}
 				} else {
 					node.setAttribute(k, prop.toString());
-					if (prop instanceof Bind) {
+					if (prop instanceof Binder) {
 						prop[setNode](node.getAttributeNode(k)!);
 					}
 				}
@@ -182,4 +225,16 @@ autoFocus = <T extends FocusElement>(node: T, inputSelect = true) => {
 	}, 0);
 	return node;
 },
-bind = <T extends ToString>(v: T) => new Bind<T>(v);
+bind = (<T extends ToString>(v: T | TemplateStringsArray, ...bindings: (Bind | ToString)[]) => {
+	if (v instanceof Array) {
+		if (v.length === 1 && bindings.length === 0) {
+			return new Bind(v[0]);
+		}
+		if (v.length !== bindings.length + 1){
+			return new SyntaxError("invalid tag call");
+		}
+		return new TemplateBind(v, bindings);
+	} else {
+		return new Bind<T>(v);
+	}
+}) as BindFn;
