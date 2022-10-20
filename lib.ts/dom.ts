@@ -111,7 +111,7 @@ class TemplateBind extends Binder {
 	}
 }
 
-export class Bind<T extends ToString = ToString> extends Binder {
+export class Bound<T extends ToString = ToString> extends Binder {
 	#value: T;
 	constructor(v: T) {
 		super();
@@ -128,6 +128,8 @@ export class Bind<T extends ToString = ToString> extends Binder {
 		return this.#value.toString();
 	}
 }
+
+export type Bind<T extends ToString = ToString> = InstanceType<typeof Bound<T>>;
 
 export const amendNode: mElement = (node?: Node | EventTarget | null, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder) {
@@ -228,13 +230,13 @@ autoFocus = <T extends FocusElement>(node: T, inputSelect = true) => {
 bind = (<T extends ToString>(v: T | TemplateStringsArray, ...bindings: (Bind | ToString)[]) => {
 	if (v instanceof Array) {
 		if (v.length === 1 && bindings.length === 0) {
-			return new Bind(v[0]);
+			return new Bound(v[0]);
 		}
 		if (v.length !== bindings.length + 1){
 			return new SyntaxError("invalid tag call");
 		}
 		return new TemplateBind(v, bindings);
 	} else {
-		return new Bind<T>(v);
+		return new Bound<T>(v);
 	}
 }) as BindFn;
