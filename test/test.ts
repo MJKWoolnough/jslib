@@ -982,6 +982,50 @@
 				attr.value = "SECOND";
 				return start === "FIRST" && start2 === "FIRST" && start3 === "FIRST" && elm.getAttribute("TEST") === "SECOND" && elm.getAttribute("TEST2") === "SECOND" && elm2.getAttribute("TEST3") === "SECOND";
 			}
+		},
+		"bind (template)": {
+			"single bind": async () => {
+				const {amendNode, bind} = await import("./lib/dom.js"),
+				      a = bind(" "),
+				      text = bind`HELLO${a}WORLD`,
+				      elm = amendNode(document.createElement("div"), text),
+				      start = elm.textContent;
+				a.value = ",";
+				return start === "HELLO WORLD" && elm.textContent === "HELLO,WORLD";
+			},
+			"single bind (attr)": async () => {
+				const {amendNode, bind} = await import("./lib/dom.js"),
+				      a = bind(" "),
+				      text = bind`HELLO${a}WORLD`,
+				      elm = amendNode(document.createElement("div"), {text}),
+				      start = elm.getAttribute("text");
+				a.value = ",";
+				return start === "HELLO WORLD" && elm.getAttribute("text") === "HELLO,WORLD";
+			},
+			"double bind": async () => {
+				const {amendNode, bind} = await import("./lib/dom.js"),
+				      a = bind("One"),
+				      b = bind("Two"),
+				      text = bind`1: ${a}\n2: ${b}`,
+				      elm = amendNode(document.createElement("div"), text),
+				      start = elm.textContent;
+				a.value = "Uno";
+				const start2 = elm.textContent;
+				b.value = "Dos";
+				return start === `1: One\n2: Two` && start2 === `1: Uno\n2: Two` && elm.textContent === `1: Uno\n2: Dos`;
+			},
+			"double bind (attr)": async () => {
+				const {amendNode, bind} = await import("./lib/dom.js"),
+				      a = bind("One"),
+				      b = bind("Two"),
+				      text = bind`1: ${a}\n2: ${b}`,
+				      elm = amendNode(document.createElement("div"), {text}),
+				      start = elm.getAttribute("text");
+				a.value = "Uno";
+				const start2 = elm.getAttribute("text");
+				b.value = "Dos";
+				return start === `1: One\n2: Two` && start2 === `1: Uno\n2: Two` && elm.getAttribute("text") === `1: Uno\n2: Dos`;
+			}
 		}
 	},
 	"html.js": {
