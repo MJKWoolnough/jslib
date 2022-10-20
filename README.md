@@ -397,8 +397,8 @@ The dom module can be used to manipulate DOM elements.
 | [amendNode](#dom_amendnode) | Function | This convenience function modifies a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget. |
 | [autoFocus](#dom_autofocus) | Function | This function queues a focus method call to the passed element. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom_amendnode) except that it clears any children before amending. |
-| [Bind](#dom_bind) | Class | This class can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
-| [bind](#dom_bind_fn) | Function | Creates bound text objects that can be used with . |
+| [Bind](#dom_bind) | Type | Objects that implement this type can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
+| [bind](#dom_bind_fn) | Function | Creates bound text objects that can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) functions. |
 | [bindElement](#dom_bindelement) | Function | This function simplifies binding of [amendNode](#dom_amendnode). |
 | [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), or a recursive array of those. |
 | [createDocumentFragment](#dom_createdocumentfragment) | Function | This convenience function creates a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment). |
@@ -440,14 +440,14 @@ This queues a focus method call to the passed element, and will call select on a
 
 ### <a name="dom_bind">Bind</a>
 ```typescript
-export class Bind<T extends ToString = ToString> {
+export type Bind<T extends ToString = ToString> {
 	value: T;
 	constructor(value: T);
 	toString(): string;
 }
 ```
 
-This class can be used in place of both property values and Children in calls to [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode), as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
+Onjects that implement this type can be used in place of both property values and Children in calls to [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode), as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
 
 When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
 
