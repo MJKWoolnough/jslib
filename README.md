@@ -398,7 +398,7 @@ The dom module can be used to manipulate DOM elements.
 | [autoFocus](#dom_autofocus) | Function | This function queues a focus method call to the passed element. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom_amendnode) except that it clears any children before amending. |
 | [Bind](#dom_bind) | Class | This class can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
-| bind | Function | Short hand for new Bind(). |
+| [bind](#dom_bind_fn) | Function | Creates bound text objects that can be used with . |
 | [bindElement](#dom_bindelement) | Function | This function simplifies binding of [amendNode](#dom_amendnode). |
 | [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), or a recursive array of those. |
 | [createDocumentFragment](#dom_createdocumentfragment) | Function | This convenience function creates a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment). |
@@ -450,6 +450,20 @@ export class Bind<T extends ToString = ToString> {
 This class can be used in place of both property values and Children in calls to [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode), as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
 
 When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
+
+### <a name="dom_bind">bind</a>
+```typescript
+<T extends ToString = ToString>(t: T): Bind<T>;
+(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]): Binder;
+```
+
+This function can be used either as a normal function, binding a single value, or as a template tag function.
+
+When used normally, this function takes a single starting value and returns a [Bind](#dom_bind) class with that value set.
+
+When used as a tag function, this function will return a type that is bound to all Bind expressions used within the template.
+
+Both returned types can be used as attributes or children in amendNode and clearNode calls.
 
 ### <a name="dom_bindelement">bindElement</a>
 ```typescript
