@@ -67,7 +67,7 @@ class TemplateBind extends Binder {
 	}
 }
 
-export class Bound extends Binder {
+class Bound extends Binder {
 	#value;
 	constructor(v) {
 		super();

@@ -111,7 +111,7 @@ class TemplateBind extends Binder {
 	}
 }
 
-export class Bound<T extends ToString = ToString> extends Binder {
+class Bound<T extends ToString = ToString> extends Binder {
 	#value: T;
 	constructor(v: T) {
 		super();
