@@ -182,4 +182,4 @@ autoFocus = <T extends FocusElement>(node: T, inputSelect = true) => {
 	}, 0);
 	return node;
 },
-bind = <T extends ToString>(v: T) => new Bind(v);
+bind = <T extends ToString>(v: T) => new Bind<T>(v);
