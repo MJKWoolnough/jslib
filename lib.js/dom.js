@@ -67,7 +67,7 @@ class TemplateBind extends Binder {
 	}
 }
 
-export class Bind extends Binder {
+export class Bound extends Binder {
 	#value;
 	constructor(v) {
 		super();
@@ -184,13 +184,13 @@ autoFocus = (node, inputSelect = true) => {
 bind = (v, ...bindings) => {
 	if (v instanceof Array) {
 		if (v.length === 1 && bindings.length === 0) {
-			return new Bind(v[0]);
+			return new Bound(v[0]);
 		}
 		if (v.length !== bindings.length + 1){
 			return new SyntaxError("invalid tag call");
 		}
 		return new TemplateBind(v, bindings);
 	} else {
-		return new Bind<T>(v);
+		return new Bound<T>(v);
 	}
 };
