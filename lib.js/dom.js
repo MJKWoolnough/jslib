@@ -34,7 +34,11 @@ class Binder {
 		for (const wr of this.#set) {
 			const ref = wr.deref();
 			if (ref) {
-				ref.textContent = text;
+				if (ref instanceof TemplateBind) {
+					ref[update]();
+				} else {
+					ref.textContent = text;
+				}
 			} else {
 				this.#set.delete(wr);
 			}
@@ -54,9 +58,6 @@ class TemplateBind extends Binder {
 				b[setNode](this);
 			}
 		}
-	}
-	set textContent(_) {
-		this[update]();
 	}
 	toString() {
 		let str = "";

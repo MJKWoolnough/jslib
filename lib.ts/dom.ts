@@ -68,8 +68,8 @@ const childrenArr = (node: Node, children: Children) => {
       update = Symbol("update");
 
 abstract class Binder {
-	#set = new Set<WeakRef<TextContent>>();
-	[setNode](n: TextContent) {
+	#set = new Set<WeakRef<TextContent | TemplateBind>>();
+	[setNode](n: TextContent | TemplateBind) {
 		this.#set.add(new WeakRef(n));
 	}
 	[update]() {
@@ -77,7 +77,11 @@ abstract class Binder {
 		for (const wr of this.#set) {
 			const ref = wr.deref();
 			if (ref) {
-				ref.textContent = text;
+				if (ref instanceof TemplateBind) {
+					ref[update]();
+				} else {
+					ref.textContent = text;
+				}
 			} else {
 				this.#set.delete(wr);
 			}
@@ -98,9 +102,6 @@ class TemplateBind extends Binder {
 				b[setNode](this);
 			}
 		}
-	}
-	set textContent(_: string) {
-		this[update]();
 	}
 	toString() {
 		let str = "";
