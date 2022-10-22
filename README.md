@@ -247,6 +247,35 @@ interface {
 
 In its simplest incarnation, this function takes a URL a returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which will return the string response from that URL. However, the passed [Properties](#conn_properties) object can modify both how the request is sent and the response interpreted.
 
+#### Examples
+```typescript
+import {HTTPRequest} from './conn.js';
+
+HTTPRequest("conn.js").then(data => console.log(data));
+```
+
+In this example to source code of the conn.js library will be printed to the console.
+
+```typescript
+import {HTTPRequest} from './conn.js';
+
+HTTPRequest("conn.js", {method: "HEAD", response: "xh"}).then(xh => console.log(xh.getResponseHeader("Content-Length")));
+```
+
+In this example a HEAD request is used to get print the size of conn.js library to the console.
+
+```typescript
+import {HTTPRequest} from './conn.js';
+
+const data = new FormData();
+
+data.append("search", "name");
+
+HTTPRequest<{names: string; count: number}>("/postHandler", {method: "POST", response: "json", data}).then(data => console.log(data.count));
+```
+
+In this example data is sent to a post handler, returning a JSON response which is automatically parsed.
+
 ### <a name="conn_properties">Properties</a>
 ```typescript
 {
