@@ -1,17 +1,23 @@
-import type {Children} from './dom.js';
+import type {DOMBind, Children} from './dom.js';
 import {amendNode, bindElement} from './dom.js';
 import {ns} from './html.js';
 
 type Options = {
 	attrs?: readonly string[];
 	manualSlot?: boolean;
+	classOnly?: boolean;
 }
 
 type AttrFn = (newValue: string, oldValue: string) => void;
 
 type AttrFnWrap = (fn: AttrFn) => void;
 
-export default (name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options) => {
+interface ElementFactory {
+	(name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options): DOMBind<HTMLElement>;
+	(name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options: Options & {classOnly: true}): HTMLElement;
+}
+
+export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options) => {
 	const attrs = options?.attrs ?? [],
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named"},
 	      element = attrs.length ? class extends HTMLElement {
@@ -36,5 +42,5 @@ export default (name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) =
 		}
 	      }
 	customElements.define(name, element);
-	return bindElement<Element>(ns, name);
-};
+	return options?.classOnly ? element : bindElement<Element>(ns, name);
+}) as ElementFactory;
