@@ -350,6 +350,42 @@ This module directly imports the [html](#html) module, and indirectly imports th
 | ids       | Function | The [ids](#css_css_id) method of a default instance of the default [CSS](#css_css) class. |
 | render    | Function | The [render](#css_css_render) method of a default instance of the default [CSS](#css_css) class. |
 
+### Example
+```typescript
+import {add, id, render} from './css.js';
+
+const title = id(),
+      titleElem = document.createElement("div"),
+      nowElem = document.createElement("span");
+
+nowElem.append("NOW");
+
+titleElem.setAttribute("class", title);
+titleElem.append("Buy ", nowElem);
+
+add(`.${title}`, {
+	"font-size": "2em",
+	">span": {
+		"color": "red"
+	}
+});
+
+document.head.append(render());
+document.body.append(titleElem);
+```
+
+This simple example will produce the following page:
+
+```html
+<html lang="en"><head>
+	<script type="module" src="script.js"></script>
+	<style type="text/css">._0{font-size:2em;}._0>span{color:red;}</style></head>
+	<body>
+		<div class="_0">Buy <span>NOW</span></div>
+	</body>
+</html>
+```
+
 ### <a name="css_css">CSS</a>
 
 |  Method  |  Description  |
