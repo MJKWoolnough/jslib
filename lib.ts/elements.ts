@@ -6,6 +6,7 @@ type Options = {
 	attrs?: readonly string[];
 	manualSlot?: boolean;
 	classOnly?: boolean;
+	delegatesFocus?: boolean;
 }
 
 type AttrFn = (newValue: string, oldValue: string) => void;
@@ -19,7 +20,7 @@ interface ElementFactory {
 
 export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options) => {
 	const attrs = options?.attrs ?? [],
-	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named"},
+	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
 	      element = attrs.length ? class extends HTMLElement {
 		#attrs: Map<string, AttrFn>;
 		static observedAttributes = attrs;
