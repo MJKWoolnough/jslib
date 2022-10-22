@@ -11,9 +11,9 @@ type AttrFn = (newValue: string, oldValue: string) => void;
 
 type AttrFnWrap = (fn: AttrFn) => void;
 
-export default (name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options: Options) => {
+export default (name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options) => {
 	const attrs = options?.attrs ?? [],
-	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options.manualSlot ? "manual" : "named"},
+	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named"},
 	      element = attrs.length ? class extends HTMLElement {
 		#attrs: Map<string, AttrFn>;
 		static observedAttributes = attrs;
