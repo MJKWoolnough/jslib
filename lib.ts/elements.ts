@@ -7,6 +7,7 @@ type Options = {
 	manualSlot?: boolean;
 	classOnly?: boolean;
 	delegatesFocus?: boolean;
+	removeEvent?: boolean;
 }
 
 type AttrFn = (newValue: string, oldValue: string) => void;
@@ -18,10 +19,17 @@ interface ElementFactory {
 	(name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options: Options & {classOnly: true}): HTMLElement;
 }
 
+class RemoveEvent extends HTMLElement {
+	disconnectedCallback() {
+		this.dispatchEvent(new CustomEvent("remove"));
+	}
+}
+
 export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options) => {
 	const attrs = options?.attrs ?? [],
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
-	      element = attrs.length ? class extends HTMLElement {
+	      base = options?.removeEvent ? RemoveEvent : HTMLElement,
+	      element = attrs.length ? class extends base {
 		#attrs: Map<string, AttrFn>;
 		static observedAttributes = attrs;
 		constructor() {
@@ -36,7 +44,7 @@ export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) 
 		attributeChangedCallback(name: string, oldValue: string, newValue: string) {
 			this.#attrs.get(name)?.(newValue, oldValue);
 		}
-	      } : class extends HTMLElement {
+	      } : class extends base {
 		constructor() {
 			super();
 			amendNode(this.attachShadow(shadowOptions), fn.call(this));
