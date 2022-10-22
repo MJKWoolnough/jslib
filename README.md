@@ -313,6 +313,17 @@ This object modifies an HTTPRequest. It allows setting of the following:
 
 This function takes a url and returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which will resolve with an initiated [WSConn](#conn_wsconn) on a successful connection.
 
+#### Examples
+```typescript
+import {WS} from './conn.js';
+
+WS("/socket").then(ws => {
+	ws.when(({data}) => console.log(JSON.parse(data)))
+});
+```
+
+This example connects a websocket to some endpoint and prints all of the JSON objects sent over it to the console.
+
 ### <a name="conn_wsconn">WSConn</a>
 
 WSConn extends the [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) class, allowing for the passed URL to be relative to the current URL.
