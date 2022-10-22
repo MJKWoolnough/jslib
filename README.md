@@ -54,6 +54,19 @@ This module contains a full [BBCode](https://en.wikipedia.org/wiki/BBCode) parse
 | text | Symbol | A [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) used to indicate the text processor in the Parsers type passed to the [(default)](#bbcode_default) parsing function. |
 | [Tokeniser](#bbcode_tokeniser) | Type | Intended for tag parsers, this type represents the token generator. |
 
+### Example
+```typescript
+import bbcode from './bbcode.js';
+import {all} from './bbcode_tags.js';
+
+bbcode(all, "[b]Hello[/b], [u]World[/u]")
+```
+
+The above will return a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) containing the following:
+```html
+<span style="font-weight: bold">Hello</span>, <span style="text-decoration: underline">World</span>
+```
+
 ### <a name="bbcode_default">(default)</a>
 
 ```typescript
