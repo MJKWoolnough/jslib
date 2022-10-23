@@ -10,11 +10,12 @@ type Options = {
 	removeEvent?: boolean;
 }
 
-type AttrFn = (newValue: string, oldValue: string) => void;
+type AttrFn = (newValue: string | null, oldValue: string | null) => void;
 
-type AttrFnWrap = (fn: AttrFn | Bind) => void;
+type AttrFnWrap = (fn: AttrFn | Bind<string>) => void;
 
 interface ElementFactory {
+	(name: string, fn: (this: HTMLElement) => Children, options?: Exclude<Options, "attrs">): DOMBind<HTMLElement>;
 	(name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options): DOMBind<HTMLElement>;
 	(name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options: Options & {classOnly: true}): HTMLElement;
 }
@@ -30,14 +31,14 @@ export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) 
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
 	      base = options?.removeEvent ? RemoveEvent : HTMLElement,
 	      element = attrs.length ? class extends base {
-		#attrs: Map<string, AttrFn | Bind>;
+		#attrs: Map<string, AttrFn | Bind<string>>;
 		static observedAttributes = attrs;
 		constructor() {
 			super();
 			this.#attrs = new Map();
 			const params: AttrFnWrap[] = [];
 			for (const param of attrs) {
-				params.push((fn: AttrFn | Bind) => this.#attrs.set(param, fn));
+				params.push((fn: AttrFn | Bind<string>) => this.#attrs.set(param, fn));
 			}
 			amendNode(this.attachShadow(shadowOptions), fn.call(this, ...params));
 		}
@@ -46,7 +47,7 @@ export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) 
 			if (a instanceof Function) {
 				a(newValue, oldValue);
 			} else if (a) {
-				a.value = newValue;
+				a.value = newValue ?? "";
 			}
 		}
 	      } : class extends base {
