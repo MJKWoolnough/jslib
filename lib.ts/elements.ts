@@ -56,5 +56,5 @@ export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) 
 		}
 	      }
 	customElements.define(name, element);
-	return options?.classOnly ? element : bindElement<Element>(ns, name);
+	return options?.classOnly ? element : bindElement<HTMLElement>(ns, name);
 }) as ElementFactory;
