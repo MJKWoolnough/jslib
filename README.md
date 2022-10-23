@@ -828,6 +828,18 @@ The fraction module exports a default class to act as a fractional, infinite pre
 | [Symbol.toPrimitive](#fraction_tofloat) | Method | Converts a Fraction to a Number. |
 | zero | Static Fraction | A Fraction representing 0. |
 
+### Example
+```typescript
+import Fraction from './fraction.js';
+
+const ten = new Fraction(10n),
+      two = new Fraction(2n);
+
+console.log(+ten.mul(two).add(Fraction.one));
+```
+
+This example shows some basic Fraction manipulations, resulting in 21 being printed to the console.
+
 ### <a name="fraction_add">add</a>
 ```typescript
 class Fraction {
