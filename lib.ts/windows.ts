@@ -536,7 +536,7 @@ export class WindowElement extends BaseElement {
 		}
 		this.dispatchEvent(new CustomEvent("remove"));
 	}
-	attributeChangedCallback(name: string, _: string, newValue: string) {
+	attributeChangedCallback(name: string, _: string | null, newValue: string | null) {
 		switch (name) {
 		case "window-title":
 			clearNode(this.#title, {"title": newValue ?? ""}, newValue ?? "");
