@@ -1,4 +1,4 @@
-import type {DOMBind, Children} from './dom.js';
+import type {Bind, DOMBind, Children} from './dom.js';
 import {amendNode, bindElement} from './dom.js';
 import {ns} from './html.js';
 
@@ -12,7 +12,7 @@ type Options = {
 
 type AttrFn = (newValue: string, oldValue: string) => void;
 
-type AttrFnWrap = (fn: AttrFn) => void;
+type AttrFnWrap = (fn: AttrFn | Bind) => void;
 
 interface ElementFactory {
 	(name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options): DOMBind<HTMLElement>;
@@ -30,19 +30,24 @@ export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) 
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
 	      base = options?.removeEvent ? RemoveEvent : HTMLElement,
 	      element = attrs.length ? class extends base {
-		#attrs: Map<string, AttrFn>;
+		#attrs: Map<string, AttrFn | Bind>;
 		static observedAttributes = attrs;
 		constructor() {
 			super();
 			this.#attrs = new Map();
 			const params: AttrFnWrap[] = [];
 			for (const param of attrs) {
-				params.push((fn: AttrFn) => this.#attrs.set(param, fn));
+				params.push((fn: AttrFn | Bind) => this.#attrs.set(param, fn));
 			}
 			amendNode(this.attachShadow(shadowOptions), fn.call(this, ...params));
 		}
 		attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-			this.#attrs.get(name)?.(newValue, oldValue);
+			const a = this.#attrs.get(name);
+			if (a instanceof Function) {
+				a(newValue, oldValue);
+			} else if (a) {
+				a.value = newValue;
+			}
 		}
 	      } : class extends base {
 		constructor() {
