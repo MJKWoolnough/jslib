@@ -1683,6 +1683,26 @@ This module directly imports the [dom](#dom) module.
 | switche | [DOMBind](#dom_dombind) | This function is as above, for the [switch](https://developer.mozilla.org/en-US/docs/Web/SVG/Element/switch) SVGElement. |
 | svgData | Function | This function takes either a [SVGSVGElement](https://developer.mozilla.org/en-US/docs/Web/API/SVGSVGElement) or a [SVGSymbolElement](https://developer.mozilla.org/en-US/docs/Web/API/SVGSymbolElement) and returns a URL encoded SVG data string. |
 
+### Example
+```typescript
+import {defs, radialGradient, path, stop, svg} from './svg.js';
+
+console.log(svg({"viewBox": "0 0 100 100"}, [
+        defs(radialGradient({"id": "burning", "cy": 0.55, "fy": 1}, [
+                stop({"offset": "0%", "stop-color": "#fff"}),
+                stop({"offset": "20%", "stop-color": "#ff0"}),
+                stop({"offset": "100%", "stop-color": "#f00"})
+        ])),
+        path({"d": "M43,99 c-20,0 -60,-30 -30,-70 q0,20 10,30 c0,-20 25,-40 20,-58 q20,30 20,58 q10,-10 5,-30 q10,15 15,35 q5,-10 0,-25 c40,50 -10,62 -40,60 z M25,20 c-15,30 5,30 0,0 z M60,20 c0,20 10,20 0,0 z", "stroke": "#000", "fill": "url(#burning)", "stroke-linejoin": "round"})
+]).outerHTML);
+```
+
+This example creates an SVG image of a flame, printing the source of it to the console:
+
+```svg
+<svg viewBox="0 0 100 100"><defs><radialGradient id="burning" cy="0.55" fy="1"><stop offset="0%" stop-color="#fff"></stop><stop offset="20%" stop-color="#ff0"></stop><stop offset="100%" stop-color="#f00"></stop></radialGradient></defs><path d="M43,99 c-20,0 -60,-30 -30,-70 q0,20 10,30 c0,-20 25,-40 20,-58 q20,30 20,58 q10,-10 5,-30 q10,15 15,35 q5,-10 0,-25 c40,50 -10,62 -40,60 z M25,20 c-15,30 5,30 0,0 z M60,20 c0,20 10,20 0,0 z" stroke="#000" fill="url(#burning)" stroke-linejoin="round"></path></svg>
+```
+
 ## <a name="windows">windows</a>
 
 The windows module adds custom elements to implement a windowing system.
