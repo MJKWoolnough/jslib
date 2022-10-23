@@ -1115,6 +1115,34 @@ The Requester Class is used to allow a server to set a function or value for mul
 | [request](#inter_requester_request) | This method is used to request data from the Requester object. |
 | [responder](#inter_requester_responder) | This method is used to set either a responder function or value on the Requester object. |
 
+#### Example
+```typescript
+import {Requester} from './inter.js';
+
+const request = new Requester<number>();
+
+let num = 0;
+
+request.responder(n => n + num++);
+
+console.log(request.request(0));
+console.log(request.request(10));
+console.log(request.request(0));
+console.log(request.request(10));
+console.log(request.request(0));
+console.log(request.request(10));
+```
+
+This example shows how a function can responsd to 'queries', with the following being printed to the console:
+```
+0
+11
+2
+13
+4
+15
+```
+
 #### <a name="inter_requester_request">request</a>
 ```typescript
 class Requester<T, U extends any[] = any[]> {
