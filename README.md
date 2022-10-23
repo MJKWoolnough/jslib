@@ -1027,6 +1027,30 @@ The Pipe Class is used to pass values to multiple registered functions, and cont
 | [remove](#inter_pipe_remove) | The method is used to unregister a function on the Pipe. |
 | [send](#inter_pipe_send) |  This method sends data to all registered functions on the Pipe. |
 
+#### Example
+```typescript
+import {Pipe} from './inter.js';
+
+const pipe = new Pipe<number>();
+
+pipe.receive(num => console.log(num));
+pipe.receive(num => console.log(num+10));
+
+pipe.send(0);
+pipe.send(1);
+pipe.send(2);
+```
+
+In this example, a Pipe is used to transmit values to two different receivers, resulting in the following being printed to the console:
+```
+0
+10
+1
+11
+2
+12
+```
+
 #### <a name="inter_pipe_bind">bind</a>
 ```typescript
 class Pipe<T> {
