@@ -12,7 +12,7 @@ type Options = {
 
 type AttrFn = (newValue: string | null, oldValue: string | null) => void;
 
-type AttrFnWrap = (fn: AttrFn | Bind<string>) => void;
+type AttrFnWrap = <T extends AttrFn | Bind<string>>(fn : T) => T;
 
 interface ElementFactory {
 	(name: string, fn: (this: HTMLElement) => Children, options?: Exclude<Options, "attrs">): DOMBind<HTMLElement>;
@@ -38,7 +38,10 @@ export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) 
 			this.#attrs = new Map();
 			const params: AttrFnWrap[] = [];
 			for (const param of attrs) {
-				params.push((fn: AttrFn | Bind<string>) => this.#attrs.set(param, fn));
+				params.push(<T extends AttrFn | Bind<string>>(fn: T) => {
+					this.#attrs.set(param, fn);
+					return fn;
+				});
 			}
 			amendNode(this.attachShadow(shadowOptions), fn.call(this, ...params));
 		}
