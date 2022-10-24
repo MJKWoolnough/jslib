@@ -32,16 +32,15 @@ export interface Elem extends HTMLElement {
 	attr(name: string, def: string): Bind<string>;
 }
 
-const attrs = new WeakMap<Node, Map<string, Bind<string> | AttrFn>>(),
-      cw = new WeakMap<Node, ChildWatchFn>(),
+const attrs = new WeakMap<Node, Map<string, (Bind<string> | AttrFn)[]>>(),
+      cw = new WeakMap<Node, ChildWatchFn[]>(),
       attrObserver = new MutationObserver(list => {
 	for (const record of list) {
 		switch (record.type) {
 		case "attributes":
 			const name = record.attributeName ?? "",
-			      ah = attrs.get(record.target)?.get(name);
-			if (ah) {
-				const v = (record.target as Elem).getAttribute(name);
+			      v = (record.target as Elem).getAttribute(name);
+			for (const ah of attrs.get(record.target)?.get(name) ?? []) {
 				if (ah instanceof Function) {
 					ah(v, record.oldValue);
 				} else {
@@ -50,10 +49,16 @@ const attrs = new WeakMap<Node, Map<string, Bind<string> | AttrFn>>(),
 			}
 			break;
 		case "childList":
-			cw.get(record.target)?.(record.addedNodes, record.removedNodes);
+			for (const fn of cw.get(record.target) ?? []) {
+				fn(record.addedNodes, record.removedNodes);
+			}
 		}
 	}
-      });
+      }),
+      setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => {
+	      m.set(k, v);
+	      return v;
+      };
 
 export default ((name: string, fn: (elem: Elem) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
@@ -65,33 +70,28 @@ export default ((name: string, fn: (elem: Elem) => Children, options?: Options) 
 			amendNode(this.attachShadow(shadowOptions), fn(this));
 		}
 		observeChildren(fn: ChildWatchFn) {
-			if (cw.has(this)) {
-				throw new Error("already assigned");
-			}
-			cw.set(this, fn);
+			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 		}
 		attr(name: string, fn: AttrFn): void;
 		attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
 		attr(name: string, def: string): Bind<string>;
 		attr(name: string, fn: string | AttrFn | AttrBindFn, def?: string) {
-			const attrMap = attrs.get(this)!;
-			if (attrMap.has(name)) {
-				throw new Error("already assigned");
-			}
-			const v = this.getAttribute(name);
+			const attrMap = attrs.get(this)!,
+			      v = this.getAttribute(name),
+			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, []);
 			if (fn instanceof Function) {
 				if (typeof def === "string") {
 					const b = bind<string>(def);
-					attrMap.set(name, (newValue: string | null, oldValue: string | null) => b.value = (fn as AttrBindFn)(newValue, oldValue));
+					attr.push((newValue: string | null, oldValue: string | null) => b.value = (fn as AttrBindFn)(newValue, oldValue));
 					return b;
 				} else {
-					attrMap.set(name, fn);
+					attr.push(fn);
 					fn(v, null);
 					return;
 				}
 			} else {
 				const b = bind<string>(v ?? fn);
-				attrMap.set(name, b);
+				attr.push(b);
 				return b;
 			}
 		}
