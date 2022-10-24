@@ -6,6 +6,9 @@ type Options = {
 	manualSlot?: boolean;
 	classOnly?: boolean;
 	delegatesFocus?: boolean;
+	attachRemoveEvents?: boolean;
+	attrs?: boolean;
+	observeChildren?: boolean;
 	attachRemoveEvent?: boolean;
 }
 
@@ -66,19 +69,30 @@ const attrs = new WeakMap<Node, Map<string, (Bind<string> | AttrFn)[]>>(),
 export default ((name: string, fn: (elem: Elem) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
 	      element = class extends (options?.attachRemoveEvent ? AttachRemoveEvent : HTMLElement) {
+		#c: boolean;
+		#a: boolean;
 		constructor() {
 			super();
-			attrs.set(this, new Map());
-			attrObserver.observe(this, {"attributeOldValue": true, "childList": true});
+			if (this.#a = options?.attrs ?? true) {
+				attrs.set(this, new Map());
+			}
+			if ((this.#c = options?.observeChildren ?? true) || this.#a) {
+				attrObserver.observe(this, {"attributeOldValue": options?.attrs ?? true, "childList": options?.observeChildren ?? true});
+			}
 			amendNode(this.attachShadow(shadowOptions), fn(this));
 		}
 		observeChildren(fn: ChildWatchFn) {
-			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
+			if (this.#c) {
+				(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
+			}
 		}
 		attr(name: string, fn: AttrFn): void;
 		attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
 		attr(name: string, def: string): Bind<string>;
 		attr(name: string, fn: string | AttrFn | AttrBindFn, def?: string) {
+			if (!this.#a) {
+				return;
+			}
 			const attrMap = attrs.get(this)!,
 			      v = this.getAttribute(name),
 			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, []);
