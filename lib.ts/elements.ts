@@ -1,9 +1,8 @@
 import type {Bind, DOMBind, Children} from './dom.js';
-import {amendNode, bindElement} from './dom.js';
+import {amendNode, bind, bindElement} from './dom.js';
 import {ns} from './html.js';
 
 type Options = {
-	attrs?: readonly string[];
 	manualSlot?: boolean;
 	classOnly?: boolean;
 	delegatesFocus?: boolean;
@@ -12,12 +11,9 @@ type Options = {
 
 type AttrFn = (newValue: string | null, oldValue: string | null) => void;
 
-type AttrFnWrap = <T extends AttrFn | Bind<string>>(fn : T) => T;
-
 interface ElementFactory {
-	(name: string, fn: (this: HTMLElement) => Children, options?: Exclude<Options, "attrs">): DOMBind<HTMLElement>;
-	(name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options): DOMBind<HTMLElement>;
-	(name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options: Options & {classOnly: true}): HTMLElement;
+	(name: string, fn: (elem: Elem) => Children, options?: Options): DOMBind<HTMLElement>;
+	(name: string, fn: (elem: Elem) => Children, options: Options & {classOnly: true}): HTMLElement;
 }
 
 class RemoveEvent extends HTMLElement {
@@ -26,39 +22,54 @@ class RemoveEvent extends HTMLElement {
 	}
 }
 
-export default ((name: string, fn: (this: HTMLElement, ...params: AttrFnWrap[]) => Children, options?: Options) => {
-	const attrs = options?.attrs ?? [],
-	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
-	      base = options?.removeEvent ? RemoveEvent : HTMLElement,
-	      element = attrs.length ? class extends base {
-		#attrs: Map<string, AttrFn | Bind<string>>;
-		static observedAttributes = attrs;
+export interface Elem extends HTMLElement {
+	attr(name: string, fn: AttrFn): void;
+	attr(name: string, def?: string): Bind<string>;
+}
+
+export default ((name: string, fn: (elem: Elem) => Children, options?: Options) => {
+	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
+	      element = class extends (options?.removeEvent ? RemoveEvent : HTMLElement) {
+		#attrs: Map<string, Bind<string> | AttrFn>;
 		constructor() {
 			super();
 			this.#attrs = new Map();
-			const params: AttrFnWrap[] = [];
-			for (const param of attrs) {
-				params.push(<T extends AttrFn | Bind<string>>(fn: T) => {
-					this.#attrs.set(param, fn);
-					return fn;
-				});
+			new MutationObserver(list => {
+				for (const record of list) {
+					if (record.type === "attributes") {
+						const name = record.attributeName ?? "",
+							ah = this.#attrs.get(name);
+						if (ah) {
+							const v = this.getAttribute(name);
+							if (ah instanceof Function) {
+								ah(v, record.oldValue);
+							} else {
+								ah.value = v ?? "";
+							}
+						}
+					}
+				}
+			}).observe(this, {"attributeOldValue": true});
+			amendNode(this.attachShadow(shadowOptions), fn(this));
+		}
+		attr(name: string, fn: AttrFn): void;
+		attr(name: string, def?: string): Bind<string>;
+		attr(name: string, fn?: string | AttrFn) {
+			if (this.#attrs.has(name)) {
+				throw new Error("already assigned");
 			}
-			amendNode(this.attachShadow(shadowOptions), fn.call(this, ...params));
-		}
-		attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-			const a = this.#attrs.get(name);
-			if (a instanceof Function) {
-				a(newValue, oldValue);
-			} else if (a) {
-				a.value = newValue ?? "";
+			const v = this.getAttribute(name);
+			if (fn instanceof Function) {
+				this.#attrs.set(name, fn);
+				fn(v, null);
+				return;
+			} else {
+				const b = bind<string>(v ?? fn ?? "");
+				this.#attrs.set(name, b);
+				return b;
 			}
 		}
-	      } : class extends base {
-		constructor() {
-			super();
-			amendNode(this.attachShadow(shadowOptions), fn.call(this));
-		}
-	      }
+	      };
 	customElements.define(name, element);
 	return options?.classOnly ? element : bindElement<HTMLElement>(ns, name);
 }) as ElementFactory;
