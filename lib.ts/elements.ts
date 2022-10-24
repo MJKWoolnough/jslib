@@ -80,6 +80,7 @@ const attrs = new WeakMap<Node, Map<string, (Bind<string> | AttrFn)[]>>(),
 export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
 	      {attrs: attributeOldValue = true, observeChildren: childList = true} = options ?? {},
+	      observeOptions = {attributeOldValue, childList},
 	      element = class extends (options?.attachRemoveEvent ? AttachRemoveEvent : HTMLElement) {
 		constructor() {
 			super();
@@ -87,7 +88,7 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 				attrs.set(this, new Map());
 			}
 			if (childList || attributeOldValue) {
-				attrObserver.observe(this, {attributeOldValue, childList});
+				attrObserver.observe(this, observeOptions);
 			}
 			amendNode(this.attachShadow(shadowOptions), fn(this));
 		}
