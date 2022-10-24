@@ -18,9 +18,26 @@ type AttrBindFn = (newValue: string | null, oldValue: string | null) => string;
 
 type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
+interface AttrClass {
+	attr(name: string, fn: AttrFn): void;
+	attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
+	attr(name: string, def: string): Bind<string>;
+}
+
+interface ChildClass {
+	observeChildren(fn: ChildWatchFn): void;
+}
+
 interface ElementFactory {
-	(name: string, fn: (elem: Elem) => Children, options?: Options): DOMBind<HTMLElement>;
-	(name: string, fn: (elem: Elem) => Children, options: Options & {classOnly: true}): HTMLElement;
+	(name: string, fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options): DOMBind<HTMLElement & AttrClass & ChildClass>;
+	(name: string, fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false}): DOMBind<HTMLElement & ChildClass>;
+	(name: string, fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false}): DOMBind<HTMLElement & AttrClass>;
+	(name: string, fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false}): DOMBind<HTMLElement>;
+
+	(name: string, fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options & {classOnly: true}): HTMLElement & AttrClass & ChildClass;
+	(name: string, fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false, classOnly: true}): HTMLElement & ChildClass;
+	(name: string, fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false, classOnly: true}): HTMLElement & AttrClass;
+	(name: string, fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false, classOnly: true}): HTMLElement;
 }
 
 class AttachRemoveEvent extends HTMLElement {
@@ -32,12 +49,6 @@ class AttachRemoveEvent extends HTMLElement {
 	}
 }
 
-export interface Elem extends HTMLElement {
-	attr(name: string, fn: AttrFn): void;
-	attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
-	attr(name: string, def: string): Bind<string>;
-}
-
 const attrs = new WeakMap<Node, Map<string, (Bind<string> | AttrFn)[]>>(),
       cw = new WeakMap<Node, ChildWatchFn[]>(),
       attrObserver = new MutationObserver(list => {
@@ -45,7 +56,7 @@ const attrs = new WeakMap<Node, Map<string, (Bind<string> | AttrFn)[]>>(),
 		switch (record.type) {
 		case "attributes":
 			const name = record.attributeName ?? "",
-			      v = (record.target as Elem).getAttribute(name);
+			      v = (record.target as Element).getAttribute(name);
 			for (const ah of attrs.get(record.target)?.get(name) ?? []) {
 				if (ah instanceof Function) {
 					ah(v, record.oldValue);
@@ -66,7 +77,7 @@ const attrs = new WeakMap<Node, Map<string, (Bind<string> | AttrFn)[]>>(),
 	      return v;
       };
 
-export default ((name: string, fn: (elem: Elem) => Children, options?: Options) => {
+export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
 	      element = class extends (options?.attachRemoveEvent ? AttachRemoveEvent : HTMLElement) {
 		#c: boolean;
