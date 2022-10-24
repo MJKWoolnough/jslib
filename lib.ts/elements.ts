@@ -11,6 +11,8 @@ type Options = {
 
 type AttrFn = (newValue: string | null, oldValue: string | null) => void;
 
+type AttrBindFn = (newValue: string | null, oldValue: string | null) => string;
+
 interface ElementFactory {
 	(name: string, fn: (elem: Elem) => Children, options?: Options): DOMBind<HTMLElement>;
 	(name: string, fn: (elem: Elem) => Children, options: Options & {classOnly: true}): HTMLElement;
@@ -24,7 +26,8 @@ class RemoveEvent extends HTMLElement {
 
 export interface Elem extends HTMLElement {
 	attr(name: string, fn: AttrFn): void;
-	attr(name: string, def?: string): Bind<string>;
+	attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
+	attr(name: string, def: string): Bind<string>;
 }
 
 const attrs = new WeakMap<Node, Map<string, Bind<string> | AttrFn>>(),
@@ -55,19 +58,26 @@ export default ((name: string, fn: (elem: Elem) => Children, options?: Options) 
 			amendNode(this.attachShadow(shadowOptions), fn(this));
 		}
 		attr(name: string, fn: AttrFn): void;
-		attr(name: string, def?: string): Bind<string>;
-		attr(name: string, fn?: string | AttrFn) {
+		attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
+		attr(name: string, def: string): Bind<string>;
+		attr(name: string, fn: string | AttrFn | AttrBindFn, def?: string) {
 			const attrMap = attrs.get(this)!;
 			if (attrMap.has(name)) {
 				throw new Error("already assigned");
 			}
 			const v = this.getAttribute(name);
 			if (fn instanceof Function) {
-				attrMap.set(name, fn);
-				fn(v, null);
-				return;
+				if (typeof def === "string") {
+					const b = bind<string>(def);
+					attrMap.set(name, (newValue: string | null, oldValue: string | null) => b.value = (fn as AttrBindFn)(newValue, oldValue));
+					return b;
+				} else {
+					attrMap.set(name, fn);
+					fn(v, null);
+					return;
+				}
 			} else {
-				const b = bind<string>(v ?? fn ?? "");
+				const b = bind<string>(v ?? fn);
 				attrMap.set(name, b);
 				return b;
 			}
