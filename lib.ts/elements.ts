@@ -6,7 +6,7 @@ type Options = {
 	manualSlot?: boolean;
 	classOnly?: boolean;
 	delegatesFocus?: boolean;
-	removeEvent?: boolean;
+	attachRemoveEvent?: boolean;
 }
 
 type AttrFn = (newValue: string | null, oldValue: string | null) => void;
@@ -20,9 +20,12 @@ interface ElementFactory {
 	(name: string, fn: (elem: Elem) => Children, options: Options & {classOnly: true}): HTMLElement;
 }
 
-class RemoveEvent extends HTMLElement {
+class AttachRemoveEvent extends HTMLElement {
+	connectedCallback() {
+		this.dispatchEvent(new CustomEvent("attached"));
+	}
 	disconnectedCallback() {
-		this.dispatchEvent(new CustomEvent("remove"));
+		this.dispatchEvent(new CustomEvent("removed"));
 	}
 }
 
@@ -62,7 +65,7 @@ const attrs = new WeakMap<Node, Map<string, (Bind<string> | AttrFn)[]>>(),
 
 export default ((name: string, fn: (elem: Elem) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
-	      element = class extends (options?.removeEvent ? RemoveEvent : HTMLElement) {
+	      element = class extends (options?.attachRemoveEvent ? AttachRemoveEvent : HTMLElement) {
 		constructor() {
 			super();
 			attrs.set(this, new Map());
