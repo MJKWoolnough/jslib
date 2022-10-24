@@ -13,6 +13,8 @@ type AttrFn = (newValue: string | null, oldValue: string | null) => void;
 
 type AttrBindFn = (newValue: string | null, oldValue: string | null) => string;
 
+type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
+
 interface ElementFactory {
 	(name: string, fn: (elem: Elem) => Children, options?: Options): DOMBind<HTMLElement>;
 	(name: string, fn: (elem: Elem) => Children, options: Options & {classOnly: true}): HTMLElement;
@@ -31,9 +33,11 @@ export interface Elem extends HTMLElement {
 }
 
 const attrs = new WeakMap<Node, Map<string, Bind<string> | AttrFn>>(),
+      cw = new WeakMap<Node, ChildWatchFn>(),
       attrObserver = new MutationObserver(list => {
 	for (const record of list) {
-		if (record.type === "attributes") {
+		switch (record.type) {
+		case "attributes":
 			const name = record.attributeName ?? "",
 			      ah = attrs.get(record.target)?.get(name);
 			if (ah) {
@@ -44,6 +48,9 @@ const attrs = new WeakMap<Node, Map<string, Bind<string> | AttrFn>>(),
 					ah.value = v ?? "";
 				}
 			}
+			break;
+		case "childList":
+			cw.get(record.target)?.(record.addedNodes, record.removedNodes);
 		}
 	}
       });
@@ -54,8 +61,14 @@ export default ((name: string, fn: (elem: Elem) => Children, options?: Options) 
 		constructor() {
 			super();
 			attrs.set(this, new Map());
-			attrObserver.observe(this, {"attributeOldValue": true});
+			attrObserver.observe(this, {"attributeOldValue": true, "childList": true});
 			amendNode(this.attachShadow(shadowOptions), fn(this));
+		}
+		observeChildren(fn: ChildWatchFn) {
+			if (cw.has(this)) {
+				throw new Error("already assigned");
+			}
+			cw.set(this, fn);
 		}
 		attr(name: string, fn: AttrFn): void;
 		attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
