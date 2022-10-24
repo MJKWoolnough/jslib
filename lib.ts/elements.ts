@@ -79,21 +79,20 @@ const attrs = new WeakMap<Node, Map<string, (Bind<string> | AttrFn)[]>>(),
 
 export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
+	      {attrs: attributeOldValue = true, observeChildren: childList = true} = options ?? {},
 	      element = class extends (options?.attachRemoveEvent ? AttachRemoveEvent : HTMLElement) {
-		#c: boolean;
-		#a: boolean;
 		constructor() {
 			super();
-			if (this.#a = options?.attrs ?? true) {
+			if (attributeOldValue) {
 				attrs.set(this, new Map());
 			}
-			if ((this.#c = options?.observeChildren ?? true) || this.#a) {
-				attrObserver.observe(this, {"attributeOldValue": options?.attrs ?? true, "childList": options?.observeChildren ?? true});
+			if (childList || attributeOldValue) {
+				attrObserver.observe(this, {attributeOldValue, childList});
 			}
 			amendNode(this.attachShadow(shadowOptions), fn(this));
 		}
 		observeChildren(fn: ChildWatchFn) {
-			if (this.#c) {
+			if (childList) {
 				(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 			}
 		}
@@ -101,7 +100,7 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 		attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
 		attr(name: string, def: string): Bind<string>;
 		attr(name: string, fn: string | AttrFn | AttrBindFn, def?: string) {
-			if (!this.#a) {
+			if (!attributeOldValue) {
 				return;
 			}
 			const attrMap = attrs.get(this)!,
