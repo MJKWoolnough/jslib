@@ -132,7 +132,7 @@ class Bound<T extends ToString = ToString> extends Binder {
 
 export type Bind<T extends ToString = ToString> = InstanceType<typeof Bound<T>>;
 
-export const amendNode: mElement = (node?: Node | EventTarget | null, properties?: Props | Children, children?: Children) => {
+export const amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
