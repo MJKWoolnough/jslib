@@ -21,7 +21,7 @@ type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 interface AttrClass {
 	attr(name: string, fn: AttrFn): void;
 	attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
-	attr(name: string, def: string): Bind<string>;
+	attr(name: string, def?: string): Bind<string>;
 }
 
 interface ChildClass {
@@ -99,8 +99,8 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 		}
 		attr(name: string, fn: AttrFn): void;
 		attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
-		attr(name: string, def: string): Bind<string>;
-		attr(name: string, fn: string | AttrFn | AttrBindFn, def?: string) {
+		attr(name: string, def?: string): Bind<string>;
+		attr(name: string, fn?: string | AttrFn | AttrBindFn, def?: string) {
 			if (!attributeOldValue) {
 				return;
 			}
@@ -109,7 +109,7 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, []);
 			if (fn instanceof Function) {
 				if (typeof def === "string") {
-					const b = bind<string>(def);
+					const b = bind<string>(def ?? "");
 					attr.push((newValue: string | null, oldValue: string | null) => b.value = (fn as AttrBindFn)(newValue, oldValue));
 					return b;
 				} else {
@@ -118,7 +118,7 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 					return;
 				}
 			} else {
-				const b = bind<string>(v ?? fn);
+				const b = bind<string>(v ?? fn ?? "");
 				attr.push(b);
 				return b;
 			}
