@@ -188,10 +188,9 @@ bind = (v, ...bindings) => {
 			return new Bound(v[0]);
 		}
 		if (v.length !== bindings.length + 1){
-			return new SyntaxError("invalid tag call");
+			throw new SyntaxError("invalid tag call");
 		}
 		return new TemplateBind(v, bindings);
-	} else {
-		return new Bound<T>(v);
 	}
+	return new Bound(v);
 };
