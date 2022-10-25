@@ -160,6 +160,9 @@ createDocumentFragment = children => {
 	return df;
 },
 clearNode = (node, properties, children) => {
+	if (!node) {
+		return node;
+	}
 	if (typeof properties === "string") {
 		children = properties = void (node.textContent = properties);
 	} else if (typeof children === "string") {

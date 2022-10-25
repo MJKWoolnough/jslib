@@ -205,7 +205,10 @@ createDocumentFragment = (children?: Children) => {
 	}
 	return df;
 },
-clearNode: mElement = (node: Node, properties?: Props | Children, children?: Children) => {
+clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Children) => {
+	if (!node) {
+		return node;
+	}
 	if (typeof properties === "string") {
 		children = properties = void (node.textContent = properties);
 	} else if (typeof children === "string") {
