@@ -127,7 +127,7 @@ export const amendNode = (node, properties, children) => {
 						}
 					}
 				} else {
-					node.setAttribute(k, prop.toString());
+					node.setAttribute(k, prop);
 					if (prop instanceof Binder) {
 						prop[setNode](node.getAttributeNode(k));
 					}

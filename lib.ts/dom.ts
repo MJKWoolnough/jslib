@@ -173,7 +173,7 @@ export const amendNode: mElement = (node?: EventTarget | null, properties?: Prop
 						}
 					}
 				} else {
-					node.setAttribute(k, prop.toString());
+					node.setAttribute(k, prop as string);
 					if (prop instanceof Binder) {
 						prop[setNode](node.getAttributeNode(k)!);
 					}
