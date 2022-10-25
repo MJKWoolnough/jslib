@@ -35,7 +35,7 @@ class Binder {
 		for (const wr of this.#set) {
 			const ref = wr.deref();
 			if (ref) {
-				if (ref instanceof TemplateBind) {
+				if (ref instanceof Binder) {
 					ref[update]();
 				} else {
 					ref.textContent = text;
