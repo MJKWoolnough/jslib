@@ -53,20 +53,20 @@ class AttachRemoveEvent extends HTMLElement {
 	}
 }
 
-const attrs = new WeakMap<Node, Map<string, (Bind | AttrFn)[]>>(),
+const attrs = new WeakMap<Node, Map<string, [Bind | null, ...AttrFn[]]>>(),
       cw = new WeakMap<Node, ChildWatchFn[]>(),
       attrObserver = new MutationObserver(list => {
 	for (const record of list) {
 		switch (record.type) {
 		case "attributes":
 			const name = record.attributeName ?? "",
-			      v = (record.target as Element).getAttribute(name);
-			for (const ah of attrs.get(record.target)?.get(name) ?? []) {
-				if (ah instanceof Function) {
-					ah(v, record.oldValue);
-				} else {
-					ah.value = v ?? "";
-				}
+			      v = (record.target as Element).getAttribute(name),
+			      ahs = attrs.get(record.target)?.get(name);
+			if (ahs?.[0]) {
+				ahs[0].value = v ?? "";
+			}
+			for (const ah of ahs?.slice(1) as AttrFn[] ?? []) {
+				ah(v, record.oldValue);
 			}
 			break;
 		case "childList":
@@ -102,18 +102,18 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 			}
 		}
 		attr(name: string, fn: AttrFn): void;
-		attr(name: string, fn: AttrBindFn, def: ToString): Bind<ToString>;
-		attr(name: string, def?: ToString): Bind<ToString>;
-		attr(name: string, fn?: ToString | AttrFn | AttrBindFn, def?: ToString) {
+		attr(name: string, fn?: AttrBindFn): Bind<ToString>;
+		attr(name: string, fn?: AttrFn | AttrBindFn) {
 			if (!attributeOldValue) {
 				return;
 			}
 			const attrMap = attrs.get(this)!,
 			      v = this.getAttribute(name),
-			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, []);
+			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [null]);
 			if (fn instanceof Function) {
-				if (def) {
-					const b = bind(def ?? "");
+				const r = fn(v, null);
+				if (r !== undefined) {
+					const b = bind(r ?? "");
 					attr.push((newValue: ToString | null, oldValue: ToString | null) => b.value = (fn as AttrBindFn)(newValue, oldValue));
 					return b;
 				} else {
@@ -121,11 +121,8 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 					fn(v, null);
 					return;
 				}
-			} else {
-				const b = bind(v ?? fn ?? "");
-				attr.push(b);
-				return b;
 			}
+			return attr[0] ??= bind(v ?? "");
 		}
 	      };
 	customElements.define(name, element);
