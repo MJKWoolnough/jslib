@@ -17,7 +17,8 @@ const childrenArr = (node, children) => {
 		}
 	}
       },
-      isEventListenerOrEventListenerObject = prop => prop instanceof Function || (prop instanceof Object && prop.handleEvent instanceof Function),
+      isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
+      isEventListenerOrEventListenerObject = prop => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bound)) || prop instanceof Bound && isEventListenerOrEventListenerObject(prop.value),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object,
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object,
@@ -79,6 +80,13 @@ class Bound extends Binder {
 		if (this.#value !== v) {
 			this.#value = v;
 			this[update]();
+		}
+	}
+	handleEvent(e) {
+		if (this.#value instanceof Function) {
+			this.#value.call(e.currentTarget, e);
+		} else if (isEventListenerObject(this.#value)) {
+			this.#value.handleEvent(e);
 		}
 	}
 	toString() {
