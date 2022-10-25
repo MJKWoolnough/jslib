@@ -104,11 +104,9 @@ export const amendNode = (node, properties, children) => {
 	} else if (node && typeof properties === "object") {
 		for (const k in properties) {
 			const prop = properties[k];
-			if (isEventObject(prop)) {
-				if (k.startsWith("on") && node instanceof EventTarget) {
-					const arr = prop instanceof Array;
-					node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.slice(2), arr ? prop[0] : prop, arr ? prop[1] : false);
-				}
+			if (isEventObject(prop) && k.startsWith("on")) {
+				const arr = prop instanceof Array;
+				node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.slice(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 			} else if (node instanceof HTMLElement || node instanceof SVGElement) {
 				if (typeof prop === "boolean") {
 					node.toggleAttribute(k, prop);
