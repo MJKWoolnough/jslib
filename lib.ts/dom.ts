@@ -13,7 +13,7 @@ type ClassObj = Record<string, boolean | null>;
 
 type StyleObj = Record<string, ToString | undefined> | CSSStyleDeclaration;
 
-type EventArray = [Exclude<EventListenerOrEventListenerObject, Bound> | Bound<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean];
+type EventArray = [Exclude<EventListenerOrEventListenerObject, Bind> | Bind<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean];
 
 type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | ClassObj | undefined;
 
@@ -61,7 +61,7 @@ const childrenArr = (node: Node, children: Children) => {
 	}
       },
       isEventListenerObject = (prop: PropValue): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
-      isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bound)) || prop instanceof Bound && isEventListenerOrEventListenerObject(prop.value),
+      isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bind)) || prop instanceof Bind && isEventListenerOrEventListenerObject(prop.value),
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object,
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object,
@@ -113,13 +113,13 @@ class TemplateBind extends Binder {
 	}
 }
 
-class Bound<T extends ToString = ToString> extends Binder {
+export class Bind<T extends ToString = ToString> extends Binder {
 	#value: T;
 	constructor(v: T) {
 		super();
 		this.#value = v;
 	}
-	get value() { return this.#value instanceof Bound ? this.#value.value : this.#value; }
+	get value() { return this.#value instanceof Bind ? this.#value.value : this.#value; }
 	set value(v: T) {
 		if (this.#value !== v) {
 			this.#value = v;
@@ -137,8 +137,6 @@ class Bound<T extends ToString = ToString> extends Binder {
 		return this.#value.toString();
 	}
 }
-
-export type Bind<T extends ToString = ToString> = InstanceType<typeof Bound<T>>;
 
 export const amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children, children?: Children) => {
 	if (typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder) {
@@ -204,7 +202,7 @@ eventOnce = 1,
 eventCapture = 2,
 eventPassive = 4,
 eventRemove = 8,
-event = (fn: Function | Exclude<EventListenerObject, Bound> | Bound<Function | EventListenerObject>, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
+event = (fn: Function | Exclude<EventListenerObject, Bind> | Bind<Function | EventListenerObject>, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
 createDocumentFragment = (children?: Children) => {
 	const df = document.createDocumentFragment();
 	if (typeof children === "string") {
@@ -244,5 +242,5 @@ bind = (<T extends ToString>(v: T | TemplateStringsArray, first?: Bind | ToStrin
 	if (v instanceof Array && first) {
 		return new TemplateBind(v, first, ...bindings);
 	}
-	return new Bound<T>(v as T);
+	return new Bind<T>(v as T);
 }) as BindFn;
