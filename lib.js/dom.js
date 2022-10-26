@@ -75,7 +75,7 @@ class Bound extends Binder {
 		super();
 		this.#value = v;
 	}
-	get value() { return this.#value; }
+	get value() { return this.#value instanceof Bound ? this.#value.value : this.#value; }
 	set value(v) {
 		if (this.#value !== v) {
 			this.#value = v;
