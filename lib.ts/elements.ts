@@ -55,27 +55,29 @@ class AttachRemoveEvent extends HTMLElement {
 
 const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
       cw = new WeakMap<Node, ChildWatchFn[]>(),
-      attrObserver = new MutationObserver(list => {
+      childObserver = new MutationObserver(list => {
 	for (const record of list) {
-		switch (record.type) {
-		case "attributes":
-			const name = record.attributeName ?? "",
-			      v = (record.target as Element).getAttribute(name) ?? Null,
-			      ahs = attrs.get(record.target)?.get(name);
-			if (ahs?.[0]) {
-				ahs[0].value = v ?? "";
-			}
-			for (const ah of ahs?.slice(1) as AttrFn[] ?? []) {
-				ah(v);
-			}
-			break;
-		case "childList":
+		if (record.type === "childList") {
 			for (const fn of cw.get(record.target) ?? []) {
 				fn(record.addedNodes, record.removedNodes);
 			}
 		}
 	}
       }),
+      setAttr = (elem: HTMLElement, name: string, value: ToString | null) => {
+	const ahs = attrs.get(elem)?.get(name);
+	if (ahs) {
+		if (value === null) {
+			value = !ahs[0].value;
+		}
+		ahs[0].value = value;
+		for (const ah of ahs?.slice(1) as AttrFn[] ?? []) {
+			ah(value);
+		}
+		return true;
+	}
+	return null;
+      },
       setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => {
 	      m.set(k, v);
 	      return v;
@@ -98,8 +100,8 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 			if (attributeOldValue) {
 				attrs.set(this, new Map());
 			}
-			if (childList || attributeOldValue) {
-				attrObserver.observe(this, observeOptions);
+			if (childList) {
+				childObserver.observe(this, observeOptions);
 			}
 			amendNode(this.attachShadow(shadowOptions), fn(this));
 		}
@@ -130,6 +132,33 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 				}
 			}
 			return attr[0];
+		}
+		addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
+			if (setAttr(this, "on" + type, listener) === null) {
+				super.addEventListener(type, listener, options);
+			}
+		}
+		removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
+			if (setAttr(this, "on" + type, Null) === null) {
+				super.removeEventListener(type, listener, options);
+			}
+		}
+		toggleAttribute(qualifiedName: string, force?: boolean) {
+			const ret = setAttr(this, qualifiedName, force ?? null);
+			if (ret === null) {
+				return super.toggleAttribute(qualifiedName, force);
+			}
+			return ret as boolean;
+		}
+		setAttribute(qualifiedName: string, value: string) {
+			if (setAttr(this, qualifiedName, value) === null) {
+				super.setAttribute(qualifiedName, value);
+			}
+		}
+		removeAttribute(qualifiedName: string) {
+			if (setAttr(this, qualifiedName, Null)) {
+				super.removeAttribute(qualifiedName);
+			}
 		}
 	      };
 	customElements.define(name, element);
