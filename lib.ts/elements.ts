@@ -16,16 +16,12 @@ interface ToString {
 	toString(): string;
 }
 
-type AttrFn = (newValue: ToString) => void;
-
-type AttrBindFn = (newValue: ToString) => ToString;
+type AttrFn = (newValue: ToString) => ToString | void;
 
 type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
 interface AttrClass {
-	attr(name: string, fn: AttrFn): void;
-	attr(name: string, fn: AttrBindFn, def: string): Bind<string>;
-	attr(name: string, def?: string): Bind<string>;
+	attr(name: string, fn?: AttrFn): void;
 }
 
 interface ChildClass {
@@ -54,17 +50,17 @@ class AttachRemoveEvent extends HTMLElement {
 }
 
 class BindFn extends Bind {
-	#fn: AttrBindFn;
-	constructor(v: ToString, fn: AttrBindFn) {
+	#fn: AttrFn;
+	constructor(v: ToString, fn: AttrFn) {
 		super(v);
 		this.#fn = fn;
 	}
 	get value() {
-		return this.#fn(super.value);
+		return this.#fn(super.value) ?? Null;
 	}
 }
 
-const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
+const attrs = new WeakMap<Node, Map<string, Bind>>(),
       cw = new WeakMap<Node, ChildWatchFn[]>(),
       childObserver = new MutationObserver(list => {
 	for (const record of list) {
@@ -79,12 +75,9 @@ const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
 	const ahs = attrs.get(elem)?.get(name);
 	if (ahs) {
 		if (value === null) {
-			value = !ahs[0].value;
+			value = !ahs.value;
 		}
-		ahs[0].value = value;
-		for (const ah of ahs?.slice(1) as AttrFn[] ?? []) {
-			ah(value);
-		}
+		ahs.value = value;
 		return true;
 	}
 	return null;
@@ -121,26 +114,13 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 				(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 			}
 		}
-		attr(name: string, fn: AttrFn): void;
-		attr(name: string, fn?: AttrBindFn): Bind<ToString>;
-		attr(name: string, fn?: AttrFn | AttrBindFn) {
+		attr(name: string, fn?: AttrFn) {
 			if (!attributeOldValue) {
 				return;
 			}
 			const attrMap = attrs.get(this)!,
-			      v = this.getAttribute(name) ?? Null,
-			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(v ?? Null)]);
-			if (fn instanceof Function) {
-				const r = fn(v);
-				if (r !== undefined) {
-					return new BindFn(attr[0], fn as AttrBindFn);
-				} else {
-					attr.push(fn);
-					fn(v);
-					return;
-				}
-			}
-			return attr[0];
+			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, bind(this.getAttribute(name) ?? Null));
+			return fn instanceof Function ? new BindFn(attr, fn) : attr;
 		}
 		addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
 			if (setAttr(this, "on" + type, listener) === null) {
