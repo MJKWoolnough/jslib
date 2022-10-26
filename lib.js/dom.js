@@ -135,7 +135,10 @@ export const amendNode = (node, properties, children) => {
 				} else {
 					node.setAttribute(k, prop);
 					if (prop instanceof Binder) {
-						prop[setNode](node.getAttributeNode(k));
+						const p = node.getAttributeNode(k);
+						if (p) {
+							prop[setNode](p);
+						}
 					}
 				}
 			}
