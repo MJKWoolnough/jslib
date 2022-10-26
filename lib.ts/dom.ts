@@ -94,7 +94,7 @@ abstract class Binder {
 class TemplateBind extends Binder {
 	#strings: TemplateStringsArray;
 	#bindings: (Bind | ToString)[];
-	constructor(strings: TemplateStringsArray, bindings: (Bind | ToString)[]) {
+	constructor(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]) {
 		super();
 		this.#strings = strings;
 		this.#bindings = bindings;
@@ -237,15 +237,9 @@ autoFocus = <T extends FocusElement>(node: T, inputSelect = true) => {
 	}, 0);
 	return node;
 },
-bind = (<T extends ToString>(v: T | TemplateStringsArray, ...bindings: (Bind | ToString)[]) => {
-	if (v instanceof Array) {
-		if (v.length === 1 && bindings.length === 0) {
-			return new Bound(v[0]);
-		}
-		if (v.length !== bindings.length + 1){
-			throw new SyntaxError("invalid tag call");
-		}
-		return new TemplateBind(v, bindings);
+bind = (<T extends ToString>(v: T | TemplateStringsArray, first?: Bind | ToString, ...bindings: (Bind | ToString)[]) => {
+	if (v instanceof Array && first) {
+		return new TemplateBind(v, first, ...bindings);
 	}
-	return new Bound<T>(v);
+	return new Bound<T>(v as T);
 }) as BindFn;

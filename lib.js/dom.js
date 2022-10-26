@@ -50,7 +50,7 @@ class Binder {
 class TemplateBind extends Binder {
 	#strings;
 	#bindings;
-	constructor(strings, bindings) {
+	constructor(strings, ...bindings) {
 		super();
 		this.#strings = strings;
 		this.#bindings = bindings;
@@ -191,15 +191,9 @@ autoFocus = (node, inputSelect = true) => {
 	}, 0);
 	return node;
 },
-bind = (v, ...bindings) => {
-	if (v instanceof Array) {
-		if (v.length === 1 && bindings.length === 0) {
-			return new Bound(v[0]);
-		}
-		if (v.length !== bindings.length + 1){
-			throw new SyntaxError("invalid tag call");
-		}
-		return new TemplateBind(v, bindings);
+bind = (v, first, ...bindings) => {
+	if (v instanceof Array && first) {
+		return new TemplateBind(v, first, ...bindings);
 	}
 	return new Bound(v);
 };
