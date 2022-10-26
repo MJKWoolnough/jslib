@@ -23,7 +23,8 @@ const childrenArr = (node, children) => {
       isClassObj = prop => prop instanceof Object,
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object,
       setNode = Symbol("setNode"),
-      update = Symbol("update");
+      update = Symbol("update"),
+      remove = Symbol("remove");
 
 class Binder {
 	#set = new Set();
@@ -41,6 +42,14 @@ class Binder {
 					ref.textContent = text;
 				}
 			} else {
+				this.#set.delete(wr);
+			}
+		}
+	}
+	[remove](b) {
+		for (const wr of this.#set) {
+			const ref = wr.deref();
+			if (!ref || ref === b) {
 				this.#set.delete(wr);
 			}
 		}
@@ -69,18 +78,27 @@ class TemplateBind extends Binder {
 	}
 }
 
-class Bind extends Binder {
+export class Bind extends Binder {
 	#value;
 	constructor(v) {
 		super();
 		this.#value = v;
+		if (v instanceof Binder) {
+			v[setNode](this);
+		}
 	}
 	get value() { return this.#value instanceof Bind ? this.#value.value : this.#value; }
 	set value(v) {
 		if (this.#value !== v) {
+			if (this.#value instanceof Binder) {
+				this.#value[remove](this);
+			}
 			this.#value = v;
-			this[update]();
+			if (v instanceof Binder) {
+				v[setNode](this);
+			}
 		}
+		this[update]();
 	}
 	handleEvent(e) {
 		if (this.#value instanceof Function) {

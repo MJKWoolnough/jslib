@@ -66,11 +66,12 @@ const childrenArr = (node: Node, children: Children) => {
       isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object,
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object,
       setNode = Symbol("setNode"),
-      update = Symbol("update");
+      update = Symbol("update"),
+      remove = Symbol("remove");
 
 abstract class Binder {
-	#set = new Set<WeakRef<TextContent | TemplateBind>>();
-	[setNode](n: TextContent | TemplateBind) {
+	#set = new Set<WeakRef<TextContent | Binder>>();
+	[setNode](n: TextContent | Binder) {
 		this.#set.add(new WeakRef(n));
 	}
 	[update]() {
@@ -84,6 +85,14 @@ abstract class Binder {
 					ref.textContent = text;
 				}
 			} else {
+				this.#set.delete(wr);
+			}
+		}
+	}
+	[remove](b: Binder) {
+		for (const wr of this.#set) {
+			const ref = wr.deref();
+			if (!ref || ref === b) {
 				this.#set.delete(wr);
 			}
 		}
@@ -118,13 +127,22 @@ export class Bind<T extends ToString = ToString> extends Binder {
 	constructor(v: T) {
 		super();
 		this.#value = v;
+		if (v instanceof Binder) {
+			v[setNode](this);
+		}
 	}
 	get value() { return this.#value instanceof Bind ? this.#value.value : this.#value; }
 	set value(v: T) {
 		if (this.#value !== v) {
+			if (this.#value instanceof Binder) {
+				this.#value[remove](this);
+			}
 			this.#value = v;
-			this[update]();
+			if (v instanceof Binder) {
+				v[setNode](this);
+			}
 		}
+		this[update]();
 	}
 	handleEvent(e: Event) {
 		if (this.#value instanceof Function) {
