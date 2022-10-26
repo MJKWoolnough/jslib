@@ -1,5 +1,5 @@
-import type {Bind, DOMBind, Children} from './dom.js';
-import {amendNode, bind, bindElement} from './dom.js';
+import type {DOMBind, Children} from './dom.js';
+import {Bind, amendNode, bind, bindElement} from './dom.js';
 import {ns} from './html.js';
 
 type Options = {
@@ -50,6 +50,17 @@ class AttachRemoveEvent extends HTMLElement {
 	}
 	disconnectedCallback() {
 		this.dispatchEvent(new CustomEvent("removed"));
+	}
+}
+
+class BindFn extends Bind {
+	#fn: AttrBindFn;
+	constructor(v: ToString, fn: AttrBindFn) {
+		super(v);
+		this.#fn = fn;
+	}
+	get value() {
+		return this.#fn(super.value);
 	}
 }
 
@@ -122,9 +133,7 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 			if (fn instanceof Function) {
 				const r = fn(v);
 				if (r !== undefined) {
-					const b = bind(r ?? Null);
-					attr.push((newValue: ToString) => b.value = (fn as AttrBindFn)(newValue));
-					return b;
+					return new BindFn(attr[0], fn as AttrBindFn);
 				} else {
 					attr.push(fn);
 					fn(v);
