@@ -16,9 +16,9 @@ interface ToString {
 	toString(): string;
 }
 
-type AttrFn = (newValue: ToString | null, oldValue: ToString | null) => void;
+type AttrFn = (newValue: ToString) => void;
 
-type AttrBindFn = (newValue: ToString | null, oldValue: ToString | null) => ToString;
+type AttrBindFn = (newValue: ToString) => ToString;
 
 type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
@@ -53,20 +53,20 @@ class AttachRemoveEvent extends HTMLElement {
 	}
 }
 
-const attrs = new WeakMap<Node, Map<string, [Bind | null, ...AttrFn[]]>>(),
+const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
       cw = new WeakMap<Node, ChildWatchFn[]>(),
       attrObserver = new MutationObserver(list => {
 	for (const record of list) {
 		switch (record.type) {
 		case "attributes":
 			const name = record.attributeName ?? "",
-			      v = (record.target as Element).getAttribute(name),
+			      v = (record.target as Element).getAttribute(name) ?? Null,
 			      ahs = attrs.get(record.target)?.get(name);
 			if (ahs?.[0]) {
 				ahs[0].value = v ?? "";
 			}
 			for (const ah of ahs?.slice(1) as AttrFn[] ?? []) {
-				ah(v, record.oldValue);
+				ah(v);
 			}
 			break;
 		case "childList":
@@ -80,6 +80,13 @@ const attrs = new WeakMap<Node, Map<string, [Bind | null, ...AttrFn[]]>>(),
 	      m.set(k, v);
 	      return v;
       };
+
+export const Null = Object.assign(() => {}, {
+	toString(){
+		return "";
+	},
+	handleEvent() {}
+});
 
 export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
@@ -108,21 +115,21 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 				return;
 			}
 			const attrMap = attrs.get(this)!,
-			      v = this.getAttribute(name),
-			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [null]);
+			      v = this.getAttribute(name) ?? Null,
+			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(v ?? Null)]);
 			if (fn instanceof Function) {
-				const r = fn(v, null);
+				const r = fn(v);
 				if (r !== undefined) {
-					const b = bind(r ?? "");
-					attr.push((newValue: ToString | null, oldValue: ToString | null) => b.value = (fn as AttrBindFn)(newValue, oldValue));
+					const b = bind(r ?? Null);
+					attr.push((newValue: ToString) => b.value = (fn as AttrBindFn)(newValue));
 					return b;
 				} else {
 					attr.push(fn);
-					fn(v, null);
+					fn(v);
 					return;
 				}
 			}
-			return attr[0] ??= bind(v ?? "");
+			return attr[0];
 		}
 	      };
 	customElements.define(name, element);
