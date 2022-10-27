@@ -164,7 +164,8 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	toString(){
 		return "";
 	},
-	handleEvent() {}
+	handleEvent() {},
+	*[Symbol.iterator]() {}
 }));
 
 export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
