@@ -104,15 +104,17 @@ const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
 				super();
 				attrs.set(this, new Map());
 			}
+			#attr (name: string) {
+				const attrMap = attrs.get(this)!;
+				return attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
+			}
 			act(name: string, fn: (newValue: ToString) => void) {
-				const attrMap = attrs.get(this)!,
-				      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
+				const attr = this.#attr(name);
 				fn(attr[0].value);
 				attr.push(fn);
 			}
 			attr(name: string, fn?: AttrFn) {
-				const attrMap = attrs.get(this)!,
-				      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
+				const attr = this.#attr(name);
 				return fn instanceof Function ? new BindFn(attr[0], fn) : attr[0];
 			}
 			addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
