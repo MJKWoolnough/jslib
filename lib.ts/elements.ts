@@ -60,7 +60,7 @@ class BindFn extends Bind {
 	}
 }
 
-const attrs = new WeakMap<Node, Map<string, Bind>>(),
+const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
       cw = new WeakMap<Node, ChildWatchFn[]>(),
       childObserver = new MutationObserver(list => {
 	for (const record of list) {
@@ -74,10 +74,14 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
       setAttr = (elem: HTMLElement, name: string, value: ToString | null) => {
 	const ahs = attrs.get(elem)?.get(name);
 	if (ahs) {
+		const [attr, ...fns] = ahs;
 		if (value === null) {
-			value = ahs.value ? Null : name;
+			value = attr.value ? Null : name;
 		}
-		ahs.value = value;
+		attr.value = value;
+		for (const fn of fns) {
+			fn(value);
+		}
 		return value !== Null;
 	}
 	return null;
@@ -114,12 +118,20 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 				(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 			}
 		}
+		act(name: string, fn: (newValue: ToString) => void) {
+			if (!attributeOldValue) {
+				return;
+			}
+			const attrMap = attrs.get(this)!,
+			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
+			attr.push(fn);
+		}
 		attr(name: string, fn?: AttrFn) {
 			if (!attributeOldValue) {
 				return;
 			}
 			const attrMap = attrs.get(this)!,
-			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, bind(this.getAttribute(name) ?? Null));
+			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
 			return fn instanceof Function ? new BindFn(attr, fn) : attr;
 		}
 		addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
