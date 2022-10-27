@@ -75,10 +75,10 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	const ahs = attrs.get(elem)?.get(name);
 	if (ahs) {
 		if (value === null) {
-			value = !ahs.value;
+			value = ahs.value ? Null : name;
 		}
 		ahs.value = value;
-		return true;
+		return value !== Null;
 	}
 	return null;
       },
@@ -137,7 +137,7 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 			if (ret === null) {
 				return super.toggleAttribute(qualifiedName, force);
 			}
-			return ret as boolean;
+			return ret;
 		}
 		setAttribute(qualifiedName: string, value: string) {
 			if (setAttr(this, qualifiedName, value) === null) {
@@ -145,7 +145,7 @@ export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Op
 			}
 		}
 		removeAttribute(qualifiedName: string) {
-			if (setAttr(this, qualifiedName, Null)) {
+			if (setAttr(this, qualifiedName, Null) === null) {
 				super.removeAttribute(qualifiedName);
 			}
 		}
