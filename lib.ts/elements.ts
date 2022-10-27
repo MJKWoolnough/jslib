@@ -160,12 +160,12 @@ const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
 	return classes[n] = base;
       };
 
-export const Null = Object.assign(() => {}, {
+export const Null = Object.freeze(Object.assign(() => {}, {
 	toString(){
 		return "";
 	},
 	handleEvent() {}
-});
+}));
 
 export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
