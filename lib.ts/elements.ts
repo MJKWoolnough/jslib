@@ -39,15 +39,6 @@ interface ElementFactory {
 	(name: string, fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false, classOnly: true}): HTMLElement;
 }
 
-class AttachRemoveEvent extends HTMLElement {
-	connectedCallback() {
-		this.dispatchEvent(new CustomEvent("attached"));
-	}
-	disconnectedCallback() {
-		this.dispatchEvent(new CustomEvent("removed"));
-	}
-}
-
 class BindFn extends Bind {
 	#fn: AttrFn;
 	constructor(v: ToString, fn: AttrFn) {
@@ -88,6 +79,82 @@ const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
       setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => {
 	      m.set(k, v);
 	      return v;
+      },
+      classes: (typeof HTMLElement | null)[] = Array.from({"length": 8}, _ => null),
+      getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean) => {
+	const n = +addRemove | (+handleAttrs << 1) | (+children << 2),
+	      b = classes[n];
+	if (b) {
+		return b;
+	}
+	let base = HTMLElement;
+	if (addRemove) {
+		base = class extends base {
+			connectedCallback() {
+				this.dispatchEvent(new CustomEvent("attached"));
+			}
+			disconnectedCallback() {
+				this.dispatchEvent(new CustomEvent("removed"));
+			}
+		}
+	}
+	if (handleAttrs) {
+		base = class extends base {
+			constructor() {
+				super();
+				attrs.set(this, new Map());
+			}
+			act(name: string, fn: (newValue: ToString) => void) {
+				const attrMap = attrs.get(this)!,
+				      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
+				attr.push(fn);
+			}
+			attr(name: string, fn?: AttrFn) {
+				const attrMap = attrs.get(this)!,
+				      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
+				return fn instanceof Function ? new BindFn(attr[0], fn) : attr[0];
+			}
+			addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
+				if (setAttr(this, "on" + type, listener) === null) {
+					super.addEventListener(type, listener, options);
+				}
+			}
+			removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
+				if (setAttr(this, "on" + type, Null) === null) {
+					super.removeEventListener(type, listener, options);
+				}
+			}
+			toggleAttribute(qualifiedName: string, force?: boolean) {
+				const ret = setAttr(this, qualifiedName, force ?? null);
+				if (ret === null) {
+					return super.toggleAttribute(qualifiedName, force);
+				}
+				return ret;
+			}
+			setAttribute(qualifiedName: string, value: string) {
+				if (setAttr(this, qualifiedName, value) === null) {
+					super.setAttribute(qualifiedName, value);
+				}
+			}
+			removeAttribute(qualifiedName: string) {
+				if (setAttr(this, qualifiedName, Null) === null) {
+					super.removeAttribute(qualifiedName);
+				}
+			}
+		}
+	}
+	if (children) {
+		base = class extends base {
+			constructor() {
+				super();
+				childObserver.observe(this, {"childList": true});
+			}
+			observeChildren(fn: ChildWatchFn) {
+				(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
+			}
+		}
+	}
+	return classes[n] = base;
       };
 
 export const Null = Object.assign(() => {}, {
@@ -99,66 +166,10 @@ export const Null = Object.assign(() => {}, {
 
 export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
-	      {attrs: attributeOldValue = true, observeChildren: childList = true} = options ?? {},
-	      observeOptions = {attributeOldValue, childList},
-	      element = class extends (options?.attachRemoveEvent ? AttachRemoveEvent : HTMLElement) {
+	      element = class extends getClass(options?.attachRemoveEvent ?? true, options?.attrs ?? true, options?.observeChildren ?? true) {
 		constructor() {
 			super();
-			if (attributeOldValue) {
-				attrs.set(this, new Map());
-			}
-			if (childList) {
-				childObserver.observe(this, observeOptions);
-			}
 			amendNode(this.attachShadow(shadowOptions), fn(this));
-		}
-		observeChildren(fn: ChildWatchFn) {
-			if (childList) {
-				(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
-			}
-		}
-		act(name: string, fn: (newValue: ToString) => void) {
-			if (!attributeOldValue) {
-				return;
-			}
-			const attrMap = attrs.get(this)!,
-			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
-			attr.push(fn);
-		}
-		attr(name: string, fn?: AttrFn) {
-			if (!attributeOldValue) {
-				return;
-			}
-			const attrMap = attrs.get(this)!,
-			      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
-			return fn instanceof Function ? new BindFn(attr, fn) : attr;
-		}
-		addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
-			if (setAttr(this, "on" + type, listener) === null) {
-				super.addEventListener(type, listener, options);
-			}
-		}
-		removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
-			if (setAttr(this, "on" + type, Null) === null) {
-				super.removeEventListener(type, listener, options);
-			}
-		}
-		toggleAttribute(qualifiedName: string, force?: boolean) {
-			const ret = setAttr(this, qualifiedName, force ?? null);
-			if (ret === null) {
-				return super.toggleAttribute(qualifiedName, force);
-			}
-			return ret;
-		}
-		setAttribute(qualifiedName: string, value: string) {
-			if (setAttr(this, qualifiedName, value) === null) {
-				super.setAttribute(qualifiedName, value);
-			}
-		}
-		removeAttribute(qualifiedName: string) {
-			if (setAttr(this, qualifiedName, Null) === null) {
-				super.removeAttribute(qualifiedName);
-			}
 		}
 	      };
 	customElements.define(name, element);
