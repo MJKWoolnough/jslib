@@ -6,7 +6,6 @@ type Options = {
 	manualSlot?: boolean;
 	classOnly?: boolean;
 	delegatesFocus?: boolean;
-	attachRemoveEvents?: boolean;
 	attrs?: boolean;
 	observeChildren?: boolean;
 	attachRemoveEvent?: boolean;
