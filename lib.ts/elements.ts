@@ -107,6 +107,7 @@ const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
 			act(name: string, fn: (newValue: ToString) => void) {
 				const attrMap = attrs.get(this)!,
 				      attr = attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
+				fn(attr[0].value);
 				attr.push(fn);
 			}
 			attr(name: string, fn?: AttrFn) {
