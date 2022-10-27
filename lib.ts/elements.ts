@@ -20,7 +20,7 @@ type AttrFn = (newValue: ToString) => ToString | void;
 type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
 interface AttrClass {
-	attr(name: string, fn?: AttrFn): void;
+	attr(name: string, fn?: Function): Bind;
 }
 
 interface ChildClass {
