@@ -1,4 +1,4 @@
-import type {DOMBind, Children} from './dom.js';
+import type {Children, DOMBind} from './dom.js';
 import {Bind, amendNode, bind, bindElement} from './dom.js';
 import {ns} from './html.js';
 
