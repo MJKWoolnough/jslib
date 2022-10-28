@@ -20,7 +20,7 @@ type AttrFn = (newValue: ToString) => ToString | void;
 type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
 interface AttrClass {
-	act(name: string, fn: Function): void;
+	act(name: string | string[], fn: Function): void;
 	attr(name: string, fn?: Function): Bind;
 }
 
@@ -87,7 +87,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 		}
 	} : handleAttrs ? class extends base {
-		#acts: BindFn[] = [];
+		#acts: (BindFn | Function)[] = [];
 		constructor() {
 			super();
 			attrs.set(this, new Map());
@@ -96,10 +96,26 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			const attrMap = attrs.get(this)!;
 			return attrMap.get(name) ?? setAndReturn(attrMap, name, bind(this.getAttribute(name) ?? Null));
 		}
-		act(name: string, fn: (newValue: ToString) => void) {
-			const attr = this.#attr(name);
-			fn(attr.value);
-			this.#acts.push(new BindFn(attr, fn));
+		act(names: string | string[], fn: (newValue: ToString) => void) {
+			if (names instanceof Array) {
+				const obj: Record<string, Bind> = {},
+				      afn = () => {
+					const o: Record<string, ToString> = {};
+					for (const n in obj) {
+						o[n] = obj[n].value;
+					}
+					fn(o);
+				      };
+				for (const n of names) {
+					obj[n] = new BindFn(this.#attr(n), afn);
+				}
+				afn();
+				this.#acts.push(afn);
+			} else {
+				const attr = this.#attr(names);
+				fn(attr.value);
+				this.#acts.push(new BindFn(attr, fn));
+			}
 		}
 		attr(name: string, fn?: AttrFn) {
 			const attr = this.#attr(name);
