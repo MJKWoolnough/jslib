@@ -94,6 +94,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	      m.set(k, v);
 	      return v;
       },
+      childList = {"childList": true},
       classes: (typeof HTMLElement | null)[] = Array.from({"length": 8}, _ => null),
       getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean): typeof HTMLElement => {
 	const n = +addRemove | (+handleAttrs << 1) | (+children << 2),
@@ -105,7 +106,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	return classes[n] = children ? class extends base {
 		constructor() {
 			super();
-			childObserver.observe(this, {"childList": true});
+			childObserver.observe(this, childList);
 		}
 		observeChildren(fn: ChildWatchFn) {
 			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
