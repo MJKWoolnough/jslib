@@ -63,14 +63,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
       }),
       setAttr = (elem: HTMLElement, name: string, value: ToString | null) => {
 	const attr = attrs.get(elem)?.get(name);
-	if (attr) {
-		if (value === null) {
-			value = attr.value ? Null : name;
-		}
-		attr.value = value;
-		return value !== Null;
-	}
-	return null;
+	return attr ? (attr.value = value === null ? attr.value ? Null : name : value) !== Null : null;
       },
       setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => {
 	      m.set(k, v);
