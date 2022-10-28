@@ -51,7 +51,30 @@ class BindFn extends Bind {
 	}
 }
 
+class BindMulti extends Bind {
+	#fn: AttrFn;
+	constructor(elem: HTMLElement, names: string[], fn: Function) {
+		super("");
+		const obj: Record<string, Bind> = {},
+		      afn = this.#fn = () => {
+			const o: Record<string, ToString> = {};
+			for (const n in obj) {
+				o[n] = obj[n].value;
+			}
+			this.value = fn(o) ?? Null;
+		};
+		for (const n of names) {
+			obj[n] = new BindFn(getAttr(elem, n), this.#fn);
+		}
+		afn();
+	}
+}
+
 const attrs = new WeakMap<Node, Map<string, Bind>>(),
+      getAttr = (elem: HTMLElement, name: string) => {
+	const attrMap = attrs.get(elem)!;
+	return attrMap.get(name) ?? setAndReturn(attrMap, name, bind(elem.getAttribute(name) ?? Null));
+      },
       cw = new WeakMap<Node, ChildWatchFn[]>(),
       childObserver = new MutationObserver(list => {
 	for (const record of list) {
@@ -87,39 +110,27 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 		}
 	} : handleAttrs ? class extends base {
-		#acts: (BindFn | Function)[] = [];
+		#acts: Bind[] = [];
 		constructor() {
 			super();
 			attrs.set(this, new Map());
 		}
-		#attr (name: string) {
-			const attrMap = attrs.get(this)!;
-			return attrMap.get(name) ?? setAndReturn(attrMap, name, bind(this.getAttribute(name) ?? Null));
-		}
 		act(names: string | string[], fn: (newValue: ToString) => void) {
 			if (names instanceof Array) {
-				const obj: Record<string, Bind> = {},
-				      afn = () => {
-					const o: Record<string, ToString> = {};
-					for (const n in obj) {
-						o[n] = obj[n].value;
-					}
-					fn(o);
-				      };
-				for (const n of names) {
-					obj[n] = new BindFn(this.#attr(n), afn);
-				}
-				afn();
-				this.#acts.push(afn);
+				this.#acts.push(new BindMulti(this, names, fn));
 			} else {
-				const attr = this.#attr(names);
+				const attr = getAttr(this, names);
 				fn(attr.value);
 				this.#acts.push(new BindFn(attr, fn));
 			}
 		}
-		attr(name: string, fn?: AttrFn) {
-			const attr = this.#attr(name);
-			return fn instanceof Function ? new BindFn(attr, fn) : attr;
+		attr(names: string | string[], fn?: AttrFn) {
+			if (names instanceof Array) {
+				return new BindMulti(this, names, fn!);
+			} else {
+				const attr = getAttr(this, names);
+				return fn instanceof Function ? new BindFn(attr, fn) : attr;
+			}
 		}
 		addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
 			if (setAttr(this, "on" + type, listener) === null) {
