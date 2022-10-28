@@ -21,6 +21,7 @@ type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
 interface AttrClass {
 	act(name: string | string[], fn: Function): void;
+	attr(name: string[], fn: Function): Bind;
 	attr(name: string, fn?: Function): Bind;
 }
 
