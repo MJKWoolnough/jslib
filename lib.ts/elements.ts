@@ -162,7 +162,10 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 		return "";
 	},
 	handleEvent() {},
-	*[Symbol.iterator]() {}
+	*[Symbol.iterator]() {},
+	[Symbol.toPrimitive](hint: string) {
+		return hint === "number" ? NaN : "";
+	}
 }));
 
 export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
