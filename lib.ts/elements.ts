@@ -50,7 +50,7 @@ class BindFn extends Bind {
 	}
 }
 
-const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
+const attrs = new WeakMap<Node, Map<string, Bind>>(),
       cw = new WeakMap<Node, ChildWatchFn[]>(),
       childObserver = new MutationObserver(list => {
 	for (const record of list) {
@@ -62,16 +62,12 @@ const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
 	}
       }),
       setAttr = (elem: HTMLElement, name: string, value: ToString | null) => {
-	const ahs = attrs.get(elem)?.get(name);
-	if (ahs) {
-		const [attr, ...fns] = ahs;
+	const attr = attrs.get(elem)?.get(name);
+	if (attr) {
 		if (value === null) {
 			value = attr.value ? Null : name;
 		}
 		attr.value = value;
-		for (const fn of fns) {
-			fn(value);
-		}
 		return value !== Null;
 	}
 	return null;
@@ -100,22 +96,23 @@ const attrs = new WeakMap<Node, Map<string, [Bind, ...AttrFn[]]>>(),
 	}
 	if (handleAttrs) {
 		base = class extends base {
+			acts: BindFn[] = [];
 			constructor() {
 				super();
 				attrs.set(this, new Map());
 			}
 			#attr (name: string) {
 				const attrMap = attrs.get(this)!;
-				return attrMap.get(name) ?? setAndReturn(attrMap, name, [bind(this.getAttribute(name) ?? Null)]);
+				return attrMap.get(name) ?? setAndReturn(attrMap, name, bind(this.getAttribute(name) ?? Null));
 			}
 			act(name: string, fn: (newValue: ToString) => void) {
 				const attr = this.#attr(name);
-				fn(attr[0].value);
-				attr.push(fn);
+				fn(attr.value);
+				this.acts.push(new BindFn(attr, fn));
 			}
 			attr(name: string, fn?: AttrFn) {
 				const attr = this.#attr(name);
-				return fn instanceof Function ? new BindFn(attr[0], fn) : attr[0];
+				return fn instanceof Function ? new BindFn(attr, fn) : attr;
 			}
 			addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
 				if (setAttr(this, "on" + type, listener) === null) {
