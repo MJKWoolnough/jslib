@@ -87,7 +87,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 		}
 	} : handleAttrs ? class extends base {
-		acts: BindFn[] = [];
+		#acts: BindFn[] = [];
 		constructor() {
 			super();
 			attrs.set(this, new Map());
@@ -99,7 +99,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		act(name: string, fn: (newValue: ToString) => void) {
 			const attr = this.#attr(name);
 			fn(attr.value);
-			this.acts.push(new BindFn(attr, fn));
+			this.#acts.push(new BindFn(attr, fn));
 		}
 		attr(name: string, fn?: AttrFn) {
 			const attr = this.#attr(name);
