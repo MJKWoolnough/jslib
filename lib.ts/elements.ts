@@ -9,6 +9,7 @@ type Options = {
 	attrs?: boolean;
 	observeChildren?: boolean;
 	attachRemoveEvent?: boolean;
+	styles?: [CSSStyleSheet];
 }
 
 interface ToString {
@@ -184,10 +185,11 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 
 export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
+	      css = options?.styles ?? [],
 	      element = class extends getClass(options?.attachRemoveEvent ?? true, options?.attrs ?? true, options?.observeChildren ?? true) {
 		constructor() {
 			super();
-			amendNode(this.attachShadow(shadowOptions), fn(this));
+			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = css;
 		}
 	      };
 	customElements.define(name, element);
