@@ -337,7 +337,7 @@ This method acts like the [then](#inter_subscription_then) method of the [Subscr
 
 ## <a name="css">css</a>
 
-This module contains a simple class for generating CSS style elements.
+This module contains an extension to the CSSStyleSheet class for simple generation of CSS style elements.
 
 This module directly imports the [html](#html) module, and indirectly imports the [dom](#dom) module.
 
@@ -379,7 +379,7 @@ This simple example will produce the following page:
 ```html
 <html lang="en"><head>
 	<script type="module" src="script.js"></script>
-	<style type="text/css">._0{font-size:2em;}._0>span{color:red;}</style></head>
+	<style type="text/css">._0 { font-size: 2em; }._0 > span { color: red; }</style></head>
 	<body>
 		<div class="_0">Buy <span>NOW</span></div>
 	</body>
