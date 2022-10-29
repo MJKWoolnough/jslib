@@ -12,17 +12,17 @@ interface Def {
 
 type IDs<N extends number, U extends string[] = []> = U['length'] extends N ? U : IDs<N, [string, ...U]>;
 
-export default class CSS {
-	#data = "";
+export default class CSS extends CSSStyleSheet {
 	#idPrefix: string;
 	#id: number;
 	constructor(prefix = "", idStart = 0) {
+		super();
 		this.#idPrefix = idRE.test(prefix) ? prefix : "_";
 		this.#id = idStart;
 	}
 	add(selector: string, def: Def) {
 		if (selector.trim()) {
-			const d = this.#data;
+			const pos = this.cssRules.length;
 			let data = "";
 			for (const key in def) {
 				const v = def[key];
@@ -33,17 +33,18 @@ export default class CSS {
 				}
 			}
 			if (data) {
-				this.#data = d + selector + "{" + data + "}" + this.#data.slice(d.length);
+				this.insertRule(selector + "{" + data + "}", pos);
 			}
 		}
 		return this;
 	}
 	query(query: string, defs: Record<string, Def>) {
-		this.#data += query + "{";
-		for (const selector in defs) {
-			this.add(selector, defs[selector]);
+		const c = new CSS(this.#idPrefix, this.#id);
+		for (const s in defs) {
+			c.add(s, defs[s]);
 		}
-		this.#data += "}";
+		this.#id = c.#id;
+		this.insertRule(query + "{" + c + "}");
 		return this;
 	}
 	id() {
@@ -53,10 +54,14 @@ export default class CSS {
 		return Array.from({length}, _ => this.id()) as IDs<N>;
 	}
 	toString() {
-		return this.#data;
+		let r = "";
+		for (const rule of this.cssRules) {
+			r += rule.cssText;
+		}
+		return r;
 	}
 	render() {
-		return style({"type": "text/css"}, this.#data);
+		return style({"type": "text/css"}, this+"");
 	}
 }
 
