@@ -1,7 +1,7 @@
 import type {Bind} from './dom.js';
 import CSS from './css.js';
 import {amendNode, bindElement, event, eventOnce} from './dom.js';
-import {div, img, li, ns, slot, span, style, ul} from './html.js';
+import {div, img, li, ns, slot, span, ul} from './html.js';
 import {item, menu} from './menu.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage as setOtherLanguage, windows} from './windows.js';
 
@@ -136,7 +136,7 @@ const windowObservations = {
 	"--overlay-on": "none"
       }).add("::slotted(windows-desktop)", {
 	"padding-bottom": "var(--taskbar-size, 4em)"
-      }) + "";
+      });
 
 setMenuLang({
 	"CLOSE": "Close",
@@ -165,7 +165,6 @@ export class ShellElement extends BaseShellElement {
 			}
 		      }));
 		amendNode(this.attachShadow({"mode": "closed"}), [
-			style({"type": "text/css"}, shellStyle),
 			slot({"name": "desktop"}),
 			taskbar,
 			div(slot({"onslotchange": function(this: HTMLSlotElement) {
@@ -206,7 +205,7 @@ export class ShellElement extends BaseShellElement {
 					}
 				});
 			}}))
-		]);
+		]).adoptedStyleSheets = [shellStyle];
 	}
 }
 
