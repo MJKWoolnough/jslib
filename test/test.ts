@@ -3664,27 +3664,27 @@
 			},
 			"a": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("a", {"a": 0}) + "" === "a{a:0;}";
+				return new CSS().add("a", {"opacity": 0}) + "" === "a { opacity: 0; }";
 			},
 			"a:hover": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("a:hover", {"a": 0}) + "" === "a:hover{a:0;}";
+				return new CSS().add("a:hover", {"opacity": 0}) + "" === "a:hover { opacity: 0; }";
 			},
 			"div.className": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("div.className", {"a": 0}) + "" === "div.className{a:0;}";
+				return new CSS().add("div.className", {"opacity": 0}) + "" === "div.className { opacity: 0; }";
 			},
 			"#IDHERE": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("#IDHERE", {"a":0}) + "" === "#IDHERE{a:0;}";
+				return new CSS().add("#IDHERE", {"opacity":0}) + "" === "#IDHERE { opacity: 0; }";
 			},
 			"ul::before": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("ul::before", {"a": 0}) + "" === "ul::before{a:0;}";
+				return new CSS().add("ul::before", {"opacity": 0}) + "" === "ul::before { opacity: 0; }";
 			},
 			"input[disabled]": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("input[disabled]", {"a": 0}) + "" === "input[disabled]{a:0;}";
+				return new CSS().add("input[disabled]", {"opacity": 0}) + "" === "input[disabled] { opacity: 0; }";
 			},
 			"no properties": async () => {
 				const {default: CSS} = await import("./lib/css.js");
@@ -3692,45 +3692,45 @@
 			},
 			"multiple properties": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("a", {"a": 0, "b": 1, "c": 2}) + "" === "a{a:0;b:1;c:2;}";
+				return new CSS().add("a", {"gap": 0, "opacity": 1, "order": 2}) + "" === "a { gap: 0px; opacity: 1; order: 2; }";
 			}
 		},
 		"complex selectors": {
 			"div a": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("div a", {"a": 0}) + "" === "div a{a:0;}";
+				return new CSS().add("div a", {"opacity": 0}) + "" === "div a { opacity: 0; }";
 			},
 			"div a:not(:hover)": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("div a:not(:hover)", {"a": 0}) + "" === "div a:not(:hover){a:0;}";
+				return new CSS().add("div a:not(:hover)", {"opacity": 0}) + "" === "div a:not(:hover) { opacity: 0; }";
 			},
 			"div + span > a:hover::before": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("div + span > a:hover::before", {"a": 0}) + "" === "div + span > a:hover::before{a:0;}";
+				return new CSS().add("div + span > a:hover::before", {"opacity": 0}) + "" === "div + span > a:hover::before { opacity: 0; }";
 			}
 		},
 		"multiple selectors": {
 			"div, a": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("div, a", {"a": 0}) + "" === "div, a{a:0;}";
+				return new CSS().add("div, a", {"opacity": 0}) + "" === "div, a { opacity: 0; }";
 			},
 			"span, ul > li, label + input": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("span, ul > li, label + input", {"a": 0}) + "" === "span, ul > li, label + input{a:0;}";
+				return new CSS().add("span, ul > li, label + input", {"opacity": 0}) + "" === "span, ul > li, label + input { opacity: 0; }";
 			}
 		},
 		"combined selectors": {
 			"div span, a span": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("div, a", {" span": {"a": 0}}) + "" === "div span, a span{a:0;}";
+				return new CSS().add("div, a", {" span": {"opacity": 0}}) + "" === "div span, a span { opacity: 0; }";
 			},
 			"div + span, a + span": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("div, a", {" + span": {"a": 0}}) + "" === "div + span, a + span{a:0;}";
+				return new CSS().add("div, a", {" + span": {"opacity": 0}}) + "" === "div + span, a + span { opacity: 0; }";
 			},
 			"div, a, div > span, a > span": async () => {
 				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("div, a", {"b": 0, " > span": {"a": 1}}) + "" === "div, a{b:0;}div > span, a > span{a:1;}";
+				return new CSS().add("div, a", {"opacity": 0, " > span": {"order": 1}}) + "" === "div, a { opacity: 0; }div > span, a > span { order: 1; }";
 			}
 		},
 		"ids": {
@@ -3759,8 +3759,8 @@
 			"@supports": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
-				return css.query("@supports (display: flex)", {
-				}) + "" === "@supports (display: flex){}";
+				return css.query("@supports (display: flex)", {"a": {"opacity": 0}}) + "" === "@supports (display: flex) {\n  a { opacity: 0; }\n}";
+
 			},
 			"@media": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
@@ -3769,7 +3769,7 @@
 					"article": {
 						"padding": "1rem 3rem"
 					}
-				}) + "" === "@media screen and (min-width: 900px){article{padding:1rem 3rem;}}";
+				}) + "" === "@media screen and (min-width: 900px) {\n  article { padding: 1rem 3rem; }\n}";
 			}
 		}
 	}
