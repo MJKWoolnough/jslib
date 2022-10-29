@@ -1,6 +1,6 @@
 import CSS from './css.js';
 import {amendNode, bindElement, event, eventCapture, eventRemove} from './dom.js';
-import {ns, slot, style} from './html.js';
+import {ns, slot} from './html.js';
 
 export type MenuItems = ItemElement | SubMenuElement | MenuItems[];
 
@@ -17,12 +17,12 @@ const blur = Symbol("blur"),
       }).add("::slotted(menu-item),::slotted(menu-submenu)", {
 	"display": "block",
 	"user-select": "none"
-      }) + "",
+      }),
       submenuStyle = new CSS().add(":host", {
 	"position": "relative"
       }).add("::slotted(menu-item)", {
 	"display": "block"
-      }) + "";
+      });
 
 export class MenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
@@ -30,9 +30,8 @@ export class MenuElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			style({"type": "text/css"}, menuStyle),
 			this.#s = slot()
-		]);
+		]).adoptedStyleSheets = [menuStyle];
 		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": (e: KeyboardEvent) => {
 			const da = document.activeElement;
 			switch (e.key) {
@@ -157,10 +156,9 @@ export class SubMenuElement extends HTMLElement {
 	constructor() {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			style({"type": "text/css"}, submenuStyle),
 			this.#s = slot(),
 			this.#p = slot()
-		]);
+		]).adoptedStyleSheets = [submenuStyle];
 		new MutationObserver(() => {
 			this.#i = null;
 			this.#m = null;
