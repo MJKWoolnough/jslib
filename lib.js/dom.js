@@ -24,6 +24,7 @@ const childrenArr = (children, res = []) => {
       isClassObj = prop => prop instanceof Object,
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || prop instanceof Object,
       isChildren = properties => typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder,
+      isNodeAttributes = n => !!n.style && !!n.classList && !!n.getAttributeNode && !!n.removeAttribute && !!n.setAttribute && !!n.toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
       remove = Symbol("remove");
@@ -128,7 +129,7 @@ export const amendNode = (node, properties, children) => {
 			if (isEventObject(prop) && k.startsWith("on")) {
 				const arr = prop instanceof Array;
 				node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.slice(2), arr ? prop[0] : prop, arr ? prop[1] : false);
-			} else if (node instanceof HTMLElement || node instanceof SVGElement) {
+			} else if (isNodeAttributes(node)) {
 				if (typeof prop === "boolean") {
 					node.toggleAttribute(k, prop);
 				} else if (prop === undefined) {

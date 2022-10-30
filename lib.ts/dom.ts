@@ -41,6 +41,15 @@ interface BindFn {
 	(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]): Binder;
 }
 
+interface NodeAttributes extends Node {
+	readonly classList: DOMTokenList;
+	readonly style: CSSStyleDeclaration;
+	getAttributeNode(qualifiedName: string): Attr | null;
+	removeAttribute(qualifiedName: string): void;
+	setAttribute(qualifiedName: string, value: string): void;
+	toggleAttribute(qualifiedName: string, force?: boolean): boolean;
+}
+
 const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	if (children instanceof Binder) {
 		const t = new Text(children+"");
@@ -67,6 +76,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object,
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || prop instanceof Object,
       isChildren = (properties: Props | Children): properties is Children => typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder,
+      isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).getAttributeNode && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttribute && !!(n as NodeAttributes).toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
       remove = Symbol("remove");
@@ -172,7 +182,7 @@ export const amendNode: mElement = (node?: EventTarget | null, properties?: Prop
 			if (isEventObject(prop) && k.startsWith("on")) {
 				const arr = prop instanceof Array;
 				node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.slice(2), arr ? prop[0] : prop, arr ? prop[1] : false);
-			} else if (node instanceof HTMLElement || node instanceof SVGElement) {
+			} else if (isNodeAttributes(node)) {
 				if (typeof prop === "boolean") {
 					node.toggleAttribute(k, prop);
 				} else if (prop === undefined) {
