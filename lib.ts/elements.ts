@@ -277,8 +277,8 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 }));
 
 export default ((fn: (elem: Node) => Children, options?: Options) => {
-	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
-	      {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], name = genName()} = options ?? {},
+	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], name = genName(), delegatesFocus = false, manualSlot = false, classOnly = false} = options ?? {},
+	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = psuedo ? class extends getPsuedo(attrs, observeChildren) {
 		constructor() {
 			super();
@@ -296,5 +296,5 @@ export default ((fn: (elem: Node) => Children, options?: Options) => {
 	if (!psuedo) {
 		customElements.define(name, element as CustomElementConstructor);
 	}
-	return options?.classOnly ? element : psuedo ? Object.defineProperty(((properties?: Props, children?: Children) => amendNode(new element(), properties, children)) as DOMBind<DocumentFragment>, "name", {"value": name}) : bindElement<HTMLElement>(ns, name);
+	return classOnly ? element : psuedo ? Object.defineProperty(((properties?: Props, children?: Children) => amendNode(new element(), properties, children)) as DOMBind<DocumentFragment>, "name", {"value": name}) : bindElement<HTMLElement>(ns, name);
 }) as ElementFactory;
