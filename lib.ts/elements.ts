@@ -250,11 +250,12 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		}
 	} : base;
       },
+      genChar = () => String.fromCharCode(97 + Math.floor(Math.random() * 26)),
       genName = () => {
 	let name;
 	do {
-		for (name = ""; name.length < 5; name += String.fromCharCode(97 + Math.floor(Math.random() * 26))) {}
-		for (name += "-"; name.length < 11; name += String.fromCharCode(97 + Math.floor(Math.random() * 26))) {}
+		for (name = ""; name.length < 5; name += genChar()) {}
+		for (name += "-"; name.length < 11; name += genChar()) {}
 	} while (customElements.get(name));
 	return name;
       };
