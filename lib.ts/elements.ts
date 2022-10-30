@@ -11,6 +11,7 @@ type Options = {
 	attachRemoveEvent?: boolean;
 	styles?: [CSSStyleSheet];
 	psuedo?: boolean;
+	name?: string;
 }
 
 interface ToString {
@@ -32,15 +33,15 @@ interface ChildClass {
 }
 
 interface ElementFactory {
-	(name: string, fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options): DOMBind<HTMLElement & AttrClass & ChildClass>;
-	(name: string, fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false}): DOMBind<HTMLElement & ChildClass>;
-	(name: string, fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false}): DOMBind<HTMLElement & AttrClass>;
-	(name: string, fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false}): DOMBind<HTMLElement>;
+	(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options): DOMBind<HTMLElement & AttrClass & ChildClass>;
+	(fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false}): DOMBind<HTMLElement & ChildClass>;
+	(fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false}): DOMBind<HTMLElement & AttrClass>;
+	(fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false}): DOMBind<HTMLElement>;
 
-	(name: string, fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options & {classOnly: true}): HTMLElement & AttrClass & ChildClass;
-	(name: string, fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false, classOnly: true}): HTMLElement & ChildClass;
-	(name: string, fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false, classOnly: true}): HTMLElement & AttrClass;
-	(name: string, fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false, classOnly: true}): HTMLElement;
+	(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options & {classOnly: true}): HTMLElement & AttrClass & ChildClass;
+	(fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false, classOnly: true}): HTMLElement & ChildClass;
+	(fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false, classOnly: true}): HTMLElement & AttrClass;
+	(fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false, classOnly: true}): HTMLElement;
 }
 
 class BindFn extends Bind {
@@ -248,6 +249,14 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			setAttr(this, qualifiedName, Null);
 		}
 	} : base;
+      },
+      genName = () => {
+	let name;
+	do {
+		for (name = ""; name.length < 5; name += String.fromCharCode(97 + Math.floor(Math.random() * 26))) {}
+		for (name += "-"; name.length < 11; name += String.fromCharCode(97 + Math.floor(Math.random() * 26))) {}
+	} while (customElements.get(name));
+	return name;
       };
 
 export const Null = Object.freeze(Object.assign(() => {}, {
@@ -261,9 +270,9 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	}
 }));
 
-export default ((name: string, fn: (elem: Node) => Children, options?: Options) => {
+export default ((fn: (elem: Node) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
-	      {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = []} = options ?? {},
+	      {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], name = genName()} = options ?? {},
 	      element = psuedo ? class extends getPsuedo(attrs, observeChildren) {
 		constructor() {
 			super();
