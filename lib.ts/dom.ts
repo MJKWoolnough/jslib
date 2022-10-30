@@ -41,13 +41,13 @@ interface BindFn {
 	(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]): Binder;
 }
 
-const childrenArr = (children: Children, res: Node[] = []) => {
+const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	if (children instanceof Binder) {
 		const t = new Text(children+"");
 		children[setNode](t);
 		res.push(t);
 	} else if (typeof children === "string") {
-		res.push(document.createTextNode(children));
+		res.push(children);
 	} else if (Array.isArray(children)) {
 		for (const c of children) {
 			childrenArr(c, res);

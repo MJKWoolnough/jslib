@@ -4,7 +4,7 @@ const childrenArr = (children, res = []) => {
 		children[setNode](t);
 		res.push(t);
 	} else if (typeof children === "string") {
-		res.push(document.createTextNode(children));
+		res.push(children);
 	} else if (Array.isArray(children)) {
 		for (const c of children) {
 			childrenArr(c, res);
