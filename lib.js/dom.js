@@ -1,21 +1,22 @@
-const childrenArr = (node, children) => {
+const childrenArr = (children, res = []) => {
 	if (children instanceof Binder) {
 		const t = new Text(children+"");
 		children[setNode](t);
-		node.appendChild(t);
+		res.push(t);
 	} else if (typeof children === "string") {
-		node.appendChild(document.createTextNode(children));
+		res.push(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
 		for (const c of children) {
-			childrenArr(node, c);
+			childrenArr(c, res);
 		}
 	} else if (children instanceof Node) {
-		node.appendChild(children);
+		res.push(children);
 	} else if (children instanceof NodeList || children instanceof HTMLCollection) {
 		for (const c of Array.from(children)) {
-			node.appendChild(c);
+			res.push(c);
 		}
 	}
+	return res;
       },
       isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bind)) || prop instanceof Bind && isEventListenerOrEventListenerObject(prop.value),
@@ -102,7 +103,7 @@ export class Bind extends Binder {
 		this[update]();
 	}
 	handleEvent(e) {
-		const v = this.#value;
+		const v = this.value;
 		if (v instanceof Function) {
 			v.call(e.currentTarget, e);
 		} else if (isEventListenerObject(v)) {
@@ -115,7 +116,7 @@ export class Bind extends Binder {
 }
 
 export const amendNode = (node, properties, children) => {
-	if (isChildren(properties)) {
+	if (properties && isChildren(properties)) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
 		for (const prop of properties) {
@@ -168,7 +169,12 @@ export const amendNode = (node, properties, children) => {
 		if (typeof children === "string" && !node.firstChild) {
 			node.textContent = children;
 		} else if (children) {
-			childrenArr(node, children);
+			const c = childrenArr(children);
+			if (node instanceof Element || node instanceof DocumentFragment) {
+				node.append(...c);
+			} else {
+				node.appendChild(createDocumentFragment(...c));
+			}
 		}
 	}
 	return node;
@@ -184,7 +190,7 @@ createDocumentFragment = children => {
 	if (typeof children === "string") {
 		df.textContent = children;
 	} else if (children !== undefined) {
-		childrenArr(df, children);
+		df.append(...childrenArr(children));
 	}
 	return df;
 },
@@ -192,12 +198,13 @@ clearNode = (node, properties, children) => {
 	if (!node) {
 		return node;
 	}
-	if (typeof properties === "string") {
-		children = properties = void (node.textContent = properties);
-	} else if (typeof children === "string") {
+	if (properties && isChildren(properties)) {
+		properties = void (children = properties);
+	}
+	if (typeof children === "string") {
 		children = void (node.textContent = children);
-	} else if (node instanceof Element) {
-		node.replaceChildren();
+	} else if (children && node instanceof Element) {
+		children = void node.replaceChildren(...childrenArr(children));
 	} else {
 		while (node.lastChild !== null) {
 			node.lastChild.remove();

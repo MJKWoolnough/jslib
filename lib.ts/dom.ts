@@ -41,24 +41,25 @@ interface BindFn {
 	(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]): Binder;
 }
 
-const childrenArr = (node: Node, children: Children) => {
+const childrenArr = (children: Children, res: Node[] = []) => {
 	if (children instanceof Binder) {
 		const t = new Text(children+"");
 		children[setNode](t);
-		node.appendChild(t);
+		res.push(t);
 	} else if (typeof children === "string") {
-		node.appendChild(document.createTextNode(children));
+		res.push(document.createTextNode(children));
 	} else if (Array.isArray(children)) {
 		for (const c of children) {
-			childrenArr(node, c);
+			childrenArr(c, res);
 		}
 	} else if (children instanceof Node) {
-		node.appendChild(children);
+		res.push(children);
 	} else if (children instanceof NodeList || children instanceof HTMLCollection) {
 		for (const c of Array.from(children)) {
-			node.appendChild(c);
+			res.push(c);
 		}
 	}
+	return res;
       },
       isEventListenerObject = (prop: PropValue): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
       isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bind)) || prop instanceof Bind && isEventListenerOrEventListenerObject(prop.value),
@@ -212,7 +213,12 @@ export const amendNode: mElement = (node?: EventTarget | null, properties?: Prop
 		if (typeof children === "string" && !node.firstChild) {
 			node.textContent = children;
 		} else if (children) {
-			childrenArr(node, children);
+			const c = childrenArr(children);
+			if (node instanceof Element || node instanceof DocumentFragment) {
+				node.append(...c);
+			} else {
+				node.appendChild(createDocumentFragment(...c));
+			}
 		}
 	}
 	return node;
@@ -228,7 +234,7 @@ createDocumentFragment = (children?: Children) => {
 	if (typeof children === "string") {
 		df.textContent = children;
 	} else if (children !== undefined) {
-		childrenArr(df, children);
+		df.append(...childrenArr(children));
 	}
 	return df;
 },
@@ -236,12 +242,13 @@ clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Ch
 	if (!node) {
 		return node;
 	}
-	if (typeof properties === "string") {
-		children = properties = void (node.textContent = properties);
-	} else if (typeof children === "string") {
+	if (properties && isChildren(properties)) {
+		properties = void (children = properties);
+	}
+	if (typeof children === "string") {
 		children = void (node.textContent = children);
-	} else if (node instanceof Element) {
-		node.replaceChildren();
+	} else if (children && node instanceof Element) {
+		children = void node.replaceChildren(...childrenArr(children));
 	} else {
 		while (node.lastChild !== null) {
 			node.lastChild.remove();
