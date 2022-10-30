@@ -1,4 +1,4 @@
-import type {Children, DOMBind} from './dom.js';
+import type {Children, DOMBind, Props} from './dom.js';
 import {Bind, amendNode, bind, bindElement} from './dom.js';
 import {ns} from './html.js';
 
@@ -10,6 +10,7 @@ type Options = {
 	observeChildren?: boolean;
 	attachRemoveEvent?: boolean;
 	styles?: [CSSStyleSheet];
+	psuedo?: boolean;
 }
 
 interface ToString {
@@ -55,7 +56,7 @@ class BindFn extends Bind {
 
 class BindMulti extends Bind {
 	#fn: AttrFn;
-	constructor(elem: HTMLElement, names: string[], fn: Function) {
+	constructor(elem: Node, names: string[], fn: Function) {
 		super("");
 		const obj: Record<string, Bind> = {},
 		      afn = this.#fn = () => {
@@ -73,9 +74,9 @@ class BindMulti extends Bind {
 }
 
 const attrs = new WeakMap<Node, Map<string, Bind>>(),
-      getAttr = (elem: HTMLElement, name: string) => {
+      getAttr = (elem: Node, name: string) => {
 	const attrMap = attrs.get(elem)!;
-	return attrMap.get(name) ?? setAndReturn(attrMap, name, bind(elem.getAttribute(name) ?? Null));
+	return attrMap.get(name) ?? setAndReturn(attrMap, name, bind((elem as HTMLElement).getAttribute(name) ?? Null));
       },
       cw = new WeakMap<Node, ChildWatchFn[]>(),
       childObserver = new MutationObserver(list => {
@@ -87,7 +88,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		}
 	}
       }),
-      setAttr = (elem: HTMLElement, name: string, value: ToString | null) => {
+      setAttr = (elem: Node, name: string, value: ToString | null) => {
 	const attr = attrs.get(elem)?.get(name);
 	return attr ? (attr.value = value === null ? attr.value ? Null : name : value) !== Null : null;
       },
@@ -183,6 +184,70 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			this.dispatchEvent(new CustomEvent("removed"));
 		}
 	} : base;
+      },
+      psuedos: (typeof DocumentFragment | null)[] = Array.from({"length": 4}, _ => null),
+      getPsuedo = (handleAttrs: boolean, children: boolean): typeof DocumentFragment => {
+	const n = +handleAttrs | (+children << 1),
+	      b = psuedos[n];
+	if (b) {
+		return b;
+	}
+	const base = children ? getPsuedo(handleAttrs, false) : DocumentFragment;
+	return psuedos[n] = children ? class extends base {
+		constructor() {
+			super();
+			childObserver.observe(this, childList);
+		}
+		observeChildren(fn: ChildWatchFn) {
+			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
+		}
+	} : handleAttrs ? class extends base {
+		#acts: Bind[] = [];
+		readonly classList = {};
+		readonly style = {};
+		constructor() {
+			super();
+			attrs.set(this, new Map());
+		}
+		act(names: string | string[], fn: (newValue: ToString) => void) {
+			if (names instanceof Array) {
+				this.#acts.push(new BindMulti(this, names, fn));
+			} else {
+				const attr = getAttr(this, names);
+				fn(attr.value);
+				this.#acts.push(new BindFn(attr, fn));
+			}
+		}
+		attr(names: string | string[], fn?: AttrFn) {
+			if (names instanceof Array) {
+				return new BindMulti(this, names, fn!);
+			} else {
+				const attr = getAttr(this, names);
+				return fn instanceof Function ? new BindFn(attr, fn) : attr;
+			}
+		}
+		addEventListener(type: string, listener: EventListenerOrEventListenerObject, _options?: boolean | AddEventListenerOptions) {
+			setAttr(this, "on" + type, listener);
+		}
+		removeEventListener(type: string, _listener: EventListenerOrEventListenerObject, _options?: boolean | EventListenerOptions) {
+			setAttr(this, "on" + type, Null);
+		}
+		getAttribute(_qualifiedName: string) {
+			return null;
+		}
+		getAttributeNode(_qualifiedName: string) {
+			return null;
+		}
+		toggleAttribute(qualifiedName: string, force?: boolean) {
+			return setAttr(this, qualifiedName, force ?? null);
+		}
+		setAttribute(qualifiedName: string, value: string) {
+			setAttr(this, qualifiedName, value);
+		}
+		removeAttribute(qualifiedName: string) {
+			setAttr(this, qualifiedName, Null);
+		}
+	} : base;
       };
 
 export const Null = Object.freeze(Object.assign(() => {}, {
@@ -196,15 +261,22 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	}
 }));
 
-export default ((name: string, fn: (elem: HTMLElement) => Children, options?: Options) => {
+export default ((name: string, fn: (elem: Node) => Children, options?: Options) => {
 	const shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": options?.manualSlot ? "manual" : "named", "delegatesFocus": options?.delegatesFocus ?? false},
-	      css = options?.styles ?? [],
-	      element = class extends getClass(options?.attachRemoveEvent ?? true, options?.attrs ?? true, options?.observeChildren ?? true) {
+	      {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = []} = options ?? {},
+	      element = psuedo ? class extends getPsuedo(attrs, observeChildren) {
 		constructor() {
 			super();
-			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = css;
+			amendNode(this, fn(this));
+		}
+	      } : class extends getClass(attachRemoveEvent, attrs, observeChildren) {
+		constructor() {
+			super();
+			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = styles;
 		}
 	      };
-	customElements.define(name, element);
-	return options?.classOnly ? element : bindElement<HTMLElement>(ns, name);
+	if (!psuedo) {
+		customElements.define(name, element as CustomElementConstructor);
+	}
+	return options?.classOnly ? element : psuedo ? Object.defineProperty(((properties?: Props, children?: Children) => amendNode(new element(), properties, children)) as DOMBind<DocumentFragment>, "name", {"value": name}) : bindElement<HTMLElement>(ns, name);
 }) as ElementFactory;
