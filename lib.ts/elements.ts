@@ -286,8 +286,8 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	}
 }));
 
-export default ((fn: (elem: Node) => Children, options?: Options) => {
-	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], name = genName(), delegatesFocus = false, manualSlot = false, classOnly = false} = options ?? {},
+export default ((fn: (elem: Node) => Children, options: Options = {}) => {
+	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], name = genName(), delegatesFocus = false, manualSlot = false, classOnly = false} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = psuedo ? class extends getPsuedo(attrs, observeChildren) {
 		constructor() {
