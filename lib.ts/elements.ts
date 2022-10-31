@@ -115,19 +115,18 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
       childList = {"childList": true},
       classes: (typeof HTMLElement | null)[] = Array.from({"length": 8}, _ => null),
       getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean): typeof HTMLElement => {
-	const n = +addRemove | (+handleAttrs << 1) | (+children << 2),
+	const n = (+addRemove << 2) | (+handleAttrs << 1) | +children,
 	      b = classes[n];
 	if (b) {
 		return b;
 	}
-	const base = children ? getClass(addRemove, handleAttrs, false) : handleAttrs ? getClass(addRemove, false, false) : HTMLElement;
+	const base = addRemove ? getClass(false, handleAttrs, children) : handleAttrs ? getClass(false, false, children) : HTMLElement;
 	return classes[n] = children ? class extends base {
-		constructor() {
-			super();
-			childObserver.observe(this, childList);
+		connectedCallback() {
+			this.dispatchEvent(new CustomEvent("attached"));
 		}
-		observeChildren(fn: ChildWatchFn) {
-			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
+		disconnectedCallback() {
+			this.dispatchEvent(new CustomEvent("removed"));
 		}
 	} : handleAttrs ? class extends base {
 		#acts: Bind[] = [];
@@ -193,11 +192,12 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			return attribute;
 		}
 	} : addRemove ? class extends base {
-		connectedCallback() {
-			this.dispatchEvent(new CustomEvent("attached"));
+		constructor() {
+			super();
+			childObserver.observe(this, childList);
 		}
-		disconnectedCallback() {
-			this.dispatchEvent(new CustomEvent("removed"));
+		observeChildren(fn: ChildWatchFn) {
+			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 		}
 	} : base;
       },
