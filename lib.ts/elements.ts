@@ -178,7 +178,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 				super.setAttribute(qualifiedName, value);
 			}
 		}
-		setAttributeNode(attribute: Attr){
+		setAttributeNode(attribute: Attr) {
 			const attr = this.getAttributeNode(attribute.name);
 			if (setAttr(this, attribute.name, attribute.value) === null) {
 				return super.setAttributeNode(attribute);
@@ -190,7 +190,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 				super.removeAttribute(qualifiedName);
 			}
 		}
-		removeAttributeNode(attribute: Attr){
+		removeAttributeNode(attribute: Attr) {
 			if (setAttr(this, attribute.name, Null) === null) {
 				return super.removeAttributeNode(attribute);
 			}
