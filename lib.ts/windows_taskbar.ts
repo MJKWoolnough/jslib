@@ -67,7 +67,7 @@ const windowObservations = {
 		">ul": {
 			"top": 0,
 			"bottom": "unset",
-			"border-width": "0 0 1px 0",
+			"border-width": "0 0 1px 0"
 		},
 		"::slotted(windows-desktop)": {
 			"padding-top": "var(--taskbar-size, 4em)",
@@ -87,7 +87,7 @@ const windowObservations = {
 		">ul": {
 			"left": "unset",
 			"right": 0,
-			"border-width": "0 0 0 1px",
+			"border-width": "0 0 0 1px"
 		},
 		" ::slotted(windows-desktop)": {
 			"padding-right": "var(--taskbar-size, 4em)",
@@ -131,7 +131,7 @@ const windowObservations = {
 	},
 	"([hide=\"icon\"])>ul img,([hide=\"title\"])>ul span": {
 		"display": "none"
-	},
+	}
       }).add("::slotted(windows-window:last-of-type)", {
 	"--overlay-on": "none"
       }).add("::slotted(windows-desktop)", {
