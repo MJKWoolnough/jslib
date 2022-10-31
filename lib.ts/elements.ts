@@ -112,6 +112,22 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	      m.set(k, v);
 	      return v;
       },
+      act = (c: Node, names: string | string[], fn: (newValue: ToString) => void) => {
+	if (names instanceof Array) {
+		return new BindMulti(c, names, fn);
+	} else {
+		const attr = getAttr(c, names);
+		fn(attr.value);
+		return new BindFn(attr, fn);
+	}
+      },
+      attr = (c: Node, names: string | string[], fn?: AttrFn) => {
+	if (names instanceof Array) {
+		return new BindMulti(c, names, fn!);
+	}
+	const attr = getAttr(c, names);
+	return fn instanceof Function ? new BindFn(attr, fn) : attr;
+      },
       childList = {"childList": true},
       classes: (typeof HTMLElement | null)[] = Array.from({"length": 8}, _ => null),
       getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean): typeof HTMLElement => {
@@ -135,21 +151,10 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			attrs.set(this, new Map());
 		}
 		act(names: string | string[], fn: (newValue: ToString) => void) {
-			if (names instanceof Array) {
-				this.#acts.push(new BindMulti(this, names, fn));
-			} else {
-				const attr = getAttr(this, names);
-				fn(attr.value);
-				this.#acts.push(new BindFn(attr, fn));
-			}
+			this.#acts.push(act(this, names, fn));
 		}
 		attr(names: string | string[], fn?: AttrFn) {
-			if (names instanceof Array) {
-				return new BindMulti(this, names, fn!);
-			} else {
-				const attr = getAttr(this, names);
-				return fn instanceof Function ? new BindFn(attr, fn) : attr;
-			}
+			return attr(this, names, fn);
 		}
 		addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
 			if (setAttr(this, "on" + type, listener) === null) {
@@ -226,21 +231,10 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			attrs.set(this, new Map());
 		}
 		act(names: string | string[], fn: (newValue: ToString) => void) {
-			if (names instanceof Array) {
-				this.#acts.push(new BindMulti(this, names, fn));
-			} else {
-				const attr = getAttr(this, names);
-				fn(attr.value);
-				this.#acts.push(new BindFn(attr, fn));
-			}
+			this.#acts.push(act(this, names, fn));
 		}
 		attr(names: string | string[], fn?: AttrFn) {
-			if (names instanceof Array) {
-				return new BindMulti(this, names, fn!);
-			} else {
-				const attr = getAttr(this, names);
-				return fn instanceof Function ? new BindFn(attr, fn) : attr;
-			}
+			return attr(this, names, fn);
 		}
 		addEventListener(type: string, listener: EventListenerOrEventListenerObject, _options?: boolean | AddEventListenerOptions) {
 			setAttr(this, "on" + type, listener);
