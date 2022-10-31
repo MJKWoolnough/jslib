@@ -306,5 +306,5 @@ export default ((fn: (elem: Node) => Children, options?: Options) => {
 	if (!psuedo) {
 		customElements.define(name, element as CustomElementConstructor);
 	}
-	return classOnly ? element : psuedo ? Object.defineProperty(((properties?: Props, children?: Children) => amendNode(new element(), properties, children)) as DOMBind<DocumentFragment>, "name", {"value": name}) : bindElement<HTMLElement>(ns, name);
+	return classOnly ? element : psuedo ? (properties?: Props, children?: Children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
 }) as ElementFactory;
