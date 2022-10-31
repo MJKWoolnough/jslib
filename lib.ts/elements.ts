@@ -207,6 +207,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	} : base;
       },
       psuedos: (typeof DocumentFragment | null)[] = Array.from({"length": 4}, _ => null),
+      noop = () => {},
       getPsuedo = (handleAttrs: boolean, children: boolean): typeof DocumentFragment => {
 	const n = +handleAttrs | (+children << 1),
 	      b = psuedos[n];
@@ -224,8 +225,8 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		}
 	} : handleAttrs ? class extends base {
 		#acts: Bind[] = [];
-		readonly classList = {};
-		readonly style = {};
+		readonly classList = {toggle: noop};
+		readonly style = {removeProperty: noop, setProperty: noop};
 		constructor() {
 			super();
 			attrs.set(this, new Map());
