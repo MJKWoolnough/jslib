@@ -129,7 +129,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	return fn instanceof Function ? new BindFn(attr, fn) : attr;
       },
       childList = {"childList": true},
-      classes: (typeof HTMLElement | null)[] = Array.from({"length": 8}, _ => null),
+      classes: (typeof HTMLElement | undefined)[] = Array.from({"length": 8}),
       getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean): typeof HTMLElement => {
 	const n = (+addRemove << 2) | (+handleAttrs << 1) | +children,
 	      b = classes[n];
@@ -188,7 +188,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		}
 	} : base;
       },
-      psuedos: (typeof DocumentFragment | null)[] = Array.from({"length": 4}, _ => null),
+      psuedos: (typeof DocumentFragment | undefined)[] = Array.from({"length": 4}),
       noop = () => {},
       getPsuedo = (handleAttrs: boolean, children: boolean): typeof DocumentFragment => {
 	const n = +handleAttrs | (+children << 1),
