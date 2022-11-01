@@ -157,44 +157,26 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 			return attr(this, names, fn);
 		}
 		addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
-			if (setAttr(this, "on" + type, listener) === null) {
-				super.addEventListener(type, listener, options);
-			}
+			setAttr(this, "on" + type, listener) ?? super.addEventListener(type, listener, options);
 		}
 		removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
-			if (setAttr(this, "on" + type, Null) === null) {
-				super.removeEventListener(type, listener, options);
-			}
+			setAttr(this, "on" + type, Null) === null ?? super.removeEventListener(type, listener, options);
 		}
 		toggleAttribute(qualifiedName: string, force?: boolean) {
-			const ret = setAttr(this, qualifiedName, force ?? null);
-			if (ret === null) {
-				return super.toggleAttribute(qualifiedName, force);
-			}
-			return ret;
+			return setAttr(this, qualifiedName, force ?? null) ?? super.toggleAttribute(qualifiedName, force);
 		}
 		setAttribute(qualifiedName: string, value: string) {
-			if (setAttr(this, qualifiedName, value) === null) {
-				super.setAttribute(qualifiedName, value);
-			}
+			setAttr(this, qualifiedName, value) ?? super.setAttribute(qualifiedName, value);
 		}
 		setAttributeNode(attribute: Attr) {
 			const attr = this.getAttributeNode(attribute.name);
-			if (setAttr(this, attribute.name, attribute.value) === null) {
-				return super.setAttributeNode(attribute);
-			}
-			return attr;
+			return setAttr(this, attribute.name, attribute.value) === null ? super.setAttributeNode(attribute) : attr;
 		}
 		removeAttribute(qualifiedName: string) {
-			if (setAttr(this, qualifiedName, Null) === null) {
-				super.removeAttribute(qualifiedName);
-			}
+			setAttr(this, qualifiedName, Null) ?? super.removeAttribute(qualifiedName);
 		}
 		removeAttributeNode(attribute: Attr) {
-			if (setAttr(this, attribute.name, Null) === null) {
-				return super.removeAttributeNode(attribute);
-			}
-			return attribute;
+			return setAttr(this, attribute.name, Null) === null ? super.removeAttributeNode(attribute) : attribute;
 		}
 	} : addRemove ? class extends base {
 		constructor() {
