@@ -3755,17 +3755,17 @@
 				return ids[0] === "_0" && ids[1] === "_1" && ids[2] === "_2";
 			}
 		},
-		"query": {
+		"at": {
 			"@supports": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
-				return css.query("@supports (display: flex)", {"a": {"opacity": 0}}) + "" === "@supports (display: flex) {\n  a { opacity: 0; }\n}";
+				return css.at("@supports (display: flex)", {"a": {"opacity": 0}}) + "" === "@supports (display: flex) {\n  a { opacity: 0; }\n}";
 
 			},
 			"@media": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
-				return css.query("@media screen and (min-width: 900px)", {
+				return css.at("@media screen and (min-width: 900px)", {
 					"article": {
 						"padding": "1rem 3rem"
 					}
