@@ -177,12 +177,13 @@ export const amendNode: mElement = (node?: EventTarget | null, properties?: Prop
 			node.setAttributeNode(prop.cloneNode() as Attr);
 		}
 	} else if (node && typeof properties === "object") {
+		const isNode = isNodeAttributes(node);
 		for (const k in properties) {
 			const prop = properties[k as keyof Props];
 			if (isEventObject(prop) && k.startsWith("on")) {
 				const arr = prop instanceof Array;
 				node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.slice(2), arr ? prop[0] : prop, arr ? prop[1] : false);
-			} else if (isNodeAttributes(node)) {
+			} else if (isNode) {
 				if (typeof prop === "boolean") {
 					node.toggleAttribute(k, prop);
 				} else if (prop === undefined) {
