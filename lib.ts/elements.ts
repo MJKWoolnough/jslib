@@ -33,24 +33,24 @@ interface ChildClass {
 }
 
 interface ElementFactory {
-	(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options): DOMBind<HTMLElement & AttrClass & ChildClass>;
-	(fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false}): DOMBind<HTMLElement & ChildClass>;
-	(fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false}): DOMBind<HTMLElement & AttrClass>;
+	(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options): DOMBind<HTMLElement>;
+	(fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false}): DOMBind<HTMLElement>;
+	(fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false}): DOMBind<HTMLElement>;
 	(fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false}): DOMBind<HTMLElement>;
 
-	(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options & {classOnly: true}): HTMLElement & AttrClass & ChildClass;
-	(fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false, classOnly: true}): HTMLElement & ChildClass;
-	(fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false, classOnly: true}): HTMLElement & AttrClass;
+	(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options & {classOnly: true}): HTMLElement;
+	(fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false, classOnly: true}): HTMLElement;
+	(fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {observeChildren: false, classOnly: true}): HTMLElement;
 	(fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false, classOnly: true}): HTMLElement;
 
-	(fn: (elem: DocumentFragment & AttrClass & ChildClass) => Children, options: Options & {psuedo: true}): DOMBind<DocumentFragment & AttrClass & ChildClass>;
-	(fn: (elem: DocumentFragment & ChildClass) => Children, options: Options & {attrs: false, psuedo: true}): DOMBind<DocumentFragment & ChildClass>;
-	(fn: (elem: DocumentFragment & AttrClass) => Children, options: Options & {observeChildren: false, psuedo: true}): DOMBind<DocumentFragment & AttrClass>;
+	(fn: (elem: DocumentFragment & AttrClass & ChildClass) => Children, options: Options & {psuedo: true}): DOMBind<DocumentFragment>;
+	(fn: (elem: DocumentFragment & ChildClass) => Children, options: Options & {attrs: false, psuedo: true}): DOMBind<DocumentFragment>;
+	(fn: (elem: DocumentFragment & AttrClass) => Children, options: Options & {observeChildren: false, psuedo: true}): DOMBind<DocumentFragment>;
 	(fn: (elem: DocumentFragment) => Children, options: Options & {attrs: false, observeChildren: false, psuedo: true}): DOMBind<DocumentFragment>;
 
-	(fn: (elem: DocumentFragment & AttrClass & ChildClass) => Children, options?: Options & {classOnly: true, psuedo: true}): DocumentFragment & AttrClass & ChildClass;
-	(fn: (elem: DocumentFragment & ChildClass) => Children, options: Options & {attrs: false, classOnly: true, psuedo: true}): DocumentFragment & ChildClass;
-	(fn: (elem: DocumentFragment & AttrClass) => Children, options: Options & {observeChildren: false, classOnly: true, psuedo: true}): DocumentFragment & AttrClass;
+	(fn: (elem: DocumentFragment & AttrClass & ChildClass) => Children, options?: Options & {classOnly: true, psuedo: true}): DocumentFragment;
+	(fn: (elem: DocumentFragment & ChildClass) => Children, options: Options & {attrs: false, classOnly: true, psuedo: true}): DocumentFragment;
+	(fn: (elem: DocumentFragment & AttrClass) => Children, options: Options & {observeChildren: false, classOnly: true, psuedo: true}): DocumentFragment;
 	(fn: (elem: DocumentFragment) => Children, options: Options & {attrs: false, observeChildren: false, classOnly: true, psuedo: true}): DocumentFragment;
 }
 
