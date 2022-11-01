@@ -26,13 +26,17 @@ export default class CSS extends CSSStyleSheet {
 		}
 		return this;
 	}
-	query(query, defs) {
-		const c = new CSS(this.#idPrefix, this.#id);
-		for (const s in defs) {
-			c.add(s, defs[s]);
+	at(at, defs) {
+		if (defs) {
+			const c = new CSS(this.#idPrefix, this.#id);
+			for (const s in defs) {
+				c.add(s, defs[s]);
+			}
+			this.#id = c.#id;
+			this.insertRule(at + "{" + c + "}");
+		} else {
+			this.insertRule(at);
 		}
-		this.#id = c.#id;
-		this.insertRule(query + "{" + c + "}");
 		return this;
 	}
 	id() {
@@ -97,7 +101,7 @@ const split = selector => {
       defaultCSS = new CSS();
 
 export const add = (selector, def) => defaultCSS.add(selector, def),
-query = (query, defs) => defaultCSS.query(query, defs),
+at = (at, defs) => defaultCSS.at(at, defs),
 id = () => defaultCSS.id(),
 ids = n => defaultCSS.ids(n),
 render = () => defaultCSS.render();
