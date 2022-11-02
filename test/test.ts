@@ -3789,5 +3789,90 @@
 				}) + "").replaceAll("  ", "").replaceAll(" \n", "\n") /* Hack to get FF and Chrome output to match */ === "@keyframes identifier {\n0% { top: 0px; }\n100% { left: 0px; }\n}";
 			}
 		}
+	},
+	"elements.js": {
+		"observeChildren": {
+			"options": async () => {
+				const {default: e} = await import("./lib/elements.js");
+				let res = 0;
+				e(e => {
+					res += +!!e.observeChildren;
+					return [];
+				}, {"observeChildren": true})()
+				e(e => {
+					res += +!(e as any).observeChildren;
+					return [];
+				}, {"observeChildren": false})();
+				return res === 2;
+			},
+			"add": async () => {
+				let res = false,
+				    done = () => {};
+				const p = new Promise<void>(r => done = r),
+				      {default: e} = await import("./lib/elements.js"),
+				      tag = e(e => {
+					e.observeChildren((added, removed) => {
+						res = added.length === 1 && added[0] instanceof HTMLBRElement && removed.length === 0;
+						done();
+					});
+					      return [];
+				      });
+				tag().appendChild(document.createElement("br"));
+				return p.then(() => res);
+			},
+			"add multiple": async () => {
+				let res = false,
+				    done = () => {};
+				const p = new Promise<void>(r => done = r),
+				      {default: e} = await import("./lib/elements.js"),
+				      tag = e(e => {
+					e.observeChildren((added, removed) => {
+						res = added.length === 3 && added[0] instanceof HTMLBRElement && added[1] instanceof HTMLDivElement && added[2] instanceof HTMLSpanElement && removed.length === 0;
+						done();
+					});
+					return [];
+				      });
+				tag().append(document.createElement("br"), document.createElement("div"), document.createElement("span"));
+				return p.then(() => res);
+			},
+			"remove": async () => {
+				let res = false,
+				    done = () => {};
+				const p = new Promise<void>(r => done = r),
+				      {default: e} = await import("./lib/elements.js"),
+				      tag = e(e => {
+					e.observeChildren((added, removed) => {
+						if (added.length === 0) {
+							res = removed.length === 1 && removed[0] instanceof HTMLBRElement;
+							done();
+						}
+					});
+					return [];
+				      }),
+				      t = tag();
+				t.appendChild(document.createElement("br"));
+				t.replaceChildren();
+				return p.then(() => res);
+			},
+			"remove multiple": async () => {
+				let res = false,
+				    done = () => {};
+				const p = new Promise<void>(r => done = r),
+				      {default: e} = await import("./lib/elements.js"),
+				      tag = e(e => {
+					e.observeChildren((added, removed) => {
+						if (added.length === 0) {
+							res = added.length === 0 && removed.length === 3 && removed[0] instanceof HTMLBRElement && removed[1] instanceof HTMLDivElement && removed[2] instanceof HTMLSpanElement;
+							done();
+						}
+					});
+					      return [];
+				      }),
+				      t = tag();
+				t.append(document.createElement("br"), document.createElement("div"), document.createElement("span"));
+				t.replaceChildren();
+				return p.then(() => res);
+			}
+		}
 	}
 });
