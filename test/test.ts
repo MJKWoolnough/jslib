@@ -3791,8 +3791,56 @@
 		}
 	},
 	"elements.js": {
-		"observeChildren": {
-			"options": async () => {
+		"options": {
+			"HTMLElement": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      tag = e(e => {
+					res += +(e instanceof HTMLElement);
+					return [];
+				      }),
+				      t  = tag();
+				res += +(tag instanceof Function);
+				res += +(t instanceof HTMLElement);
+				return res === 3;
+			},
+			"DocumentFragment": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      tag = e(e => {
+					res += +(e instanceof DocumentFragment);
+					return [];
+				      }, {"psuedo": true}),
+				      t  = tag();
+				res += +(tag instanceof Function);
+				res += +(t instanceof DocumentFragment);
+				return res === 3;
+			},
+			"HTMLElement class": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      tag = e(e => {
+					res += +(e instanceof HTMLElement);
+					return [];
+				      }, {"classOnly": true}),
+				      t  = new tag();
+				res += +(tag instanceof Function);
+				res += +(t instanceof HTMLElement);
+				return res === 3;
+			},
+			"DocumentFragment class": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      tag = e(e => {
+					res += +(e instanceof DocumentFragment);
+					return [];
+				      }, {"classOnly": true, "psuedo": true}),
+				      t  = new tag();
+				res += +(tag instanceof Function);
+				res += +(t instanceof DocumentFragment);
+				return res === 3;
+			},
+			"observeChildren": async () => {
 				const {default: e} = await import("./lib/elements.js");
 				let res = 0;
 				e(e => {
@@ -3805,6 +3853,47 @@
 				}, {"observeChildren": false})();
 				return res === 2;
 			},
+			"observeChildren (psuedo)": async () => {
+				const {default: e} = await import("./lib/elements.js");
+				let res = 0;
+				e(e => {
+					res += +!!e.observeChildren;
+					return [];
+				}, {"observeChildren": true, "psuedo": true})()
+				e(e => {
+					res += +!(e as any).observeChildren;
+					return [];
+				}, {"observeChildren": false, "psuedo": true})();
+				return res === 2;
+			},
+			"attrs": async () => {
+				const {default: e} = await import("./lib/elements.js");
+				let res = 0;
+				e(e => {
+					res += +!!e.attr;
+					return [];
+				}, {"attrs": true})()
+				e(e => {
+					res += +!(e as any).attr;
+					return [];
+				}, {"attrs": false})();
+				return res === 2;
+			},
+			"attrs (psuedo)": async () => {
+				const {default: e} = await import("./lib/elements.js");
+				let res = 0;
+				e(e => {
+					res += +!!e.attr;
+					return [];
+				}, {"attrs": true, "psuedo": true})()
+				e(e => {
+					res += +!(e as any).attr;
+					return [];
+				}, {"attrs": false, "psuedo": true})();
+				return res === 2;
+			}
+		},
+		"observeChildren": {
 			"add": async () => {
 				let res = false,
 				    done = () => {};
@@ -3875,19 +3964,6 @@
 			}
 		},
 		"observeChildren (psuedo)": {
-			"options": async () => {
-				const {default: e} = await import("./lib/elements.js");
-				let res = 0;
-				e(e => {
-					res += +!!e.observeChildren;
-					return [];
-				}, {"observeChildren": true, "psuedo": true})()
-				e(e => {
-					res += +!(e as any).observeChildren;
-					return [];
-				}, {"observeChildren": false, "psuedo": true})();
-				return res === 2;
-			},
 			"add": async () => {
 				let res = false,
 				    done = () => {};
