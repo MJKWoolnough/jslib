@@ -84,7 +84,7 @@ const attrs = new WeakMap(),
 		return b;
 	}
 	const base = addRemove ? getClass(false, handleAttrs, children) : handleAttrs ? getClass(false, false, children) : HTMLElement;
-	return classes[n] = children ? class extends base {
+	return classes[n] = addRemove ? class extends base {
 		connectedCallback() {
 			this.dispatchEvent(new CustomEvent("attached"));
 		}
@@ -125,7 +125,7 @@ const attrs = new WeakMap(),
 		removeAttributeNode(attribute) {
 			return setAttr(this, attribute.name, Null) === null ? super.removeAttributeNode(attribute) : attribute;
 		}
-	} : addRemove ? class extends base {
+	} : children ? class extends base {
 		constructor() {
 			super();
 			childObserver.observe(this, childList);
