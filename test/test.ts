@@ -3770,7 +3770,24 @@
 						"padding": "1rem 3rem"
 					}
 				}) + "" === "@media screen and (min-width: 900px) {\n  article { padding: 1rem 3rem; }\n}";
-			}
+			},
+			"@namespace": async() => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      css = new CSS();
+				return css.at(`@namespace svg url(http://www.w3.org/2000/svg)`) + "" === `@namespace svg url("http://www.w3.org/2000/svg");`;
+			},
+			"@keyframes": async() => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      css = new CSS();
+				return (css.at("@keyframes identifier", {
+					"0%": {
+						"top": 0
+					},
+					"100%": {
+						"left": 0
+					}
+				}) + "").replaceAll("  ", "").replaceAll(" \n", "\n") /* Hack to get FF and Chrome output to match */ === "@keyframes identifier {\n0% { top: 0px; }\n100% { left: 0px; }\n}";
+			},
 		}
 	}
 });
