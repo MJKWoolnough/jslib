@@ -3787,7 +3787,7 @@
 						"left": 0
 					}
 				}) + "").replaceAll("  ", "").replaceAll(" \n", "\n") /* Hack to get FF and Chrome output to match */ === "@keyframes identifier {\n0% { top: 0px; }\n100% { left: 0px; }\n}";
-			},
+			}
 		}
 	}
 });
