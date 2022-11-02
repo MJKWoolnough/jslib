@@ -8,34 +8,43 @@ export default class CSS extends CSSStyleSheet {
 		this.#idPrefix = idRE.test(prefix) ? prefix : "_";
 		this.#id = idStart;
 	}
+	#compileRule(selector, def) {
+		const rules = [];
+		let data = "";
+		for (const key in def) {
+			const v = def[key];
+			if (isDef(v)) {
+				rules.push(...this.#compileRule(join(selector, key), v));
+			} else {
+				data += `${key}:${v};`;
+			}
+		}
+		if (data) {
+			rules.unshift(selector + "{" + data + "}");
+		}
+		return rules;
+	}
 	add(selector, def) {
 		if (selector.trim()) {
-			const pos = this.cssRules.length;
-			let data = "";
-			for (const key in def) {
-				const v = def[key];
-				if (isDef(v)) {
-					this.add(join(selector, key), v);
-				} else {
-					data += `${key}:${v};`;
-				}
-			}
-			if (data) {
-				this.insertRule(selector + "{" + data + "}", pos);
+			for (const rule of this.#compileRule(selector, def)) {
+				this.insertRule(rule, this.cssRules.length);
 			}
 		}
 		return this;
 	}
 	at(at, defs) {
-		if (defs) {
-			const c = new CSS(this.#idPrefix, this.#id);
-			for (const s in defs) {
-				c.add(s, defs[s]);
+		if (at.trim()) {
+			if (defs) {
+				let data = "";
+				for (const def in defs) {
+					for (const rule of this.#compileRule(def, defs[def])) {
+						data += rule;
+					}
+				}
+				this.insertRule(at + "{" + data + "}");
+			} else {
+				this.insertRule(at);
 			}
-			this.#id = c.#id;
-			this.insertRule(at + "{" + c + "}");
-		} else {
-			this.insertRule(at);
 		}
 		return this;
 	}
