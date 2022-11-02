@@ -3904,7 +3904,7 @@
 						res = added.length === 1 && added[0] instanceof HTMLBRElement && removed.length === 0;
 						done();
 					});
-					      return [];
+					return [];
 				      });
 				tag().appendChild(document.createElement("br"));
 				return p.then(() => res);
@@ -3955,7 +3955,7 @@
 							done();
 						}
 					});
-					      return [];
+					return [];
 				      }),
 				      t = tag();
 				t.append(document.createElement("br"), document.createElement("div"), document.createElement("span"));
@@ -3974,7 +3974,7 @@
 						res = added.length === 1 && added[0] instanceof HTMLBRElement && removed.length === 0;
 						done();
 					});
-					      return [];
+					return [];
 				      }, {"psuedo": true});
 				tag().appendChild(document.createElement("br"));
 				return p.then(() => res);
@@ -4025,7 +4025,7 @@
 							done();
 						}
 					});
-					      return [];
+					return [];
 				      }, {"psuedo": true}),
 				      t = tag();
 				t.append(document.createElement("br"), document.createElement("div"), document.createElement("span"));
