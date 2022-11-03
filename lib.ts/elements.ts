@@ -84,8 +84,6 @@ class BindMulti extends Bind {
 	}
 }
 
-let noObserve = false;
-
 const attrs = new WeakMap<Node, Map<string, Bind>>(),
       getAttr = (elem: Node, name: string) => {
 	const attrMap = attrs.get(elem)!;
@@ -93,9 +91,6 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
       },
       cw = new WeakMap<Node, ChildWatchFn[]>(),
       childObserver = new MutationObserver(list => {
-	if (noObserve) {
-		return;
-	}
 	for (const record of list) {
 		if (record.type === "childList") {
 			for (const fn of cw.get(record.target) ?? []) {
@@ -198,10 +193,6 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	}
 	const base = children ? getPsuedo(handleAttrs, false) : DocumentFragment;
 	return psuedos[n] = children ? class extends base {
-		constructor() {
-			super();
-			childObserver.observe(this, childList);
-		}
 		observeChildren(fn: ChildWatchFn) {
 			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 		}
@@ -267,10 +258,10 @@ export default ((fn: (elem: Node) => Children, options: Options = {}) => {
 	      element = psuedo ? class extends getPsuedo(attrs, observeChildren) {
 		constructor() {
 			super();
-			const c = fn(this);
-			noObserve = true;
-			amendNode(this, c);
-			noObserve = false;
+			amendNode(this, fn(this));
+			if (observeChildren) {
+				childObserver.observe(this, childList);
+			}
 		}
 	      } : class extends getClass(attachRemoveEvent, attrs, observeChildren) {
 		constructor() {
