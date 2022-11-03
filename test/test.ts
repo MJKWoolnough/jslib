@@ -4052,6 +4052,34 @@
 				tag().appendChild(document.createElement("br"));
 				return p.then(() => res === 1);
 			}
+		},
+		"attachRemove": {
+			"attachRemove": async () => {
+				const {default: e} = await import("./lib/elements.js"),
+				      div = document.createElement("div"),
+				      t = e(() => [])();
+				let res = 0;
+				document.body.append(div);
+				t.addEventListener("attached", () => res++);
+				t.addEventListener("removed", () => res *= 3);
+				div.append(t);
+				t.remove();
+				div.remove();
+				return res === 3;
+			},
+			"attachRemove: false": async () => {
+				const {default: e} = await import("./lib/elements.js"),
+				      div = document.createElement("div"),
+				      t = e(() => [], {"attachRemoveEvent": false})();
+				let res = 0;
+				document.body.append(div);
+				t.addEventListener("attached", () => res++);
+				t.addEventListener("removed", () => res *= 3);
+				div.append(t);
+				t.remove();
+				div.remove();
+				return res === 0;
+			}
 		}
 	}
 });
