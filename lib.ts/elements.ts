@@ -69,18 +69,25 @@ class BindMulti extends Bind {
 	#fn: AttrFn;
 	constructor(elem: Node, names: string[], fn: Function) {
 		super("");
+		let calling = false;
 		const obj: Record<string, Bind> = {},
-		      afn = this.#fn = () => {
+		      afn = this.#fn = (val: ToString) => {
+			if (calling) {
+				return val;
+			}
+			calling = true;
 			const o: Record<string, ToString> = {};
 			for (const n in obj) {
 				o[n] = obj[n].value;
 			}
+			calling = false;
 			this.value = fn(o) ?? Null;
+			return val;
 		};
 		for (const n of names) {
 			obj[n] = new BindFn(getAttr(elem, n), this.#fn);
 		}
-		afn();
+		afn("");
 	}
 }
 
