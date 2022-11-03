@@ -4084,6 +4084,45 @@
 				div.remove();
 				return res === 0;
 			}
+		},
+		"attrs": {
+			"set and update": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      {amendNode} = await import("./lib/dom.js"),
+				      div = document.createElement("div"),
+				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr")})),
+				      tag = t();
+				res += +(div.getAttribute("someAttr") === "");
+				tag.setAttribute("thatAttr", "abc");
+				res += +(div.getAttribute("someAttr") === "abc");
+				return res === 2;
+			},
+			"set fn and update": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      {amendNode} = await import("./lib/dom.js"),
+				      div = document.createElement("div"),
+				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)})),
+				      tag = t();
+				res += +(div.getAttribute("someAttr") === "1");
+				amendNode(tag, {"thatAttr": 5});
+				res += +(div.getAttribute("someAttr") === "6");
+				return res === 2;
+			},
+			"process fn": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      {amendNode} = await import("./lib/dom.js"),
+				      t = e(e => {
+					      e.act("thatAttr", (a: number) => res += +a || 0);
+					      return [];
+				      }),
+				      tag = t();
+				amendNode(tag, {"thatAttr": 5});
+				amendNode(tag, {"thatAttr": 2});
+				return res === 7;
+			}
 		}
 	}
 });
