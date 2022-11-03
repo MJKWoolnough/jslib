@@ -4113,8 +4113,8 @@
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      t = e(e => {
-					      e.act("thatAttr", (a: number) => res += +a || 0);
-					      return [];
+					e.act("thatAttr", (a: number) => res += +a || 0);
+					return [];
 				      })();
 				amendNode(t, {"thatAttr": 5});
 				amendNode(t, {"thatAttr": 2});
@@ -4149,8 +4149,8 @@
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      t = e(e => {
-					      e.act("thatAttr", (a: number) => res += +a || 0);
-					      return [];
+					e.act("thatAttr", (a: number) => res += +a || 0);
+					return [];
 				      }, {"psuedo": true})();
 				amendNode(t, {"thatAttr": 5});
 				amendNode(t, {"thatAttr": 2});
