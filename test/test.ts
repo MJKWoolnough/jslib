@@ -4108,6 +4108,19 @@
 				res += +(div.getAttribute("someAttr") === "6");
 				return res === 2;
 			},
+			"set multiple fn and update": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      {amendNode} = await import("./lib/dom.js"),
+				      div = document.createElement("div"),
+				      t = e(e => amendNode(div, {"someAttr": e.attr(["thatAttr", "otherAttr"], ({thatAttr, otherAttr}: {thatAttr: number, otherAttr: number}) => ((+thatAttr || 0) + 1) * ((+otherAttr || 0) + 1))}))();
+				res += +(div.getAttribute("someAttr") === "1");
+				amendNode(t, {"thatAttr": 3});
+				res += +(div.getAttribute("someAttr") === "4");
+				amendNode(t, {"otherAttr": 4});
+				res += +(div.getAttribute("someAttr") === "20");
+				return res === 3;
+			},
 			"process fn": async () => {
 				let res = 0;
 				const {default: e} = await import("./lib/elements.js"),
