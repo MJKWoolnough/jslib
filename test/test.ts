@@ -3891,6 +3891,10 @@
 					return [];
 				}, {"attrs": false, "psuedo": true})();
 				return res === 2;
+			},
+			"custom name": async () => {
+				const {default: e} = await import("./lib/elements.js");
+				return e(() => [], {"name": "custom-name"}).name === "custom-name";
 			}
 		},
 		"observeChildren": {
