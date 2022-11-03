@@ -4031,6 +4031,26 @@
 				t.append(document.createElement("br"), document.createElement("div"), document.createElement("span"));
 				t.replaceChildren();
 				return p.then(() => res);
+			},
+			"add during": async () => {
+				let res = 0,
+				    check = false,
+				    done = () => {};
+				const p = new Promise<void>(r => done = r),
+				      {default: e} = await import("./lib/elements.js"),
+				      tag = e(e => {
+					e.appendChild(document.createElement("br"));
+					e.observeChildren((added, removed) => {
+						res += +(added.length === 1 && added[0] instanceof HTMLBRElement && removed.length === 0);
+						if (check) {
+							done();
+						}
+					});
+					return document.createElement("br");
+				      }, {"psuedo": true});
+				check = true;
+				tag().appendChild(document.createElement("br"));
+				return p.then(() => res === 1);
 			}
 		}
 	}
