@@ -4091,10 +4091,9 @@
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr")})),
-				      tag = t();
+				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr")}))();
 				res += +(div.getAttribute("someAttr") === "");
-				tag.setAttribute("thatAttr", "abc");
+				t.setAttribute("thatAttr", "abc");
 				res += +(div.getAttribute("someAttr") === "abc");
 				return res === 2;
 			},
@@ -4103,10 +4102,9 @@
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)})),
-				      tag = t();
+				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)}))();
 				res += +(div.getAttribute("someAttr") === "1");
-				amendNode(tag, {"thatAttr": 5});
+				amendNode(t, {"thatAttr": 5});
 				res += +(div.getAttribute("someAttr") === "6");
 				return res === 2;
 			},
@@ -4117,10 +4115,9 @@
 				      t = e(e => {
 					      e.act("thatAttr", (a: number) => res += +a || 0);
 					      return [];
-				      }),
-				      tag = t();
-				amendNode(tag, {"thatAttr": 5});
-				amendNode(tag, {"thatAttr": 2});
+				      })();
+				amendNode(t, {"thatAttr": 5});
+				amendNode(t, {"thatAttr": 2});
 				return res === 7;
 			}
 		},
@@ -4130,8 +4127,7 @@
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr")}), {"psuedo": true}),
-				      tag = t();
+				      tag = e(e => amendNode(div, {"someAttr": e.attr("thatAttr")}), {"psuedo": true})();
 				res += +(div.getAttribute("someAttr") === "");
 				amendNode(tag, {"thatAttr": "abc"});
 				res += +(div.getAttribute("someAttr") === "abc");
@@ -4142,10 +4138,9 @@
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)}), {"psuedo": true}),
-				      tag = t();
+				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)}), {"psuedo": true})();
 				res += +(div.getAttribute("someAttr") === "1");
-				amendNode(tag, {"thatAttr": 5});
+				amendNode(t, {"thatAttr": 5});
 				res += +(div.getAttribute("someAttr") === "6");
 				return res === 2;
 			},
@@ -4156,10 +4151,9 @@
 				      t = e(e => {
 					      e.act("thatAttr", (a: number) => res += +a || 0);
 					      return [];
-				      }, {"psuedo": true}),
-				      tag = t();
-				amendNode(tag, {"thatAttr": 5});
-				amendNode(tag, {"thatAttr": 2});
+				      }, {"psuedo": true})();
+				amendNode(t, {"thatAttr": 5});
+				amendNode(t, {"thatAttr": 2});
 				return res === 7;
 			}
 		}
