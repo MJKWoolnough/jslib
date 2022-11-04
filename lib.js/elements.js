@@ -192,10 +192,9 @@ const attrs = new WeakMap(),
 		}
 	} : base;
       },
-      genChars = () => String.fromCharCode(...Array.from({"length": 5}, _ => 97 + Math.floor(Math.random() * 26))),
       genName = () => {
 	let name;
-	while(customElements.get(name = genChars() + "-" + genChars())) {}
+	while(customElements.get(name = String.fromCharCode(...Array.from({"length": 11}, (_, n) => n === 5 ? 45 : 97 + Math.floor(Math.random() * 26))))) {}
 	return name;
       };
 
