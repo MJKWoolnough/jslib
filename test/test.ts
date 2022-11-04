@@ -3816,30 +3816,6 @@
 				res += +(t instanceof DocumentFragment);
 				return res === 3;
 			},
-			"HTMLElement class": async () => {
-				let res = 0;
-				const {default: e} = await import("./lib/elements.js"),
-				      tag = e(e => {
-					res += +(e instanceof HTMLElement);
-					return [];
-				      }, {"classOnly": true}),
-				      t  = new tag();
-				res += +(tag instanceof Function);
-				res += +(t instanceof HTMLElement);
-				return res === 3;
-			},
-			"DocumentFragment class": async () => {
-				let res = 0;
-				const {default: e} = await import("./lib/elements.js"),
-				      tag = e(e => {
-					res += +(e instanceof DocumentFragment);
-					return [];
-				      }, {"classOnly": true, "psuedo": true}),
-				      t  = new tag();
-				res += +(tag instanceof Function);
-				res += +(t instanceof DocumentFragment);
-				return res === 3;
-			},
 			"observeChildren": async () => {
 				const {default: e} = await import("./lib/elements.js");
 				let res = 0;
