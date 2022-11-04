@@ -80,96 +80,96 @@ const attrs = new WeakMap(),
       childList = {"childList": true},
       classes = Array.from({"length": 8}),
       getClass = (addRemove, handleAttrs, children) => classes[(+addRemove << 2) | (+handleAttrs << 1) | +children] ??= addRemove ? class extends getClass(false, handleAttrs, children) {
-		connectedCallback() {
-			this.dispatchEvent(new CustomEvent("attached"));
-		}
-		disconnectedCallback() {
-			this.dispatchEvent(new CustomEvent("removed"));
-		}
-	} : handleAttrs ? class extends getClass(false, false, children) {
-		#acts = [];
-		constructor() {
-			super();
-			attrs.set(this, new Map());
-		}
-		act(names, fn) {
-			this.#acts.push(act(this, names, fn));
-		}
-		attr(names, fn) {
-			return attr(this, names, fn);
-		}
-		addEventListener(type, listener, options) {
-			setAttr(this, "on" + type, listener) ?? super.addEventListener(type, listener, options);
-		}
-		removeEventListener(type, listener, options) {
-			setAttr(this, "on" + type, Null) === null ?? super.removeEventListener(type, listener, options);
-		}
-		toggleAttribute(qualifiedName, force) {
-			return setAttr(this, qualifiedName, force ?? null) ?? super.toggleAttribute(qualifiedName, force);
-		}
-		setAttribute(qualifiedName, value) {
-			setAttr(this, qualifiedName, value) ?? super.setAttribute(qualifiedName, value);
-		}
-		setAttributeNode(attribute) {
-			const attr = this.getAttributeNode(attribute.name);
-			return setAttr(this, attribute.name, attribute.value) === null ? super.setAttributeNode(attribute) : attr;
-		}
-		removeAttribute(qualifiedName) {
-			setAttr(this, qualifiedName, Null) ?? super.removeAttribute(qualifiedName);
-		}
-		removeAttributeNode(attribute) {
-			return setAttr(this, attribute.name, Null) === null ? super.removeAttributeNode(attribute) : attribute;
-		}
-	} : children ? class extends HTMLElement {
-		constructor() {
-			super();
-			childObserver.observe(this, childList);
-		}
-		observeChildren(fn) {
-			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
-		}
-	} : HTMLElement,
+	connectedCallback() {
+		this.dispatchEvent(new CustomEvent("attached"));
+	}
+	disconnectedCallback() {
+		this.dispatchEvent(new CustomEvent("removed"));
+	}
+      } : handleAttrs ? class extends getClass(false, false, children) {
+	#acts = [];
+	constructor() {
+		super();
+		attrs.set(this, new Map());
+	}
+	act(names, fn) {
+		this.#acts.push(act(this, names, fn));
+	}
+	attr(names, fn) {
+		return attr(this, names, fn);
+	}
+	addEventListener(type, listener, options) {
+		setAttr(this, "on" + type, listener) ?? super.addEventListener(type, listener, options);
+	}
+	removeEventListener(type, listener, options) {
+		setAttr(this, "on" + type, Null) === null ?? super.removeEventListener(type, listener, options);
+	}
+	toggleAttribute(qualifiedName, force) {
+		return setAttr(this, qualifiedName, force ?? null) ?? super.toggleAttribute(qualifiedName, force);
+	}
+	setAttribute(qualifiedName, value) {
+		setAttr(this, qualifiedName, value) ?? super.setAttribute(qualifiedName, value);
+	}
+	setAttributeNode(attribute) {
+		const attr = this.getAttributeNode(attribute.name);
+		return setAttr(this, attribute.name, attribute.value) === null ? super.setAttributeNode(attribute) : attr;
+	}
+	removeAttribute(qualifiedName) {
+		setAttr(this, qualifiedName, Null) ?? super.removeAttribute(qualifiedName);
+	}
+	removeAttributeNode(attribute) {
+		return setAttr(this, attribute.name, Null) === null ? super.removeAttributeNode(attribute) : attribute;
+	}
+      } : children ? class extends HTMLElement {
+	constructor() {
+		super();
+		childObserver.observe(this, childList);
+	}
+	observeChildren(fn) {
+		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
+	}
+      } : HTMLElement,
       psuedos = Array.from({"length": 4}),
       noop = () => {},
       getPsuedo = (handleAttrs, children) => psuedos[+handleAttrs | (+children << 1)] ??= children ? class extends getPsuedo(handleAttrs, false) {
-		observeChildren(fn) {
-			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
-		}
-	} : handleAttrs ? class extends DocumentFragment {
-		#acts = [];
-		classList = {toggle: noop};
-		style = {removeProperty: noop, setProperty: noop};
-		constructor() {
-			super();
-			attrs.set(this, new Map());
-		}
-		act(names, fn) {
-			this.#acts.push(act(this, names, fn));
-		}
-		attr(names, fn) {
-			return attr(this, names, fn);
-		}
-		addEventListener(type, listener) {
-			setAttr(this, "on" + type, listener);
-		}
-		removeEventListener(type) {
-			setAttr(this, "on" + type, Null);
-		}
-		getAttribute() {
-			return null;
-		}
-		getAttributeNode() {
-			return null;
-		}
-		toggleAttribute(qualifiedName, force) {
-			return setAttr(this, qualifiedName, force ?? null);
-		}
-		setAttribute(qualifiedName, value) {
-			setAttr(this, qualifiedName, value);
-		}
-		removeAttribute(qualifiedName) {
-			setAttr(this, qualifiedName, Null);
-		}
+	observeChildren(fn) {
+		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
+	}
+      } : handleAttrs ? class extends DocumentFragment {
+	#acts = [];
+	classList = {toggle: noop};
+	style = {removeProperty: noop, setProperty: noop};
+	constructor() {
+		super();
+		attrs.set(this, new Map());
+	}
+	act(names, fn) {
+		this.#acts.push(act(this, names, fn));
+	}
+	attr(names, fn) {
+		return attr(this, names, fn);
+	}
+	addEventListener(type, listener) {
+		setAttr(this, "on" + type, listener);
+	}
+	removeEventListener(type) {
+		setAttr(this, "on" + type, Null);
+	}
+	getAttribute() {
+		return null;
+	}
+	getAttributeNode() {
+		return null;
+	}
+	toggleAttribute(qualifiedName, force) {
+		return setAttr(this, qualifiedName, force ?? null);
+	}
+	setAttribute(qualifiedName, value) {
+		setAttr(this, qualifiedName, value);
+	}
+	removeAttribute(qualifiedName) {
+		setAttr(this, qualifiedName, Null);
+	}
       } : DocumentFragment,
       genName = () => {
 	let name;

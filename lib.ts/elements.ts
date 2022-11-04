@@ -122,96 +122,96 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
       childList = {"childList": true},
       classes: (typeof HTMLElement | undefined)[] = Array.from({"length": 8}),
       getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean): typeof HTMLElement => classes[(+addRemove << 2) | (+handleAttrs << 1) | +children] ??= addRemove ? class extends getClass(false, handleAttrs, children) {
-		connectedCallback() {
-			this.dispatchEvent(new CustomEvent("attached"));
-		}
-		disconnectedCallback() {
-			this.dispatchEvent(new CustomEvent("removed"));
-		}
-	} : handleAttrs ? class extends getClass(false, false, children) {
-		#acts: Bind[] = [];
-		constructor() {
-			super();
-			attrs.set(this, new Map());
-		}
-		act(names: string | string[], fn: (newValue: ToString) => void) {
-			this.#acts.push(act(this, names, fn));
-		}
-		attr(names: string | string[], fn?: AttrFn) {
-			return attr(this, names, fn);
-		}
-		addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
-			setAttr(this, "on" + type, listener) ?? super.addEventListener(type, listener, options);
-		}
-		removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
-			setAttr(this, "on" + type, Null) === null ?? super.removeEventListener(type, listener, options);
-		}
-		toggleAttribute(qualifiedName: string, force?: boolean) {
-			return setAttr(this, qualifiedName, force ?? null) ?? super.toggleAttribute(qualifiedName, force);
-		}
-		setAttribute(qualifiedName: string, value: string) {
-			setAttr(this, qualifiedName, value) ?? super.setAttribute(qualifiedName, value);
-		}
-		setAttributeNode(attribute: Attr) {
-			const attr = this.getAttributeNode(attribute.name);
-			return setAttr(this, attribute.name, attribute.value) === null ? super.setAttributeNode(attribute) : attr;
-		}
-		removeAttribute(qualifiedName: string) {
-			setAttr(this, qualifiedName, Null) ?? super.removeAttribute(qualifiedName);
-		}
-		removeAttributeNode(attribute: Attr) {
-			return setAttr(this, attribute.name, Null) === null ? super.removeAttributeNode(attribute) : attribute;
-		}
-	} : children ? class extends HTMLElement {
-		constructor() {
-			super();
-			childObserver.observe(this, childList);
-		}
-		observeChildren(fn: ChildWatchFn) {
-			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
-		}
-	} : HTMLElement,
+	connectedCallback() {
+		this.dispatchEvent(new CustomEvent("attached"));
+	}
+	disconnectedCallback() {
+		this.dispatchEvent(new CustomEvent("removed"));
+	}
+      } : handleAttrs ? class extends getClass(false, false, children) {
+	#acts: Bind[] = [];
+	constructor() {
+		super();
+		attrs.set(this, new Map());
+	}
+	act(names: string | string[], fn: (newValue: ToString) => void) {
+		this.#acts.push(act(this, names, fn));
+	}
+	attr(names: string | string[], fn?: AttrFn) {
+		return attr(this, names, fn);
+	}
+	addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
+		setAttr(this, "on" + type, listener) ?? super.addEventListener(type, listener, options);
+	}
+	removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) {
+		setAttr(this, "on" + type, Null) === null ?? super.removeEventListener(type, listener, options);
+	}
+	toggleAttribute(qualifiedName: string, force?: boolean) {
+		return setAttr(this, qualifiedName, force ?? null) ?? super.toggleAttribute(qualifiedName, force);
+	}
+	setAttribute(qualifiedName: string, value: string) {
+		setAttr(this, qualifiedName, value) ?? super.setAttribute(qualifiedName, value);
+	}
+	setAttributeNode(attribute: Attr) {
+		const attr = this.getAttributeNode(attribute.name);
+		return setAttr(this, attribute.name, attribute.value) === null ? super.setAttributeNode(attribute) : attr;
+	}
+	removeAttribute(qualifiedName: string) {
+		setAttr(this, qualifiedName, Null) ?? super.removeAttribute(qualifiedName);
+	}
+	removeAttributeNode(attribute: Attr) {
+		return setAttr(this, attribute.name, Null) === null ? super.removeAttributeNode(attribute) : attribute;
+	}
+      } : children ? class extends HTMLElement {
+	constructor() {
+		super();
+		childObserver.observe(this, childList);
+	}
+	observeChildren(fn: ChildWatchFn) {
+		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
+	}
+      } : HTMLElement,
       psuedos: (typeof DocumentFragment | undefined)[] = Array.from({"length": 4}),
       noop = () => {},
       getPsuedo = (handleAttrs: boolean, children: boolean): typeof DocumentFragment => psuedos[+handleAttrs | (+children << 1)] ??= children ? class extends getPsuedo(handleAttrs, false) {
-		observeChildren(fn: ChildWatchFn) {
-			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
-		}
-	} : handleAttrs ? class extends DocumentFragment {
-		#acts: Bind[] = [];
-		readonly classList = {toggle: noop};
-		readonly style = {removeProperty: noop, setProperty: noop};
-		constructor() {
-			super();
-			attrs.set(this, new Map());
-		}
-		act(names: string | string[], fn: (newValue: ToString) => void) {
-			this.#acts.push(act(this, names, fn));
-		}
-		attr(names: string | string[], fn?: AttrFn) {
-			return attr(this, names, fn);
-		}
-		addEventListener(type: string, listener: EventListenerOrEventListenerObject, _options?: boolean | AddEventListenerOptions) {
-			setAttr(this, "on" + type, listener);
-		}
-		removeEventListener(type: string, _listener: EventListenerOrEventListenerObject, _options?: boolean | EventListenerOptions) {
-			setAttr(this, "on" + type, Null);
-		}
-		getAttribute(_qualifiedName: string) {
-			return null;
-		}
-		getAttributeNode(_qualifiedName: string) {
-			return null;
-		}
-		toggleAttribute(qualifiedName: string, force?: boolean) {
-			return setAttr(this, qualifiedName, force ?? null);
-		}
-		setAttribute(qualifiedName: string, value: string) {
-			setAttr(this, qualifiedName, value);
-		}
-		removeAttribute(qualifiedName: string) {
-			setAttr(this, qualifiedName, Null);
-		}
+	observeChildren(fn: ChildWatchFn) {
+		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
+	}
+      } : handleAttrs ? class extends DocumentFragment {
+	#acts: Bind[] = [];
+	readonly classList = {toggle: noop};
+	readonly style = {removeProperty: noop, setProperty: noop};
+	constructor() {
+		super();
+		attrs.set(this, new Map());
+	}
+	act(names: string | string[], fn: (newValue: ToString) => void) {
+		this.#acts.push(act(this, names, fn));
+	}
+	attr(names: string | string[], fn?: AttrFn) {
+		return attr(this, names, fn);
+	}
+	addEventListener(type: string, listener: EventListenerOrEventListenerObject, _options?: boolean | AddEventListenerOptions) {
+		setAttr(this, "on" + type, listener);
+	}
+	removeEventListener(type: string, _listener: EventListenerOrEventListenerObject, _options?: boolean | EventListenerOptions) {
+		setAttr(this, "on" + type, Null);
+	}
+	getAttribute(_qualifiedName: string) {
+		return null;
+	}
+	getAttributeNode(_qualifiedName: string) {
+		return null;
+	}
+	toggleAttribute(qualifiedName: string, force?: boolean) {
+		return setAttr(this, qualifiedName, force ?? null);
+	}
+	setAttribute(qualifiedName: string, value: string) {
+		setAttr(this, qualifiedName, value);
+	}
+	removeAttribute(qualifiedName: string) {
+		setAttr(this, qualifiedName, Null);
+	}
       } : DocumentFragment,
       genName = () => {
 	let name;
