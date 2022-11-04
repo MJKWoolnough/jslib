@@ -4108,6 +4108,34 @@
 				amendNode(t, {"thatAttr": 5});
 				amendNode(t, {"thatAttr": 2});
 				return res === 7;
+			},
+			"event": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      {amendNode} = await import("./lib/dom.js"),
+				      div = document.createElement("div"),
+				      t = e(e => {
+					amendNode(div, {"onclick": e.attr("onclick")});
+					return div;
+				      })();
+				amendNode(t, {"onclick": () => res++});
+				div.click();
+				div.click();
+				return res === 2;
+			},
+			"event with modification": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      {amendNode} = await import("./lib/dom.js"),
+				      div = document.createElement("div"),
+				      t = e(e => {
+					amendNode(div, {"onclick": e.attr("onclick", (fn: Function) => () => fn(2))});
+					return div;
+				      })();
+				amendNode(t, {"onclick": (n: number) => res += n});
+				div.click();
+				div.click();
+				return res === 4;
 			}
 		},
 		"attrs (psuedo)": {
@@ -4144,6 +4172,38 @@
 				amendNode(t, {"thatAttr": 5});
 				amendNode(t, {"thatAttr": 2});
 				return res === 7;
+			},
+			"event": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      {amendNode} = await import("./lib/dom.js"),
+				      div = document.createElement("div"),
+				      t = e(e => {
+					amendNode(div, {"onclick": e.attr("onclick")});
+					return div;
+				      }, {"psuedo": true})();
+				amendNode(t, {"onclick": () => res++});
+				div.click();
+				div.click();
+				amendNode(t, {"onclick": () => res += 2});
+				div.click();
+				return res === 4;
+			},
+			"event with modification": async () => {
+				let res = 0;
+				const {default: e} = await import("./lib/elements.js"),
+				      {amendNode} = await import("./lib/dom.js"),
+				      div = document.createElement("div"),
+				      t = e(e => {
+					amendNode(div, {"onclick": e.attr("onclick", (fn: Function) => () => fn(2))});
+					return div;
+				      }, {"psuedo": true})();
+				amendNode(t, {"onclick": (n: number) => res += n});
+				div.click();
+				div.click();
+				amendNode(t, {"onclick": (n: number) => res += 3 * n});
+				div.click();
+				return res === 10;
 			}
 		}
 	}
