@@ -57,7 +57,7 @@ class BindFn extends Bind {
 class BindMulti extends Bind {
 	#fn: AttrFn;
 	constructor(elem: Node, names: string[], fn: Function) {
-		super("");
+		super(0);
 		let calling = false;
 		const obj: Record<string, Bind> = {},
 		      self = this;
@@ -76,7 +76,7 @@ class BindMulti extends Bind {
 		for (const n of names) {
 			obj[n] = new BindFn(getAttr(elem, n), this.#fn);
 		}
-		this.#fn("");
+		this.#fn(0);
 	}
 }
 
