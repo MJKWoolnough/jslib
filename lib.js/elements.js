@@ -24,12 +24,7 @@ class BindMulti extends Bind {
 				calling = true;
 				const o = {};
 				for (const n in obj) {
-					const on = obj[n];
-					if (on === this) {
-						o[n] = val;
-					} else {
-						o[n] = on.value;
-					}
+					o[n] = obj[n] === this ? val : obj[n].value;
 				}
 				calling = false;
 				self.value = fn(o) ?? Null;
