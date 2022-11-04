@@ -73,21 +73,20 @@ class BindMulti extends Bind {
 		const obj: Record<string, Bind> = {},
 		      self = this;
 		this.#fn = function(this: Bind, val: ToString) {
-			if (calling) {
-				return val;
-			}
-			calling = true;
-			const o: Record<string, ToString> = {};
-			for (const n in obj) {
-				const on = obj[n];
-				if (on === this) {
-					o[n] = val;
-				} else {
-					o[n] = on.value;
+			if (!calling) {
+				calling = true;
+				const o: Record<string, ToString> = {};
+				for (const n in obj) {
+					const on = obj[n];
+					if (on === this) {
+						o[n] = val;
+					} else {
+						o[n] = on.value;
+					}
 				}
+				calling = false;
+				self.value = fn(o) ?? Null;
 			}
-			calling = false;
-			self.value = fn(o) ?? Null;
 			return val;
 		};
 		for (const n of names) {

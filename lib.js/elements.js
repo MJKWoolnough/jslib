@@ -20,21 +20,20 @@ class BindMulti extends Bind {
 		const obj = {},
 		      self = this;
 		this.#fn = function(val) {
-			if (calling) {
-				return val;
-			}
-			calling = true;
-			const o = {};
-			for (const n in obj) {
-				const on = obj[n];
-				if (on === this) {
-					o[n] = val;
-				} else {
-					o[n] = on.value;
+			if (!calling) {
+				calling = true;
+				const o = {};
+				for (const n in obj) {
+					const on = obj[n];
+					if (on === this) {
+						o[n] = val;
+					} else {
+						o[n] = on.value;
+					}
 				}
+				calling = false;
+				self.value = fn(o) ?? Null;
 			}
-			calling = false;
-			self.value = fn(o) ?? Null;
 			return val;
 		};
 		for (const n of names) {
