@@ -126,21 +126,14 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
       },
       childList = {"childList": true},
       classes: (typeof HTMLElement | undefined)[] = Array.from({"length": 8}),
-      getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean): typeof HTMLElement => {
-	const n = (+addRemove << 2) | (+handleAttrs << 1) | +children,
-	      b = classes[n];
-	if (b) {
-		return b;
-	}
-	const base = addRemove ? getClass(false, handleAttrs, children) : handleAttrs ? getClass(false, false, children) : HTMLElement;
-	return classes[n] = addRemove ? class extends base {
+      getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean): typeof HTMLElement => classes[(+addRemove << 2) | (+handleAttrs << 1) | +children] ??= addRemove ? class extends getClass(false, handleAttrs, children) {
 		connectedCallback() {
 			this.dispatchEvent(new CustomEvent("attached"));
 		}
 		disconnectedCallback() {
 			this.dispatchEvent(new CustomEvent("removed"));
 		}
-	} : handleAttrs ? class extends base {
+	} : handleAttrs ? class extends getClass(false, false, children) {
 		#acts: Bind[] = [];
 		constructor() {
 			super();
@@ -174,7 +167,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		removeAttributeNode(attribute: Attr) {
 			return setAttr(this, attribute.name, Null) === null ? super.removeAttributeNode(attribute) : attribute;
 		}
-	} : children ? class extends base {
+	} : children ? class extends HTMLElement {
 		constructor() {
 			super();
 			childObserver.observe(this, childList);
@@ -182,22 +175,14 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		observeChildren(fn: ChildWatchFn) {
 			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 		}
-	} : base;
-      },
+	} : HTMLElement,
       psuedos: (typeof DocumentFragment | undefined)[] = Array.from({"length": 4}),
       noop = () => {},
-      getPsuedo = (handleAttrs: boolean, children: boolean): typeof DocumentFragment => {
-	const n = +handleAttrs | (+children << 1),
-	      b = psuedos[n];
-	if (b) {
-		return b;
-	}
-	const base = children ? getPsuedo(handleAttrs, false) : DocumentFragment;
-	return psuedos[n] = children ? class extends base {
+      getPsuedo = (handleAttrs: boolean, children: boolean): typeof DocumentFragment => psuedos[+handleAttrs | (+children << 1)] ??= children ? class extends getPsuedo(handleAttrs, false) {
 		observeChildren(fn: ChildWatchFn) {
 			(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 		}
-	} : handleAttrs ? class extends base {
+	} : handleAttrs ? class extends DocumentFragment {
 		#acts: Bind[] = [];
 		readonly classList = {toggle: noop};
 		readonly style = {removeProperty: noop, setProperty: noop};
@@ -232,8 +217,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		removeAttribute(qualifiedName: string) {
 			setAttr(this, qualifiedName, Null);
 		}
-	} : base;
-      },
+      } : DocumentFragment,
       genName = () => {
 	let name;
 	while(customElements.get(name = String.fromCharCode(...Array.from({"length": 11}, (_, n) => n === 5 ? 45 : 97 + Math.floor(Math.random() * 26))))) {}
