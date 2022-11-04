@@ -18,23 +18,29 @@ class BindMulti extends Bind {
 		super("");
 		let calling = false;
 		const obj = {},
-		      afn = this.#fn = val => {
+		      self = this;
+		this.#fn = function(val) {
 			if (calling) {
 				return val;
 			}
 			calling = true;
 			const o = {};
 			for (const n in obj) {
-				o[n] = obj[n].value;
+				const on = obj[n];
+				if (on === this) {
+					o[n] = val;
+				} else {
+					o[n] = on.value;
+				}
 			}
 			calling = false;
-			this.value = fn(o) ?? Null;
+			self.value = fn(o) ?? Null;
 			return val;
 		};
 		for (const n of names) {
 			obj[n] = new BindFn(getAttr(elem, n), this.#fn);
 		}
-		afn("");
+		this.#fn("");
 	}
 }
 
