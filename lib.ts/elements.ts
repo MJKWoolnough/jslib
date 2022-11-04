@@ -4,7 +4,6 @@ import {ns} from './html.js';
 
 type Options = {
 	manualSlot?: boolean;
-	classOnly?: boolean;
 	delegatesFocus?: boolean;
 	attrs?: boolean;
 	observeChildren?: boolean;
@@ -38,20 +37,10 @@ interface ElementFactory {
 	(fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {attrs?: true, observeChildren: false, classOnly?: false, psuedo?: false}): DOMBind<HTMLElement>;
 	(fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false, classOnly?: false, psuedo?: false}): DOMBind<HTMLElement>;
 
-	(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options & {attrs?: true, observeChildren?: true, classOnly: true, psuedo?: false}): typeof HTMLElement;
-	(fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false, observeChildren?: true, classOnly: true, psuedo?: false}): typeof HTMLElement;
-	(fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {attrs?: true, observeChildren: false, classOnly: true, psuedo?: false}): typeof HTMLElement;
-	(fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false, classOnly: true, psuedo?: false}): typeof HTMLElement;
-
 	(fn: (elem: DocumentFragment & AttrClass & ChildClass) => Children, options: Options & {attrs?: true, observeChildren?: true, classOnly?: false, psuedo: true}): DOMBind<DocumentFragment>;
 	(fn: (elem: DocumentFragment & ChildClass) => Children, options: Options & {attrs: false, observeChildren?: true, classOnly?: false, psuedo: true}): DOMBind<DocumentFragment>;
 	(fn: (elem: DocumentFragment & AttrClass) => Children, options: Options & {attrs?: true, observeChildren: false, classOnly?: false, psuedo: true}): DOMBind<DocumentFragment>;
 	(fn: (elem: DocumentFragment) => Children, options: Options & {attrs: false, observeChildren: false, classOnly?: false, psuedo: true}): DOMBind<DocumentFragment>;
-
-	(fn: (elem: DocumentFragment & AttrClass & ChildClass) => Children, options?: Options & {attrs?: true, observeChildren?: true, classOnly: true, psuedo: true}): typeof DocumentFragment;
-	(fn: (elem: DocumentFragment & ChildClass) => Children, options: Options & {attrs: false, observeChildren?: true, classOnly: true, psuedo: true}): typeof DocumentFragment;
-	(fn: (elem: DocumentFragment & AttrClass) => Children, options: Options & {attrs?: true, observeChildren: false, classOnly: true, psuedo: true}): typeof DocumentFragment;
-	(fn: (elem: DocumentFragment) => Children, options: Options & {attrs: false, observeChildren: false, classOnly: true, psuedo: true}): typeof DocumentFragment;
 }
 
 class BindFn extends Bind {
@@ -263,7 +252,7 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 }));
 
 export default ((fn: (elem: Node) => Children, options: Options = {}) => {
-	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, classOnly = false} = options,
+	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = psuedo ? class extends getPsuedo(attrs, observeChildren) {
@@ -283,5 +272,5 @@ export default ((fn: (elem: Node) => Children, options: Options = {}) => {
 	if (!psuedo) {
 		customElements.define(name, element as CustomElementConstructor);
 	}
-	return classOnly ? element : psuedo ? (properties?: Props, children?: Children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
+	return psuedo ? (properties?: Props, children?: Children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
 }) as ElementFactory;

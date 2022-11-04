@@ -210,7 +210,7 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 }));
 
 export default (fn, options = {}) => {
-	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, classOnly = false} = options,
+	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = psuedo ? class extends getPsuedo(attrs, observeChildren) {
@@ -230,5 +230,5 @@ export default (fn, options = {}) => {
 	if (!psuedo) {
 		customElements.define(name, element);
 	}
-	return classOnly ? element : psuedo ? (properties, children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
+	return psuedo ? (properties, children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
 };
