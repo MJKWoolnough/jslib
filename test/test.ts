@@ -205,20 +205,20 @@
 			}
 		},
 		"Subscription": {
-			"then": async () => {
+			"when": async () => {
 				let res = false,
 				    sFn = (_: boolean) => {};
 				const {Subscription} = await import("./lib/inter.js");
-				new Subscription<boolean>(s => sFn = s).then(b => res = b).catch(() => res = false);
+				new Subscription<boolean>(s => sFn = s).when(b => res = b).catch(() => res = false);
 				sFn(true);
 				return res;
 			},
-			"then-chain": async () => {
+			"when-chain": async () => {
 				let res = false,
 				    sFn = (_: boolean) => {};
 				const {Subscription} = await import("./lib/inter.js"),
 				      s = new Subscription<boolean>(s => sFn = s);
-				s.then(b => b).then(b => res = b).catch(() => res = false);;
+				s.when(b => b).when(b => res = b).catch(() => res = false);;
 				sFn(true);
 				return res;
 			},
@@ -227,9 +227,9 @@
 				    sFn = (_: number) => {};
 				const {Subscription} = await import("./lib/inter.js"),
 				      s = new Subscription<number>(s => sFn = s);
-				s.then(b => res += b).catch(() => res = 0);
-				s.then(b => res += b).catch(() => res = 0);;
-				s.then(b => res += b).catch(() => res = 0);;
+				s.when(b => res += b).catch(() => res = 0);
+				s.when(b => res += b).catch(() => res = 0);;
+				s.when(b => res += b).catch(() => res = 0);;
 				sFn(1);
 				return res === 3;
 			},
@@ -238,9 +238,9 @@
 				    sFn = (_: number) => {};
 				const {Subscription} = await import("./lib/inter.js"),
 				      s = new Subscription<number>(s => sFn = s);
-				s.then(b => b + 1).then(b => res += b);
-				s.then(b => b + 2).then(b => res += b);
-				s.then(b => b + 3).then(b => res += b);
+				s.when(b => b + 1).when(b => res += b);
+				s.when(b => b + 2).when(b => res += b);
+				s.when(b => b + 3).when(b => res += b);
 				sFn(1);
 				return res === 9;
 			},
@@ -256,7 +256,7 @@
 				let res = 0,
 				    sFn = (_: boolean) => {};
 				const {Subscription} = await import("./lib/inter.js");
-				new Subscription<boolean>(s => sFn = s).then(() => {throw 1}).catch(e => res += e);
+				new Subscription<boolean>(s => sFn = s).when(() => {throw 1}).catch(e => res += e);
 				sFn(false);
 				return res === 1;
 			},
@@ -273,8 +273,8 @@
 				let res = 0,
 				    sFn = (_: boolean) => {};
 				const {Subscription} = await import("./lib/inter.js");
-				new Subscription<boolean>(s => sFn = s).then(() => {}).finally(() => res++);
-				new Subscription<boolean>(() => {}).then(() => {}).finally(() => res++);
+				new Subscription<boolean>(s => sFn = s).when(() => {}).finally(() => res++);
+				new Subscription<boolean>(() => {}).when(() => {}).finally(() => res++);
 				sFn(false);
 				return res === 1;
 			},
@@ -282,8 +282,8 @@
 				let res = 0,
 				    sFn = (_: boolean) => {};
 				const {Subscription} = await import("./lib/inter.js");
-				new Subscription<boolean>(s => sFn = s).then(() => {throw 1}).finally(() => res++);
-				new Subscription<boolean>(() => {}).then(() => {throw 1}).finally(() => res++);
+				new Subscription<boolean>(s => sFn = s).when(() => {throw 1}).finally(() => res++);
+				new Subscription<boolean>(() => {}).when(() => {throw 1}).finally(() => res++);
 				sFn(false);
 				return res === 1;
 			},
@@ -297,8 +297,8 @@
 			"chain-cancel": async () => {
 				let res = 0;
 				const {Subscription} = await import("./lib/inter.js");
-				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).then(() => {}).cancel();
-				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).then(() => {});
+				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).when(() => {}).cancel();
+				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).when(() => {});
 				return res === 1;
 			},
 			"splitCancel": async () => {
@@ -311,8 +311,8 @@
 					      error = eFn;
 					      cFn(() => res = -999);
 				      }).splitCancel(),
-				      first = sc().then(n => res += n * 2, n => res += n * 3),
-				      second = sc().then(n => res += n * 5, n => res += n * 7);
+				      first = sc().when(n => res += n * 2, n => res += n * 3),
+				      second = sc().when(n => res += n * 5, n => res += n * 7);
 				success(1);
 				error(2);
 				first.cancel();
@@ -333,8 +333,8 @@
 					      error = eFn;
 					      cFn(() => res *= 10);
 				      }).splitCancel(true),
-				      first = sc().then(n => res += n * 2, n => res += n * 3),
-				      second = sc().then(n => res += n * 5, n => res += n * 7);
+				      first = sc().when(n => res += n * 2, n => res += n * 3),
+				      second = sc().when(n => res += n * 5, n => res += n * 7);
 				success(1);
 				error(2);
 				first.cancel();
@@ -363,7 +363,7 @@
 						secondError = eFn;
 						cFn(() => res *= 5);
 					})
-				      ).then(n => res += typeof n === "string" ? n.length : n, e => res *= e);
+				      ).when(n => res += typeof n === "string" ? n.length : n, e => res *= e);
 				firstSuccess!(1);
 				firstError!(2);
 				secondSuccess!("123");
@@ -411,7 +411,7 @@
 				      [s, sFn, eFn, cFn] = Subscription.bind<number>();
 				let res = 0;
 				cFn(() => res++);
-				s.then(num => res *= num, num => res %= num).cancel();
+				s.when(num => res *= num, num => res %= num).cancel();
 				sFn(2);
 				sFn(3);
 				eFn(4);
@@ -1304,7 +1304,7 @@
 					const rpc = new RPC(ws);
 					let fn = (_b: boolean) => {},
 					    res = 0;
-					rpc.subscribe(-1).then(data => res += +(data === "123"));
+					rpc.subscribe(-1).when(data => res += +(data === "123"));
 					rpc.request("broadcast", "123").then(d => {
 						if (d) {
 							res *= 2;
