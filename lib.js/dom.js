@@ -171,11 +171,10 @@ export const amendNode = (node, properties, children) => {
 		if (typeof children === "string" && !node.firstChild) {
 			node.textContent = children;
 		} else if (children) {
-			const c = childrenArr(children);
 			if (node instanceof Element || node instanceof DocumentFragment) {
-				node.append(...c);
+				node.append(...childrenArr(children));
 			} else {
-				node.appendChild(createDocumentFragment(...c));
+				node.appendChild(createDocumentFragment(children));
 			}
 		}
 	}
