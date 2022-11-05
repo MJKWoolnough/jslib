@@ -53,7 +53,7 @@ export class Subscription {
 		this.#success = successReceive;
 		this.#error = errorReceive;
 	}
-	then(successFn, errorFn) {
+	when(successFn, errorFn) {
 		const s = new Subscription((sFn, eFn) => {
 			this.#success(successFn instanceof Function ? data => {
 				try {
@@ -77,10 +77,10 @@ export class Subscription {
 		this.#cancel?.();
 	}
 	catch(errorFn) {
-		return this.then(undefined, errorFn);
+		return this.when(undefined, errorFn);
 	}
 	finally(afterFn) {
-		return this.then(data => (afterFn(), data), error => {
+		return this.when(data => (afterFn(), data), error => {
 			afterFn();
 			throw error;
 		});
@@ -89,7 +89,7 @@ export class Subscription {
 		const [successSend, successReceive, successRemove] = new Pipe().bind(),
 		      [errorSend, errorReceive, errorRemove] = new Pipe().bind();
 		let n = 0;
-		this.then(successSend, errorSend);
+		this.when(successSend, errorSend);
 		return () => new Subscription((sFn, eFn, cancelFn) => {
 			successReceive(sFn);
 			errorReceive(eFn);
@@ -107,7 +107,7 @@ export class Subscription {
 	static merge(...subs) {
 		return new Subscription((success, error, cancel) => {
 			for (const s of subs) {
-				s.then(success, error);
+				s.when(success, error);
 			}
 			cancel(() => {
 				for(const s of subs) {

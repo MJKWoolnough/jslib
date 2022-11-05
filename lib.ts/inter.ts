@@ -66,7 +66,7 @@ export class Subscription<T> {
 		this.#success = successReceive;
 		this.#error = errorReceive;
 	}
-	then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
+	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
 		const s = new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void) => {
 			this.#success(successFn instanceof Function ? (data: T) => {
 				try {
@@ -90,10 +90,10 @@ export class Subscription<T> {
 		this.#cancel?.();
 	}
 	catch<TResult = never>(errorFn: (data: any) => TResult): Subscription<T | TResult> {
-		return this.then(undefined, errorFn);
+		return this.when(undefined, errorFn);
 	}
 	finally(afterFn: () => void): Subscription<T> {
-		return this.then((data: T) => (afterFn(), data), (error: any) => {
+		return this.when((data: T) => (afterFn(), data), (error: any) => {
 			afterFn();
 			throw error;
 		});
@@ -102,7 +102,7 @@ export class Subscription<T> {
 		const [successSend, successReceive, successRemove] = new Pipe<T>().bind(),
 		      [errorSend, errorReceive, errorRemove] = new Pipe<any>().bind();
 		let n = 0;
-		this.then(successSend, errorSend);
+		this.when(successSend, errorSend);
 		return () => new Subscription<T>((sFn, eFn, cancelFn) => {
 			successReceive(sFn);
 			errorReceive(eFn);
@@ -120,7 +120,7 @@ export class Subscription<T> {
 	static merge<T>(...subs: Subscription<T>[]) {
 		return new Subscription<T>((success: (data: T) => void, error: (data: any) => void, cancel: (data: () => void) => void) => {
 			for (const s of subs) {
-				s.then(success, error);
+				s.when(success, error);
 			}
 			cancel(() => {
 				for(const s of subs) {
