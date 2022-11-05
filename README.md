@@ -1167,14 +1167,14 @@ The Subscription Class is similar to the [Promise](https://developer.mozilla.org
 
 |  Method  |  Type  |  Description  |
 |----------|--------|---------------|
-| [bind](#inter_subscription_bind) | Static Method | This method binds the then, error, and cancel functions. |
+| [bind](#inter_subscription_bind) | Static Method | This method binds the when, error, and cancel functions. |
 | [cancel](#inter_subscription_cancel) | Method | This method sends a cancel signal up the Subscription chain. |
 | [catch](#inter_subscription_catch) | Method | This method acts like the [Promise.catch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch) method. |
 | [constructor](#inter_subscription_constructor) | Constructor | This constructs a new Subscription. |
 | [finally](#inter_subscription_finally) | Method | This method acts like the [Promise.finally](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally) method. |
 | [merge](#inter_subscription_merge) | Static Method | This combines several Subscriptions into one. |
 | [splitCancel](#inter_subscription_splitcancel) | Method | This method set all child Subscription objects to remove themselves from this Subscription using the cancel method. |
-| [then](#inter_subscription_then) | Method | This method acts like the [Promise.then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) method. |
+| [when](#inter_subscription_when) | Method | This method acts like the [Promise.then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) method. |
 
 #### <a name="inter_subscription_bind">bind</a>
 ```typescript
@@ -1189,16 +1189,16 @@ class Subscription<T> {
 }
 ```
 
-This method returns an Array of functions bound to the then, error, and cancel methods of the Subscription Class. The bindmask determines which methods are bound.
+This method returns an Array of functions bound to the when, error, and cancel methods of the Subscription Class. The bindmask determines which methods are bound.
 
 |  Mask Bit Value  |  Method  |
 |------------------|----------|
-| 1                | [then](#inter_subscription_then) |
+| 1                | [when](#inter_subscription_when) |
 | 2                | [error](#inter_subscription_error) |
 | 4                | [cancel](#inter_subscription_cancel) |
 
 The return will return the following:
-[*then bound function*,  *error bound function*, *cancel bound function*]
+[*when bound function*,  *error bound function*, *cancel bound function*]
 
 #### <a name="inter_subscription_cancel">cancel</a>
 ```typescript
@@ -1227,7 +1227,7 @@ class Subscription<T> {
 
 The constructor of the Subscription class takes a function that receives success, error, and cancel functions.
 
-The success function can be called multiple times and will send any params in the call on to any 'then' functions.
+The success function can be called multiple times and will send any params in the call on to any 'when' functions.
 
 The error function can be called multiple times and will send any params in the call on to any 'catch' functions.
 
@@ -1262,14 +1262,14 @@ This method creates a break in the cancel signal chain, so that any cancel signa
 
 The cancelOnEmpty flag, when true, will send an actual cancel signal all the way up the chain when called on the last split child.
 
-#### <a name="inter_subscription_then">then</a>
+#### <a name="inter_subscription_when">when</a>
 ```typescript
 class Subscription<T> {
-		then<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) => Subscription<TResult1 | TResult2>;
+		when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) => Subscription<TResult1 | TResult2>;
 }
 ```
 
-The then method act similarly to the then method of the [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) class, except that it can be activated multiple times.
+The when method act similarly to the then method of the [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) class, except that it can be activated multiple times.
 
 ### <a name="inter_waitgroup">WaitGroup</a>
 
