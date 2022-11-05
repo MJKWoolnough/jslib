@@ -84,7 +84,7 @@ export class WSConn extends WebSocket {
 				end();
 			}, o);
 			cFn(end);
-		}).then(ssFn, eeFn);
+		}).when(ssFn, eeFn);
 	}
 }
 
