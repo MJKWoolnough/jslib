@@ -31,12 +31,15 @@ interface ChildClass {
 	observeChildren(fn: ChildWatchFn): void;
 }
 
-interface HTMLElementORDocumentFragmentFactory <T extends Node, U extends {psuedo?: boolean}> {
-	(fn: (elem: T & AttrClass & ChildClass) => Children, options?: Options & {attrs?: true, observeChildren?: true, classOnly?: false} & U): DOMBind<T>;
-	(fn: (elem: T & ChildClass) => Children, options: Options & {attrs: false, observeChildren?: true, classOnly?: false} & U): DOMBind<T>;
-	(fn: (elem: T & AttrClass) => Children, options: Options & {attrs?: true, observeChildren: false, classOnly?: false} & U): DOMBind<T>;
-	(fn: (elem: T) => Children, options: Options & {attrs: false, observeChildren: false, classOnly?: false} & U): DOMBind<T>;
+interface OptionsFactory <T extends Node, U extends Options, V extends T> {
+	(fn: (elem: V) => Children, options?: U): DOMBind<T>;
 }
+
+type HTMLElementORDocumentFragmentFactory<T extends Node, U extends {psuedo?: boolean}> =
+	OptionsFactory<T, Options & {attrs?: true, observeChildren?: true, classOnly?: false} & U, T & AttrClass & ChildClass> &
+	OptionsFactory<T, Options & {attrs: false, observeChildren?: true, classOnly?: false} & U, T & ChildClass> &
+	OptionsFactory<T, Options & {attrs?: true, observeChildren: false, classOnly?: false} & U, T & AttrClass> &
+	OptionsFactory<T, Options & {attrs: false, observeChildren: false, classOnly?: false} & U, T>;
 
 type ElementFactory = HTMLElementORDocumentFragmentFactory<HTMLElement, {psuedo?: false}> & HTMLElementORDocumentFragmentFactory<DocumentFragment, {psuedo: true}>;
 
