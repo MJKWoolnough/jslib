@@ -31,17 +31,14 @@ interface ChildClass {
 	observeChildren(fn: ChildWatchFn): void;
 }
 
-interface ElementFactory {
-	(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children, options?: Options & {attrs?: true, observeChildren?: true, classOnly?: false, psuedo?: false}): DOMBind<HTMLElement>;
-	(fn: (elem: HTMLElement & ChildClass) => Children, options: Options & {attrs: false, observeChildren?: true, classOnly?: false, psuedo?: false}): DOMBind<HTMLElement>;
-	(fn: (elem: HTMLElement & AttrClass) => Children, options: Options & {attrs?: true, observeChildren: false, classOnly?: false, psuedo?: false}): DOMBind<HTMLElement>;
-	(fn: (elem: HTMLElement) => Children, options: Options & {attrs: false, observeChildren: false, classOnly?: false, psuedo?: false}): DOMBind<HTMLElement>;
-
-	(fn: (elem: DocumentFragment & AttrClass & ChildClass) => Children, options: Options & {attrs?: true, observeChildren?: true, classOnly?: false, psuedo: true}): DOMBind<DocumentFragment>;
-	(fn: (elem: DocumentFragment & ChildClass) => Children, options: Options & {attrs: false, observeChildren?: true, classOnly?: false, psuedo: true}): DOMBind<DocumentFragment>;
-	(fn: (elem: DocumentFragment & AttrClass) => Children, options: Options & {attrs?: true, observeChildren: false, classOnly?: false, psuedo: true}): DOMBind<DocumentFragment>;
-	(fn: (elem: DocumentFragment) => Children, options: Options & {attrs: false, observeChildren: false, classOnly?: false, psuedo: true}): DOMBind<DocumentFragment>;
+interface HTMLElementORDocumentFragmentFactory <T extends Node, U extends {psuedo?: boolean}> {
+	(fn: (elem: T & AttrClass & ChildClass) => Children, options?: Options & {attrs?: true, observeChildren?: true, classOnly?: false} & U): DOMBind<T>;
+	(fn: (elem: T & ChildClass) => Children, options: Options & {attrs: false, observeChildren?: true, classOnly?: false} & U): DOMBind<T>;
+	(fn: (elem: T & AttrClass) => Children, options: Options & {attrs?: true, observeChildren: false, classOnly?: false} & U): DOMBind<T>;
+	(fn: (elem: T) => Children, options: Options & {attrs: false, observeChildren: false, classOnly?: false} & U): DOMBind<T>;
 }
+
+type ElementFactory = HTMLElementORDocumentFragmentFactory<HTMLElement, {psuedo?: false}> & HTMLElementORDocumentFragmentFactory<DocumentFragment, {psuedo: true}>;
 
 class BindFn extends Bind {
 	#fn: AttrFn;
