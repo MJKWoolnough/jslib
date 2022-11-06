@@ -31,6 +31,10 @@ interface ChildClass {
 	observeChildren(fn: ChildWatchFn): void;
 }
 
+type ConstructorOf<C> = {
+	new(...args: any[]): C;
+}
+
 interface OptionsFactory <T extends Node, U extends Options, V extends T> {
 	(fn: (elem: V) => Children, options?: U): DOMBind<T>;
 }
@@ -120,8 +124,8 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	return fn instanceof Function ? new BindFn(attr, fn) : attr;
       },
       childList = {"childList": true},
-      classes: (typeof HTMLElement | undefined)[] = Array.from({"length": 8}),
-      getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean): typeof HTMLElement => classes[(+addRemove << 2) | (+handleAttrs << 1) | +children] ??= addRemove ? class extends getClass(false, handleAttrs, children) {
+      classes: (ConstructorOf<HTMLElement> | undefined)[] = Array.from({"length": 8}),
+      getClass = (addRemove: boolean, handleAttrs: boolean, children: boolean): ConstructorOf<HTMLElement> => classes[(+addRemove << 2) | (+handleAttrs << 1) | +children] ??= addRemove ? class extends getClass(false, handleAttrs, children) {
 	connectedCallback() {
 		this.dispatchEvent(new CustomEvent("attached"));
 	}
@@ -171,9 +175,9 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
       } : HTMLElement,
-      psuedos: (typeof DocumentFragment | undefined)[] = Array.from({"length": 4}),
+      psuedos: (ConstructorOf<DocumentFragment> | undefined)[] = Array.from({"length": 4}),
       noop = () => {},
-      getPsuedo = (handleAttrs: boolean, children: boolean): typeof DocumentFragment => psuedos[+handleAttrs | (+children << 1)] ??= children ? class extends getPsuedo(handleAttrs, false) {
+      getPsuedo = (handleAttrs: boolean, children: boolean): ConstructorOf<DocumentFragment> => psuedos[+handleAttrs | (+children << 1)] ??= children ? class extends getPsuedo(handleAttrs, false) {
 	observeChildren(fn: ChildWatchFn) {
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
