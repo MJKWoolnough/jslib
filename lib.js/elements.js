@@ -175,7 +175,8 @@ const attrs = new WeakMap(),
 	let name;
 	while(customElements.get(name = String.fromCharCode(...Array.from({"length": 11}, (_, n) => n === 5 ? 45 : 97 + Math.floor(Math.random() * 26))))) {}
 	return name;
-      };
+      },
+      noExtend = v => v;
 
 export const Null = Object.freeze(Object.assign(() => {}, {
 	toString(){
@@ -189,10 +190,10 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 }));
 
 export default (fn, options = {}) => {
-	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false} = options,
+	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
-	      element = psuedo ? class extends getPsuedo(attrs, observeChildren) {
+	      element = extend(psuedo ? class extends getPsuedo(attrs, observeChildren) {
 		constructor() {
 			super();
 			amendNode(this, fn(this));
@@ -205,7 +206,7 @@ export default (fn, options = {}) => {
 			super();
 			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = styles;
 		}
-	      };
+	      });
 	if (!psuedo) {
 		customElements.define(name, element);
 	}

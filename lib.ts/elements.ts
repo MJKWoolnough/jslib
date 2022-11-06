@@ -11,6 +11,7 @@ type Options = {
 	styles?: [CSSStyleSheet];
 	psuedo?: boolean;
 	name?: string;
+	extend?: (base: ConstructorOf<Node>) => ConstructorOf<Node>;
 }
 
 interface ToString {
@@ -36,7 +37,7 @@ type ConstructorOf<C> = {
 }
 
 interface OptionsFactory <T extends Node, U extends Options, V extends T> {
-	(fn: (elem: V) => Children, options?: U): DOMBind<T>;
+	<W extends V>(fn: (elem: V) => Children, options?: U & {extend?: (base: ConstructorOf<V>) => ConstructorOf<W>}): DOMBind<W>;
 }
 
 type HTMLElementORDocumentFragmentFactory<T extends Node, U extends {psuedo?: boolean}> =
@@ -221,7 +222,8 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	let name;
 	while(customElements.get(name = String.fromCharCode(...Array.from({"length": 11}, (_, n) => n === 5 ? 45 : 97 + Math.floor(Math.random() * 26))))) {}
 	return name;
-      };
+      },
+      noExtend = <T>(v: T) => v;
 
 export const Null = Object.freeze(Object.assign(() => {}, {
 	toString(){
@@ -235,10 +237,10 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 }));
 
 export default ((fn: (elem: Node) => Children, options: Options = {}) => {
-	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false} = options,
+	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
-	      element = psuedo ? class extends getPsuedo(attrs, observeChildren) {
+	      element = extend(psuedo ? class extends getPsuedo(attrs, observeChildren) {
 		constructor() {
 			super();
 			amendNode(this, fn(this));
@@ -251,7 +253,7 @@ export default ((fn: (elem: Node) => Children, options: Options = {}) => {
 			super();
 			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = styles;
 		}
-	      };
+	      });
 	if (!psuedo) {
 		customElements.define(name, element as CustomElementConstructor);
 	}
