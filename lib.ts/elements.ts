@@ -11,7 +11,7 @@ type Options = {
 	styles?: [CSSStyleSheet];
 	psuedo?: boolean;
 	name?: string;
-	extend?: (base: ConstructorOf<Node>) => ConstructorOf<Node>;
+	extend?: <T extends ConstructorOf<Node>>(base: T) => T;
 }
 
 interface ToString {
