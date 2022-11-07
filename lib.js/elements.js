@@ -193,7 +193,7 @@ export default (fn, options = {}) => {
 	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
-	      element = extend(psuedo ? class extends getPsuedo(attrs, observeChildren) {
+	      element = psuedo ? class extends extend(getPsuedo(attrs, observeChildren)) {
 		constructor() {
 			super();
 			amendNode(this, fn(this));
@@ -201,12 +201,12 @@ export default (fn, options = {}) => {
 				childObserver.observe(this, childList);
 			}
 		}
-	      } : class extends getClass(attachRemoveEvent, attrs, observeChildren) {
+	      } : class extends extend(getClass(attachRemoveEvent, attrs, observeChildren)) {
 		constructor() {
 			super();
 			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = styles;
 		}
-	      });
+	      };
 	if (!psuedo) {
 		customElements.define(name, element);
 	}

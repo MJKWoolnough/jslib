@@ -36,15 +36,15 @@ type ConstructorOf<C> = {
 	new(...args: any[]): C;
 }
 
-interface OptionsFactory <T extends Node, U extends Options, V extends T> {
-	<W extends V>(fn: (elem: V) => Children, options?: U & {extend?: (base: ConstructorOf<V>) => ConstructorOf<W>}): DOMBind<W>;
+interface OptionsFactory <T extends Node, U extends Options> {
+	<V extends T>(fn: (elem: V) => Children, options?: U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<V>}): DOMBind<V>;
 }
 
 type HTMLElementORDocumentFragmentFactory<T extends Node, U extends {psuedo?: boolean}> =
-	OptionsFactory<T, Options & {attrs?: true, observeChildren?: true, classOnly?: false} & U, T & AttrClass & ChildClass> &
-	OptionsFactory<T, Options & {attrs: false, observeChildren?: true, classOnly?: false} & U, T & ChildClass> &
-	OptionsFactory<T, Options & {attrs?: true, observeChildren: false, classOnly?: false} & U, T & AttrClass> &
-	OptionsFactory<T, Options & {attrs: false, observeChildren: false, classOnly?: false} & U, T>;
+	OptionsFactory<T & AttrClass & ChildClass, Options & {attrs?: true, observeChildren?: true, classOnly?: false} & U> &
+	OptionsFactory<T & ChildClass, Options & {attrs: false, observeChildren?: true, classOnly?: false} & U> &
+	OptionsFactory<T & AttrClass, Options & {attrs?: true, observeChildren: false, classOnly?: false} & U> &
+	OptionsFactory<T, Options & {attrs: false, observeChildren: false, classOnly?: false} & U>;
 
 type ElementFactory = HTMLElementORDocumentFragmentFactory<HTMLElement, {psuedo?: false}> & HTMLElementORDocumentFragmentFactory<DocumentFragment, {psuedo: true}>;
 
@@ -240,7 +240,7 @@ export default ((fn: (elem: Node) => Children, options: Options = {}) => {
 	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
-	      element = extend(psuedo ? class extends getPsuedo(attrs, observeChildren) {
+	      element = psuedo ? class extends extend(getPsuedo(attrs, observeChildren)) {
 		constructor() {
 			super();
 			amendNode(this, fn(this));
@@ -248,12 +248,12 @@ export default ((fn: (elem: Node) => Children, options: Options = {}) => {
 				childObserver.observe(this, childList);
 			}
 		}
-	      } : class extends getClass(attachRemoveEvent, attrs, observeChildren) {
+	      } : class extends extend(getClass(attachRemoveEvent, attrs, observeChildren)) {
 		constructor() {
 			super();
 			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = styles;
 		}
-	      });
+	      };
 	if (!psuedo) {
 		customElements.define(name, element as CustomElementConstructor);
 	}
