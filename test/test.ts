@@ -3871,6 +3871,14 @@
 			"custom name": async () => {
 				const {default: e} = await import("./lib/elements.js");
 				return e(() => [], {"name": "custom-name"}).name === "custom-name";
+			},
+			"classOnly": async() => {
+				const {default: e} = await import("./lib/elements.js");
+				return new (e(() => [], {"classOnly": true})) instanceof HTMLElement;
+			},
+			"classOnly (psuedo)": async() => {
+				const {default: e} = await import("./lib/elements.js");
+				return new (e(() => [], {"classOnly": true, "psuedo": true})) instanceof DocumentFragment;
 			}
 		},
 		"observeChildren": {
