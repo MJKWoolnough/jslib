@@ -3879,6 +3879,11 @@
 			"classOnly (psuedo)": async() => {
 				const {default: e} = await import("./lib/elements.js");
 				return new (e(() => [], {"classOnly": true, "psuedo": true})) instanceof DocumentFragment;
+			},
+			"extend": async() => {
+				const {default: e} = await import("./lib/elements.js"),
+				      t = e(() => [], {"extend": v => class extends v{a = 1}})();
+				return t.a === 1;
 			}
 		},
 		"observeChildren": {
