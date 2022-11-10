@@ -12,6 +12,7 @@ type Options = {
 	psuedo?: boolean;
 	name?: string;
 	extend?: <T extends ConstructorOf<Node>>(base: T) => T;
+	classOnly?: boolean;
 }
 
 interface ToString {
@@ -37,14 +38,15 @@ type ConstructorOf<C> = {
 }
 
 interface OptionsFactory <T extends Node, U extends Options> {
-	<V extends T>(fn: (elem: V) => Children, options?: U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<V>}): DOMBind<V>;
+	<V extends T>(fn: (elem: V) => Children, options?: U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<V>, classOnly?: false}): DOMBind<V>;
+	<V extends T>(fn: (elem: V) => Children, options?: U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<V>, classOnly: true}): ConstructorOf<V>;
 }
 
 type HTMLElementORDocumentFragmentFactory<T extends Node, U extends {psuedo?: boolean}> =
-	OptionsFactory<T & AttrClass & ChildClass, Options & {attrs?: true, observeChildren?: true, classOnly?: false} & U> &
-	OptionsFactory<T & ChildClass, Options & {attrs: false, observeChildren?: true, classOnly?: false} & U> &
-	OptionsFactory<T & AttrClass, Options & {attrs?: true, observeChildren: false, classOnly?: false} & U> &
-	OptionsFactory<T, Options & {attrs: false, observeChildren: false, classOnly?: false} & U>;
+	OptionsFactory<T & AttrClass & ChildClass, Options & {attrs?: true, observeChildren?: true} & U> &
+	OptionsFactory<T & ChildClass, Options & {attrs: false, observeChildren?: true} & U> &
+	OptionsFactory<T & AttrClass, Options & {attrs?: true, observeChildren: false} & U> &
+	OptionsFactory<T, Options & {attrs: false, observeChildren: false} & U>;
 
 type ElementFactory = HTMLElementORDocumentFragmentFactory<HTMLElement, {psuedo?: false}> & HTMLElementORDocumentFragmentFactory<DocumentFragment, {psuedo: true}>;
 
@@ -237,7 +239,7 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 }));
 
 export default ((fn: (elem: Node) => Children, options: Options = {}) => {
-	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend} = options,
+	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = psuedo ? class extends extend(getPsuedo(attrs, observeChildren)) {
@@ -257,5 +259,5 @@ export default ((fn: (elem: Node) => Children, options: Options = {}) => {
 	if (!psuedo) {
 		customElements.define(name, element as CustomElementConstructor);
 	}
-	return psuedo ? (properties?: Props, children?: Children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
+	return classOnly ? element : psuedo ? (properties?: Props, children?: Children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
 }) as ElementFactory;
