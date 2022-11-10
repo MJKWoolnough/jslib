@@ -11,7 +11,7 @@ type Options = {
 	styles?: [CSSStyleSheet];
 	psuedo?: boolean;
 	name?: string;
-	extend?: <T extends ConstructorOf<Node>>(base: T) => T;
+	extend?: Function;
 	classOnly?: boolean;
 }
 
@@ -225,7 +225,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	while(customElements.get(name = String.fromCharCode(...Array.from({"length": 11}, (_, n) => n === 5 ? 45 : 97 + Math.floor(Math.random() * 26))))) {}
 	return name;
       },
-      noExtend = <T>(v: T) => v;
+      noExtend = <T extends ConstructorOf<HTMLElement> | ConstructorOf<DocumentFragment>>(v: T) => v;
 
 export const Null = Object.freeze(Object.assign(() => {}, {
 	toString(){
@@ -242,7 +242,7 @@ export default ((fn: (elem: Node) => Children, options: Options = {}) => {
 	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
-	      element = psuedo ? class extends extend(getPsuedo(attrs, observeChildren)) {
+	      element = psuedo ? class extends (extend as (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V))(getPsuedo(attrs, observeChildren)) {
 		constructor() {
 			super();
 			amendNode(this, fn(this));
@@ -250,7 +250,7 @@ export default ((fn: (elem: Node) => Children, options: Options = {}) => {
 				childObserver.observe(this, childList);
 			}
 		}
-	      } : class extends extend(getClass(attachRemoveEvent, attrs, observeChildren)) {
+	      } : class extends (extend as (<T extends ConstructorOf<HTMLElement>, V extends T>(base: T) => V))(getClass(attachRemoveEvent, attrs, observeChildren)) {
 		constructor() {
 			super();
 			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = styles;
