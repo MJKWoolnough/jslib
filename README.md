@@ -783,6 +783,8 @@ The default export of the elements module is a function that can be used to crea
 | false   | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [ChildClass](#elements_childclass) |
 | false   | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) |
 
+In addition, the type T can be further modified by the use of the `extend` Option, which will add a custom class to the prototype chain, allowing its methods and field to be used, including during the `fn` call.
+
 The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the psuedo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the psuedo Option is true.
 
 If the `classOnly` Option is set to false (or unset), the resulting [DOMBind](#dom_dombind) can be used in the same way as any other DOMBind, creating your (psuedo-)element and applying the attributes and children accordingly.
@@ -831,6 +833,7 @@ type Options = {
 	attrs?: boolean;
 	classOnly?: boolean;
 	delegatesFocus?: boolean;
+	extend?: (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V) | (<T extends ConstructorOf<HTMLElement>, V extends T>(base: T) => V);
 	manualSlot?: boolean;
 	name?: string;
 	observeChildren?: boolean;
@@ -847,6 +850,7 @@ This unexported type is used to change how the elements are created and controll
 | attrs             | true      | When true, enables both the 'act' and 'attr' methods on the element class. |
 | classOnly         | false     | When true, the return from the default function will be the generated class, when false the return from the default function will be a [DOMBind](#dom_dombind). |
 | delegatesFocus    | false     | When true, sets the delegatesFocus option during attachShadow call to true. Has no effect when 'psuedo' is set to true. |
+| extend            | e => e    | Allows the generated class to be extended with a custom class. This extension will be applied before the passed fn function is called. |
 | manualSlot        | false     | When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'psuedo' is set to true. |
 | name              | undefined | Registers a custom element name for the generated element class, instead of a randomly generated one. Has no effect when 'psuedo' is set to true. |
 | observeChildren   | true      | When true, enables the observeChildren method on the element class. |
