@@ -2,6 +2,11 @@ import type {Children, DOMBind, Props} from './dom.js';
 import {Bind, amendNode, bind, bindElement} from './dom.js';
 import {ns} from './html.js';
 
+export interface Extender {
+	<T extends HTMLElement, V extends T>(base: {new(...args: any[]): HTMLElement}): {new(...args: any[]): V};
+	<T extends DocumentFragment, V extends T>(base: {new(...args: any[]): HTMLElement}): {new(...args: any[]): V};
+}
+
 type Options = {
 	manualSlot?: boolean;
 	delegatesFocus?: boolean;
