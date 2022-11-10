@@ -12,6 +12,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [css](#css)                                 | A simple CSS management library. |
 | [dom](#dom)                                 | Functions for manipulating the DOM. |
 | [drag](#drag)                               | Library for making browser Drag'n'Drop easier to use. |
+| [elements](#elements)                       | Library for easy custom element creation. |
 | [events](#events)                           | Functions to simplify starting & stopping global keyboard and mouse events. |
 | [fraction](#fraction)                       | An infinity precision fractional math type. |
 | [html](#html)                               | Functions to create HTML elements. |
@@ -751,6 +752,102 @@ interface Transfer<T> {
 ```
 
 The unexported Transfer interface describes an object that will transfer a T to a caller of [DragTransfer](#drag_dragtransfer)<T>.get.
+
+## <a name="elements">elements</a>
+
+The elements module allows for easy creation of custom elements, with simple attribute and event binding
+
+This module directly imports the [dom](#dom) and [html](#html) modules.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [(default)](#elements_default) | Function | A factory function used to create custom elements. |
+| [Null](#elements_null) | Object | The default value of attributes used in the attr and act methods of a custom element. |
+
+### <a name="elements_default">(default)</a>
+```typescript
+(fn: (elem: T) => Children, options?: Options) => DOMBind<T>;
+```
+
+The default export of the elements module is a function that can be used to create custom elements. The Type `T` is determined by the [Options](#elements_options) provided. The following table shows how setting options affects the type of `T`.
+
+|  attrs  |  observeChildren  |  psuedo  |  T  |
+|---------|-------------------|----------|-----|
+| true    | true              | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [AttrClass](#elements_attrclass) & [ChildClass](#elements_childclass) |
+| true    | false             | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [AttrClass](#elements_attrclass) |
+| false   | true              | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [ChildClass](#elements_childclass) |
+| false   | false             | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) |
+| true    | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [AttrClass](#elements_attrclass) & [ChildClass](#elements_childclass) |
+| true    | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [AttrClass](#elements_attrclass) |
+| false   | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [ChildClass](#elements_childclass) |
+| false   | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) |
+
+The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the psuedo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the psuedo Option is true.
+
+The resulting [DOMBind](#dom_dombind) can be used in the same way as any other DOMBind, creating your (psuedo-)element and applying the attributes and children accordingly.
+
+### <a name="elements_attrclass">AttrClass</a>
+```typescript
+class AttrClass {
+	act(name: string, fn: (newValue: ToString) => void): void;
+	act(name: string[], fn: (values: Object) => void): void;
+	attr(name: string, fn?: (newValue: ToString) => ToString | null | undefined): Bind;
+	attr(name: string[], fn: (values: Object) => ToString | null | undefined): Bind;
+}
+```
+
+This class is added to an element created with the [(default)](#elements_default) function when the `attr` is `true` (or unset).
+
+The `act` method allows actions to be taken when attributes on the element are changed. When monitoring a single attribute, the newValue will be the new value assigned to that attribute. When monitoring multiple attributes, an Object will be passed to the function with keys on the attribute names set to the value of that attribute.
+
+The `attr` method acts similarly to the `act` method, but will return a [Bind](#dom_bind). When monitoring a single attribute, the value of the Bind object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attriubtes, the value of the Bind object will be set to the return of the fn function. The fn function works similary to that used in the `act` method.
+
+### <a name="elements_childclass">ChildClass</a>
+```typescript
+class ChildClass {
+	observeChildren(fn: (added: NodeList, removed: NodeList) => void): void;
+}
+```
+
+This class is added to an element created with the [(default)](#elements_default) function when the `observeChildren` is `true` (or unset).
+
+The observeChildren method sets a callback function that will be called whenever children are added or removed from the element, with the lists of added and removed children.
+
+NB: For psuedo-elements, the callback function will not be triggered during construction.
+
+### <a name="elements_null">Null</a>
+
+The Null value is used by the act and attrs methods to indicate the non-existance of a value. It can act as a noop function, an empty string, an empty iterator, and NaN depending on how it is used.
+
+As this may be passed to any function passed to the act and attr methods, it should either be checked for directly (with an equality check), or used in a way in which it will be coerced to the correct data type.
+
+### <a name="elements_options">Options</a>
+```typescript
+type Options = {
+	attachRemoveEvent?: boolean;
+	attrs?: boolean;
+	classOnly?: boolean;
+	delegatesFocus?: boolean;
+	manualSlot?: boolean;
+	name?: string;
+	observeChildren?: boolean;
+	psuedo?: boolean;
+	styles?: [CSSStyleSheet];
+}
+```
+
+This unexported type is used to change how the elements are created and controlled.
+
+|  Options          |  Default  |  Description  |
+|-------------------|-----------|---------------|
+| attachRemoveEvent | true      | When true, the resulting created element will send an 'attached' event when the element is attached to a parent, and a 'removed' event when removed from a parent. Has no effect when 'psuedo' is set to true. |
+| attrs             | true      | When true, enables both the 'act' and 'attr' methods on the element class. |
+| delegatesFocus    | false     | When true, sets the delegatesFocus option during attachShadow call to true. Has no effect when 'psuedo' is set to true. |
+| manualSlot        | false     | When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'psuedo' is set to true. |
+| name              | undefined | Registers a custom element name for the generated element class, instead of a randomly generated one. Has no effect when 'psuedo' is set to true. |
+| observeChildren   | true      | When true, enables the observeChildren method on the element class. |
+| psuedo            | false     | When true, the class created is extended from DocumentFragment, instead of HTMLElement, and does not register a custom element. This will act, in many ways, like a custom element, but without a Shadow Root, any children are attached directly to the DOM on appending. |
+| styles            | []        | Sets the adoptedStyleSheets options on the Shadow Root. Has no effect when 'psuedo' is set to true. |
 
 ## <a name="events">events</a>
 
