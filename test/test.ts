@@ -3884,6 +3884,12 @@
 				const {default: e} = await import("./lib/elements.js"),
 				      t = e(() => [], {"extend": v => class extends v{a = 1}})();
 				return t.a === 1;
+			},
+			"extend Nodes": async() => {
+				const {default: e} = await import("./lib/elements.js"),
+				      {addNodeRef, node} = await import("./lib/nodes.js"),
+				      t = e(() => [], {"extend": addNodeRef})();
+				return t[node] === t;
 			}
 		},
 		"observeChildren": {
