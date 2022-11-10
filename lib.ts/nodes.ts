@@ -1,6 +1,12 @@
+interface Extender {
+	<T extends HTMLElement, V extends T>(base: {new(...args: any[]): HTMLElement}): {new(...args: any[]): V};
+	<T extends DocumentFragment, V extends T>(base: {new(...args: any[]): HTMLElement}): {new(...args: any[]): V};
+}
+
 export const node = Symbol("node"),
 noSort = () => 0,
-stringSort = new Intl.Collator().compare;
+stringSort = new Intl.Collator().compare,
+addNodeRef: Extender = (base: {new(...args: any[]): HTMLElement}) => class extends base {[node] = this;};
 
 interface Item {
 	[node]: Node;

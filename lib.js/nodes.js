@@ -1,6 +1,7 @@
 export const node = Symbol("node"),
 noSort = () => 0,
-stringSort = new Intl.Collator().compare;
+stringSort = new Intl.Collator().compare,
+addNodeRef = v => class extends v {[node] = this};
 
 const sortNodes = (root, n) => {
 	while (n.p.i && root.s(n.i, n.p.i) * root.o < 0) {
