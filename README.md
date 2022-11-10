@@ -767,6 +767,7 @@ This module directly imports the [dom](#dom) and [html](#html) modules.
 ### <a name="elements_default">(default)</a>
 ```typescript
 (fn: (elem: T) => Children, options?: Options) => DOMBind<T>;
+(fn: (elem: T) => Children, options?: Options & {classOnly: true}) => ConstructorOf<T>;
 ```
 
 The default export of the elements module is a function that can be used to create custom elements. The Type `T` is determined by the [Options](#elements_options) provided. The following table shows how setting options affects the type of `T`.
@@ -784,7 +785,9 @@ The default export of the elements module is a function that can be used to crea
 
 The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the psuedo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the psuedo Option is true.
 
-The resulting [DOMBind](#dom_dombind) can be used in the same way as any other DOMBind, creating your (psuedo-)element and applying the attributes and children accordingly.
+If the `classOnly` Option is set to false (or unset), the resulting [DOMBind](#dom_dombind) can be used in the same way as any other DOMBind, creating your (psuedo-)element and applying the attributes and children accordingly.
+
+If the `classOnly` Option is set to true, the function will just return the generated class constructor, without creating a DOMBind function.
 
 ### <a name="elements_attrclass">AttrClass</a>
 ```typescript
@@ -842,6 +845,7 @@ This unexported type is used to change how the elements are created and controll
 |-------------------|-----------|---------------|
 | attachRemoveEvent | true      | When true, the resulting created element will send an 'attached' event when the element is attached to a parent, and a 'removed' event when removed from a parent. Has no effect when 'psuedo' is set to true. |
 | attrs             | true      | When true, enables both the 'act' and 'attr' methods on the element class. |
+| classOnly         | false     | When true, the return from the default function will be the generated class, when false the return from the default function will be a [DOMBind](#dom_dombind). |
 | delegatesFocus    | false     | When true, sets the delegatesFocus option during attachShadow call to true. Has no effect when 'psuedo' is set to true. |
 | manualSlot        | false     | When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'psuedo' is set to true. |
 | name              | undefined | Registers a custom element name for the generated element class, instead of a randomly generated one. Has no effect when 'psuedo' is set to true. |
