@@ -3889,6 +3889,8 @@
 				const {default: e} = await import("./lib/elements.js"),
 				      {addNodeRef, node} = await import("./lib/nodes.js"),
 				      t = e(() => [], {"extend": addNodeRef})();
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				// Works when using non-dynamic import.
 				return t[node] === t;
 			}
 		},
