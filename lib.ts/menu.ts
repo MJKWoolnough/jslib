@@ -29,9 +29,7 @@ export class MenuElement extends HTMLElement {
 	#c?: Function;
 	constructor() {
 		super();
-		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			this.#s = slot()
-		]).adoptedStyleSheets = [menuStyle];
+		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot()).adoptedStyleSheets = [menuStyle];
 		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": (e: KeyboardEvent) => {
 			const da = document.activeElement;
 			switch (e.key) {
