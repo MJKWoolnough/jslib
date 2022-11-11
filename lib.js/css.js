@@ -52,7 +52,7 @@ export default class CSS extends CSSStyleSheet {
 		return this.#idPrefix + this.#id++;
 	}
 	ids(length) {
-		return Array.from({length}, _ => this.id());
+		return Array.from({length}, () => this.id());
 	}
 	toString() {
 		let r = "";

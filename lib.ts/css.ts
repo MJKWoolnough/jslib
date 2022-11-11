@@ -64,7 +64,7 @@ export default class CSS extends CSSStyleSheet {
 		return this.#idPrefix + this.#id++;
 	}
 	ids<N extends number>(length: N) {
-		return Array.from({length}, _ => this.id()) as IDs<N>;
+		return Array.from({length}, () => this.id()) as IDs<N>;
 	}
 	toString() {
 		let r = "";
