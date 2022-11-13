@@ -349,6 +349,7 @@ This module directly imports the [html](#html) module, and indirectly imports th
 | at        | Function | The [at](#css_css_at) method of a default instance of the default [CSS](#css_css) class. |
 | id        | Function | The [id](#css_css_id) method of a default instance of the default [CSS](#css_css) class. |
 | ids       | Function | The [ids](#css_css_id) method of a default instance of the default [CSS](#css_css) class. |
+| [mixin](#css_mixin) | Function | This function merges two [Def](#css_def) objects.
 | render    | Function | The [render](#css_css_render) method of a default instance of the default [CSS](#css_css) class. |
 
 ### Example
@@ -470,6 +471,13 @@ The key can refer to property name or an extended selector.
 When the key is a property name, the value will be a [Value](#css_value) type.
 
 When the key is an extended selector, it will be logically appended to the current selector and processed as in a call to the [add](#css_css_add) method with the value Def. The logical appending splits both the parent and extended selectors at the ',' seperator and concatenates all pairs together, seperated by ',' seperators.
+
+### <a name="css_mixin">mixin</a>
+```typescript
+(base: Def, add: Def) => Def;
+```
+
+This function deeply adds the `add` values to the `base`, and returns the merged `base` [Def](#css_def) Object.
 
 ### <a name="css_value">Value</a>
 ```typescript
