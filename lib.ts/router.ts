@@ -6,7 +6,7 @@ const update = Symbol("update"),
       aHandler = function(this: HTMLAnchorElement, e: Event) {
 	const href = this.getAttribute("href");
 	if (href) {
-		history.pushState({}, "", new URL(href, window.location + "") + "")
+		history.pushState(Date.now(), "", new URL(href, window.location + "") + "")
 	}
 	e.preventDefault();
       };
