@@ -171,7 +171,9 @@ export const amendNode = (node, properties, children) => {
 		if (typeof children === "string" && !node.firstChild) {
 			node.textContent = children;
 		} else if (children) {
-			if (node instanceof Element || node instanceof DocumentFragment) {
+			if (children instanceof Node) {
+				node.appendChild(children);
+			} else if (node instanceof Element || node instanceof DocumentFragment) {
 				node.append(...childrenArr(children));
 			} else {
 				node.appendChild(createDocumentFragment(children));
@@ -190,6 +192,8 @@ createDocumentFragment = children => {
 	const df = document.createDocumentFragment();
 	if (typeof children === "string") {
 		df.textContent = children;
+	} else if (children instanceof Node) {
+		df.append(children);
 	} else if (children !== undefined) {
 		df.append(...childrenArr(children));
 	}
