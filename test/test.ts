@@ -3788,6 +3788,28 @@
 					}
 				}) + "").replaceAll("  ", "").replaceAll(" \n", "\n") /* Hack to get FF and Chrome output to match */ === "@keyframes identifier {\n0% { top: 0px; }\n100% { left: 0px; }\n}";
 			}
+		},
+		"mixins": {
+			"shallow single": async () => {
+				const {mixin} = await import("./lib/css.js"),
+				      o = mixin({}, {"a": "b"});
+				return o["a"] === "b";
+			},
+			"shallow multiple": async () => {
+				const {mixin} = await import("./lib/css.js"),
+				      o = mixin({"existing1": "some value", "existing2": "be gone"}, {"a": "b", "existing2": "stay"});
+				return o["existing1"] === "some value" && o["existing2"] === "stay" && o["a"] === "b";
+			},
+			"deep single": async () => {
+				const {mixin} = await import("./lib/css.js"),
+				      o = mixin({}, {"a": {"b": "c"}});
+				return o["a"] instanceof Object && (o["a"] as Record<string, string>)["b"] === "c";
+			},
+			"deep merge": async () => {
+				const {mixin} = await import("./lib/css.js"),
+				      o = mixin({"existing": {"a": "b", "c": "d"}}, {"existing": {"c": "e", "f": "g"}});
+				return o["existing"] instanceof Object && (o["existing"] as Record<string, string>)["c"] === "e" && (o["existing"] as Record<string, string>)["f"] === "g";
+			}
 		}
 	},
 	"elements.js": {
