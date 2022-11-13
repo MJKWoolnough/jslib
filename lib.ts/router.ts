@@ -9,12 +9,24 @@ const update = Symbol("update"),
 
 class Router extends HTMLElement {
 	#s: HTMLSlotElement;
+	#current?: Route;
 	constructor() {
 		super();
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot());
 	}
 	[update]() {
-		this.#s.assign();
+		const url = window.location.pathname;
+		for (const c of this.children) {
+			if (c instanceof Route) {
+				const prefix = c.getAttribute("prefix"); // will probably end up with something more complicated that just URL prefix
+				if (prefix && url.startsWith(prefix))  {
+					if (this.#current !== c) {
+						this.#s.assign(this.#current = c);
+					}
+					return;
+				}
+			}
+		}
 	}
 }
 
