@@ -125,4 +125,18 @@ export const add = (selector: string, def: Def) => defaultCSS.add(selector, def)
 at = (at: string, defs?: Record<string, Def>) => defaultCSS.at(at, defs),
 id = () => defaultCSS.id(),
 ids = <N extends number>(n: N) => defaultCSS.ids(n) as IDs<N>,
-render = () => defaultCSS.render();
+render = () => defaultCSS.render(),
+mixin = (base: Def, add: Def) => {
+	for (const key in add) {
+		const v = add[key];
+		if (isDef(v)) {
+			const w = base[key] ?? (base[key] = {});
+			if (isDef(w)) {
+				mixin(w, v);
+			}
+		} else {
+			base[key] = v;
+		}
+	}
+	return base;
+};

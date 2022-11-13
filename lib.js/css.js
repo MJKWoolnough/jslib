@@ -113,4 +113,18 @@ export const add = (selector, def) => defaultCSS.add(selector, def),
 at = (at, defs) => defaultCSS.at(at, defs),
 id = () => defaultCSS.id(),
 ids = n => defaultCSS.ids(n),
-render = () => defaultCSS.render();
+render = () => defaultCSS.render(),
+mixin = (base, add) => {
+	for (const key in add) {
+		const v = add[key];
+		if (isDef(v)) {
+			const w = base[key] ?? (base[key] = {});
+			if (isDef(w)) {
+				mixin(w, v);
+			}
+		} else {
+			base[key] = v;
+		}
+	}
+	return base;
+};
