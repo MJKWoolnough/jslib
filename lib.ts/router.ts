@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import {amendNode, bindElement} from './dom.js';
+import {amendNode, bindElement, event, eventRemove} from './dom.js';
 import {a as aHTML, ns, slot} from './html.js';
 
 const update = Symbol("update"),
@@ -31,6 +31,13 @@ class Router extends HTMLElement {
 				}
 			}
 		}
+	}
+	handleEvent() {}
+	connectedCallback() {
+		amendNode(window, {"onpopstate": this});
+	}
+	disconnectedCallback() {
+		amendNode(window, {"onpopstate": event(this, eventRemove)});
 	}
 }
 
