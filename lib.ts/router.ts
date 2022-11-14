@@ -45,7 +45,7 @@ class Router extends HTMLElement {
 			depth++;
 			if (n instanceof ShadowRoot) {
 				n = n.host;
-			} else if (!n.parentNode) {
+			} else if (!n.parentNode || n instanceof Route) {
 				return;
 			} else {
 				n = n.parentNode;
