@@ -14,13 +14,11 @@ const update = Symbol("update"),
 	}
 	e.preventDefault();
       },
-      routers = new Map<Router, number>();
+      routers = new Set<Router>();
 
 amendNode(window, {"onpopstate": () => {
-	for (const [r] of Array.from(routers.entries()).sort(([, a], [, b]) => a - b)) {
-		if (r.isConnected) {
-			r[update]();
-		}
+	for (const r of routers) {
+		r[update]();
 	}
 }});
 
@@ -47,10 +45,8 @@ class Router extends HTMLElement {
 	}
 	handleEvent() {}
 	connectedCallback() {
-		let n: Node | Document = this,
-		    depth = 0;
+		let n: Node | Document = this;
 		while (n !== document) {
-			depth++;
 			if (n instanceof ShadowRoot) {
 				n = n.host;
 				return;
@@ -60,7 +56,7 @@ class Router extends HTMLElement {
 				n = n.parentNode;
 			}
 		}
-		routers.set(this, depth);
+		routers.add(this);
 	}
 	disconnectedCallback() {
 		routers.delete(this);
