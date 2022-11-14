@@ -16,6 +16,14 @@ const update = Symbol("update"),
       },
       routers = new Map<Router, number>();
 
+amendNode(window, {"onpopstate": () => {
+	for (const [r] of Array.from(routers.entries()).sort(([, a], [, b]) => a - b)) {
+		if (r.isConnected) {
+			r[update]();
+		}
+	}
+}});
+
 class Router extends HTMLElement {
 	#s: HTMLSlotElement;
 	#current?: Route;
