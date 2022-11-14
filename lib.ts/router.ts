@@ -1,8 +1,9 @@
 import type {Children, Props} from './dom.js';
-import {amendNode, bindElement} from './dom.js';
-import {a as aHTML, ns, slot} from './html.js';
+import {amendNode, clearNode, bindElement} from './dom.js';
+import {a as aHTML, ns} from './html.js';
 
 const update = Symbol("update"),
+      clone = Symbol("clone"),
       aHandler = function(this: HTMLAnchorElement, e: Event) {
 	const href = this.getAttribute("href");
 	if (href) {
@@ -23,11 +24,11 @@ amendNode(window, {"onpopstate": () => {
 }});
 
 class Router extends HTMLElement {
-	#s: HTMLSlotElement;
+	#s: ShadowRoot;
 	#current?: Route;
 	constructor() {
 		super();
-		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot());
+		this.#s = this.attachShadow({"mode": "closed", "slotAssignment": "manual"});
 	}
 	[update]() {
 		const url = window.location.pathname;
@@ -36,7 +37,7 @@ class Router extends HTMLElement {
 				const prefix = c.getAttribute("prefix"); // will probably end up with something more complicated that just URL prefix
 				if (prefix && url.startsWith(prefix))  {
 					if (this.#current !== c) {
-						this.#s.assign(this.#current = c);
+						clearNode(this.#s, (this.#current = c)[clone]());
 					}
 					return;
 				}
@@ -63,6 +64,9 @@ class Router extends HTMLElement {
 }
 
 class Route extends HTMLTemplateElement {
+	[clone]() {
+		return this.content.cloneNode();
+	}
 	connectedCallback() {
 		if (this.parentNode instanceof Router) {
 			this.parentNode[update]();
