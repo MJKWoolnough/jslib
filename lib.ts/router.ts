@@ -3,10 +3,11 @@ import {amendNode, clearNode, bindElement} from './dom.js';
 import {a as aHTML, ns} from './html.js';
 
 const update = Symbol("update"),
-      clone = Symbol("clone"),
+      newState = Symbol("newState"),
       aHandler = function(this: HTMLAnchorElement, e: Event) {
 	const href = this.getAttribute("href");
 	if (href) {
+		lastState = history.state;
 		const url = new URL(href, window.location + "");
 		if (url.host !== window.location.host) {
 			return;
@@ -17,31 +18,50 @@ const update = Symbol("update"),
       },
       routers = new Set<Router>();
 
+let lastState = 0;
+
 amendNode(window, {"onpopstate": () => {
 	for (const r of routers) {
-		r[update]();
+		r[newState]();
 	}
 }});
 
 class Router extends HTMLElement {
 	#s: ShadowRoot;
 	#current?: Route;
+	#history = new Map<number, Node[]>();
 	constructor() {
 		super();
 		this.#s = this.attachShadow({"mode": "closed", "slotAssignment": "manual"});
 	}
-	[update]() {
+	[newState]() {
+		this.#history.set(lastState, Array.from(this.#s.childNodes));
+		const h = this.#history.get(history.state ?? 0);
+		if (h) {
+			clearNode(this.#s, h);
+		} else {
+			const c = this.#getRoute();
+			if (c) {
+				clearNode(this.#s, (this.#current = c).content.cloneNode());
+			}
+		}
+	}
+	#getRoute() {
 		const url = window.location.pathname;
 		for (const c of this.children) {
 			if (c instanceof Route) {
 				const prefix = c.getAttribute("prefix"); // will probably end up with something more complicated that just URL prefix
 				if (prefix && url.startsWith(prefix))  {
-					if (this.#current !== c) {
-						clearNode(this.#s, (this.#current = c)[clone]());
-					}
-					return;
+					return c;
 				}
 			}
+		}
+		return null;
+	}
+	[update]() {
+		const c = this.#getRoute();
+		if (c && this.#current !== c) {
+			clearNode(this.#s, (this.#current = c).content.cloneNode());
 		}
 	}
 	handleEvent() {}
@@ -64,9 +84,6 @@ class Router extends HTMLElement {
 }
 
 class Route extends HTMLTemplateElement {
-	[clone]() {
-		return this.content.cloneNode();
-	}
 	connectedCallback() {
 		if (this.parentNode instanceof Router) {
 			this.parentNode[update]();
