@@ -41,9 +41,7 @@ class Router extends HTMLElement {
 			clearNode(this.#s, h);
 		} else {
 			const c = this.#getRoute();
-			if (c) {
-				clearNode(this.#s, (this.#current = c).content.cloneNode());
-			}
+			clearNode(this.#s, c ? (this.#current = c).content.cloneNode() : []);
 		}
 	}
 	#getRoute() {
@@ -60,8 +58,12 @@ class Router extends HTMLElement {
 	}
 	[update]() {
 		const c = this.#getRoute();
-		if (c && this.#current !== c) {
-			clearNode(this.#s, (this.#current = c).content.cloneNode());
+		if (c) {
+			if (this.#current !== c) {
+				clearNode(this.#s, (this.#current = c).content.cloneNode());
+			}
+		} else {
+			clearNode(this.#s);
 		}
 	}
 	handleEvent() {}
