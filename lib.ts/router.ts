@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import {amendNode, bindElement, event, eventRemove} from './dom.js';
+import {amendNode, bindElement} from './dom.js';
 import {a as aHTML, ns, slot} from './html.js';
 
 const update = Symbol("update"),
@@ -13,7 +13,8 @@ const update = Symbol("update"),
 		history.pushState(Date.now(), "", new URL(href, url + "") + "")
 	}
 	e.preventDefault();
-      };
+      },
+      routers = new Map<Router, number>();
 
 class Router extends HTMLElement {
 	#s: HTMLSlotElement;
@@ -38,10 +39,22 @@ class Router extends HTMLElement {
 	}
 	handleEvent() {}
 	connectedCallback() {
-		amendNode(window, {"onpopstate": this});
+		let n: Node | Document = this,
+		    depth = 0;
+		while (n !== document) {
+			depth++;
+			if (n instanceof ShadowRoot) {
+				n = n.host;
+			} else if (!n.parentNode) {
+				return;
+			} else {
+				n = n.parentNode;
+			}
+		}
+		routers.set(this, depth);
 	}
 	disconnectedCallback() {
-		amendNode(window, {"onpopstate": event(this, eventRemove)});
+		routers.delete(this);
 	}
 }
 
