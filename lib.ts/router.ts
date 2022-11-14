@@ -46,7 +46,7 @@ class Router extends HTMLElement {
 	handleEvent() {}
 	connectedCallback() {
 		let n: Node | Document = this;
-		while (n !== document) {
+		while (n) {
 			if (n instanceof ShadowRoot) {
 				n = n.host;
 				return;
