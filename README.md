@@ -27,6 +27,17 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [windows_taskbar](#windows_taskbar)         | Custom Element that lists Windows on a TaskBar. |
 | [windows_taskmanager](#windows_taskmanager) | Custom Element that allows minimisation of Windows. |
 
+# Packages
+
+Thematically, the above modules can be grouped into a few packages:
+
+|  Package  |  Description  |  Members  |
+|-----------|---------------|-----------|
+| Decorum   | A collection of DOM manipulation libs. | [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Nodes](#nodes), and [SVG](#svg) |
+| Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), and [RPC](#rpc). |
+| Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager))) modules. |
+| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), and [Settings](#settings) |
+
 # Scripts
 
 |  Script      |  Description  |
