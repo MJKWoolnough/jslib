@@ -66,7 +66,6 @@ class Router extends HTMLElement {
 			clearNode(this.#s);
 		}
 	}
-	handleEvent() {}
 	connectedCallback() {
 		let n: Node | Document = this;
 		while (n) {
