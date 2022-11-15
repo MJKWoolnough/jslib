@@ -9,12 +9,11 @@ const update = Symbol("update"),
 	if (href) {
 		lastState = history.state;
 		const url = new URL(href, window.location + "");
-		if (url.host !== window.location.host) {
-			return;
+		if (url.host === window.location.host) {
+			history.pushState(Date.now(), "", new URL(href, url + "") + "")
+			e.preventDefault();
 		}
-		history.pushState(Date.now(), "", new URL(href, url + "") + "")
 	}
-	e.preventDefault();
       },
       routers = new Set<Router>();
 
