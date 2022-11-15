@@ -47,7 +47,7 @@ class Router extends HTMLElement {
 		const url = window.location.pathname;
 		for (const c of this.children) {
 			if (c instanceof Route) {
-				const prefix = c.getAttribute("prefix"); // will probably end up with something more complicated that just URL prefix
+				const prefix = c.getAttribute("prefix"); // will probably end up with something more complicated than just URL prefix
 				if (prefix && url.startsWith(prefix))  {
 					return c;
 				}
