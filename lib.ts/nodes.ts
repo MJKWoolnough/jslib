@@ -426,6 +426,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	}
 	[Symbol.unscopables]() {
 		return {
+			__proto__: null,
 			"copyWithin": true,
 			"entries": true,
 			"fill": true,

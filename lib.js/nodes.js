@@ -376,6 +376,7 @@ export class NodeArray {
 	}
 	[Symbol.unscopables]() {
 		return {
+			__proto__: null,
 			"copyWithin": true,
 			"entries": true,
 			"fill": true,
