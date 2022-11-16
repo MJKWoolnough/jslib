@@ -31,15 +31,16 @@ const sortNodes = (root, n) => {
       },
       getNode = (root, index) => {
 	if (index < 0) {
-		for (let curr = root.p, pos = index; curr.i; pos++, curr = curr.p) {
-			if (pos === 0) {
-				return [curr, pos];
+		index++;
+		for (let curr = root.p; curr.i; index++, curr = curr.p) {
+			if (!index) {
+				return [curr, index];
 			}
 		}
 	} else if (index < root.l) {
-		for (let curr = root.n, pos = index; curr.i; pos--, curr = curr.n) {
-			if (pos === 0) {
-				return [curr, pos];
+		for (let curr = root.n; curr.i; index--, curr = curr.n) {
+			if (!index) {
+				return [curr, index];
 			}
 		}
 	}
