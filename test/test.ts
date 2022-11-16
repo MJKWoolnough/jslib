@@ -4309,6 +4309,71 @@
 				      n = new NodeArray(document.createElement("div"));
 				return n.at(0) === undefined && n.at(-1) === undefined;
 			}
+		},
+		"NodeArray - concat": {
+			"no nodes": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      n = new NodeArray(document.createElement("div"));
+				return n.concat([]).length === 0;
+			},
+			"a node": async () => {
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      aNode = {[node]: document.createElement("div")},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray(document.createElement("div"), noSort, [aNode]),
+				      nn = n.concat();
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return nn.length === 1 && nn[0] === aNode;
+			},
+			"a node + another": async () => {
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      aNode = {[node]: document.createElement("div")},
+				      another = {[node]: document.createElement("span")},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray(document.createElement("div"), noSort, [aNode]),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      nn = n.concat(another);
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return nn.length == 2 && nn[0] === aNode && nn[1] === another;
+			},
+			"two nodes + another": async () => {
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      aNode = {[node]: document.createElement("div")},
+				      bNode = {[node]: document.createElement("a")},
+				      another = {[node]: document.createElement("span")},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray(document.createElement("div"), noSort, [aNode, bNode]),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      nn = n.concat(another);
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return nn.length == 3 && nn[0] === aNode && nn[1] === bNode && nn[2] == another;
+			},
+			"two nodes + two others": async () => {
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      aNode = {[node]: document.createElement("div")},
+				      bNode = {[node]: document.createElement("a")},
+				      another = {[node]: document.createElement("span")},
+				      anotherOne = {[node]: document.createElement("br")},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray(document.createElement("div"), noSort, [aNode, bNode]),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      nn = n.concat(another, anotherOne);
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return nn.length == 4 && nn[0] === aNode && nn[1] === bNode && nn[2] == another && nn[3] == anotherOne;
+			},
+			"two nodes + array": async () => {
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      aNode = {[node]: document.createElement("div")},
+				      bNode = {[node]: document.createElement("a")},
+				      another = {[node]: document.createElement("span")},
+				      anotherOne = {[node]: document.createElement("br")},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray(document.createElement("div"), noSort, [aNode, bNode]),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      nn = n.concat([another, anotherOne]);
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return nn.length == 4 && nn[0] === aNode && nn[1] === bNode && nn[2] == another && nn[3] == anotherOne;
+			}
 		}
 	}
 });
