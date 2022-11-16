@@ -4385,6 +4385,41 @@
 				}
 				return false;
 			},
+		},
+		"NodeArray - entries": {
+			"no nodes": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      n = new NodeArray(document.createElement("div")),
+				      g = n.entries();
+				return g.next().value === undefined;
+			},
+			"two nodes": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]),
+				      g = n.entries(),
+				      a = g.next().value,
+				      b = g.next().value;
+				return a?.[0] === 0 && a?.[1].num === 1 && b?.[0] === 1 && b?.[1].num === 2 && g.next().value === undefined;
+			},
+			"many nodes": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+				let good = 0;
+				for (const [num, e] of n.entries()) {
+					if (num === good && e.num === num) {
+						good++;
+					}
+				}
+				return good === 5;
+			}
 		}
 	}
 });
