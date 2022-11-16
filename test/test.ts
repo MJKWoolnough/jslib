@@ -4374,6 +4374,17 @@
 				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 				return nn.length == 4 && nn[0] === aNode && nn[1] === bNode && nn[2] == another && nn[3] == anotherOne;
 			}
+		},
+		"NodeArray - copyWithin": {
+			"should throw error": async () => {
+				const {NodeArray} = await import("./lib/nodes.js");
+				try {
+					new NodeArray(document.createElement("div")).copyWithin(0);
+				} catch {
+					return true;
+				}
+				return false;
+			},
 		}
 	}
 });
