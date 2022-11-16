@@ -4272,8 +4272,7 @@
 				      div = document.createElement("div"),
 				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 				      n = new NodeArray<MyNode>(div, noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
-				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
-				return n[node] === div && n.length === 2 && n[0].num === 1 && n[1].num === 2 && n[0][node] instanceof HTMLSpanElement && n[1][node] instanceof HTMLBRElement;
+				return n.length === 2 && n[0].num === 1 && n[1].num === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
 			},
 			"sorted nodes": async () => {
 				type MyNode = {
@@ -4283,8 +4282,7 @@
 				      div = document.createElement("div"),
 				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 				      n = new NodeArray<MyNode>(div, (a: MyNode, b: MyNode) => a.num - b.num, [{[node]: document.createElement("br"), num: 2}, {[node]: document.createElement("span"), num: 1}]);
-				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
-				return n[node] === div && n.length === 2 && n[0].num === 1 && n[1].num === 2 && n[0][node] instanceof HTMLSpanElement && n[1][node] instanceof HTMLBRElement;
+				return n.length === 2 && n[0].num === 1 && n[1].num === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
 			}
 		}
 	}
