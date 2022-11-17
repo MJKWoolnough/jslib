@@ -1,4 +1,4 @@
-import {amendNode, createDocumentFragment, bindElement} from './dom.js';
+import {amendNode, bindElement} from './dom.js';
 import {ns} from './html.js';
 
 const update = Symbol("update"),
@@ -42,34 +42,24 @@ amendNode(window, {"onclick": (e: Event) => {
 }});
 
 class Router extends HTMLElement {
-	#start = new Text();
-	#end = new Text();
-	#current?: Route;
-	#history = new Map<number, Node[]>();
+	#marker: ChildNode = new Text();
+	#current?: Node;
+	#history = new Map<number, ChildNode>();
 	constructor() {
 		super();
 		mo.observe(this, {"childList": true});
 	}
 	#sanity() {
-		for (let curr = this.#start.nextSibling; curr; curr = curr.nextSibling) {
-			if (curr === this.#end) {
-				return true;
-			}
-		}
-		return false;
+		return !!this.#marker.parentNode;
 	}
 	#clear() {
-		while (this.#start.nextSibling !== this.#end && this.#start.nextSibling) {
-			this.#start.nextSibling.remove();
-		}
+		this.#marker.replaceWith(this.#marker = new Text());
 	}
 	#getRoute(path: string) {
 		for (const c of this.children) {
-			if (c instanceof Route) {
-				const prefix = c.getAttribute("prefix"); // will probably end up with something more complicated than just URL prefix
-				if (prefix && path.startsWith(prefix))  {
-					return c;
-				}
+			const prefix = c.getAttribute("prefix"); // will probably end up with something more complicated than just URL prefix
+			if (prefix && path.startsWith(prefix))  {
+				return c;
 			}
 		}
 		return null;
@@ -78,21 +68,17 @@ class Router extends HTMLElement {
 		if (!this.#sanity()) {
 			return false;
 		}
-		const children: Node[] = [],
-		      h = this.#history.get(state ?? 0);
-		for (let curr = this.#start.nextSibling; curr !== this.#end && curr; curr = curr.nextSibling) {
-			children.push(curr);
-		}
-		this.#history.set(lastState, children);
-		this.#clear();
+		const h = this.#history.get(state ?? 0);
+		this.#history.set(lastState, this.#marker);
 		if (h) {
-			this.#start.after(createDocumentFragment(h));
+			this.#marker.replaceWith(this.#marker = h);
 		} else {
 			const c = this.#getRoute(path);
 			if (!c) {
+				this.#clear();
 				return false;
 			}
-			this.#start.after((this.#current = c).content.cloneNode());
+			this.#marker.after(this.#marker = (this.#current = c).cloneNode() as Element);
 		}
 		return false;
 	}
@@ -103,8 +89,7 @@ class Router extends HTMLElement {
 		const c = this.#getRoute(window.location.pathname);
 		if (c) {
 			if (this.#current !== c) {
-				this.#clear();
-				this.#start.after((this.#current = c).content.cloneNode());
+				this.#marker.after(this.#marker = (this.#current = c).cloneNode() as Element);
 			}
 		} else {
 			this.#clear();
@@ -115,28 +100,21 @@ class Router extends HTMLElement {
 		while (n) {
 			if (n instanceof ShadowRoot) {
 				n = n.host;
-			} else if (!n.parentNode || n instanceof Route) {
+			} else if (!n.parentNode || n instanceof Router) {
 				return;
 			} else {
 				n = n.parentNode;
 			}
 		}
 		routers.add(this);
-		this.before(this.#start);
-		this.after(this.#end);
-		this.remove();
+		this.replaceWith(this.#marker);
 	}
 	remove() {
-		this.#start.remove();
-		this.#end.remove();
+		this.#marker.remove();
 		routers.delete(this);
 	}
 }
 
-class Route extends HTMLTemplateElement {}
-
 customElements.define("router-router", Router);
-customElements.define("router-route", Route);
 
-export const router = bindElement(ns, "router-router"),
-route = bindElement(ns, "router-route");
+export const router = bindElement(ns, "router-router");
