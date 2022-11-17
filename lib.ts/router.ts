@@ -30,6 +30,9 @@ class Router extends HTMLElement {
 	#end = new Text();
 	#current?: Route;
 	#history = new Map<number, Node[]>();
+	#sanity() {
+		return this.#start.parentNode && this.#start.parentNode !== this.#end.parentNode;
+	}
 	#clear() {
 		while (this.#start.nextSibling !== this.#end && this.#start.nextSibling) {
 			this.#start.nextSibling?.remove();
@@ -51,6 +54,9 @@ class Router extends HTMLElement {
 		return null;
 	}
 	[newState]() {
+		if (!this.#sanity()) {
+			return;
+		}
 		const children: Node[] = [],
 		      h = this.#history.get(history.state ?? 0);
 		for (let curr = this.#start.nextSibling; curr !== this.#end && curr; curr = curr.nextSibling) {
@@ -68,6 +74,9 @@ class Router extends HTMLElement {
 		}
 	}
 	[update]() {
+		if (!this.#sanity()) {
+			return;
+		}
 		const c = this.#getRoute();
 		if (c) {
 			if (this.#current !== c) {
