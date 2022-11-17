@@ -1,29 +1,8 @@
-import type {Children, Props} from './dom.js';
 import {amendNode, createDocumentFragment, bindElement} from './dom.js';
-import {a as aHTML, ns} from './html.js';
+import {ns} from './html.js';
 
 const update = Symbol("update"),
       newState = Symbol("newState"),
-      aHandler = function(this: HTMLAnchorElement, e: Event) {
-	const href = this.getAttribute("href");
-	if (href) {
-		lastState = history.state;
-		const url = new URL(href, window.location + "");
-		if (url.host === window.location.host) {
-			const now = Date.now();
-			let handled = false;
-			for (const r of routers) {
-				if (r[newState](url.pathname, now)) {
-					handled = true;
-				}
-			}
-			if (handled) {
-				history.pushState(now, "", new URL(href, url + "") + "")
-				e.preventDefault();
-			}
-		}
-	}
-      },
       routers = new Set<Router>(),
       mo = new MutationObserver(records => {
 	for (const record of records) {
@@ -35,7 +14,28 @@ const update = Symbol("update"),
 
 let lastState = 0;
 
-amendNode(window, {"onpopstate": () => {
+amendNode(window, {"onclick": (e: Event) => {
+	if (e.target instanceof HTMLAnchorElement) {
+		const href = e.target.getAttribute("href");
+		if (href) {
+			lastState = history.state;
+			const url = new URL(href, window.location + "");
+			if (url.host === window.location.host) {
+				const now = Date.now();
+				let handled = false;
+				for (const r of routers) {
+					if (r[newState](url.pathname, now)) {
+						handled = true;
+					}
+				}
+				if (handled) {
+					history.pushState(now, "", new URL(href, url + "") + "")
+					e.preventDefault();
+				}
+			}
+		}
+	}
+}, "onpopstate": () => {
 	for (const r of routers) {
 		r[newState](window.location.pathname, history.state);
 	}
@@ -130,17 +130,8 @@ class Router extends HTMLElement {
 
 class Route extends HTMLTemplateElement {}
 
-class RouterA extends HTMLAnchorElement {
-	constructor() {
-		super();
-		amendNode(this, {"onclick": aHandler});
-	}
-}
-
 customElements.define("router-router", Router);
 customElements.define("router-route", Route);
-customElements.define("router-a", RouterA);
 
 export const router = bindElement(ns, "router-router"),
-route = bindElement(ns, "router-route"),
-a = (props?: Props, children?: Children) => amendNode(aHTML({"onclick": aHandler}), props, children);
+route = bindElement(ns, "router-route");
