@@ -126,6 +126,11 @@ class Router extends HTMLElement {
 		this.after(this.#end);
 		this.remove();
 	}
+	remove() {
+		this.#start.remove();
+		this.#end.remove();
+		routers.delete(this);
+	}
 }
 
 class Route extends HTMLTemplateElement {}
