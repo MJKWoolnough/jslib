@@ -108,6 +108,7 @@ class Router extends HTMLElement {
 		}
 		routers.add(this);
 		this.replaceWith(this.#marker);
+		this[update]();
 	}
 	remove() {
 		this.#marker.remove();
