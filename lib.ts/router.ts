@@ -31,14 +31,16 @@ class Router extends HTMLElement {
 	#current?: Route;
 	#history = new Map<number, Node[]>();
 	#sanity() {
-		return this.#start.parentNode && this.#start.parentNode !== this.#end.parentNode;
+		for (let curr = this.#start.nextSibling; curr; curr = curr.nextSibling) {
+			if (curr === this.#end) {
+				return true;
+			}
+		}
+		return false;
 	}
 	#clear() {
 		while (this.#start.nextSibling !== this.#end && this.#start.nextSibling) {
-			this.#start.nextSibling?.remove();
-		}
-		if (this.#start.nextSibling !== this.#end) {
-			this.#start.after(this.#end);
+			this.#start.nextSibling.remove();
 		}
 	}
 	#getRoute() {
