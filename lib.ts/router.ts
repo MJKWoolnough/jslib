@@ -57,7 +57,7 @@ class Router extends HTMLElement {
 	}
 	#getRoute(path: string) {
 		for (const c of this.children) {
-			const prefix = c.getAttribute("prefix"); // will probably end up with something more complicated than just URL prefix
+			const prefix = c.getAttribute("router-prefix"); // will probably end up with something more complicated than just URL prefix
 			if (prefix && path.startsWith(prefix))  {
 				return c;
 			}
