@@ -1,5 +1,5 @@
 import type {Children, Props} from './dom.js';
-import {amendNode, clearNode, bindElement} from './dom.js';
+import {amendNode, createDocumentFragment, bindElement} from './dom.js';
 import {a as aHTML, ns} from './html.js';
 
 const update = Symbol("update"),
@@ -26,21 +26,16 @@ amendNode(window, {"onpopstate": () => {
 }});
 
 class Router extends HTMLElement {
-	#s: ShadowRoot;
+	#start = new Text();
+	#end = new Text();
 	#current?: Route;
 	#history = new Map<number, Node[]>();
-	constructor() {
-		super();
-		this.#s = this.attachShadow({"mode": "closed", "slotAssignment": "manual"});
-	}
-	[newState]() {
-		this.#history.set(lastState, Array.from(this.#s.childNodes));
-		const h = this.#history.get(history.state ?? 0);
-		if (h) {
-			clearNode(this.#s, h);
-		} else {
-			const c = this.#getRoute();
-			clearNode(this.#s, c ? (this.#current = c).content.cloneNode() : []);
+	#clear() {
+		while (this.#start.nextSibling !== this.#end && this.#start.nextSibling) {
+			this.#start.nextSibling?.remove();
+		}
+		if (this.#start.nextSibling !== this.#end) {
+			this.#start.after(this.#end);
 		}
 	}
 	#getRoute() {
@@ -55,14 +50,32 @@ class Router extends HTMLElement {
 		}
 		return null;
 	}
+	[newState]() {
+		const children: Node[] = [],
+		      h = this.#history.get(history.state ?? 0);
+		for (let curr = this.#start.nextSibling; curr !== this.#end && curr; curr = curr.nextSibling) {
+			children.push(curr);
+		}
+		this.#history.set(lastState, children);
+		this.#clear();
+		if (h) {
+			this.#start.after(createDocumentFragment(h));
+		} else {
+			const c = this.#getRoute();
+			if (c) {
+				this.#start.after((this.#current = c).content.cloneNode());
+			}
+		}
+	}
 	[update]() {
 		const c = this.#getRoute();
 		if (c) {
 			if (this.#current !== c) {
-				clearNode(this.#s, (this.#current = c).content.cloneNode());
+				this.#clear();
+				this.#start.after((this.#current = c).content.cloneNode());
 			}
 		} else {
-			clearNode(this.#s);
+			this.#clear();
 		}
 	}
 	connectedCallback() {
@@ -70,16 +83,16 @@ class Router extends HTMLElement {
 		while (n) {
 			if (n instanceof ShadowRoot) {
 				n = n.host;
-			} else if (!n.parentNode || n instanceof Route || n instanceof Router) {
+			} else if (!n.parentNode || n instanceof Route) {
 				return;
 			} else {
 				n = n.parentNode;
 			}
 		}
 		routers.add(this);
-	}
-	disconnectedCallback() {
-		routers.delete(this);
+		this.before(this.#start);
+		this.after(this.#end);
+		this.remove();
 	}
 }
 
