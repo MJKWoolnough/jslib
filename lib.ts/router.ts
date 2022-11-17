@@ -10,8 +10,17 @@ const update = Symbol("update"),
 		lastState = history.state;
 		const url = new URL(href, window.location + "");
 		if (url.host === window.location.host) {
-			history.pushState(Date.now(), "", new URL(href, url + "") + "")
-			e.preventDefault();
+			const now = Date.now();
+			let handled = false;
+			for (const r of routers) {
+				if (r[newState](url.pathname, now)) {
+					handled = true;
+				}
+			}
+			if (handled) {
+				history.pushState(now, "", new URL(href, url + "") + "")
+				e.preventDefault();
+			}
 		}
 	}
       },
@@ -21,7 +30,7 @@ let lastState = 0;
 
 amendNode(window, {"onpopstate": () => {
 	for (const r of routers) {
-		r[newState]();
+		r[newState](window.location.pathname, history.state);
 	}
 }});
 
@@ -43,24 +52,23 @@ class Router extends HTMLElement {
 			this.#start.nextSibling.remove();
 		}
 	}
-	#getRoute() {
-		const url = window.location.pathname;
+	#getRoute(path: string) {
 		for (const c of this.children) {
 			if (c instanceof Route) {
 				const prefix = c.getAttribute("prefix"); // will probably end up with something more complicated than just URL prefix
-				if (prefix && url.startsWith(prefix))  {
+				if (prefix && path.startsWith(prefix))  {
 					return c;
 				}
 			}
 		}
 		return null;
 	}
-	[newState]() {
+	[newState](path: string, state: number) {
 		if (!this.#sanity()) {
-			return;
+			return false;
 		}
 		const children: Node[] = [],
-		      h = this.#history.get(history.state ?? 0);
+		      h = this.#history.get(state ?? 0);
 		for (let curr = this.#start.nextSibling; curr !== this.#end && curr; curr = curr.nextSibling) {
 			children.push(curr);
 		}
@@ -69,17 +77,19 @@ class Router extends HTMLElement {
 		if (h) {
 			this.#start.after(createDocumentFragment(h));
 		} else {
-			const c = this.#getRoute();
-			if (c) {
-				this.#start.after((this.#current = c).content.cloneNode());
+			const c = this.#getRoute(path);
+			if (!c) {
+				return false;
 			}
+			this.#start.after((this.#current = c).content.cloneNode());
 		}
+		return false;
 	}
 	[update]() {
 		if (!this.#sanity()) {
 			return;
 		}
-		const c = this.#getRoute();
+		const c = this.#getRoute(window.location.pathname);
 		if (c) {
 			if (this.#current !== c) {
 				this.#clear();
