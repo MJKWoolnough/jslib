@@ -24,7 +24,14 @@ const update = Symbol("update"),
 		}
 	}
       },
-      routers = new Set<Router>();
+      routers = new Set<Router>(),
+      mo = new MutationObserver(records => {
+	for (const record of records) {
+		if (record.type === "childList" && record.target instanceof Router) {
+			record.target[update]();
+		}
+	}
+      });
 
 let lastState = 0;
 
@@ -39,6 +46,10 @@ class Router extends HTMLElement {
 	#end = new Text();
 	#current?: Route;
 	#history = new Map<number, Node[]>();
+	constructor() {
+		super();
+		mo.observe(this, {"childList": true});
+	}
 	#sanity() {
 		for (let curr = this.#start.nextSibling; curr; curr = curr.nextSibling) {
 			if (curr === this.#end) {
@@ -117,14 +128,7 @@ class Router extends HTMLElement {
 	}
 }
 
-class Route extends HTMLTemplateElement {
-	connectedCallback() {
-		if (this.parentNode instanceof Router) {
-			this.parentNode[update]();
-		}
-	}
-	disconnectedCallback() { this.connectedCallback(); }
-}
+class Route extends HTMLTemplateElement {}
 
 class RouterA extends HTMLAnchorElement {
 	constructor() {
