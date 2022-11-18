@@ -60,6 +60,7 @@ class Router extends HTMLElement {
 		return !!this.#marker.parentNode;
 	}
 	#clear() {
+		this.#current = undefined;
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
 	#getRoute(path: string) {
