@@ -78,7 +78,7 @@ class Router extends HTMLElement {
 				this.#clear();
 				return false;
 			}
-			this.#marker.after(this.#marker = (this.#current = c).cloneNode() as Element);
+			this.#marker.replaceWith(this.#marker = (this.#current = c).cloneNode() as Element);
 		}
 		return false;
 	}
@@ -89,7 +89,7 @@ class Router extends HTMLElement {
 		const c = this.#getRoute(window.location.pathname);
 		if (c) {
 			if (this.#current !== c) {
-				this.#marker.after(this.#marker = (this.#current = c).cloneNode() as Element);
+				this.#marker.replaceWith(this.#marker = (this.#current = c).cloneNode() as Element);
 			}
 		} else {
 			this.#clear();
