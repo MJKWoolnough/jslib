@@ -1,5 +1,11 @@
-import {amendNode, bindElement} from './dom.js';
+import {amendNode, bindElement, clearNode} from './dom.js';
 import {ns} from './html.js';
+
+type MatchFn = (path: string) => boolean;
+
+type NodeFn = () => Element | Text;
+
+type MatchNode = [MatchFn, NodeFn];
 
 const update = Symbol("update"),
       newState = Symbol("newState"),
@@ -43,8 +49,9 @@ amendNode(window, {"onclick": (e: Event) => {
 
 class Router extends HTMLElement {
 	#marker: ChildNode = new Text();
-	#current?: Node;
+	#current?: MatchNode;
 	#history = new Map<number, ChildNode>();
+	#matchers: MatchNode[] = [];
 	constructor() {
 		super();
 		mo.observe(this, {"childList": true});
@@ -56,13 +63,15 @@ class Router extends HTMLElement {
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
 	#getRoute(path: string) {
-		for (const c of this.children) {
-			const prefix = c.getAttribute("router-prefix"); // will probably end up with something more complicated than just URL prefix
-			if (prefix != null && path.startsWith(prefix))  {
+		for (const c of this.#matchers) {
+			if (c[0](path)) {
 				return c;
 			}
 		}
 		return null;
+	}
+	register(matchFn: MatchFn, nodeFn: NodeFn) {
+		this.#matchers.push([matchFn, nodeFn]);
 	}
 	[newState](path: string, state: number) {
 		if (!this.#sanity()) {
@@ -75,7 +84,7 @@ class Router extends HTMLElement {
 		} else {
 			const c = this.#getRoute(path);
 			if (c) {
-				this.#marker.replaceWith(this.#marker = (this.#current = c).cloneNode(true) as Element);
+				this.#marker.replaceWith(this.#marker = (this.#current = c)[1]());
 				return true;
 			}
 			this.#clear();
@@ -86,10 +95,17 @@ class Router extends HTMLElement {
 		if (!this.#sanity()) {
 			return;
 		}
+		for (const c of this.children) {
+			const prefix = c.getAttribute("router-prefix"); // will probably end up with something more complicated than just URL prefix
+			if (prefix != null) {
+				this.register((path: string) => path.startsWith(prefix), () => c.cloneNode(true) as Element);
+			}
+		}
+		clearNode(this);
 		const c = this.#getRoute(window.location.pathname);
 		if (c) {
 			if (this.#current !== c) {
-				this.#marker.replaceWith(this.#marker = (this.#current = c).cloneNode(true) as Element);
+				this.#marker.replaceWith(this.#marker = (this.#current = c)[1]());
 			}
 		} else {
 			this.#clear();
