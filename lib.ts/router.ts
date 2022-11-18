@@ -79,6 +79,7 @@ class Router extends HTMLElement {
 				return false;
 			}
 			this.#marker.replaceWith(this.#marker = (this.#current = c).cloneNode(true) as Element);
+			return true;
 		}
 		return false;
 	}
