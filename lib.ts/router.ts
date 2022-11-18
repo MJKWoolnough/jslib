@@ -74,12 +74,11 @@ class Router extends HTMLElement {
 			this.#marker.replaceWith(this.#marker = h);
 		} else {
 			const c = this.#getRoute(path);
-			if (!c) {
-				this.#clear();
-				return false;
+			if (c) {
+				this.#marker.replaceWith(this.#marker = (this.#current = c).cloneNode(true) as Element);
+				return true;
 			}
-			this.#marker.replaceWith(this.#marker = (this.#current = c).cloneNode(true) as Element);
-			return true;
+			this.#clear();
 		}
 		return false;
 	}
