@@ -18,7 +18,6 @@ amendNode(window, {"onclick": (e: Event) => {
 	if (e.target instanceof HTMLAnchorElement) {
 		const href = e.target.getAttribute("href");
 		if (href) {
-			lastState = history.state;
 			const url = new URL(href, window.location + "");
 			if (url.host === window.location.host) {
 				const now = Date.now();
@@ -32,6 +31,7 @@ amendNode(window, {"onclick": (e: Event) => {
 					history.pushState(now, "", new URL(href, url + "") + "")
 					e.preventDefault();
 				}
+				lastState = now;
 			}
 		}
 	}
