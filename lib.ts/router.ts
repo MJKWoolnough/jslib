@@ -72,6 +72,7 @@ class Router extends HTMLElement {
 	}
 	register(matchFn: MatchFn, nodeFn: NodeFn) {
 		this.#matchers.push([matchFn, nodeFn]);
+		return this;
 	}
 	[newState](path: string, state: number) {
 		if (!this.#sanity()) {
