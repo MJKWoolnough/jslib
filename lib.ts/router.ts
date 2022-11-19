@@ -103,12 +103,10 @@ class Router extends HTMLElement {
 		}
 		this.replaceChildren();
 		const c = this.#getRoute(window.location.pathname);
-		if (c) {
-			if (this.#current !== c) {
-				this.#marker.replaceWith(this.#marker = (this.#current = c)[1]());
-			}
-		} else {
+		if (!c) {
 			this.#clear();
+		} else if (this.#current !== c) {
+			this.#marker.replaceWith(this.#marker = (this.#current = c)[1]());
 		}
 	}
 	connectedCallback() {
