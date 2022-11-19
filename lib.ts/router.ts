@@ -1,5 +1,4 @@
-import {amendNode, bindElement} from './dom.js';
-import {ns} from './html.js';
+import {amendNode} from './dom.js';
 
 type MatchFn = (path: string) => boolean;
 
@@ -138,4 +137,4 @@ class Router extends HTMLElement {
 
 customElements.define("router-router", Router);
 
-export const router = bindElement(ns, "router-router");
+export const router = () => new Router();
