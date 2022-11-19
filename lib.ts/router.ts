@@ -61,20 +61,25 @@ class Router extends HTMLElement {
 		this.#connected = false;
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
-	#setRoute(path: string) {
+	#match(matchFn: MatchFn, nodeFn: NodeFn, path = window.location.pathname) {
+		if (!this.#connected && matchFn(path)) {
+			this.#marker.replaceWith(this.#marker = nodeFn());
+			return this.#connected = true;
+		}
+		return false;
+	}
+	#setRoute(path?: string) {
 		for (const c of this.#matchers) {
-			if (c[0](path)) {
-				this.#marker.replaceWith(this.#marker = c[1]());
-				return this.#connected = true;
+			if (this.#match(c[0], c[1]), path) {
+				return true;
 			}
 		}
 		return false;
 	}
 	register(matchFn: MatchFn, nodeFn: NodeFn) {
 		this.#matchers.push([matchFn, nodeFn]);
-		if (!this.#connected && matchFn(window.location.pathname)) {
-			this.#marker.replaceWith(this.#marker = nodeFn());
-			this.#connected = true;
+		if (!this.#connected) {
+			this.#match(matchFn, nodeFn);
 		}
 		return this;
 	}
