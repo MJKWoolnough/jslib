@@ -47,7 +47,7 @@ window.addEventListener("popstate", () => {
 
 class Router extends HTMLElement {
 	#marker: ChildNode = new Text();
-	#current?: MatchNode;
+	#connected = false;
 	#history = new Map<number, ChildNode>();
 	#matchers: MatchNode[] = [];
 	constructor() {
@@ -58,7 +58,7 @@ class Router extends HTMLElement {
 		return !!this.#marker.parentNode;
 	}
 	#clear() {
-		this.#current = undefined;
+		this.#connected = false;
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
 	#getRoute(path: string) {
@@ -71,6 +71,10 @@ class Router extends HTMLElement {
 	}
 	register(matchFn: MatchFn, nodeFn: NodeFn) {
 		this.#matchers.push([matchFn, nodeFn]);
+		if (!this.#connected && matchFn(window.location.pathname)) {
+			this.#marker.replaceWith(this.#marker = nodeFn());
+			this.#connected = true;
+		}
 		return this;
 	}
 	[newState](path: string, state: number) {
@@ -84,8 +88,8 @@ class Router extends HTMLElement {
 		} else {
 			const c = this.#getRoute(path);
 			if (c) {
-				this.#marker.replaceWith(this.#marker = (this.#current = c)[1]());
-				return true;
+				this.#marker.replaceWith(this.#marker = c[1]());
+				return this.#connected = true;
 			}
 			this.#clear();
 		}
@@ -102,12 +106,6 @@ class Router extends HTMLElement {
 			}
 		}
 		this.replaceChildren();
-		const c = this.#getRoute(window.location.pathname);
-		if (!c) {
-			this.#clear();
-		} else if (this.#current !== c) {
-			this.#marker.replaceWith(this.#marker = (this.#current = c)[1]());
-		}
 	}
 	connectedCallback() {
 		let n = this.parentNode;
