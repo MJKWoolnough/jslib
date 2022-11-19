@@ -1,4 +1,4 @@
-import {amendNode, bindElement, clearNode} from './dom.js';
+import {amendNode, bindElement} from './dom.js';
 import {ns} from './html.js';
 
 type MatchFn = (path: string) => boolean;
@@ -103,7 +103,7 @@ class Router extends HTMLElement {
 				this.register((path: string) => path.startsWith(prefix), () => c.cloneNode(true) as Element);
 			}
 		}
-		clearNode(this);
+		this.replaceChildren();
 		const c = this.#getRoute(window.location.pathname);
 		if (c) {
 			if (this.#current !== c) {
