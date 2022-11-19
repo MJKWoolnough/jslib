@@ -1,5 +1,3 @@
-import {amendNode} from './dom.js';
-
 type MatchFn = (path: string) => boolean;
 
 type NodeFn = () => Element | Text;
@@ -19,7 +17,7 @@ const update = Symbol("update"),
 
 let lastState = Date.now();
 
-amendNode(window, {"onclick": (e: Event) => {
+window.addEventListener("click", (e: Event) => {
 	if (e.target instanceof HTMLAnchorElement) {
 		const href = e.target.getAttribute("href");
 		if (href) {
@@ -40,11 +38,12 @@ amendNode(window, {"onclick": (e: Event) => {
 			}
 		}
 	}
-}, "onpopstate": () => {
+});
+window.addEventListener("popstate", () => {
 	for (const r of routers) {
 		r[newState](window.location.pathname, history.state);
 	}
-}});
+});
 
 class Router extends HTMLElement {
 	#marker: ChildNode = new Text();
