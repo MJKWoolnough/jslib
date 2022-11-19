@@ -9,7 +9,7 @@ const update = Symbol("update"),
       routers = new Set<Router>(),
       mo = new MutationObserver(records => {
 	for (const record of records) {
-		if (record.type === "childList" && record.target instanceof Router) {
+		if (record.type === "childList" && record.target instanceof Router && record.addedNodes.length) {
 			record.target[update]();
 		}
 	}
