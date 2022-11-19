@@ -61,13 +61,14 @@ class Router extends HTMLElement {
 		this.#connected = false;
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
-	#getRoute(path: string) {
+	#setRoute(path: string) {
 		for (const c of this.#matchers) {
 			if (c[0](path)) {
-				return c;
+				this.#marker.replaceWith(this.#marker = c[1]());
+				return this.#connected = true;
 			}
 		}
-		return null;
+		return false;
 	}
 	register(matchFn: MatchFn, nodeFn: NodeFn) {
 		this.#matchers.push([matchFn, nodeFn]);
@@ -78,18 +79,13 @@ class Router extends HTMLElement {
 		return this;
 	}
 	[newState](path: string, state: number) {
-		if (!this.#sanity()) {
-			return false;
-		}
-		const h = this.#history.get(state ?? 0);
-		this.#history.set(lastState, this.#marker);
-		if (h) {
-			this.#marker.replaceWith(this.#marker = h);
-		} else {
-			const c = this.#getRoute(path);
-			if (c) {
-				this.#marker.replaceWith(this.#marker = c[1]());
-				return this.#connected = true;
+		if (this.#sanity()) {
+			const h = this.#history.get(state ?? 0);
+			this.#history.set(lastState, this.#marker);
+			if (h) {
+				this.#marker.replaceWith(this.#marker = h);
+			} else if (this.#setRoute(path)) {
+				return true;
 			}
 			this.#clear();
 		}
@@ -121,7 +117,9 @@ class Router extends HTMLElement {
 			}
 		}
 		routers.add(this);
+		this.#clear();
 		this.replaceWith(this.#marker);
+		this.#setRoute(window.location.pathname);
 		this[update]();
 	}
 	remove() {
