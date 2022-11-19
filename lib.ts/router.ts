@@ -18,7 +18,7 @@ const update = Symbol("update"),
 	}
       });
 
-let lastState = 0;
+let lastState = Date.now();
 
 amendNode(window, {"onclick": (e: Event) => {
 	if (e.target instanceof HTMLAnchorElement) {
