@@ -865,7 +865,7 @@ This unexported type is used to change how the elements are created and controll
 
 |  Options          |  Default  |  Description  |
 |-------------------|-----------|---------------|
-| attachRemoveEvent | true      | When true, the resulting created element will send an 'attached' event when the element is attached to a parent, and a 'removed' event when removed from a parent. Has no effect when 'psuedo' is set to true. |
+| attachRemoveEvent | true      | When true, the resulting created element will send an 'attached' event when the element is attached to the document, and a 'removed' event when removed from the document. Has no effect when 'psuedo' is set to true. |
 | attrs             | true      | When true, enables both the 'act' and 'attr' methods on the element class. |
 | classOnly         | false     | When true, the return from the default function will be the generated class, when false the return from the default function will be a [DOMBind](#dom_dombind). |
 | delegatesFocus    | false     | When true, sets the delegatesFocus option during attachShadow call to true. Has no effect when 'psuedo' is set to true. |
