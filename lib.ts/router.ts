@@ -89,6 +89,7 @@ class Router extends HTMLElement {
 			this.#history.set(lastState, this.#marker);
 			if (h) {
 				this.#marker.replaceWith(this.#marker = h);
+				return true;
 			} else if (this.#setRoute(path)) {
 				return true;
 			}
