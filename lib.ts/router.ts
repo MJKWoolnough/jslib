@@ -62,7 +62,7 @@ class Router extends HTMLElement {
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
 	#match(matchFn: MatchFn, nodeFn: NodeFn, path = window.location.pathname) {
-		if (!this.#connected && matchFn(path)) {
+		if (matchFn(path)) {
 			this.#marker.replaceWith(this.#marker = nodeFn());
 			return this.#connected = true;
 		}
