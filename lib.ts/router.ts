@@ -1,6 +1,6 @@
 type MatchFn = (path: string) => boolean;
 
-type NodeFn = () => Element | Text;
+type NodeFn = () => Exclude<Element, Router> | Text;
 
 type MatchNode = [MatchFn, NodeFn];
 
@@ -88,9 +88,11 @@ class Router extends HTMLElement {
 			return;
 		}
 		for (const c of this.children) {
-			const prefix = c.getAttribute("route-match");
-			if (prefix !== null) {
-				this.register((path: string) => path.startsWith(prefix), () => c.cloneNode(true) as Element);
+			if (!(c instanceof Router)) {
+				const prefix = c.getAttribute("route-match");
+				if (prefix !== null) {
+					this.register((path: string) => path.startsWith(prefix), () => c.cloneNode(true) as Element);
+				}
 			}
 		}
 		this.replaceChildren();
