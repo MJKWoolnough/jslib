@@ -55,7 +55,7 @@ class Router extends HTMLElement {
 		mo.observe(this, {"childList": true});
 	}
 	#sanity() {
-		return !!this.#marker.parentNode;
+		return this.#marker.isConnected;
 	}
 	#clear() {
 		this.#connected = false;
