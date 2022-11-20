@@ -120,7 +120,7 @@ class Router extends HTMLElement {
 	}
 }
 
-customElements.define("router-router", Router);
+customElements.define("x-router", Router);
 
 export const router = () => new Router(),
 goto = (href: string) => {
