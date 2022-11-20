@@ -103,7 +103,7 @@ class Router extends HTMLElement {
 		}
 		for (const c of this.children) {
 			const prefix = c.getAttribute("router-match");
-			if (prefix != null) {
+			if (prefix !== null) {
 				this.register((path: string) => path.startsWith(prefix), () => c.cloneNode(true) as Element);
 			}
 		}
