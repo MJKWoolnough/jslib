@@ -20,22 +20,8 @@ let lastState = Date.now();
 window.addEventListener("click", (e: Event) => {
 	if (e.target instanceof HTMLAnchorElement) {
 		const href = e.target.getAttribute("href");
-		if (href) {
-			const url = new URL(href, window.location + "");
-			if (url.host === window.location.host) {
-				const now = Date.now();
-				let handled = false;
-				for (const r of routers) {
-					if (r[newState](url.pathname, now)) {
-						handled = true;
-					}
-				}
-				if (handled) {
-					history.pushState(now, "", new URL(href, url + "") + "")
-					e.preventDefault();
-				}
-				lastState = now;
-			}
+		if (href && goto(href)) {
+			e.preventDefault();
 		}
 	}
 });
@@ -136,4 +122,21 @@ class Router extends HTMLElement {
 
 customElements.define("router-router", Router);
 
-export const router = () => new Router();
+export const router = () => new Router(),
+goto = (href: string) => {
+	const url = new URL(href, window.location + "");
+	let handled = false;
+	if (url.host === window.location.host) {
+		const now = Date.now();
+		for (const r of routers) {
+			if (r[newState](url.pathname, now)) {
+				handled = true;
+			}
+		}
+		lastState = now;
+		if (handled) {
+			history.pushState(now, "", new URL(href, url + "") + "")
+		}
+	}
+	return handled;
+};
