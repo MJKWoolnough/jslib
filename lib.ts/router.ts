@@ -70,7 +70,7 @@ class Router extends HTMLElement {
 	}
 	#setRoute(path?: string) {
 		for (const c of this.#matchers) {
-			if (this.#match(c[0], c[1]), path) {
+			if (this.#match(c[0], c[1], path)) {
 				return true;
 			}
 		}
