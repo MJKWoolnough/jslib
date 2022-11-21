@@ -4468,7 +4468,48 @@
 					return true;
 				}
 				return false;
+			}
+		},
+		"NodeArray - filter": {
+			"no nodes": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      n = new NodeArray(document.createElement("div"));
+				let good = true;
+				return n.filter(() => good = false) && good;
 			},
+			"a node true": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      item = {[node]: document.createElement("span"), num: 1},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
+				      filtered = n.filter(() => true);
+				return filtered.length === 1 && filtered[0] === item;
+			},
+			"a node false": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      item = {[node]: document.createElement("span"), num: 1},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
+				      filtered = n.filter(() => false);
+				return filtered.length === 0;
+			},
+			"many nodes": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
+				      aThis = {},
+				      filtered = n.filter(function(this: any, e) { return e.num % 2 === 0 && this === aThis; }, aThis);
+				return filtered.length === 3 && filtered[0].num === 0 && filtered[1].num === 2 && filtered[2].num === 4;
+			}
 		}
 	}
 });
