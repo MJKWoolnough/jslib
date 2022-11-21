@@ -4457,6 +4457,18 @@
 				let pos = 0;
 				return n.every(function(this: any, t, p, a){ return t.num === pos && p === pos++ && a === n && this === aThis}, aThis);
 			}
+		},
+		"NodeArray - fill": {
+			"should throw error": async () => {
+				const {NodeArray, node} = await import("./lib/nodes.js");
+				try {
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					new NodeArray(document.createElement("div")).fill({[node]: document.createElement("span")});
+				} catch {
+					return true;
+				}
+				return false;
+			},
 		}
 	}
 });
