@@ -4551,6 +4551,44 @@
 				      filtered = n.filterRemove(function(this: any, e) { return e.num % 2 === 0 && this === aThis; }, aThis);
 				return filtered.length === 3 && filtered[0].num === 0 && filtered[1].num === 2 && filtered[2].num === 4 && n[0].num === 1 && n[1].num === 3;
 			}
+		},
+		"NodeArray - find": {
+			"no nodes": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      n = new NodeArray(document.createElement("div"));
+				let good = false;
+				return n.find(() => good = true) === undefined && !good;
+			},
+			"a node true": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      item = {[node]: document.createElement("span"), num: 1},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+				return n.find(() => true) === item;
+			},
+			"a node false": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      item = {[node]: document.createElement("span"), num: 1},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+				return n.find(() => false) === undefined;
+			},
+			"many nodes": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
+				      aThis = {};
+				return n.find(function(this: any, e) { return e.num === 3 && this === aThis; }, aThis)?.num === 3;
+			}
 		}
 	}
 });
