@@ -12,6 +12,7 @@ type MatchNode = [Match, NodeFn];
 type LocationURL = {
 	pathname: string;
 	search: string;
+	searchParams?: URLSearchParams;
 	hash: string;
 };
 
@@ -63,7 +64,7 @@ class Router extends HTMLElement {
 	}
 	#match(match: Match, nodeFn: NodeFn, url: LocationURL = window.location) {
 		const attrs: Record<string, string> = {},
-		      params = new URLSearchParams(url.search)
+		      params = url.searchParams ?? new URLSearchParams(url.search);
 		if (match.path) {
 			const matches = url.pathname.match(match.path);
 			if (!matches) {
