@@ -3,7 +3,7 @@ type NodeFn = () => Exclude<Element, Router> | Text;
 type Match = {
 	path?: RegExp;
 	matches: string[];
-	params: Record<string, string>;
+	params: Record<string, String>;
 	hash: string;
 };
 
@@ -15,6 +15,8 @@ type LocationURL = {
 	searchParams?: URLSearchParams;
 	hash: string;
 };
+
+class BindString extends String {}
 
 const update = Symbol("update"),
       newState = Symbol("newState"),
@@ -76,8 +78,11 @@ class Router extends HTMLElement {
 			}
 		}
 		for (const param in match.params) {
-			if (params.get(param) !== match.params[param]) {
+			const p = params.get(param);
+			if (p !== match.params[param]) {
 				return false;
+			} else if (match.params[param] instanceof BindString) {
+				attrs[param] = p;
 			}
 		}
 		if (url.hash === match.hash) {
