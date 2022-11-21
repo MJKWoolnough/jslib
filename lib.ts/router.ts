@@ -1,4 +1,4 @@
-type NodeFn = () => Exclude<Element, Router> | Text;
+type NodeFn = (attrs: Record<string, string>) => Exclude<Element, Router>;
 
 type Match = {
 	path?: RegExp;
@@ -86,7 +86,7 @@ class Router extends HTMLElement {
 			}
 		}
 		if (url.hash === match.hash) {
-			this.#marker.replaceWith(this.#marker = nodeFn());
+			this.#marker.replaceWith(this.#marker = nodeFn(attrs));
 			return this.#connected = true;
 		}
 		return false;
@@ -131,7 +131,13 @@ class Router extends HTMLElement {
 				if (match !== null) {
 					const element = c.cloneNode(true) as Element;
 					element.removeAttribute("route-match");
-					this.register(match, () => element.cloneNode(true) as Element);
+					this.register(match, (attrs: Record<string, string>) => {
+						const node = element.cloneNode(true) as Element;
+						for (const attr in attrs) {
+							element.setAttribute(attr, attrs[attr]);
+						}
+						return node;
+					});
 				}
 			}
 		}
