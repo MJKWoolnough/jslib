@@ -1,8 +1,19 @@
-type MatchFn = (path: string) => boolean;
-
 type NodeFn = () => Exclude<Element, Router> | Text;
 
-type MatchNode = [MatchFn, NodeFn];
+type Match = {
+	path?: RegExp;
+	matches: string[];
+	params: Record<string, string>;
+	hash: string;
+};
+
+type MatchNode = [Match, NodeFn];
+
+type LocationURL = {
+	pathname: string;
+	search: string;
+	hash: string;
+};
 
 const update = Symbol("update"),
       newState = Symbol("newState"),
@@ -13,7 +24,10 @@ const update = Symbol("update"),
 			record.target[update]();
 		}
 	}
-      });
+      }),
+      createMatch = (_match: string) => {
+	      return {} as Match;
+      };
 
 let lastState = Date.now();
 
@@ -27,7 +41,7 @@ window.addEventListener("click", (e: Event) => {
 });
 window.addEventListener("popstate", () => {
 	for (const r of routers) {
-		r[newState](window.location.pathname, history.state);
+		r[newState](window.location, history.state);
 	}
 });
 
@@ -47,14 +61,31 @@ class Router extends HTMLElement {
 		this.#connected = false;
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
-	#match(matchFn: MatchFn, nodeFn: NodeFn, path = window.location.pathname) {
-		if (matchFn(path)) {
+	#match(match: Match, nodeFn: NodeFn, url: LocationURL = window.location) {
+		const attrs: Record<string, string> = {},
+		      params = new URLSearchParams(url.search)
+		if (match.path) {
+			const matches = url.pathname.match(match.path);
+			if (!matches) {
+				return false;
+			}
+			matches.unshift();
+			for (const attr of match.matches) {
+				attrs[attr] = matches.shift()!;
+			}
+		}
+		for (const param in match.params) {
+			if (params.get(param) !== match.params[param]) {
+				return false;
+			}
+		}
+		if (url.hash === match.hash) {
 			this.#marker.replaceWith(this.#marker = nodeFn());
 			return this.#connected = true;
 		}
 		return false;
 	}
-	#setRoute(path?: string) {
+	#setRoute(path?: LocationURL) {
 		for (const c of this.#matchers) {
 			if (this.#match(c[0], c[1], path)) {
 				return true;
@@ -62,14 +93,15 @@ class Router extends HTMLElement {
 		}
 		return false;
 	}
-	register(matchFn: MatchFn, nodeFn: NodeFn) {
-		this.#matchers.push([matchFn, nodeFn]);
+	register(match: string, nodeFn: NodeFn) {
+		const matchObj = createMatch(match);
+		this.#matchers.push([matchObj, nodeFn]);
 		if (!this.#connected) {
-			this.#match(matchFn, nodeFn);
+			this.#match(matchObj, nodeFn);
 		}
 		return this;
 	}
-	[newState](path: string, state: number) {
+	[newState](path: LocationURL, state: number) {
 		if (this.#sanity()) {
 			const h = this.#history.get(state ?? 0);
 			this.#history.set(lastState, this.#marker);
@@ -89,11 +121,11 @@ class Router extends HTMLElement {
 		}
 		for (const c of this.children) {
 			if (!(c instanceof Router)) {
-				const prefix = c.getAttribute("route-match");
-				if (prefix !== null) {
+				const match = c.getAttribute("route-match");
+				if (match !== null) {
 					const element = c.cloneNode(true) as Element;
 					element.removeAttribute("route-match");
-					this.register((path: string) => path.startsWith(prefix), () => element.cloneNode(true) as Element);
+					this.register(match, () => element.cloneNode(true) as Element);
 				}
 			}
 		}
@@ -115,7 +147,7 @@ class Router extends HTMLElement {
 		routers.add(this);
 		this.#clear();
 		this.replaceWith(this.#marker);
-		this.#setRoute(window.location.pathname);
+		this.#setRoute(window.location);
 		this[update]();
 	}
 	remove() {
@@ -133,7 +165,7 @@ goto = (href: string) => {
 	if (url.host === window.location.host) {
 		const now = Date.now();
 		for (const r of routers) {
-			if (r[newState](url.pathname, now)) {
+			if (r[newState](url, now)) {
 				handled = true;
 			}
 		}
