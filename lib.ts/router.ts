@@ -31,18 +31,13 @@ const update = Symbol("update"),
 	      matches: string[] = [];
 	let path = u.pathname,
 	    r = match.startsWith("/") ? "^" : "";
-	while (true) {
-		const c = path.indexOf(':');
-		if (c >= 0) {
-			r += path.slice(0, c);
-			path = path.slice(c);
-			const s = path.indexOf('/'),
-			      t = s < 0 ? path.length : s;
-			matches.push(path.slice(1, t));
-			path = path.slice(t);
-		} else {
-			break;
-		}
+	for (let c = path.indexOf(':'); c >= 0; c = path.indexOf(':')) {
+		r += path.slice(0, c);
+		path = path.slice(c);
+		const s = path.indexOf('/'),
+		      t = s < 0 ? path.length : s;
+		matches.push(path.slice(1, t));
+		path = path.slice(t);
 	}
 	r += path;
 	return {
