@@ -51,7 +51,7 @@ const update = Symbol("update"),
 let lastState = Date.now();
 
 window.addEventListener("click", (e: Event) => {
-	if (e.target instanceof HTMLAnchorElement) {
+	if (e.target instanceof HTMLAnchorElement || e.target instanceof HTMLAreaElement) {
 		const href = e.target.getAttribute("href");
 		if (href && goto(href)) {
 			e.preventDefault();
