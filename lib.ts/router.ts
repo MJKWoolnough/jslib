@@ -150,7 +150,7 @@ class Router extends HTMLElement {
 					this.register(match, (attrs: Record<string, string>) => {
 						const node = element.cloneNode(true) as Element;
 						for (const attr in attrs) {
-							element.setAttribute(attr, attrs[attr]);
+							node.setAttribute(attr, attrs[attr]);
 						}
 						return node;
 					});
