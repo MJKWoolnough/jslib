@@ -1,9 +1,9 @@
 type NodeFn = (attrs: Record<string, string>) => Exclude<Element, Router>;
 
 type Match = {
-	path?: RegExp;
+	path: RegExp;
 	matches: string[];
-	params: Record<string, String>;
+	params: URLSearchParams;
 	hash: string;
 };
 
@@ -16,8 +16,6 @@ type LocationURL = {
 	hash: string;
 };
 
-class BindString extends String {}
-
 const update = Symbol("update"),
       newState = Symbol("newState"),
       routers = new Set<Router>(),
@@ -28,8 +26,31 @@ const update = Symbol("update"),
 		}
 	}
       }),
-      createMatch = (_match: string) => {
-	      return {} as Match;
+      createMatch = (match: string) => {
+	const u = new URL(match, window.location.protocol + window.location.host),
+	      matches: string[] = [];
+	let path = u.pathname,
+	    r = match.startsWith("/") ? "^" : "";
+	while (true) {
+		const c = path.indexOf(':');
+		if (c >= 0) {
+			r += path.slice(0, c);
+			path = path.slice(c);
+			const s = path.indexOf('/'),
+			      t = s < 0 ? path.length : s;
+			matches.push(path.slice(1, t));
+			path = path.slice(t);
+		} else {
+			break;
+		}
+	}
+	r += path;
+	return {
+		"path": new RegExp(r),
+		matches,
+		"params": u.searchParams,
+		"hash": u.hash
+	}
       };
 
 let lastState = Date.now();
@@ -66,23 +87,23 @@ class Router extends HTMLElement {
 	}
 	#match(match: Match, nodeFn: NodeFn, url: LocationURL = window.location) {
 		const attrs: Record<string, string> = {},
-		      params = url.searchParams ?? new URLSearchParams(url.search);
-		if (match.path) {
-			const matches = url.pathname.match(match.path);
-			if (!matches) {
-				return false;
-			}
-			matches.unshift();
-			for (const attr of match.matches) {
-				attrs[attr] = matches.shift()!;
-			}
+		      params = url.searchParams ?? new URLSearchParams(url.search),
+		      matches = url.pathname.match(match.path);
+		if (!matches) {
+			return false;
 		}
-		for (const param in match.params) {
+		matches.unshift();
+		for (const attr of match.matches) {
+			attrs[attr] = matches.shift()!;
+		}
+		for (const [param, value] of match.params) {
 			const p = params.get(param);
-			if (p !== match.params[param]) {
+			if (value.charAt(0) === ':') {
+				if (p) {
+					attrs[value.slice(1)] = p;
+				}
+			} else if (p !== value) {
 				return false;
-			} else if (match.params[param] instanceof BindString) {
-				attrs[param] = p;
 			}
 		}
 		if (url.hash === match.hash) {
