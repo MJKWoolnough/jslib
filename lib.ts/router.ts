@@ -52,7 +52,7 @@ let lastState = Date.now();
 
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;
-	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement)) {
+	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
 		target = target.parentNode as Element;
 	}
 	if (target) {

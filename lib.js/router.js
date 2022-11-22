@@ -33,8 +33,12 @@ const update = Symbol("update"),
 let lastState = Date.now();
 
 window.addEventListener("click", e => {
-	if (e.target instanceof HTMLAnchorElement) {
-		const href = e.target.getAttribute("href");
+	let target = e.target;
+	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
+		target = target.parentNode;
+	}
+	if (target) {
+		const href = target.getAttribute("href");
 		if (href && goto(href)) {
 			e.preventDefault();
 		}
