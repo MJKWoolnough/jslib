@@ -87,7 +87,7 @@ class Router extends HTMLElement {
 		if (!matches) {
 			return false;
 		}
-		matches.unshift();
+		matches.shift();
 		for (const attr of match.matches) {
 			attrs[attr] = matches.shift()!;
 		}
