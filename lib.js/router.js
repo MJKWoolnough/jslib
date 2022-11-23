@@ -8,20 +8,13 @@ const update = Symbol("update"),
 		}
 	}
       }),
-      regexpChars = ['\\', '[', ']', '(', ')', '$', '*', '+', '.'],
-      escapeRegexp = data => {
-	for (const c of regexpChars) {
-		data = data.replaceAll(c, "\\" + c);
-	}
-	return data;
-      },
       createMatch = match => {
 	const u = new URL(match, window.location.protocol + window.location.host),
 	      matches = [];
 	let path = u.pathname,
 	    r = match.startsWith("/") ? "^" : "";
 	for (let c = path.indexOf(':'); c >= 0; c = path.indexOf(':')) {
-		r += escapeRegexp(path.slice(0, c)) + "([^/]*)";
+		r += path.slice(0, c).replace(/[\\[\]()$*+.]/g, '\\$&') + "([^/]*)";
 		path = path.slice(c);
 		const s = path.indexOf('/'),
 		      t = s < 0 ? path.length : s;
