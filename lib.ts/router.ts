@@ -54,9 +54,6 @@ class Router extends HTMLElement {
 		super();
 		mo.observe(this, {"childList": true});
 	}
-	#sanity() {
-		return this.#marker.isConnected;
-	}
 	#clear() {
 		this.#connected = false;
 		this.#marker.replaceWith(this.#marker = new Text());
@@ -122,7 +119,7 @@ class Router extends HTMLElement {
 		return this;
 	}
 	[newState](path: LocationURL, state: number) {
-		if (this.#sanity()) {
+		if (this.#marker.isConnected) {
 			const h = this.#history.get(state ?? 0);
 			this.#history.set(lastState, this.#marker);
 			if (h) {
@@ -136,26 +133,25 @@ class Router extends HTMLElement {
 		return false;
 	}
 	[update]() {
-		if (!this.#sanity()) {
-			return;
-		}
-		for (const c of this.children) {
-			if (!(c instanceof Router)) {
-				const match = c.getAttribute("route-match");
-				if (match !== null) {
-					const element = c.cloneNode(true) as Element;
-					element.removeAttribute("route-match");
-					this.register(match, (attrs: Record<string, string>) => {
-						const node = element.cloneNode(true) as Element;
-						for (const attr in attrs) {
-							node.setAttribute(attr, attrs[attr]);
-						}
-						return node;
-					});
+		if (this.#marker.isConnected) {
+			for (const c of this.children) {
+				if (!(c instanceof Router)) {
+					const match = c.getAttribute("route-match");
+					if (match !== null) {
+						const element = c.cloneNode(true) as Element;
+						element.removeAttribute("route-match");
+						this.register(match, (attrs: Record<string, string>) => {
+							const node = element.cloneNode(true) as Element;
+							for (const attr in attrs) {
+								node.setAttribute(attr, attrs[attr]);
+							}
+							return node;
+						});
+					}
 				}
 			}
+			this.replaceChildren();
 		}
-		this.replaceChildren();
 	}
 	connectedCallback() {
 		let n = this.parentNode;
