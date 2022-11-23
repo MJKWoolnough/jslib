@@ -7,28 +7,7 @@ const update = Symbol("update"),
 			record.target[update]();
 		}
 	}
-      }),
-      createMatch = match => {
-	const u = new URL(match, window.location.protocol + window.location.host),
-	      matches = [];
-	let path = u.pathname,
-	    r = match.startsWith("/") ? "^" : "";
-	for (let c = path.indexOf(':'); c >= 0; c = path.indexOf(':')) {
-		r += path.slice(0, c).replace(/[\\[\]()$*+.]/g, '\\$&') + "([^/]*)";
-		path = path.slice(c);
-		const s = path.indexOf('/'),
-		      t = s < 0 ? path.length : s;
-		matches.push(path.slice(1, t));
-		path = path.slice(t);
-	}
-	r += path;
-	return {
-		"path": new RegExp(r),
-		matches,
-		"params": u.searchParams,
-		"hash": u.hash
-	}
-      };
+      });
 
 let lastState = Date.now();
 
@@ -100,7 +79,24 @@ class Router extends HTMLElement {
 		return false;
 	}
 	register(match, nodeFn) {
-		const matchObj = createMatch(match);
+		const u = new URL(match, window.location.protocol + window.location.host),
+		      matches = [],
+		      matchObj = {
+			matches,
+			"params": u.searchParams,
+			"hash": u.hash
+		      };
+		let path = u.pathname,
+		    r = match.startsWith("/") ? "^" : "";
+		for (let c = path.indexOf(':'); c >= 0; c = path.indexOf(':')) {
+			r += path.slice(0, c).replace(/[\\[\]()$*+.]/g, '\\$&') + "([^/]*)";
+			path = path.slice(c);
+			const s = path.indexOf('/'),
+			      t = s < 0 ? path.length : s;
+			matches.push(path.slice(1, t));
+			path = path.slice(t);
+		}
+		matchObj.path = new RegExp(r + path);
 		this.#matchers.push([matchObj, nodeFn]);
 		if (!this.#connected) {
 			this.#match(matchObj, nodeFn);
