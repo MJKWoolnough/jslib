@@ -44,11 +44,9 @@ window.addEventListener("click", e => {
 	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
 		target = target.parentNode;
 	}
-	if (target) {
-		const href = target.getAttribute("href");
-		if (href && goto(href)) {
-			e.preventDefault();
-		}
+	const href = target?.getAttribute("href");
+	if (href && goto(href)) {
+		e.preventDefault();
 	}
 });
 window.addEventListener("popstate", () => {
