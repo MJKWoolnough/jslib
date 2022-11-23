@@ -40,7 +40,7 @@ class Router extends HTMLElement {
 		this.#connected = false;
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
-	#match(match, nodeFn, url = window.location) {
+	#match(match, nodeFn, url = window.location, defaultAttrs) {
 		const attrs = {},
 		      params = url.searchParams ?? new URLSearchParams(url.search),
 		      matches = url.pathname.match(match.path);
@@ -62,14 +62,14 @@ class Router extends HTMLElement {
 			}
 		}
 		if (url.hash === match.hash) {
-			this.#marker.replaceWith(this.#marker = nodeFn(attrs));
+			this.#marker.replaceWith(this.#marker = nodeFn(defaultAttrs ? Object.assign(attrs, defaultAttrs) : attrs));
 			return this.#connected = true;
 		}
 		return false;
 	}
-	#setRoute(path) {
+	#setRoute(path, attrs) {
 		for (const c of this.#matchers) {
-			if (this.#match(c[0], c[1], path)) {
+			if (this.#match(c[0], c[1], path, attrs)) {
 				return true;
 			}
 		}
@@ -100,14 +100,14 @@ class Router extends HTMLElement {
 		}
 		return this;
 	}
-	[newState](path, state) {
+	[newState](path, state, attrs) {
 		if (this.#marker.isConnected) {
 			const h = this.#history.get(state ?? 0);
 			this.#history.set(lastState, this.#marker);
 			if (h) {
 				this.#marker.replaceWith(this.#marker = h);
 				return true;
-			} else if (this.#setRoute(path)) {
+			} else if (this.#setRoute(path, attrs)) {
 				return true;
 			}
 			this.#clear();
@@ -163,13 +163,13 @@ class Router extends HTMLElement {
 customElements.define("x-router", Router);
 
 export const router = () => new Router(),
-goto = href => {
+goto = (href, attrs) => {
 	const url = new URL(href, window.location + "");
 	let handled = false;
 	if (url.host === window.location.host) {
 		const now = Date.now();
 		for (const r of routers) {
-			if (r[newState](url, now)) {
+			if (r[newState](url, now, attrs)) {
 				handled = true;
 			}
 		}

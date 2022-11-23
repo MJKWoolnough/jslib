@@ -1,4 +1,4 @@
-type NodeFn = (attrs: Record<string, string>) => Exclude<Element, Router>;
+type NodeFn = (attrs: Record<string, ToString>) => Exclude<Element, Router>;
 
 type Match = {
 	path: RegExp;
@@ -15,6 +15,10 @@ type LocationURL = {
 	searchParams?: URLSearchParams;
 	hash: string;
 };
+
+interface ToString {
+	toString(): string;
+}
 
 const update = Symbol("update"),
       newState = Symbol("newState"),
@@ -58,8 +62,8 @@ class Router extends HTMLElement {
 		this.#connected = false;
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
-	#match(match: Match, nodeFn: NodeFn, url: LocationURL = window.location) {
-		const attrs: Record<string, string> = {},
+	#match(match: Match, nodeFn: NodeFn, url: LocationURL = window.location, defaultAttrs?: Record<string, ToString>) {
+		const attrs: Record<string, ToString> = {},
 		      params = url.searchParams ?? new URLSearchParams(url.search),
 		      matches = url.pathname.match(match.path);
 		if (!matches) {
@@ -80,14 +84,14 @@ class Router extends HTMLElement {
 			}
 		}
 		if (url.hash === match.hash) {
-			this.#marker.replaceWith(this.#marker = nodeFn(attrs));
+			this.#marker.replaceWith(this.#marker = nodeFn(defaultAttrs ? Object.assign(attrs, defaultAttrs) : attrs));
 			return this.#connected = true;
 		}
 		return false;
 	}
-	#setRoute(path?: LocationURL) {
+	#setRoute(path?: LocationURL, attrs?: Record<string, ToString>) {
 		for (const c of this.#matchers) {
-			if (this.#match(c[0], c[1], path)) {
+			if (this.#match(c[0], c[1], path, attrs)) {
 				return true;
 			}
 		}
@@ -118,14 +122,14 @@ class Router extends HTMLElement {
 		}
 		return this;
 	}
-	[newState](path: LocationURL, state: number) {
+	[newState](path: LocationURL, state: number, attrs?: Record<string, ToString>) {
 		if (this.#marker.isConnected) {
 			const h = this.#history.get(state ?? 0);
 			this.#history.set(lastState, this.#marker);
 			if (h) {
 				this.#marker.replaceWith(this.#marker = h);
 				return true;
-			} else if (this.#setRoute(path)) {
+			} else if (this.#setRoute(path, attrs)) {
 				return true;
 			}
 			this.#clear();
@@ -140,10 +144,10 @@ class Router extends HTMLElement {
 					if (match !== null) {
 						const element = c.cloneNode(true) as Element;
 						element.removeAttribute("route-match");
-						this.register(match, (attrs: Record<string, string>) => {
+						this.register(match, (attrs: Record<string, ToString>) => {
 							const node = element.cloneNode(true) as Element;
 							for (const attr in attrs) {
-								node.setAttribute(attr, attrs[attr]);
+								node.setAttribute(attr, attrs[attr] as string);
 							}
 							return node;
 						});
@@ -181,13 +185,13 @@ class Router extends HTMLElement {
 customElements.define("x-router", Router);
 
 export const router = () => new Router(),
-goto = (href: string) => {
+goto = (href: string, attrs?: Record<string, ToString>) => {
 	const url = new URL(href, window.location + "");
 	let handled = false;
 	if (url.host === window.location.host) {
 		const now = Date.now();
 		for (const r of routers) {
-			if (r[newState](url, now)) {
+			if (r[newState](url, now, attrs)) {
 				handled = true;
 			}
 		}
