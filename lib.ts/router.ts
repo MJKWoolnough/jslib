@@ -94,7 +94,7 @@ class Router extends HTMLElement {
 		return false;
 	}
 	register(match: string, nodeFn: NodeFn) {
-		const u = new URL(match, window.location.protocol + window.location.host),
+		const u = new URL(match, window.location.origin),
 		      matches: string[] = [],
 		      matchObj = {
 			matches,
