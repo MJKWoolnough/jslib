@@ -97,7 +97,7 @@ class Router extends HTMLElement {
 		}
 		return false;
 	}
-	register(match: string, nodeFn: NodeFn) {
+	add(match: string, nodeFn: NodeFn) {
 		const u = new URL(match, window.location.origin),
 		      matches: string[] = [],
 		      matchObj = {
@@ -144,7 +144,7 @@ class Router extends HTMLElement {
 					if (match !== null) {
 						const element = c.cloneNode(true) as Element;
 						element.removeAttribute("route-match");
-						this.register(match, (attrs: Record<string, ToString>) => {
+						this.add(match, (attrs: Record<string, ToString>) => {
 							const node = element.cloneNode(true) as Element;
 							for (const attr in attrs) {
 								node.setAttribute(attr, attrs[attr] as string);

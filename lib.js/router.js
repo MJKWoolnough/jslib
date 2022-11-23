@@ -75,7 +75,7 @@ class Router extends HTMLElement {
 		}
 		return false;
 	}
-	register(match, nodeFn) {
+	add(match, nodeFn) {
 		const u = new URL(match, window.location.origin),
 		      matches = [],
 		      matchObj = {
@@ -122,7 +122,7 @@ class Router extends HTMLElement {
 					if (match !== null) {
 						const element = c.cloneNode(true);
 						element.removeAttribute("route-match");
-						this.register(match, attrs => {
+						this.add(match, attrs => {
 							const node = element.cloneNode(true);
 							for (const attr in attrs) {
 								node.setAttribute(attr, attrs[attr]);
