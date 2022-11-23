@@ -8,7 +8,7 @@ const update = Symbol("update"),
 		}
 	}
       }),
-      regexpChars = ['\\', '[', ']', '(', ')'],
+      regexpChars = ['\\', '[', ']', '(', ')', '$', '*', '+', '.'],
       escapeRegexp = data => {
 	for (const c of regexpChars) {
 		data = data.replaceAll(c, "\\" + c);
