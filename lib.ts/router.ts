@@ -26,7 +26,7 @@ const update = Symbol("update"),
 		}
 	}
       }),
-      regexpChars = ['[', ']', '(', ')', '\\'],
+      regexpChars = ['\\', '[', ']', '(', ')'],
       escapeRegexp = (data: string) => {
 	for (const c of regexpChars) {
 		data = data.replaceAll(c, "\\" + c);
@@ -47,6 +47,7 @@ const update = Symbol("update"),
 		path = path.slice(t);
 	}
 	r += path;
+	      console.log(r);
 	return {
 		"path": new RegExp(r),
 		matches,
