@@ -4675,6 +4675,39 @@
 				      aThis = {};
 				return n.findLast(function(this: any, e) { return e.num === 3 && this === aThis; }, aThis)?.num === 3;
 			}
+		},
+		"NodeArray - forEach": {
+			"no nodes": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      n = new NodeArray(document.createElement("div"));
+				let good = true;
+				n.forEach(() => good = false);
+				return good;
+			},
+			"a node true": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      item = {[node]: document.createElement("span"), num: 1},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+				let good = false;
+				n.forEach(e => good = e === item);
+				return good;
+			},
+			"many nodes": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
+				      aThis = {};
+				let good = true;
+				n.forEach(function(this: any, e, n){good &&= e.num === n && this === aThis} , aThis);
+				return good
+			}
 		}
 	}
 });
