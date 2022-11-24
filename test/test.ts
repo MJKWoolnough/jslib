@@ -4707,6 +4707,41 @@
 				n.forEach(function(this: any, e, n){good &&= e.num === n && this === aThis} , aThis);
 				return good
 			}
+		},
+		"NodeArray - from": {
+			"no nodes": async () => {
+				const {NodeArray, node} = await import("./lib/nodes.js"),
+				      div = document.createElement("div"),
+				      n = NodeArray.from(div);
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return n.length === 0 && n[node] === div;
+			},
+			"a nodes": async () => {
+				const {NodeArray, node} = await import("./lib/nodes.js"),
+				      div = document.createElement("div"),
+				      child = div.appendChild(document.createElement("span")),
+				      n = NodeArray.from(div);
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return n.length === 1 && n[node] === div && n.at(0)?.[node] === child;
+			},
+			"many nodes": async () => {
+				const {NodeArray, node} = await import("./lib/nodes.js"),
+				      div = document.createElement("div"),
+				      children = Array.from({length: 5}, () => div.appendChild(document.createElement("span"))),
+				      n = NodeArray.from(div);
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return n.length === 5 && n.at(0)?.[node] === children[0] && n.at(4)?.[node] === children[4];
+			},
+			"many nodes with fn": async () => {
+				let pos = 0;
+				const {NodeArray, node} = await import("./lib/nodes.js"),
+				      div = document.createElement("div"),
+				      children = Array.from({length: 5}, () => div.appendChild(document.createElement("span"))),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = NodeArray.from(div, e => ({[node]: e, "num": pos++}));
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return n.length === 5 && n.at(0)?.[node] === children[0] && n.at(0)?.num === 0 && n.at(4)?.[node] === children[4] && n.at(4)?.num === 4;
+			}
 		}
 	}
 });
