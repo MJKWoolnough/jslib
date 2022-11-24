@@ -4662,7 +4662,6 @@
 				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
-				console.log(n.findLast(() => true));
 				return n.findLast(() => true)?.num === 4;
 			},
 			"many nodes": async () => {
