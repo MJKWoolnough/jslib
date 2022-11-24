@@ -220,7 +220,7 @@ export class NodeArray {
 	}
 	static from(n, itemFn = noItemFn) {
 		const s = new NodeArray(n),
-		      root = s.#root;
+		      root = s[realTarget].#root;
 		for (const c of n.childNodes) {
 			const i = itemFn(c);
 			if (i) {

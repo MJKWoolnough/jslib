@@ -266,7 +266,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	static from<T extends Item, H extends Node = Node>(n: H, itemFn: (node: Node) => T | undefined): NodeArray<T, H>;
 	static from<T extends Item = Item, H extends Node = Node>(n: H, itemFn = noItemFn): NodeArray<T, H> {
 		const s = new NodeArray<T, H>(n),
-		      root = s.#root;
+		      root = s[realTarget].#root;
 		for (const c of n.childNodes) {
 			const i = itemFn(c) as T;
 			if (i) {
