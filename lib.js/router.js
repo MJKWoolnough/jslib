@@ -175,7 +175,7 @@ goto = (href, attrs) => {
 		}
 		lastState = now;
 		if (handled) {
-			history.pushState(now, "", new URL(href, url + "") + "")
+			history.pushState(now, "", new URL(href, url + "") + "");
 		}
 	}
 	return handled;
