@@ -4742,6 +4742,42 @@
 				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 				return n.length === 5 && n.at(0)?.[node] === children[0] && n.at(0)?.num === 0 && n.at(4)?.[node] === children[4] && n.at(4)?.num === 4;
 			}
+		},
+		"NodeArray - includes": {
+			"no nodes": async () => {
+				const {NodeArray, node} = await import("./lib/nodes.js"),
+				      n = new NodeArray(document.createElement("div"));
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return !n.includes({[node]: document.createElement("div")});
+			},
+			"a node true": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      item = {[node]: document.createElement("span"), num: 1},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+				return n.includes(item);
+			},
+			"many nodes": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+				return n.includes(n.at(0)!) && n.includes(n.at(4)!);
+			},
+			"many nodes with offset": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+				return !n.includes(n.at(0)!, 1) && n.includes(n.at(4)!, 4);
+			}
 		}
 	}
 });
