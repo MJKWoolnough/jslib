@@ -72,17 +72,18 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
 	return n;
       },
       getNode = <T extends Item>(root: Root<T>, index: number): [ItemOrRoot<T>, number] => {
+	const pos = index;
 	if (index < 0) {
 		index++;
 		for (let curr = root.p; curr.i; index++, curr = curr.p) {
 			if (!index) {
-				return [curr, index];
+				return [curr, root.l + pos];
 			}
 		}
 	} else if (index < root.l) {
 		for (let curr = root.n; curr.i; index--, curr = curr.n) {
 			if (!index) {
-				return [curr, index];
+				return [curr, pos];
 			}
 		}
 	}
