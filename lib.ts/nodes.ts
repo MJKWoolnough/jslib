@@ -244,7 +244,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return -1;
 	}
 	findLast(callback: Callback<T, any, this>, thisArg?: any) {
-		for (const [index, item] of entries(this[realTarget].#root, 0, -1)) {
+		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
 			}
@@ -300,7 +300,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 			yield i;
 		}
 	}
-	lastIndexOf(searchElement: T, fromIndex = 0) {
+	lastIndexOf(searchElement: T, fromIndex = -1) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex, -1)) {
 			if (Object.is(searchElement, item)) {
 				return index;
@@ -346,7 +346,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
 	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T): T;
 	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
-		for (const [index, item] of entries(this[realTarget].#root, 0, -1)) {
+		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (initialValue === undefined) {
 				initialValue = item;
 			} else {

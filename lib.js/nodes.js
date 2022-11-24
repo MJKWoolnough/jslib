@@ -200,7 +200,7 @@ export class NodeArray {
 		return -1;
 	}
 	findLast(callback, thisArg) {
-		for (const [index, item] of entries(this[realTarget].#root, 0, -1)) {
+		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
 			}
@@ -254,7 +254,7 @@ export class NodeArray {
 			yield i;
 		}
 	}
-	lastIndexOf(searchElement, fromIndex = 0) {
+	lastIndexOf(searchElement, fromIndex = -1) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex, -1)) {
 			if (Object.is(searchElement, item)) {
 				return index;
@@ -296,7 +296,7 @@ export class NodeArray {
 		return initialValue;
 	}
 	reduceRight(callbackfn, initialValue) {
-		for (const [index, item] of entries(this[realTarget].#root, 0, -1)) {
+		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (initialValue === undefined) {
 				initialValue = item;
 			} else {
