@@ -4286,6 +4286,11 @@
 			}
 		},
 		"NodeArray - at": {
+			"no nodes": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      n = new NodeArray(document.createElement("div"));
+				return n.at(0) === undefined && n.at(-1) === undefined;
+			},
 			"two nodes": async () => {
 				type MyNode = {
 					num: number;
@@ -4304,11 +4309,24 @@
 				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
 				return n.at(0)?.num === 0 && n.at(1)?.num === 1 && n.at(4)?.num === 4 && n.at(4) === n.at(-1) && n.at(3) === n.at(-2);
 			},
-			"no nodes": async () => {
-				const {NodeArray} = await import("./lib/nodes.js"),
-				      n = new NodeArray(document.createElement("div"));
-				return n.at(0) === undefined && n.at(-1) === undefined;
-			}
+			"many nodes big negative": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+				return n.at(-6) === undefined;
+			},
+			"many nodes big positive": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+				return n.at(5) === undefined;
+			},
 		},
 		"NodeArray - concat": {
 			"no nodes": async () => {
