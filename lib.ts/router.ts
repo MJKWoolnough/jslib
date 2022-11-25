@@ -47,6 +47,7 @@ window.addEventListener("popstate", () => {
 	for (const r of routers) {
 		r[newState](window.location, history.state);
 	}
+	lastState = history.state;
 });
 
 class Router extends HTMLElement {
