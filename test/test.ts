@@ -4832,6 +4832,31 @@
 				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
 				return n.indexOf(n.at(0)!, 1) === -1 && n.indexOf(n.at(4)!, 4) === 4;
 			}
+		},
+		"NodeArray - keys": {
+			"no nodes": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      n = new NodeArray(document.createElement("div"));
+				return Array.from(n.keys()).join(",") === "";
+			},
+			"a node": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
+				return Array.from(n.keys()).join(",") === "0";
+			},
+			"many nodes": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+				return Array.from(n.keys()).join(",") === "0,1,2,3,4";
+			}
 		}
 	}
 });
