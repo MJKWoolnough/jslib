@@ -5033,6 +5033,49 @@
 				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
 				return n.reduceRight((v, c, i) => v * i + c.num, 0) === 0 && n.reduceRight((v, c, i) => v * (i + 1) + c.num, 0) === 119;
 			}
+		},
+		"NodeArray - reverse": {
+			"no nodes": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      n = new NodeArray(document.createElement("div"));
+				return n.reverse().length === 0;
+			},
+			"a node true": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      item = {[node]: document.createElement("span"), num: 1},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+				return n.reverse().at(0) === item;
+			},
+			"many nodes": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items);
+				n.reverse();
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return n.at(0) === items[4] && n.at(4) === items[0] && n[node].children[0] === items[4][node] && n[node].children[4] === items[0][node]; 
+			},
+			"many nodes sorted + push": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node} = await import("./lib/nodes.js"),
+				      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+				      item = {[node]: document.createElement("span"), "num": 99},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), (a, b) => a.num - b.num, items);
+				n.reverse();
+				n.push(item);
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return n.at(0) === item; 
+			}
 		}
 	}
 });
