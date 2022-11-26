@@ -4934,18 +4934,20 @@
 					num: number;
 				}
 				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      div = document.createElement("div"),
 				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
-				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
-				return n.pop()?.num === 1 && n.pop() === undefined;
+				      n = new NodeArray<MyNode>(div, noSort, [{[node]: document.createElement("span"), num: 1}]);
+				return n.pop()?.num === 1 && n.pop() === undefined && n.length === 0 && div.children.length === 0;
 			},
 			"many nodes": async () => {
 				type MyNode = {
 					num: number;
 				}
 				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      div = document.createElement("div"),
 				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
-				      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
-				return n.pop()?.num === 4 && n.pop()?.num === 3;
+				      n = new NodeArray<MyNode>(div, noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+				return n.pop()?.num === 4 && n.pop()?.num === 3 && n.length === 3 && div.children.length === 3;
 			}
 		}
 	}
