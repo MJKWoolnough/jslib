@@ -867,7 +867,7 @@ This unexported type is used to change how the elements are created and controll
 |-------------------|-----------|---------------|
 | attachRemoveEvent | true      | When true, the resulting created element will send an 'attached' event when the element is attached to the document, and a 'removed' event when removed from the document. Has no effect when 'psuedo' is set to true. |
 | attrs             | true      | When true, enables both the 'act' and 'attr' methods on the element class. |
-| classOnly         | false     | When true, the return from the default function will be the generated class, when false the return from the default function will be a [DOMBind](#dom_dombind). |
+| classOnly         | false     | When true, the return from the default function will be the generated class, when false the return from the default function will be a [DOMBind](#dom_dombind). If the 'name' option is set to empty string, the class will *not* be registered with the [Custom Elements Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). |
 | delegatesFocus    | false     | When true, sets the delegatesFocus option during attachShadow call to true. Has no effect when 'psuedo' is set to true. |
 | extend            | e => e    | Allows the generated class to be extended with a custom class. This extension will be applied before the passed fn function is called. |
 | manualSlot        | false     | When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'psuedo' is set to true. |
