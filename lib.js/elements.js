@@ -207,7 +207,7 @@ export default (fn, options = {}) => {
 			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = styles;
 		}
 	      };
-	if (!psuedo) {
+	if (!psuedo && !(classOnly && name === "")) {
 		customElements.define(name, element);
 	}
 	return classOnly ? element : psuedo ? (properties, children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
