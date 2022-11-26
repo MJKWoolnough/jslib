@@ -4950,6 +4950,36 @@
 				return n.pop()?.num === 4 && n.pop()?.num === 3 && n.length === 3 && div.children.length === 3;
 			}
 		},
+		"NodeArray - push": {
+			"empty push": async () => {
+				const {NodeArray, node} = await import("./lib/nodes.js"),
+				      item = {[node]: document.createElement("span")},
+				      n = new NodeArray(document.createElement("div"));
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return n.length === 0 && n.push(item) === 1 && n.length === 1 && n.at(0) === item && n[node].children?.[0] === item[node];
+			},
+			"non-empty push": async () => {
+				const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+				      item = {[node]: document.createElement("span")},
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				return n.length === 5 && n.push(item) === 6 && n.length === 6 && n.at(5) === item && n[node].children[5] === item[node];
+			},
+			"sorted push": async () => {
+				type MyNode = {
+					num: number;
+				}
+				const {NodeArray, node} = await import("./lib/nodes.js"),
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				      n = new NodeArray<MyNode>(document.createElement("div"), (a, b) => b.num - a.num);
+				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+				for (let i = 0; i < 5; i++) {
+					n.push({[node]: document.createElement("span"), num: i});
+				}
+				return n.length === 5 && n.at(0)?.num === 4 && n.at(4)?.num === 0;
+			}
+		},
 		"NodeArray - reduce": {
 			"no nodes": async () => {
 				const {NodeArray} = await import("./lib/nodes.js"),
