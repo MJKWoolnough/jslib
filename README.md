@@ -20,6 +20,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [load](#load)                               | Used for initialisation. |
 | [menu](#menu)                               | Library for creating right-click menus. |
 | [nodes](#nodes)                             | Classes for handling of collections of DOM Nodes. |
+| [router](#router)                           | Router element for SPAs. |
 | [rpc](#rpc)                                 | JSONRPC implementation. |
 | [settings](#settings)                       | Type-safe wrappers around localStorage. |
 | [svg](#svg)                                 | Functions to create SVG elements. |
@@ -36,7 +37,7 @@ Thematically, the above modules can be grouped into a few packages:
 | Decorum   | A collection of DOM manipulation libs. | [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), and [RPC](#rpc). |
 | Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
-| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), and [Settings](#settings). |
+| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), [Router](#router), and [Settings](#settings). |
 
 # Scripts
 
@@ -1695,6 +1696,77 @@ interface {
 ```
 
 This unexported type satifies any type has used the [node](#nodes_node) [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) to delegate a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) element.
+
+## <a name="router">router</a>
+
+The router module allows for easy use of the [History](https://developer.mozilla.org/en-US/docs/Web/API/History) API, updating the page according to the rules given to the router.
+
+This library implements a global click-handler to intercept the uses of both [HTMLAnchorElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLAnchorElement) and [HTMLAreaElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLAreaElement) elements, looking for URLs that match what the routers can handle. 
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [goto](#router_goto) | Function | Used to update the routers to a new location. |
+| [router](#router_router) | Function | Used to create a new router. |
+
+### <a name="router_goto">goto</a>
+```typescript
+(href: string, attrs?: Record<string, ToString>) => boolean;
+```
+
+This function will update all routers to the provided `href` location, overriding any resolved attributes from the URL with those specified in the `attrs` object.
+
+It will return true if any Router has a route that matches the location, and false otherwise.
+
+### <a name="router_router">router</a>
+
+The `router` function creates a new router, which should be added to the DOM in the place that you wish the matched routes to be placed.
+
+|  Method  |  Description  |
+|----------|---------------|
+| [add](#router_router_add) | Used to add routes to the Router. |
+| remove | Used to remove the Router from the DOM and disable its routing. It can be added to the DOM later to reactivate it. |
+
+In addition to being able to be used from javascript, the Router can be added directly with HTML using the `x-router` tag. When used in this way, routes can be added by adding children to the Router with the `route-match` attribute set to the matching route, as per the [add](#router_router_add) method.
+
+For example, the following creates two path routes and a catch-all route:
+
+```html
+<x-router>
+	<div route-match="/a">Route A</a>
+	<div route-match="/b"><span>Route B</span></a>
+	<div route-match="">404</a>
+</x-router>
+```
+
+#### <a name="router_router_add">add</a>
+```typescript
+class Router {
+	add(match: string, nodeFn: (attrs: Record<string, ToString>) => Exclude<Element, Router>): this;
+}
+```
+
+This method adds routes to a Router, specifying both a path to be matched and the function that is used to generate the HTML for that route. Note that the nodeFn can be a [DOMBind](#dom_dombind) function.
+
+This method returns the Router for easy chaining.
+
+The match string can consist of three parts, the path, the query, and the fragment; like an ordinary URL, but without the origin (scheme, user info, host, and port).
+
+Both the path and query sections of the match string can contain variable bindings, which are attribute names, prepended with a ':'. For the path section, the binding can be anywhere in the string and the attribute name will end with either a '/' or the end of the string. For the query section bindings, the value of a parameter must start with ':' and the rest of the value will be the attribute name. The 'attrs' object will contain these bindings with the key set to the name of the binding and the value set to the value passed, if any.
+
+For the path, if it starts with '/' then the match path will parsed as absolute, and when not starting with a '/' the match path can start anywhere after a '/' in the actual path. If the match path ends with '/', then the match path will be parsed as a prefix, whereas with no following '/', the match path will accept nothing beyond the end of it.
+
+For the query, any non-binding params must match the URL param values for the route to match. Bound params are considered optional.
+
+For the fragment, if the match string has one then it must match the URL fragment exactly. If the match string does not have one, the fragment will not be checked.
+
+Some examples:
+
+|  URL  |  Match  |  Success  |  Params  |
+|-------|---------|-----------|----------|
+| /a    | /a<br>/b<br>a | true<br>false<br>true | |
+| /a-112 | /a<br>/a-112<br>/a-:id | false<br>true<br>true | <br><br>id = 112 |
+| /search?mode=list&id=123&q=keyword | /no-search?mode=list<br>/search?mode=list<br>/search?id=:id&mode=list<br>/search?q=:query&mode=list&id=:id | false<br>true<br>true<br>true | <br><br>id = 123<br>id = 123 & query=keyword |
+| /some-page#content | /some-page<br>/some-page#otherContent<br>/some-page#content | true<br>false<br>true |  |
 
 ## <a name="rpc">rpc</a>
 
