@@ -49,15 +49,15 @@ summary:hover {
 	background-color: #ddd;
 }
 
-.fails:empty {
+span:empty {
 	display: none;
 }
 
-.fails {
+span {
 	color: #f00;
 }
 
-.fails:before {
+span:before {
 	display: inline-block;
 	content: "FAIL(S): ";
 	margin-left: 1em;

@@ -47,7 +47,6 @@ type Tests = {
 				      total = new Counter("0", totalCount),
 				      successful = new Counter("0", successCount),
 				      errors = document.createElement("span");
-				errors.setAttribute("class", "fails");
 				summary.append(name, ": ", successful, "/", total, errors);
 				details.append(processTests(breadcrumbs + name + "/", test, total, successful, errors.appendChild(new Counter("", errorCount))));
 			}
@@ -62,7 +61,6 @@ type Tests = {
 	      errors = document.createElement("span"),
 	      tests = processTests("/", data, total, successful, errors.appendChild(new Counter("")));
 	let opened = false;
-	errors.setAttribute("class", "fails");
 	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", successful, "/", total, errors, tests));
 	window.addEventListener("keypress", (e: KeyboardEvent) => {
 		if (e.key === "o") {
