@@ -5099,6 +5099,123 @@ type Tests = {
 					      n = new NodeArray<MyNode>(div, noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
 					return n.shift()?.num === 0 && n.shift()?.num === 1 && n.length === 3 && div.children.length === 3;
 				}
+			},
+			"slice": {
+				"no nodes": async () => {
+					const {NodeArray} = await import("./lib/nodes.js"),
+					      n = new NodeArray(document.createElement("div"));
+					return n.slice().length === 0;
+				},
+				"a node": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      item = {[node]: document.createElement("span"), "num": 99},
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
+					      s = n.slice();
+					return s.length === 1 && s[0] === item;
+				},
+				"many nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
+					      s = n.slice();
+					return s.length === 5 && s[0] === items[0] && s[4] === items[4]; 
+				},
+				"many nodes (+ve start)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
+					      s = n.slice(1);
+					return s.length === 4 && s[0] === items[1] && s[3] === items[4]; 
+				},
+				"many nodes (-ve start)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
+					      s = n.slice(-2);
+					return s.length === 2 && s[0] === items[3] && s[1] === items[4]; 
+				},
+				"many nodes (big +ve start)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
+					      s = n.slice(10);
+					return s.length === 0; 
+				},
+				"many nodes (big -ve start)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
+					      s = n.slice(-10);
+					return s.length === 5 && s[0] === items[0] && s[4] === items[4]; 
+				},
+				"many nodes (+ve end)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
+					      s = n.slice(0, 2);
+					return s.length === 2 && s[0] === items[0] && s[1] === items[1]; 
+				},
+				"many nodes (-ve end)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
+					      s = n.slice(0, -2);
+					return s.length === 3 && s[0] === items[0] && s[2] === items[2]; 
+				},
+				"many nodes (big +ve end)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
+					      s = n.slice(0, 10);
+					return s.length === 5 && s[0] === items[0] && s[4] === items[4]; 
+				},
+				"many nodes (big -ve end)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
+					      s = n.slice(0, -10);
+					return s.length === 0; 
+				},
 			}
 		}
 	}
