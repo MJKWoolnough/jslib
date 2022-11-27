@@ -1,65 +1,73 @@
-((data: Record<string, Record<string, Record<string, () => Promise<boolean>>>>) => {
-	const completeSpan = document.createElement("span"),
-	      failSpan = document.createElement("span"),
-	      df = document.createDocumentFragment();
-	let completeNum = 0,
-	    totalNum = 0,
-	    failNum = 0,
-	    opened = false;
-	failSpan.setAttribute("class", "fails");
-	completeSpan.innerText = "0";
-	for (const [library, libTests] of Object.entries(data)) {
-		const libDet = df.appendChild(document.createElement("details")),
-		      libSum = libDet.appendChild(document.createElement("summary")),
-		      libCom = document.createElement("span"),
-		      libFail = document.createElement("span");
-		let libTotalNum = 0,
-		    libCompleteNum = 0,
-		    libFails = 0;
-		libFail.setAttribute("class", "fails");
-		libCom.innerText = "0";
-		for (const [section, tests] of Object.entries(libTests)) {
-			const sectionDet = libDet.appendChild(document.createElement("details")),
-			      sectionSum = sectionDet.appendChild(document.createElement("summary")),
-			      sectionCom = document.createElement("span"),
-			      sectionFail = document.createElement("span"),
-			      ul = sectionDet.appendChild(document.createElement("ul"));
-			let sectionTotalNum = 0,
-			    sectionCompleteNum = 0,
-			    sectionFails = 0;
-			sectionFail.setAttribute("class", "fails");
-			sectionCom.innerText = "0";
-			for (const [description, test] of Object.entries(tests)) {
-				sectionTotalNum++;
-				libTotalNum++;
-				totalNum++;
-				const li = ul.appendChild(document.createElement("li"));
-				li.innerText = description;
+type Tests = {
+	[key: string]: Tests | (() => Promise<boolean>);
+}
+
+((data: Record<string, Tests>) => {
+	class Counter extends Text {
+		#parent?: Counter;
+		#count = 0;
+		constructor(start: string, parent?: Counter) {
+			super(start);
+			this.#parent = parent;
+		}
+		add() {
+			this.textContent = (++this.#count) + "";
+			this.#parent?.add();
+		}
+	}
+	const processTests = (breadcrumbs: string, t: Tests, totalCount: Counter, successCount: Counter, errorCount: Counter) => {
+		const df = document.createDocumentFragment(),
+		      testList = document.createElement("ul");
+		for (const [name, test] of Object.entries(t)) {
+			if (test instanceof Function) {
+				const li = testList.appendChild(document.createElement("li"));
+				li.textContent = name;
 				li.setAttribute("title", test.toString());
+				totalCount.add();
 				test().catch(error => {
-					console.log({library, section, description, error});
-					alert(`Error in library ${library}, section ${section}, test "${description}": check console for details`);
+					console.log({"section": breadcrumbs.slice(1, -1).split("/"), name, error});
+					alert(`Error in section ${breadcrumbs}, test "${name}": check console for details`);
 					return false;
 				}).then(pass => {
 					li.setAttribute("class", pass ? "pass" : "fail");
 					if (pass) {
-						sectionCom.innerText = (++sectionCompleteNum)+"";
-						libCom.innerText = (++libCompleteNum)+"";
-						completeSpan.innerText = (++completeNum)+"";
+						successCount.add();
 					} else {
-						sectionDet.toggleAttribute("open", true);
-						libDet.toggleAttribute("open", true);
-						sectionFail.innerText = (++sectionFails)+"";
-						libFail.innerText = (++libFails)+"";
-						failSpan.innerText = (++failNum)+"";
+						for (let node = li.parentNode; node; node = node.parentNode) {
+							if (node instanceof HTMLDetailsElement) {
+								node.toggleAttribute("open", true);
+							}
+						}
+						errorCount.add();
 					}
 				});
+			} else {
+				const details = df.appendChild(document.createElement("details")),
+				      summary = details.appendChild(document.createElement("summary")),
+				      total = new Counter("0", totalCount),
+				      successful = new Counter("0", successCount),
+				      errors = new Counter("", errorCount),
+				      errorSpan = document.createElement("span");
+				errorSpan.setAttribute("class", "fails");
+				errorSpan.append(errors);
+				summary.append(name, ": ", successful, "/", total, errorSpan);
+				details.append(processTests(breadcrumbs + name + "/", test, total, successful, errors));
 			}
-			sectionSum.append(section + ": ", sectionCom, "/" + sectionTotalNum, sectionFail);
 		}
-		libSum.append(library + ": ", libCom, "/" + libTotalNum, libFail);
-	}
-	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", completeSpan, "/" + totalNum, failSpan, df));
+		if (testList.childElementCount > 0) {
+			df.append(testList);
+		}
+		return df;
+	      },
+	      total = new Counter("0"),
+	      successful = new Counter("0"),
+	      errors = new Counter(""),
+	      errorSpan = document.createElement("span"),
+	      tests = processTests("/", data, total, successful, errors);
+	let opened = false;
+	errorSpan.setAttribute("class", "fails");
+	errorSpan.append(errors);
+	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", successful, "/", total, errorSpan, tests));
 	window.addEventListener("keypress", (e: KeyboardEvent) => {
 		if (e.key === "o") {
 			opened = !opened;
