@@ -371,8 +371,13 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	slice(begin = 0, end?: number) {
 		const root = this[realTarget].#root,
 		      slice: T[] = [];
+		if (begin <= -root.l) {
+			begin = 0;
+		}
 		if (end === undefined) {
 			end = root.l;
+		} else if (end < -root.l) {
+			end = 0;
 		} else if (end < 0) {
 			end += root.l;
 		}
