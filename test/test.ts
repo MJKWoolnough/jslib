@@ -5072,6 +5072,33 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.at(0) === item; 
 				}
+			},
+			"shift": {
+				"no nodes": async () => {
+					const {NodeArray} = await import("./lib/nodes.js"),
+					      n = new NodeArray(document.createElement("div"));
+					return n.shift() === undefined;
+				},
+				"a node": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(div, noSort, [{[node]: document.createElement("span"), num: 1}]);
+					return n.shift()?.num === 1 && n.shift() === undefined && n.length === 0 && div.children.length === 0;
+				},
+				"many nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(div, noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+					return n.shift()?.num === 0 && n.shift()?.num === 1 && n.length === 3 && div.children.length === 3;
+				}
 			}
 		}
 	}
