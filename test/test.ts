@@ -27,7 +27,6 @@ type Tests = {
 				test().catch(error => {
 					console.log({"section": breadcrumbs.slice(1, -1).split("/"), name, error});
 					alert(`Error in section ${breadcrumbs}, test "${name}": check console for details`);
-					return false;
 				}).then(pass => {
 					li.setAttribute("class", pass ? "pass" : "fail");
 					if (pass) {
