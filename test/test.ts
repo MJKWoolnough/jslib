@@ -76,14 +76,12 @@ type Tests = {
 	});
 })({
 	"load.js": {
-		"pageLoad": {
-			"pageLoad": async () => {
-				const {default: pageLoad} = await import("./lib/load.js");
-				return Promise.race([
-					pageLoad,
-					new Promise(sFn => setTimeout(() => sFn(false), 10000))
-				]).then(v => v !== false);
-			}
+		"pageLoad": async () => {
+			const {default: pageLoad} = await import("./lib/load.js");
+			return Promise.race([
+				pageLoad,
+				new Promise(sFn => setTimeout(() => sFn(false), 10000))
+			]).then(v => v !== false);
 		}
 	},
 	"inter.js": {
@@ -1259,323 +1257,319 @@ type Tests = {
 		}
 	},
 	"rpc.js": {
-		"RPC": {
-			"static test": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {RPC} = await import("./lib/rpc.js");
-				return WS("/rpc").then(ws => new RPC(ws).request("static").then(d => d === "123"));
-			},
-			"echo test": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {RPC} = await import("./lib/rpc.js");
-				return WS("/rpc").then(ws => new RPC(ws).request("echo", "456").then(d => d === "456"));
-			},
-			"broadcast test": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {RPC} = await import("./lib/rpc.js");
-				return WS("/rpc").then(ws => {
-					const rpc = new RPC(ws);
-					let fn = (_b: boolean) => {},
-					    res = 0;
-					rpc.await(-1).then(data => res += +(data === "123"));
+		"static test": async () => {
+			const {WS} = await import("./lib/conn.js"),
+			      {RPC} = await import("./lib/rpc.js");
+			return WS("/rpc").then(ws => new RPC(ws).request("static").then(d => d === "123"));
+		},
+		"echo test": async () => {
+			const {WS} = await import("./lib/conn.js"),
+			      {RPC} = await import("./lib/rpc.js");
+			return WS("/rpc").then(ws => new RPC(ws).request("echo", "456").then(d => d === "456"));
+		},
+		"broadcast test": async () => {
+			const {WS} = await import("./lib/conn.js"),
+			      {RPC} = await import("./lib/rpc.js");
+			return WS("/rpc").then(ws => {
+				const rpc = new RPC(ws);
+				let fn = (_b: boolean) => {},
+				    res = 0;
+				rpc.await(-1).then(data => res += +(data === "123"));
+				rpc.request("broadcast", "123").then(d => {
+					if (d) {
+						res *= 2;
+					}
+					fn(res === 2);
+				});
+				return new Promise<boolean>(sFn => fn = sFn);
+			});
+		},
+		"broadcast test, double recieve": async () => {
+			const {WS} = await import("./lib/conn.js"),
+			      {RPC} = await import("./lib/rpc.js");
+			return WS("/rpc").then(ws => {
+				const rpc = new RPC(ws);
+				let fn = (_b: boolean) => {},
+				    res = 0;
+				rpc.await(-1).then(data => res += +(data === "123"));
+				rpc.await(-1).then(data => res += +(data === "123"));
+				rpc.request("broadcast", "123").then(d => {
+					if (d) {
+						res *= 2;
+					}
+					fn(res === 4);
+				});
+				return new Promise<boolean>(sFn => fn = sFn);
+			});
+		},
+		"broadcast test, subscribed": async () => {
+			const {WS} = await import("./lib/conn.js"),
+			      {RPC} = await import("./lib/rpc.js");
+			return WS("/rpc").then(ws => {
+				const rpc = new RPC(ws);
+				let fn = (_b: boolean) => {},
+				    res = 0;
+				rpc.subscribe(-1).when(data => res += +(data === "123"));
+				rpc.request("broadcast", "123").then(d => {
+					if (d) {
+						res *= 2;
+					}
 					rpc.request("broadcast", "123").then(d => {
 						if (d) {
 							res *= 2;
 						}
-						fn(res === 2);
+						fn(res === 6);
 					});
-					return new Promise<boolean>(sFn => fn = sFn);
 				});
-			},
-			"broadcast test, double recieve": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {RPC} = await import("./lib/rpc.js");
-				return WS("/rpc").then(ws => {
-					const rpc = new RPC(ws);
-					let fn = (_b: boolean) => {},
-					    res = 0;
-					rpc.await(-1).then(data => res += +(data === "123"));
-					rpc.await(-1).then(data => res += +(data === "123"));
-					rpc.request("broadcast", "123").then(d => {
-						if (d) {
-							res *= 2;
-						}
-						fn(res === 4);
-					});
-					return new Promise<boolean>(sFn => fn = sFn);
-				});
-			},
-			"broadcast test, subscribed": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {RPC} = await import("./lib/rpc.js");
-				return WS("/rpc").then(ws => {
-					const rpc = new RPC(ws);
-					let fn = (_b: boolean) => {},
-					    res = 0;
-					rpc.subscribe(-1).when(data => res += +(data === "123"));
-					rpc.request("broadcast", "123").then(d => {
-						if (d) {
-							res *= 2;
-						}
-						rpc.request("broadcast", "123").then(d => {
-							if (d) {
-								res *= 2;
-							}
-							fn(res === 6);
-						});
-					});
-					return new Promise<boolean>(sFn => fn = sFn);
-				});
-			},
-			"endpoint error": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {RPC} = await import("./lib/rpc.js");
-				return WS("/rpc").then(ws => new RPC(ws).request("unknown").then(() => false).catch(() => true));
-			},
-			"close test": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {RPC} = await import("./lib/rpc.js");
-				return WS("/rpc").then(ws => new RPC(ws).request("close").then(() => false).catch(() => true));
-			},
-			"close all test": async () => {
-				const {WS} = await import("./lib/conn.js"),
-				      {RPC} = await import("./lib/rpc.js");
-				return WS("/rpc").then(ws => {
-					const rpc = new RPC(ws);
-					let res = 0;
-					rpc.await(-1).catch(() => res++);
-					rpc.await(-2).catch(() => res++);
-					return rpc.request("close").then(() => false).catch(() => new Promise<boolean>(sFn => window.setTimeout(() => sFn(res === 2), 0)));
-				});
-			}
+				return new Promise<boolean>(sFn => fn = sFn);
+			});
+		},
+		"endpoint error": async () => {
+			const {WS} = await import("./lib/conn.js"),
+			      {RPC} = await import("./lib/rpc.js");
+			return WS("/rpc").then(ws => new RPC(ws).request("unknown").then(() => false).catch(() => true));
+		},
+		"close test": async () => {
+			const {WS} = await import("./lib/conn.js"),
+			      {RPC} = await import("./lib/rpc.js");
+			return WS("/rpc").then(ws => new RPC(ws).request("close").then(() => false).catch(() => true));
+		},
+		"close all test": async () => {
+			const {WS} = await import("./lib/conn.js"),
+			      {RPC} = await import("./lib/rpc.js");
+			return WS("/rpc").then(ws => {
+				const rpc = new RPC(ws);
+				let res = 0;
+				rpc.await(-1).catch(() => res++);
+				rpc.await(-2).catch(() => res++);
+				return rpc.request("close").then(() => false).catch(() => new Promise<boolean>(sFn => window.setTimeout(() => sFn(res === 2), 0)));
+			});
 		}
 	},
 	"bbcode.js": {
-		"tokeniser": {
-			"text": async () => {
-				const bbcode = (await import("./lib/bbcode.js")).default;
-				let ret = false;
-				bbcode({[(await import("./lib/bbcode.js")).text]: (_n: Node, t: string) => ret = t === " "}, " ");
-				return ret;
-			},
-			"long text": async () => {
-				const bbcode = (await import("./lib/bbcode.js")).default;
-				let ret = false;
-				bbcode({[(await import("./lib/bbcode.js")).text]: (_n: Node, t: string) => ret = t === "ABC 123"}, "ABC 123");
-				return ret;
-			},
-			"simple token check": async () => {
-				const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
-				let ret = false;
-				bbcode({
-					"a": (_n: Node, t: any) => {
-						const tk = t.next(true).value;
-						if (isOpenTag(tk)) {
-							ret = tk.tagName === "a";
-						}
-					},
-					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
-				}, "[a]");
-				return ret;
-			},
-			"simple token with attr check": async () => {
-				const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
-				let ret = false;
-				bbcode({
-					"a": (_n: Node, t: any) => {
-						const tk = t.next(true).value;
-						if (isOpenTag(tk)) {
-							ret = tk.tagName === "a" && tk.attr === "b";
-						}
-					},
-					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
-				}, "[a=b]");
-				return ret;
-			},
-			"simple token with close check": async () => {
-				const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
-				let ret = false;
-				bbcode({
-					"a": (_n: Node, t: any) => {
-						let tk = t.next(true).value;
-						if (isOpenTag(tk) && tk.tagName === "a") {
-							tk = t.next().value;
-							if (isCloseTag(tk)) {
-								ret = tk.tagName === "d";
-							}
-						}
-					},
-					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
-				}, "[a][/d]");
-				return ret;
-			},
-			"simple token with attr and close check": async () => {
-				const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
-				let ret = false;
-				bbcode({
-					"a": (_n: Node, t: any) => {
-						let tk = t.next(true).value;
-						if (isOpenTag(tk) && tk.tagName === "a" && tk.attr === "bc") {
-							tk = t.next().value;
-							if (isCloseTag(tk)) {
-								ret = tk.tagName === "d";
-							}
-						}
-					},
-					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
-				}, "[a=bc][/d]");
-				return ret;
-			},
-			"multi-token check": async () => {
-				const {default: bbcode, isCloseTag, isOpenTag, isString} = await import("./lib/bbcode.js");
-				let ret = false;
-				bbcode({
-					"a": (_n: Node, t: any) => {
-						const checks = [
-							[isOpenTag, (tk: any) => tk.tagName === "a" && tk.attr === "bc"],
-							[isOpenTag, (tk: any) => tk.tagName === "d"],
-							[isOpenTag, (tk: any) => tk.tagName === "e" && tk.attr === "12\n3"],
-							[isString, (data: any) => data === "TEXT"],
-							[isCloseTag, (tk: any) => tk.tagName === "e"],
-							[isString, (data: any) => data === "MORE\nTEXT"],
-							[isCloseTag, (tk: any) => tk.tagName === "d"],
-							[isCloseTag, (tk: any) => tk.tagName === "a"]
-						] as [Function, Function][];
-						ret = true;
-						for (let tk = t.next(true).value; tk; tk = t.next().value) {
-							const [typeCheck, valueCheck] = checks.shift()!;
-							ret &&= typeCheck(tk) && valueCheck(tk);
-						}
-					},
-					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
-				}, "[a=bc][d][e=12\n3]TEXT[/e]MORE\nTEXT[/d][/a]");
-				return ret;
-			},
-			"process check": async () => {
-				const {default: bbcode, process} = await import("./lib/bbcode.js"),
-				      base = {
-					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
-				      };
-				let ret = 0;
-				bbcode(Object.assign({"a": (n: Node, t: any) => process(n, t, Object.assign({"b": () => ret++}, base), "a")}, base), "[b][a][b][b][/a][b]");
-				return ret === 2;
-			},
-			"quoted attr": async () => {
-				const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
-				let ret = false;
-				bbcode({
-					"a": (_n: Node, t: any) => {
-						const checks = [
-							[isOpenTag, (tk: any) => tk.tagName === "a" && tk.attr === "bc"],
-							[isOpenTag, (tk: any) => tk.tagName === "b" && tk.attr === ""],
-							[isOpenTag, (tk: any) => tk.tagName === "c" && tk.attr === "\""],
-							[isOpenTag, (tk: any) => tk.tagName === "d" && tk.attr === "]"]
-						] as [Function, Function][];
-						ret = true;
-						for (let tk = t.next(true).value; tk; tk = t.next().value) {
-							const [typeCheck, valueCheck] = checks.shift()!;
-							ret &&= typeCheck(tk) && valueCheck(tk);
-						}
-					},
-					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
-				}, `[a="bc"][b=""][c="\\""][d="]"]`);
-				return ret;
-			},
-			"isolation": async () => {
-				const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
-				let ret = false;
-				bbcode({
-					"a": (_n: Node, t: any) => {
-						let tk = t.next(1).value;
-						if (!isOpenTag(tk) || tk.tagName !== "a") {
-							return;
-						}
-						t.next();
-						tk = t.next(1).value;
-						if (!isOpenTag(tk) || tk.tagName !== "b") {
-							return;
-						}
-						t.next();
-						tk = t.next(1).value;
-						if (!isOpenTag(tk) || tk.tagName !== "b") {
-							return;
-						}
-						t.next();
-						tk = t.next(1).value;
-						if (!isOpenTag(tk) || tk.tagName !== "c") {
-							return;
-						}
+		"text": async () => {
+			const bbcode = (await import("./lib/bbcode.js")).default;
+			let ret = false;
+			bbcode({[(await import("./lib/bbcode.js")).text]: (_n: Node, t: string) => ret = t === " "}, " ");
+			return ret;
+		},
+		"long text": async () => {
+			const bbcode = (await import("./lib/bbcode.js")).default;
+			let ret = false;
+			bbcode({[(await import("./lib/bbcode.js")).text]: (_n: Node, t: string) => ret = t === "ABC 123"}, "ABC 123");
+			return ret;
+		},
+		"simple token check": async () => {
+			const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
+			let ret = false;
+			bbcode({
+				"a": (_n: Node, t: any) => {
+					const tk = t.next(true).value;
+					if (isOpenTag(tk)) {
+						ret = tk.tagName === "a";
+					}
+				},
+				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+			}, "[a]");
+			return ret;
+		},
+		"simple token with attr check": async () => {
+			const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
+			let ret = false;
+			bbcode({
+				"a": (_n: Node, t: any) => {
+					const tk = t.next(true).value;
+					if (isOpenTag(tk)) {
+						ret = tk.tagName === "a" && tk.attr === "b";
+					}
+				},
+				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+			}, "[a=b]");
+			return ret;
+		},
+		"simple token with close check": async () => {
+			const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
+			let ret = false;
+			bbcode({
+				"a": (_n: Node, t: any) => {
+					let tk = t.next(true).value;
+					if (isOpenTag(tk) && tk.tagName === "a") {
 						tk = t.next().value;
-						if (!isOpenTag(tk) || tk.tagName !== "d") {
-							return;
+						if (isCloseTag(tk)) {
+							ret = tk.tagName === "d";
 						}
+					}
+				},
+				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+			}, "[a][/d]");
+			return ret;
+		},
+		"simple token with attr and close check": async () => {
+			const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
+			let ret = false;
+			bbcode({
+				"a": (_n: Node, t: any) => {
+					let tk = t.next(true).value;
+					if (isOpenTag(tk) && tk.tagName === "a" && tk.attr === "bc") {
 						tk = t.next().value;
-						if (!isOpenTag(tk) || tk.tagName !== "e") {
+						if (isCloseTag(tk)) {
+							ret = tk.tagName === "d";
+						}
+					}
+				},
+				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+			}, "[a=bc][/d]");
+			return ret;
+		},
+		"multi-token check": async () => {
+			const {default: bbcode, isCloseTag, isOpenTag, isString} = await import("./lib/bbcode.js");
+			let ret = false;
+			bbcode({
+				"a": (_n: Node, t: any) => {
+					const checks = [
+						[isOpenTag, (tk: any) => tk.tagName === "a" && tk.attr === "bc"],
+						[isOpenTag, (tk: any) => tk.tagName === "d"],
+						[isOpenTag, (tk: any) => tk.tagName === "e" && tk.attr === "12\n3"],
+						[isString, (data: any) => data === "TEXT"],
+						[isCloseTag, (tk: any) => tk.tagName === "e"],
+						[isString, (data: any) => data === "MORE\nTEXT"],
+						[isCloseTag, (tk: any) => tk.tagName === "d"],
+						[isCloseTag, (tk: any) => tk.tagName === "a"]
+					] as [Function, Function][];
+					ret = true;
+					for (let tk = t.next(true).value; tk; tk = t.next().value) {
+						const [typeCheck, valueCheck] = checks.shift()!;
+						ret &&= typeCheck(tk) && valueCheck(tk);
+					}
+				},
+				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+			}, "[a=bc][d][e=12\n3]TEXT[/e]MORE\nTEXT[/d][/a]");
+			return ret;
+		},
+		"process check": async () => {
+			const {default: bbcode, process} = await import("./lib/bbcode.js"),
+			      base = {
+				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+			      };
+			let ret = 0;
+			bbcode(Object.assign({"a": (n: Node, t: any) => process(n, t, Object.assign({"b": () => ret++}, base), "a")}, base), "[b][a][b][b][/a][b]");
+			return ret === 2;
+		},
+		"quoted attr": async () => {
+			const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
+			let ret = false;
+			bbcode({
+				"a": (_n: Node, t: any) => {
+					const checks = [
+						[isOpenTag, (tk: any) => tk.tagName === "a" && tk.attr === "bc"],
+						[isOpenTag, (tk: any) => tk.tagName === "b" && tk.attr === ""],
+						[isOpenTag, (tk: any) => tk.tagName === "c" && tk.attr === "\""],
+						[isOpenTag, (tk: any) => tk.tagName === "d" && tk.attr === "]"]
+					] as [Function, Function][];
+					ret = true;
+					for (let tk = t.next(true).value; tk; tk = t.next().value) {
+						const [typeCheck, valueCheck] = checks.shift()!;
+						ret &&= typeCheck(tk) && valueCheck(tk);
+					}
+				},
+				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+			}, `[a="bc"][b=""][c="\\""][d="]"]`);
+			return ret;
+		},
+		"isolation": async () => {
+			const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
+			let ret = false;
+			bbcode({
+				"a": (_n: Node, t: any) => {
+					let tk = t.next(1).value;
+					if (!isOpenTag(tk) || tk.tagName !== "a") {
+						return;
+					}
+					t.next();
+					tk = t.next(1).value;
+					if (!isOpenTag(tk) || tk.tagName !== "b") {
+						return;
+					}
+					t.next();
+					tk = t.next(1).value;
+					if (!isOpenTag(tk) || tk.tagName !== "b") {
+						return;
+					}
+					t.next();
+					tk = t.next(1).value;
+					if (!isOpenTag(tk) || tk.tagName !== "c") {
+						return;
+					}
+					tk = t.next().value;
+					if (!isOpenTag(tk) || tk.tagName !== "d") {
+						return;
+					}
+					tk = t.next().value;
+					if (!isOpenTag(tk) || tk.tagName !== "e") {
+						return;
+					}
+					for (let i = 0; i < 10; i++) {
+						if (t.next().value) {
 							return;
 						}
-						for (let i = 0; i < 10; i++) {
-							if (t.next().value) {
-								return;
-							}
-						}
-						tk = t.next(1).value;
-						if (!isCloseTag(tk) || tk.tagName !== "c") {
+					}
+					tk = t.next(1).value;
+					if (!isCloseTag(tk) || tk.tagName !== "c") {
+						return;
+					}
+					tk = t.next().value;
+					if (!isOpenTag(tk) || tk.tagName !== "f") {
+						return;
+					}
+					for (let i = 0; i < 10; i++) {
+						if (t.next().value) {
 							return;
 						}
-						tk = t.next().value;
-						if (!isOpenTag(tk) || tk.tagName !== "f") {
+					}
+					tk = t.next(1).value;
+					if (!isCloseTag(tk) || tk.tagName !== "b") {
+						return;
+					}
+					tk = t.next().value;
+					if (!isOpenTag(tk) || tk.tagName !== "g") {
+						return;
+					}
+					tk = t.next().value;
+					if (!isOpenTag(tk) || tk.tagName !== "h") {
+						return;
+					}
+					for (let i = 0; i < 10; i++) {
+						if (t.next().value) {
 							return;
 						}
-						for (let i = 0; i < 10; i++) {
-							if (t.next().value) {
-								return;
-							}
-						}
-						tk = t.next(1).value;
-						if (!isCloseTag(tk) || tk.tagName !== "b") {
+					}
+					tk = t.next(1).value;
+					if (!isCloseTag(tk) || tk.tagName !== "b") {
+						return;
+					}
+					for (let i = 0; i < 10; i++) {
+						if (t.next().value) {
 							return;
 						}
-						tk = t.next().value;
-						if (!isOpenTag(tk) || tk.tagName !== "g") {
+					}
+					tk = t.next(1).value;
+					if (!isCloseTag(tk) || tk.tagName !== "a") {
+						return;
+					}
+					tk = t.next().value;
+					if (!isOpenTag(tk) || tk.tagName !== "i") {
+						return;
+					}
+					for (let i = 0; i < 10; i++) {
+						if (t.next().value) {
 							return;
 						}
-						tk = t.next().value;
-						if (!isOpenTag(tk) || tk.tagName !== "h") {
-							return;
-						}
-						for (let i = 0; i < 10; i++) {
-							if (t.next().value) {
-								return;
-							}
-						}
-						tk = t.next(1).value;
-						if (!isCloseTag(tk) || tk.tagName !== "b") {
-							return;
-						}
-						for (let i = 0; i < 10; i++) {
-							if (t.next().value) {
-								return;
-							}
-						}
-						tk = t.next(1).value;
-						if (!isCloseTag(tk) || tk.tagName !== "a") {
-							return;
-						}
-						tk = t.next().value;
-						if (!isOpenTag(tk) || tk.tagName !== "i") {
-							return;
-						}
-						for (let i = 0; i < 10; i++) {
-							if (t.next().value) {
-								return;
-							}
-						}
-						ret = true;
-					},
-					[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
-				}, `[a][b][b][c][d][e][/c][f][/b][g][h][/b][/a][i]`);
-				return ret;
-			}
+					}
+					ret = true;
+				},
+				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+			}, `[a][b][b][c][d][e][/c][f][/b][g][h][/b][/a][i]`);
+			return ret;
 		}
 	},
 	"bbcode_tags.js": {
