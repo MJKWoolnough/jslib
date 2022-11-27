@@ -46,12 +46,10 @@ type Tests = {
 				      summary = details.appendChild(document.createElement("summary")),
 				      total = new Counter("0", totalCount),
 				      successful = new Counter("0", successCount),
-				      errors = new Counter("", errorCount),
-				      errorSpan = document.createElement("span");
-				errorSpan.setAttribute("class", "fails");
-				errorSpan.append(errors);
-				summary.append(name, ": ", successful, "/", total, errorSpan);
-				details.append(processTests(breadcrumbs + name + "/", test, total, successful, errors));
+				      errors = document.createElement("span");
+				errors.setAttribute("class", "fails");
+				summary.append(name, ": ", successful, "/", total, errors);
+				details.append(processTests(breadcrumbs + name + "/", test, total, successful, errors.appendChild(new Counter("", errorCount))));
 			}
 		}
 		if (testList.childElementCount > 0) {
@@ -61,13 +59,11 @@ type Tests = {
 	      },
 	      total = new Counter("0"),
 	      successful = new Counter("0"),
-	      errors = new Counter(""),
-	      errorSpan = document.createElement("span"),
-	      tests = processTests("/", data, total, successful, errors);
+	      errors = document.createElement("span"),
+	      tests = processTests("/", data, total, successful, errors.appendChild(new Counter("")));
 	let opened = false;
-	errorSpan.setAttribute("class", "fails");
-	errorSpan.append(errors);
-	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", successful, "/", total, errorSpan, tests));
+	errors.setAttribute("class", "fails");
+	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", successful, "/", total, errors, tests));
 	window.addEventListener("keypress", (e: KeyboardEvent) => {
 		if (e.key === "o") {
 			opened = !opened;
