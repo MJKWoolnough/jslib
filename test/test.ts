@@ -1686,512 +1686,532 @@ type Tests = {
 				      {all} = await import("./lib/bbcode_tags.js");
 				return bbcode(all, "[b][hr][/b]").firstElementChild!.innerHTML === `<hr>`;
 			},
-			"colour with no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][colour]TEXT[/colour]").firstElementChild!.innerHTML === `[colour]TEXT[/colour]`;
-			},
-			"colour with short hex": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][colour=#f00]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(255, 0, 0);">TEXT</span>`;
-			},
-			"colour with long hex": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][colour=#00f]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(0, 0, 255);">TEXT</span>`;
-			},
-			"colour with colour name": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][colour=green]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: green;">TEXT</span>`;
-			},
-			"colour with rgb": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][colour=rgb(1, 2, 3)]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(1, 2, 3);">TEXT</span>`;
-			},
-			"colour with rgba": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][colour=rgba(1, 2, 3, 0.4)]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgba(1, 2, 3, 0.4);">TEXT</span>`;
-			},
-			"colour with nonsense (XSS)": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][colour=green;123\">]TEXT[/colour]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
-			},
-			"color with no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][color]TEXT[/color]").firstElementChild!.innerHTML === `[color]TEXT[/color]`;
-			},
-			"color with short hex": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][color=#f00]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(255, 0, 0);">TEXT</span>`;
-			},
-			"color with long hex": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][color=#00f]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(0, 0, 255);">TEXT</span>`;
-			},
-			"color with colour name": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][color=green]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: green;">TEXT</span>`;
-			},
-			"color with rgb": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][color=rgb(1, 2, 3)]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(1, 2, 3);">TEXT</span>`;
-			},
-			"color with rgba": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][color=rgba(1, 2, 3, 0.4)]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgba(1, 2, 3, 0.4);">TEXT</span>`;
-			},
-			"color with nonsense (XSS)": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][color=green;123\">]TEXT[/color]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
-			},
-			"size with no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][size]TEXT[/size]").firstElementChild!.innerHTML === `[size]TEXT[/size]`;
-			},
-			"size with minimum attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][size=1]TEXT[/size]").firstElementChild!.innerHTML === `<span style="font-size: 0.1em;">TEXT</span>`;
-			},
-			"size with maximum attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][size=100]TEXT[/size]").firstElementChild!.innerHTML === `<span style="font-size: 10em;">TEXT</span>`;
-			},
-			"size with below minimum attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][size=0]TEXT[/size]").firstElementChild!.innerHTML === `[size=0]TEXT[/size]`;
-			},
-			"size with above maximum attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][size=101]TEXT[/size]").firstElementChild!.innerHTML === `[size=101]TEXT[/size]`;
-			},
-			"size with non-integer attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][size=1.1]TEXT[/size]").firstElementChild!.innerHTML === `<span style="font-size: 0.1em;">TEXT</span>`;
-			},
-			"size with non-number attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][size=size]TEXT[/size]").firstElementChild!.innerHTML === `[size=size]TEXT[/size]`;
-			},
-			"font with no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][font]TEXT[/font]").firstElementChild!.innerHTML === `[font]TEXT[/font]`;
-			},
-			"font with font attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][font=arial]TEXT[/font]").firstElementChild!.innerHTML === `<span style="font-family: arial;">TEXT</span>`;
-			},
-			"font with multiple fonts attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][font=arial, times]TEXT[/font]").firstElementChild!.innerHTML === `<span style="font-family: arial, times;">TEXT</span>`;
-			},
-			"font with nonsense attr (XSS)": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][font=arial;\"><XSS>]TEXT[/font]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
-			},
-			"url no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/TEXT">TEXT</a>`;
-			},
-			"url no attr, same protocol": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url]//example.com/test/[/url]").firstElementChild!.innerHTML === `<a href="${window.location.protocol}//example.com/test/">//example.com/test/</a>`;
-			},
-			"url no attr, full URL": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url]https://example.com/test2/[/url]").firstElementChild!.innerHTML === `<a href="https://example.com/test2/">https://example.com/test2/</a>`;
-			},
-			"url path attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url=test]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/test">TEXT</a>`;
-			},
-			"url same protocol attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url=//example.com/test/]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.protocol}//example.com/test/">TEXT</a>`;
-			},
-			"url full url attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url=https://example.com/test2/]TEXT[/url]").firstElementChild!.innerHTML === `<a href="https://example.com/test2/">TEXT</a>`;
-			},
-			"url invalid text": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url]//#[/url]").firstElementChild!.innerHTML === `[url]//#[/url]`;
-			},
-			"url invalid attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url=//#]TEXT[/url]").firstElementChild!.innerHTML === `[url=//#]TEXT[/url]`;
-			},
-			"url empty attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url=][/url]").firstElementChild!.innerHTML === `[url=][/url]`;
-			},
-			"url no url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url][/url]").firstElementChild!.innerHTML === `[url][/url]`;
-			},
-			"url no end tag with attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url=http://example.com/]EXAMPLE").firstElementChild!.innerHTML === `<a href="http://example.com/">EXAMPLE</a>`;
-			},
-			"url no end tag with no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url]http://example.com").firstElementChild!.innerHTML === `[url]http://example.com`;
-			},
-			"url with inner tags and attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url=http://example.com][b]BOLD[/b] Text[/url]").firstElementChild!.innerHTML === `<a href="http://example.com/"><span style="font-weight: bold">BOLD</span> Text</a>`;
-			},
-			"url with inner tags and no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][url][b]BOLD[/b] Text[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/[b]BOLD[/b]%20Text">[b]BOLD[/b] Text</a>`;
-			},
-			"audio with path url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][audio]AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="${window.location.origin}/AUDIO" controls=""></audio>`;
-			},
-			"audio with same protocol url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][audio]//example.com/AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="${window.location.protocol}//example.com/AUDIO" controls=""></audio>`;
-			},
-			"audio with full url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][audio]https://example.com/AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="https://example.com/AUDIO" controls=""></audio>`;
-			},
-			"audio with invalid url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][audio]//#[/audio]").firstElementChild!.innerHTML === `[audio]//#[/audio]`;
-			},
-			"audio with no url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][audio][/audio]").firstElementChild!.innerHTML === `[audio][/audio]`;
-			},
-			"audio with no end tag": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][audio]https://example.com/AUDIO").firstElementChild!.innerHTML === `[audio]https://example.com/AUDIO`;
-			},
-			"img with no url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img][/img]").firstElementChild!.innerHTML === `[img][/img]`;
-			},
-			"img with relative url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
-			},
-			"img with same protocol url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img]//example.com/IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.protocol}//example.com/IMAGE">`;
-			},
-			"img with full url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img]https://example.com/IMAGE[/img]").firstElementChild!.innerHTML === `<img src="https://example.com/IMAGE">`;
-			},
-			"img with no end tag": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img]https://example.com/IMAGE").firstElementChild!.innerHTML === `[img]https://example.com/IMAGE`;
-			},
-			"img with invalid url": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img]//#[/url]").firstElementChild!.innerHTML === `[img]//#[/url]`;
-			},
-			"img with width": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10">`;
-			},
-			"img with height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=x10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" height="10">`;
-			},
-			"img with width and height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=20x10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20" height="10">`;
-			},
-			"img with percentage width": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10%">`;
-			},
-			"img with percentage height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=x10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" height="10%">`;
-			},
-			"img with percentage width and percentage height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=20%x10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20%" height="10%">`;
-			},
-			"img with width and percentage height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=20x10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20" height="10%">`;
-			},
-			"img with percentage width and height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=20%x10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20%" height="10">`;
-			},
-			"img with invalid width": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=ax]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
-			},
-			"img with invalid height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=xa]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
-			},
-			"img with invalid width and invalid height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=axb]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
-			},
-			"img with invalid width and valid height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=ax10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" height="10">`;
-			},
-			"img with valid width and invalid height": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][img=10xa]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10">`;
-			},
-			"code with no inner text": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][code][/code]").firstElementChild!.innerHTML === `<pre></pre>`;
-			},
-			"code with just text": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][code]TEXT[/code]").firstElementChild!.innerHTML === `<pre>TEXT</pre>`;
-			},
-			"code with text and tags": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i][/code]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
-			},
-			"code with no end tag": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
+			"colour": {
+				"colour with no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][colour]TEXT[/colour]").firstElementChild!.innerHTML === `[colour]TEXT[/colour]`;
+				},
+				"colour with short hex": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][colour=#f00]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(255, 0, 0);">TEXT</span>`;
+				},
+				"colour with long hex": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][colour=#00f]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(0, 0, 255);">TEXT</span>`;
+				},
+				"colour with colour name": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][colour=green]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: green;">TEXT</span>`;
+				},
+				"colour with rgb": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][colour=rgb(1, 2, 3)]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(1, 2, 3);">TEXT</span>`;
+				},
+				"colour with rgba": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][colour=rgba(1, 2, 3, 0.4)]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgba(1, 2, 3, 0.4);">TEXT</span>`;
+				},
+				"colour with nonsense (XSS)": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][colour=green;123\">]TEXT[/colour]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
+				},
+				"color with no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][color]TEXT[/color]").firstElementChild!.innerHTML === `[color]TEXT[/color]`;
+				},
+				"color with short hex": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][color=#f00]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(255, 0, 0);">TEXT</span>`;
+				},
+				"color with long hex": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][color=#00f]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(0, 0, 255);">TEXT</span>`;
+				},
+				"color with colour name": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][color=green]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: green;">TEXT</span>`;
+				},
+				"color with rgb": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][color=rgb(1, 2, 3)]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(1, 2, 3);">TEXT</span>`;
+				},
+				"color with rgba": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][color=rgba(1, 2, 3, 0.4)]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgba(1, 2, 3, 0.4);">TEXT</span>`;
+				},
+				"color with nonsense (XSS)": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][color=green;123\">]TEXT[/color]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
+				}
+			},
+			"size": {
+				"size with no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][size]TEXT[/size]").firstElementChild!.innerHTML === `[size]TEXT[/size]`;
+				},
+				"size with minimum attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][size=1]TEXT[/size]").firstElementChild!.innerHTML === `<span style="font-size: 0.1em;">TEXT</span>`;
+				},
+				"size with maximum attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][size=100]TEXT[/size]").firstElementChild!.innerHTML === `<span style="font-size: 10em;">TEXT</span>`;
+				},
+				"size with below minimum attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][size=0]TEXT[/size]").firstElementChild!.innerHTML === `[size=0]TEXT[/size]`;
+				},
+				"size with above maximum attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][size=101]TEXT[/size]").firstElementChild!.innerHTML === `[size=101]TEXT[/size]`;
+				},
+				"size with non-integer attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][size=1.1]TEXT[/size]").firstElementChild!.innerHTML === `<span style="font-size: 0.1em;">TEXT</span>`;
+				},
+				"size with non-number attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][size=size]TEXT[/size]").firstElementChild!.innerHTML === `[size=size]TEXT[/size]`;
+				}
+			},
+			"font": {
+				"font with no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][font]TEXT[/font]").firstElementChild!.innerHTML === `[font]TEXT[/font]`;
+				},
+				"font with font attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][font=arial]TEXT[/font]").firstElementChild!.innerHTML === `<span style="font-family: arial;">TEXT</span>`;
+				},
+				"font with multiple fonts attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][font=arial, times]TEXT[/font]").firstElementChild!.innerHTML === `<span style="font-family: arial, times;">TEXT</span>`;
+				},
+				"font with nonsense attr (XSS)": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][font=arial;\"><XSS>]TEXT[/font]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
+				}
+			},
+			"url": {
+				"url no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/TEXT">TEXT</a>`;
+				},
+				"url no attr, same protocol": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url]//example.com/test/[/url]").firstElementChild!.innerHTML === `<a href="${window.location.protocol}//example.com/test/">//example.com/test/</a>`;
+				},
+				"url no attr, full URL": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url]https://example.com/test2/[/url]").firstElementChild!.innerHTML === `<a href="https://example.com/test2/">https://example.com/test2/</a>`;
+				},
+				"url path attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url=test]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/test">TEXT</a>`;
+				},
+				"url same protocol attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url=//example.com/test/]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.protocol}//example.com/test/">TEXT</a>`;
+				},
+				"url full url attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url=https://example.com/test2/]TEXT[/url]").firstElementChild!.innerHTML === `<a href="https://example.com/test2/">TEXT</a>`;
+				},
+				"url invalid text": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url]//#[/url]").firstElementChild!.innerHTML === `[url]//#[/url]`;
+				},
+				"url invalid attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url=//#]TEXT[/url]").firstElementChild!.innerHTML === `[url=//#]TEXT[/url]`;
+				},
+				"url empty attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url=][/url]").firstElementChild!.innerHTML === `[url=][/url]`;
+				},
+				"url no url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url][/url]").firstElementChild!.innerHTML === `[url][/url]`;
+				},
+				"url no end tag with attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url=http://example.com/]EXAMPLE").firstElementChild!.innerHTML === `<a href="http://example.com/">EXAMPLE</a>`;
+				},
+				"url no end tag with no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url]http://example.com").firstElementChild!.innerHTML === `[url]http://example.com`;
+				},
+				"url with inner tags and attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url=http://example.com][b]BOLD[/b] Text[/url]").firstElementChild!.innerHTML === `<a href="http://example.com/"><span style="font-weight: bold">BOLD</span> Text</a>`;
+				},
+				"url with inner tags and no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][url][b]BOLD[/b] Text[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/[b]BOLD[/b]%20Text">[b]BOLD[/b] Text</a>`;
+				}
+			},
+			"audio": {
+				"audio with path url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][audio]AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="${window.location.origin}/AUDIO" controls=""></audio>`;
+				},
+				"audio with same protocol url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][audio]//example.com/AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="${window.location.protocol}//example.com/AUDIO" controls=""></audio>`;
+				},
+				"audio with full url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][audio]https://example.com/AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="https://example.com/AUDIO" controls=""></audio>`;
+				},
+				"audio with invalid url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][audio]//#[/audio]").firstElementChild!.innerHTML === `[audio]//#[/audio]`;
+				},
+				"audio with no url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][audio][/audio]").firstElementChild!.innerHTML === `[audio][/audio]`;
+				},
+				"audio with no end tag": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][audio]https://example.com/AUDIO").firstElementChild!.innerHTML === `[audio]https://example.com/AUDIO`;
+				}
+			},
+			"img": {
+				"img with no url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img][/img]").firstElementChild!.innerHTML === `[img][/img]`;
+				},
+				"img with relative url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
+				},
+				"img with same protocol url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img]//example.com/IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.protocol}//example.com/IMAGE">`;
+				},
+				"img with full url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img]https://example.com/IMAGE[/img]").firstElementChild!.innerHTML === `<img src="https://example.com/IMAGE">`;
+				},
+				"img with no end tag": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img]https://example.com/IMAGE").firstElementChild!.innerHTML === `[img]https://example.com/IMAGE`;
+				},
+				"img with invalid url": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img]//#[/url]").firstElementChild!.innerHTML === `[img]//#[/url]`;
+				},
+				"img with width": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10">`;
+				},
+				"img with height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=x10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" height="10">`;
+				},
+				"img with width and height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=20x10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20" height="10">`;
+				},
+				"img with percentage width": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10%">`;
+				},
+				"img with percentage height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=x10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" height="10%">`;
+				},
+				"img with percentage width and percentage height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=20%x10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20%" height="10%">`;
+				},
+				"img with width and percentage height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=20x10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20" height="10%">`;
+				},
+				"img with percentage width and height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=20%x10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20%" height="10">`;
+				},
+				"img with invalid width": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=ax]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
+				},
+				"img with invalid height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=xa]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
+				},
+				"img with invalid width and invalid height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=axb]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
+				},
+				"img with invalid width and valid height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=ax10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" height="10">`;
+				},
+				"img with valid width and invalid height": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][img=10xa]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10">`;
+				}
+			},
+			"code": {
+				"code with no inner text": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][code][/code]").firstElementChild!.innerHTML === `<pre></pre>`;
+				},
+				"code with just text": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][code]TEXT[/code]").firstElementChild!.innerHTML === `<pre>TEXT</pre>`;
+				},
+				"code with text and tags": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i][/code]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
+				},
+				"code with no end tag": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
+				}
 			}
 		},
 		"complex tags": {
-			"quote empty, no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][quote][/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote></blockquote></fieldset>`;
+			"quote": {
+				"quote empty, no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][quote][/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote></blockquote></fieldset>`;
+				},
+				"quote just text no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][quote]TEXT[/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote>TEXT</blockquote></fieldset>`;
+				},
+				"quote with tags no attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][quote]TEXT[code]MORE TEXT[/code][/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote>TEXT<pre>MORE TEXT</pre></blockquote></fieldset>`;
+				},
+				"quote just text with attr": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][quote=NAME]TEXT[/quote]").firstElementChild!.innerHTML === `<fieldset><legend>NAME</legend><blockquote>TEXT</blockquote></fieldset>`;
+				},
+				"quote with unfinished tag, testing quote enclosure": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][quote=NAME][i]TEXT[/quote][u]MORE TEXT[/u]").firstElementChild!.innerHTML === `<fieldset><legend>NAME</legend><blockquote><span style="font-style: italic">TEXT</span></blockquote></fieldset><span style="text-decoration: underline">MORE TEXT</span>`;
+				},
+				"quote with unfinished tags, testing multiple quote enclosure": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][quote]START[quote=NAME][i]TEXT[/quote][u]MORE TEXT[/quote][s]LAST TEXT[/s]").firstElementChild!.innerHTML === `<fieldset><blockquote>START<fieldset><legend>NAME</legend><blockquote><span style="font-style: italic">TEXT</span></blockquote></fieldset><span style="text-decoration: underline">MORE TEXT</span></blockquote></fieldset><span style="text-decoration: line-through">LAST TEXT</span>`;
+				}
 			},
-			"quote just text no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][quote]TEXT[/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote>TEXT</blockquote></fieldset>`;
+			"list": {
+				"list with no contents": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list][/list]").firstElementChild!.innerHTML === `<ul></ul>`;
+				},
+				"list with text contents": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list]TEXT[/list]").firstElementChild!.innerHTML === `<ul></ul>`;
+				},
+				"list with 'a' type": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list=a][/list]").firstElementChild!.innerHTML === `<ol type="a"></ol>`;
+				},
+				"list with 'A' type": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list=A][/list]").firstElementChild!.innerHTML === `<ol type="A"></ol>`;
+				},
+				"list with 'i' type": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list=i][/list]").firstElementChild!.innerHTML === `<ol type="i"></ol>`;
+				},
+				"list with 'I' type": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list=I][/list]").firstElementChild!.innerHTML === `<ol type="I"></ol>`;
+				},
+				"list with '1' type": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list=1][/list]").firstElementChild!.innerHTML === `<ol type="1"></ol>`;
+				},
+				"list with invalid type": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list=b][/list]").firstElementChild!.innerHTML === `<ul></ul>`;
+				},
+				"list with single item": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list][*][/*][/list]").firstElementChild!.innerHTML === `<ul><li></li></ul>`;
+				},
+				"list with multiple items": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list][*][/*][*][/*][*][/*][/list]").firstElementChild!.innerHTML === `<ul><li></li><li></li><li></li></ul>`;
+				},
+				"list with multiple items and data": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list][*]TEXT[/*][*][b]BOLD TEXT[/b][/*][*][u]MORE [i]TEXT[/i][/u][/*][/list]").firstElementChild!.innerHTML === `<ul><li>TEXT</li><li><span style="font-weight: bold">BOLD TEXT</span></li><li><span style="text-decoration: underline">MORE <span style="font-style: italic">TEXT</span></span></li></ul>`;
+				},
+				"list with missing end tag": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list]").firstElementChild!.innerHTML === `<ul></ul>`;
+				},
+				"list with items and missing end tag": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list][*][/*][*][/*][*][/*]").firstElementChild!.innerHTML === `<ul><li></li><li></li><li></li></ul>`;
+				},
+				"list with missing item end tags": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list][*][*][*]").firstElementChild!.innerHTML === `<ul><li></li><li></li><li></li></ul>`;
+				},
+				"list with missing item end tags with data": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][list][*]TEXT[*][b]BOLD TEXT[/b][*][u]MORE [i]TEXT[/i][/u][/list]").firstElementChild!.innerHTML === `<ul><li>TEXT</li><li><span style="font-weight: bold">BOLD TEXT</span></li><li><span style="text-decoration: underline">MORE <span style="font-style: italic">TEXT</span></span></li></ul>`;
+				}
 			},
-			"quote with tags no attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][quote]TEXT[code]MORE TEXT[/code][/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote>TEXT<pre>MORE TEXT</pre></blockquote></fieldset>`;
-			},
-			"quote just text with attr": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][quote=NAME]TEXT[/quote]").firstElementChild!.innerHTML === `<fieldset><legend>NAME</legend><blockquote>TEXT</blockquote></fieldset>`;
-			},
-			"quote with unfinished tag, testing quote enclosure": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][quote=NAME][i]TEXT[/quote][u]MORE TEXT[/u]").firstElementChild!.innerHTML === `<fieldset><legend>NAME</legend><blockquote><span style="font-style: italic">TEXT</span></blockquote></fieldset><span style="text-decoration: underline">MORE TEXT</span>`;
-			},
-			"quote with unfinished tags, testing multiple quote enclosure": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][quote]START[quote=NAME][i]TEXT[/quote][u]MORE TEXT[/quote][s]LAST TEXT[/s]").firstElementChild!.innerHTML === `<fieldset><blockquote>START<fieldset><legend>NAME</legend><blockquote><span style="font-style: italic">TEXT</span></blockquote></fieldset><span style="text-decoration: underline">MORE TEXT</span></blockquote></fieldset><span style="text-decoration: line-through">LAST TEXT</span>`;
-			},
-			"list with no contents": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list][/list]").firstElementChild!.innerHTML === `<ul></ul>`;
-			},
-			"list with text contents": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list]TEXT[/list]").firstElementChild!.innerHTML === `<ul></ul>`;
-			},
-			"list with 'a' type": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list=a][/list]").firstElementChild!.innerHTML === `<ol type="a"></ol>`;
-			},
-			"list with 'A' type": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list=A][/list]").firstElementChild!.innerHTML === `<ol type="A"></ol>`;
-			},
-			"list with 'i' type": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list=i][/list]").firstElementChild!.innerHTML === `<ol type="i"></ol>`;
-			},
-			"list with 'I' type": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list=I][/list]").firstElementChild!.innerHTML === `<ol type="I"></ol>`;
-			},
-			"list with '1' type": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list=1][/list]").firstElementChild!.innerHTML === `<ol type="1"></ol>`;
-			},
-			"list with invalid type": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list=b][/list]").firstElementChild!.innerHTML === `<ul></ul>`;
-			},
-			"list with single item": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list][*][/*][/list]").firstElementChild!.innerHTML === `<ul><li></li></ul>`;
-			},
-			"list with multiple items": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list][*][/*][*][/*][*][/*][/list]").firstElementChild!.innerHTML === `<ul><li></li><li></li><li></li></ul>`;
-			},
-			"list with multiple items and data": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list][*]TEXT[/*][*][b]BOLD TEXT[/b][/*][*][u]MORE [i]TEXT[/i][/u][/*][/list]").firstElementChild!.innerHTML === `<ul><li>TEXT</li><li><span style="font-weight: bold">BOLD TEXT</span></li><li><span style="text-decoration: underline">MORE <span style="font-style: italic">TEXT</span></span></li></ul>`;
-			},
-			"list with missing end tag": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list]").firstElementChild!.innerHTML === `<ul></ul>`;
-			},
-			"list with items and missing end tag": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list][*][/*][*][/*][*][/*]").firstElementChild!.innerHTML === `<ul><li></li><li></li><li></li></ul>`;
-			},
-			"list with missing item end tags": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list][*][*][*]").firstElementChild!.innerHTML === `<ul><li></li><li></li><li></li></ul>`;
-			},
-			"list with missing item end tags with data": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][list][*]TEXT[*][b]BOLD TEXT[/b][*][u]MORE [i]TEXT[/i][/u][/list]").firstElementChild!.innerHTML === `<ul><li>TEXT</li><li><span style="font-weight: bold">BOLD TEXT</span></li><li><span style="text-decoration: underline">MORE <span style="font-style: italic">TEXT</span></span></li></ul>`;
-			},
-			"table tag empty": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][/table]").firstElementChild!.innerHTML === ``;
-			},
-			"table with empty row": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][tr][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr></tr></tbody></table>`;
-			},
-			"table with empty cell": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][tr][td][/td][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td></td></tr></tbody></table>`;
-			},
-			"table with missing end row tag": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][tr][td][/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td></td></tr></tbody></table>`;
-			},
-			"table with missing end cell tag": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][tr][td][/tr][/table]").firstElementChild!.innerHTML === ``;
-			},
-			"table with missing end cell and row tag": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][tr][td][/table]").firstElementChild!.innerHTML === ``;
-			},
-			"table with multiple cells": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][tr][td]A[/td][td]B[/td][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td>A</td><td>B</td></tr></tbody></table>`;
-			},
-			"table with multiple rows and cells": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][tr][td][h1]A[/h1][/td][td]B[/td][/tr][tr][td]C[/td][td]D[/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td><h1>A</h1></td><td>B</td></tr><tr><td>C</td><td>D</td></tr></tbody></table>`;
-			},
-			"table with multiple rows, cells, and header cells": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][tr][th]1st[/th][td][h1]A[/h1][/td][td]B[/td][/tr][tr][th]2nd[/th][td]C[/td][td]D[/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><th>1st</th><td><h1>A</h1></td><td>B</td></tr><tr><th>2nd</th><td>C</td><td>D</td></tr></tbody></table>`;
-			},
-			"table with header": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][thead][tr][th]A[/th][/tr][tr][td]B[/td][/tr][/thead][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th></tr><tr><td>B</td></tr></thead></table>`;
-			},
-			"table with footer": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][tfoot][tr][th]A[/th][/tr][tr][td]B[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><tfoot><tr><th>A</th></tr><tr><td>B</td></tr></tfoot></table>`;
-			},
-			"table with everything": async () => {
-				const {default: bbcode} = await import("./lib/bbcode.js"),
-				      {all} = await import("./lib/bbcode_tags.js");
-				return bbcode(all, "[b][table][thead][tr][th]A[/th][th]B[/th][/tr][/thead][tbody][tr][td]1[/td][td]2[/td][/tr][/tbody][tfoot][tr][td]I[/td][td]II[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody><tfoot><tr><td>I</td><td>II</td></tr></tfoot></table>`;
+			"table": {
+				"table tag empty": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][/table]").firstElementChild!.innerHTML === ``;
+				},
+				"table with empty row": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][tr][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr></tr></tbody></table>`;
+				},
+				"table with empty cell": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][tr][td][/td][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td></td></tr></tbody></table>`;
+				},
+				"table with missing end row tag": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][tr][td][/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td></td></tr></tbody></table>`;
+				},
+				"table with missing end cell tag": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][tr][td][/tr][/table]").firstElementChild!.innerHTML === ``;
+				},
+				"table with missing end cell and row tag": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][tr][td][/table]").firstElementChild!.innerHTML === ``;
+				},
+				"table with multiple cells": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][tr][td]A[/td][td]B[/td][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td>A</td><td>B</td></tr></tbody></table>`;
+				},
+				"table with multiple rows and cells": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][tr][td][h1]A[/h1][/td][td]B[/td][/tr][tr][td]C[/td][td]D[/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td><h1>A</h1></td><td>B</td></tr><tr><td>C</td><td>D</td></tr></tbody></table>`;
+				},
+				"table with multiple rows, cells, and header cells": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][tr][th]1st[/th][td][h1]A[/h1][/td][td]B[/td][/tr][tr][th]2nd[/th][td]C[/td][td]D[/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><th>1st</th><td><h1>A</h1></td><td>B</td></tr><tr><th>2nd</th><td>C</td><td>D</td></tr></tbody></table>`;
+				},
+				"table with header": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][thead][tr][th]A[/th][/tr][tr][td]B[/td][/tr][/thead][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th></tr><tr><td>B</td></tr></thead></table>`;
+				},
+				"table with footer": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][tfoot][tr][th]A[/th][/tr][tr][td]B[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><tfoot><tr><th>A</th></tr><tr><td>B</td></tr></tfoot></table>`;
+				},
+				"table with everything": async () => {
+					const {default: bbcode} = await import("./lib/bbcode.js"),
+					      {all} = await import("./lib/bbcode_tags.js");
+					return bbcode(all, "[b][table][thead][tr][th]A[/th][th]B[/th][/tr][/thead][tbody][tr][td]1[/td][td]2[/td][/tr][/tbody][tfoot][tr][td]I[/td][td]II[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody><tfoot><tr><td>I</td><td>II</td></tr></tfoot></table>`;
+				}
 			}
 		},
 		"none": {
