@@ -3839,7 +3839,7 @@ type Tests = {
 				e(e => {
 					res += +!!e.observeChildren;
 					return [];
-				}, {"observeChildren": true})()
+				}, {"observeChildren": true})();
 				e(e => {
 					res += +!(e as any).observeChildren;
 					return [];
@@ -3852,7 +3852,7 @@ type Tests = {
 				e(e => {
 					res += +!!e.observeChildren;
 					return [];
-				}, {"observeChildren": true, "psuedo": true})()
+				}, {"observeChildren": true, "psuedo": true})();
 				e(e => {
 					res += +!(e as any).observeChildren;
 					return [];
@@ -3865,7 +3865,7 @@ type Tests = {
 				e(e => {
 					res += +!!e.attr;
 					return [];
-				}, {"attrs": true})()
+				}, {"attrs": true})();
 				e(e => {
 					res += +!(e as any).attr;
 					return [];
@@ -3878,7 +3878,7 @@ type Tests = {
 				e(e => {
 					res += +!!e.attr;
 					return [];
-				}, {"attrs": true, "psuedo": true})()
+				}, {"attrs": true, "psuedo": true})();
 				e(e => {
 					res += +!(e as any).attr;
 					return [];
