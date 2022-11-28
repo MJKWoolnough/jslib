@@ -5215,6 +5215,43 @@ type Tests = {
 					      s = n.slice(0, -10);
 					return n.length === 5 && s.length === 0;
 				}
+			},
+			"some": {
+				"no nodes": async () => {
+					const {NodeArray} = await import("./lib/nodes.js"),
+					      n = new NodeArray(document.createElement("div"));
+					let good = true;
+					return !n.some(() => good = false) && good;
+				},
+				"a node true": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
+					let good = false;
+					return n.some(() => good = true) && good;
+				},
+				"a node false": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
+					let good = true;
+					return !n.some(() => good = false) && !good;
+				},
+				"many nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+					return n.some(t => t.num === 3);
+				}
 			}
 		}
 	}
