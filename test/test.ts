@@ -4322,7 +4322,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
 					return n.at(5) === undefined;
-				},
+				}
 			},
 			"concat": {
 				"no nodes": async () => {
@@ -4398,7 +4398,7 @@ type Tests = {
 						return true;
 					}
 					return false;
-				},
+				}
 			},
 			"entries": {
 				"no nodes": async () => {
@@ -5214,7 +5214,7 @@ type Tests = {
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(0, -10);
 					return n.length === 5 && s.length === 0;
-				},
+				}
 			}
 		}
 	}
