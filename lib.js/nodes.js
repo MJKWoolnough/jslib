@@ -326,8 +326,6 @@ export class NodeArray {
 		}
 		if (end === undefined) {
 			end = root.l;
-		} else if (end < -root.l) {
-			end = 0;
 		} else if (end < 0) {
 			end += root.l;
 		}
