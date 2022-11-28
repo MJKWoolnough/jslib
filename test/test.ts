@@ -5104,7 +5104,7 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
-					return n.slice().length === 0;
+					return n.length === 0 && n.slice().length === 0;
 				},
 				"a node": async () => {
 					type MyNode = {
@@ -5115,7 +5115,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
 					      s = n.slice();
-					return s.length === 1 && s[0] === item;
+					return n.length === 1 && s.length === 1 && s[0] === item;
 				},
 				"many nodes": async () => {
 					type MyNode = {
@@ -5126,7 +5126,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice();
-					return s.length === 5 && s[0] === items[0] && s[4] === items[4]; 
+					return n.length === 5 && s.length === 5 && s[0] === items[0] && s[4] === items[4];
 				},
 				"many nodes (+ve start)": async () => {
 					type MyNode = {
@@ -5137,7 +5137,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(1);
-					return s.length === 4 && s[0] === items[1] && s[3] === items[4]; 
+					return n.length === 5 && s.length === 4 && s[0] === items[1] && s[3] === items[4];
 				},
 				"many nodes (-ve start)": async () => {
 					type MyNode = {
@@ -5148,7 +5148,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(-2);
-					return s.length === 2 && s[0] === items[3] && s[1] === items[4]; 
+					return n.length === 5 && s.length === 2 && s[0] === items[3] && s[1] === items[4];
 				},
 				"many nodes (big +ve start)": async () => {
 					type MyNode = {
@@ -5159,7 +5159,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(10);
-					return s.length === 0; 
+					return n.length === 5 && s.length === 0;
 				},
 				"many nodes (big -ve start)": async () => {
 					type MyNode = {
@@ -5170,7 +5170,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(-10);
-					return s.length === 5 && s[0] === items[0] && s[4] === items[4]; 
+					return n.length === 5 && s.length === 5 && s[0] === items[0] && s[4] === items[4];
 				},
 				"many nodes (+ve end)": async () => {
 					type MyNode = {
@@ -5181,7 +5181,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(0, 2);
-					return s.length === 2 && s[0] === items[0] && s[1] === items[1]; 
+					return n.length === 5 && s.length === 2 && s[0] === items[0] && s[1] === items[1];
 				},
 				"many nodes (-ve end)": async () => {
 					type MyNode = {
@@ -5192,7 +5192,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(0, -2);
-					return s.length === 3 && s[0] === items[0] && s[2] === items[2]; 
+					return n.length === 5 && s.length === 3 && s[0] === items[0] && s[2] === items[2];
 				},
 				"many nodes (big +ve end)": async () => {
 					type MyNode = {
@@ -5203,7 +5203,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(0, 10);
-					return s.length === 5 && s[0] === items[0] && s[4] === items[4]; 
+					return n.length === 5 && s.length === 5 && s[0] === items[0] && s[4] === items[4];
 				},
 				"many nodes (big -ve end)": async () => {
 					type MyNode = {
@@ -5214,7 +5214,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(0, -10);
-					return s.length === 0; 
+					return n.length === 5 && s.length === 0;
 				},
 			}
 		}
