@@ -5252,6 +5252,30 @@ type Tests = {
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
 					return n.some(t => t.num === 3);
 				}
+			},
+			"sort": {
+				"no nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"));
+					n.sort((a, b) => b.num - a.num);
+					return n.length === 0;
+				},
+				"many nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					      div = document.createElement("div"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(div, noSort, items);
+					n.sort((a, b) => b.num - a.num);
+					return n.at(0) === items[4] && n.at(1) === items[3] && n.at(2) === items[2] && n.at(3) === items[1] && n.at(4) === items[0] && div.children[0] === items[4][node] && div.children[4] === items[0][node];
+				}
 			}
 		}
 	}
