@@ -52,9 +52,7 @@ interface NodeAttributes extends Node {
 
 const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	if (children instanceof Binder) {
-		const t = new Text(children+"");
-		children[setNode](t);
-		res.push(t);
+		res.push(children[setNode](new Text(children+"")));
 	} else if (typeof children === "string") {
 		res.push(children);
 	} else if (Array.isArray(children)) {
@@ -83,8 +81,9 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 
 abstract class Binder {
 	#set = new Set<WeakRef<TextContent | Binder>>();
-	[setNode](n: TextContent | Binder) {
+	[setNode]<T extends TextContent | Binder>(n: T) {
 		this.#set.add(new WeakRef(n));
+		return n;
 	}
 	[update]() {
 		const text = this+"";
