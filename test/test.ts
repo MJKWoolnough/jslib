@@ -5069,7 +5069,6 @@ type Tests = {
 					      n = new NodeArray<MyNode>(document.createElement("div"), (a, b) => a.num - b.num, items);
 					n.reverse();
 					n.push(item);
-					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.at(0) === item; 
 				}
 			},
