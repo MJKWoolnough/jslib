@@ -156,8 +156,8 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 	toggleAttribute(qualifiedName: string, force?: boolean) {
 		return setAttr(this, qualifiedName, force ?? null) ?? super.toggleAttribute(qualifiedName, force);
 	}
-	setAttribute(qualifiedName: string, value: string) {
-		setAttr(this, qualifiedName, value) ?? super.setAttribute(qualifiedName, value);
+	setAttribute(qualifiedName: string, value: ToString) {
+		setAttr(this, qualifiedName, value) ?? super.setAttribute(qualifiedName, value as string);
 	}
 	setAttributeNode(attribute: Attr) {
 		const attr = this.getAttributeNode(attribute.name);
