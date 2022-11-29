@@ -382,11 +382,16 @@ export class NodeArray {
 	[Symbol.unscopables]() {
 		return {
 			__proto__: null,
+			"at": true,
 			"copyWithin": true,
 			"entries": true,
 			"fill": true,
 			"find": true,
 			"findIndex": true,
+			"findLast": true,
+			"findLastIndex": true,
+			"flat": true,
+			"flatMap": true,
 			"includes": true,
 			"keys": true,
 			"values": true
