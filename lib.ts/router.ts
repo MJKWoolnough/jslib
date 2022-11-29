@@ -183,7 +183,33 @@ class Router extends HTMLElement {
 	}
 }
 
+
 customElements.define("x-router", Router);
+customElements.define("x-route", class extends HTMLElement {
+	connectedCallback() {
+		const c = this.getAttribute("class"),
+		      i = this.getAttribute("id"),
+		      t = this.getAttribute("title");
+		if (c) {
+			document.documentElement.classList.toggle(c, true);
+		}
+		if (i) {
+			document.documentElement.setAttribute("id", i);
+		}
+		if (t) {
+			document.title = t;
+		}
+	}
+	disconnectedCallback() {
+		const c = this.getAttribute("class");
+		if (c) {
+			document.documentElement.classList.toggle(c, false);
+		}
+		if (document.documentElement.getAttribute("id") === this.getAttribute("id")) {
+			document.documentElement.removeAttribute("id");
+		}
+	}
+});
 
 export const router = () => new Router(),
 goto = (href: string, attrs?: Record<string, ToString>) => {
