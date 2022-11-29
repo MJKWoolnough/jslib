@@ -1738,6 +1738,20 @@ For example, the following creates two path routes and a catch-all route:
 </x-router>
 ```
 
+In addition to the `x-router` tag, there is also the `x-route` tag which can be used in HTML to set `title`, `class`, and `id` attributes which, when the route is selected, are set as the window title, html class, and html ID, respectively. An example is the following:
+
+```html
+<x-router>
+	<x-route title="Route A" id="route_a" class="dark" route-match="/a">Route A</a>
+	<x-route title="Route B" class="light" route-match="/b"><span>Route B</span></a>
+	<x-route title="Unknown Route" route-match="">404</a>
+</x-router>
+```
+
+When the first route is matched, the title of the document will be set to "Route A", the class of the root `html` element will be set to "dark", and the ID of the root `html` element will be set to "route_a". Likewise, when the second route is matched, the title of the document will be set to "Route B", and the class will be set to "light". Lastly, the catch-all third route will just set the document title to "Unknown Route".
+
+When a route is unmatched, any class and ID set is removed.
+
 #### <a name="router_router_add">add</a>
 ```typescript
 class Router {
