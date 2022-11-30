@@ -5496,6 +5496,37 @@ type Tests = {
 					return n[5] === undefined;
 				}
 			}
+		},
+		"NodeMap": {
+			"construct": {
+				"empty": async () => {
+					const {NodeMap, node} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      n = new NodeMap(div);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n[node] === div;
+				},
+				"some nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string, MyNode>(div, noSort, [["A", {[node]: document.createElement("span"), num: 1}], ["B", {[node]: document.createElement("br"), num: 2}]]);
+					return n.size === 2 && n.get("A")?.num === 1 && n.get("B")?.num === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
+				},
+				"sorted nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeMap, node} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<MyNode>(div, (a: MyNode, b: MyNode) => a.num - b.num, [["A", {[node]: document.createElement("br"), num: 2}], ["B", {[node]: document.createElement("span"), num: 1}]]);
+					return n.size === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
+				}
+			}
 		}
 	}
 });
