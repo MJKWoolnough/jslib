@@ -5598,6 +5598,38 @@ type Tests = {
 					      b = g.next().value;
 					return a?.[0] === "A" && a?.[1] === items[0][1] && b?.[0] === "B" && b?.[1] === items[1][1] && g.next().value === undefined;
 				}
+			},
+			"forEach": {
+				"no nodes": async () => {
+					const {NodeMap} = await import("./lib/nodes.js"),
+					      n = new NodeMap(document.createElement("div"));
+					let good = true;
+					n.forEach(() => good = false);
+					return good;
+				},
+				"a node true": async () => {
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      item = {[node]: document.createElement("span")},
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray(document.createElement("div"), noSort, [item]);
+					let good = false;
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					n.forEach(e => good = e === item);
+					return good;
+				},
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(document.createElement("div"), noSort, items),
+					      aThis = {};
+					let good = true;
+					n.forEach(function(this: any, v: any, k: string, o: any) {
+						const i = items.shift();
+						good &&= k === i?.[0] && v === i?.[1] && this === aThis && o === n;
+					}, aThis);
+					return good
+				}
 			}
 		}
 	}
