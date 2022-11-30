@@ -436,7 +436,7 @@ export class NodeMap {
 		}
 	}
 	forEach(callbackfn, thisArg = this) {
-		this.#root.m.forEach((v, k) => callbackfn(v.i, k, thisArg));
+		this.#root.m.forEach((v, k) => callbackfn.call(thisArg, v.i, k, this));
 	}
 	get(k) {
 		return this.#root.m.get(k)?.i;

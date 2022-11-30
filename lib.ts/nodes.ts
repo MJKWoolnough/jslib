@@ -487,7 +487,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		}
 	}
 	forEach(callbackfn: (value: T, key: K, map: NodeMap<K, T>) => void, thisArg: any = this) {
-		this.#root.m.forEach((v, k) => callbackfn(v.i, k, thisArg));
+		this.#root.m.forEach((v, k) => callbackfn.call(thisArg, v.i, k, this));
 	}
 	get(k: K) {
 		return this.#root.m.get(k)?.i;
