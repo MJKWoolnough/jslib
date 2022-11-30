@@ -5640,6 +5640,15 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.get("A") === items[0][1] && n.get("E") === items[4][1] && n.get("F") === undefined;
 				}
+			},
+			"has": {
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(document.createElement("div"), noSort, items);
+					return n.has("A") && n.has("E") && !n.has("F");
+				}
 			}
 		}
 	}
