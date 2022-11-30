@@ -5558,6 +5558,28 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return s === 5 && l === 5 && n.size === 0 && n[node].children.length === 0;
 				}
+			},
+			"delete": {
+				"one node": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap(document.createElement("div"), noSort, [["a", {[node]: document.createElement("span")}]]);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					n.delete("a");
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.size === 0 && n[node].children.length === 0;
+				},
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap(div, noSort, items);
+					n.delete("B");
+					n.delete("D");
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.size === 3 && div.children.length === 3 && div.firstChild === items[0][1][node] && div.lastChild === items[4][1][node] && div.children[1] === items[2][1][node];
+				}
 			}
 		}
 	}
