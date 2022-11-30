@@ -5526,6 +5526,38 @@ type Tests = {
 					      n = new NodeMap<MyNode>(div, (a: MyNode, b: MyNode) => a.num - b.num, [["A", {[node]: document.createElement("br"), num: 2}], ["B", {[node]: document.createElement("span"), num: 1}]]);
 					return n.size === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
 				}
+			},
+			"clear": {
+				"empty": async () => {
+					const {NodeMap} = await import("./lib/nodes.js"),
+					      n = new NodeMap(document.createElement("div"));
+					n.clear();
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.size === 0;
+				},
+				"one node": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap(document.createElement("div"), noSort, [["a", {[node]: document.createElement("span")}]]),
+					      s = n.size,
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      l = n[node].children.length;
+					n.clear();
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return s === 1 && l === 1 && n.size === 0 && n[node].children.length === 0;
+				},
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap(document.createElement("div"), noSort, items),
+					      s = n.size,
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      l = n[node].children.length;
+					n.clear();
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return s === 5 && l === 5 && n.size === 0 && n[node].children.length === 0;
+				}
 			}
 		}
 	}
