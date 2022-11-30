@@ -5580,6 +5580,24 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 3 && div.children.length === 3 && div.firstChild === items[0][1][node] && div.lastChild === items[4][1][node] && div.children[1] === items[2][1][node];
 				}
+			},
+			"entries": {
+				"no nodes": async () => {
+					const {NodeMap} = await import("./lib/nodes.js"),
+					      n = new NodeMap(document.createElement("div")),
+					      g = n.entries();
+					return g.next().value === undefined;
+				},
+				"two nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 2}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap(document.createElement("div"), noSort, items),
+					      g = n.entries(),
+					      a = g.next().value,
+					      b = g.next().value;
+					return a?.[0] === "A" && a?.[1] === items[0][1] && b?.[0] === "B" && b?.[1] === items[1][1] && g.next().value === undefined;
+				}
 			}
 		}
 	}
