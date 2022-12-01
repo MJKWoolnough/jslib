@@ -5815,6 +5815,45 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return div.firstChild === items[4][1][node] && div.lastChild === item[node]; 
 				}
+			},
+			"set": {
+				"empty set": async () => {
+					const {NodeMap, node} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      item = {[node]: document.createElement("span")},
+					      n = new NodeMap(div);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					n.set("A", item);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.size === 1 && n.get("A") === item && div.firstChild === item[node];
+				},
+				"non-empty set": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      item = {[node]: document.createElement("span")},
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap(div, noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					n.set("F", item);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.size === 6 && n.get("F") === item && div.children[5] === item[node];
+				},
+				"sorted set": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeMap, node} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]) as [string, MyNode][],
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string, MyNode>(div, (a, b) => b.num - a.num);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					for (const [key, item] of items) {
+						n.set(key, item);
+					}
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.size === 5 && div.firstChild === items[4][1][node] && div.lastChild === items[0][1][node];
+				}
 			}
 		}
 	}
