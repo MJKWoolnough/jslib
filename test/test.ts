@@ -5754,6 +5754,28 @@ type Tests = {
 					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
 					return ([["A", 0], ["B", 1], ["C", 2], ["D", 3], ["E", 4], ["F", -1]] as [string, number][]).every(([key, pos]) => n.position(key) === pos);
 				}
+			},
+			"reSet": {
+				"a node": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      item = {[node]: document.createElement("span")},
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(div, noSort, [["A", item]]);
+					n.reSet("A", "B");
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return div.firstChild === div.lastChild && div.firstChild === item[node] && n.size === 1 && !n.has("A") //&& n.get("B") === item;
+				},
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(div, noSort, items);
+					n.reSet("C", "F");
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.size === 5 && div.children[2] === items[2][1][node] && !n.has("C") && n.get("F") === items[2][1];
+				}
 			}
 		}
 	}
