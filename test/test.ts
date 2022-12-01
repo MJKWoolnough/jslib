@@ -5649,6 +5649,38 @@ type Tests = {
 					      n = new NodeMap<string>(document.createElement("div"), noSort, items);
 					return n.has("A") && n.has("E") && !n.has("F");
 				}
+			},
+			"insertAfter": {
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      item = {[node]: document.createElement("span")},
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(div, noSort, items);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.insertAfter("F", item, "C") && n.size === 6 && div.children[3] === item[node];
+				},
+				"bad key": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      item = {[node]: document.createElement("span")},
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(div, noSort, items);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return !n.insertAfter("F", item, "G") && n.size === 5;
+				},
+				"existing key": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      item = {[node]: document.createElement("span")},
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(div, noSort, items);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.insertAfter("E", item, "C") && n.size === 5 && div.children[3] === item[node];
+				}
 			}
 		}
 	}
