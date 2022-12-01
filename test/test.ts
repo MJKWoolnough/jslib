@@ -5854,6 +5854,31 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 5 && div.firstChild === items[4][1][node] && div.lastChild === items[0][1][node];
 				}
+			},
+			"sort": {
+				"no nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeMap} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string, MyNode>(document.createElement("div"));
+					n.sort((a, b) => b.num - a.num);
+					return n.size === 0;
+				},
+				"many nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]) as [string, MyNode][],
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string, MyNode>(div, noSort, items);
+					n.sort((a, b) => b.num - a.num);
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return div.children[0] === items[4][1][node] && div.children[1] === items[3][1][node] && div.children[2] === items[2][1][node] && div.children[3] === items[1][1][node] && div.children[4] === items[0][1][node];
+				}
 			}
 		}
 	}
