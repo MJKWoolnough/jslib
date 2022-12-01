@@ -5721,6 +5721,31 @@ type Tests = {
 					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
 					return ([[0, "A"], [1, "B"], [2, "C"], [3, "D"], [4, "E"], [5, undefined]] as [number, string | undefined][]).every(([pos, key]) => n.keyAt(pos) === key);
 				}
+			},
+			"keys": {
+				"no nodes": async () => {
+					const {NodeMap} = await import("./lib/nodes.js"),
+					      n = new NodeMap(document.createElement("div"));
+					return Array.from(n.keys()).join(",") === "";
+				},
+				"a node": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(document.createElement("div"), noSort, [["A", {[node]: document.createElement("span")}]]);
+					return Array.from(n.keys()).join(",") === "A";
+				},
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
+					return Array.from(n.keys()).join(",") === "A,B,C,D,E";
+				},
+				"many nodes (reversed)": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(69 - num), {[node]: document.createElement("span")}]));
+					return Array.from(n.keys()).join(",") === "E,D,C,B,A";
+				}
 			}
 		}
 	}
