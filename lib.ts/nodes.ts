@@ -541,7 +541,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		const root = this.#root,
 		      i = root.m.get(k);
 		if (i) {
-			this.delete(j);
+			root.m.delete(k);
 			i.k = j;
 			root.m.set(j, i);
 		}
