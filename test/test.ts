@@ -5746,6 +5746,14 @@ type Tests = {
 					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(69 - num), {[node]: document.createElement("span")}]));
 					return Array.from(n.keys()).join(",") === "E,D,C,B,A";
 				}
+			},
+			"position": {
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
+					return ([["A", 0], ["B", 1], ["C", 2], ["D", 3], ["E", 4], ["F", -1]] as [string, number][]).every(([key, pos]) => n.position(key) === pos);
+				}
 			}
 		}
 	}
