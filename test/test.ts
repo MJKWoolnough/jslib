@@ -5713,6 +5713,14 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.insertBefore("E", item, "C") && n.size === 5 && div.children[2] === item[node];
 				}
+			},
+			"keyAt": {
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
+					return ([[0, "A"], [1, "B"], [2, "C"], [3, "D"], [4, "E"], [5, undefined]] as [number, string | undefined][]).every(([pos, key]) => n.keyAt(pos) === key);
+				}
 			}
 		}
 	}
