@@ -5776,6 +5776,45 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 5 && div.children[2] === items[2][1][node] && !n.has("C") && n.get("F") === items[2][1];
 				}
+			},
+			"reverse": {
+				"no nodes": async () => {
+					const {NodeMap} = await import("./lib/nodes.js"),
+					      n = new NodeMap(document.createElement("div"));
+					return n.reverse().size === 0;
+				},
+				"a node": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      item = {[node]: document.createElement("span"), num: 1},
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<MyNode>(div, noSort, [["A", item]]);
+					return div.firstChild === item[node];
+				},
+				"many nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(div, noSort, items);
+					n.reverse();
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return div.firstChild === items[4][1][node] && div.lastChild === items[0][1][node]; 
+				},
+				"many nodes sorted + set": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+
+					      div = document.createElement("div"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
+					      item = {[node]: document.createElement("span"), "num": 99},
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(div, noSort, items);
+					n.reverse();
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					n.set("F", item)
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return div.firstChild === items[4][1][node] && div.lastChild === item[node]; 
+				}
 			}
 		}
 	}
