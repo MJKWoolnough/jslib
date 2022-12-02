@@ -5879,6 +5879,38 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return div.children[0] === items[4][1][node] && div.children[1] === items[3][1][node] && div.children[2] === items[2][1][node] && div.children[3] === items[1][1][node] && div.children[4] === items[0][1][node];
 				}
+			},
+			"values": {
+				"no nodes": async () => {
+					const {NodeMap} = await import("./lib/nodes.js"),
+					      n = new NodeMap(document.createElement("div")),
+					      g = n.values();
+					return g.next().value === undefined;
+				},
+				"two nodes": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 2}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(document.createElement("div"), noSort, items),
+					      g = n.values(),
+					      a = g.next().value,
+					      b = g.next().value;
+					return a === items[0][1] && b === items[1][1] && g.next().value === undefined;
+				},
+				"many nodes (iterator)": async () => {
+					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string>(document.createElement("div"), noSort, items);
+					let good = 0;
+					for (const item of n.values()) {
+					// @ts-ignore: Type Error
+						if (item === items.shift()?.[1]) {
+							good++;
+						}
+					}
+					return good === 5;
+				}
 			}
 		}
 	}
