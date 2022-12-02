@@ -12,6 +12,7 @@ ul {
 
 li {
 	background-color: #ccc;
+	overflow: hidden;
 }
 
 li:nth-child(2n) {
@@ -66,4 +67,8 @@ span:before {
 summary {
 	cursor: pointer;
 	user-select: none;
+}
+
+button {
+	float: right;
 }
