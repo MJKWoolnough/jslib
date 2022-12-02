@@ -5295,6 +5295,19 @@ type Tests = {
 					      n = new NodeArray<MyNode>(div, noSort, items);
 					n.sort((a, b) => b.num - a.num);
 					return n.at(0) === items[4] && n.at(1) === items[3] && n.at(2) === items[2] && n.at(3) === items[1] && n.at(4) === items[0] && div.children[0] === items[4][node] && div.children[4] === items[0][node];
+				},
+				"many nodes (re-sort)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					      div = document.createElement("div"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(div, (a, b) => a.num - b.num, items);
+					items[0].num = 6;
+					n.sort();
+					return n.at(0) === items[1] && div.firstChild === items[1][node] && n.at(4) === items[0] && div.lastChild === items[0][node];
 				}
 			},
 			"splice": {
@@ -5878,6 +5891,20 @@ type Tests = {
 					n.sort((a, b) => b.num - a.num);
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return div.children[0] === items[4][1][node] && div.children[1] === items[3][1][node] && div.children[2] === items[2][1][node] && div.children[3] === items[1][1][node] && div.children[4] === items[0][1][node];
+				},
+				"many nodes (re-sort)": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeMap, node} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]) as [string, MyNode][],
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeMap<string, MyNode>(div, (a, b) => a.num - b.num, items);
+					items[0][1].num = 6
+					n.sort();
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					return n.position("B") === 0 && div.firstChild === items[1][1][node] && n.position("A") === 4 && div.lastChild === items[0][1][node];
 				}
 			},
 			"values": {
