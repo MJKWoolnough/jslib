@@ -88,7 +88,7 @@ type ManualTests = {
 	      errors = document.createElement("span"),
 	      tests = processTests("/", data, total, successful, errors.appendChild(new Counter("")));
 	let opened = false;
-	window.addEventListener("load", () => document.body.replaceChildren("Tests: ", successful, "/", total, errors, tests));
+	window.addEventListener("load", () => document.body.append("Tests: ", successful, "/", total, errors, tests));
 	window.addEventListener("keypress", (e: KeyboardEvent) => {
 		if (e.key === "o") {
 			opened = !opened;
