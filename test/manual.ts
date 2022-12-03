@@ -102,8 +102,8 @@ type ManualTests = {
 })({
 	"router": {
 		"html": {
-			"simple non-match": [`import './lib/router.js';`, `<x-router><button route-match="" onclick="result(true)">Success</button></x-router><button onclick="result(false)">Click here if Success button isn't showing</button>`],
-			"simple match": [`import './lib/router.js';`, `<x-router><button route-match="/test" onclick="result(true)">Success</button></x-router><button onclick="result(false)">Click here if Succes button isn't showing</button>`]
+			"simple non-match": [`import './lib/router.js';`, `<x-router><button route-match="" onclick="result(true)">Success</button></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
+			"simple match": [`import './lib/router.js';`, `<x-router><button route-match="/test" onclick="result(true)">Success</button></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`]
 		}
 	}
 });
