@@ -100,4 +100,7 @@ type ManualTests = {
 		}
 	});
 })({
+	"router": {
+		"simple non-match": [`import './lib/router.js';`, `<x-router><button route-match="" onclick="result(true)">Click here for success</button></x-router>`]
+	}
 });
