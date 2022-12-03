@@ -1752,6 +1752,15 @@ When the first route is matched, the title of the document will be set to "Route
 
 When a route is unmatched, any class and ID set is removed.
 
+NB: It is recommended to either set the style attribute on all x-router elements to "display: none", or to add the following to CSS on the page:
+```css
+x-router {
+	display: none;
+}
+```
+
+This will hide the flash of elements that will appear of the page before the x-router element is registered.
+
 #### <a name="router_router_add">add</a>
 ```typescript
 class Router {
