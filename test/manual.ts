@@ -26,14 +26,13 @@ type ManualTests = {
 				totalCount.add();
 				button.innerText = "Run Test";
 				button.addEventListener("click", () => {
-					const w = window.open("", "", ""),
+					const w = window.open("/test", "", ""),
 					      script = document.createElement("script");
 					if (!w) {
 						alert("Cannot create window");
 						return;
 					}
 					button.toggleAttribute("disabled", true);
-					w.document.title = `${breadcrumbs}: ${name}`;
 					let resultFn: (pass: boolean) => void,
 					    errorFn: (error: any) => void;
 					new Promise<boolean>((sFn, eFn) => {
@@ -65,8 +64,11 @@ type ManualTests = {
 					});
 					script.setAttribute("type", "module");
 					script.innerText = test[0];
-					w.document.body.innerHTML = test[1] ?? "";
-					w.document.head.append(script);
+					w.addEventListener("load", () => {
+						w.document.title = `${breadcrumbs}: ${name}`;
+						w.document.body.innerHTML = test[1] ?? "";
+						w.document.head.append(script);
+					});
 				});
 			} else {
 				const details = df.appendChild(document.createElement("details")),
