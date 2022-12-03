@@ -15,7 +15,8 @@ type ManualTests = {
 			this.#parent?.add();
 		}
 	}
-	const processTests = (breadcrumbs: string, t: ManualTests, totalCount: Counter, successCount: Counter, errorCount: Counter) => {
+	const icon = document.head.getElementsByTagName("link")[0],
+	      processTests = (breadcrumbs: string, t: ManualTests, totalCount: Counter, successCount: Counter, errorCount: Counter) => {
 		const df = document.createDocumentFragment(),
 		      testList = document.createElement("ul");
 		for (const [name, test] of Object.entries(t)) {
@@ -68,6 +69,7 @@ type ManualTests = {
 						w.document.title = `${breadcrumbs}: ${name}`;
 						w.document.body.innerHTML = test[1] ?? "";
 						w.document.head.append(script);
+						w.document.head.append(icon.cloneNode());
 					});
 				});
 			} else {
