@@ -110,7 +110,8 @@ type ManualTests = {
 		"html": {
 			"simple non-match": [`import './lib/router.js';`, `<x-router><button route-match="" onclick="result(true)">Success</button></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 			"simple match": [`import './lib/router.js';`, `<x-router><button route-match="/test" onclick="result(true)">Success</button></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
-			"match after link": [`import './lib/router.js';`, `<x-router><button route-match="/other-page" onclick="result(true)">Success</button><a route-match="" href="/other-page">Click here to make button</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`]
+			"match after link": [`import './lib/router.js';`, `<x-router><button route-match="/other-page" onclick="result(true)">Success</button><a route-match="" href="/other-page">Click here to make button</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
+			"match after button (goto)": [`import {goto} from './lib/router.js';window.goto = goto;`, `<x-router><button route-match="/other-page" onclick="result(true)">Success</button><button route-match="" onclick="goto('/other-page')">Click Here</button></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 		}
 	}
 });
