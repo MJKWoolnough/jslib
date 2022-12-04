@@ -33,6 +33,8 @@ const update = Symbol("update"),
 
 let lastState = Date.now();
 
+history.replaceState(lastState, "");
+
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;
 	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
