@@ -114,6 +114,7 @@ type ManualTests = {
 			"path param": [`import './lib/router.js';`, `<x-router><button route-match="/page-:page" onclick="result(this.getAttribute('page') === '15')">Click Here</button><a route-match="" href="/page-15">Click Here</a></x-router><br /><button onclick="result(false)">Fail</button>`],
 			"match query": [`import './lib/router.js';`, `<x-router><button route-match="/?page=other" onclick="result(true)">Success</button><a route-match="" href="?page=other">Click here to make button</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 			"query param": [`import {goto} from './lib/router.js';window.goto = goto;`, `<x-router><button route-match="?page=:page" onclick="this.getAttribute('page') === '15' ? result(true) : goto('?page=15')">Click Here</button></x-router><br /><button onclick="result(false)">Fail</button>`],
+			"match hash": [`import './lib/router.js';`, `<x-router><button route-match="#match" onclick="result(true)">Success</button><a route-match="" href="#match">Click here to make button</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 		}
 	}
 });
