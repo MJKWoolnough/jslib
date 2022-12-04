@@ -98,7 +98,11 @@ type ManualTests = {
 			opened = !opened;
 			Array.from(document.getElementsByTagName("details"), e => e.toggleAttribute("open", opened));
 		} else if (e.key === "r") {
-			Array.from(document.getElementsByTagName("button"), e => e.click());
+			if (e.shiftKey) {
+				Array.from(document.getElementsByTagName("button"), e => e.click());
+			} else {
+				document.getElementsByTagName("button")[0]?.click();
+			}
 		}
 	});
 })({
