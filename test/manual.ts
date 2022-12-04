@@ -112,6 +112,7 @@ type ManualTests = {
 			"match after button (goto)": [`import {goto} from './lib/router.js';window.goto = goto;`, `<x-router><button route-match="/other-page" onclick="result(true)">Success</button><button route-match="" onclick="goto('/other-page')">Click Here</button></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 			"history check": [`import {goto} from './lib/router.js';window.goto = goto;`, `<x-router><div route-match="/other-page">Use the back button.</div><div route-match=""><button onclick="this.setAttribute('onclick', 'result(true)');goto('/other-page');">Click Here</button></div></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 			"path param": [`import './lib/router.js';`, `<x-router><button route-match="/page-:page" onclick="result(this.getAttribute('page') === '15')">Click Here</button><a route-match="" href="/page-15">Click Here</a></x-router><br /><button onclick="result(false)">Fail</button>`],
+			"match query": [`import './lib/router.js';`, `<x-router><button route-match="/?page=other" onclick="result(true)">Success</button><a route-match="" href="?page=other">Click here to make button</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 		}
 	}
 });
