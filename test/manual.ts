@@ -122,6 +122,7 @@ type ManualTests = {
 			"x-route": {
 				"title change": [`import './lib/router.js';`, `<x-router><x-route title="New Title" route-match="/other-page"><button onclick="result(document.title === 'New Title')">Click Here</button></x-route><a href="/other-page" route-match="">Click Here</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 				"id change": [`import './lib/router.js';`, `<x-router><x-route id="MyID" route-match="/other-page"><button onclick="result(document.documentElement.getAttribute('id') === 'MyID')">Click Here</button></x-route><a href="/other-page" route-match="">Click Here</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
+				"class change": [`import './lib/router.js';`, `<x-router><x-route class="MyClass" route-match="/other-page"><button onclick="result(document.documentElement.getAttribute('class') === 'MyClass')">Click Here</button></x-route><a href="/other-page" route-match="">Click Here</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`]
 			}
 		}
 	}
