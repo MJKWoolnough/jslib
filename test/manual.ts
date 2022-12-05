@@ -120,7 +120,8 @@ type ManualTests = {
 				"suffix match": [`import './lib/router.js';`, `<x-router><button route-match="other-page/" onclick="result(true)">Success</button><a href="/something/other-page/name" route-match="">Click Here</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`]
 			},
 			"x-route": {
-				"title change": [`import './lib/router.js';`, `<x-router><x-route title="New Title" route-match="/other-page"><button onclick="result(document.title === 'New Title')">Click Here</button></x-route><a href="/other-page" route-match="">Click Here</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`]
+				"title change": [`import './lib/router.js';`, `<x-router><x-route title="New Title" route-match="/other-page"><button onclick="result(document.title === 'New Title')">Click Here</button></x-route><a href="/other-page" route-match="">Click Here</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
+				"id change": [`import './lib/router.js';`, `<x-router><x-route id="MyID" route-match="/other-page"><button onclick="result(document.documentElement.getAttribute('id') === 'MyID')">Click Here</button></x-route><a href="/other-page" route-match="">Click Here</a></x-router><br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 			}
 		}
 	}
