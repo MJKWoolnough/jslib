@@ -214,7 +214,7 @@ customElements.define("x-route", class extends HTMLElement {
 });
 
 export const router = () => new Router(),
-goto = (href: string, attrs?: Record<string, ToString>) => {
+goto = (window as any).goto = (href: string, attrs?: Record<string, ToString>) => {
 	const url = new URL(href, window.location + "");
 	let handled = false;
 	if (url.host === window.location.host) {
