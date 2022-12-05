@@ -1705,7 +1705,7 @@ This library implements a global click-handler to intercept the uses of both [HT
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
-| [goto](#router_goto) | Function | Used to update the routers to a new location. |
+| [goto](#router_goto) | Function | Used to update the routers to a new location. This function is added to the Window object in order to allow easy calling from HTML event handlers. |
 | [router](#router_router) | Function | Used to create a new router. |
 
 ### <a name="router_goto">goto</a>
@@ -1716,6 +1716,8 @@ This library implements a global click-handler to intercept the uses of both [HT
 This function will update all routers to the provided `href` location, overriding any resolved attributes from the URL with those specified in the `attrs` object.
 
 It will return true if any Router has a route that matches the location, and false otherwise.
+
+This function may be called directly from HTML event handlers, as it is granted global scope in the page.
 
 ### <a name="router_router">router</a>
 
