@@ -53,9 +53,9 @@ export default class CSS extends CSSStyleSheet {
 						data += rule;
 					}
 				}
-				this.insertRule(at + "{" + data + "}");
+				this.insertRule(at + "{" + data + "}", this.cssRules.length);
 			} else {
-				this.insertRule(at);
+				this.insertRule(at, this.cssRules.length);
 			}
 		}
 		return this;
