@@ -9,7 +9,7 @@ const update = Symbol("update"),
 	}
       }),
       defaultSwapper = (current, next) => current.replaceWith(next),
-      swappers = new Map();
+      swappers = new Map([["", defaultSwapper]]);
 
 let lastState = Date.now();
 

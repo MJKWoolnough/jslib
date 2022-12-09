@@ -33,7 +33,7 @@ const update = Symbol("update"),
 	}
       }),
       defaultSwapper = (current: ChildNode, next: ChildNode) => current.replaceWith(next),
-      swappers = new Map<string, Swapper>();
+      swappers = new Map<string, Swapper>([["", defaultSwapper]]);
 
 let lastState = Date.now();
 
