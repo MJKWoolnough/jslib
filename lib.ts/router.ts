@@ -20,6 +20,8 @@ interface ToString {
 	toString(): string;
 }
 
+type Swapper = (current: ChildNode, next: ChildNode) => void;
+
 const update = Symbol("update"),
       newState = Symbol("newState"),
       routers = new Set<Router>(),
@@ -126,6 +128,9 @@ class Router extends HTMLElement {
 			this.#match(matchObj, nodeFn);
 		}
 		return this;
+	}
+	setTransition(s: Swapper) {
+		this.#swapper = s;
 	}
 	[newState](path: LocationURL, state: number, attrs?: Record<string, ToString>) {
 		if (this.#marker.isConnected) {
