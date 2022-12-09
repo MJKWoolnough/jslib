@@ -29,7 +29,8 @@ const update = Symbol("update"),
 			record.target[update]();
 		}
 	}
-      });
+      }),
+      defaultSwapper = (current: ChildNode, next: ChildNode) => current.replaceWith(next);
 
 let lastState = Date.now();
 
@@ -57,6 +58,7 @@ class Router extends HTMLElement {
 	#connected = false;
 	#history = new Map<number, ChildNode>();
 	#matchers: MatchNode[] = [];
+	#swapper = defaultSwapper;
 	constructor() {
 		super();
 		mo.observe(this, {"childList": true});
@@ -87,7 +89,7 @@ class Router extends HTMLElement {
 			}
 		}
 		if (url.hash === match.hash) {
-			this.#marker.replaceWith(this.#marker = nodeFn(defaultAttrs ? Object.assign(attrs, defaultAttrs) : attrs));
+			this.#swapper(this.#marker, this.#marker = nodeFn(defaultAttrs ? Object.assign(attrs, defaultAttrs) : attrs));
 			return this.#connected = true;
 		}
 		return false;
