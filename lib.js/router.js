@@ -108,6 +108,7 @@ class Router extends HTMLElement {
 	}
 	setTransition(s) {
 		this.#swapper = s;
+		return this;
 	}
 	[newState](path, state, attrs) {
 		if (this.#marker.isConnected) {

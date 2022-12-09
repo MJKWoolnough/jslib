@@ -132,6 +132,7 @@ class Router extends HTMLElement {
 	}
 	setTransition(s: Swapper) {
 		this.#swapper = s;
+		return this;
 	}
 	[newState](path: LocationURL, state: number, attrs?: Record<string, ToString>) {
 		if (this.#marker.isConnected) {
