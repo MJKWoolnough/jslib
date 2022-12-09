@@ -37,7 +37,7 @@ class Router extends HTMLElement {
 	#connected = false;
 	#history = new Map();
 	#matchers = [];
-	#swapper = defaultSwapper;
+	#swapper;
 	constructor() {
 		super();
 		mo.observe(this, {"childList": true});
@@ -68,7 +68,7 @@ class Router extends HTMLElement {
 			}
 		}
 		if (url.hash === match.hash) {
-			this.#swapper(this.#marker, this.#marker = nodeFn(defaultAttrs ? Object.assign(attrs, defaultAttrs) : attrs));
+			((typeof this.#swapper === "string" ? swappers.get(this.#swapper) : this.#swapper) ?? defaultSwapper)(this.#marker, this.#marker = nodeFn(defaultAttrs ? Object.assign(attrs, defaultAttrs) : attrs));
 			return this.#connected = true;
 		}
 		return false;
