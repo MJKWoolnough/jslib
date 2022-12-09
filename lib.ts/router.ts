@@ -32,7 +32,8 @@ const update = Symbol("update"),
 		}
 	}
       }),
-      defaultSwapper = (current: ChildNode, next: ChildNode) => current.replaceWith(next);
+      defaultSwapper = (current: ChildNode, next: ChildNode) => current.replaceWith(next),
+      swappers = new Map<string, Swapper>();
 
 let lastState = Date.now();
 
@@ -237,4 +238,11 @@ goto = (window as any).goto = (href: string, attrs?: Record<string, ToString>) =
 		}
 	}
 	return handled;
+},
+registerTransition = (name: string, s: Swapper) => {
+	if (swappers.has(name)) {
+		return false;
+	}
+	swappers.set(name, s);
+	return true;
 };

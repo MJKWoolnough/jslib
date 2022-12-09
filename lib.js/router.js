@@ -8,7 +8,8 @@ const update = Symbol("update"),
 		}
 	}
       }),
-      defaultSwapper = (current, next) => current.replaceWith(next);
+      defaultSwapper = (current, next) => current.replaceWith(next),
+      swappers = new Map();
 
 let lastState = Date.now();
 
@@ -212,4 +213,11 @@ goto = window.goto = (href, attrs) => {
 		}
 	}
 	return handled;
+},
+registerTransition = (name, s) => {
+	if (swappers.has(name)) {
+		return false;
+	}
+	swappers.set(name, s);
+	return true;
 };
