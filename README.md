@@ -1706,6 +1706,7 @@ This library implements a global click-handler to intercept the uses of both [HT
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
 | [goto](#router_goto) | Function | Used to update the routers to a new location. This function is added to the Window object in order to allow easy calling from HTML event handlers. |
+| [registerTransition](#router_registertransition) | Function | Used to register a transition effect to be used by HTML router. |
 | [router](#router_router) | Function | Used to create a new router. |
 
 ### <a name="router_goto">goto</a>
@@ -1719,6 +1720,15 @@ It will return true if any Router has a route that matches the location, and fal
 
 This function may be called directly from HTML event handlers, as it is granted global scope in the page.
 
+### <a name="router_registertransition">registerTransition</a>
+```typescript
+(name: string, fn: (current: ChildNode, next: ChildNode) => void) => boolean;
+```
+
+This function will register a transition function with the specified name, allowing for transition effects and animation. This function will return true on a successful registration, and false if it fails, which will most likely be because of a name collision.
+
+For the passed function, it is expected that the `next` node will replace the `current` node in the document immediately.
+
 ### <a name="router_router">router</a>
 
 The `router` function creates a new router, which should be added to the DOM in the place that you wish the matched routes to be placed.
@@ -1727,8 +1737,11 @@ The `router` function creates a new router, which should be added to the DOM in 
 |----------|---------------|
 | [add](#router_router_add) | Used to add routes to the Router. |
 | remove | Used to remove the Router from the DOM and disable its routing. It can be added to the DOM later to reactivate it. |
+| [setTransition](#router_router_settransition) | Used to set a transition function. |
 
 In addition to being able to be used from javascript, the Router can be added directly with HTML using the `x-router` tag. When used in this way, routes can be added by adding children to the Router with the `route-match` attribute set to the matching route, as per the [add](#router_router_add) method.
+
+The `x-router` can take a `router-transition` attribute, the name of which can be set to a name/function combo that is registered with the [registerTransition](#router_registertransition) function to allow an animated transition between routes.
 
 For example, the following creates two path routes and a catch-all route:
 
@@ -1792,6 +1805,17 @@ Some examples:
 | /a-112 | /a<br>/a-112<br>/a-:id | false<br>true<br>true | <br><br>id = 112 |
 | /search?mode=list&id=123&q=keyword | /no-search?mode=list<br>/search?mode=list<br>/search?id=:id&mode=list<br>/search?q=:query&mode=list&id=:id | false<br>true<br>true<br>true | <br><br>id = 123<br>id = 123 & query=keyword |
 | /some-page#content | /some-page<br>/some-page#otherContent<br>/some-page#content | true<br>false<br>true |  |
+
+#### <a name="router_router_settransition">setTransition</a>
+```typescript
+class Router {
+	setTransition(fn: (current: ChildNode, next: ChildNode) => void): this;
+}
+```
+
+The method is used to set the routers transition method. By default the router simply swaps the nodes, but this method allows for other effects and animations.
+
+It is expected that the `next` node will replace the `current` node in the document immediately.
 
 ## <a name="rpc">rpc</a>
 
