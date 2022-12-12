@@ -46,3 +46,14 @@ registerTransition("wipe-right", createTransition([
 	{"clipPath": "inset(0 100% 0 0)"},
 	{"clipPath": "inset(0 0 0 0)"},
 ]));
+
+
+registerTransition("zoom", createTransition([
+	{"transform": "scale(1)"},
+	{"transform": "scale(0)"},
+	{"transform": "scale(0)"}
+], [
+	{"transform": "scale(0)"},
+	{"transform": "scale(0)"},
+	{"transform": "scale(1)"}
+]));
