@@ -68,10 +68,13 @@ class Router extends HTMLElement {
 			}
 		}
 		if (url.hash === match.hash) {
-			(this.#swapper ?? swappers.get(this.getAttribute("router-transition") ?? "") ?? defaultSwapper)(this.#marker, this.#marker = nodeFn(defaultAttrs ? Object.assign(attrs, defaultAttrs) : attrs));
+			this.#setNode(nodeFn(defaultAttrs ? Object.assign(attrs, defaultAttrs) : attrs));
 			return this.#connected = true;
 		}
 		return false;
+	}
+	#setNode(n) {
+		(this.#swapper ?? swappers.get(this.getAttribute("router-transition") ?? "") ?? defaultSwapper)(this.#marker, this.#marker = n);
 	}
 	#setRoute(path, attrs) {
 		for (const c of this.#matchers) {
@@ -115,7 +118,7 @@ class Router extends HTMLElement {
 			const h = this.#history.get(state ?? 0);
 			this.#history.set(lastState, this.#marker);
 			if (h) {
-				this.#marker.replaceWith(this.#marker = h);
+				this.#setNode(h);
 				return true;
 			} else if (this.#setRoute(path, attrs)) {
 				return true;
@@ -169,6 +172,7 @@ class Router extends HTMLElement {
 		routers.delete(this);
 	}
 }
+
 
 customElements.define("x-router", Router);
 customElements.define("x-route", class extends HTMLElement {
