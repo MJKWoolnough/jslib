@@ -1,6 +1,6 @@
 import {registerTransition} from './router.js';
 
-const createTransition = (forCurrent: Keyframe[], forNext: Keyframe[], duration = 500) => (current: ChildNode, next: ChildNode) => {
+export const createTransition = (forCurrent: Keyframe[], forNext: Keyframe[], duration = 500) => (current: ChildNode, next: ChildNode) => {
 	if (current instanceof HTMLElement && next instanceof HTMLElement) {
 		const {offsetWidth, offsetHeight, offsetLeft, offsetTop} = current,
 		      currentAnim = new Animation(new KeyframeEffect(
@@ -20,35 +20,30 @@ const createTransition = (forCurrent: Keyframe[], forNext: Keyframe[], duration 
 	} else {
 		current.replaceWith(next);
 	}
-      };
-
-registerTransition("fade", createTransition([
+},
+fade = createTransition([
 	{"opacity": 1},
 	{"opacity": 0}
 ],
 [
 	{"opacity": 0},
 	{"opacity": 1}
-]));
-
-registerTransition("wipe-left", createTransition([
+]),
+wipeLeft = createTransition([
 	{"clipPath": "inset(0 0 0 0)"},
 	{"clipPath": "inset(0 100% 0 0)"}
 ], [
 	{"clipPath": "inset(0 0 0 100%)"},
 	{"clipPath": "inset(0 0 0 0)"},
-]));
-
-registerTransition("wipe-right", createTransition([
+]),
+wipeRight = createTransition([
 	{"clipPath": "inset(0 0 0 0)"},
 	{"clipPath": "inset(0 0 0 100%)"}
 ], [
 	{"clipPath": "inset(0 100% 0 0)"},
 	{"clipPath": "inset(0 0 0 0)"},
-]));
-
-
-registerTransition("zoom", createTransition([
+]),
+zoom = createTransition([
 	{"transform": "scale(1)"},
 	{"transform": "scale(0)"},
 	{"transform": "scale(0)"}
@@ -56,4 +51,9 @@ registerTransition("zoom", createTransition([
 	{"transform": "scale(0)"},
 	{"transform": "scale(0)"},
 	{"transform": "scale(1)"}
-]));
+]);
+
+registerTransition("fade", fade);
+registerTransition("wipe-left", wipeLeft);
+registerTransition("wipe-right", wipeRight);
+registerTransition("zoom", zoom);
