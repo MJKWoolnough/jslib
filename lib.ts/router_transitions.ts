@@ -38,3 +38,11 @@ registerTransition("wipe-left", createTransition([
 	{"clipPath": "inset(0 0 0 100%)"},
 	{"clipPath": "inset(0 0 0 0)"},
 ]));
+
+registerTransition("wipe-right", createTransition([
+	{"clipPath": "inset(0 0 0 0)"},
+	{"clipPath": "inset(0 0 0 100%)"}
+], [
+	{"clipPath": "inset(0 100% 0 0)"},
+	{"clipPath": "inset(0 0 0 0)"},
+]));
