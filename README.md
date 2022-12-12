@@ -21,6 +21,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [menu](#menu)                               | Library for creating right-click menus. |
 | [nodes](#nodes)                             | Classes for handling of collections of DOM Nodes. |
 | [router](#router)                           | Router element for SPAs. |
+| [router_transitions](#router_transitions)   | Transition effects for the Router. |
 | [rpc](#rpc)                                 | JSONRPC implementation. |
 | [settings](#settings)                       | Type-safe wrappers around localStorage. |
 | [svg](#svg)                                 | Functions to create SVG elements. |
@@ -37,7 +38,7 @@ Thematically, the above modules can be grouped into a few packages:
 | Decorum   | A collection of DOM manipulation libs. | [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), and [RPC](#rpc). |
 | Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
-| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), [Router](#router), and [Settings](#settings). |
+| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), [Router](#router), [Transitions](#router_transitions), and [Settings](#settings). |
 
 # Scripts
 
@@ -1816,6 +1817,27 @@ class Router {
 The method is used to set the routers transition method. By default the router simply swaps the nodes, but this method allows for other effects and animations.
 
 It is expected that the `next` node will replace the `current` node in the document immediately.
+
+## <a name="router_transitions">router_transitions</a>
+
+This library defines some simple transitional effects for the [router](#router) library.
+
+This module directly imports the [router](#router) module.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [createTransition](#router_transitions_createtransition) | Function | This function is used to create Transition Functions. |
+| fade | Function | A simple fade transition. |
+| wipeLeft | Function | A transition that reveals the new element beneath the first while wiping left. |
+| wipeRight | Function | A transition that reveals the new element beneath the first while wiping right. |
+| zoom | Function | A transition that scales out the first element before zooming in on the new element. |
+
+### <a name="router_transitions_createTransition">createTransition</a>
+```typescript
+(currentKeyframes: Keyframe[], nextKeyframes: Keyframe[], duration = 500) => (current: ChildNode, next: ChildNode) => void;
+```
+
+This function creates simple transition function (as used with the [registerTransition](#router_registertransition) function and the Router [setTransition](#router_router_settransition) method of the router module.
 
 ## <a name="rpc">rpc</a>
 
