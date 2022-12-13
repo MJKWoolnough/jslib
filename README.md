@@ -1816,7 +1816,7 @@ class Router {
 
 The method is used to set the routers transition method. By default the router simply swaps the nodes, but this method allows for other effects and animations.
 
-It is expected that the `next` node will replace the `current` node in the document immediately.
+It is expected that the `next` node will be placed in the document immediately, and adjacent to the `current` node.
 
 ## <a name="router_transitions">router_transitions</a>
 
