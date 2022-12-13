@@ -13,11 +13,11 @@ export const createTransition = (forCurrent: Keyframe[], forNext: Keyframe[], du
 			forNext,
 			{duration}
 		      ));
+		current.before(next);
 		for (const anim of next.getAnimations()) {
 			anim.cancel();
 		}
 		currentAnim.addEventListener("finish", () => current.remove(), {"once": true});
-		current.before(next);
 		currentAnim.play();
 		nextAnim.play();
 	} else {
