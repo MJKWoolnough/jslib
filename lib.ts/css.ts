@@ -1,5 +1,3 @@
-import {style} from './html.js';
-
 interface ToString {
 	toString(): string;
 }
@@ -74,7 +72,10 @@ export default class CSS extends CSSStyleSheet {
 		return r;
 	}
 	render() {
-		return style({"type": "text/css"}, this+"");
+		const style = document.createElement("style");
+		style.setAttribute("type", "text/css");
+		style.textContent = this + "";
+		return style;
 	}
 }
 
