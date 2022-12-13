@@ -1,6 +1,6 @@
 import {registerTransition} from './router.js';
 
-export const createTransition = (forCurrent: Keyframe[], forNext: Keyframe[], duration = 500) => (current: ChildNode, next: ChildNode) => {
+export const createTransition = (forCurrent: Keyframe[], forNext = forCurrent.slice().reverse(), duration = 500) => (current: ChildNode, next: ChildNode) => {
 	if (current instanceof HTMLElement && next instanceof HTMLElement) {
 		const {offsetWidth, offsetHeight, offsetLeft, offsetTop} = current,
 		      currentAnim = new Animation(new KeyframeEffect(
@@ -22,10 +22,6 @@ export const createTransition = (forCurrent: Keyframe[], forNext: Keyframe[], du
 fade = createTransition([
 	{"opacity": 1},
 	{"opacity": 0}
-],
-[
-	{"opacity": 0},
-	{"opacity": 1}
 ]),
 wipeLeft = createTransition([
 	{"clipPath": "inset(0 0 0 0)"},
@@ -45,10 +41,6 @@ zoom = createTransition([
 	{"transform": "scale(1)"},
 	{"transform": "scale(0)"},
 	{"transform": "scale(0)"}
-], [
-	{"transform": "scale(0)"},
-	{"transform": "scale(0)"},
-	{"transform": "scale(1)"}
 ]);
 
 registerTransition("fade", fade);
