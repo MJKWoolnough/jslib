@@ -28,14 +28,14 @@ wipeLeft = createTransition([
 	{"clipPath": "inset(0 100% 0 0)"}
 ], [
 	{"clipPath": "inset(0 0 0 100%)"},
-	{"clipPath": "inset(0 0 0 0)"},
+	{"clipPath": "inset(0 0 0 0)"}
 ]),
 wipeRight = createTransition([
 	{"clipPath": "inset(0 0 0 0)"},
 	{"clipPath": "inset(0 0 0 100%)"}
 ], [
 	{"clipPath": "inset(0 100% 0 0)"},
-	{"clipPath": "inset(0 0 0 0)"},
+	{"clipPath": "inset(0 0 0 0)"}
 ]),
 zoom = createTransition([
 	{"transform": "scale(1)"},
