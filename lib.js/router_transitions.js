@@ -7,11 +7,6 @@ export const createTransition = (forCurrent, forNext, duration = 500) => (curren
 			current,
 			forCurrent.map(k => Object.assign({"position": "absolute", "top": offsetTop + "px", "left": offsetLeft + "px", "width": offsetWidth + "px", "height": offsetHeight + "px"}, k)),
 			{duration}
-		      )),
-		      nextAnim = new Animation(new KeyframeEffect(
-			next,
-			forNext,
-			{duration}
 		      ));
 		current.before(next);
 		for (const anim of next.getAnimations()) {
@@ -19,7 +14,7 @@ export const createTransition = (forCurrent, forNext, duration = 500) => (curren
 		}
 		currentAnim.addEventListener("finish", () => current.remove(), {"once": true});
 		currentAnim.play();
-		nextAnim.play();
+		next.animate(forNext, duration);
 	} else {
 		current.replaceWith(next);
 	}
