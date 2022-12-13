@@ -9,7 +9,7 @@ export const createTransition = (forCurrent, forNext, duration = 500) => (curren
 			{duration}
 		      ));
 		current.before(next);
-		for (const anim of next.getAnimations()) {
+		for (const anim of next.getAnimations().concat(current.getAnimations())) {
 			anim.cancel();
 		}
 		currentAnim.addEventListener("finish", () => current.remove(), {"once": true});

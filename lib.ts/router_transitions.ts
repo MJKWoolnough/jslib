@@ -9,7 +9,7 @@ export const createTransition = (forCurrent: Keyframe[], forNext: Keyframe[], du
 			{duration}
 		      ));
 		current.before(next);
-		for (const anim of next.getAnimations()) {
+		for (const anim of next.getAnimations().concat(current.getAnimations())) {
 			anim.cancel();
 		}
 		currentAnim.addEventListener("finish", () => current.remove(), {"once": true});
