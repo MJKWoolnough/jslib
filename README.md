@@ -1832,10 +1832,12 @@ This module directly imports the [router](#router) module.
 
 ### <a name="router_transitions_createTransition">createTransition</a>
 ```typescript
-(currentKeyframes: Keyframe[], nextKeyframes: Keyframe[], duration = 500) => (current: ChildNode, next: ChildNode) => void;
+(currentKeyframes: Keyframe[], nextKeyframes?: Keyframe[], duration = 500) => (current: ChildNode, next: ChildNode) => void;
 ```
 
 This function creates simple transition function (as used with the [registerTransition](#router_registertransition) function and the Router [setTransition](#router_router_settransition) method of the router module.
+
+If `nextKeyframes` is not specified, then it will be determined by reversing the `currentKeyframes` array.
 
 ## <a name="rpc">rpc</a>
 
