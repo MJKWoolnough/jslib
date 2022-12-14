@@ -13,7 +13,7 @@ const windowObservations = {
 	"attributeFilter": ["maximised"],
 	"attributes": true
       },
-      shellStyle = new CSS().add(":host", {
+      shellStyle = [new CSS().add(":host", {
 	"display": "block",
 	"position": "relative",
 	"overflow": "hidden",
@@ -45,7 +45,7 @@ const windowObservations = {
 	}
       }).add("::slotted(windows-window:last-of-type)", {
 	      "--overlay-on": "none"
-      });
+      })];
 
 type Sdata = {
 	item: HTMLDivElement | null;
@@ -131,7 +131,7 @@ export class ShellElement extends BaseShellElement {
 					}
 				};
 			}}))
-		]).adoptedStyleSheets = [shellStyle];
+		]).adoptedStyleSheets = shellStyle;
 	}
 }
 
