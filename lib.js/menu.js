@@ -6,26 +6,26 @@ const blur = Symbol("blur"),
       disconnect = Symbol("disconnect"),
       itemElement = Symbol("itemElement"),
       menuElement = Symbol("menuElement"),
-      menuStyle = new CSS().add(":host", {
+      menuStyle = [new CSS().add(":host", {
 	"outline": "none",
 	"display": "inline-flex",
 	"flex-flow": "column wrap"
       }).add("::slotted(menu-item),::slotted(menu-submenu)", {
 	"display": "block",
 	"user-select": "none"
-      }),
-      submenuStyle = new CSS().add(":host", {
+      })],
+      submenuStyle = [new CSS().add(":host", {
 	"position": "relative"
       }).add("::slotted(menu-item)", {
 	"display": "block"
-      });
+      })];
 
 export class MenuElement extends HTMLElement {
 	#s;
 	#c;
 	constructor() {
 		super();
-		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot()).adoptedStyleSheets = [menuStyle];
+		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot()).adoptedStyleSheets = menuStyle;
 		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": e => {
 			const da = document.activeElement;
 			switch (e.key) {
@@ -152,7 +152,7 @@ export class SubMenuElement extends HTMLElement {
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			this.#s = slot(),
 			this.#p = slot()
-		]).adoptedStyleSheets = [submenuStyle];
+		]).adoptedStyleSheets = submenuStyle;
 		new MutationObserver(() => {
 			this.#i = null;
 			this.#m = null;
