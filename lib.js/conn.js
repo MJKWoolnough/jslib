@@ -52,7 +52,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		props["signal"].addEventListener("abort", () => {
 			xh.abort();
 			errorFn(new Error("Aborted"));
-		}, {"once": true});
+		}, once);
 	}
 	xh.send(props["data"] ?? null);
 }),
