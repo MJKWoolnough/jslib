@@ -49,9 +49,10 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		break;
 	}
 	if (props["signal"]) {
-		props["signal"].addEventListener("abort", () => {
+		const signal = props["signal"];
+		signal.addEventListener("abort", () => {
 			xh.abort();
-			errorFn(new Error("Aborted"));
+			errorFn(signal.reason instanceof Error ? signal.reason : new Error(signal.reason));
 		}, once);
 	}
 	xh.send(props["data"] ?? null);
