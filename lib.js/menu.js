@@ -1,6 +1,6 @@
 import CSS from './css.js';
 import {amendNode, bindElement, event, eventCapture, eventRemove} from './dom.js';
-import {ns, slot, style} from './html.js';
+import {ns, slot} from './html.js';
 
 const blur = Symbol("blur"),
       disconnect = Symbol("disconnect"),
