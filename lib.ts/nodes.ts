@@ -158,10 +158,7 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
       proxyObj = {
 	has: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
 	get: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => target.at(index)) || (target as any)[name],
-	set: <T extends Item>(target: NodeArray<T>, name: PropertyKey, value: T) => pIFn(name, index => {
-		target.splice(index, 1, value);
-		return true;
-	}) || false,
+	set: <T extends Item>(target: NodeArray<T>, name: PropertyKey, value: T) => pIFn(name, index => !!target.splice(index, 1, value)) || false,
 	deleteProperty: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => target.splice(index, 1).length > 0) || delete (target as any)[name]
       };
 
