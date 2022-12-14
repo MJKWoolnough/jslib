@@ -144,7 +144,7 @@ const resizeWindow = (w, direction, e) => {
 	"OK": "Ok",
 	"RESTORE": "Restore"
       },
-      shellStyle = new CSS().add(":host", {
+      shellStyle = [new CSS().add(":host", {
 	"display": "block",
 	"position": "relative",
 	"overflow": "hidden",
@@ -154,15 +154,15 @@ const resizeWindow = (w, direction, e) => {
 	"--taskmanager-on": "none"
       }).add("::slotted(windows-window:last-of-type)", {
 	"--overlay-on": "none" // hack until exportpart is supported
-      }),
-      desktopStyle = new CSS().add(":host", {
+      })],
+      desktopStyle = [new CSS().add(":host", {
 	"position": "absolute",
 	"top": 0,
 	"left": 0,
 	"bottom": 0,
 	"right": 0
-      }),
-      windowStyle = new CSS().add(":host", {
+      })],
+      windowStyle = [new CSS().add(":host", {
 	"position": "absolute",
 	"display": "block",
 	"background-color": "#fff",
@@ -345,7 +345,7 @@ const resizeWindow = (w, direction, e) => {
 	"([minimised]),>div:nth-child(1),([hide-titlebar])>div:nth-child(2),([hide-close])>div:nth-child(2)>div>button:nth-of-type(1),([hide-maximise])>div:nth-child(2)>div>button:nth-of-type(2),([hide-minimise])>div:nth-child(2)>div>button:nth-of-type(3),([window-hide])>div:nth-child(2)>div>button:nth-of-type(3)": {
 		"display": "none"
 	}
-      });
+      })];
 
 let focusingWindow = null, dragging = false;
 
@@ -429,7 +429,7 @@ export class ShellElement extends BaseElement {
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			slot({"name": "desktop"}),
 			div(slot())
-		]).adoptedStyleSheets = [shellStyle];
+		]).adoptedStyleSheets = shellStyle;
 	}
 	addWindow(w) {
 		if (w.parentNode !== this) {
@@ -463,7 +463,7 @@ export class DesktopElement extends HTMLElement {
 	constructor() {
 		super();
 		setTimeout(amendNode, 0, this, {"slot": "desktop"});
-		amendNode(this.attachShadow({"mode": "closed"}), slot({"slot": "desktop"})).adoptedStyleSheets = [desktopStyle];
+		amendNode(this.attachShadow({"mode": "closed"}), slot({"slot": "desktop"})).adoptedStyleSheets = desktopStyle;
 	}
 	attributeChangedCallback(name, _, newValue) {
 		if (name === "slot" && newValue !== "desktop") {
@@ -504,7 +504,7 @@ export class WindowElement extends BaseElement {
 			]),
 			this.#slot = div(slot()),
 			div({onclick})
-		]).adoptedStyleSheets = [windowStyle];
+		]).adoptedStyleSheets = windowStyle;
 		setTimeout(amendNode, 0, this, {"onmousedown": event(onclick, eventCapture)});
 	}
 	connectedCallback() {
