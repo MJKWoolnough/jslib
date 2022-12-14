@@ -23,7 +23,7 @@ const windowObservations = {
 		}
 	}
       },
-      shellStyle = new CSS().add(":host", {
+      shellStyle = [new CSS().add(":host", {
 	"display": "block",
 	"position": "relative",
 	"overflow": "hidden",
@@ -135,7 +135,7 @@ const windowObservations = {
 	"--overlay-on": "none"
       }).add("::slotted(windows-desktop)", {
 	"padding-bottom": "var(--taskbar-size, 4em)"
-      });
+      })];
 
 setMenuLang({
 	"CLOSE": "Close",
@@ -204,7 +204,7 @@ export class ShellElement extends BaseShellElement {
 					}
 				});
 			}}))
-		]).adoptedStyleSheets = [shellStyle];
+		]).adoptedStyleSheets = shellStyle;
 	}
 }
 
