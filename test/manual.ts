@@ -130,6 +130,13 @@ type ManualTests = {
 			}
 		},
 		"js": {
+			"simple non-match": [`import {router} from './lib/router.js';
+document.body.insertBefore(router().add("", () => {
+	const button = document.createElement("button");
+	button.textContent = "Success";
+	button.addEventListener("click", () => result(true));
+	return button;
+}), document.body.firstChild);`, `<br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 		}
 	}
 });
