@@ -198,6 +198,16 @@ document.body.insertBefore(router().add("/page-:page", ({page}) => {
 	a.setAttribute("href", "/page-15");
 	return a;
 }), document.body.firstChild);`, `<br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
+			"match query": [`import {router} from './lib/router.js';
+document.body.insertBefore(router().add("?page=other", () => {
+	result(true);
+	return new Text("Success");
+}).add("", () => {
+	const a = document.createElement("a");
+	a.textContent = "Click Here";
+	a.setAttribute("href", "?page=other");
+	return a;
+}), document.body.firstChild);`, `<br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 		}
 	}
 });
