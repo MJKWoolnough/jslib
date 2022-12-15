@@ -228,6 +228,16 @@ document.body.insertBefore(router().add("#match", () => {
 	a.setAttribute("href", "#match");
 	return a;
 }), document.body.firstChild);`, `<br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
+			"prefix match": [`import {router} from './lib/router.js';
+document.body.insertBefore(router().add("/other-page/", () => {
+	result(true);
+	return new Text("Success");
+}).add("", () => {
+	const a = document.createElement("a");
+	a.textContent = "Click Here";
+	a.setAttribute("href", "/other-page/name");
+	return a;
+}), document.body.firstChild);`, `<br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 		}
 	}
 });
