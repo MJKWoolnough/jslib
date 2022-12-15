@@ -156,6 +156,18 @@ document.body.insertBefore(router().add("/other-page", () => {
 	a.setAttribute("href", "/other-page");
 	return a;
 }), document.body.firstChild);`, `<br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
+			"match after button (goto)": [`import {goto, router} from './lib/router.js';
+document.body.insertBefore(router().add("/other-page", () => {
+	const button = document.createElement("button");
+	button.textContent = "Success";
+	button.addEventListener("click", () => result(true));
+	return button;
+}).add("", () => {
+	const a = document.createElement("button");
+	a.textContent = "Click Here";
+	a.addEventListener("click", () => goto("/other-page"));
+	return a;
+}), document.body.firstChild);`, `<br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 		}
 	}
 });
