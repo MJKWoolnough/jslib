@@ -168,6 +168,26 @@ document.body.insertBefore(router().add("/other-page", () => {
 	a.addEventListener("click", () => goto("/other-page"));
 	return a;
 }), document.body.firstChild);`, `<br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
+			"history check": [`import {goto, router} from './lib/router.js';
+document.body.insertBefore(router().add("/other-page", () => {
+	const div = document.createElement("div");
+	div.textContent = "Use the back button";
+	return div;
+}).add("", () => {
+	const button = document.createElement("button");
+	let clicked = false;
+	button.textContent = "Click Here";
+	button.addEventListener("click", () => {
+		if (clicked) {
+			result(true);
+		} else {
+			clicked = true;
+			button.textContent = "Success";
+			goto("/other-page");
+		}
+	});
+	return button;
+}), document.body.firstChild);`, `<br /><button onclick="result(false)">Click here if Success button isn't showing</button>`],
 		}
 	}
 });
