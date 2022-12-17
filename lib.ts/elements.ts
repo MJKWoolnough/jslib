@@ -42,11 +42,7 @@ interface OptionsFactory <T extends Node, U extends Options> {
 	<V extends T>(fn: (elem: V) => Children, options?: U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<V>, classOnly: true}): ConstructorOf<V>;
 }
 
-type HTMLElementORDocumentFragmentFactory<T extends Node, U extends {psuedo?: boolean}> =
-	OptionsFactory<T & AttrClass & ChildClass, Options & {attrs?: true, observeChildren?: true} & U> &
-	OptionsFactory<T & ChildClass, Options & {attrs: false, observeChildren?: true} & U> &
-	OptionsFactory<T & AttrClass, Options & {attrs?: true, observeChildren: false} & U> &
-	OptionsFactory<T, Options & {attrs: false, observeChildren: false} & U>;
+type HTMLElementORDocumentFragmentFactory<T extends Node, U extends {psuedo?: boolean}> = OptionsFactory<T & AttrClass & ChildClass, Options & {attrs?: true, observeChildren?: true} & U> & OptionsFactory<T & ChildClass, Options & {attrs: false, observeChildren?: true} & U> & OptionsFactory<T & AttrClass, Options & {attrs?: true, observeChildren: false} & U> & OptionsFactory<T, Options & {attrs: false, observeChildren: false} & U>;
 
 type ElementFactory = HTMLElementORDocumentFragmentFactory<HTMLElement, {psuedo?: false}> & HTMLElementORDocumentFragmentFactory<DocumentFragment, {psuedo: true}>;
 
