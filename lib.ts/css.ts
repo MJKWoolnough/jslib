@@ -127,7 +127,7 @@ mixin = (base: Def, add: Def) => {
 	for (const key in add) {
 		const v = add[key];
 		if (isDef(v)) {
-			const w = base[key] ?? (base[key] = {});
+			const w = base[key] ??= {};
 			if (isDef(w)) {
 				mixin(w, v);
 			}
