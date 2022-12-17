@@ -105,7 +105,7 @@ const sortNodes = (root, n) => {
       replaceKey = (root, k, item, prev) => {
 	const old = root.m.get(k);
 	if (old) {
-		if (Object.is(old.i, item) && old.p === prev) {
+		if (old.i === item && old.p === prev) {
 			return;
 		}
 		removeNode(root, old);

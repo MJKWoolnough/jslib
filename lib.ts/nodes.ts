@@ -147,7 +147,7 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
       replaceKey = <K, T extends Item>(root: MapRoot<K, T>, k: K, item: T, prev: ItemOrRoot<T>) => {
 	const old = root.m.get(k);
 	if (old) {
-		if (Object.is(old.i, item) && old.p === prev) {
+		if (old.i === item && old.p === prev) {
 			return;
 		}
 		removeNode(root, old);
