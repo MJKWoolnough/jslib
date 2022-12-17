@@ -3673,10 +3673,6 @@ type Tests = {
 	},
 	"css.js": {
 		"compound selectors": {
-			"empty": async () => {
-				const {default: CSS} = await import("./lib/css.js");
-				return new CSS().add("", {"a": 0}) + "" === "";
-			},
 			"a": async () => {
 				const {default: CSS} = await import("./lib/css.js");
 				return new CSS().add("a", {"opacity": 0}) + "" === "a { opacity: 0; }";
