@@ -83,7 +83,7 @@ export class Subscription<T> {
 				}
 			} : eFn);
 		});
-		s.#cancelBind = s.#cancel = this.#cancelBind ?? (this.#cancelBind = () => this.#cancel?.());
+		s.#cancelBind = s.#cancel = this.#cancelBind ??= () => this.#cancel?.();
 		return s;
 	}
 	cancel() {
