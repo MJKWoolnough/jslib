@@ -106,17 +106,6 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
 		yield [pos, curr.i];
 	}
       },
-      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
-	if (typeof name === "number") {
-		return fn(name);
-	} else if (typeof name === "string") {
-		const index = parseInt(name);
-		if (index.toString() === name) {
-			return fn(index);
-		}
-	}
-	return undefined;
-      },
       noItemFn = (n: Node) => ({[node]: n}),
       sort = <T extends Item>(root: Root<T>, compareFunction?: sortFunc<T>) => {
 	if (compareFunction) {
@@ -155,6 +144,17 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
 	root.m.set(k, Object.assign(addItemAfter(root, prev, item), {k}));
       },
       realTarget = Symbol("realTarget"),
+      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
+	if (typeof name === "number") {
+		return fn(name);
+	} else if (typeof name === "string") {
+		const index = parseInt(name);
+		if (index.toString() === name) {
+			return fn(index);
+		}
+	}
+	return undefined;
+      },
       proxyObj = {
 	has: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
 	get: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => target.at(index)) || (target as any)[name],
