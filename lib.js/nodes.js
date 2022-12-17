@@ -230,7 +230,7 @@ export class NodeArray {
 	}
 	includes(valueToFind, fromIndex = 0) {
 		for (const [, item] of entries(this[realTarget].#root, fromIndex)) {
-			if (Object.is(valueToFind, item)) {
+			if (valueToFind === item) {
 				return true;
 			}
 		}
@@ -238,7 +238,7 @@ export class NodeArray {
 	}
 	indexOf(searchElement, fromIndex = 0) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex)) {
-			if (Object.is(searchElement, item)) {
+			if (searchElement === item) {
 				return index;
 			}
 		}
@@ -254,7 +254,7 @@ export class NodeArray {
 	}
 	lastIndexOf(searchElement, fromIndex = -1) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex, -1)) {
-			if (Object.is(searchElement, item)) {
+			if (searchElement === item) {
 				return index;
 			}
 		}

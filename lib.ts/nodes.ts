@@ -276,7 +276,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	}
 	includes(valueToFind: T, fromIndex = 0) {
 		for (const [, item] of entries(this[realTarget].#root, fromIndex)) {
-			if (Object.is(valueToFind, item)) {
+			if (valueToFind === item) {
 				return true;
 			}
 		}
@@ -284,7 +284,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	}
 	indexOf(searchElement: T, fromIndex = 0) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex)) {
-			if (Object.is(searchElement, item)) {
+			if (searchElement === item) {
 				return index;
 			}
 		}
@@ -300,7 +300,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	}
 	lastIndexOf(searchElement: T, fromIndex = -1) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex, -1)) {
-			if (Object.is(searchElement, item)) {
+			if (searchElement === item) {
 				return index;
 			}
 		}
