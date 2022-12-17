@@ -35,26 +35,22 @@ export default class CSS extends CSSStyleSheet {
 		return rules;
 	}
 	add(selector: string, def: Def) {
-		if (selector.trim()) {
-			for (const rule of this.#compileRule(selector, def)) {
-				this.insertRule(rule, this.cssRules.length);
-			}
+		for (const rule of this.#compileRule(selector, def)) {
+			this.insertRule(rule, this.cssRules.length);
 		}
 		return this;
 	}
 	at(at: string, defs?: Record<string, Def>) {
-		if (at.trim()) {
-			if (defs) {
-				let data = "";
-				for (const def in defs) {
-					for (const rule of this.#compileRule(def, defs[def])) {
-						data += rule;
-					}
+		if (defs) {
+			let data = "";
+			for (const def in defs) {
+				for (const rule of this.#compileRule(def, defs[def])) {
+					data += rule;
 				}
-				this.insertRule(at + "{" + data + "}", this.cssRules.length);
-			} else {
-				this.insertRule(at, this.cssRules.length);
 			}
+			this.insertRule(at + "{" + data + "}", this.cssRules.length);
+		} else {
+			this.insertRule(at, this.cssRules.length);
 		}
 		return this;
 	}
