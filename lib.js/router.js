@@ -85,7 +85,7 @@ class Router extends HTMLElement {
 		return false;
 	}
 	add(match, nodeFn) {
-		const u = new URL(match, window.location.origin),
+		const u = new URL(match, window.location.href),
 		      matches = [],
 		      matchObj = {
 			matches,
