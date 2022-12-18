@@ -53,14 +53,12 @@ interface NodeAttributes extends Node {
 const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	if (children instanceof Binder) {
 		res.push(children[setNode](new Text(children+"")));
-	} else if (typeof children === "string") {
+	} else if (typeof children === "string" || children instanceof Node) {
 		res.push(children);
 	} else if (Array.isArray(children)) {
 		for (const c of children) {
 			childrenArr(c, res);
 		}
-	} else if (children instanceof Node) {
-		res.push(children);
 	} else if (children instanceof NodeList || children instanceof HTMLCollection) {
 		res.push(...children);
 	}
