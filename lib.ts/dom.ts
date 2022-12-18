@@ -62,9 +62,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	} else if (children instanceof Node) {
 		res.push(children);
 	} else if (children instanceof NodeList || children instanceof HTMLCollection) {
-		for (const c of Array.from(children)) {
-			res.push(c);
-		}
+		res.push(...children);
 	}
 	return res;
       },
