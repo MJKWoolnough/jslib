@@ -357,7 +357,7 @@ abstract class BaseElement extends HTMLElement {
 				"window-hide": true,
 				"window-icon": icon,
 				"window-title": title,
-				"hide-maximise": "true",
+				"hide-maximise": true,
 				"onremove": () => resolve(false)
 			      }, [
 				div(message),
@@ -375,7 +375,7 @@ abstract class BaseElement extends HTMLElement {
 				"window-hide": true,
 				"window-icon": icon,
 				"window-title": title,
-				"hide-maximise": "true",
+				"hide-maximise": true,
 				"onremove": () => resolve(false)
 			      }, [
 				div(message),
@@ -409,7 +409,7 @@ abstract class BaseElement extends HTMLElement {
 				"window-hide": true,
 				"window-icon": icon,
 				"window-title": title,
-				"hide-maximise": "true",
+				"hide-maximise": true,
 				"onremove": () => resolve(null)
 			      }, [
 				div(message),
