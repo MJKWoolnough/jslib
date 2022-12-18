@@ -59,7 +59,7 @@ class Router extends HTMLElement {
 		}
 		for (const [param, value] of match.params) {
 			const p = params.get(param);
-			if (value.charAt(0) === ':') {
+			if (value.charAt(0) === ':' && value.length > 1) {
 				if (p) {
 					attrs[value.slice(1)] = p;
 				}
