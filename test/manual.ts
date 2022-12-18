@@ -98,7 +98,7 @@ type ManualTests = {
 			opened = !opened;
 			Array.from(document.getElementsByTagName("details"), e => e.toggleAttribute("open", opened));
 		} else if (e.key === "R") {
-			Array.from(document.getElementsByTagName("button"), e => e.click());
+			Array.from(document.getElementsByTagName("button")).slice(0, 20).forEach(e => e.click());
 		} else if (e.key === "r") {
 			document.getElementsByTagName("button")[0]?.click();
 		}
