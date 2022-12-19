@@ -5936,5 +5936,43 @@ type Tests = {
 				}
 			}
 		}
+	},
+	"misc.js": {
+		"isInt": {
+			"basic": {
+				"0": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return isInt(0);
+				},
+				"'0'": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt("0");
+				},
+				"1": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return isInt(1);
+				},
+				"-1": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return isInt(-1);
+				},
+				"'a'": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt('a');
+				},
+				"0.5": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt(0.5);
+				},
+				"true": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt(true);
+				},
+				"false": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt(false);
+				}
+			}
+		}
 	}
 });
