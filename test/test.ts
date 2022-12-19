@@ -5971,6 +5971,18 @@ type Tests = {
 				"false": async () => {
 					const {isInt} = await import("./lib/misc.js");
 					return !isInt(false);
+				},
+				"NaN": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt(NaN);
+				},
+				"+Infinity": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt(+Infinity);
+				},
+				"-Infinity": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt(-Infinity);
 				}
 			},
 			"limits": {
