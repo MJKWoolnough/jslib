@@ -19,6 +19,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [inter](#inter)                             | Classes to provide different type of internal communication. |
 | [load](#load)                               | Used for initialisation. |
 | [menu](#menu)                               | Library for creating right-click menus. |
+| [misc](#misc)                               | Miscellaneous, simple, dependency-free functions. |
 | [nodes](#nodes)                             | Classes for handling of collections of DOM Nodes. |
 | [router](#router)                           | Router element for SPAs. |
 | [router_transitions](#router_transitions)   | Transition effects for the Router. |
@@ -38,7 +39,7 @@ Thematically, the above modules can be grouped into a few packages:
 | Decorum   | A collection of DOM manipulation libs. | [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), and [RPC](#rpc). |
 | Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
-| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), [Router](#router), [Transitions](#router_transitions), and [Settings](#settings). |
+| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), [Misc](#misc), [Router](#router), [Transitions](#router_transitions), and [Settings](#settings). |
 
 # Scripts
 
@@ -1512,6 +1513,43 @@ The ItemElement will be displayed in the parent [MenuElement](#menu_menuelement)
 The 'key' attribute sets a possible quick access key, values of which should be one of the [Keyboard event key values](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values).
 
 The 'disable' attribute makes the item unselectable and unfocusable.
+
+## <a name="misc">misc</a>
+
+The misc module contains various simple, dependency-free functions.
+
+|  Export  |  Description  |
+|----------|---------------|
+| [checkInt](#misc_checkint) | This function determines whether the value passed is an integer, within a given range, returning either the valid integer or a default value. |
+| [isInt](#misc_isint) | This function determines whether the value passed is an integer, within a given range. |
+| [mod](#misc_mod) | This function performs the modulo operation on the two given numbers. |
+
+### <a name="misc_checkint">checkInt</a>
+```typescript
+(n: any, min = -Infinity, max = Infinity, def = 0) => number;
+```
+
+This function determines whether `n` is a valid integer, as determined by the [isInt](#misc_isint) function, and returns `n` if it is, or `def` otherwise.
+
+### <a name="misc_isint">isInt</a>
+```typescript
+(v: any, min = -Infinity, max = Infinity): v is number;
+```
+
+This function determines whether `v` is a valid integer in the range provided (min <= v <= max).
+
+NB: Infinity is not a valid integer.
+
+### <a name="misc_mod">mod</a>
+```typescript
+(n: number, m: number) => number;
+```
+
+Javascript does not have a built-in modulo operator, and as such this function is useful to perform it. It does the following:
+
+```typescript
+((n % m) + m) % m;
+```
 
 ## <a name="nodes">nodes</a>
 
