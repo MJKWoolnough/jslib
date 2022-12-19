@@ -6015,6 +6015,40 @@ type Tests = {
 					return !isInt(6, -2, 5);
 				}
 			}
+		},
+		"checkInt": {
+			"'a'": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+				return checkInt("a") === 0;
+			},
+			"0.5": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+				return checkInt(0.5) === 0;
+			},
+			"-2 <= x <= 5, x = -3": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+				return checkInt(-3, -2, 5) === 0;
+			},
+			"-2 <= x <= 5, x = 1": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+				return checkInt(1, -2, 5) === 1;
+			},
+			"-2 <= x <= 5, x = 6": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+				return checkInt(6, -2, 5) === 0;
+			},
+			"-2 <= x <= 5, x = -3, def = 2": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+				return checkInt(-3, -2, 5, 2) === 2;
+			},
+			"-2 <= x <= 5, x = 1, def = 2": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+				return checkInt(1, -2, 5, 2) === 1;
+			},
+			"-2 <= x <= 5, x = 6, def = 2": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+				return checkInt(6, -2, 5, 2) === 2;
+			}
 		}
 	}
 });
