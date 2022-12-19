@@ -5972,6 +5972,36 @@ type Tests = {
 					const {isInt} = await import("./lib/misc.js");
 					return !isInt(false);
 				}
+			},
+			"limits": {
+				"-2 <= x <= 5, x = -3": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt(-3, -2, 5);
+				},
+				"-2 <= x <= 5, x = -2": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return isInt(-2, -2, 5);
+				},
+				"-2 <= x <= 5, x = -1": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return isInt(-1, -2, 5);
+				},
+				"-2 <= x <= 5, x = 0": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return isInt(0, -2, 5);
+				},
+				"-2 <= x <= 5, x = 4": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return isInt(4, -2, 5);
+				},
+				"-2 <= x <= 5, x = 5": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return isInt(5, -2, 5);
+				},
+				"-2 <= x <= 5, x = 6": async () => {
+					const {isInt} = await import("./lib/misc.js");
+					return !isInt(6, -2, 5);
+				}
 			}
 		}
 	}
