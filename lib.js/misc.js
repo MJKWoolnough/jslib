@@ -5,6 +5,10 @@ setAndReturn = (m, k, v) => {
 	m.set(k, v);
 	return v;
 },
+pushAndReturn = (a, v) => {
+	a.push(v);
+	return v;
+},
 addAndReturn = (s, v) => {
 	s.add(v);
 	return v;

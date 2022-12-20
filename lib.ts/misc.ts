@@ -5,6 +5,10 @@ setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => {
 	m.set(k, v);
 	return v;
 },
+pushAndReturn = <V>(a: {push: (m: V) => any}, v: V) => {
+	a.push(v);
+	return v;
+},
 addAndReturn = <V>(s: {add: (m: V) => any}, v: V) => {
 	s.add(v);
 	return v;
