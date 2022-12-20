@@ -1523,6 +1523,7 @@ The misc module contains various simple, dependency-free functions.
 | [checkInt](#misc_checkint) | This function determines whether the value passed is an integer, within a given range, returning either the valid integer or a default value. |
 | [isInt](#misc_isint) | This function determines whether the value passed is an integer, within a given range. |
 | [mod](#misc_mod) | This function performs the modulo operation on the two given numbers. |
+| [setAndReturn](#misc_setandreturn) | This function sets a value on a map and returns the value. |
 
 ### <a name="misc_checkint">checkInt</a>
 ```typescript
@@ -1550,6 +1551,15 @@ Javascript does not have a built-in modulo operator, and as such this function i
 ```typescript
 ((n % m) + m) % m;
 ```
+
+### <a name="misc_setandreturn">setAndReturn</a>
+```typescript
+setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => V;
+```
+
+This function takes a map-like object and calls the `set` method with the given key and value, before returning the value `v`.
+
+This functions is useful for one-liners where you need to store a value in a map and still work on that value.
 
 ## <a name="nodes">nodes</a>
 
