@@ -6071,6 +6071,18 @@ type Tests = {
 				const {mod} = await import("./lib/misc.js");
 				return mod(-2, 2) === 0;
 			}
+		},
+		"setAndReturn": {
+			"setAndReturn": async () => {
+				const {setAndReturn} = await import("./lib/misc.js"),
+				      m = new Map<string, number>();
+				return setAndReturn(m, "key", 3) === 3 && m.get("key") === 3;
+			},
+			"overwrite": async () => {
+				const {setAndReturn} = await import("./lib/misc.js"),
+				      m = new Map<string, number>([["key", 2]]);
+				return m.get("key") === 2 && setAndReturn(m, "key", 3) === 3 && m.get("key") === 3;
+			}
 		}
 	}
 });
