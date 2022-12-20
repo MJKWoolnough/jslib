@@ -1524,6 +1524,7 @@ The misc module contains various simple, dependency-free functions.
 | [checkInt](#misc_checkint) | This function determines whether the value passed is an integer, within a given range, returning either the valid integer or a default value. |
 | [isInt](#misc_isint) | This function determines whether the value passed is an integer, within a given range. |
 | [mod](#misc_mod) | This function performs the modulo operation on the two given numbers. |
+| [pushAndReturn](#misc_pushandreturn) | This function adds a value to an Array and returns the value. |
 | [setAndReturn](#misc_setandreturn) | This function sets a value on a map and returns the value. |
 
 ### <a name="misc_addandreturn">addAndReturn</a>
@@ -1561,6 +1562,15 @@ Javascript does not have a built-in modulo operator, and as such this function i
 ```typescript
 ((n % m) + m) % m;
 ```
+
+### <a name="misc_pushandreturn">pushAndReturn</a>
+```typescript
+<V>(a: {push: (m: V) => any}, v: V) => V;
+```
+
+This function takes an Array-like object and calls the `push` method with the given value, before returning the value `v`.
+
+This functions is useful for one-liners where you need to store a value in an Array and still work on that value.
 
 ### <a name="misc_setandreturn">setAndReturn</a>
 ```typescript
