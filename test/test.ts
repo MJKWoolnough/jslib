@@ -6083,6 +6083,18 @@ type Tests = {
 				      m = new Map<string, number>([["key", 2]]);
 				return m.get("key") === 2 && setAndReturn(m, "key", 3) === 3 && m.get("key") === 3;
 			}
+		},
+		"addAndReturn": {
+			"addAndReturn": async () => {
+				const {addAndReturn} = await import("./lib/misc.js"),
+				      s = new Set<number>();
+				return !s.has(3) && addAndReturn(s, 3) === 3 && s.has(3);
+			},
+			"overwrite": async () => {
+				const {addAndReturn} = await import("./lib/misc.js"),
+				      s = new Set<number>([3]);
+				return s.has(3) && addAndReturn(s, 3) === 3 && s.has(3);
+			}
 		}
 	}
 });
