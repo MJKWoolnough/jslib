@@ -6095,6 +6095,13 @@ type Tests = {
 				      s = new Set<number>([3]);
 				return s.has(3) && addAndReturn(s, 3) === 3 && s.has(3);
 			}
+		},
+		"pushAndReturn": {
+			"pushAndReturn": async () => {
+				const {pushAndReturn} = await import("./lib/misc.js"),
+				      a: number[] = [];
+				return a.length === 0 && pushAndReturn(a, 3) === 3 && a[0] === 3;
+			}
 		}
 	}
 });
