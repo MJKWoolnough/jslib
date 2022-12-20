@@ -4,4 +4,8 @@ mod = (n, m) => ((n % m) + m) % m,
 setAndReturn = (m, k, v) => {
 	m.set(k, v);
 	return v;
+},
+addAndReturn = (s, v) => {
+	s.add(v);
+	return v;
 };

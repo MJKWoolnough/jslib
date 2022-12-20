@@ -4,4 +4,8 @@ mod = (n: number, m: number) => ((n % m) + m) % m,
 setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => {
 	m.set(k, v);
 	return v;
+},
+addAndReturn = <V>(s: {add: (m: V) => any}, v: V) => {
+	s.add(v);
+	return v;
 };
