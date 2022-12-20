@@ -1520,10 +1520,20 @@ The misc module contains various simple, dependency-free functions.
 
 |  Export  |  Description  |
 |----------|---------------|
+| [addAndReturn](#misc_addandreturn) | This function adds a value to a Set and returns the value. |
 | [checkInt](#misc_checkint) | This function determines whether the value passed is an integer, within a given range, returning either the valid integer or a default value. |
 | [isInt](#misc_isint) | This function determines whether the value passed is an integer, within a given range. |
 | [mod](#misc_mod) | This function performs the modulo operation on the two given numbers. |
 | [setAndReturn](#misc_setandreturn) | This function sets a value on a map and returns the value. |
+
+### <a name="misc_addandreturn">addAndReturn</a>
+```typescript
+<V>(s: {add: (m: V) => any}, v: V) => V;
+```
+
+This function takes a Set-like object and calls the `add` method with the given value, before returning the value `v`.
+
+This functions is useful for one-liners where you need to store a value in a Set and still work on that value.
 
 ### <a name="misc_checkint">checkInt</a>
 ```typescript
