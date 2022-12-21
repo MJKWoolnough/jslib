@@ -12,4 +12,8 @@ pushAndReturn = <V>(a: {push: (m: V) => any}, v: V) => {
 addAndReturn = <V>(s: {add: (m: V) => any}, v: V) => {
 	s.add(v);
 	return v;
-};
+},
+queue = (() => {
+	let p = Promise.resolve();
+	return (fn: () => Promise<any>) => p = p.finally(fn);
+})();
