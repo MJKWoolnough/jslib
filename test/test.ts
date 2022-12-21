@@ -6102,6 +6102,16 @@ type Tests = {
 				      a: number[] = [];
 				return a.length === 0 && pushAndReturn(a, 3) === 3 && a[0] === 3;
 			}
+		},
+		"queue": {
+			"queue": async () => {
+				const {queue} = await import("./lib/misc.js");
+				let res = 0;
+				queue(async () => res += 1);
+				queue(async () => res *= 2);
+				queue(async () => res += 3);
+				return queue(async () => res *= 5).then(() => res === 25);
+			}
 		}
 	}
 });
