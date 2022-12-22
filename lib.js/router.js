@@ -176,10 +176,13 @@ class Router extends HTMLElement {
 
 customElements.define("x-router", Router);
 customElements.define("x-route", class extends HTMLElement {
+	#class;
+	#id;
+	#title;
 	connectedCallback() {
-		const c = this.getAttribute("class"),
-		      i = this.getAttribute("id"),
-		      t = this.getAttribute("title");
+		const c = this.#class ??= this.getAttribute("class") ?? "",
+		      i = this.#id ??= this.getAttribute("id") ?? "",
+		      t = this.#title ??= this.getAttribute("title") ?? "";
 		if (c) {
 			document.documentElement.classList.toggle(c, true);
 		}
@@ -191,11 +194,11 @@ customElements.define("x-route", class extends HTMLElement {
 		}
 	}
 	disconnectedCallback() {
-		const c = this.getAttribute("class");
+		const c = this.#class;
 		if (c) {
 			document.documentElement.classList.toggle(c, false);
 		}
-		if (document.documentElement.getAttribute("id") === this.getAttribute("id")) {
+		if (this.#id && document.documentElement.getAttribute("id") === this.#id) {
 			document.documentElement.removeAttribute("id");
 		}
 	}
