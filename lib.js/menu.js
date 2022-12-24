@@ -6,18 +6,24 @@ const blur = Symbol("blur"),
       disconnect = Symbol("disconnect"),
       itemElement = Symbol("itemElement"),
       menuElement = Symbol("menuElement"),
-      menuStyle = [new CSS().add(":host", {
-	"outline": "none",
-	"display": "inline-flex",
-	"flex-flow": "column wrap"
-      }).add("::slotted(menu-item),::slotted(menu-submenu)", {
-	"display": "block",
-	"user-select": "none"
+      menuStyle = [new CSS().add({
+	":host": {
+		"outline": "none",
+		"display": "inline-flex",
+		"flex-flow": "column wrap"
+	},
+	"::slotted(menu-item),::slotted(menu-submenu)": {
+		"display": "block",
+		"user-select": "none"
+	}
       })],
-      submenuStyle = [new CSS().add(":host", {
-	"position": "relative"
-      }).add("::slotted(menu-item)", {
-	"display": "block"
+      submenuStyle = [new CSS().add({
+	":host": {
+		"position": "relative"
+	},
+	"::slotted(menu-item)": {
+		"display": "block"
+	}
       })];
 
 export class MenuElement extends HTMLElement {
