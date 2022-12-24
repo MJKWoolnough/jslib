@@ -144,16 +144,20 @@ const resizeWindow = (w, direction, e) => {
 	"OK": "Ok",
 	"RESTORE": "Restore"
       },
-      shellStyle = [new CSS().add(":host", {
-	"display": "block",
-	"position": "relative",
-	"overflow": "hidden",
-	"width": "var(--shell-width, 100%)",
-	"height": "var(--shell-height, 100%)"
-      }).add("::slotted(windows-window)", {
-	"--taskmanager-on": "none"
-      }).add("::slotted(windows-window:last-of-type)", {
-	"--overlay-on": "none" // hack until exportpart is supported
+      shellStyle = [new CSS().add({
+	":host": {
+		"display": "block",
+		"position": "relative",
+		"overflow": "hidden",
+		"width": "var(--shell-width, 100%)",
+		"height": "var(--shell-height, 100%)"
+	},
+	"::slotted(windows-window)": {
+		"--taskmanager-on": "none"
+	},
+	"::slotted(windows-window:last-of-type)": {
+		"--overlay-on": "none" // hack until exportpart is supported
+	}
       })],
       desktopStyle = [new CSS().add(":host", {
 	"position": "absolute",
