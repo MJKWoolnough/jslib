@@ -3704,6 +3704,13 @@ type Tests = {
 			"multiple properties": async () => {
 				const {default: CSS} = await import("./lib/css.js");
 				return new CSS().add("a", {"gap": 0, "opacity": 1, "order": 2}) + "" === "a { gap: 0px; opacity: 1; order: 2; }";
+			},
+			"multiple defs": async () => {
+				const {default: CSS} = await import("./lib/css.js");
+				return new CSS().add({
+					"a": {"gap": 0, "opacity": 1, "order": 2},
+					"div": {"opacity": 0}
+				}) + "" === "a { gap: 0px; opacity: 1; order: 2; }div { opacity: 0; }";
 			}
 		},
 		"complex selectors": {
