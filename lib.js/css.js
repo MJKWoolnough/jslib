@@ -22,9 +22,11 @@ export default class CSS extends CSSStyleSheet {
 		}
 		return rules;
 	}
-	add(selector, def) {
-		for (const rule of this.#compileRule(selector, def)) {
-			this.insertRule(rule, this.cssRules.length);
+	add(selectorOrDefs, defs = {}) {
+		for (const [selector, def] of typeof selectorOrDefs === "string" ? [[selectorOrDefs, defs]] : Object.entries(selectorOrDefs)) {
+			for (const rule of this.#compileRule(selector, def)) {
+				this.insertRule(rule, this.cssRules.length);
+			}
 		}
 		return this;
 	}
