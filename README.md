@@ -415,11 +415,12 @@ This simple example will produce the following page:
 #### <a name="css_css_add">add</a>
 ```typescript
 class CSS {
+	add(defs: Record<string, Def>): this;
 	add(selector: string, def: Def): this;
 }
 ```
 
-This method takes a CSS selector string and a [Def](#css_def) object containing all of the style information. The CSS instance if returned for simple method chaining.
+This method can either be callsed with a CSS selector string and a [Def](#css_def) object containing all of the style information, or and object with selector keys and [Def](#css_def) values. The CSS instance is returned for simple method chaining.
 
 #### <a name="css_css_at">at</a>
 ```typescript
