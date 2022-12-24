@@ -118,11 +118,11 @@ const split = (selector: string) => {
       idRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
       defaultCSS = new CSS();
 
-export const add = (selector: string, def: Def) => defaultCSS.add(selector, def),
-at = (at: string, defs?: Record<string, Def>) => defaultCSS.at(at, defs),
-id = () => defaultCSS.id(),
-ids = <N extends number>(n: N) => defaultCSS.ids(n) as IDs<N>,
-render = () => defaultCSS.render(),
+export const add = defaultCSS.add.bind(defaultCSS),
+at = defaultCSS.at.bind(defaultCSS),
+id = defaultCSS.id.bind(defaultCSS),
+ids = defaultCSS.ids.bind(defaultCSS),
+render = defaultCSS.render.bind(defaultCSS),
 mixin = (base: Def, add: Def) => {
 	for (const key in add) {
 		const v = add[key];

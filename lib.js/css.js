@@ -106,11 +106,11 @@ const split = selector => {
       idRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
       defaultCSS = new CSS();
 
-export const add = (selector, def) => defaultCSS.add(selector, def),
-at = (at, defs) => defaultCSS.at(at, defs),
-id = () => defaultCSS.id(),
-ids = n => defaultCSS.ids(n),
-render = () => defaultCSS.render(),
+export const add = defaultCSS.add.bind(defaultCSS),
+at = defaultCSS.at.bind(defaultCSS),
+id = defaultCSS.id.bind(defaultCSS),
+ids = defaultCSS.ids.bind(defaultCSS),
+render = defaultCSS.render.bind(defaultCSS),
 mixin = (base, add) => {
 	for (const key in add) {
 		const v = add[key];
