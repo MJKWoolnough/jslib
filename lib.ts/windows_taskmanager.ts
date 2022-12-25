@@ -13,38 +13,41 @@ const windowObservations = {
 	"attributeFilter": ["maximised"],
 	"attributes": true
       },
-      shellStyle = [new CSS().add(":host", {
-	"display": "block",
-	"position": "relative",
-	"overflow": "hidden",
-	"width": "var(--shell-width, 100%)",
-	"height": "var(--shell-height, 100%)",
-	">footer": {
-		"display": "flex",
-		"position": "absolute",
-		"grid-gap": "5px",
-		"flex-wrap": "wrap-reverse",
-		"width": "100%",
-		"bottom": 0,
-		"left": 0,
-		"pointer-events": "none",
-		">div": {
-			"width": "200px",
-			"position": "relative",
-			"pointer-events": "auto",
-			">windows-window": {
-				"min-height": "auto",
-				"position": "static",
-				"--overlay-on": "none",
-				":not([maximised])": {
-					"visibility": "hidden"
+      shellStyle = [new CSS().add({
+	":host": {
+		"display": "block",
+		"position": "relative",
+		"overflow": "hidden",
+		"width": "var(--shell-width, 100%)",
+		"height": "var(--shell-height, 100%)",
+		">footer": {
+			"display": "flex",
+			"position": "absolute",
+			"grid-gap": "5px",
+			"flex-wrap": "wrap-reverse",
+			"width": "100%",
+			"bottom": 0,
+			"left": 0,
+			"pointer-events": "none",
+			">div": {
+				"width": "200px",
+				"position": "relative",
+				"pointer-events": "auto",
+				">windows-window": {
+					"min-height": "auto",
+					"position": "static",
+					"--overlay-on": "none",
+					":not([maximised])": {
+						"visibility": "hidden"
+					}
 				}
 			}
-		}
 
-	}
-      }).add("::slotted(windows-window:last-of-type)", {
+		}
+	},
+	"::slotted(windows-window:last-of-type)": {
 	      "--overlay-on": "none"
+	}
       })];
 
 type Sdata = {
