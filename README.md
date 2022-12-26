@@ -420,7 +420,7 @@ class CSS {
 }
 ```
 
-This method can either be callsed with a CSS selector string and a [Def](#css_def) object containing all of the style information, or and object with selector keys and [Def](#css_def) values. The CSS instance is returned for simple method chaining.
+This method can either be called with a CSS selector string and a [Def](#css_def) object containing all of the style information, or and object with selector keys and [Def](#css_def) values. The CSS instance is returned for simple method chaining.
 
 #### <a name="css_css_at">at</a>
 ```typescript
