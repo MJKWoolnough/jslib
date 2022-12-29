@@ -189,8 +189,10 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	}
 }));
 
-export default (fn, options = {}) => {
-	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
+export default (optionsOrFn, fn) => {
+	fn ??= optionsOrFn;
+	const options = optionsOrFn instanceof Function ? {} : optionsOrFn,
+	      {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = psuedo ? class extends extend(getPsuedo(attrs, observeChildren)) {

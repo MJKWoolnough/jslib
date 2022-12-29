@@ -39,7 +39,7 @@ type ConstructorOf<C> = {
 
 export type Extender = {new(...a: any[]): HTMLElement};
 
-type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V>(fn: (elem: T & V) => Children, options?: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>}) => U extends {classOnly: true} ? ConstructorOf<T & V> : DOMBind<T & V>;
+type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = (<V>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>}, fn: (elem: T & V) => Children) => U extends {classOnly: true} ? ConstructorOf<T & V> : DOMBind<T & V>);
 
 type WithClass<U extends Options> = OptionsFactory<U & {classOnly?: false}> & OptionsFactory<U & {classOnly: true}>;
 
@@ -47,7 +47,7 @@ type WithChildren<U extends Options> = WithClass<U & {observeChildren?: true}> &
 
 type WithAttrs<U extends Options> = WithChildren<U & {attrs?: true}> & WithChildren<U & {attrs: false}>;
 
-type ElementFactory = WithAttrs<{psuedo?: false}> & WithAttrs<{psuedo: true}>;
+type ElementFactory = WithAttrs<{psuedo?: false}> & WithAttrs<{psuedo: true}> & ((fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>);
 
 class BindFn extends Bind {
 	#fn: AttrFn;
@@ -237,8 +237,10 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	}
 }));
 
-export default ((fn: (elem: Node) => Children, options: Options = {}) => {
-	const {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
+export default ((optionsOrFn: ((elem: Node) => Children) | Options, fn: (elem: Node) => Children) => {
+	fn ??= optionsOrFn as (elem: Node) => Children;
+	const options = optionsOrFn instanceof Function ? {} : optionsOrFn,
+	      {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = psuedo ? class extends (extend as (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V))(getPsuedo(attrs, observeChildren)) {
