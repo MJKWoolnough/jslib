@@ -23,13 +23,13 @@ type AttrFn = (newValue: ToString) => ToString | void;
 
 type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
-interface AttrClass {
+type AttrClass = {
 	act(name: string | string[], fn: Function): void;
 	attr(name: string[], fn: Function): Bind;
 	attr(name: string, fn?: Function): Bind;
 }
 
-interface ChildClass {
+type ChildClass = {
 	observeChildren(fn: ChildWatchFn): void;
 }
 
@@ -37,11 +37,13 @@ type ConstructorOf<C> = {
 	new(...args: any[]): C;
 }
 
-type OptionsFactory <T extends HTMLElement | DocumentFragment, U extends Options> = <X extends {}, V extends T & X = T & X, ClassOnly extends boolean = false>(fn: (elem: V) => Children, options?: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<V>, classOnly?: ClassOnly}) => ClassOnly extends true ? ConstructorOf<V> : DOMBind<V>;
+type OptionsFactory <T extends HTMLElement | DocumentFragment, U extends Options> = <V extends T, ClassOnly extends boolean = false>(fn: (elem: V) => Children, options?: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<V>, classOnly?: ClassOnly}) => ClassOnly extends true ? ConstructorOf<V> : DOMBind<V>;
 
-type HTMLElementORDocumentFragmentFactory<T extends HTMLElement | DocumentFragment, U extends {psuedo?: boolean}> = OptionsFactory<T & AttrClass & ChildClass, {attrs?: true, observeChildren?: true} & U> & OptionsFactory<T & ChildClass, {attrs: false, observeChildren?: true} & U> & OptionsFactory<T & AttrClass, {attrs?: true, observeChildren: false} & U> & OptionsFactory<T, {attrs: false, observeChildren: false} & U>;
+type WithChildren<T extends HTMLElement | DocumentFragment, U extends Options> = OptionsFactory<T, U & {observeChildren: false}> & OptionsFactory<T & ChildClass, U & {observeChildren?: true}>;
 
-type ElementFactory = HTMLElementORDocumentFragmentFactory<HTMLElement, {psuedo?: false}> & HTMLElementORDocumentFragmentFactory<DocumentFragment, {psuedo: true}>;
+type WithAttrs<T extends HTMLElement | DocumentFragment, U extends Options> = WithChildren<T, U & {attrs: false}> & WithChildren<T & AttrClass, U & {attrs?: true}>;
+
+type ElementFactory = WithAttrs<HTMLElement, {psuedo?: false}> & WithAttrs<DocumentFragment, {psuedo: true}>;
 
 class BindFn extends Bind {
 	#fn: AttrFn;
