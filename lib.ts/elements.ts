@@ -37,13 +37,15 @@ type ConstructorOf<C> = {
 	new(...args: any[]): C;
 }
 
-type OptionsFactory <T extends HTMLElement | DocumentFragment, U extends Options> = <V extends T, ClassOnly extends boolean = false>(fn: (elem: V) => Children, options?: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<V>, classOnly?: ClassOnly}) => ClassOnly extends true ? ConstructorOf<V> : DOMBind<V>;
+type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V extends T>(fn: (elem: V) => Children, options?: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<V>}) => U extends {classOnly: true} ? ConstructorOf<V> : DOMBind<V>;
 
-type WithChildren<T extends HTMLElement | DocumentFragment, U extends Options> = OptionsFactory<T, U & {observeChildren: false}> & OptionsFactory<T & ChildClass, U & {observeChildren?: true}>;
+type WithClass<U extends Options> = OptionsFactory<U & {classOnly: true}> & OptionsFactory<U & {classOnly?: false}>;
 
-type WithAttrs<T extends HTMLElement | DocumentFragment, U extends Options> = WithChildren<T, U & {attrs: false}> & WithChildren<T & AttrClass, U & {attrs?: true}>;
+type WithChildren<U extends Options> = WithClass<U & {observeChildren: false}> & WithClass<U & {observeChildren?: true}>;
 
-type ElementFactory = WithAttrs<HTMLElement, {psuedo?: false}> & WithAttrs<DocumentFragment, {psuedo: true}>;
+type WithAttrs<U extends Options> = WithChildren<U & {attrs: false}> & WithChildren<U & {attrs?: true}>;
+
+type ElementFactory = WithAttrs<{psuedo?: false}> & WithAttrs<{psuedo: true}>;
 
 class BindFn extends Bind {
 	#fn: AttrFn;
