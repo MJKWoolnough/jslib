@@ -783,13 +783,13 @@ This module directly imports the [dom](#dom) and [html](#html) modules.
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
 | [(default)](#elements_default) | Function | A factory function used to create custom elements. |
-| [Extender](#element_extender) | Type | A convenience type to aid with creating `extend` mixin functions. |
 | [Null](#elements_null) | Object | The default value of attributes used in the attr and act methods of a custom element. |
 
 ### <a name="elements_default">(default)</a>
 ```typescript
-(fn: (elem: T) => Children, options?: Options) => DOMBind<T>;
-(fn: (elem: T) => Children, options?: Options & {classOnly: true}) => ConstructorOf<T>;
+(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>;
+(options: Options, fn: (elem: T) => Children) => DOMBind<T>;
+(options: Options & {classOnly: true}, fn: (elem: T) => Children) => ConstructorOf<T>;
 ```
 
 The default export of the elements module is a function that can be used to create custom elements. The Type `T` is determined by the [Options](#elements_options) provided. The following table shows how setting options affects the type of `T`.
@@ -841,16 +841,6 @@ This class is added to an element created with the [(default)](#elements_default
 The observeChildren method sets a callback function that will be called whenever children are added or removed from the element, with the lists of added and removed children.
 
 NB: For psuedo-elements, the callback function will not be triggered during construction.
-
-### <a name="elements_extender">Extender</a>
-
-This type is used for less painful creation of `extend` mixin functions. It is used as the generic extend component of the mixin function, like the following:
-
-```typescript
-<T extends Extender>(base: T) => class extends base {someValue = 123;}
-```
-
-This is required to allow typescript to figure out the final, extended class type.
 
 ### <a name="elements_null">Null</a>
 
