@@ -2929,6 +2929,21 @@ type Tests = {
 				window.dispatchEvent(new FocusEvent("blur"));
 				stop(false);
 				return res === 3;
+			},
+			"change key": async () => {
+				let res = 0;
+				const {keyEvent} = await import("./lib/events.js"),
+				      key = "Custom28",
+				      newKey = "Custom29",
+				      [start, stop, change] = keyEvent(key, () => res++, () => res *= 3);
+				start();
+				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+				window.dispatchEvent(new KeyboardEvent("keydown", {"key": newKey}));
+				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+				change(newKey);
+				window.dispatchEvent(new KeyboardEvent("keydown", {"key": newKey}));
+				stop();
+				return res === 12;
 			}
 		},
 		"key combinations": {
