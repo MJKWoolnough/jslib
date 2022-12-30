@@ -901,14 +901,16 @@ This function returns true if any function is currently active for the passed ke
 
 ### <a name="events_keyevent">keyEvent</a>
 ```typescript
-(key: string | string[], onkeydown?: (e: KeyboardEvent) => void, onkeyup?: (e: KeyboardEvent) => void, once = false) => [() => void, (now = true) => void];
+(key: string | string[], onkeydown?: (e: KeyboardEvent) => void, onkeyup?: (e: KeyboardEvent) => void, once = false) => [() => void, (now = true) => void, (newKey: string | string[], now = true) => void];
 ```
 
 This function takes a key combination or array of key combinations, an optional [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent) function to act as the keydown event handler, an optional [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent) function to act as the keyup handler, and an optional boolean (default false) to determine if the event only runs one time per activation.
 
 The key combinations are strings which can contain key names as determined by the [KeyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value, and can be prefixed by any number of the following: `Alt+`, `Option+`, `Control+`, `Ctrl+`, `Command+`, `Meta+`, `Super+`, `Windows+`, and `Shift+`.
 
-The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function.
+The function returns an array of three functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function.
+
+The last function returned, allows the registered key(s) to be changed to the newKey string/array passed. The now param will be passed to the stop function when cancelling the previously assigned keys.
 
 NB: If the window loses focus, the module will generate a keyup event. This can be detected be checking the [Event.isTrusted](https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted) field.
 
