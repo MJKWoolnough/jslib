@@ -97,9 +97,8 @@ mouseY = 0;
 export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
 	const keydown = [onkeydown, once],
 	      keyup = [onkeyup, once],
-	      keys = (typeof key === "string" ? [key] : key).filter(k => !!k).map(parseCombination);
-	return [
-		() => {
+	      keys = (typeof key === "string" ? [key] : key).filter(k => !!k).map(parseCombination),
+	      start = () => {
 			for (const kc of keys) {
 				if (onkeydown) {
 					const kh = held.has(kc),
@@ -115,13 +114,29 @@ export const keyEvent = (key, onkeydown, onkeyup, once = false) => {
 					getSet(ups, kc).add(keyup);
 				}
 			}
-		},
-		(now = true) => {
-			for (const kc of keys) {
-				const toRun = now && held.has(kc) && ups.get(kc)?.has(keyup) ? keyup[0] : null;
-				downs.get(kc)?.delete(keydown);
-				ups.get(kc)?.delete(keyup);
-				toRun?.(ke("up", kc));
+			started = true;
+	      },
+	      stop = (now = true) => {
+		for (const kc of keys) {
+			const toRun = now && held.has(kc) && ups.get(kc)?.has(keyup) ? keyup[0] : null;
+			downs.get(kc)?.delete(keydown);
+			ups.get(kc)?.delete(keyup);
+			toRun?.(ke("up", kc));
+		}
+		started = false;
+	      };
+	let started = false;
+	return [
+		start,
+		stop,
+		(newKey, now = true) => {
+			const s = started;
+			if (s) {
+				stop(now);
+			}
+			keys.splice(0, keys.length, ...(typeof newKey === "string" ? [newKey] : newKey).filter(k => !!k).map(parseCombination));
+			if (s) {
+				start();
 			}
 		}
 	];
