@@ -37,7 +37,7 @@ type ConstructorOf<C> = {
 	new(...args: any[]): C;
 }
 
-type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = (<V>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>}, fn: (elem: T & V) => Children) => U extends {classOnly: true} ? ConstructorOf<T & V> : DOMBind<T & V>);
+type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>}, fn: (elem: T & V) => Children) => U extends {classOnly: true} ? ConstructorOf<T & V> : DOMBind<T & V>;
 
 type WithClass<U extends Options> = OptionsFactory<U & {classOnly?: false}> & OptionsFactory<U & {classOnly: true}>;
 
