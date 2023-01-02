@@ -92,7 +92,7 @@ export class WSConn extends WebSocket {
 	constructor(url: string, protocols?: string | string[]) {
 		super(new URL(url, base), protocols);
 	}
-	when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: string) => U) {
+	when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: Error) => U) {
 		return new Subscription<MessageEvent>((sFn, eFn, cFn) => {
 			const w = this,
 			      ac = new AbortController(),
