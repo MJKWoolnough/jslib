@@ -17,7 +17,6 @@ const childrenArr = (children, res = []) => {
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object && !(prop instanceof Binder),
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binder)),
-      isChildren = properties => typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder,
       isNodeAttributes = n => !!n.style && !!n.classList && !!n.getAttributeNode && !!n.removeAttribute && !!n.setAttribute && !!n.toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
@@ -111,7 +110,8 @@ export class Bind extends Binder {
 	}
 }
 
-export const amendNode = (node, properties, children) => {
+export const isChildren = properties => typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder,
+amendNode = (node, properties, children) => {
 	if (properties && isChildren(properties)) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {

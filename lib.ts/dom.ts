@@ -69,7 +69,6 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object && !(prop instanceof Binder),
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binder)),
-      isChildren = (properties: Props | Children): properties is Children => typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder,
       isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).getAttributeNode && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttribute && !!(n as NodeAttributes).toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
@@ -164,7 +163,8 @@ export class Bind<T extends ToString = ToString> extends Binder {
 	}
 }
 
-export const amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children, children?: Children) => {
+export const isChildren = (properties: Props | Children): properties is Children => typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder,
+amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children, children?: Children) => {
 	if (properties && isChildren(properties)) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
