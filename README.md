@@ -790,7 +790,9 @@ This module directly imports the [dom](#dom) and [html](#html) modules.
 ```typescript
 (fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>;
 (options: Options, fn: (elem: T) => Children) => DOMBind<T>;
-(options: Options & {classOnly: true}, fn: (elem: T) => Children) => ConstructorOf<T>;
+(options: Options & {classOnly: true}, fn: (elem: T) => Children) => {new() => T};
+(options: Options & {args: string[]}, fn: (...args: ToString[], elem: T) => Children) => DOMBind<T>;
+(options: Options & {args: string[], classOnly: true}, fn: (...args: ToString[], elem: T) => Children) => {new(...args: ToString[]) => T};
 ```
 
 The default export of the elements module is a function that can be used to create custom elements. The Type `T` is determined by the [Options](#elements_options) provided. The following table shows how setting options affects the type of `T`.
@@ -806,7 +808,9 @@ The default export of the elements module is a function that can be used to crea
 | false   | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [ChildClass](#elements_childclass) |
 | false   | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) |
 
-In addition, the type T can be further modified by the use of the `extend` Option, which will add a custom class to the prototype chain, allowing its methods and field to be used, including during the `fn` call.
+In addition, the type T can be further modified by the use of the `extend` Option, which will add a custom class to the prototype chain, allowing its methods and field to be used, including during the intialising `fn` call.
+
+When the `args` Option is specified, the `fn` call (and the `classOnly` constructor) gain a number of parameters equal to the number of strings specified. For the [DOMBind](#dom_dombind) output, these parameters are set in the [Props](#dom_props) object passed to the function with the key being the name specified in the array. For the `classOnly` output, these values must be specified manually in the constructor call.
 
 The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the psuedo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the psuedo Option is true.
 
@@ -852,6 +856,7 @@ As this may be passed to any function passed to the act and attr methods, it sho
 ### <a name="elements_options">Options</a>
 ```typescript
 type Options = {
+	args: string[];
 	attachRemoveEvent?: boolean;
 	attrs?: boolean;
 	classOnly?: boolean;
@@ -869,6 +874,7 @@ This unexported type is used to change how the elements are created and controll
 
 |  Options          |  Default  |  Description  |
 |-------------------|-----------|---------------|
+| args              | []        | Each string of this array is a reference to an parameter that is passed to the initialising function. The value for each parameter is taken either from the properties object passed to the [DOMBind](#dom_dombind) creation function, or are specified directly in the constructor of the `classOnly` generated class. |
 | attachRemoveEvent | true      | When true, the resulting created element will send an 'attached' event when the element is attached to the document, and a 'removed' event when removed from the document. Has no effect when 'psuedo' is set to true. |
 | attrs             | true      | When true, enables both the 'act' and 'attr' methods on the element class. |
 | classOnly         | false     | When true, the return from the default function will be the generated class, when false the return from the default function will be a [DOMBind](#dom_dombind). If the 'name' option is set to empty string, the class will *not* be registered with the [Custom Elements Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). |
