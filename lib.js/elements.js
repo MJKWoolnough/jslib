@@ -229,7 +229,7 @@ export default (optionsOrFn, fn) => {
 				pos++;
 			}
 		} else {
-			props = children;
+			props = properties;
 		}
 		return amendNode(new element(...eArgs), props, children)
 	}, "name", {"value": name});

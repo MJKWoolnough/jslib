@@ -278,7 +278,7 @@ export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | O
 				pos++;
 			}
 		} else {
-			props = children;
+			props = properties;
 		}
 		return amendNode(new element(...eArgs), props, children)
 	}, "name", {"value": name});
