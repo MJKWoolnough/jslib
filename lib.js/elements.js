@@ -1,5 +1,4 @@
-import {Bind, amendNode, bind, bindElement} from './dom.js';
-import {ns} from './html.js';
+import {Bind, amendNode, bind, isChildren} from './dom.js';
 
 class BindFn extends Bind {
 	#fn;
@@ -192,25 +191,45 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 export default (optionsOrFn, fn) => {
 	fn ??= optionsOrFn;
 	const options = optionsOrFn instanceof Function ? {} : optionsOrFn,
-	      {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
+	      {args = [], attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = psuedo ? class extends extend(getPsuedo(attrs, observeChildren)) {
-		constructor() {
+		constructor(...args) {
 			super();
-			amendNode(this, fn(this));
+			args.push(this);
+			amendNode(this, fn.apply(null, args));
 			if (observeChildren) {
 				childObserver.observe(this, childList);
 			}
 		}
 	      } : class extends extend(getClass(attachRemoveEvent, attrs, observeChildren)) {
-		constructor() {
+		constructor(...args) {
 			super();
-			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = styles;
+			args.push(this);
+			amendNode(this.attachShadow(shadowOptions), fn.apply(null, args)).adoptedStyleSheets = styles;
 		}
 	      };
 	if (!psuedo && !(classOnly && name === "")) {
 		customElements.define(name, element);
 	}
-	return classOnly ? element : psuedo ? (properties, children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
+	return Object.assign(classOnly ? element : (properties, children) => {
+		const eArgs = args.map(() => Null);
+		let props = {};
+		if (properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
+			let pos = 0;
+			for (const a of args) {
+				const v = properties[a];
+				if (v) {
+					eArgs[pos] = v;
+				} else {
+					props[a] = v;
+				}
+				pos++;
+			}
+		} else {
+			props = children;
+		}
+		return amendNode(new element(...eArgs), props, children)
+	}, {name});
 };

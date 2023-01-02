@@ -1,8 +1,8 @@
 import type {Children, DOMBind, Props} from './dom.js';
-import {Bind, amendNode, bind, bindElement} from './dom.js';
-import {ns} from './html.js';
+import {Bind, amendNode, bind, isChildren} from './dom.js';
 
 type Options = {
+	args?: string[];
 	manualSlot?: boolean;
 	delegatesFocus?: boolean;
 	attrs?: boolean;
@@ -37,7 +37,9 @@ type ConstructorOf<C> = {
 	new(...args: any[]): C;
 }
 
-type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>}, fn: (elem: T & V) => Children) => U extends {classOnly: true} ? ConstructorOf<T & V> : DOMBind<T & V>;
+type ToStringArray<N extends number, U extends ToString[] = []> = U['length'] extends N ? U : ToStringArray<N, [ToString, ...U]>;
+
+type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: [string, ...string[]] & {length: W}}, fn: (...args: [...ToStringArray<W>, T & V]) => Children) => U extends {classOnly: true} ? {new(...args: [...ToStringArray<W>]): T & V}  : DOMBind<T & V>;
 
 type WithClass<U extends Options> = OptionsFactory<U & {classOnly?: false}> & OptionsFactory<U & {classOnly: true}>;
 
@@ -235,28 +237,48 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	}
 }));
 
-export default ((optionsOrFn: ((elem: Node) => Children) | Options, fn: (elem: Node) => Children) => {
-	fn ??= optionsOrFn as (elem: Node) => Children;
+export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | Options, fn: (...args: [...ToString[], Node]) => Children) => {
+	fn ??= optionsOrFn as (...args: [...ToString[], Node]) => Children;
 	const options = optionsOrFn instanceof Function ? {} : optionsOrFn,
-	      {attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
+	      {args = [], attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
 	      {name = psuedo ? "" : genName()} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = psuedo ? class extends (extend as (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V))(getPsuedo(attrs, observeChildren)) {
-		constructor() {
+		constructor(...args: ToString[]) {
 			super();
-			amendNode(this, fn(this));
+			args.push(this);
+			amendNode(this, fn.apply(null, args as [...ToString[], this]));
 			if (observeChildren) {
 				childObserver.observe(this, childList);
 			}
 		}
 	      } : class extends (extend as (<T extends ConstructorOf<HTMLElement>, V extends T>(base: T) => V))(getClass(attachRemoveEvent, attrs, observeChildren)) {
-		constructor() {
+		constructor(...args: ToString[]) {
 			super();
-			amendNode(this.attachShadow(shadowOptions), fn(this)).adoptedStyleSheets = styles;
+			args.push(this);
+			amendNode(this.attachShadow(shadowOptions), fn.apply(null, args as [...ToString[], this])).adoptedStyleSheets = styles;
 		}
 	      };
 	if (!psuedo && !(classOnly && name === "")) {
 		customElements.define(name, element as CustomElementConstructor);
 	}
-	return classOnly ? element : psuedo ? (properties?: Props, children?: Children) => amendNode(new element(), properties, children) : bindElement<HTMLElement>(ns, name);
+	return Object.assign(classOnly ? element : (properties?: Props | Children, children?: Children) => {
+		const eArgs: ToString[] = args.map(() => Null);
+		let props: Props | Children | undefined = {};
+		if (properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
+			let pos = 0;
+			for (const a of args) {
+				const v = properties[a];
+				if (v) {
+					eArgs[pos] = v;
+				} else {
+					props[a] = v;
+				}
+				pos++;
+			}
+		} else {
+			props = children;
+		}
+		return amendNode(new element(...eArgs), props, children)
+	}, {name});
 }) as ElementFactory;
