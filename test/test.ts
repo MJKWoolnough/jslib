@@ -3952,6 +3952,42 @@ type Tests = {
 				// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 				// Works when using non-dynamic import.
 				return t[node] === t;
+			},
+			"args": async() => {
+				const {default: e} = await import("./lib/elements.js"),
+				      t = e({"args": ["a", "b"]}, (a, b, e) => {
+					if (a === 1) {
+						res += 1;
+					}
+					if (b === 2) {
+						res += 2;
+					}
+					if (e instanceof HTMLElement) {
+						res *= 3;
+					}
+					return [];
+				      });
+				let res = 0;
+				t({"a": 1, "b": 2});
+				return res === 9;
+			},
+			"args (classOnly)": async() => {
+				const {default: e} = await import("./lib/elements.js"),
+				      t = e({"classOnly": true, "args": ["a", "b"]}, (a, b, e) => {
+					if (a === 1) {
+						res += 1;
+					}
+					if (b === 2) {
+						res += 2;
+					}
+					if (e instanceof HTMLElement) {
+						res *= 3;
+					}
+					return [];
+				      });
+				let res = 0;
+				new t(1, 2);
+				return res === 9;
 			}
 		},
 		"observeChildren": {
