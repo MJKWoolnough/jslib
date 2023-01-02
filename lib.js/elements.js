@@ -215,15 +215,16 @@ export default (optionsOrFn, fn) => {
 	}
 	return Object.defineProperty(classOnly ? element : (properties, children) => {
 		const eArgs = args.map(() => Null);
-		let props = {};
+		let props;
 		if (properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
 			let pos = 0;
+			props = Object.assign({}, properties);
 			for (const a of args) {
 				const v = properties[a];
 				if (v) {
 					eArgs[pos] = v;
 				} else {
-					props[a] = v;
+					delete props[a];
 				}
 				pos++;
 			}
