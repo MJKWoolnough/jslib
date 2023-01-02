@@ -519,6 +519,7 @@ The dom module can be used to manipulate DOM elements.
 | eventOnce | Number | Can be passed to the [event](#dom_event) function to set the `once` property on an event. |
 | eventPassive | Number| Can be passed to the [event](#dom_event) function to set the `passive` property on an event. |
 | eventRemove | Number | Can be passed to the [event](#dom_event) function to set the event to be removed. |
+| isChildren | Function | This function determines whether the passed in object can be used as a [Children](#dom_children) type. |
 | <a name="dom_props">Props</a> | Type | A [PropsObject](#dom_propsobject) or [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap). |
 | [PropsObject](#dom_propsobject) | Type | This object is used to set attributes and events on a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget with the [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode) functions. |
 
