@@ -6,12 +6,12 @@ type MessageData = {
 	error?: RPCError;
 }
 
-type handler = [(data: any) => void, (data: RPCError) => void];
+type handler = [(data: any) => void, (data: Error) => void];
 
 interface Conn {
 	close: () => void;
 	send: (data: string) => void;
-	when: (sFn: (data: {data: string}) => void, eFn: (error: string) => void) => void;
+	when: (sFn: (data: {data: string}) => void, eFn: (error: Error) => void) => void;
 }
 
 const noop = () => {},
@@ -22,7 +22,7 @@ const noop = () => {},
 	return s;
       };
 
-export class RPCError {
+export class RPCError implements Error {
 	code: number;
 	message: string;
 	data?: any;
@@ -31,6 +31,9 @@ export class RPCError {
 		this.message = message;
 		this.data = data;
 		Object.freeze(this);
+	}
+	get name() {
+		return "RPCError";
 	}
 	toString() {
 		return this.message;
@@ -62,13 +65,12 @@ export class RPC {
 			}
 		}, err => {
 			this.close();
-			const e = new RPCError(-999, err);
 			for (const [, r] of this.#r) {
-				r[1](e);
+				r[1](err);
 			}
 			for (const [, s] of this.#a) {
 				for (const r of s) {
-					r[1](e);
+					r[1](err);
 				}
 			}
 		});

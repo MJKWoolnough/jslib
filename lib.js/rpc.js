@@ -15,6 +15,9 @@ export class RPCError {
 		this.data = data;
 		Object.freeze(this);
 	}
+	get name() {
+		return "RPCError";
+	}
 	toString() {
 		return this.message;
 	}
@@ -45,13 +48,12 @@ export class RPC {
 			}
 		}, err => {
 			this.close();
-			const e = new RPCError(-999, err);
 			for (const [, r] of this.#r) {
-				r[1](e);
+				r[1](err);
 			}
 			for (const [, s] of this.#a) {
 				for (const r of s) {
-					r[1](e);
+					r[1](err);
 				}
 			}
 		});
