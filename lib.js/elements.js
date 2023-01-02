@@ -215,7 +215,7 @@ export default (optionsOrFn, fn) => {
 	}
 	return Object.defineProperty(classOnly ? element : (properties, children) => {
 		const eArgs = args.map(() => Null);
-		let props;
+		let props = properties;
 		if (args.length && properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
 			let pos = 0;
 			props = Object.assign({}, properties);
@@ -228,8 +228,6 @@ export default (optionsOrFn, fn) => {
 				}
 				pos++;
 			}
-		} else {
-			props = properties;
 		}
 		return amendNode(new element(...eArgs), props, children)
 	}, "name", {"value": name});

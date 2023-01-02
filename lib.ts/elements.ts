@@ -264,7 +264,7 @@ export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | O
 	}
 	return Object.defineProperty(classOnly ? element : (properties?: Props | Children, children?: Children) => {
 		const eArgs: ToString[] = args.map(() => Null);
-		let props: Props | Children | undefined;
+		let props = properties;
 		if (args.length && properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
 			let pos = 0;
 			props = Object.assign({}, properties);
@@ -277,8 +277,6 @@ export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | O
 				}
 				pos++;
 			}
-		} else {
-			props = properties;
 		}
 		return amendNode(new element(...eArgs), props, children)
 	}, "name", {"value": name});
