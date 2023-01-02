@@ -213,7 +213,7 @@ export default (optionsOrFn, fn) => {
 	if (!psuedo && !(classOnly && name === "")) {
 		customElements.define(name, element);
 	}
-	return Object.assign(classOnly ? element : (properties, children) => {
+	return Object.defineProperty(classOnly ? element : (properties, children) => {
 		const eArgs = args.map(() => Null);
 		let props = {};
 		if (properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
@@ -231,5 +231,5 @@ export default (optionsOrFn, fn) => {
 			props = children;
 		}
 		return amendNode(new element(...eArgs), props, children)
-	}, {name});
+	}, "name", {"value": name});
 };

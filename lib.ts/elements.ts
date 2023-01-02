@@ -262,7 +262,7 @@ export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | O
 	if (!psuedo && !(classOnly && name === "")) {
 		customElements.define(name, element as CustomElementConstructor);
 	}
-	return Object.assign(classOnly ? element : (properties?: Props | Children, children?: Children) => {
+	return Object.defineProperty(classOnly ? element : (properties?: Props | Children, children?: Children) => {
 		const eArgs: ToString[] = args.map(() => Null);
 		let props: Props | Children | undefined = {};
 		if (properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
@@ -280,5 +280,5 @@ export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | O
 			props = children;
 		}
 		return amendNode(new element(...eArgs), props, children)
-	}, {name});
+	}, "name", {"value": name});
 }) as ElementFactory;
