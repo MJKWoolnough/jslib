@@ -216,7 +216,7 @@ export default (optionsOrFn, fn) => {
 	return Object.defineProperty(classOnly ? element : (properties, children) => {
 		const eArgs = args.map(() => Null);
 		let props;
-		if (properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
+		if (args.length && properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
 			let pos = 0;
 			props = Object.assign({}, properties);
 			for (const a of args) {

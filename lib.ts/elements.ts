@@ -265,7 +265,7 @@ export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | O
 	return Object.defineProperty(classOnly ? element : (properties?: Props | Children, children?: Children) => {
 		const eArgs: ToString[] = args.map(() => Null);
 		let props: Props | Children | undefined;
-		if (properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
+		if (args.length && properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
 			let pos = 0;
 			props = Object.assign({}, properties);
 			for (const a of args) {
