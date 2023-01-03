@@ -39,7 +39,7 @@ type ConstructorOf<C> = {
 
 type ToStringArray<N extends number, U extends ToString[] = []> = U['length'] extends N ? U : ToStringArray<N, [ToString, ...U]>;
 
-type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: [string, ...string[]] & {length: W}}, fn: (...args: [...ToStringArray<W>, T & V]) => Children) => U extends {classOnly: true} ? {new(...args: [...ToStringArray<W>]): T & V}  : DOMBind<T & V>;
+type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: [string, ...string[]] & {length: W}}, fn: (...args: [...ToStringArray<W>, T & V]) => Children) => U extends {classOnly: true} ? {new(...args: [...ToStringArray<W>]): T & V} : DOMBind<T & V>;
 
 type WithClass<U extends Options> = OptionsFactory<U & {classOnly?: false}> & OptionsFactory<U & {classOnly: true}>;
 
