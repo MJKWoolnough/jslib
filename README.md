@@ -533,7 +533,7 @@ interface {
 }
 ```
 
-This fuction is used to set attributes and children on [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s, and events on [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s and other [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget)s.
+This function is used to set attributes and children on [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s, and events on [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s and other [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget)s.
 
 If the element passed is a [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) or [SVGElement](https://developer.mozilla.org/en-US/docs/Web/API/SVGElement), then a properties param is processed, applying attributes as per the [PropsObject](#dom_propsobject) type. Likewise, any events are set or unset on a passed [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), as per the [PropsObject](#dom_propsobject) type.
 
