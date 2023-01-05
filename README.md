@@ -797,7 +797,7 @@ This module directly imports the [dom](#dom) and [html](#html) modules.
 
 The default export of the elements module is a function that can be used to create custom elements. The Type `T` is determined by the [Options](#elements_options) provided. The following table shows how setting options affects the type of `T`.
 
-|  attrs  |  observeChildren  |  psuedo  |  T  |
+|  attrs  |  observeChildren  |  pseudo  |  T  |
 |---------|-------------------|----------|-----|
 | true    | true              | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [AttrClass](#elements_attrclass) & [ChildClass](#elements_childclass) |
 | true    | false             | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [AttrClass](#elements_attrclass) |
@@ -865,7 +865,7 @@ type Options = {
 	manualSlot?: boolean;
 	name?: string;
 	observeChildren?: boolean;
-	psuedo?: boolean;
+	pseudo?: boolean;
 	styles?: [CSSStyleSheet];
 }
 ```
@@ -875,16 +875,16 @@ This unexported type is used to change how the elements are created and controll
 |  Options          |  Default  |  Description  |
 |-------------------|-----------|---------------|
 | args              | []        | Each string of this array is a reference to an parameter that is passed to the initialising function. The value for each parameter is taken either from the properties object passed to the [DOMBind](#dom_dombind) creation function, or are specified directly in the constructor of the `classOnly` generated class. |
-| attachRemoveEvent | true      | When true, the resulting created element will send an 'attached' event when the element is attached to the document, and a 'removed' event when removed from the document. Has no effect when 'psuedo' is set to true. |
+| attachRemoveEvent | true      | When true, the resulting created element will send an 'attached' event when the element is attached to the document, and a 'removed' event when removed from the document. Has no effect when 'pseudo' is set to true. |
 | attrs             | true      | When true, enables both the 'act' and 'attr' methods on the element class. |
 | classOnly         | false     | When true, the return from the default function will be the generated class, when false the return from the default function will be a [DOMBind](#dom_dombind). If the 'name' option is set to empty string, the class will *not* be registered with the [Custom Elements Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). |
-| delegatesFocus    | false     | When true, sets the delegatesFocus option during attachShadow call to true. Has no effect when 'psuedo' is set to true. |
+| delegatesFocus    | false     | When true, sets the delegatesFocus option during attachShadow call to true. Has no effect when 'pseudo' is set to true. |
 | extend            | e => e    | Allows the generated class to be extended with a custom class. This extension will be applied before the passed fn function is called. |
-| manualSlot        | false     | When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'psuedo' is set to true. |
-| name              | undefined | Registers a custom element name for the generated element class, instead of a randomly generated one. Has no effect when 'psuedo' is set to true. |
+| manualSlot        | false     | When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'pseudo' is set to true. |
+| name              | undefined | Registers a custom element name for the generated element class, instead of a randomly generated one. Has no effect when 'pseudo' is set to true. |
 | observeChildren   | true      | When true, enables the observeChildren method on the element class. |
-| psuedo            | false     | When true, the class created is extended from DocumentFragment, instead of HTMLElement, and does not register a custom element. This will act, in many ways, like a custom element, but without a Shadow Root, any children are attached directly to the DOM on appending. |
-| styles            | []        | Sets the adoptedStyleSheets options on the Shadow Root. Has no effect when 'psuedo' is set to true. |
+| pseudo            | false     | When true, the class created is extended from DocumentFragment, instead of HTMLElement, and does not register a custom element. This will act, in many ways, like a custom element, but without a Shadow Root, any children are attached directly to the DOM on appending. |
+| styles            | []        | Sets the adoptedStyleSheets options on the Shadow Root. Has no effect when 'pseudo' is set to true. |
 
 ## <a name="events">events</a>
 
