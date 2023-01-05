@@ -32,13 +32,14 @@ const windowObservations = {
 			">div": {
 				"width": "200px",
 				"position": "relative",
-				"pointer-events": "auto",
 				">windows-window": {
 					"min-height": "auto",
 					"position": "static",
+					"pointer-events": "auto",
 					"--overlay-on": "none",
 					":not([maximised])": {
-						"visibility": "hidden"
+						"pointer-events": "none",
+						"visibility": "hidden",
 					}
 				}
 			}
