@@ -845,7 +845,7 @@ This class is added to an element created with the [(default)](#elements_default
 
 The observeChildren method sets a callback function that will be called whenever children are added or removed from the element, with the lists of added and removed children.
 
-NB: For psuedo-elements, the callback function will not be triggered during construction.
+NB: For pseudo-elements, the callback function will not be triggered during construction.
 
 ### <a name="elements_null">Null</a>
 
