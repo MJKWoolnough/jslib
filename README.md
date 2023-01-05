@@ -812,9 +812,9 @@ In addition, the type T can be further modified by the use of the `extend` Optio
 
 When the `args` Option is specified, the `fn` call (and the `classOnly` constructor) gain a number of parameters equal to the number of strings specified. For the [DOMBind](#dom_dombind) output, these parameters are set in the [Props](#dom_props) object passed to the function with the key being the name specified in the array. For the `classOnly` output, these values must be specified manually in the constructor call.
 
-The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the psuedo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the psuedo Option is true.
+The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the pseudo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the psuedo Option is true.
 
-If the `classOnly` Option is set to false (or unset), the resulting [DOMBind](#dom_dombind) can be used in the same way as any other DOMBind, creating your (psuedo-)element and applying the attributes and children accordingly.
+If the `classOnly` Option is set to false (or unset), the resulting [DOMBind](#dom_dombind) can be used in the same way as any other DOMBind, creating your (pseudo-)element and applying the attributes and children accordingly.
 
 If the `classOnly` Option is set to true, the function will just return the generated class constructor, without creating a DOMBind function.
 
