@@ -832,7 +832,7 @@ This class is added to an element created with the [(default)](#elements_default
 
 The `act` method allows actions to be taken when attributes on the element are changed. When monitoring a single attribute, the newValue will be the new value assigned to that attribute. When monitoring multiple attributes, an Object will be passed to the function with keys on the attribute names set to the value of that attribute.
 
-The `attr` method acts similarly to the `act` method, but will return a [Bind](#dom_bind). When monitoring a single attribute, the value of the Bind object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attriubtes, the value of the Bind object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
+The `attr` method acts similarly to the `act` method, but will return a [Bind](#dom_bind). When monitoring a single attribute, the value of the Bind object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Bind object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
 
 ### <a name="elements_childclass">ChildClass</a>
 ```typescript
