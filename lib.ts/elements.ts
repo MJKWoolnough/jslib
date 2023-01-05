@@ -9,7 +9,7 @@ type Options = {
 	observeChildren?: boolean;
 	attachRemoveEvent?: boolean;
 	styles?: [CSSStyleSheet];
-	psuedo?: boolean;
+	pseudo?: boolean;
 	name?: string;
 	extend?: Function;
 	classOnly?: boolean;
@@ -39,7 +39,7 @@ type ConstructorOf<C> = {
 
 type ToStringArray<N extends number, U extends ToString[] = []> = U['length'] extends N ? U : ToStringArray<N, [ToString, ...U]>;
 
-type OptionsFactory <U extends Options, T extends Node = (U extends {psuedo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: [string, ...string[]] & {length: W}}, fn: (...args: [...ToStringArray<W>, T & V]) => Children) => U extends {classOnly: true} ? {new(...args: [...ToStringArray<W>]): T & V} : DOMBind<T & V>;
+type OptionsFactory <U extends Options, T extends Node = (U extends {pseudo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: [string, ...string[]] & {length: W}}, fn: (...args: [...ToStringArray<W>, T & V]) => Children) => U extends {classOnly: true} ? {new(...args: [...ToStringArray<W>]): T & V} : DOMBind<T & V>;
 
 type WithClass<U extends Options> = OptionsFactory<U & {classOnly?: false}> & OptionsFactory<U & {classOnly: true}>;
 
@@ -47,7 +47,7 @@ type WithChildren<U extends Options> = WithClass<U & {observeChildren?: true}> &
 
 type WithAttrs<U extends Options> = WithChildren<U & {attrs?: true}> & WithChildren<U & {attrs: false}>;
 
-type ElementFactory = WithAttrs<{psuedo?: false}> & WithAttrs<{psuedo: true}> & ((fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>);
+type ElementFactory = WithAttrs<{pseudo?: false}> & WithAttrs<{pseudo: true}> & ((fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>);
 
 class BindFn extends Bind {
 	#fn: AttrFn;
@@ -177,9 +177,9 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
       } : HTMLElement,
-      psuedos: (ConstructorOf<DocumentFragment> | undefined)[] = Array.from({"length": 4}),
+      pseudos: (ConstructorOf<DocumentFragment> | undefined)[] = Array.from({"length": 4}),
       noop = () => {},
-      getPsuedo = (handleAttrs: boolean, children: boolean): ConstructorOf<DocumentFragment> => psuedos[+handleAttrs | (+children << 1)] ??= children ? class extends getPsuedo(handleAttrs, false) {
+      getPseudo = (handleAttrs: boolean, children: boolean): ConstructorOf<DocumentFragment> => pseudos[+handleAttrs | (+children << 1)] ??= children ? class extends getPseudo(handleAttrs, false) {
 	observeChildren(fn: ChildWatchFn) {
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
@@ -240,10 +240,10 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | Options, fn: (...args: [...ToString[], Node]) => Children) => {
 	fn ??= optionsOrFn as (...args: [...ToString[], Node]) => Children;
 	const options = optionsOrFn instanceof Function ? {} : optionsOrFn,
-	      {args = [], attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
-	      {name = psuedo ? "" : genName()} = options,
+	      {args = [], attachRemoveEvent = true, attrs = true, observeChildren = true, pseudo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
+	      {name = pseudo ? "" : genName()} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
-	      element = psuedo ? class extends (extend as (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V))(getPsuedo(attrs, observeChildren)) {
+	      element = pseudo ? class extends (extend as (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V))(getPseudo(attrs, observeChildren)) {
 		constructor(...args: ToString[]) {
 			super();
 			args.push(this);
@@ -259,7 +259,7 @@ export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | O
 			amendNode(this.attachShadow(shadowOptions), fn.apply(null, args as [...ToString[], this])).adoptedStyleSheets = styles;
 		}
 	      };
-	if (!psuedo && !(classOnly && name === "")) {
+	if (!pseudo && !(classOnly && name === "")) {
 		customElements.define(name, element as CustomElementConstructor);
 	}
 	return Object.defineProperty(classOnly ? element : (properties?: Props | Children, children?: Children) => {

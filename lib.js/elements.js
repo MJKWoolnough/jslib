@@ -128,9 +128,9 @@ const attrs = new WeakMap(),
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
       } : HTMLElement,
-      psuedos = Array.from({"length": 4}),
+      pseudos = Array.from({"length": 4}),
       noop = () => {},
-      getPsuedo = (handleAttrs, children) => psuedos[+handleAttrs | (+children << 1)] ??= children ? class extends getPsuedo(handleAttrs, false) {
+      getPseudo = (handleAttrs, children) => pseudos[+handleAttrs | (+children << 1)] ??= children ? class extends getPseudo(handleAttrs, false) {
 	observeChildren(fn) {
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
@@ -191,10 +191,10 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 export default (optionsOrFn, fn) => {
 	fn ??= optionsOrFn;
 	const options = optionsOrFn instanceof Function ? {} : optionsOrFn,
-	      {args = [], attachRemoveEvent = true, attrs = true, observeChildren = true, psuedo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
-	      {name = psuedo ? "" : genName()} = options,
+	      {args = [], attachRemoveEvent = true, attrs = true, observeChildren = true, pseudo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
+	      {name = pseudo ? "" : genName()} = options,
 	      shadowOptions = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
-	      element = psuedo ? class extends extend(getPsuedo(attrs, observeChildren)) {
+	      element = pseudo ? class extends extend(getPseudo(attrs, observeChildren)) {
 		constructor(...args) {
 			super();
 			args.push(this);
@@ -210,7 +210,7 @@ export default (optionsOrFn, fn) => {
 			amendNode(this.attachShadow(shadowOptions), fn.apply(null, args)).adoptedStyleSheets = styles;
 		}
 	      };
-	if (!psuedo && !(classOnly && name === "")) {
+	if (!pseudo && !(classOnly && name === "")) {
 		customElements.define(name, element);
 	}
 	return Object.defineProperty(classOnly ? element : (properties, children) => {
