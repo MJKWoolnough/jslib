@@ -849,7 +849,7 @@ NB: For pseudo-elements, the callback function will not be triggered during cons
 
 ### <a name="elements_null">Null</a>
 
-The Null value is used by the act and attrs methods to indicate the non-existance of a value. It can act as a noop function, an empty string, an empty iterator, and NaN depending on how it is used.
+The Null value is used by the act and attrs methods to indicate the non-existence of a value. It can act as a noop function, an empty string, an empty iterator, and NaN depending on how it is used.
 
 As this may be passed to any function passed to the act and attr methods, it should either be checked for directly (with an equality check), or used in a way in which it will be coerced to the correct data type.
 
