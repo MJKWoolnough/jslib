@@ -812,7 +812,7 @@ In addition, the type T can be further modified by the use of the `extend` Optio
 
 When the `args` Option is specified, the `fn` call (and the `classOnly` constructor) gain a number of parameters equal to the number of strings specified. For the [DOMBind](#dom_dombind) output, these parameters are set in the [Props](#dom_props) object passed to the function with the key being the name specified in the array. For the `classOnly` output, these values must be specified manually in the constructor call.
 
-The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the pseudo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the psuedo Option is true.
+The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the pseudo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the pseudo Option is true.
 
 If the `classOnly` Option is set to false (or unset), the resulting [DOMBind](#dom_dombind) can be used in the same way as any other DOMBind, creating your (pseudo-)element and applying the attributes and children accordingly.
 
@@ -832,7 +832,7 @@ This class is added to an element created with the [(default)](#elements_default
 
 The `act` method allows actions to be taken when attributes on the element are changed. When monitoring a single attribute, the newValue will be the new value assigned to that attribute. When monitoring multiple attributes, an Object will be passed to the function with keys on the attribute names set to the value of that attribute.
 
-The `attr` method acts similarly to the `act` method, but will return a [Bind](#dom_bind). When monitoring a single attribute, the value of the Bind object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attriubtes, the value of the Bind object will be set to the return of the fn function. The fn function works similary to that used in the `act` method.
+The `attr` method acts similarly to the `act` method, but will return a [Bind](#dom_bind). When monitoring a single attribute, the value of the Bind object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attriubtes, the value of the Bind object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
 
 ### <a name="elements_childclass">ChildClass</a>
 ```typescript
