@@ -37,9 +37,17 @@ type ConstructorOf<C> = {
 	new(...args: any[]): C;
 }
 
-type ToStringArray<N extends number, U extends ToString[] = []> = U['length'] extends N ? U : ToStringArray<N, [ToString, ...U]>;
+type Cast<A, B> = A extends B ? A : B;
 
-type OptionsFactory <U extends Options, T extends Node = (U extends {pseudo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: [string, ...string[]] & {length: W}}, fn: (...args: [...ToStringArray<W>, T & V]) => Children) => U extends {classOnly: true} ? {new(...args: [...ToStringArray<W>]): T & V} : DOMBind<T & V>;
+type Narrowable = string | number | bigint | boolean;
+
+type Narrow<A> = Cast<A, [] | (A extends Narrowable ? A : never) | ({ [K in keyof A]: Narrow<A[K]>})>;
+
+type RestOf<T extends readonly any[]> = T extends [arg: any, ...rest: infer U] ? U : T;
+
+type ToObject<Keys extends readonly string[], Values extends readonly ToString[]> = Keys[0] extends string ? Values[0] extends ToString ? {[K in Keys[0]]: Values[0]} & ToObject<RestOf<Keys>, RestOf<Values>>: {} : {};
+
+type OptionsFactory <U extends Options, T extends Node = (U extends {pseudo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number, X extends readonly [string, ...string[]] & {length: W}, Y extends readonly [ToString, ...ToString[]] & {length: W}>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: Narrow<X>}, fn: (elem: T & V, ...args: Y) => Children) => U extends {classOnly: true} ? {new(...args: [...Y]): T & V} : W extends 0 ? DOMBind<T & V> : (properties: Props & ToObject<X, Y>, children?: Children) => T & V;
 
 type WithClass<U extends Options> = OptionsFactory<U & {classOnly?: false}> & OptionsFactory<U & {classOnly: true}>;
 
