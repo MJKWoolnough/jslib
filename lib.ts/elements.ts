@@ -245,8 +245,8 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	}
 }));
 
-export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | Options, fn: (...args: [...ToString[], Node]) => Children) => {
-	fn ??= optionsOrFn as (...args: [...ToString[], Node]) => Children;
+export default ((optionsOrFn: ((elem: Node, ...args: ToString[]) => Children) | Options, fn: (elem: Node, ...args: ToString[]) => Children) => {
+	fn ??= optionsOrFn as (elem: Node, ...args: ToString[]) => Children;
 	const options = optionsOrFn instanceof Function ? {} : optionsOrFn,
 	      {args = [], attachRemoveEvent = true, attrs = true, observeChildren = true, pseudo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
 	      {name = pseudo ? "" : genName()} = options,
@@ -254,8 +254,8 @@ export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | O
 	      element = pseudo ? class extends (extend as (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V))(getPseudo(attrs, observeChildren)) {
 		constructor(...args: ToString[]) {
 			super();
-			args.push(this);
-			amendNode(this, fn.apply(null, args as [...ToString[], this]));
+			args.unshift(this);
+			amendNode(this, fn.apply(null, args as [this, ...ToString[]]));
 			if (observeChildren) {
 				childObserver.observe(this, childList);
 			}
@@ -263,8 +263,8 @@ export default ((optionsOrFn: ((...args: [...ToString[], Node]) => Children) | O
 	      } : class extends (extend as (<T extends ConstructorOf<HTMLElement>, V extends T>(base: T) => V))(getClass(attachRemoveEvent, attrs, observeChildren)) {
 		constructor(...args: ToString[]) {
 			super();
-			args.push(this);
-			amendNode(this.attachShadow(shadowOptions), fn.apply(null, args as [...ToString[], this])).adoptedStyleSheets = styles;
+			args.unshift(this);
+			amendNode(this.attachShadow(shadowOptions), fn.apply(null, args as [this, ...ToString[]])).adoptedStyleSheets = styles;
 		}
 	      };
 	if (!pseudo && !(classOnly && name === "")) {

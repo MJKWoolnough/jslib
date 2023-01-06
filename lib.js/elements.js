@@ -197,7 +197,7 @@ export default (optionsOrFn, fn) => {
 	      element = pseudo ? class extends extend(getPseudo(attrs, observeChildren)) {
 		constructor(...args) {
 			super();
-			args.push(this);
+			args.unshift(this);
 			amendNode(this, fn.apply(null, args));
 			if (observeChildren) {
 				childObserver.observe(this, childList);
@@ -206,7 +206,7 @@ export default (optionsOrFn, fn) => {
 	      } : class extends extend(getClass(attachRemoveEvent, attrs, observeChildren)) {
 		constructor(...args) {
 			super();
-			args.push(this);
+			args.unshift(this);
 			amendNode(this.attachShadow(shadowOptions), fn.apply(null, args)).adoptedStyleSheets = styles;
 		}
 	      };
