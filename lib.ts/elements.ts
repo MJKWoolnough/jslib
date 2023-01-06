@@ -45,9 +45,9 @@ type Narrow<A> = Cast<A, [] | (A extends Narrowable ? A : never) | ({ [K in keyo
 
 type RestOf<T extends readonly any[]> = T extends [arg: any, ...rest: infer U] ? U : T;
 
-type ToObject<Keys extends readonly string[], Values extends readonly ToString[]> = Keys[0] extends string ? Values[0] extends ToString ? {[K in Keys[0]]: Values[0]} & ToObject<RestOf<Keys>, RestOf<Values>>: {} : {};
+type ToObject<Keys extends readonly string[], Values extends readonly (ToString | undefined)[]> = Keys[0] extends string ? (Values[0] extends ToString ? {[K in Keys[0]]: Values[0]} : {[K in Keys[0]]?: Values[0]}) & ToObject<RestOf<Keys>, RestOf<Values>>: {};
 
-type OptionsFactory <U extends Options, T extends Node = (U extends {pseudo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number, X extends readonly [string, ...string[]] & {length: W}, Y extends readonly [ToString, ...ToString[]] & {length: W}>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: Narrow<X>}, fn: (elem: T & V, ...args: Y) => Children) => U extends {classOnly: true} ? {new(...args: [...Y]): T & V} : W extends 0 ? DOMBind<T & V> : (properties: Props & ToObject<X, Y>, children?: Children) => T & V;
+type OptionsFactory <U extends Options, T extends Node = (U extends {pseudo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number, X extends readonly [string, ...string[]] & {length: W}, Y extends readonly [ToString | undefined, ...(ToString | undefined)[]] & {length: W}>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: Narrow<X>}, fn: (elem: T & V, ...args: Y) => Children) => U extends {classOnly: true} ? {new(...args: [...Y]): T & V} : W extends 0 ? DOMBind<T & V> : (properties: Props & ToObject<X, Y>, children?: Children) => T & V;
 
 type WithClass<U extends Options> = OptionsFactory<U & {classOnly?: false}> & OptionsFactory<U & {classOnly: true}>;
 
@@ -245,14 +245,14 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	}
 }));
 
-export default ((optionsOrFn: ((elem: Node, ...args: ToString[]) => Children) | Options, fn: (elem: Node, ...args: ToString[]) => Children) => {
-	fn ??= optionsOrFn as (elem: Node, ...args: ToString[]) => Children;
+export default ((optionsOrFn: ((elem: Node, ...args: (ToString | undefined)[]) => Children) | Options, fn: (elem: Node, ...args: (ToString | undefined)[]) => Children) => {
+	fn ??= optionsOrFn as (elem: Node, ...args: (ToString | undefined)[]) => Children;
 	const options = optionsOrFn instanceof Function ? {} : optionsOrFn,
 	      {args = [], attachRemoveEvent = true, attrs = true, observeChildren = true, pseudo = false, styles = [], delegatesFocus = false, manualSlot = false, extend = noExtend, classOnly = false} = options,
 	      {name = pseudo ? "" : genName()} = options,
 	      shadowOptions: ShadowRootInit = {"mode": "closed", "slotAssignment": manualSlot ? "manual" : "named", delegatesFocus},
 	      element = pseudo ? class extends (extend as (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V))(getPseudo(attrs, observeChildren)) {
-		constructor(...args: ToString[]) {
+		constructor(...args: (ToString | undefined)[]) {
 			super();
 			amendNode(this, fn.call(null, this, ...args));
 			if (observeChildren) {
@@ -260,7 +260,7 @@ export default ((optionsOrFn: ((elem: Node, ...args: ToString[]) => Children) | 
 			}
 		}
 	      } : class extends (extend as (<T extends ConstructorOf<HTMLElement>, V extends T>(base: T) => V))(getClass(attachRemoveEvent, attrs, observeChildren)) {
-		constructor(...args: ToString[]) {
+		constructor(...args: (ToString | undefined)[]) {
 			super();
 			amendNode(this.attachShadow(shadowOptions), fn.call(null, this, ...args)).adoptedStyleSheets = styles;
 		}
@@ -269,7 +269,7 @@ export default ((optionsOrFn: ((elem: Node, ...args: ToString[]) => Children) | 
 		customElements.define(name, element as CustomElementConstructor);
 	}
 	return Object.defineProperty(classOnly ? element : (properties?: Props | Children, children?: Children) => {
-		const eArgs: ToString[] = args.map(() => Null);
+		const eArgs: (ToString | undefined)[] = args.map(() => undefined);
 		let props = properties;
 		if (args.length && properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
 			let pos = 0;

@@ -212,7 +212,7 @@ export default (optionsOrFn, fn) => {
 		customElements.define(name, element);
 	}
 	return Object.defineProperty(classOnly ? element : (properties, children) => {
-		const eArgs = args.map(() => Null);
+		const eArgs = args.map(() => undefined);
 		let props = properties;
 		if (args.length && properties && !isChildren(properties) && !(properties instanceof NamedNodeMap)) {
 			let pos = 0;
