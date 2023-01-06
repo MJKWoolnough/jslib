@@ -254,8 +254,7 @@ export default ((optionsOrFn: ((elem: Node, ...args: ToString[]) => Children) | 
 	      element = pseudo ? class extends (extend as (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V))(getPseudo(attrs, observeChildren)) {
 		constructor(...args: ToString[]) {
 			super();
-			args.unshift(this);
-			amendNode(this, fn.apply(null, args as [this, ...ToString[]]));
+			amendNode(this, fn.call(null, this, ...args));
 			if (observeChildren) {
 				childObserver.observe(this, childList);
 			}
@@ -263,8 +262,7 @@ export default ((optionsOrFn: ((elem: Node, ...args: ToString[]) => Children) | 
 	      } : class extends (extend as (<T extends ConstructorOf<HTMLElement>, V extends T>(base: T) => V))(getClass(attachRemoveEvent, attrs, observeChildren)) {
 		constructor(...args: ToString[]) {
 			super();
-			args.unshift(this);
-			amendNode(this.attachShadow(shadowOptions), fn.apply(null, args as [this, ...ToString[]])).adoptedStyleSheets = styles;
+			amendNode(this.attachShadow(shadowOptions), fn.call(null, this, ...args)).adoptedStyleSheets = styles;
 		}
 	      };
 	if (!pseudo && !(classOnly && name === "")) {
