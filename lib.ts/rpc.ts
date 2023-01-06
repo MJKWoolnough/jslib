@@ -79,33 +79,36 @@ export class RPC {
 		this.#c?.close();
 		this.#connInit(conn);
 	}
-	request<T = any>(method: string, params?: any) {
+	request<T = any>(method: string, typeCheck?: (a: any) => a is T): Promise<T>;
+	request<T = any>(method: string, params: any, typeCheck?: (a: any) => a is T): Promise<T>;
+	request<T = any>(method: string, paramsOrTypeCheck?: Exclude<any, Function> | ((a: any) => a is T), typeCheck?: (a: any) => a is T) {
 		const c = this.#c;
 		return c ? new Promise<T>((sFn, eFn) => {
+			typeCheck ??= paramsOrTypeCheck instanceof Function ? paramsOrTypeCheck : undefined;
 			const id = this.#id++;
-			this.#r.set(id, [sFn, eFn]);
+			this.#r.set(id, [a => (!typeCheck || typeCheck(a)) ? sFn(a) : eFn(new TypeError("invalid type")), eFn]);
 			c.send(JSON.stringify({
 				id,
 				method,
-				params
+				"params": paramsOrTypeCheck instanceof Function ? undefined : paramsOrTypeCheck
 			}));
 		}) : Promise.reject("RPC Closed");
 	}
-	await<T = any>(id: number) {
+	await<T = any>(id: number, typeCheck?: (a: any) => a is T) {
 		const h: handler = [noop, noop],
 		      a = this.#a,
 		      s = a.get(id) ?? newSet(a, id),
 		      p = new Promise<T>((sFn, eFn) => {
-			h[0] = sFn;
+			h[0] = a => (!typeCheck || typeCheck(a)) ? sFn(a) : eFn(new TypeError("invalid type"));
 			h[1] = eFn;
 			s.add(h);
 		      });
 		p.finally(() => s.delete(h)).catch(() => {});
 		return p;
 	}
-	subscribe<T = any>(id: number) {
+	subscribe<T = any>(id: number, typeCheck?: (a: any) => a is T) {
 		return new Subscription<T>((sFn, eFn, cFn) => {
-			const h: handler = [sFn, eFn],
+			const h: handler = [a => (!typeCheck || typeCheck(a)) ? sFn(a) : eFn(new TypeError("invalid type")), eFn],
 			      a = this.#a,
 			      s = a.get(id) ?? newSet(a, id);
 			s.add(h);
