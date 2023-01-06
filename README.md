@@ -1962,31 +1962,38 @@ This unexported type is the interface used by [RPC](#rpc_rpc) to send and receiv
 #### <a name="rpc_rpc_await">await</a>
 ```typescript
 class RPC {
-	await<T = any>(id: number) => Promise<T>;
+	await<T = any>(id: number, typeCheck?: (a: any) => a is T): Promise<T>;
 }
 ```
 
 The await method will wait for a message with a matching ID, which must be negative, and resolve the promise with the data that message contains.
 
+The typeCheck function can be specified to check that the data returned matches the format expected.
+
 #### <a name="rpc_rpc_request">request</a>
 ```typescript
 class RPC {
-	request<T = any>(method: string, params?: any) => Promise<T>;
+	request<T = any>(method: string, typeCheck?: (a: any) => a is T): Promise<T>;
+	request<T = any>(method: string, params: any, typeCheck?: (a: any) => a is T): Promise<T>;
 }
 ```
 
-The request method calls the remote procedure named by the `method` param, and sends the `params` data, JSON encoded, to it.
+The request method calls the remote procedure named by the `method` param, and sends any `params` data, JSON encoded, to it.
+
+The typeCheck function can be specified to check that the data returned matches the format expected.
 
 The Promise will resolve with the returned data from from the remote procedure call.
 
 #### <a name="rpc_rpc_subscribe">subscribe</a>
 ```typescript
 class RPC {
-	subscribe<T = any>(id: number) => Subscription<T>;
+	subscribe<T = any>(id: number, typeCheck?: (a: any) => a is T): Subscription<T>;
 }
 ```
 
 The subscribe method will wait for a message with a matching ID, which must be negative, and resolve the [Subscription](#inter_subscription) with the data that message contains for each message with that ID.
+
+The typeCheck function can be specified to check that the data returned matches the format expected.
 
 ## <a name="settings">settings</a>
 
