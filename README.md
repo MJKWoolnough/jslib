@@ -791,7 +791,7 @@ This module directly imports the [dom](#dom) and [html](#html) modules.
 (fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>;
 (options: Options, fn: (elem: T) => Children) => DOMBind<T>;
 (options: Options & {classOnly: true}, fn: (elem: T) => Children) => {new() => T};
-(options: Options & {args: string[]}, fn: (...args: ToString[], elem: T) => Children) => DOMBind<T>;
+(options: Options & {args: string[]}, fn: (elem: T, ...args: ToString[]) => Children) => DOMBind<T>;
 (options: Options & {args: string[], classOnly: true}, fn: (...args: ToString[], elem: T) => Children) => {new(...args: ToString[]) => T};
 ```
 
@@ -810,7 +810,7 @@ The default export of the elements module is a function that can be used to crea
 
 In addition, the type T can be further modified by the use of the `extend` Option, which will add a custom class to the prototype chain, allowing its methods and field to be used, including during the initialising `fn` call.
 
-When the `args` Option is specified, the `fn` call (and the `classOnly` constructor) gain a number of parameters equal to the number of strings specified. For the [DOMBind](#dom_dombind) output, these parameters are set in the [Props](#dom_props) object passed to the function with the key being the name specified in the array. For the `classOnly` output, these values must be specified manually in the constructor call.
+When the `args` Option is specified, the `fn` call (and the `classOnly` constructor) gain a number of parameters equal to the number of strings specified. For the [DOMBind](#dom_dombind) output, these parameters must be set in the [Props](#dom_props) object passed to the function with the key being the name specified in the array. For the `classOnly` output, these values must be specified manually in the constructor call. The default type for these parameters is ToString, but can be specified in the `fn` to set the type in both the DOMBind-like Props object, and the constructor call of the `classOnly` return.
 
 The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the pseudo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the pseudo Option is true.
 
