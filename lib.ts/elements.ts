@@ -285,5 +285,5 @@ export default ((optionsOrFn: ((elem: Node, ...args: (ToString | undefined)[]) =
 			}
 		}
 		return amendNode(new element(...eArgs), props, children)
-	}, "name", {"value": name});
+	}, "name", {"value": name}) as any;
 }) as ElementFactory;
