@@ -41,7 +41,7 @@ type Cast<A, B> = A extends B ? A : B;
 
 type Narrowable = string | number | bigint | boolean;
 
-type Narrow<A> = Cast<A, [] | (A extends Narrowable ? A : never) | ({ [K in keyof A]: Narrow<A[K]>})>;
+type Narrow<A> = Cast<A, [] | (A extends Narrowable ? A : never) | ({[K in keyof A]: Narrow<A[K]>})>;
 
 type RestOf<Arr extends readonly any[]> = Arr extends [arg: any, ...rest: infer Rest] ? Rest : Arr;
 
