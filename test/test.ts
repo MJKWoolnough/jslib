@@ -3854,7 +3854,7 @@ type Tests = {
 					res += +(e instanceof HTMLElement);
 					return [];
 				      }),
-				      t  = tag();
+				      t = tag();
 				res += +(tag instanceof Function);
 				res += +(t instanceof HTMLElement);
 				return res === 3;
@@ -3866,7 +3866,7 @@ type Tests = {
 					res += +(e instanceof DocumentFragment);
 					return [];
 				      }),
-				      t  = tag();
+				      t = tag();
 				res += +(tag instanceof Function);
 				res += +(t instanceof DocumentFragment);
 				return res === 3;
