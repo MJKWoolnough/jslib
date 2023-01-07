@@ -3862,7 +3862,7 @@ type Tests = {
 			"DocumentFragment": async () => {
 				let res = 0;
 				const {default: e} = await import("./lib/elements.js"),
-				      tag = e({"psuedo": true}, e => {
+				      tag = e({"pseudo": true}, e => {
 					res += +(e instanceof DocumentFragment);
 					return [];
 				      }),
@@ -3884,14 +3884,14 @@ type Tests = {
 				})();
 				return res === 2;
 			},
-			"observeChildren (psuedo)": async () => {
+			"observeChildren (pseudo)": async () => {
 				const {default: e} = await import("./lib/elements.js");
 				let res = 0;
-				e({"observeChildren": true, "psuedo": true}, e => {
+				e({"observeChildren": true, "pseudo": true}, e => {
 					res += +!!e.observeChildren;
 					return [];
 				})();
-				e({"observeChildren": false, "psuedo": true}, e => {
+				e({"observeChildren": false, "pseudo": true}, e => {
 					res += +!(e as any).observeChildren;
 					return [];
 				})();
@@ -3910,14 +3910,14 @@ type Tests = {
 				})();
 				return res === 2;
 			},
-			"attrs (psuedo)": async () => {
+			"attrs (pseudo)": async () => {
 				const {default: e} = await import("./lib/elements.js");
 				let res = 0;
-				e({"attrs": true, "psuedo": true}, e => {
+				e({"attrs": true, "pseudo": true}, e => {
 					res += +!!e.attr;
 					return [];
 				})();
-				e({"attrs": false, "psuedo": true}, e => {
+				e({"attrs": false, "pseudo": true}, e => {
 					res += +!(e as any).attr;
 					return [];
 				})();
@@ -3931,18 +3931,18 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js");
 				return new (e({"classOnly": true}, () => [])) instanceof HTMLElement;
 			},
-			"classOnly (psuedo)": async() => {
+			"classOnly (pseudo)": async() => {
 				const {default: e} = await import("./lib/elements.js");
-				return new (e({"classOnly": true, "psuedo": true}, () => [])) instanceof DocumentFragment;
+				return new (e({"classOnly": true, "pseudo": true}, () => [])) instanceof DocumentFragment;
 			},
 			"extend": async() => {
 				const {default: e} = await import("./lib/elements.js"),
 				      t = e({"extend": v => class extends v{a = 1}}, () => [])();
 				return t.a === 1;
 			},
-			"extend (psuedo)": async() => {
+			"extend (pseudo)": async() => {
 				const {default: e} = await import("./lib/elements.js"),
-				      t = e({"extend": v => class extends v{a = 1}, "psuedo": true}, () => [])();
+				      t = e({"extend": v => class extends v{a = 1}, "pseudo": true}, () => [])();
 				return t.a === 1;
 			},
 			"extend Nodes": async() => {
@@ -4060,13 +4060,13 @@ type Tests = {
 				return p.then(() => res);
 			}
 		},
-		"observeChildren (psuedo)": {
+		"observeChildren (pseudo)": {
 			"add": async () => {
 				let res = false,
 				    done = () => {};
 				const p = new Promise<void>(r => done = r),
 				      {default: e} = await import("./lib/elements.js"),
-				      tag = e({"psuedo": true}, e => {
+				      tag = e({"pseudo": true}, e => {
 					e.observeChildren((added, removed) => {
 						res = added.length === 1 && added[0] instanceof HTMLBRElement && removed.length === 0;
 						done();
@@ -4081,7 +4081,7 @@ type Tests = {
 				    done = () => {};
 				const p = new Promise<void>(r => done = r),
 				      {default: e} = await import("./lib/elements.js"),
-				      tag = e({"psuedo": true}, e => {
+				      tag = e({"pseudo": true}, e => {
 					e.observeChildren((added, removed) => {
 						res = added.length === 3 && added[0] instanceof HTMLBRElement && added[1] instanceof HTMLDivElement && added[2] instanceof HTMLSpanElement && removed.length === 0;
 						done();
@@ -4096,7 +4096,7 @@ type Tests = {
 				    done = () => {};
 				const p = new Promise<void>(r => done = r),
 				      {default: e} = await import("./lib/elements.js"),
-				      tag = e({"psuedo": true}, e => {
+				      tag = e({"pseudo": true}, e => {
 					e.observeChildren((added, removed) => {
 						if (added.length === 0) {
 							res = removed.length === 1 && removed[0] instanceof HTMLBRElement;
@@ -4115,7 +4115,7 @@ type Tests = {
 				    done = () => {};
 				const p = new Promise<void>(r => done = r),
 				      {default: e} = await import("./lib/elements.js"),
-				      tag = e({"psuedo": true}, e => {
+				      tag = e({"pseudo": true}, e => {
 					e.observeChildren((added, removed) => {
 						if (added.length === 0) {
 							res = added.length === 0 && removed.length === 3 && removed[0] instanceof HTMLBRElement && removed[1] instanceof HTMLDivElement && removed[2] instanceof HTMLSpanElement;
@@ -4135,7 +4135,7 @@ type Tests = {
 				    done = () => {};
 				const p = new Promise<void>(r => done = r),
 				      {default: e} = await import("./lib/elements.js"),
-				      tag = e({"psuedo": true}, e => {
+				      tag = e({"pseudo": true}, e => {
 					e.appendChild(document.createElement("br"));
 					e.observeChildren((added, removed) => {
 						res += +(added.length === 1 && added[0] instanceof HTMLBRElement && removed.length === 0);
@@ -4255,13 +4255,13 @@ type Tests = {
 				return res === 4;
 			}
 		},
-		"attrs (psuedo)": {
+		"attrs (pseudo)": {
 			"set and update": async () => {
 				let res = 0;
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      tag = e({"psuedo": true}, e => amendNode(div, {"someAttr": e.attr("thatAttr")}))();
+				      tag = e({"pseudo": true}, e => amendNode(div, {"someAttr": e.attr("thatAttr")}))();
 				res += +(div.getAttribute("someAttr") === "");
 				amendNode(tag, {"thatAttr": "abc"});
 				res += +(div.getAttribute("someAttr") === "abc");
@@ -4272,7 +4272,7 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e({"psuedo": true}, e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)}))();
+				      t = e({"pseudo": true}, e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)}))();
 				res += +(div.getAttribute("someAttr") === "1");
 				amendNode(t, {"thatAttr": 5});
 				res += +(div.getAttribute("someAttr") === "6");
@@ -4282,7 +4282,7 @@ type Tests = {
 				let res = 0;
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
-				      t = e({"psuedo": true}, e => {
+				      t = e({"pseudo": true}, e => {
 					e.act("thatAttr", (a: number) => res += +a || 0);
 					return [];
 				      })();
@@ -4295,7 +4295,7 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e({"psuedo": true}, e => {
+				      t = e({"pseudo": true}, e => {
 					amendNode(div, {"onclick": e.attr("onclick")});
 					return div;
 				      })();
@@ -4311,7 +4311,7 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e({"psuedo": true}, e => {
+				      t = e({"pseudo": true}, e => {
 					amendNode(div, {"onclick": e.attr("onclick", (fn: Function) => () => fn(2))});
 					return div;
 				      })();
