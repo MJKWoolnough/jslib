@@ -43,17 +43,17 @@ type Narrowable = string | number | bigint | boolean;
 
 type Narrow<A> = Cast<A, [] | (A extends Narrowable ? A : never) | ({ [K in keyof A]: Narrow<A[K]>})>;
 
-type RestOf<T extends readonly any[]> = T extends [arg: any, ...rest: infer U] ? U : T;
+type RestOf<Arr extends readonly any[]> = Arr extends [arg: any, ...rest: infer Rest] ? Rest : Arr;
 
 type ToPropsObject<Keys extends readonly string[], Values extends readonly (ToString | undefined)[]> = Keys[0] extends string ? (Values[0] extends ToString ? {[K in Keys[0]]: Values[0]} : {[K in Keys[0]]?: Values[0]}) & ToPropsObject<RestOf<Keys>, RestOf<Values>>: PropsObject;
 
-type OptionsFactory <U extends Options, T extends Node = (U extends {pseudo: true} ? DocumentFragment : HTMLElement) & (U extends {attrs: false} ? {} : AttrClass) & (U extends {observeChildren: false} ? {} : ChildClass)> = <V, W extends number, X extends readonly [string, ...string[]] & {length: W}, Y extends readonly [ToString | undefined, ...(ToString | undefined)[]] & {length: W}>(options: Options & U & {extend?: (base: ConstructorOf<T>) => ConstructorOf<T & V>, args?: Narrow<X>}, fn: (elem: T & V, ...args: Y) => Children) => U extends {classOnly: true} ? {new(...args: [...Y]): T & V} : W extends 0 ? DOMBind<T & V> : (properties: ToPropsObject<X, Y>, children?: Children) => T & V;
+type OptionsFactory <SelectedOptions extends Options, Base extends Node = (SelectedOptions extends {pseudo: true} ? DocumentFragment : HTMLElement) & (SelectedOptions extends {attrs: false} ? {} : AttrClass) & (SelectedOptions extends {observeChildren: false} ? {} : ChildClass)> = <Extension, ArgLength extends number, ArgNames extends readonly [string, ...string[]] & {length: ArgLength}, ArgTypes extends readonly [ToString | undefined, ...(ToString | undefined)[]] & {length: ArgLength}>(options: Options & SelectedOptions & {extend?: (base: ConstructorOf<Base>) => ConstructorOf<Base & Extension>, args?: Narrow<ArgNames>}, fn: (elem: Base & Extension, ...args: ArgTypes) => Children) => SelectedOptions extends {classOnly: true} ? {new(...args: [...ArgTypes]): Base & Extension} : ArgLength extends 0 ? DOMBind<Base & Extension> : (properties: ToPropsObject<ArgNames, ArgTypes>, children?: Children) => Base & Extension;
 
-type WithClass<U extends Options> = OptionsFactory<U & {classOnly?: false}> & OptionsFactory<U & {classOnly: true}>;
+type WithClass<SelectedOptions extends Options> = OptionsFactory<SelectedOptions & {classOnly?: false}> & OptionsFactory<SelectedOptions & {classOnly: true}>;
 
-type WithChildren<U extends Options> = WithClass<U & {observeChildren?: true}> & WithClass<U & {observeChildren: false}>;
+type WithChildren<SelectedOptions extends Options> = WithClass<SelectedOptions & {observeChildren?: true}> & WithClass<SelectedOptions & {observeChildren: false}>;
 
-type WithAttrs<U extends Options> = WithChildren<U & {attrs?: true}> & WithChildren<U & {attrs: false}>;
+type WithAttrs<SelectedOptions extends Options> = WithChildren<SelectedOptions & {attrs?: true}> & WithChildren<SelectedOptions & {attrs: false}>;
 
 type ElementFactory = WithAttrs<{pseudo?: false}> & WithAttrs<{pseudo: true}> & ((fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>);
 
