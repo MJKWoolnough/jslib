@@ -3955,7 +3955,7 @@ type Tests = {
 			},
 			"args": async() => {
 				const {default: e} = await import("./lib/elements.js"),
-				      t = e({"args": ["a", "b"]}, (a, b, e) => {
+				      t = e({"args": ["a", "b"]}, (e, a, b) => {
 					if (a === 1) {
 						res += 1;
 					}
@@ -3973,7 +3973,7 @@ type Tests = {
 			},
 			"args (classOnly)": async() => {
 				const {default: e} = await import("./lib/elements.js"),
-				      t = e({"classOnly": true, "args": ["a", "b"]}, (a, b, e) => {
+				      t = e({"classOnly": true, "args": ["a", "b"]}, (e, a, b) => {
 					if (a === 1) {
 						res += 1;
 					}
