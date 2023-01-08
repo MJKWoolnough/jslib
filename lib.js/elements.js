@@ -227,6 +227,6 @@ export default (optionsOrFn, fn) => {
 				pos++;
 			}
 		}
-		return amendNode(new element(...eArgs), props, children)
+		return amendNode(new element(...eArgs), props, children);
 	}, "name", {"value": name});
 };
