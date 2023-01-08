@@ -5878,7 +5878,7 @@ type Tests = {
 					      n = new NodeMap<string>(div, noSort, items);
 					n.reverse();
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
-					n.set("F", item)
+					n.set("F", item);
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return div.firstChild === items[4][1][node] && div.lastChild === item[node]; 
 				}
@@ -5955,7 +5955,7 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]) as [string, MyNode][],
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string, MyNode>(div, (a, b) => a.num - b.num, items);
-					items[0][1].num = 6
+					items[0][1].num = 6;
 					n.sort();
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.position("B") === 0 && div.firstChild === items[1][1][node] && n.position("A") === 4 && div.lastChild === items[0][1][node];
