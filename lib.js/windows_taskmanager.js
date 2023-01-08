@@ -39,7 +39,7 @@ const windowObservations = {
 					"--overlay-on": "none",
 					":not([maximised])": {
 						"pointer-events": "none",
-						"visibility": "hidden",
+						"visibility": "hidden"
 					}
 				}
 			}
