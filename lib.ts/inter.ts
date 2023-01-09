@@ -187,3 +187,15 @@ export class WaitGroup {
 		}
 	}
 }
+
+export class Pickup<T> {
+	#data?: T;
+	set(d: T) {
+		return this.#data = d;
+	}
+	get() {
+		const d = this.#data;
+		this.#data = undefined;
+		return d;
+	}
+}

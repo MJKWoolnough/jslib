@@ -167,3 +167,15 @@ export class WaitGroup {
 		}
 	}
 }
+
+export class Pickup {
+	#data;
+	set(d) {
+		return this.#data = d;
+	}
+	get() {
+		const d = this.#data;
+		this.#data = undefined;
+		return d;
+	}
+}
