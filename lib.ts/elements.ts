@@ -8,7 +8,7 @@ type Options = {
 	attrs?: boolean;
 	observeChildren?: boolean;
 	attachRemoveEvent?: boolean;
-	styles?: [CSSStyleSheet];
+	styles?: CSSStyleSheet[];
 	pseudo?: boolean;
 	name?: string;
 	extend?: Function;
