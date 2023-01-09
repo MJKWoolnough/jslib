@@ -866,7 +866,7 @@ type Options = {
 	name?: string;
 	observeChildren?: boolean;
 	pseudo?: boolean;
-	styles?: [CSSStyleSheet];
+	styles?: CSSStyleSheet[];
 }
 ```
 
