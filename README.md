@@ -808,7 +808,7 @@ The default export of the elements module is a function that can be used to crea
 | false   | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [ChildClass](#elements_childclass) |
 | false   | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) |
 
-In addition, the type T can be further modified by the use of the `extend` Option, which will add a custom class to the prototype chain, allowing its methods and field to be used, including during the initialising `fn` call.
+In addition, the type T can be further modified by the use of the `extend` Option, which will add a custom class to the prototype chain, allowing its methods and field to be used, including during the initialising `fn` call. As the `fn` initialising function will not have access to any private class members, it is recommended to either use Symbols, or a data sharing Class, such as [Pickup](#inter_pickup), to allow access to private fields.
 
 When the `args` Option is specified, the `fn` call (and the `classOnly` constructor) gain a number of parameters equal to the number of strings specified. For the [DOMBind](#dom_dombind) output, these parameters must be set in the [Props](#dom_props) object passed to the function with the key being the name specified in the array. For the `classOnly` output, these values must be specified manually in the constructor call. The default type for these parameters is ToString, but can be specified in the `fn` to set the type in both the DOMBind-like Props object, and the constructor call of the `classOnly` return.
 
