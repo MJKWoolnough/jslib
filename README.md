@@ -18,6 +18,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [html](#html)                               | Functions to create HTML elements. |
 | [inter](#inter)                             | Classes to provide different type of internal communication. |
 | [load](#load)                               | Used for initialisation. |
+| [math](#math)                               | Functions to create MathML elements. |
 | [menu](#menu)                               | Library for creating right-click menus. |
 | [misc](#misc)                               | Miscellaneous, simple, dependency-free functions. |
 | [nodes](#nodes)                             | Classes for handling of collections of DOM Nodes. |
@@ -36,7 +37,7 @@ Thematically, the above modules can be grouped into a few packages:
 
 |  Package  |  Description  |  Members  |
 |-----------|---------------|-----------|
-| Decorum   | A collection of DOM manipulation libs. | [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Nodes](#nodes), and [SVG](#svg). |
+| Decorum   | A collection of DOM manipulation libs. | [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), and [RPC](#rpc). |
 | Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
 | Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), [Misc](#misc), [Router](#router), [Transitions](#router_transitions), and [Settings](#settings). |
@@ -1497,6 +1498,18 @@ The WaitInfo type contains the following data:
 ## <a name="load">load</a>
 
 The load module contains a single default export, a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which is resolved when the page finished loading.
+
+## <A name="math">math</a>
+
+The math module exports function for the creation of [MathMLElements](https://developer.mozilla.org/en-US/docs/Web/MathML).
+
+This module directly imports the [dom](#dom) module.
+
+|  Export  |  Type | Description  |
+|----------|-------|--------------|
+| ns | String | This constant contains the XMLNamespace of MathMLElements. |
+| [annotation](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/semantics) [maction](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/maction) [math](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/math) [menclose](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/menclose) [merror](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/merror) [mfenced](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mfenced) [mfrac](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mfrac) [mi](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mi) [mmultiscripts](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mmultiscripts) [mn](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mn) [mo](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mo) [mover](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mover) [mpadded](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mpadded) [mphantom](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mphantom) [mprescripts](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mprescripts) [mroot](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mroot) [mrow](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mrow) [ms](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/ms) [mspace](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mspace) [msqrt](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/msqrt) [mstyle](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mstyle) [msub](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/msub) [msubsup](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/msubsup) [msup](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/msup) [mtable](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtable) [mtd](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtd) [mtext](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtext) [mtr](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtr) [munder](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/munder) [munderover](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/munderover) [semantics](https://developer.mozilla.org/en-US/docs/Web/MathML/Element/semantics) | [DOMBind](#dom_dombind) | Each of these exports is a function which can take either a [Props](#dom_props) param and a [Children](#dom_children) param, or just a [Children](#dom_children) param, both as defined in the [dom](#dom) module, returning a MathMLElement, with the attributes and children set. |
+| annotationXML | [DOMBind](#dom_dombind) | This function is as above, for the [annotation-xml](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/semantics) [MathMLElement](https://developer.mozilla.org/en-US/docs/Web/API/MathMLElement). |
 
 ## <a name="menu">menu</a>
 
