@@ -22,7 +22,7 @@ const childrenArr = (children, res = []) => {
       update = Symbol("update"),
       remove = Symbol("remove");
 
-class Binding {
+export class Binding {
 	#set = new Set();
 	[setNode](n) {
 		this.#set.add(new WeakRef(n));

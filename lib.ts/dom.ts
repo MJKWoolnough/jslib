@@ -74,7 +74,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       update = Symbol("update"),
       remove = Symbol("remove");
 
-abstract class Binding {
+export abstract class Binding {
 	#set = new Set<WeakRef<TextContent | Binding>>();
 	[setNode]<T extends TextContent | Binding>(n: T) {
 		this.#set.add(new WeakRef(n));
