@@ -1,5 +1,5 @@
 const childrenArr = (children, res = []) => {
-	if (children instanceof Binder) {
+	if (children instanceof Binding) {
 		res.push(children[setNode](new Text(children+"")));
 	} else if (typeof children === "string" || children instanceof Node) {
 		res.push(children);
@@ -15,14 +15,14 @@ const childrenArr = (children, res = []) => {
       isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bind)) || prop instanceof Bind && isEventListenerOrEventListenerObject(prop.value),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
-      isClassObj = prop => prop instanceof Object && !(prop instanceof Binder),
-      isStyleObj = prop => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binder)),
+      isClassObj = prop => prop instanceof Object && !(prop instanceof Binding),
+      isStyleObj = prop => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
       isNodeAttributes = n => !!n.style && !!n.classList && !!n.getAttributeNode && !!n.removeAttribute && !!n.setAttribute && !!n.toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
       remove = Symbol("remove");
 
-class Binder {
+class Binding {
 	#set = new Set();
 	[setNode](n) {
 		this.#set.add(new WeakRef(n));
@@ -33,7 +33,7 @@ class Binder {
 		for (const wr of this.#set) {
 			const ref = wr.deref();
 			if (ref) {
-				if (ref instanceof Binder) {
+				if (ref instanceof Binding) {
 					ref[update]();
 				} else {
 					ref.textContent = text;
@@ -53,7 +53,7 @@ class Binder {
 	}
 }
 
-class TemplateBind extends Binder {
+class TemplateBind extends Binding {
 	#strings;
 	#bindings;
 	constructor(strings, ...bindings) {
@@ -61,7 +61,7 @@ class TemplateBind extends Binder {
 		this.#strings = strings;
 		this.#bindings = bindings;
 		for (const b of bindings) {
-			if (b instanceof Binder) {
+			if (b instanceof Binding) {
 				b[setNode](this);
 			}
 		}
@@ -75,23 +75,23 @@ class TemplateBind extends Binder {
 	}
 }
 
-export class Bind extends Binder {
+export class Bind extends Binding {
 	#value;
 	constructor(v) {
 		super();
 		this.#value = v;
-		if (v instanceof Binder) {
+		if (v instanceof Binding) {
 			v[setNode](this);
 		}
 	}
 	get value() { return this.#value instanceof Bind ? this.#value.value : this.#value; }
 	set value(v) {
 		if (this.#value !== v) {
-			if (this.#value instanceof Binder) {
+			if (this.#value instanceof Binding) {
 				this.#value[remove](this);
 			}
 			this.#value = v;
-			if (v instanceof Binder) {
+			if (v instanceof Binding) {
 				v[setNode](this);
 			}
 		}
@@ -110,7 +110,7 @@ export class Bind extends Binder {
 	}
 }
 
-export const isChildren = properties => typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binder,
+export const isChildren = properties => typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binding,
 amendNode = (node, properties, children) => {
 	if (properties && isChildren(properties)) {
 		children = properties;
@@ -152,7 +152,7 @@ amendNode = (node, properties, children) => {
 					}
 				} else {
 					node.setAttribute(k, prop);
-					if (prop instanceof Binder) {
+					if (prop instanceof Binding) {
 						const p = node.getAttributeNode(k);
 						if (p) {
 							prop[setNode](p);
