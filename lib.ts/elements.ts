@@ -278,7 +278,6 @@ export default ((optionsOrFn: ((elem: Node, ...args: (ToString | undefined)[]) =
 				const v = properties[a];
 				if (v) {
 					eArgs[pos] = v;
-				} else {
 					delete props[a];
 				}
 				pos++;

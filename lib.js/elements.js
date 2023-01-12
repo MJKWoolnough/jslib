@@ -221,7 +221,6 @@ export default (optionsOrFn, fn) => {
 				const v = properties[a];
 				if (v) {
 					eArgs[pos] = v;
-				} else {
 					delete props[a];
 				}
 				pos++;
