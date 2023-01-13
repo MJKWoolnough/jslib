@@ -794,9 +794,9 @@ This module directly imports the [dom](#dom) and [html](#html) modules.
 ```typescript
 (fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>;
 (options: Options, fn: (elem: T) => Children) => DOMBind<T>;
-(options: Options & {classOnly: true}, fn: (elem: T) => Children) => {new() => T};
+(options: Options & {classOnly: true}, fn: (elem: T) => Children) => new() => T;
 (options: Options & {args: string[]}, fn: (elem: T, ...args: ToString[]) => Children) => DOMBind<T>;
-(options: Options & {args: string[], classOnly: true}, fn: (...args: ToString[], elem: T) => Children) => {new(...args: ToString[]) => T};
+(options: Options & {args: string[], classOnly: true}, fn: (...args: ToString[], elem: T) => Children) => new(...args: ToString[]) => T;
 ```
 
 The default export of the elements module is a function that can be used to create custom elements. The Type `T` is determined by the [Options](#elements_options) provided. The following table shows how setting options affects the type of `T`.
