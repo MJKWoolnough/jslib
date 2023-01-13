@@ -33,9 +33,7 @@ type ChildClass = {
 	observeChildren(fn: ChildWatchFn): void;
 }
 
-type ConstructorOf<C> = {
-	new(...args: any[]): C;
-}
+type ConstructorOf<C> = new(...args: any[]) => C;
 
 type Cast<A, B> = A extends B ? A : B;
 
