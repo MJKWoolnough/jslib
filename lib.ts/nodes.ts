@@ -1,7 +1,7 @@
 export const node = Symbol("node"),
 noSort = () => 0,
 stringSort = new Intl.Collator().compare,
-addNodeRef = <T extends {new(...a: any[]): HTMLElement}>(b: T) => class extends b { [node] = this; };
+addNodeRef = <T extends new(...a: any[]) => HTMLElement>(b: T) => class extends b { [node] = this; };
 
 interface Item {
 	[node]: Node;
