@@ -48,7 +48,9 @@ Thematically, the above modules can be grouped into a few packages:
 |--------------|---------------|
 | circular     | This script walks a javascript import tree to determine if there are any circular imports, which may cause initialisation problems. The first argument specifies the root script. |
 | html         | This script generates the html module, either from a in-built list of HTML tags, or from a supplied list as the first argument and the output filename as the second |
+| math         | This script generates the math module, either from a in-built list of MathML tags, or from a supplied list as the first argument and the output filename as the second |
 | requiredHTML | This script walks a javascript import tree to determine which imports from the [html](#html) module are being used. Can be used as the first argument to the `html` script. |
+| requiredMath | This script walks a javascript import tree to determine which imports from the [math](#html) module are being used. Can be used as the first argument to the `nath` script. |
 | requiredSVG  | This script walks a javascript import tree to determine which imports from the [svg](#svg) module are being used. Can be used as the first argument to the `svg` script. |
 | svg          | This script generates the svg module, either from a in-built list of SVG tags, or from a supplied list as the first argument and the output filename as the second. |
 
