@@ -1117,7 +1117,7 @@ type Tests = {
 			}
 		}
 	},
-	"math.js": {
+	"math.js": window.MathMLElement ? {
 		"elements": {
 			"math": async () => {
 				const {math} = await import("./lib/math.js");
@@ -1138,6 +1138,11 @@ type Tests = {
 				      e = math({"property": "value"}, child);
 				return e.getAttribute("property") === "value" && e.firstChild === child;
 			}
+		}
+	} : {
+		"Not Supported": async () => {
+			console.error("MathML not supported, test skipped.");
+			return true;
 		}
 	},
 	"conn.js": {
