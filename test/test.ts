@@ -1117,6 +1117,29 @@ type Tests = {
 			}
 		}
 	},
+	"math.js": {
+		"elements": {
+			"math": async () => {
+				const {math} = await import("./lib/math.js");
+				return math() instanceof MathMLElement;
+			},
+			"math with child": async () => {
+				const {math, ms} = await import("./lib/math.js"),
+				      child = ms();
+				return math(child).firstChild === child;
+			},
+			"math with props": async () => {
+				const {math} = await import("./lib/math.js");
+				return math({"property": "value"}).getAttribute("property") === "value";
+			},
+			"math with props + child": async () => {
+				const {math, ms} = await import("./lib/math.js"),
+				      child = ms(),
+				      e = math({"property": "value"}, child);
+				return e.getAttribute("property") === "value" && e.firstChild === child;
+			}
+		}
+	},
 	"conn.js": {
 		"HTTPRequest": {
 			"GET": async () => {
