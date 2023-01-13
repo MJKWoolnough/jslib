@@ -1013,7 +1013,7 @@ class Fraction {
 }
 ```
 
-The constructor of Fraction takes a [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) numerator and an optional [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) denominator and returns a Fraction accordingly. A zero (0n) denominator would create a Fraction equivalant of [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
+The constructor of Fraction takes a [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) numerator and an optional [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) denominator and returns a Fraction accordingly. A zero (0n) denominator would create a Fraction equivalent of [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
 
 ### <a name="fraction_div">div</a>
 ```typescript
@@ -1036,7 +1036,7 @@ class Fraction {
 }
 ```
 
-The isNaN method returns true if the Fraction is equivalant to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN), which is when the denominator is equal to zero.
+The isNaN method returns true if the Fraction is equivalent to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN), which is when the denominator is equal to zero.
 
 ### <a name="fraction_max">max</a>
 ```typescript
@@ -1045,7 +1045,7 @@ class Fraction {
 }
 ```
 
-This static method returns the larger of the two passed Fraction, or [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN) is either param is equivalant to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
+This static method returns the larger of the two passed Fraction, or [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN) is either param is equivalent to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
 
 ### <a name="fraction_min">min</a>
 ```typescript
@@ -1054,7 +1054,7 @@ class Fraction {
 }
 ```
 
-This static method returns the smaller of the two passed Fraction, or [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN) is either param is equivalant to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
+This static method returns the smaller of the two passed Fraction, or [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN) is either param is equivalent to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
 
 ### <a name="fraction_mul">mul</a>
 ```typescript
