@@ -1139,7 +1139,7 @@ console.log(table({"class": "myTable"}, [
 ]).outerHTML);
 ```
 
-This example buils up an HTML table and the following is printed to the console:
+This example builds up an HTML table and the following is printed to the console:
 ```html
 <table class="myTable"><thead><tr><th style="background-color: #ff0">Title 1</th><th>Title 2</th></tr></thead><tbody><tr><td id="cell_1">Cell 1</td><td>Cell 2</td></tr><tr><td>Cell 3</td><td>Cell 4</td></tr></tbody></table>
 ```
