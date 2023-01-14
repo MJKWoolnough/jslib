@@ -23,13 +23,13 @@ type AttrFn = (newValue: ToString) => ToString | void;
 
 type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
-type AttrClass = {
+export type WithAttr = {
 	act(name: string | string[], fn: Function): void;
 	attr(name: string[], fn: Function): Bind;
 	attr(name: string, fn?: Function): Bind;
 }
 
-type ChildClass = {
+export type WithChildren = {
 	observeChildren(fn: ChildWatchFn): void;
 }
 
@@ -45,15 +45,15 @@ type RestOf<Arr extends readonly any[]> = Arr extends [arg: any, ...rest: infer 
 
 type ToPropsObject<Keys extends readonly string[], Values extends readonly (ToString | undefined)[]> = Keys[0] extends string ? (Values[0] extends ToString ? {[K in Keys[0]]: Values[0]} : {[K in Keys[0]]?: Values[0]}) & ToPropsObject<RestOf<Keys>, RestOf<Values>>: PropsObject;
 
-type OptionsFactory <SelectedOptions extends Options, Base extends Node = (SelectedOptions extends {pseudo: true} ? DocumentFragment : HTMLElement) & (SelectedOptions extends {attrs: false} ? {} : AttrClass) & (SelectedOptions extends {observeChildren: false} ? {} : ChildClass)> = <Extension, ArgLength extends number, ArgNames extends readonly [string, ...string[]] & {length: ArgLength}, ArgTypes extends readonly [ToString | undefined, ...(ToString | undefined)[]] & {length: ArgLength}>(options: Options & SelectedOptions & {extend?: (base: ConstructorOf<Base>) => ConstructorOf<Base & Extension>, args?: Narrow<ArgNames>}, fn: ArgNames extends string[] ? (elem: Base & Extension, ...args: ArgTypes) => Children : (elem: Base & Extension) => Children) => SelectedOptions extends {classOnly: true} ? ArgNames extends string[] ? {new(...args: ArgTypes): Base & Extension} : ConstructorOf<Base & Extension> : ArgNames extends string[] ? (properties: ToPropsObject<ArgNames, ArgTypes>, children?: Children) => Base & Extension : DOMBind<Base & Extension>;
+type OptionsFactory <SelectedOptions extends Options, Base extends Node = (SelectedOptions extends {pseudo: true} ? DocumentFragment : HTMLElement) & (SelectedOptions extends {attrs: false} ? {} : WithAttr) & (SelectedOptions extends {observeChildren: false} ? {} : WithChildren)> = <Extension, ArgLength extends number, ArgNames extends readonly [string, ...string[]] & {length: ArgLength}, ArgTypes extends readonly [ToString | undefined, ...(ToString | undefined)[]] & {length: ArgLength}>(options: Options & SelectedOptions & {extend?: (base: ConstructorOf<Base>) => ConstructorOf<Base & Extension>, args?: Narrow<ArgNames>}, fn: ArgNames extends string[] ? (elem: Base & Extension, ...args: ArgTypes) => Children : (elem: Base & Extension) => Children) => SelectedOptions extends {classOnly: true} ? ArgNames extends string[] ? {new(...args: ArgTypes): Base & Extension} : ConstructorOf<Base & Extension> : ArgNames extends string[] ? (properties: ToPropsObject<ArgNames, ArgTypes>, children?: Children) => Base & Extension : DOMBind<Base & Extension>;
 
-type WithClass<SelectedOptions extends Options> = OptionsFactory<SelectedOptions & {classOnly?: false}> & OptionsFactory<SelectedOptions & {classOnly: true}>;
+type WithClassOption<SelectedOptions extends Options> = OptionsFactory<SelectedOptions & {classOnly?: false}> & OptionsFactory<SelectedOptions & {classOnly: true}>;
 
-type WithChildren<SelectedOptions extends Options> = WithClass<SelectedOptions & {observeChildren?: true}> & WithClass<SelectedOptions & {observeChildren: false}>;
+type WithChildrenOption<SelectedOptions extends Options> = WithClassOption<SelectedOptions & {observeChildren?: true}> & WithClassOption<SelectedOptions & {observeChildren: false}>;
 
-type WithAttrs<SelectedOptions extends Options> = WithChildren<SelectedOptions & {attrs?: true}> & WithChildren<SelectedOptions & {attrs: false}>;
+type WithAttrsOption<SelectedOptions extends Options> = WithChildrenOption<SelectedOptions & {attrs?: true}> & WithChildrenOption<SelectedOptions & {attrs: false}>;
 
-type ElementFactory = WithAttrs<{pseudo?: false}> & WithAttrs<{pseudo: true}> & ((fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>);
+type ElementFactory = WithAttrsOption<{pseudo?: false}> & WithAttrsOption<{pseudo: true}> & ((fn: (elem: HTMLElement & WithAttr & WithChildren) => Children) => DOMBind<HTMLElement & WithAttr & WithChildren>);
 
 class BindFn extends Bind {
 	#fn: AttrFn;
