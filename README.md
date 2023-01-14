@@ -789,10 +789,12 @@ This module directly imports the [dom](#dom) and [html](#html) modules.
 |----------|--------|---------------|
 | [(default)](#elements_default) | Function | A factory function used to create custom elements. |
 | [Null](#elements_null) | Object | The default value of attributes used in the attr and act methods of a custom element. |
+| [WithAttr](#element_withattr) | Type | The type added to an HTMLElement or DocumentFragment when the 'attrs' option is set to true. |
+| [WithChildren](#element_withchildren) | Type | The type added to an HTMLElement or DocumentFragment when the 'children' option is set to true. |
 
 ### <a name="elements_default">(default)</a>
 ```typescript
-(fn: (elem: HTMLElement & AttrClass & ChildClass) => Children) => DOMBind<HTMLElement & AttrClass & ChildClass>;
+(fn: (elem: HTMLElement & WithAttr & WithChildren) => Children) => DOMBind<HTMLElement & WithAttr & WithChild>;
 (options: Options, fn: (elem: T) => Children) => DOMBind<T>;
 (options: Options & {classOnly: true}, fn: (elem: T) => Children) => new() => T;
 (options: Options & {args: string[]}, fn: (elem: T, ...args: ToString[]) => Children) => DOMBind<T>;
@@ -803,13 +805,13 @@ The default export of the elements module is a function that can be used to crea
 
 |  attrs  |  observeChildren  |  pseudo  |  T  |
 |---------|-------------------|----------|-----|
-| true    | true              | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [AttrClass](#elements_attrclass) & [ChildClass](#elements_childclass) |
-| true    | false             | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [AttrClass](#elements_attrclass) |
-| false   | true              | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [ChildClass](#elements_childclass) |
+| true    | true              | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [WithAttr](#elements_withattr) & [WithChildren](#elements_withchildren) |
+| true    | false             | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [WithAttr](#elements_withattr) |
+| false   | true              | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [WithChildren](#elements_withchildren) |
 | false   | false             | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) |
-| true    | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [AttrClass](#elements_attrclass) & [ChildClass](#elements_childclass) |
-| true    | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [AttrClass](#elements_attrclass) |
-| false   | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [ChildClass](#elements_childclass) |
+| true    | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [WithAttr](#elements_withattr) & [WithChildren](#elements_withchildren) |
+| true    | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [WithAttr](#elements_withattr) |
+| false   | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [WithChildren](#elements_withchildren) |
 | false   | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) |
 
 In addition, the type T can be further modified by the use of the `extend` Option, which will add a custom class to the prototype chain, allowing its methods and field to be used, including during the initialising `fn` call. As the `fn` initialising function will not have access to any private class members, it is recommended to either use Symbols, or a data sharing Class, such as [Pickup](#inter_pickup), to allow access to private fields.
@@ -822,9 +824,9 @@ If the `classOnly` Option is set to false (or unset), the resulting [DOMBind](#d
 
 If the `classOnly` Option is set to true, the function will just return the generated class constructor, without creating a DOMBind function.
 
-### <a name="elements_attrclass">AttrClass</a>
+### <a name="elements_withattr">WithAttr</a>
 ```typescript
-class AttrClass {
+class WithAttr {
 	act(name: string, fn: (newValue: ToString) => void): void;
 	act(name: string[], fn: (values: Object) => void): void;
 	attr(name: string, fn?: (newValue: ToString) => ToString | null | undefined): Bind;
@@ -838,9 +840,9 @@ The `act` method allows actions to be taken when attributes on the element are c
 
 The `attr` method acts similarly to the `act` method, but will return a [Bind](#dom_bind). When monitoring a single attribute, the value of the Bind object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Bind object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
 
-### <a name="elements_childclass">ChildClass</a>
+### <a name="elements_withchildren">WithChildren</a>
 ```typescript
-class ChildClass {
+class WithChildren {
 	observeChildren(fn: (added: NodeList, removed: NodeList) => void): void;
 }
 ```
