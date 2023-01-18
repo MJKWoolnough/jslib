@@ -1431,7 +1431,7 @@ The when method act similarly to the then method of the [Promise](https://develo
 
 ### <a name="inter_waitgroup">WaitGroup</a>
 
-The WaitGroup Class is used to wait for multiple asynchronous taks to complete.
+The WaitGroup Class is used to wait for multiple asynchronous tasks to complete.
 
 |  Method  |  Type  |  Description  |
 |----------|--------|---------------|
