@@ -1291,7 +1291,7 @@ console.log(request.request(0));
 console.log(request.request(10));
 ```
 
-This example shows how a function can responsd to 'queries', with the following being printed to the console:
+This example shows how a function can respond to 'queries', with the following being printed to the console:
 ```
 0
 11
