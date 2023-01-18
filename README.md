@@ -1815,7 +1815,7 @@ interface {
 }
 ```
 
-This unexported type satifies any type has used the [node](#nodes_node) [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) to delegate a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) element.
+This unexported type satisfies any type has used the [node](#nodes_node) [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) to delegate a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) element.
 
 ## <a name="router">router</a>
 
