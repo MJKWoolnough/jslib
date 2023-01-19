@@ -2162,7 +2162,7 @@ This module directly imports the [css](#css), [dom](#dom), [html](#html), and [s
 | <a name="windows_defaulticon">defaultIcon</a> | String | The current default window icon. |
 | desktop | Function | A [DOMBind](#dom_dombind) that creates a DesktopElement. Registered with customElements as `windows-desktop`. |
 | <a name="windows_desktopelement">DesktopElement</a> | Class | This class creates a desktop-like space with a [ShellElement](#windows_shellelement). |
-| setDefaultIcon | Function | This function sets the deaultIcon variable. |
+| setDefaultIcon | Function | This function sets the defaultIcon variable. |
 | [setLanguage](#windows_setlanguage) | Function | Sets the language items used by the [ShellElement](#windows_shellelement) and [WindowElement](#windows_windowelement) classes. |
 | shell | Function | A [DOMBind](#dom_dombind) that creates a ShellElement. |
 | [ShellElement](#windows_shellelement) | Class | A class to create a shell for [WindowElement](#windows_windowelement)s to exist within. Extends [BaseElement](#windows_baseelement). Registered with customElements as `windows-shell`. |
