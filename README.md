@@ -229,7 +229,7 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 | i             | The *i* tag sets italic on the contained data. |
 | img           | The *img* tag processes the contained text as a URL for an HTMLImageElement, and can optionally use the attribute to set the width and height of the image. The format for the attribute is `w`x`h` where either `w` or `h` can be omitted. |
 | left          | The *left* tag sets left alignment for the contained data. |
-| list          | The *list* tag creates a new list. The attribute determines what type of list, with no attribute resulting in an HTMLUListElement, and any of `a`, `A`, `i`, `I`, and `1` resulting in an HTMLOListElement with the type set the the specified value. Any children of the list should be wrapped in `[*] [/*]` tags, though the closing tag can be omitted. |
+| list          | The *list* tag creates a new list. The attribute determines what type of list, with no attribute resulting in an HTMLUListElement, and any of `a`, `A`, `i`, `I`, and `1` resulting in an HTMLOListElement with the type set to the specified value. Any children of the list should be wrapped in `[*] [/*]` tags, though the closing tag can be omitted. |
 | quote         | The *quote* tag creates a HTMLQuoteElement around the contained data. Any attribute is created as an HTMLLegendElement as the first child. |
 | right         | The *right* tag sets right alignment for the contained data. |
 | s             | The *s* tag sets strike-through on the contained data. |
