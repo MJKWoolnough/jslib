@@ -2372,7 +2372,7 @@ In addition the taskbar-size style var can be used to set the width (or height, 
 
 ## <a name="windows_taskmanager">windows_taskmanager</a>
 
-The windows_taskmanager module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that allows `Windows` to be minimised within the shell, appearing as just the title-bar at the bottom of the shell.aThe exports are the same as the [windows](#windows) module, except for the changes below.
+The windows_taskmanager module provides a replacement for the [windows](#windows) module [ShellElement](#windows_shellelement) that allows `Windows` to be minimised within the shell, appearing as just the title-bar at the bottom of the shell. The exports are the same as the [windows](#windows) module, except for the changes below.
 
 This module directly imports the [css](#css), [dom](#dom),[html](#html), and [windows](#windows) modules.
 
