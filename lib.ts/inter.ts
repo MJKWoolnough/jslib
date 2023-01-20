@@ -62,8 +62,15 @@ export class Subscription<T> {
 	#cancelBind?: () => void;
 	constructor(fn: (successFn: (data: T) => void, errorFn: (data: any) => void, cancelFn: (data: () => void) => void) => void) {
 		const [successSend, successReceive] = new Pipe<T>().bind(3),
-		      [errorSend, errorReceive] = new Pipe<any>().bind(3);
-		fn(successSend, errorSend, (fn: () => void) => this.#cancel = fn);
+		      errPipe = new Pipe<any>(),
+		      [, errorReceive] = errPipe.bind(2);
+		fn(successSend, (err: any) => {
+			if (errPipe.length) {
+				errPipe.send(err);
+			} else {
+				throw err;
+			}
+		}, (fn: () => void) => this.#cancel = fn);
 		this.#success = successReceive;
 		this.#error = errorReceive;
 	}

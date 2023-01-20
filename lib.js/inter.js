@@ -49,8 +49,15 @@ export class Subscription {
 	#cancelBind;
 	constructor(fn) {
 		const [successSend, successReceive] = new Pipe().bind(3),
-		      [errorSend, errorReceive] = new Pipe().bind(3);
-		fn(successSend, errorSend, fn => this.#cancel = fn);
+		      errPipe = new Pipe(),
+		      [, errorReceive] = errPipe.bind(2);
+		fn(successSend, err => {
+			if (errPipe.length) {
+				errPipe.send(err);
+			} else {
+				throw err;
+			}
+		}, fn => this.#cancel = fn);
 		this.#success = successReceive;
 		this.#error = errorReceive;
 	}
