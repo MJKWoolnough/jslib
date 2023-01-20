@@ -1,5 +1,6 @@
 export class Pipe {
 	#out = [];
+	get length() { return this.#out.length }
 	send(data) {
 		for (const fn of this.#out) {
 			fn(data);

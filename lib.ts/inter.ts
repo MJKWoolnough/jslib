@@ -6,6 +6,7 @@ export type WaitInfo = {
 
 export class Pipe<T> {
 	#out: ((data: T) => void)[] = [];
+	get length() { return this.#out.length }
 	send(data: T) {
 		for (const fn of this.#out) {
 			fn(data);
