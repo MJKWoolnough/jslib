@@ -16,4 +16,13 @@ addAndReturn = <V>(s: {add: (m: V) => any}, v: V) => {
 queue = (() => {
 	let p = Promise.resolve();
 	return (fn: () => Promise<any>) => p = p.finally(fn);
-})();
+})(),
+autoFocus = <T extends {focus(): void}>(node: T, inputSelect = true) => {
+	window.setTimeout(() => {
+		node.focus();
+		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
+			node.select();
+		}
+	}, 0);
+	return node;
+};

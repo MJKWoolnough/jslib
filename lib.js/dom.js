@@ -212,15 +212,6 @@ clearNode = (node, properties, children) => {
 	}
 	return amendNode(node, properties, children);
 },
-autoFocus = (node, inputSelect = true) => {
-	window.setTimeout(() => {
-		node.focus();
-		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
-			node.select();
-		}
-	}, 0);
-	return node;
-},
 bind = (v, first, ...bindings) => {
 	if (v instanceof Array && first) {
 		return new TemplateBind(v, first, ...bindings);

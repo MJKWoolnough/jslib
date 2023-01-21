@@ -28,10 +28,6 @@ export interface DOMBind<T extends Node> {
 	(children?: Children): T;
 }
 
-interface FocusElement {
-	focus(): void;
-}
-
 interface TextContent {
 	textContent: string | null;
 }
@@ -264,15 +260,6 @@ clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Ch
 		}
 	}
 	return amendNode(node, properties, children);
-},
-autoFocus = <T extends FocusElement>(node: T, inputSelect = true) => {
-	window.setTimeout(() => {
-		node.focus();
-		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
-			node.select();
-		}
-	}, 0);
-	return node;
 },
 bind = (<T extends ToString>(v: T | TemplateStringsArray, first?: Bind | ToString, ...bindings: (Bind | ToString)[]) => {
 	if (v instanceof Array && first) {
