@@ -919,30 +919,6 @@ type Tests = {
 				return n.getAttribute("property") === "value" && n.firstChild === s;
 			}
 		},
-		"autoFocus": {
-			"focus()": async () => {
-				const {autoFocus} = await import("./lib/dom.js");
-				let res = 0;
-				class focusElement extends HTMLElement {
-					focus() {res++;}
-					select() {res *= 2;}
-				}
-				customElements.define("focus-element", focusElement);
-				autoFocus(new focusElement());
-				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 1), 100));
-			},
-			"select()": async () => {
-				const {autoFocus} = await import("./lib/dom.js");
-				let res = 0;
-				class selectElement extends HTMLInputElement {
-					focus() {res++;}
-					select() {res *= 2;}
-				}
-				customElements.define("select-element", selectElement, {"extends": "input"});
-				autoFocus(new selectElement());
-				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 2), 100));
-			}
-		},
 		"bind": {
 			"bind text": async () => {
 				const {amendNode, bind} = await import("./lib/dom.js"),
@@ -6194,6 +6170,30 @@ type Tests = {
 			queue(async () => res *= 2);
 			queue(async () => res += 3);
 			return queue(async () => res *= 5).then(() => res === 25);
-		}
+		},
+		"autoFocus": {
+			"focus()": async () => {
+				const {autoFocus} = await import("./lib/misc.js");
+				let res = 0;
+				class focusElement extends HTMLElement {
+					focus() {res++;}
+					select() {res *= 2;}
+				}
+				customElements.define("focus-element", focusElement);
+				autoFocus(new focusElement());
+				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 1), 100));
+			},
+			"select()": async () => {
+				const {autoFocus} = await import("./lib/misc.js");
+				let res = 0;
+				class selectElement extends HTMLInputElement {
+					focus() {res++;}
+					select() {res *= 2;}
+				}
+				customElements.define("select-element", selectElement, {"extends": "input"});
+				autoFocus(new selectElement());
+				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 2), 100));
+			}
+		},
 	}
 });
