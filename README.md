@@ -509,7 +509,6 @@ The dom module can be used to manipulate DOM elements.
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
 | [amendNode](#dom_amendnode) | Function | This convenience function modifies a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget. |
-| [autoFocus](#dom_autofocus) | Function | This function queues a focus method call to the passed element. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom_amendnode) except that it clears any children before amending. |
 | [Bind](#dom_bind) | Class | A subclass of Binding, Objects that implement this type can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
 | Binding | Class | An abstract class that is a parent class of both of the return types from the [bind](#dom_bind_fn) function. |
@@ -546,13 +545,6 @@ For any Node, the children are set according to the [Children](#dom_children) va
 This function returns the element passed to it.
 
 NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with [window.open()](https://developer.mozilla.org/en-US/docs/Web/API/Window/open)
-
-### <a name="dom_autofocus">autoFocus</a>
-```typescript
-<T extends FocusElement>(node: T, inputSelect = true) => T;
-```
-
-This queues a focus method call to the passed element, and will call select on any [HTMLInputElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement) or [HTMLTextAreaElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement), unless false is passed as the second param.
 
 ### <a name="dom_bind">Bind</a>
 ```typescript
@@ -1567,6 +1559,7 @@ The misc module contains various simple, dependency-free functions.
 |  Export  |  Description  |
 |----------|---------------|
 | [addAndReturn](#misc_addandreturn) | This function adds a value to a Set and returns the value. |
+| [autoFocus](#misc_autofocus) | Function | This function queues a focus method call to the passed element. |
 | [checkInt](#misc_checkint) | This function determines whether the value passed is an integer, within a given range, returning either the valid integer or a default value. |
 | [isInt](#misc_isint) | This function determines whether the value passed is an integer, within a given range. |
 | [mod](#misc_mod) | This function performs the modulo operation on the two given numbers. |
@@ -1582,6 +1575,13 @@ The misc module contains various simple, dependency-free functions.
 This function takes a Set-like object and calls the `add` method with the given value, before returning the value `v`.
 
 This functions is useful for one-liners where you need to store a value in a Set and still work on that value.
+
+### <a name="misc_autofocus">autoFocus</a>
+```typescript
+<T extends FocusElement>(node: T, inputSelect = true) => T;
+```
+
+This queues a focus method call to the passed element, and will call select on any [HTMLInputElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement) or [HTMLTextAreaElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement), unless false is passed as the second param.
 
 ### <a name="misc_checkint">checkInt</a>
 ```typescript
