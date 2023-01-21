@@ -130,14 +130,16 @@ const attrs = new WeakMap(),
       } : HTMLElement,
       pseudos = Array.from({"length": 4}),
       noop = () => {},
+      classList = Object.freeze({toggle: noop}),
+      style = Object.freeze({removeProperty: noop, setProperty: noop}),
       getPseudo = (handleAttrs, children) => pseudos[+handleAttrs | (+children << 1)] ??= children ? class extends getPseudo(handleAttrs, false) {
 	observeChildren(fn) {
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
       } : handleAttrs ? class extends DocumentFragment {
 	#acts = [];
-	classList = {toggle: noop};
-	style = {removeProperty: noop, setProperty: noop};
+	classList = classList;
+	style = style;
 	constructor() {
 		super();
 		attrs.set(this, new Map());
