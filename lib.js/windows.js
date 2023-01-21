@@ -1,6 +1,7 @@
 import CSS from './css.js';
-import {amendNode, autoFocus, bindElement, clearNode, event, eventCapture} from './dom.js';
+import {amendNode, bindElement, clearNode, event, eventCapture} from './dom.js';
 import {button, div, img, input, ns, slot, span} from './html.js';
+import {autoFocus} from './misc.js';
 import {ns as svgNS} from './svg.js';
 
 const resizeWindow = (w, direction, e) => {
