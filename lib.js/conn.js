@@ -74,17 +74,16 @@ export class WSConn extends WebSocket {
 		return new Subscription((sFn, eFn, cFn) => {
 			const w = this,
 			      ac = new AbortController(),
-			      o = {"signal": ac.signal},
-			      end = () => ac.abort();
+			      o = {"signal": ac.signal};
 			w.addEventListener("message", sFn, o);
 			w.addEventListener("error", e => eFn(e.error), o);
 			w.addEventListener("close", e => {
 				const err = new Error(e.reason);
 				err.name = "CloseError";
 				eFn(err);
-				end();
+				ac.abort();
 			}, o);
-			cFn(end);
+			cFn(() => ac.abort());
 		}).when(ssFn, eeFn);
 	}
 }
