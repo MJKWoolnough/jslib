@@ -281,10 +281,10 @@ type Tests = {
 				let res = 0,
 				    sFn = (_: boolean) => {};
 				const {Subscription} = await import("./lib/inter.js");
-				new Subscription<boolean>(s => sFn = s).when(() => {throw 1}).finally(() => res++);
-				new Subscription<boolean>(() => {}).when(() => {throw 1}).finally(() => res++);
+				new Subscription<boolean>(s => sFn = s).when(() => {throw 1}).finally(() => res++).catch(() => res *= 5);
+				new Subscription<boolean>(() => {}).when(() => {throw 1}).finally(() => res += 3);
 				sFn(false);
-				return res === 1;
+				return res === 5;
 			},
 			"cancel": async () => {
 				let res = 0;
