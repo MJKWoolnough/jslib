@@ -13,7 +13,7 @@ const childrenArr = (children, res = []) => {
 	return res;
       },
       isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
-      isEventListenerOrEventListenerObject = prop => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bind)) || prop instanceof Bind && isEventListenerOrEventListenerObject(prop.value),
+      isEventListenerOrEventListenerObject = prop => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bound)) || prop instanceof Bound && isEventListenerOrEventListenerObject(prop.value),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object && !(prop instanceof Binding),
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
@@ -75,7 +75,7 @@ class TemplateBind extends Binding {
 	}
 }
 
-export class Bind extends Binding {
+export class Bound extends Binding {
 	#value;
 	constructor(v) {
 		super();
@@ -84,7 +84,7 @@ export class Bind extends Binding {
 			v[setNode](this);
 		}
 	}
-	get value() { return this.#value instanceof Bind ? this.#value.value : this.#value; }
+	get value() { return this.#value instanceof Bound ? this.#value.value : this.#value; }
 	set value(v) {
 		if (this.#value !== v) {
 			if (this.#value instanceof Binding) {
@@ -216,5 +216,5 @@ bind = (v, first, ...bindings) => {
 	if (v instanceof Array && first) {
 		return new TemplateBind(v, first, ...bindings);
 	}
-	return new Bind(v);
+	return new Bound(v);
 };

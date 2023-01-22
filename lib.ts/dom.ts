@@ -13,7 +13,7 @@ type ClassObj = Record<string, boolean | null>;
 
 type StyleObj = Record<string, ToString | undefined> | CSSStyleDeclaration;
 
-type EventArray = [Exclude<EventListenerOrEventListenerObject, Bind> | Bind<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean];
+type EventArray = [Exclude<EventListenerOrEventListenerObject, Bound> | Bound<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean];
 
 type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | ClassObj | undefined;
 
@@ -33,8 +33,8 @@ interface TextContent {
 }
 
 interface BindFn {
-	<T extends ToString = ToString>(t: T): Bind<T>;
-	(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]): Binding;
+	<T extends ToString = ToString>(t: T): Bound<T>;
+	(strings: TemplateStringsArray, ...bindings: (Bound | ToString)[]): Binding;
 }
 
 interface NodeAttributes extends Node {
@@ -61,7 +61,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	return res;
       },
       isEventListenerObject = (prop: PropValue): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
-      isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bind)) || prop instanceof Bind && isEventListenerOrEventListenerObject(prop.value),
+      isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bound)) || prop instanceof Bound && isEventListenerOrEventListenerObject(prop.value),
       isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object && !(prop instanceof Binding),
       isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
@@ -104,8 +104,8 @@ export abstract class Binding {
 
 class TemplateBind extends Binding {
 	#strings: TemplateStringsArray;
-	#bindings: (Bind | ToString)[];
-	constructor(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]) {
+	#bindings: (Bound | ToString)[];
+	constructor(strings: TemplateStringsArray, ...bindings: (Bound | ToString)[]) {
 		super();
 		this.#strings = strings;
 		this.#bindings = bindings;
@@ -124,7 +124,7 @@ class TemplateBind extends Binding {
 	}
 }
 
-export class Bind<T extends ToString = ToString> extends Binding {
+export class Bound<T extends ToString = ToString> extends Binding {
 	#value: T;
 	constructor(v: T) {
 		super();
@@ -133,7 +133,7 @@ export class Bind<T extends ToString = ToString> extends Binding {
 			v[setNode](this);
 		}
 	}
-	get value() { return this.#value instanceof Bind ? this.#value.value : this.#value; }
+	get value() { return this.#value instanceof Bound ? this.#value.value : this.#value; }
 	set value(v: T) {
 		if (this.#value !== v) {
 			if (this.#value instanceof Binding) {
@@ -231,7 +231,7 @@ eventOnce = 1,
 eventCapture = 2,
 eventPassive = 4,
 eventRemove = 8,
-event = (fn: Function | Exclude<EventListenerObject, Bind> | Bind<Function | EventListenerObject>, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
+event = (fn: Function | Exclude<EventListenerObject, Bound> | Bound<Function | EventListenerObject>, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
 createDocumentFragment = (children?: Children) => {
 	const df = document.createDocumentFragment();
 	if (typeof children === "string") {
@@ -261,9 +261,9 @@ clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Ch
 	}
 	return amendNode(node, properties, children);
 },
-bind = (<T extends ToString>(v: T | TemplateStringsArray, first?: Bind | ToString, ...bindings: (Bind | ToString)[]) => {
+bind = (<T extends ToString>(v: T | TemplateStringsArray, first?: Bound | ToString, ...bindings: (Bound | ToString)[]) => {
 	if (v instanceof Array && first) {
 		return new TemplateBind(v, first, ...bindings);
 	}
-	return new Bind<T>(v as T);
+	return new Bound<T>(v as T);
 }) as BindFn;
