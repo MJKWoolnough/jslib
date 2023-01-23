@@ -800,6 +800,12 @@ type Tests = {
 				amendNode(window, {"onevent": [fn, {}, true]});
 				window.dispatchEvent(new CustomEvent("event"));
 				return res === 1;
+			},
+			"null": async () => {
+				const {amendNode} = await import("./lib/dom.js"),
+				      d = amendNode(document.createElement("div"), {"attr": "abc"});
+				amendNode(d, {"attr": null, "another": null});
+				return d.getAttribute("attr") === "abc" && d.getAttribute("another") === null;
 			}
 		},
 		"event": {
