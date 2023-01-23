@@ -1,6 +1,6 @@
-import {Bind, amendNode, bind, isChildren} from './dom.js';
+import {Bound, amendNode, bind, isChildren} from './dom.js';
 
-class BindFn extends Bind {
+class BindFn extends Bound {
 	#fn;
 	constructor(v, fn) {
 		super(v);
@@ -11,7 +11,7 @@ class BindFn extends Bind {
 	}
 }
 
-class BindMulti extends Bind {
+class BindMulti extends Bound {
 	#fn;
 	constructor(elem, names, fn) {
 		super(0);

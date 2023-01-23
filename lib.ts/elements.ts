@@ -1,5 +1,5 @@
-import type {Children, DOMBind, Props, PropsObject} from './dom.js';
-import {Bind, amendNode, bind, isChildren} from './dom.js';
+import type {Binding, Children, DOMBind, Props, PropsObject} from './dom.js';
+import {Bound, amendNode, bind, isChildren} from './dom.js';
 
 type Options = {
 	args?: string[];
@@ -25,8 +25,8 @@ type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
 export type WithAttr = {
 	act(name: string | string[], fn: Function): void;
-	attr(name: string[], fn: Function): Bind;
-	attr(name: string, fn?: Function): Bind;
+	attr(name: string[], fn: Function): Binding;
+	attr(name: string, fn?: Function): Binding;
 }
 
 export type WithChildren = {
@@ -55,7 +55,7 @@ type WithAttrsOption<SelectedOptions extends Options> = WithChildrenOption<Selec
 
 type ElementFactory = WithAttrsOption<{pseudo?: false}> & WithAttrsOption<{pseudo: true}> & ((fn: (elem: HTMLElement & WithAttr & WithChildren) => Children) => DOMBind<HTMLElement & WithAttr & WithChildren>);
 
-class BindFn extends Bind {
+class BindFn extends Bound {
 	#fn: AttrFn;
 	constructor(v: ToString, fn: AttrFn) {
 		super(v);
@@ -66,14 +66,14 @@ class BindFn extends Bind {
 	}
 }
 
-class BindMulti extends Bind {
+class BindMulti extends Bound {
 	#fn: AttrFn;
 	constructor(elem: Node, names: string[], fn: Function) {
 		super(0);
 		let calling = false;
-		const obj: Record<string, Bind> = {},
+		const obj: Record<string, Bound> = {},
 		      self = this;
-		this.#fn = function(this: Bind, val: ToString) {
+		this.#fn = function(this: Bound, val: ToString) {
 			if (!calling) {
 				calling = true;
 				const o: Record<string, ToString> = {};
@@ -92,7 +92,7 @@ class BindMulti extends Bind {
 	}
 }
 
-const attrs = new WeakMap<Node, Map<string, Bind>>(),
+const attrs = new WeakMap<Node, Map<string, Bound>>(),
       getAttr = (elem: Node, name: string) => {
 	const attrMap = attrs.get(elem)!;
 	return attrMap.get(name) ?? setAndReturn(attrMap, name, bind((elem as HTMLElement).getAttribute(name) ?? Null));
@@ -141,7 +141,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		this.dispatchEvent(new CustomEvent("removed"));
 	}
       } : handleAttrs ? class extends getClass(false, false, children) {
-	#acts: Bind[] = [];
+	#acts: Binding[] = [];
 	constructor() {
 		super();
 		attrs.set(this, new Map());
@@ -192,7 +192,7 @@ const attrs = new WeakMap<Node, Map<string, Bind>>(),
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
       } : handleAttrs ? class extends DocumentFragment {
-	#acts: Bind[] = [];
+	#acts: Binding[] = [];
 	readonly classList = classList;
 	readonly style = style;
 	constructor() {
