@@ -405,6 +405,8 @@ This simple example will produce the following page:
 
 ### <a name="css_css">CSS</a>
 
+The default export is a class that extends the [CSSStyleSheet](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet) interface, with the following methods:
+
 |  Method  |  Description  |
 |----------|---------------|
 | [add](#css_css_add) | A method to add a CSS declaration. |
