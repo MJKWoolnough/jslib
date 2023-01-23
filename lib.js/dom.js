@@ -150,7 +150,7 @@ amendNode = (node, properties, children) => {
 							node.style.setProperty(k, p.toString());
 						}
 					}
-				} else {
+				} else if (prop !== null) {
 					node.setAttribute(k, prop);
 					if (prop instanceof Binding) {
 						const p = node.getAttributeNode(k);

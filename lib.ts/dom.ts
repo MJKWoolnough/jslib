@@ -15,9 +15,7 @@ type StyleObj = Record<string, ToString | undefined> | CSSStyleDeclaration;
 
 type EventArray = [Exclude<EventListenerOrEventListenerObject, Bound> | Bound<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean];
 
-type PropValue = ToString | string[] | DOMTokenList | Function | EventArray | EventListenerObject | StyleObj | ClassObj | undefined;
-
-export type PropsObject = Record<string, PropValue>;
+export type PropsObject = Record<string, unknown>;
 
 export type Props = PropsObject | NamedNodeMap;
 
@@ -60,11 +58,11 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	}
 	return res;
       },
-      isEventListenerObject = (prop: PropValue): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
-      isEventListenerOrEventListenerObject = (prop: PropValue): prop is EventListenerOrEventListenerObject => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bound)) || prop instanceof Bound && isEventListenerOrEventListenerObject(prop.value),
-      isEventObject = (prop: PropValue): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
-      isClassObj = (prop: ToString | StyleObj | ClassObj): prop is ClassObj => prop instanceof Object && !(prop instanceof Binding),
-      isStyleObj = (prop: ToString | StyleObj): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
+      isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
+      isEventListenerOrEventListenerObject = (prop: unknown): prop is EventListenerOrEventListenerObject => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bound)) || prop instanceof Bound && isEventListenerOrEventListenerObject(prop.value),
+      isEventObject = (prop: unknown): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
+      isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !(prop instanceof Binding),
+      isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
       isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).getAttributeNode && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttribute && !!(n as NodeAttributes).toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
@@ -199,7 +197,7 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
 							node.style.setProperty(k, p.toString());
 						}
 					}
-				} else {
+				} else if (prop !== null) {
 					node.setAttribute(k, prop as string);
 					if (prop instanceof Binding) {
 						const p = node.getAttributeNode(k);
