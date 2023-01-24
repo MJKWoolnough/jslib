@@ -512,7 +512,7 @@ The dom module can be used to manipulate DOM elements.
 |----------|--------|---------------|
 | [amendNode](#dom_amendnode) | Function | This convenience function modifies a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom_amendnode) except that it clears any children before amending. |
-| Binding | Class | An abstract class that is a parent class of both of the return types from the [bind](#dom_bind_fn) function. |
+| <a name="dom_binding">Binding</a> | Class | An abstract class that is a parent class of both of the return types from the [bind](#dom_bind_fn) function. |
 | [bind](#dom_bind_fn) | Function | Creates bound text objects that can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) functions. |
 | [Bound](#dom_bound) | Class | A subclass of Binding, Objects that implement this type can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
 | [bindElement](#dom_bindelement) | Function | This function simplifies binding of [amendNode](#dom_amendnode). |
@@ -823,8 +823,8 @@ If the `classOnly` Option is set to true, the function will just return the gene
 class WithAttr {
 	act(name: string, fn: (newValue: ToString) => void): void;
 	act(name: string[], fn: (values: Object) => void): void;
-	attr(name: string, fn?: (newValue: ToString) => ToString | null | undefined): Bind;
-	attr(name: string[], fn: (values: Object) => ToString | null | undefined): Bind;
+	attr(name: string, fn?: (newValue: ToString) => ToString | null | undefined): Binding;
+	attr(name: string[], fn: (values: Object) => ToString | null | undefined): Binding;
 }
 ```
 
@@ -832,7 +832,7 @@ This class is added to an element created with the [(default)](#elements_default
 
 The `act` method allows actions to be taken when attributes on the element are changed. When monitoring a single attribute, the newValue will be the new value assigned to that attribute. When monitoring multiple attributes, an Object will be passed to the function with keys on the attribute names set to the value of that attribute.
 
-The `attr` method acts similarly to the `act` method, but will return a [Bind](#dom_bind). When monitoring a single attribute, the value of the Bind object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Bind object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
+The `attr` method acts similarly to the `act` method, but will return a [Binding](#dom_binding). When monitoring a single attribute, the value of the Binding object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
 
 ### <a name="elements_withchildren">WithChildren</a>
 ```typescript
