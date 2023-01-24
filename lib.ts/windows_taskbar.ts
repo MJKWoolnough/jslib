@@ -1,4 +1,4 @@
-import type {Bind} from './dom.js';
+import type {Binding} from './dom.js';
 import CSS from './css.js';
 import {amendNode, bindElement, event, eventOnce} from './dom.js';
 import {div, img, li, ns, slot, span, ul} from './html.js';
@@ -12,9 +12,9 @@ const windowObservations = {
 	"attributes": true
       },
       menuItems = {
-	"CLOSE": '' as string | Bind,
-	"MINIMISE": '' as string | Bind,
-	"RESTORE": '' as string | Bind
+	"CLOSE": '' as string | Binding,
+	"MINIMISE": '' as string | Binding,
+	"RESTORE": '' as string | Binding
       },
       setMenuLang = (l: Parameters<typeof setOtherLanguage>[0]) => {
 	for (const k of ["CLOSE", "MINIMISE", "RESTORE"] as const) {
