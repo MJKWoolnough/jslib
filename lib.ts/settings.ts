@@ -83,7 +83,7 @@ export class StringSetting extends Setting<string> {
 }
 
 export class JSONSetting<T> extends Setting<T> {
-	constructor(name: string, starting: T, validator: (v: any) => v is T) {
+	constructor(name: string, starting: T, validator: (v: unknown) => v is T) {
 		const s = window.localStorage.getItem(name);
 		let value = starting;
 		if (s) {
