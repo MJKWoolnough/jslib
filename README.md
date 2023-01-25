@@ -2070,7 +2070,7 @@ Otherwise this class just extends the base [Setting](#settings_setting) class wi
 ### <a name="settings_jsonsetting">JSONSetting</a>
 ```typescript
 class JSONSetting<T> extends Setting<T> {
-	constructor(name: string, starting: T, validator: (v: any) => v is T);
+	constructor(name: string, starting: T, validator: (v: unknown) => v is T);
 }
 ```
 
