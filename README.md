@@ -1587,14 +1587,14 @@ This queues a focus method call to the passed element, and will call select on a
 
 ### <a name="misc_checkint">checkInt</a>
 ```typescript
-(n: any, min = -Infinity, max = Infinity, def = 0) => number;
+(n: unknown, min = -Infinity, max = Infinity, def = 0) => number;
 ```
 
 This function determines whether `n` is a valid integer, as determined by the [isInt](#misc_isint) function, and returns `n` if it is, or `def` otherwise.
 
 ### <a name="misc_isint">isInt</a>
 ```typescript
-(v: any, min = -Infinity, max = Infinity): v is number;
+(v: unknown, min = -Infinity, max = Infinity): v is number;
 ```
 
 This function determines whether `v` is a valid integer in the range provided (min <= v <= max).
