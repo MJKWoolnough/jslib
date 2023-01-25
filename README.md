@@ -311,18 +311,18 @@ In this example data is sent to a post handler, returning a JSON response which 
 ```
 
 This object modifies an HTTPRequest. It allows setting of the following:
-|  Field            |  Description  |
-|-------------------|---------------|
-| method            | Can change the request method. |
-| user              | Allows the setting of a Basic Authorization username.  |
-| password          | Allows the settings of a Basic Authorization password. |
-| headers           | An object to allow the setting or arbitrary headers. |
-| type              | Sets the Content-Type of the request. |
-| response          | This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the [XMLHTTPRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object. |
-| onuploadprogress  | This sets an event handler to monitor any upload progress. |
+|  Field             |  Description  |
+|--------------------|---------------|
+| method             | Can change the request method. |
+| user               | Allows the setting of a Basic Authorization username.  |
+| password           | Allows the settings of a Basic Authorization password. |
+| headers            | An object to allow the setting or arbitrary headers. |
+| type               | Sets the Content-Type of the request. |
+| response           | This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the [XMLHTTPRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object. |
+| onuploadprogress   | This sets an event handler to monitor any upload progress. |
 | ondownloadprogress | This sets an event handler to monitor any download process. |
-| data              | This is an [XMLHttpRequestBodyInit](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send#body) and is send as the body of the request. |
-| signal            | An [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to be used to cancel any request. |
+| data               | This is an [XMLHttpRequestBodyInit](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send#body) and is send as the body of the request. |
+| signal             | An [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to be used to cancel any request. |
 
 ### <a name="conn_ws">WS</a>
 ```typescript
