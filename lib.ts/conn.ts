@@ -105,7 +105,7 @@ export class WSConn extends WebSocket {
 				eFn(err);
 				ac.abort();
 			}, o);
-			cFn(() => ac.abort);
+			cFn(() => ac.abort());
 		}).when<T, U>(ssFn, eeFn);
 	}
 }
