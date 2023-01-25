@@ -351,7 +351,7 @@ In addition, it adds a method:
 when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: Error) => U) => Subscription<MessageEvent>;
 ```
 
-This method acts like the [then](#inter_subscription_then) method of the [Subscription](#inter_subscription) class from the [inter](#inter) module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error. The method returns a [Subscription](#inter_subscription) object with the success and error functions set to those provided.
+This method acts like the [when](#inter_subscription_when) method of the [Subscription](#inter_subscription) class from the [inter](#inter) module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error. The method returns a [Subscription](#inter_subscription) object with the success and error functions set to those provided.
 
 ## <a name="css">css</a>
 
