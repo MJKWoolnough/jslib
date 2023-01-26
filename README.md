@@ -516,7 +516,7 @@ The dom module can be used to manipulate DOM elements.
 | [bind](#dom_bind_fn) | Function | Creates bound text objects that can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) functions. |
 | [Bound](#dom_bound) | Class | A subclass of Binding, Objects that implement this type can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
 | [bindElement](#dom_bindelement) | Function | This function simplifies binding of [amendNode](#dom_amendnode). |
-| [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), or a recursive array of those. |
+| [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), [Binding](#dom_binding), or a recursive array of those. |
 | [createDocumentFragment](#dom_createdocumentfragment) | Function | This convenience function creates a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment). |
 | [DOMBind](#dom_dombind) | Type | This type represents a binding of either [amendNode](#dom_amendnode) or [clearNode](#dom_clearnode) with the first param bound. |
 | [event](#dom_event) | Function | This helper function helps with setting up events for [amendNode](#dom_amendnode). |
