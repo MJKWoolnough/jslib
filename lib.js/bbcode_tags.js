@@ -2,6 +2,16 @@ import {isCloseTag, isOpenTag, isString, process, text as textSymbol} from './bb
 import {amendNode} from './dom.js';
 import {a, audio as aaudio, blockquote, br, div, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, mark, ol, pre, span, table as atable, tbody, td, tfoot, th, thead, tr, ul} from './html.js';
 
+/**
+ * This module contains many standard [BBCode](https://en.wikipedia.org/wiki/BBCode) tags parsers, and a default text processor.
+ *
+ * This module directly imports the {@link bbcode}, {@link dom}, and {@link html} modules.
+ *
+ * @module bbcode_tags
+ * @requires module:bbcode
+ */
+/** */
+
 const simple = (fn, style) => (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -19,17 +29,32 @@ const simple = (fn, style) => (n, t, p) => {
 	}
       };
 
-export const b = simple(span, "font-weight: bold"),
+export const
+/** Bold Tag */
+b = simple(span, "font-weight: bold"),
+/** Italic Tag */
 i = simple(span, "font-style: italic"),
+/** Underline Tag */
 u = simple(span, "text-decoration: underline"),
+/** Strikethrough Tag */
 s = simple(span, "text-decoration: line-through"),
+/** Left Align Tag */
 left = simple(div, "text-align: left"),
+/** Centre Align Tag */
 centre = simple(div, "text-align: center"),
+/** Center (US) Align Tag */
 center = centre,
+/** Right Align Tag */
 right = simple(div, "text-align: right"),
+/** Full Justify Tag */
 justify = simple(div, "text-align: justify"),
+/** Full Justify Tag */
 full = justify,
+/** Highlight Tag */
 highlight = simple(mark),
+/**
+ * Colour Tag, accepts any {@link https://developer.mozilla.org/en-US/docs/Web/CSS/color_value | CSS Colour Value}
+ */
 colour = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -40,7 +65,11 @@ colour = (n, t, p) => {
 		}
 	}
 },
+/**
+ * Color Tag, accepts any {@link https://developer.mozilla.org/en-US/docs/Web/CSS/color_value | CSS Colour Value}
+ */
 color = colour,
+/** Font Size Tag, accepts an integer between 1 and 100 (inclusive) as a font size. */
 size = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -52,6 +81,9 @@ size = (n, t, p) => {
 		}
 	}
 },
+/*
+ * Font Tag, accepts any value that can be accepted by the {@link https://developer.mozilla.org/en-US/docs/Web/CSS/font-family | font-family} CSS property.
+ */
 font = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -62,13 +94,21 @@ font = (n, t, p) => {
 		}
 	}
 },
+/** H1 Header Tag */
 h1 = simple(ah1),
+/** H2 Header Tag */
 h2 = simple(ah2),
+/** H3 Header Tag */
 h3 = simple(ah3),
+/** H4 Header Tag */
 h4 = simple(ah4),
+/** H5 Header Tag */
 h5 = simple(ah5),
+/** H6 Header Tag */
 h6 = simple(ah6),
+/** Horizontal Rule Tag */
 hr = n => amendNode(n, ahr()),
+/** Link Tag, will accepts a URL as an attribute. If no attribute is specified, it will attempt to parse the contents as a URL. */
 url = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -95,6 +135,7 @@ url = (n, t, p) => {
 		}
 	}
 },
+/** Audio Tag, will attempt to process the contents as a URL. */
 audio = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -119,6 +160,15 @@ audio = (n, t, p) => {
 		}
 	}
 },
+/**
+ * Image Tag, can accept dimensions as an attribute.
+ *
+ * Dimensions can be specified as either absolute pixels, or as a percentage of the containing element.
+ *
+ * Width and Height are separated by an `x` character. Either value can be omitted.
+ *
+ * Will attempt to process the contents as a URL for the image.
+ */
 img = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -165,12 +215,27 @@ img = (n, t, p) => {
 		amendNode(n, aimg(params));
 	}
 },
+/** Pre-formatted Code Tag */
 code = (n, t) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
 		amendNode(n, pre(textContents(t, tk.tagName)));
 	}
 },
+/**
+ * Table Tag.
+ *
+ * Has the following sub tags:
+ *
+ * thead - Table Header
+ * tbody - Table Body
+ * tfoot - Table Footer
+ * tr    - Table Row
+ * th    - Table Header Cell
+ * td    - Table Cell
+ *
+ * These tags follow the same rules as the same-named HTML counterparts.
+ */
 table = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -269,6 +334,7 @@ table = (n, t, p) => {
 		}
 	}
 },
+/** Quotation Tag, will accept attribution as a param. */
 quote = (n, t, p) => {
 	const tk = t.next(1).value;
 	if (tk && isOpenTag(tk)) {
@@ -279,6 +345,7 @@ quote = (n, t, p) => {
 		t.next(1);
 	}
 },
+/** The *list* tag creates a new list. The attribute determines what type of list, with no attribute resulting in an HTMLUListElement, and any of `a`, `A`, `i`, `I`, and `1` resulting in an HTMLOListElement with the type set to the specified value. Any children of the list should be wrapped in `[*] [/*]` tags, though the closing tag can be omitted. */
 list = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
@@ -334,7 +401,9 @@ list = (n, t, p) => {
 		amendNode(n, l);
 	}
 },
+/** Basic Text processor that converts all line breaks into HTMLBRElement's. */
 text = (n, t) => amendNode(n, t.split("\n").map((s, n) => [n > 0 ? br() : [], s])),
+/** An object which contains all of the tag processors and the text processor. */
 all = Object.freeze({
 	b,
 	i,
@@ -367,6 +436,7 @@ all = Object.freeze({
 	list,
 	[textSymbol]: text
 }),
+/** A special tag processor that ignores the tag and continues processing the inner text. */
 none = (n, t, p) => {
 	const tk = t.next(true).value;
 	if (tk && isOpenTag(tk)) {
