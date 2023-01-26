@@ -24,7 +24,7 @@ if [ -n "$ts" ]; then
 	(
 		echo "import type {DOMBind} from './dom.js';";
 		echo "import {bindElement} from './dom.js';";
-		echo -en "\nexport const ns = \"http://www.w3.org/2000/svg\",\nsvgData = (s: SVGSVGElement | SVGSymbolElement) => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + (s instanceof SVGSVGElement ? s.outerHTML.slice(4) : s.outerHTML.slice(7, -7) + \"svg>\")),\n[";
+		echo -en "\n/**\n * The svg module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/SVGElement | SVGElement)s.\n *\n * @module svg\n * @requires module:dom\n */\n/** */\n\nexport const\n/** This constant contains the XMLNamespace of SVGElements. */\nns = \"http://www.w3.org/2000/svg\",\n/**\n * This function takes either a {@link https://developer.mozilla.org/en-US/docs/Web/API/SVGSVGElement | SVGSVGElement} or a {@link https://developer.mozilla.org/en-US/docs/Web/API/SVGSymbolElement | SVGSymbolElement} and returns a URL encoded SVG data string.\n * @param {SVGSVGElement | SVGSymbolElement} s The SVG or Symbol element to be stringified.\n *\n * @return {string} The string representation of the input.\n */\nsvgData = (s: SVGSVGElement | SVGSymbolElement) => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + (s instanceof SVGSVGElement ? s.outerHTML.slice(4) : s.outerHTML.slice(7, -7) + \"svg>\")),\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -64,7 +64,7 @@ fi;
 if [ -n "$js" ]; then
 	(
 		echo "import {bindElement} from './dom.js';";
-		echo -en "\nexport const ns = \"http://www.w3.org/2000/svg\",\nsvgData = s => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + (s instanceof SVGSVGElement ? s.outerHTML.slice(4) : s.outerHTML.slice(7, -7) + \"svg>\")),\n[";
+		echo -en "\n/**\n * The svg module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/SVGElement | SVGElement)s.\n *\n * @module svg\n * @requires module:dom\n */\n/** */\n\nexport const\n/** This constant contains the XMLNamespace of SVGElements. */\nns = \"http://www.w3.org/2000/svg\",\n/**\n * This function takes either a {@link https://developer.mozilla.org/en-US/docs/Web/API/SVGSVGElement | SVGSVGElement} or a {@link https://developer.mozilla.org/en-US/docs/Web/API/SVGSymbolElement | SVGSymbolElement} and returns a URL encoded SVG data string.\n * @param {SVGSVGElement | SVGSymbolElement} s The SVG or Symbol element to be stringified.\n *\n * @return {string} The string representation of the input.\n */\nsvgData = s => \"data:image/svg+xml,\" + encodeURIComponent(\"<svg xmlns=\\\"\" + ns + \"\\\"\" + (s instanceof SVGSVGElement ? s.outerHTML.slice(4) : s.outerHTML.slice(7, -7) + \"svg>\")),\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
