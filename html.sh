@@ -24,7 +24,7 @@ if [ -n "$ts" ]; then
 	(
 		echo "import type {DOMBind} from './dom.js';";
 		echo "import {bindElement} from './dom.js';";
-		echo -en "\nexport const ns = \"http://www.w3.org/1999/xhtml\",\n[";
+		echo -en "\n/**\n * The html module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement)s.\n *\n * @module html\n * @requires module:dom\n */\n/** */\n\nexport const\n/** This constant contains the XMLNamespace of HTMLElements. */\nns = \"http://www.w3.org/1999/xhtml\",\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
@@ -55,7 +55,7 @@ fi;
 if [ -n "$js" ]; then
 	(
 		echo -e "import {bindElement} from './dom.js';\n";
-		echo -en "export const ns = \"http://www.w3.org/1999/xhtml\",\n[";
+		echo -en "\n/**\n * The html module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement)s.\n *\n * @module html\n * @requires module:dom\n */\n/** */\n\nexport const\n/** This constant contains the XMLNamespace of HTMLElements. */\nns = \"http://www.w3.org/1999/xhtml\",\n[";
 		first=true;
 		for tag in $tags; do
 			if $first; then
