@@ -71,6 +71,9 @@ const resizeWindow = (w, direction, e) => {
 	}, 0, signal)});
       },
       moveWindow = (w, e) => {
+	if (e.target instanceof HTMLButtonElement) {
+		return;
+	}
 	const shell = w.parentNode;
 	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
