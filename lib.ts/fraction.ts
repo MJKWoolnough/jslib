@@ -44,7 +44,17 @@ export default class Fraction {
 	sign() {
 		return !this.#denominator ? NaN : !this.#numerator ? 0 : this.#numerator < 0n ? -1 : 1;
 	}
-	[Symbol.toPrimitive]() {
+	[Symbol.toPrimitive](hint: string) {
+		if (hint !== "number") {
+			switch (this.#denominator) {
+			case 0n:
+				return "NaN";
+			case 1n:
+				return `${this.#numerator}`;
+			default:
+				return `${this.#numerator} / ${this.#denominator}`;
+			}
+		}
 		if (!this.#denominator) {
 			return NaN;
 		}
