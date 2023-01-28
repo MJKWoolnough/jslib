@@ -3394,53 +3394,105 @@ type Tests = {
 			}
 		},
 		"Symbol.toPrimitive": {
-			"0": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +Fraction.zero === 0;
+			"number": {
+				"0": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +Fraction.zero === 0;
+				},
+				"1": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +Fraction.one === 1;
+				},
+				"NaN": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return isNaN(+Fraction.NaN);
+				},
+				"-1": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +new Fraction(-1n) === -1;
+				},
+				"1/2": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +new Fraction(1n, 2n) === 0.5;
+				},
+				"2/4": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +new Fraction(2n, 4n) === 0.5;
+				},
+				"1/10": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +new Fraction(1n, 10n) === 0.1;
+				},
+				"30/3": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +new Fraction(30n, 3n) === 10;
+				},
+				"-1/2": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +new Fraction(-1n, 2n) === -0.5;
+				},
+				"2/-4": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +new Fraction(2n, -4n) === -0.5;
+				},
+				"-1/10": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +new Fraction(-1n, 10n) === -0.1;
+				},
+				"30/-3": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return +new Fraction(30n, -3n) === -10;
+				}
 			},
-			"1": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +Fraction.one === 1;
-			},
-			"NaN": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return isNaN(+Fraction.NaN);
-			},
-			"-1": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(-1n) === -1;
-			},
-			"1/2": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(1n, 2n) === 0.5;
-			},
-			"2/4": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(2n, 4n) === 0.5;
-			},
-			"1/10": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(1n, 10n) === 0.1;
-			},
-			"30/3": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(30n, 3n) === 10;
-			},
-			"-1/2": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(-1n, 2n) === -0.5;
-			},
-			"2/-4": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(2n, -4n) === -0.5;
-			},
-			"-1/10": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(-1n, 10n) === -0.1;
-			},
-			"30/-3": async () => {
-				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(30n, -3n) === -10;
+			"string": {
+				"0": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return Fraction.zero + "" === "0";
+				},
+				"1": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return Fraction.one + "" === "1";
+				},
+				"NaN": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return Fraction.NaN + "" === "NaN";
+				},
+				"-1": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return new Fraction(-1n) + "" === "-1";
+				},
+				"1/2": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return new Fraction(1n, 2n) + "" === "1 / 2";
+				},
+				"2/4": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return new Fraction(2n, 4n) + "" === "2 / 4";
+				},
+				"1/10": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return new Fraction(1n, 10n) + "" === "1 / 10";
+				},
+				"30/3": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return new Fraction(30n, 3n) + "" === "30 / 3";
+				},
+				"-1/2": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return new Fraction(-1n, 2n) + "" === "-1 / 2";
+				},
+				"2/-4": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return new Fraction(2n, -4n) + "" === "-2 / 4";
+				},
+				"-1/10": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return new Fraction(-1n, 10n) + "" === "-1 / 10";
+				},
+				"30/-3": async () => {
+					const {default: Fraction} = await import("./lib/fraction.js");
+					return new Fraction(30n, -3n) + "" === "-30 / 3";
+				}
 			}
 		},
 		"add": {
