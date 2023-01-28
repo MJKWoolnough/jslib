@@ -3746,6 +3746,24 @@ type Tests = {
 				const {default: Fraction} = await import("./lib/fraction.js");
 				return Fraction.max(new Fraction(-1n), new Fraction(2n)).cmp(new Fraction(2n)) === 0;
 			}
+		},
+		"simplify": {
+			"2/8": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(2n, 8n).simplify() + "" === "1 / 4";
+			},
+			"-2/8": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(-2n, 8n).simplify() + "" === "-1 / 4";
+			},
+			"8/2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(8n, 2n).simplify() + "" === "4";
+			},
+			"-8/2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return new Fraction(-8n, 2n).simplify() + "" === "-4";
+			}
 		}
 	},
 	"css.js": {
