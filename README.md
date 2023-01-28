@@ -960,6 +960,7 @@ The fraction module exports a default class to act as a fractional, infinite pre
 | NaN | Static Fraction | A Fraction representing [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN). |
 | one | Static Fraction | A Fraction representing 1. |
 | [sign](#fraction_sign) | Method | Returns the sign of the Fraction. |
+| simplify | Fraction | Returns a simplified version of the Fraction. |
 | [sub](#fraction_sub) | Method | Subtract one Fraction from another. |
 | [Symbol.toPrimitive](#fraction_toprimitive) | Method | Converts a Fraction to a Number or String, depending on usage. |
 | zero | Static Fraction | A Fraction representing 0. |
