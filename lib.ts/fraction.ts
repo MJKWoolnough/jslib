@@ -1,3 +1,5 @@
+const gcd = (a: bigint, b: bigint): bigint => b === 0n ? a : gcd(b, a % b);
+
 export default class Fraction {
 	#numerator: bigint;
 	#denominator: bigint;
@@ -43,6 +45,15 @@ export default class Fraction {
 	}
 	sign() {
 		return !this.#denominator ? NaN : !this.#numerator ? 0 : this.#numerator < 0n ? -1 : 1;
+	}
+	simplify() {
+		if (!this.#denominator) {
+			return Fraction.NaN;
+		}
+		const a = this.#numerator < 0n ? -this.#numerator : this.#numerator,
+		      b = this.#denominator,
+		      g = a > b ? gcd(a, b) : gcd(b, a);
+		return new Fraction(this.#numerator / g, b / g);
 	}
 	[Symbol.toPrimitive](hint: string) {
 		if (hint !== "number") {
