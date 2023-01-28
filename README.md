@@ -961,7 +961,7 @@ The fraction module exports a default class to act as a fractional, infinite pre
 | one | Static Fraction | A Fraction representing 1. |
 | [sign](#fraction_sign) | Method | Returns the sign of the Fraction. |
 | [sub](#fraction_sub) | Method | Subtract one Fraction from another. |
-| [Symbol.toPrimitive](#fraction_tofloat) | Method | Converts a Fraction to a Number. |
+| [Symbol.toPrimitive](#fraction_toprimitive) | Method | Converts a Fraction to a Number or String, depending on usage. |
 | zero | Static Fraction | A Fraction representing 0. |
 
 ### Example
@@ -1092,14 +1092,16 @@ For example:
 (new Fraction(3n)).sub(new Fraction(2n) =~ new Fraction(1n);
 ```
 
-### <a name="fraction_tofloat">Symbol.toPrimitive</a>
+### <a name="fraction_toprimitive">Symbol.toPrimitive</a>
 ```typescript
 class Fraction {
-	[Symbol.toPrimitive]() => number;
+	[Symbol.toPrimitive](hint: string) => number | number;
 }
 ```
 
-This method returns a normal javascript number representation of the Fraction value, to 5 decimal places.
+When the hint is set to "number", this method returns a normal javascript number representation of the Fraction value, to 5 decimal places. Otherwise, it returns a string representation of the fraction.
+
+See [toPrimitive](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toPrimitive) documentation for how to use this symbol.
 
 ## <a name="html">html</a>
 
