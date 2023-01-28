@@ -3416,7 +3416,7 @@ type Tests = {
 			},
 			"2/4": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
-				return +new Fraction(1n, 2n) === 0.5;
+				return +new Fraction(2n, 4n) === 0.5;
 			},
 			"1/10": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
