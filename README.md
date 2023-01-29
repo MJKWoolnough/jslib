@@ -513,7 +513,7 @@ The dom module can be used to manipulate DOM elements.
 | [amendNode](#dom_amendnode) | Function | This convenience function modifies a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom_amendnode) except that it clears any children before amending. |
 | <a name="dom_binding">Binding</a> | Class | An abstract class that is a parent class of both of the return types from the [bind](#dom_bind_fn) function. |
-| [bind](#dom_bind_fn) | Function | Creates bound text objects that can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) functions. |
+| [bind](#dom_bind) | Function | Creates bound text objects that can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) functions. |
 | [Bound](#dom_bound) | Class | A subclass of Binding, Objects that implement this type can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
 | [bindElement](#dom_bindelement) | Function | This function simplifies binding of [amendNode](#dom_amendnode). |
 | [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), [Binding](#dom_binding), or a recursive array of those. |
