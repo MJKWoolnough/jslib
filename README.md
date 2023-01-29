@@ -556,7 +556,7 @@ NB: Due to how this function uses instanceof to determine what can be applied to
 
 This function can be used either as a normal function, binding a single value, or as a template tag function.
 
-When used normally, this function takes a single starting value and returns a [Bind](#dom_bind) class with that value set.
+When used normally, this function takes a single starting value and returns a [Bound](#dom_bound) class with that value set.
 
 When used as a tag function, this function will return a type that is bound to all Bind expressions used within the template.
 
