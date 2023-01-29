@@ -562,6 +562,13 @@ When used as a tag function, this function will return a type that is bound to a
 
 Both returned types can be used as attributes or children in amendNode and clearNode calls.
 
+### <a name="dom_bindelement">bindElement</a>
+```typescript
+<T extends Element>(ns: string, value: string) => DOMBind<T>;
+```
+
+This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.
+
 ### <a name="dom_bound">Bound</a>
 ```typescript
 export type Bound<T extends ToString = ToString> {
@@ -574,13 +581,6 @@ export type Bound<T extends ToString = ToString> {
 Objects that implement this type can be used in place of both property values and Children in calls to [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode), as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
 
 When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
-
-### <a name="dom_bindelement">bindElement</a>
-```typescript
-<T extends Element>(ns: string, value: string) => DOMBind<T>;
-```
-
-This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.
 
 ### <a name="dom_children">Children</a>
 ```typescript
