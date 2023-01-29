@@ -49,6 +49,10 @@ export default class Fraction {
 	simplify() {
 		if (!this.#denominator) {
 			return Fraction.NaN;
+		} else if (!this.#numerator) {
+			return Fraction.zero;
+		} else if (this.#numerator === this.#denominator) {
+			return Fraction.one;
 		}
 		const a = this.#numerator < 0n ? -this.#numerator : this.#numerator,
 		      b = this.#denominator,
