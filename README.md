@@ -546,7 +546,7 @@ For any Node, the children are set according to the [Children](#dom_children) va
 
 This function returns the element passed to it.
 
-NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with [window.open()](https://developer.mozilla.org/en-US/docs/Web/API/Window/open)
+NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with [window.open()](https://developer.mozilla.org/en-US/docs/Web/API/Window/open).
 
 ### <a name="dom_bind">bind</a>
 ```typescript
