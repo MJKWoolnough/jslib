@@ -613,7 +613,9 @@ This utility type is useful for any function that wants to call [amendNode](#dom
 
 This helper function is used to create [EventArray](#dom_eventarray)s.
 
-The options param is a bitmask created by ORing together the eventOnce, eventCapture, eventPassive, and eventRemove constants, as per need.
+The `options` param is a bitmask created by ORing together the eventOnce, eventCapture, eventPassive, and eventRemove constants, as per need.
+
+The `signal` param can be used to set a [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to the `signal` option of the [addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) call. This will be unused in a event removal context.
 
 ### <a name="dom_eventarray">EventArray</a>
 ```typescript
