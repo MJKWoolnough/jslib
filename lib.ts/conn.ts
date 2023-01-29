@@ -1,15 +1,39 @@
 import {Subscription} from './inter.js';
 
+/**
+ * The conn module contains some convenience wrappers around {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest | XMLHttpRequest} and {@link https://developer.mozilla.org/en-US/docs/Web/API/WebSocket | WebSocket}.
+ *
+ * @module conn
+ * @requires module:inter
+ */
+
+/** This object modifies an HTTPRequest. */
 export type Properties = {
+	/** Can change the request method. */
 	method?: string;
+	/** Allows the setting of a Basic Authorization username. */
 	user?: string;
+	/** Allows the settings of a Basic Authorization password. */
 	password?: string;
+	/** An object to allow the setting or arbitrary headers. */
 	headers?: object;
+	/** Sets the Content-Type of the request. */
 	type?: string;
+	/**
+	 * This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest | XMLHttpRequest} object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object.
+	 */
 	response?: "" | "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
+	/** This sets an event handler to monitor any upload progress. */
 	onuploadprogress?: (event: ProgressEvent) => void;
+	/** This sets an event handler to monitor any download process. */
 	ondownloadprogress?: (event: ProgressEvent) => void;
+	/**
+	 * This is an {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send#body | XMLHttpRequestBodyInit} and is send as the body of the request.
+	 */
 	data?: XMLHttpRequestBodyInit;
+	/**
+	 * An {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to be used to cancel any request.
+	 */
 	signal?: AbortSignal;
 }
 
@@ -25,7 +49,17 @@ interface requestReturn {
 const once = {"once": true},
       base = new URL(window.location+"");
 
-export const HTTPRequest: requestReturn = <T = any>(url: string, props: Properties = {}): Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest> => new Promise((successFn, errorFn) => {
+export const
+/**
+ * In its simplest incarnation, this function takes a URL a returns a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} which will return the string response from that URL. However, the passed {@link Properties} object can modify both how the request is sent and the response interpreted.
+ *
+ * @typeParam T
+ * @param {string} url         The URL to request.
+ * @param {Properties} [props] An optional object containing properties to modify the request.
+ *
+ * @return {Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest>} A promise resolving to a type that depends on the options passed.
+ */
+HTTPRequest: requestReturn = <T = any>(url: string, props: Properties = {}): Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest> => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
 	xh.open(props["method"] ?? "GET", url);
 	if (props.hasOwnProperty("headers") && typeof props["headers"] === "object") {
@@ -79,6 +113,13 @@ export const HTTPRequest: requestReturn = <T = any>(url: string, props: Properti
 	}
 	xh.send(props["data"] ?? null);
 }),
+/**
+ * This function takes a url and returns a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} which will resolve with an initiated {@link WSConn} on a successful connection.
+ *
+ * @param {string} url An absolute or relative URL to connect to.
+ *
+ * @returns {Promise<WSConn>} A Promise that resolves to a WSConn.
+ */
 WS = (url: string) => new Promise<WSConn>((successFn, errorFn) => {
 	const ws = new WSConn(url);
 	ws.addEventListener("open", () => {
@@ -88,11 +129,32 @@ WS = (url: string) => new Promise<WSConn>((successFn, errorFn) => {
 	ws.addEventListener("error", errorFn, once);
 });
 
+/**
+ * WSConn extends the [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) class, allowing for the passed URL to be relative to the current URL.
+ *
+ * In addition, it adds the {@link WSConn/when} method.
+ */
 export class WSConn extends WebSocket {
+	/**
+	 * The constructor is nearly identical to usage of the parent class except that the url param need not be absolute.
+	 *
+	 * @param {string} url                    URL to connect to, can be absolute or relative.
+	 * @param {string | string[]} [protocols] Either a single, or array of, [sub-]protocols.
+	 */
 	constructor(url: string, protocols?: string | string[]) {
 		super(new URL(url, base), protocols);
 	}
-	when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: Error) => U) {
+	/**
+	 * This method acts like the {@link module:inter/Subscription.when | when} method of the {@link inter:Subscription | Subscription} class from the {@link module:inter | inter} module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error. The method returns a [Subscription](#inter_subscription) object with the success and error functions set to those provided.
+	 *
+	 * @typeParam {any} T = Success type
+	 * @typeParam {any} U = Error type
+	 * @param {(data: MessageEvent) => T} [ssFn] Function to be called when a message arrives.
+	 * @param {(data: Error) => U} [eeFn]        Function to be called when an error occurs.
+	 *
+	 * @return {Subscription<T | Y>} A {@link inter:Subscription | Subscription} object.
+	 */
+	when<T = any, U = any>(ssFn?: (data: MessageEvent) => T, eeFn?: (data: Error) => U): Subscription<T | U> {
 		return new Subscription<MessageEvent>((sFn, eFn, cFn) => {
 			const w = this,
 			      ac = new AbortController(),
