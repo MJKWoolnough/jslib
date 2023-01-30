@@ -965,6 +965,8 @@ The fraction module exports a default class to act as a fractional, infinite pre
 | simplify | Fraction | Returns a simplified version of the Fraction. |
 | [sub](#fraction_sub) | Method | Subtract one Fraction from another. |
 | [Symbol.toPrimitive](#fraction_toprimitive) | Method | Converts a Fraction to a Number or String, depending on usage. |
+| toFloat | Method | Converts a Fraction to a Number. |
+| toString | Method | Converts a Fraction to a string. |
 | zero | Static Fraction | A Fraction representing 0. |
 
 ### Example
