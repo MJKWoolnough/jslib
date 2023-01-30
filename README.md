@@ -502,7 +502,7 @@ This function deeply adds the `add` values to the `base`, and returns the merged
 type Value = string | number | ToString;
 ```
 
-This unexported type represents a CSS value, as either a string, number or any object with the toString [method](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toString).
+This unexported type represents a CSS value, as either a string, number or any object with the [toString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toString) method.
 
 ## <a name="dom">dom</a>
 
