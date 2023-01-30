@@ -60,20 +60,23 @@ export default class Fraction {
 		return new Fraction(this.#numerator / g, b / g);
 	}
 	[Symbol.toPrimitive](hint: string) {
-		if (hint !== "number") {
-			switch (this.#denominator) {
-			case 0n:
-				return "NaN";
-			case 1n:
-				return `${this.#numerator}`;
-			default:
-				return `${this.#numerator} / ${this.#denominator}`;
-			}
-		}
+		return hint === "number" ? this.toFloat() : this.toString();
+	}
+	toFloat() {
 		if (!this.#denominator) {
 			return NaN;
 		}
 		return Number(10000n * this.#numerator / this.#denominator) / 10000;
+	}
+	toString() {
+		switch (this.#denominator) {
+		case 0n:
+			return "NaN";
+		case 1n:
+			return `${this.#numerator}`;
+		default:
+			return `${this.#numerator} / ${this.#denominator}`;
+		}
 	}
 	static min(a: Fraction, b: Fraction) {
 		return a.cmp(b) === -1 ? a : b;
