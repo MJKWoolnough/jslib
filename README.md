@@ -457,7 +457,7 @@ class CSS {
 
 This method will return sequential unique ids to be used as either class names or element IDs. The prefix of the string will be as provided to the [constructor](#css_css_constructor) and the suffix will be an increasing number starting at the value provided to the [constructor](#css_css_constructor).
 
-#### <a name="css_css_ids">id</a>
+#### <a name="css_css_ids">ids</a>
 ```typescript
 class CSS {
 	ids(n: number): string[];
