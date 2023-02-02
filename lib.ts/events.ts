@@ -1,3 +1,9 @@
+/**
+ * The event module is used for easy creation of global events.
+ *
+ * @module events
+ */
+
 type KeyFn = (e: KeyboardEvent) => void;
 
 type MouseFn = (e: MouseEvent) => void;
@@ -97,10 +103,32 @@ const maxMouseButton = 16,
 	return a;
       };
 
-export let mouseX = 0,
+export let
+/** The current X coordinate of the mouse. */
+mouseX = 0,
+/** The current Y coordinate of the mouse. */
 mouseY = 0;
 
-export const keyEvent = (key: string | string[], onkeydown?: KeyFn, onkeyup?: KeyFn, once = false) => {
+export const
+/**
+ * This function takes a key combination or array of key combinations, an optional {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent | KeyboardEvent} function to act as the keydown event handler, an optional {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent | KeyboardEvent} function to act as the keyup handler, and an optional boolean (default false) to determine if the event only runs one time per activation.
+ *
+ * The key combinations are strings which can contain key names as determined by the {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key | KeyboardEvent.key} value, and can be prefixed by any number of the following: `Alt+`, `Option+`, `Control+`, `Ctrl+`, `Command+`, `Meta+`, `Super+`, `Windows+`, and `Shift+`.
+ *
+ * The function returns an array of three functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function.
+ *
+ * The last function returned, allows the registered key(s) to be changed to the newKey string/array passed. The now param will be passed to the stop function when cancelling the previously assigned keys.
+ *
+ * NB: If the window loses focus, the module will generate a keyup event. This can be detected be checking the {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted| Event.isTrusted} field.
+ *
+ * @param {string | string[]} key A key combination string, or an array of key combination strings.
+ * @param {(e: KeyboardEvent) => void} [onkeydown]     Function to be called when one of the key combinations is pressed.
+ * @param {(e: KeyboardEvent) => void} [onkeyup]       Function to be called when one of the key combinations is released.
+ * @param {boolean} [once=false]  When set to true, will only activate one time.
+ *
+ * @return {[() => void, (now = true) => void, (newKey: string | string[], now = true) => void]} Array of functions as described above.
+ */
+keyEvent = (key: string | string[], onkeydown?: KeyFn, onkeyup?: KeyFn, once = false) => {
 	const keydown: [KeyFn, boolean] = [onkeydown!, once],
 	      keyup: [KeyFn, boolean] = [onkeyup!, once],
 	      keys = (typeof key === "string" ? [key] : key).filter(k => !!k).map(parseCombination),
@@ -147,6 +175,18 @@ export const keyEvent = (key: string | string[], onkeydown?: KeyFn, onkeyup?: Ke
 		}
 	] as const;
 },
+/**
+ * This function takes a {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent | MouseEvent} function and an optional function which will be run when the event deactivates.
+ *
+ * The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any mouseup event handler unless false is passed into the function.
+ *
+ * NB: If the window loses focus, the module will run the onend function.
+ *
+ * @param {(e: MouseEvent) => void} onmousemove Function to be called when the mouse is moved.
+ * @param {() => void} [onend]  Function to be called when the event is stopped.
+ *
+ * @return {[() => void, (run = true) => void]} Array of Functions as descrived above.
+ */
 mouseMoveEvent = (onmousemove: MouseFn, onend?: () => void) => {
 	const id = nextMouseID++;
 	return [
@@ -164,6 +204,19 @@ mouseMoveEvent = (onmousemove: MouseFn, onend?: () => void) => {
 		}
 	] as const;
 },
+/**
+ * This function takes a mouse button (0..15), an optional {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent | MouseEvent} function to act as the mousemove event handler, and an optional function to be run on mouseup.
+ *
+ * The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any mouseup event handler unless false is passed into the function.
+ *
+ * NB: If the window loses focus, the module will generate a mouseup event. This can be detected be checking the {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted| Event.isTrusted} field.
+ *
+ * @param {number} button  Mouse button to detect being released.
+ * @param {(e: MouseEvent) => void} onmousemove Function to be called when the mouse is moved.
+ * @param {(e: MouseEvent) => void} onmouseup   Function to be called when the mouse button is released.
+ *
+ * @return {[() => void, (run = true) => void]} Array of functions, as described above.
+ */
 mouseDragEvent = (button: MouseButton, onmousemove?: MouseFn, onmouseup: MouseFn = () => {}) => {
 	const id = nextMouseID++;
 	return [
@@ -181,6 +234,13 @@ mouseDragEvent = (button: MouseButton, onmousemove?: MouseFn, onmouseup: MouseFn
 		}
 	] as const;
 },
+/**
+ * This function returns true if any function is currently active for the passed key.
+ *
+ * @param {string} key The key (combination) string to be checked.
+ *
+ * @return {boolean} True if there is a currently active handler for the `key` string.
+ */
 hasKeyEvent = (key: string) => {
 	const kc = parseCombination(key);
 	for (const evs of [downs, ups]) {
