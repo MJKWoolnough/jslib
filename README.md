@@ -1171,7 +1171,7 @@ The Pickup Class is used to pass a single value to a single recipient.
 
 |  Method  |  Description  |
 |----------|---------------|
-| get      | Used to retrieve the value if one has been set. It will return `undefined` if no value is currently set. |
+| get      | Used to retrieve the value if one has been set. It will return `undefined` if no value is currently set. Clears any data stored.|
 | set      | Used to set the value on the class. |
 
 ### <a name="inter_pipe">Pipe</a>
