@@ -1451,7 +1451,7 @@ class WaitGroup {
 
 This method adds to the number of registered tasks.
 
-#### <a name="inter_waitgroup_donn">done</a>
+#### <a name="inter_waitgroup_done">done</a>
 ```typescript
 class WaitGroup {
 	done() => void;
