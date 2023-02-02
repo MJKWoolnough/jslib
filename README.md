@@ -777,7 +777,7 @@ The unexported Transfer interface describes an object that will transfer a T to 
 
 ## <a name="elements">elements</a>
 
-The elements module allows for easy creation of custom elements, with simple attribute and event binding
+The elements module allows for easy creation of custom elements, with simple attribute and event binding.
 
 This module directly imports the [dom](#dom) and [html](#html) modules.
 
