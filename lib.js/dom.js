@@ -1,3 +1,41 @@
+/**
+ * The dom module can be used to manipulate DOM elements.
+ *
+ * @module dom
+ */
+/** */
+
+/**
+ * This type can be used to set events with {@link amendNode} and {@link clearNode}. The boolean is true if the event is to be removed
+ *
+ * @typedef {[Exclude<EventListenerOrEventListenerObject, Bound> | Bound<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean]} EventArray
+ */
+
+/**
+ * This object is used to set attributes and events on a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node) or {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget | EventTarget} with the {@link amendNode} and {@link clearNode} functions.
+ *
+ * @typedef {Record<string, unknown>} PropsObject
+ */
+
+/**
+ * This type represents all possible values for the `properties` param of the {@link amendNode} and {@link clearNode} functions.
+ *
+ * @typedef {PropsObject | NamedNodeMap} Props
+ */
+
+/**
+ * This type is a string, {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}, {@link https://developer.mozilla.org/en-US/docs/Web/API/NodeList | NodeList}, {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection | HTMLCollection}, {@link Binding}, or a recursive array of those.
+ *
+ * @typedef {string | Node | Children[] | NodeList | HTMLCollection | Binding} Children;
+ */
+
+/**
+ * This type represents a binding of either {@link amendNode} or {@link clearNode} with the first param bound.
+ *
+ * @typeParam {Node} T
+ * @typedef {(properties?: Props, children?: Children): T | (children?: Children): T} DOMBind
+ */
+
 const childrenArr = (children, res = []) => {
 	if (children instanceof Binding) {
 		res.push(children[setNode](new Text(children+"")));
@@ -22,6 +60,9 @@ const childrenArr = (children, res = []) => {
       update = Symbol("update"),
       remove = Symbol("remove");
 
+/**
+ * An abstract class that is a parent class of both of the return types from the {@link bind} function.
+ */
 export class Binding {
 	#set = new Set();
 	[setNode](n) {
@@ -75,6 +116,11 @@ class TemplateBind extends Binding {
 	}
 }
 
+/**
+ * Objects that implement this type can be used in place of both property values and Children in calls to {@link amendNode and {@link clearNode}, as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
+ *
+ * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
+ */
 export class Bound extends Binding {
 	#value;
 	constructor(v) {
@@ -110,7 +156,33 @@ export class Bound extends Binding {
 	}
 }
 
-export const isChildren = properties => typeof properties === "string" || properties instanceof Array || properties instanceof NodeList || properties instanceof HTMLCollection || properties instanceof Node || properties instanceof Binding,
+export const
+/**
+ * This function determines whether the passed in object can be used as a {@link Children} type.
+ *
+ * @param {Props | Children} propertiesOrChildren The value to be checked for 'Children'-ness.
+ *
+ * @return {boolean} True is the passed value can be assigned to a Children type.
+ */
+isChildren = propertiesOrChildren => typeof propertiesOrChildren === "string" || propertiesOrChildren instanceof Array || propertiesOrChildren instanceof NodeList || propertiesOrChildren instanceof HTMLCollection || propertiesOrChildren instanceof Node || propertiesOrChildren instanceof Binding,
+/**
+ * This function is used to set attributes and children on {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s, and events on {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s and other {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget | EventTarget}s.
+ *
+ * If the element passed is a {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement} or {@link https://developer.mozilla.org/en-US/docs/Web/API/SVGElement | SVGElement}, then a properties param is processed, applying attributes as per the {@link PropsObject} type. Likewise, any events are set or unset on a passed {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget | EventTarget}, as per the {@link PropsObject} type.
+ *
+ * For any Node, the children are set according to the {@link Children} value.
+ *
+ * This function returns the element passed to it.
+ *
+ * NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/open | window.open}.
+ *
+ * @typeParam {EventTarget | null} T
+ * @param {T} [node]                      The EventTarget or Node to be modified.
+ * @param {Props | Children} [properties] The properties to be added to the EventTarget or Node. Can be ommitted with Children in its place.
+ * @param {Children} [Children]           Children to be added to a Node. Should be ommitted if `properties` was set to a Children type.
+ *
+ * @return {T} The passed EventTarget or Node.
+ */
 amendNode = (node, properties, children) => {
 	if (properties && isChildren(properties)) {
 		children = properties;
@@ -177,12 +249,40 @@ amendNode = (node, properties, children) => {
 	}
 	return node;
 },
+/**
+ * This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.
+ * @typeParam {Element} T
+ * @param {string} ns    Namespace of the bound element.
+ * @param {string} value Name of the element.
+ *
+ * @return {(props? Props | Children, children?: Children) => T} Function used to create a `T` element with the specified properties and/or children.
+ * */
 bindElement = (ns, value) => Object.defineProperty((props, children) => amendNode(document.createElementNS(ns, value), props, children), "name", {value}),
+/** Can be passed to the {@link event} function to set the `once` property on an event. */
 eventOnce = 1,
+/** Can be passed to the {@link event} function to set the `capture` property on an event. */
 eventCapture = 2,
+/** Can be passed to the {@link event} function to set the `passive` property on an event. */
 eventPassive = 4,
+/** Can be passed to the {@link event} function to set the event to be removed. */
 eventRemove = 8,
+/**
+ * This helper function is used to create {@link EventArray}s.
+ *
+ * @param {Function | Exclude<EventListenerObject, Bound> | Bound<Function | EventListenerObject>} fn An Event Function or a EventListenerObject, or a {@link Bound} version of those.
+ * @param {number} options                                                                            The options param is a bitmask created by ORing together the {@link eventOnce}, {@link eventCapture}, {@link eventPassive}, and {@link eventRemove} constants, as per need.
+ * @param {AbortSignal} [signal]                                                                      The `signal` param can be used to set a {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to the `signal` option of the {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener | addEventListener} call. This will be unused in a event removal context.
+ *
+ * @return {EventArray} An array that can be used with {@link amendNode}, {@link clearNode}, or any DOMBind function to add or remove an event, as specified.
+ */
 event = (fn, options, signal) => [fn, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
+/**
+ * This function creates a {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment} that contains any {@link Children} passed to it, as with {@link amendNode}.
+ *
+ * @param {Children} [children] Children to be added to a new DocumentFragment.
+ *
+ * @return {DocumentFragment} A DocumentFragment with specified children attached.
+ */
 createDocumentFragment = children => {
 	const df = document.createDocumentFragment();
 	if (typeof children === "string") {
@@ -194,6 +294,15 @@ createDocumentFragment = children => {
 	}
 	return df;
 },
+/**
+ * This function acts identically to {@link amendNode} except that it clears any children before amending.
+ *
+ * @typeParam {Node} T
+ * @param {Props | Children} [properties] The properties to be added to the EventTarget or Node. Can be ommitted with Children in its place.
+ * @param {Children} [Children]           Children to be added to the Node. Should be ommitted if `properties` was set to a Children type.
+ *
+ * @return {T} The Node being cleared.
+ */
 clearNode = (node, properties, children) => {
 	if (!node) {
 		return node;
@@ -212,6 +321,20 @@ clearNode = (node, properties, children) => {
 	}
 	return amendNode(node, properties, children);
 },
+/**
+ * This function can be used either as a normal function, binding a single value, or as a template tag function.
+ *
+ * When used normally, this function takes a single starting value and returns a {@link Bound} class with that value set.
+ *
+ * When used as a tag function, this function will return a type that is bound to all Bind expressions used within the template.
+ *
+ * Both returned types can be used as attributes or children in amendNode and clearNode calls.
+ *
+ * @typeParam {ToString} T
+ * @param {T} v Value to be bound so it can be changed when assigned to an element attribute or child.
+ *
+ * @return {Binding} Bound value.
+ */
 bind = (v, first, ...bindings) => {
 	if (v instanceof Array && first) {
 		return new TemplateBind(v, first, ...bindings);
