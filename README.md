@@ -1064,7 +1064,7 @@ class Fraction {
 }
 ```
 
-The div method creates a new Fraction with the values set as the result of the base Fraction multiplied by the passed Fraction.
+The mul method creates a new Fraction with the values set as the result of the base Fraction multiplied by the passed Fraction.
 
 ### <a name="fraction_sign">sign</a>
 ```typescript
