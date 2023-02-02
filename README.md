@@ -1091,7 +1091,6 @@ class Fraction {
 
 The sub method creates a new Fraction with the values set as the result of the passed Fraction subtracted from the base Fraction.
 
-
 For example:
 ```typescript
 (new Fraction(3n)).sub(new Fraction(2n) =~ new Fraction(1n);
