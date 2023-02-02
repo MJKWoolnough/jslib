@@ -1417,7 +1417,7 @@ class Subscription<T> {
 }
 ```
 
-This method creates a break in the cancel signal chain, so that any cancel signal simply removes that Subscription from it's parent.
+This method creates a break in the cancel signal chain, so that any cancel signal simply removes that Subscription from its parent.
 
 The cancelOnEmpty flag, when true, will send an actual cancel signal all the way up the chain when called on the last split child.
 
