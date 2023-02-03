@@ -66,29 +66,23 @@ const childrenArr = (children, res = []) => {
 export class Binding {
 	#set = new Set();
 	[setNode](n) {
-		this.#set.add(new WeakRef(n));
+		this.#set.add(n);
 		return n;
 	}
 	[update]() {
 		const text = this+"";
-		for (const wr of this.#set) {
-			const ref = wr.deref();
-			if (ref) {
-				if (ref instanceof Binding) {
-					ref[update]();
-				} else {
-					ref.textContent = text;
-				}
+		for (const ref of this.#set) {
+			if (ref instanceof Binding) {
+				ref[update]();
 			} else {
-				this.#set.delete(wr);
+				ref.textContent = text;
 			}
 		}
 	}
 	[remove](b) {
-		for (const wr of this.#set) {
-			const ref = wr.deref();
-			if (!ref || ref === b) {
-				this.#set.delete(wr);
+		for (const ref of this.#set) {
+			if (ref === b) {
+				this.#set.delete(ref);
 			}
 		}
 	}

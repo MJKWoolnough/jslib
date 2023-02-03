@@ -92,31 +92,25 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
  * An abstract class that is a parent class of both of the return types from the {@link bind} function.
  */
 export abstract class Binding {
-	#set = new Set<WeakRef<TextContent | Binding>>();
+	#set = new Set<TextContent | Binding>();
 	[setNode]<T extends TextContent | Binding>(n: T) {
-		this.#set.add(new WeakRef(n));
+		this.#set.add(n);
 		return n;
 	}
 	[update]() {
 		const text = this+"";
-		for (const wr of this.#set) {
-			const ref = wr.deref();
-			if (ref) {
-				if (ref instanceof Binding) {
-					ref[update]();
-				} else {
-					ref.textContent = text;
-				}
+		for (const ref of this.#set) {
+			if (ref instanceof Binding) {
+				ref[update]();
 			} else {
-				this.#set.delete(wr);
+				ref.textContent = text;
 			}
 		}
 	}
 	[remove](b: Binding) {
-		for (const wr of this.#set) {
-			const ref = wr.deref();
-			if (!ref || ref === b) {
-				this.#set.delete(wr);
+		for (const ref of this.#set) {
+			if (ref === b) {
+				this.#set.delete(ref);
 			}
 		}
 	}
