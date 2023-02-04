@@ -55,7 +55,7 @@ const childrenArr = (children, res = []) => {
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object && !(prop instanceof Binding),
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
-      isNodeAttributes = n => !!n.style && !!n.classList && !!n.getAttributeNode && !!n.removeAttribute && !!n.setAttributeNode && !!n.toggleAttribute,
+      isNodeAttributes = n => !!n.style && !!n.classList && !!n.removeAttribute && !!n.setAttributeNode && !!n.toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
       remove = Symbol("remove");

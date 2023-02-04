@@ -54,7 +54,6 @@ interface BindFn {
 interface NodeAttributes extends Node {
 	readonly classList: DOMTokenList;
 	readonly style: CSSStyleDeclaration;
-	getAttributeNode(qualifiedName: string): Attr | null;
 	removeAttribute(qualifiedName: string): void;
 	setAttributeNode(attr: Attr): Attr | null;
 	toggleAttribute(qualifiedName: string, force?: boolean): boolean;
@@ -79,7 +78,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       isEventObject = (prop: unknown): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !(prop instanceof Binding),
       isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
-      isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).getAttributeNode && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute,
+      isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
       remove = Symbol("remove");
