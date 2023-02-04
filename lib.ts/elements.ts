@@ -166,7 +166,7 @@ const attrs = new WeakMap<Node, Map<string, Bound>>(),
 	}
 	setAttributeNode(attribute: Attr) {
 		const attr = this.getAttributeNode(attribute.name);
-		return setAttr(this, attribute.name, attribute.value) === null ? super.setAttributeNode(attribute) : attr;
+		return setAttr(this, attribute.name, "realValue" in attribute ? attribute.realValue ?? Null : attribute.value) === null ? super.setAttributeNode(attribute) : attr;
 	}
 	removeAttribute(qualifiedName: string) {
 		setAttr(this, qualifiedName, Null) ?? super.removeAttribute(qualifiedName);
@@ -224,7 +224,7 @@ const attrs = new WeakMap<Node, Map<string, Bound>>(),
 		setAttr(this, qualifiedName, value);
 	}
 	setAttributeNode(attribute: Attr) {
-		setAttr(this, attribute.name, attribute.value);
+		setAttr(this, attribute.name, "realValue" in attribute ? attribute.realValue ?? Null : attribute.value);
 		return null;
 	}
 	removeAttribute(qualifiedName: string) {
