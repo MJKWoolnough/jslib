@@ -292,7 +292,7 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
 						}
 					}
 				} else if (prop !== null) {
-					const attr = document.createAttributeNS(null, k);
+					const attr = Object.assign(document.createAttributeNS(null, k), {"realValue": prop});
 					attr.textContent = prop + "";
 					node.setAttributeNode(prop instanceof Binding ? prop[setNode](attr) : attr);
 				}
