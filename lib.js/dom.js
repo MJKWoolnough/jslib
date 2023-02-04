@@ -58,80 +58,58 @@ const childrenArr = (children, res = []) => {
       isNodeAttributes = n => !!n.style && !!n.classList && !!n.getAttributeNode && !!n.removeAttribute && !!n.setAttributeNode && !!n.toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
-      remove = Symbol("remove"),
-      hasRefs = Symbol("hasRefs"),
-      refs = new Set<TextContent | Binding>(),
-      updateRefs = (() => {
-	const update = () => {
-		updating = false;
-		for (const ref of refs) {
-			if (ref instanceof Attr) {
-				if (ref.ownerElement) {
-					continue;
-				}
-			} else if (ref instanceof Text) {
-				if (ref.parentNode) {
-					continue;
-				}
-			} else if (ref instanceof Binding) {
-				if (ref[hasRefs]()) {
-					continue;
-				}
-			}
-			refs.delete(ref);
-		}
-	      };
-	let updating = false;
-	return () => {
-		if (!updating) {
-			setTimeout(update);
-			updating = true;
-		}
-	}
-      })();
-
+      remove = Symbol("remove");
 
 /**
  * An abstract class that is a parent class of both of the return types from the {@link bind} function.
  */
 export class Binding {
 	#set = new Set();
+	#cleanSet() {
+		for (const n of Array.from(this.#set)) {
+			if (n instanceof WeakRef) {
+				const ref = n.deref();
+				if (!ref) {
+					this.#set.delete(n);
+				} else if (n instanceof Binding && n.#set.size || n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement) {
+					this.#set.delete(n);
+					this.#set.add(ref);
+				}
+			} else if (n instanceof Binding && !n.#set.size || n instanceof Text && !n.parentNode || n instanceof Attr && !n.ownerElement) {
+				this.#set.delete(n);
+				this.#set.add(new WeakRef(n));
+			}
+		}
+	}
 	[setNode](n) {
-		updateRefs();
-		refs.add(n);
-		this.#set.add(new WeakRef(n));
+		this.#cleanSet();
+		this.#set.add(n);
 		return n;
 	}
 	[update]() {
-		updateRefs();
 		const text = this+"";
 		for (const wr of this.#set) {
-			const ref = wr.deref();
-			if (ref) {
-				if (ref instanceof Binding) {
-					ref[update]();
-				} else {
-					ref.textContent = text;
+			const n = wr instanceof WeakRef ? wr.deref() : wr;
+			if (n instanceof Binding) {
+				n[update]();
+			} else if (n) {
+				n.textContent = text;
+			}
+		}
+		this.#cleanSet();
+	}
+	[remove](b) {
+		this.#cleanSet();
+		for (const n of this.#set) {
+			if (n === b) {
+				this.#set.delete(n);
+			} else if (n instanceof WeakRef) {
+				const ref = n.deref();
+				if (!ref || ref === b) {
+					this.#set.delete(n);
 				}
 			}
 		}
-	}
-	[remove](b) {
-		updateRefs();
-		for (const wr of this.#set) {
-			const ref = wr.deref();
-			if (!ref || ref === b) {
-				this.#set.delete(wr);
-			}
-		}
-	}
-	[hasRefs]() {
-		for (const wr of this.#set) {
-			if (!wr.deref()) {
-				this.#set.delete(wr);
-			}
-		}
-		return !!this.#set.size;
 	}
 }
 
