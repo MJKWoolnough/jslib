@@ -60,7 +60,7 @@ interface NodeAttributes extends Node {
 	readonly style: CSSStyleDeclaration;
 	getAttributeNode(qualifiedName: string): Attr | null;
 	removeAttribute(qualifiedName: string): void;
-	setAttribute(qualifiedName: string, value: string): void;
+	setAttributeNode(attr: Attr): Attr | null;
 	toggleAttribute(qualifiedName: string, force?: boolean): boolean;
 }
 
@@ -83,7 +83,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       isEventObject = (prop: unknown): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !(prop instanceof Binding),
       isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
-      isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).getAttributeNode && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttribute && !!(n as NodeAttributes).toggleAttribute,
+      isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).getAttributeNode && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute,
       setNode = Symbol("setNode"),
       update = Symbol("update"),
       remove = Symbol("remove"),
@@ -117,7 +117,6 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 		}
 	}
       })();
-
 
 /**
  * An abstract class that is a parent class of both of the return types from the {@link bind} function.
@@ -293,13 +292,9 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
 						}
 					}
 				} else if (prop !== null) {
-					node.setAttribute(k, prop as string);
-					if (prop instanceof Binding) {
-						const p = node.getAttributeNode(k);
-						if (p) {
-							prop[setNode](p);
-						}
-					}
+					const attr = document.createAttributeNS(null, k);
+					attr.textContent = prop + "";
+					node.setAttributeNode(prop instanceof Binding ? prop[setNode](attr) : attr);
 				}
 			}
 		}
