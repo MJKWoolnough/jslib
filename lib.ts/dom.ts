@@ -46,10 +46,6 @@ export interface DOMBind<T extends Node> {
 	(children?: Children): T;
 }
 
-interface TextContent {
-	textContent: string | null;
-}
-
 interface BindFn {
 	<T extends ToString = ToString>(t: T): Bound<T>;
 	(strings: TemplateStringsArray, ...bindings: (Bound | ToString)[]): Binding;
@@ -88,7 +84,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       update = Symbol("update"),
       remove = Symbol("remove"),
       hasRefs = Symbol("hasRefs"),
-      refs = new Set<TextContent | Binding>(),
+      refs = new Set<Attr | Text | Binding>(),
       updateRefs = (() => {
 	const update = () => {
 		updating = false;
@@ -122,8 +118,8 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
  * An abstract class that is a parent class of both of the return types from the {@link bind} function.
  */
 export abstract class Binding {
-	#set = new Set<WeakRef<TextContent | Binding>>();
-	[setNode]<T extends TextContent | Binding>(n: T) {
+	#set = new Set<WeakRef<Attr | Text | Binding>>();
+	[setNode]<T extends Attr | Text | Binding>(n: T) {
 		updateRefs();
 		refs.add(n);
 		this.#set.add(new WeakRef(n));
