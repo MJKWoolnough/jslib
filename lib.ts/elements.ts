@@ -223,8 +223,16 @@ const attrs = new WeakMap<Node, Map<string, Bound>>(),
 	setAttribute(qualifiedName: string, value: string) {
 		setAttr(this, qualifiedName, value);
 	}
+	setAttributeNode(attribute: Attr) {
+		setAttr(this, attribute.name, attribute.value);
+		return null;
+	}
 	removeAttribute(qualifiedName: string) {
 		setAttr(this, qualifiedName, Null);
+	}
+	removeAttributeNode(attribute: Attr) {
+		this.removeAttribute(attribute.name);
+		return null;
 	}
       } : DocumentFragment,
       genName = () => {
