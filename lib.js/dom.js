@@ -65,11 +65,14 @@ const childrenArr = (children, res = []) => {
  */
 export class Binding {
 	#set = new Set();
-	#cleanSet() {
+	#cleanSet(b) {
+		if (b) {
+			this.#set.delete(b);
+		}
 		for (const n of Array.from(this.#set)) {
 			if (n instanceof WeakRef) {
 				const ref = n.deref();
-				if (!ref) {
+				if (!ref || ref === b) {
 					this.#set.delete(n);
 				} else if (n instanceof Binding && n.#set.size || n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement) {
 					this.#set.delete(n);
@@ -99,17 +102,7 @@ export class Binding {
 		this.#cleanSet();
 	}
 	[remove](b) {
-		this.#cleanSet();
-		for (const n of this.#set) {
-			if (n === b) {
-				this.#set.delete(n);
-			} else if (n instanceof WeakRef) {
-				const ref = n.deref();
-				if (!ref || ref === b) {
-					this.#set.delete(n);
-				}
-			}
-		}
+		this.#cleanSet(b);
 	}
 }
 

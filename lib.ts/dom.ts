@@ -89,11 +89,14 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
  */
 export abstract class Binding {
 	#set = new Set<Attr | Text | Binding | WeakRef<Attr | Text | Binding>>();
-	#cleanSet() {
+	#cleanSet(b?: Binding) {
+		if (b) {
+			this.#set.delete(b);
+		}
 		for (const n of Array.from(this.#set)) {
 			if (n instanceof WeakRef) {
 				const ref = n.deref();
-				if (!ref) {
+				if (!ref || ref === b) {
 					this.#set.delete(n);
 				} else if (n instanceof Binding && n.#set.size || n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement) {
 					this.#set.delete(n);
@@ -123,17 +126,7 @@ export abstract class Binding {
 		this.#cleanSet();
 	}
 	[remove](b: Binding) {
-		this.#cleanSet();
-		for (const n of this.#set) {
-			if (n === b) {
-				this.#set.delete(n);
-			} else if (n instanceof WeakRef) {
-				const ref = n.deref();
-				if (!ref || ref === b) {
-					this.#set.delete(n);
-				}
-			}
-		}
+		this.#cleanSet(b);
 	}
 	abstract toString(): string;
 }
