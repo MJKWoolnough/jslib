@@ -88,6 +88,8 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
  */
 export abstract class Binding {
 	#set = new Set<Attr | Text | Binding | WeakRef<Attr | Text | Binding>>();
+	#to!: Function;
+	#st = -1;
 	#cleanSet(b?: Binding) {
 		if (b) {
 			this.#set.delete(b);
@@ -105,6 +107,13 @@ export abstract class Binding {
 				this.#set.delete(n);
 				this.#set.add(new WeakRef(n));
 			}
+		}
+		if (this.#st !== -1) {
+			clearTimeout(this.#st);
+			this.#st = -1;
+		}
+		if (this.#set.size) {
+			this.#st = setTimeout(this.#to ??= () => this.#cleanSet(), 50000 + Math.floor(Math.random() * 20000));
 		}
 	}
 	[setNode]<T extends Attr | Text | Binding>(n: T) {

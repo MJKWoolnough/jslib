@@ -65,6 +65,7 @@ const childrenArr = (children, res = []) => {
  */
 export class Binding {
 	#set = new Set();
+	#st = -1;
 	#cleanSet(b) {
 		if (b) {
 			this.#set.delete(b);
@@ -82,6 +83,13 @@ export class Binding {
 				this.#set.delete(n);
 				this.#set.add(new WeakRef(n));
 			}
+		}
+		if (this.#st !== -1) {
+			clearTimeout(this.#st);
+			this.#st = -1;
+		}
+		if (this.#set.size) {
+			this.#st = setTimeout(this.#to ??= () => this.#cleanSet(), 50000 + Math.floor(Math.random() * 20000));
 		}
 	}
 	[setNode](n) {
