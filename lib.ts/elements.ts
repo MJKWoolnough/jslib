@@ -1,18 +1,40 @@
 import type {Binding, Children, DOMBind, Props, PropsObject} from './dom.js';
 import {Bound, amendNode, bind, isChildren} from './dom.js';
 
+/**
+ * The elements module allows for easy creation of custom elements, with simple attribute and event binding.
+ *
+ * This module directly imports the {@link dom} and P@link html} modules.
+ *
+ * @module elements
+ */
+
+/** This unexported type is used to change how the elements are created and controlled. */
 type Options = {
+	/** Each string of this array is a reference to an parameter that is passed to the initialising function. The value for each parameter is taken either from the properties object passed to the [DOMBind](#dom_dombind) creation function, or are specified directly in the constructor of the `classOnly` generated class. */
 	args?: string[];
-	manualSlot?: boolean;
-	delegatesFocus?: boolean;
-	attrs?: boolean;
-	observeChildren?: boolean;
+	/** When true, the resulting created element will send an 'attached' event when the element is attached to the document, and a 'removed' event when removed from the document. Has no effect when 'pseudo' is set to true. (default: true) */
 	attachRemoveEvent?: boolean;
-	styles?: CSSStyleSheet[];
-	pseudo?: boolean;
-	name?: string;
-	extend?: Function;
+	/** When true, enables both the 'act' and 'attr' methods on the element class. (default: true) */
+	attrs?: boolean;
+	/**
+	 * When true, the return from the default function will be the generated class, when false the return from the default function will be a @{link dom:DOMBind | DOMBind}. If the `name` option is set to empty string, the class will *not* be registered with the {@link https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry | Custom Elements Registry]}. (default: false)
+	 * */
 	classOnly?: boolean;
+	/** When true, sets the `delegatesFocus` option during `attachShadow` call to true. Has no effect when `pseudo` is set to true. (default: false) */
+	delegatesFocus?: boolean;
+	/**  Allows the generated class to be extended with a custom class. This extension will be applied before the passed fn function is called. */
+	extend?: Function;
+	/** When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'pseudo' is set to true. (default: false) */
+	manualSlot?: boolean;
+	/** Registers a custom element name for the generated element class, instead of a randomly generated one. Has no effect when 'pseudo' is set to true. */
+	name?: string;
+	/** When true, enables the observeChildren method on the element class. (default: true) */
+	observeChildren?: boolean;
+	/** When true, the class created is extended from DocumentFragment, instead of HTMLElement, and does not register a custom element. This will act, in many ways, like a custom element, but without a Shadow Root, any children are attached directly to the DOM on appending. (default: false) */
+	pseudo?: boolean;
+	/** Sets the adoptedStyleSheets options on the Shadow Root. Has no effect when 'pseudo' is set to true. */
+	styles?: CSSStyleSheet[];
 }
 
 interface ToString {
@@ -23,12 +45,26 @@ type AttrFn = (newValue: ToString) => ToString | void;
 
 type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
+/**
+ * This class is added to an element created with the (default) function when the `attr` is `true` (or unset).
+ *
+ * The `act` method allows actions to be taken when attributes on the element are changed. When monitoring a single attribute, the newValue will be the new value assigned to that attribute. When monitoring multiple attributes, an Object will be passed to the function with keys on the attribute names set to the value of that attribute.
+ *
+ * The `attr` method acts similarly to the `act` method, but will return a {@link dom:Binding}. When monitoring a single attribute, the value of the Binding object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
+ */
 export type WithAttr = {
 	act(name: string | string[], fn: Function): void;
 	attr(name: string[], fn: Function): Binding;
 	attr(name: string, fn?: Function): Binding;
 }
 
+/**
+ * This class is added to an element created with the (default) function when the `observeChildren` is `true` (or unset).
+ *
+ * The observeChildren method sets a callback function that will be called whenever children are added or removed from the element, with the lists of added and removed children.
+ *
+ * NB: For pseudo-elements, the callback function will not be triggered during construction.
+ */
 export type WithChildren = {
 	observeChildren(fn: ChildWatchFn): void;
 }
@@ -242,7 +278,13 @@ const attrs = new WeakMap<Node, Map<string, Bound>>(),
       },
       noExtend = <T extends ConstructorOf<HTMLElement> | ConstructorOf<DocumentFragment>>(v: T) => v;
 
-export const Null = Object.freeze(Object.assign(() => {}, {
+export const
+/**
+ * The Null value is used by the act and attrs methods to indicate the non-existence of a value. It can act as a noop function, an empty string, an empty iterator, and NaN depending on how it is used.
+ *
+ * As this may be passed to any function passed to the act and attr methods, it should either be checked for directly (with an equality check), or used in a way in which it will be coerced to the correct data type.
+ */
+Null = Object.freeze(Object.assign(() => {}, {
 	toString(){
 		return "";
 	},
@@ -253,6 +295,35 @@ export const Null = Object.freeze(Object.assign(() => {}, {
 	}
 }));
 
+/**
+ * The default export of the elements module is a function that can be used to create custom elements. The Type `T` is determined by the {@link Options} provided. The following table shows how setting options affects the type of `T`:
+ *
+ * |  attrs  |  observeChildren  |  pseudo  |  T  |
+ * |---------|-------------------|----------|-----|
+ * | true    | true              | false    | {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement} & {@link WithAttr} & {@link WithChildren} |
+ * | true    | false             | false    | {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement} & {@link WithAttr} |
+ * | false   | true              | false    | {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement} & {@link WithChildren} |
+ * | false   | false             | false    | {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement} |
+ * | true    | true              | true     | {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment} & {@link WithAttr} & {@link WithChildren} |
+ * | true    | false             | true     | {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment} & {@link WithAttr} |
+ * | false   | true              | true     | {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment} & {@link WithChildren} |
+ * | false   | false             | true     | {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment} |
+ *
+ * In addition, the type `T` can be further modified by the use of the `extend` Option, which will add a custom class to the prototype chain, allowing its methods and field to be used, including during the initialising `fn` call. As the `fn` initialising function will not have access to any private class members, it is recommended to either use Symbols, or a data sharing Class, such as {@link inter:Pickup}, to allow access to private fields.
+ *
+ * When the `args` Option is specified, the `fn` call (and the `classOnly` constructor) gain a number of parameters equal to the number of strings specified. For the [DOMBind](#dom_dombind) output, these parameters must be set in the [Props](#dom_props) object passed to the function with the key being the name specified in the array. For the `classOnly` output, these values must be specified manually in the constructor call. The default type for these parameters is ToString, but can be specified in the `fn` to set the type in both the DOMBind-like Props object, and the constructor call of the `classOnly` return. NB: When using the `args` options with the intention of creating the new element without the use of the returned class/function (e.g. directly from HTML) then you *should* make all of the args optional as there is no other way to pass attributes to the initialisation function during construction of the element.
+ *
+ * The {@link dom:Children} returned from passed `fn` function are added either to the {@link https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot | ShadowRoot}, if the `pseudo` Option is `false`, or to the {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment}, if the `pseudo` Option is `true`.
+ *
+ * If the `classOnly` Option is set to `false` (or unset), the resulting {@link dom:DOMBind} can be used in the same way as any other DOMBind, creating your (pseudo-)element and applying the attributes and children accordingly.
+ *
+ * If the `classOnly` Option is set to `true`, the function will just return the generated class constructor, without creating a DOMBind function.
+ *
+ * @param {((elem: Node, ...args: (ToString | undefined)[]) => Children) | Options} optionsOrFn Either an {@link Options} object, or the initialising function.
+ * @param {(elem: Node, ...args: (ToString | undefined)[]) => Children)} [fn]                   If the first arg is an {@link Options} object, then this must be the initialising function.
+ *
+ * @return {Class | DOMBind}
+ */
 export default ((optionsOrFn: ((elem: Node, ...args: (ToString | undefined)[]) => Children) | Options, fn: (elem: Node, ...args: (ToString | undefined)[]) => Children) => {
 	fn ??= optionsOrFn as (elem: Node, ...args: (ToString | undefined)[]) => Children;
 	const options = optionsOrFn instanceof Function ? {} : optionsOrFn,
