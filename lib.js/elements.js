@@ -1,17 +1,18 @@
 import {Bound, amendNode, bind, isChildren} from './dom.js';
+import {setAndReturn} from './misc.js';
+
+/**
+ * The elements module allows for easy creation of custom elements, with simple attribute and event binding.
+ *
+ * This module directly imports the {@link dom}, {@link html}, and {@link misc} modules.
+ *
+ * @module elements
+ */
 
 /**
  * @typedef Children
  *
  * @see dom:Children
- */
-
-/**
- * The elements module allows for easy creation of custom elements, with simple attribute and event binding.
- *
- * This module directly imports the {@link dom} and P@link html} modules.
- *
- * @module elements
  */
 
 /** This unexported type is used to change how the elements are created and controlled.
@@ -102,10 +103,6 @@ const attrs = new WeakMap(),
       setAttr = (elem, name, value) => {
 	const attr = attrs.get(elem)?.get(name);
 	return attr ? (attr.value = value === null ? attr.value ? Null : name : value) !== Null : null;
-      },
-      setAndReturn = (m, k, v) => {
-	      m.set(k, v);
-	      return v;
       },
       act = (c, names, fn) => {
 	if (names instanceof Array) {

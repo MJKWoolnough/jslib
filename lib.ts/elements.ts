@@ -1,10 +1,11 @@
 import type {Binding, Children, DOMBind, Props, PropsObject} from './dom.js';
 import {Bound, amendNode, bind, isChildren} from './dom.js';
+import {setAndReturn} from './misc.js';
 
 /**
  * The elements module allows for easy creation of custom elements, with simple attribute and event binding.
  *
- * This module directly imports the {@link dom} and P@link html} modules.
+ * This module directly imports the {@link dom}, {@link html}, and {@link misc} modules.
  *
  * @module elements
  */
@@ -146,10 +147,6 @@ const attrs = new WeakMap<Node, Map<string, Bound>>(),
       setAttr = (elem: Node, name: string, value: ToString | null) => {
 	const attr = attrs.get(elem)?.get(name);
 	return attr ? (attr.value = value === null ? attr.value ? Null : name : value) !== Null : null;
-      },
-      setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => {
-	      m.set(k, v);
-	      return v;
       },
       act = (c: Node, names: string | string[], fn: (newValue: ToString) => void) => {
 	if (names instanceof Array) {
