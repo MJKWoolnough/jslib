@@ -948,20 +948,20 @@ type Tests = {
 				const {amendNode, bind} = await import("./lib/dom.js"),
 				      attr = bind("FIRST"),
 				      elm = amendNode(document.createElement("div"), {"TEST": attr}),
-				      start = elm.getAttribute("TEST");
+				      start = elm.getAttributeNS(null, "TEST");
 				attr.value = "SECOND";
-				return start === "FIRST" && elm.getAttribute("TEST") === "SECOND";
+				return start === "FIRST" && elm.getAttributeNS(null, "TEST") === "SECOND";
 			},
 			"bind attr (multiple)": async () => {
 				const {amendNode, bind} = await import("./lib/dom.js"),
 				      attr = bind("FIRST"),
 				      elm = amendNode(document.createElement("div"), {"TEST": attr, "TEST2": attr}),
 				      elm2 = amendNode(document.createElement("div"), {"TEST3": attr}),
-				      start = elm.getAttribute("TEST"),
-				      start2 = elm.getAttribute("TEST2"),
-				      start3 = elm2.getAttribute("TEST3");
+				      start = elm.getAttributeNS(null, "TEST"),
+				      start2 = elm.getAttributeNS(null, "TEST2"),
+				      start3 = elm2.getAttributeNS(null, "TEST3");
 				attr.value = "SECOND";
-				return start === "FIRST" && start2 === "FIRST" && start3 === "FIRST" && elm.getAttribute("TEST") === "SECOND" && elm.getAttribute("TEST2") === "SECOND" && elm2.getAttribute("TEST3") === "SECOND";
+				return start === "FIRST" && start2 === "FIRST" && start3 === "FIRST" && elm.getAttributeNS(null, "TEST") === "SECOND" && elm.getAttributeNS(null, "TEST2") === "SECOND" && elm2.getAttributeNS(null, "TEST3") === "SECOND";
 			}
 		},
 		"bind (template)": {
@@ -4265,9 +4265,9 @@ type Tests = {
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
 				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr")}))();
-				res += +(div.getAttribute("someAttr") === "");
+				res += +(div.getAttributeNS(null, "someAttr") === "");
 				t.setAttribute("thatAttr", "abc");
-				res += +(div.getAttribute("someAttr") === "abc");
+				res += +(div.getAttributeNS(null, "someAttr") === "abc");
 				return res === 2;
 			},
 			"set fn and update": async () => {
@@ -4276,9 +4276,9 @@ type Tests = {
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
 				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)}))();
-				res += +(div.getAttribute("someAttr") === "1");
+				res += +(div.getAttributeNS(null, "someAttr") === "1");
 				amendNode(t, {"thatAttr": 5});
-				res += +(div.getAttribute("someAttr") === "6");
+				res += +(div.getAttributeNS(null, "someAttr") === "6");
 				return res === 2;
 			},
 			"set multiple fn and update": async () => {
@@ -4287,11 +4287,11 @@ type Tests = {
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
 				      t = e(e => amendNode(div, {"someAttr": e.attr(["thatAttr", "otherAttr"], ({thatAttr, otherAttr}: {thatAttr: number, otherAttr: number}) => ((+thatAttr || 0) + 1) * ((+otherAttr || 0) + 1))}))();
-				res += +(div.getAttribute("someAttr") === "1");
+				res += +(div.getAttributeNS(null, "someAttr") === "1");
 				amendNode(t, {"thatAttr": 3});
-				res += +(div.getAttribute("someAttr") === "4");
+				res += +(div.getAttributeNS(null, "someAttr") === "4");
 				amendNode(t, {"otherAttr": 4});
-				res += +(div.getAttribute("someAttr") === "20");
+				res += +(div.getAttributeNS(null, "someAttr") === "20");
 				return res === 3;
 			},
 			"process fn": async () => {
@@ -4342,9 +4342,9 @@ type Tests = {
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
 				      tag = e({"pseudo": true}, e => amendNode(div, {"someAttr": e.attr("thatAttr")}))();
-				res += +(div.getAttribute("someAttr") === "");
+				res += +(div.getAttributeNS(null, "someAttr") === "");
 				amendNode(tag, {"thatAttr": "abc"});
-				res += +(div.getAttribute("someAttr") === "abc");
+				res += +(div.getAttributeNS(null, "someAttr") === "abc");
 				return res === 2;
 			},
 			"set fn and update": async () => {
@@ -4353,9 +4353,9 @@ type Tests = {
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
 				      t = e({"pseudo": true}, e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)}))();
-				res += +(div.getAttribute("someAttr") === "1");
+				res += +(div.getAttributeNS(null, "someAttr") === "1");
 				amendNode(t, {"thatAttr": 5});
-				res += +(div.getAttribute("someAttr") === "6");
+				res += +(div.getAttributeNS(null, "someAttr") === "6");
 				return res === 2;
 			},
 			"process fn": async () => {
