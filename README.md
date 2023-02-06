@@ -1813,7 +1813,7 @@ class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
 }
 ```
 
-The sort method sorts the [Item](#nodes_item) s, and new items will be inserted according to the sorting function provided.
+The sort method sorts the [Item](#nodes_item)s, and new items will be inserted according to the sorting function provided.
 
 Running this function with no param will result in the NodeMap being re-sorted according to the existing sorting function.
 
