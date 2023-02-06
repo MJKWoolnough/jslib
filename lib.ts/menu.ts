@@ -2,8 +2,23 @@ import CSS from './css.js';
 import {amendNode, bindElement, event, eventCapture, eventRemove} from './dom.js';
 import {ns, slot} from './html.js';
 
+/**
+ * The menu module adds custom elements to create context-menus.
+ *
+ * This module directly imports the {@link css}, {@link dom}, and {@link html} modules.
+ *
+ * @module menu
+ */
+/** */
+
+/**
+ * Type of children applicable to a {@link MenuElement}. Allows {@link ItemElement}, {@link SubMenuElement}, and recursive arrays of both.
+ */
 export type MenuItems = ItemElement | SubMenuElement | MenuItems[];
 
+/**
+ * Type of children applicable to a {@link SubMenuElement}. Allows {@link ItemElement}, {@link MenuElement}, and recursive arrays of both.
+ */
 export type SubMenuItems = ItemElement | MenuElement | SubMenuItems[];
 
 const blur = Symbol("blur"),
@@ -30,6 +45,11 @@ const blur = Symbol("blur"),
 	}
       })];
 
+/**
+ * The MenuElement class represents a context-menu that is displayed as a hovering list on the page. It can contain any number of {@link ItemElement}s and {@link SubMenuElement}s, which will be the elements of the list.
+ *
+ * When the MenuElement is attached to the DOM (non-{@link SubMenuElement}) is will use any `x` and `y` attributes on the element to determine the location of the menu on screen. It will attempt to place, within the {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent | offsetParent}, the top-left corner of the menu at the `x` and `y` coordinates specified, but will try the right corners if there is not enough space to the left and the bottom corners if there is not enough space below. If there is not enough space for the menu, the fallback coordinates for both attributes is `0, 0`.
+ */
 export class MenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
 	#c?: Function;
@@ -126,6 +146,15 @@ export class MenuElement extends HTMLElement {
 	}
 }
 
+/**
+ * The ItemElement class represents items within a menu. It can be used either directly in a {@link MenuElement}, or in a {@link SubMenuElement} as its representative element. It can contain any structure, which will be what appears in the menu.
+ *
+ * The action of the element is defined with a custom `select` event, which is called when the element is selected. Unless the `select` event cancels the event ({@link https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault | preventDefault}) the menu will close after the event is executed.
+ *
+ * When used directly in a {@link MenuElement}, the `key` attribute sets a possible quick access key, values of which should be one of the {@link https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values | Keyboard event key values}.
+ *
+ * When used directly in a {@link MenuElement}, the `disable` attribute makes the item unselectable and unfocusable.
+ */
 export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
@@ -151,6 +180,15 @@ export class ItemElement extends HTMLElement {
 	}
 }
 
+/**
+ * The SubMenuElement class defines an element which is a MenuItem. It It should contain a single {@link ItemElement} and a single {@link MenuElement}.
+ *
+ * The ItemElement will be displayed in the parent {@link MenuElement} and the child MenuElement will be the menu that is displayed when this element is selected. The placement works similarly to that of {@link MenuElement}, in that it will attempt to put the top-left corner of the new menu at the top-right of the SubMenuElement selected, moving up as necessary, and will move to the left of the SubMenuElement is there is not enough space to the right.
+ *
+ * The `key` attribute sets a possible quick access key, values of which should be one of the {@link https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values | Keyboard event key values}.
+ *
+ * The `disable` attribute makes the item unselectable and unfocusable.
+ */
 export class SubMenuElement extends HTMLElement {
 	#s: HTMLSlotElement;
 	#p: HTMLSlotElement;
@@ -243,6 +281,16 @@ customElements.define("menu-menu", MenuElement);
 customElements.define("menu-item", ItemElement);
 customElements.define("menu-submenu", SubMenuElement);
 
-export const menu = bindElement<MenuElement>(ns, "menu-menu"),
+export const
+/**
+ * A {@link dom:DOMBind | DOMBind} that creates a {@link MenuElement}.
+ */
+menu = bindElement<MenuElement>(ns, "menu-menu"),
+/**
+ * A {@link dom:DOMBind | DOMBind} that creates a {@link ItemElement}.
+ */
 item = bindElement<ItemElement>(ns, "menu-item"),
+/**
+ * A {@link dom:DOMBind | DOMBind} that creates a {@link SubMenuElement}.
+ */
 submenu = bindElement<SubMenuElement>(ns, "menu-submenu");
