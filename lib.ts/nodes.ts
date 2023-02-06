@@ -1,8 +1,20 @@
-export const node = Symbol("node"),
+export const
+/**
+ * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | link} of a type.
+ */
+node = Symbol("node"),
+/** A sorting function that does no sorting. */
 noSort = () => 0,
+/** A function to sort strings. */
 stringSort = new Intl.Collator().compare,
+/**
+ * A function that extends an HTMLElement based class, adding a [node] field set to `this`. Can be used with the {@link mod:elements} library as an extender function.
+ */
 addNodeRef = <T extends new(...a: any[]) => HTMLElement>(b: T) => class extends b { [node] = this; };
 
+/**
+ * This unexported type satisfies any type has used the {@link node} {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} to delegate a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} element.
+ */
 interface Item {
 	[node]: Node;
 }
@@ -158,9 +170,41 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
 	deleteProperty: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => target.splice(index, 1).length > 0) || delete (target as any)[name]
       };
 
+/**
+ * This class provides {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array | Array}-like access to DOM {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s, allowing them to be sorted and accessed via position-based indexes.
+ *
+ * This type implements all fields and methods of the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array | Array} interface, except for the following changes:
+ *
+ * |  Field  |  Type  |  Differences |
+ * |---------|--------|--------------|
+ * | [node]  | Node   | New field to access base {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}. |
+ * | concat | Method | Returns a normal Array, not a NodeArray. |
+ * | {@link NodeArray/constructor} | constructor} | Constructor | Takes very different params to initialise a NodeArray. |
+ * | copyWithin | Method | Not applicable and throws an error. |
+ * | fill | Method | Not applicable and throws an error. |
+ * | filterRemove | Method | New method that works like `filter` but also removes the filtered items. |
+ * | {@link NodeArray/from | from} | Static Method | Takes very different params to initialise a NodeArray. |
+ * | {@link NodeArray/reverse} | Method | Reverses the sorting of the [Item](#nodes_item)s. |
+ * | slice | Method | Returns a normal Array, not a NodeArray. |
+ * | {@link NodeArray/sort | sort} | Method | Sorts the [Item](#nodes_item)s. |
+ *
+ * @typeParam {Node} H
+ * @typeParam {Item} T
+ */
 export class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 	#root: Root<T, H>;
 	[realTarget]!: this;
+	/*
+	 * The NodeArray constructor takes a parent element, onto which all [Item](#nodes_item) elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
+	 *
+	 * The sorting function is used to order [Item](#nodes_item)s as they are inserted.
+	 *
+	 * The NodeArray type is wrapped with a Proxy to implement [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)-like indexing.
+	 *
+	 * @param {H} h A parent element, onto which all [Item](#nodes_item) elements will be attached.
+	 * @param {Function} [s] An optional starting sort function.
+	 * @param {Iterable<T>} elements An optional set of starting elements of type `T`.
+	 */
 	constructor(h: H, s: sortFunc<T> = noSort, elements: Iterable<T> = []) {
 		const root = this.#root = {s, h, l: 0, o: 1} as Root<T, H>;
 		Object.defineProperty(this, realTarget, {"value": this});
@@ -258,7 +302,15 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	}
 	static from<_, H extends Node = Node>(n: H): NodeArray<Item, H>;
 	static from<T extends Item, H extends Node = Node>(n: H, itemFn: (node: Node) => T | undefined): NodeArray<T, H>;
-	static from<T extends Item = Item, H extends Node = Node>(n: H, itemFn = noItemFn): NodeArray<T, H> {
+	/**
+	 * This function will create a NodeArray from the given parent {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}, iterating over every child and running the itemFn to generate an {@link Item}  to be append to the NodeArray.
+	 *
+	 * @param {H} n Parent Node.
+	 * @param {(node: Node) => T | undefined} [itemFn] Function to create Items from nodes.
+	 *
+	 * @return {NodeArray<H, T>}
+	 */
+	static from<T extends Item = Item, H extends Node = Node>(n: H, itemFn: Function = noItemFn): NodeArray<T, H> {
 		const s = new NodeArray<T, H>(n),
 		      root = s[realTarget].#root;
 		for (const c of n.childNodes) {
@@ -349,7 +401,12 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return initialValue;
 	}
-	reverse() {
+	/**
+	 * The reverse method reverse the position of each {@link Item} and reverses the sorting algorithm.
+	 *
+	 * @return {NodeArray} Returns `this`.
+	 */
+	reverse(): this {
 		reverse(this[realTarget].#root);
 		return this;
 	}
@@ -388,7 +445,14 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return false;
 	}
-	sort(compareFunction?: sortFunc<T>) {
+	/**
+	 * The sort method works much like the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort | Array.sort} method, but new items will be inserted according to the sorting function provided.
+	 *
+	 * Running this function with no param will result in the NodeArray being re-sorted according to the existing sorting function.
+	 *
+	 * @return {NodeArray} Returns `this`.
+	 */
+	sort(compareFunction?: sortFunc<T>): this {
 		sort(this[realTarget].#root, compareFunction);
 		return this;
 	}
@@ -443,8 +507,38 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	[n: number]: T;
 }
 
+/**
+ * This class provides {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map | Map}-like access to DOM {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s, allowing them to be sorted and accessed via keys.
+ *
+ * This type implements all fields and methods of the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map | Map} interface, except for the following changes:
+ *
+ * |  Field  |  Type  |  Differences |
+ * |---------|--------|--------------|
+ * | [node]  | Node   | New field to access base {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}. |
+ * | {@link NodeMap/constructor | constructor} | Constructor | Takes very different params to initialise a NodeMap. |
+ * | {@link NodeMap/insertAfter | insertAfter} | Method | Inserts an {@link Item} after another. |
+ * | {@link NodeMap/insertBefore | insertBefore} | Method | Inserts an {@link Item} before another. |
+ * | {@link NodeMap/keyAt | keyAt} | Method | Returns the key of the {@link Item} at the specified position. |
+ * | {@link NodeMap/position | position} | Method | Returns the position of the {@link Item} specified by the key. |
+ * | {@link NodeMap/reSet | reSet} | Method | Changes the key for an item. |
+ * | {@link NodeMap/reverse | reverse} | Method | Reverses the sorting of the {@link Item}s. |
+ * | {@link NodeMap/sort | sort} | Method | Sorts the {@link Item}s. |
+ *
+ * @typeParam K
+ * @typeParam {Item} T
+ * @typeParam {Node} H
+ */
 export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
 	#root: MapRoot<K, T, H>;
+	/**
+	 * The NodeMap constructor takes a parent element, onto which all {@link Item} elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
+	 *
+	 * The sorting function is used to order {@link Item}s as they are inserted.
+	 *
+	 * @param {H} h The parent element, onto which all {@link Item} elements will be attached.
+	 * @param {Function} s An optional starting sort function.
+	 * @param {Iterable<[K, T]>} entries An optional set of starting elements of type `T`.
+	 */
 	constructor(h: H, s: sortFunc<T> = noSort, entries: Iterable<[K, T]> = []) {
 		const root = this.#root = {s, h, l: 0, o: 1, m: new Map()} as MapRoot<K, T, H>;
 		root.p = root.n = root;
@@ -488,7 +582,16 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	has(k: K) {
 		return this.#root.m.has(k);
 	}
-	insertAfter(k: K, item: T, after: K) {
+	/**
+	 * The insertAfter method will insert a new {@link Item} after the {@link Item} denoted by the `after` key.
+	 *
+	 * @param {K} k The new key.
+	 * @param {T} item The new item.
+	 * @param {K} after The key to insert after.
+	 *
+	 * @return {boolean}  Will return `true` unless the `after` key cannot be found, in which case it will return false.
+	 */
+	insertAfter(k: K, item: T, after: K): boolean {
 		const root = this.#root,
 		      a = root.m.get(after);
 		if (!a) {
@@ -497,7 +600,16 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		replaceKey(root, k, item, a);
 		return true;
 	}
-	insertBefore(k: K, item: T, before: K) {
+	/**
+	 * The insertBefore method will insert a new {@link Item} before the {@link Item} denoted by the `before` key.
+	 *
+	 * @param {K} k The new key.
+	 * @param {T} item The new item.
+	 * @param {K} before The key to insert before.
+	 *
+	 * @return {boolean}  Will return `true` unless the `after` key cannot be found, in which case it will return false.
+	 */
+	insertBefore(k: K, item: T, before: K): boolean {
 		const root = this.#root,
 		      b = root.m.get(before);
 		if (!b) {
@@ -506,7 +618,14 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		replaceKey(root, k, item, b.p);
 		return true;
 	}
-	keyAt(pos: number) {
+	/**
+	 * The keyAt method returns the position of the key in within the sorted {@link Item}. It returns undefined if there is nothing at the specified position.
+	 *
+	 * @param {number} pos The position to retrieve the key of.
+	 *
+	 * @return {K | undefined} The key, if it was found, or undefined.
+	 */
+	keyAt(pos: number): K | undefined {
 		while (pos < 0) {
 			pos += this.#root.l;
 		}
@@ -520,7 +639,14 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	keys(): IterableIterator<K> {
 		return this.#root.m.keys();
 	}
-	position(key: K) {
+	/**
+	 * The position method returns the current sorted position of the {@link Item} described by the key.
+	 *
+	 * @param {K} key The key to find the position of.
+	 *
+	 * @return {number} The position of the key, or `-1` if it was not found.
+	 */
+	position(key: K): number {
 		const root = this.#root;
 		let count = -1,
 		    curr = (root.m.get(key) ?? root) as ItemOrRoot<T>;
@@ -530,6 +656,12 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		}
 		return count;
 	}
+	/**
+	 * The reset method changes the key assigned to an [Item](#nodes_item) without performing any sorting.
+	 *
+	 * @param {K} k The key to be replaced.
+	 * @param {K} j The key replace with.
+	 */
 	reSet(k: K, j: K) {
 		const root = this.#root,
 		      i = root.m.get(k);
@@ -539,7 +671,12 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 			root.m.set(j, i);
 		}
 	}
-	reverse() {
+	/**
+	 * The reverse method reverse the position of each {@link Item} and reverses the sorting algorithm.
+	 *
+	 * @return {NodeMap} Returns `this`.
+	 */
+	reverse(): this {
 		reverse(this.#root);
 		return this;
 	}
@@ -548,7 +685,14 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		replaceKey(root, k, item, root.p);
 		return this;
 	}
-	sort(compareFunction?: sortFunc<T>) {
+	/**
+	 * The sort method sorts the {@link Item}s, and new items will be inserted according to the sorting function provided.
+	 *
+	 * Running this function with no param will result in the NodeMap being re-sorted according to the existing sorting function.
+	 *
+	 * @return {NodeMap} Returns `this`.
+	 */
+	sort(compareFunction?: sortFunc<T>): this {
 		sort(this.#root, compareFunction);
 		return this;
 	}
