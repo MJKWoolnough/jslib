@@ -1548,7 +1548,7 @@ When used directly in a [MenuElement](#menu_menu_element), the 'disable' attribu
 
 The MenuElement class represents a context-menu that is displayed as a hovering list on the page. It can contain any number of [ItemElement](#menu_itemelement)s and [SubMenuElement](#menu_submenuelement)s, which will be the elements of the list.
 
-When the MenuElement is attached to the DOM (non-[SubMenuElement](#menu_submenuelement)) is will use any 'x' and 'y' attributes on the element to determine the location of the menu on screen. It will attempt to place, within the [offsetParent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent), the top-left corner of the menu at the 'x' and 'y' coordinates specified, but will try the right corners if there is not enough space to the left and the bottom corners if there is not enough space below. If there is not enough space for the menu, the fallback coordinates for both attributes is 0, 0.
+When the MenuElement is attached to the DOM (non-[SubMenuElement](#menu_submenuelement)) is will use any 'x' and 'y' attributes on the element to determine the location of the menu on screen. It will attempt to place, within the [offsetParent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent), the top-left corner of the menu at the 'x' and 'y' coordinates specified, but will try the right corners if there is not enough space to the left and the bottom corners if there is not enough space below. If there is not enough space for the menu, the fallback coordinates for both attributes is `0, 0`.
 
 ### <a name="menu_SubMenuelement">SubMenuElement</a>
 
