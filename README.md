@@ -1538,7 +1538,7 @@ This module directly imports the [css](#css), [dom](#dom) and [html](#html) modu
 
 The ItemElement class represents items within a menu. It can be used either directly in a [MenuElement](#menu_menuelement), or in a [SubMenuElement](#menu_submenuelement) as its representative element. It can contain any structure, which will be what appears in the menu.
 
-The action of the element is defined with a custom 'select' event, which is called when the element is selected. Unless the 'select' event cancels the event (preventDefault) the menu will close after the event is executed.
+The action of the element is defined with a custom 'select' event, which is called when the element is selected. Unless the 'select' event cancels the event ([preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault)) the menu will close after the event is executed.
 
 When used directly in a [MenuElement](#menu_menu_element), the 'key' attribute sets a possible quick access key, values of which should be one of the [Keyboard event key values](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values).
 
