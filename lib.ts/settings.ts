@@ -96,6 +96,9 @@ export class JSONSetting<T> extends Setting<T> {
 		}
 		super(name, value);
 	}
+	save() {
+		this.set(this.value);
+	}
 	[s](v: T) {
 		return JSON.stringify(v);
 	}
