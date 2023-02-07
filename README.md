@@ -2077,10 +2077,13 @@ Otherwise this class just extends the base [Setting](#settings_setting) class wi
 ```typescript
 class JSONSetting<T> extends Setting<T> {
 	constructor(name: string, starting: T, validator: (v: unknown) => v is T);
+	save(): void;
 }
 ```
 
 The JSONSetting class extends the `constructor` of [Setting](#settings_setting) to, in addition to the string name and default starting value, takes a required validator function to confirm the retrieved value is of type `T`.
+
+In addition, this class adds a `save` method which will save any changes made to the stored `value` object, without having to re-set it.
 
 Otherwise this class just extends the base [Setting](#settings_setting) class with the `T` type.
 
