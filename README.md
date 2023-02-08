@@ -2248,7 +2248,6 @@ The setLanguage function sets the language items used by the [ShellElement](#win
 
 The ShellElement class is a CustomElement that can contain a single [DesktopElement](#windows_desktopelement) and any number of  [WindowElement](#windows_windowelement)s.
 
-
 This element handles the follow attributes.
 
 |  Attribute     |  Type  |  Description  |
