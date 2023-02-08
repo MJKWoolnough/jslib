@@ -1955,10 +1955,10 @@ This module directly imports the [router](#router) module.
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
 | [createTransition](#router_transitions_createtransition) | Function | This function is used to create Transition Functions. |
-| fade | Function | A simple fade transition. |
-| wipeLeft | Function | A transition that reveals the new element beneath the first while wiping left. |
-| wipeRight | Function | A transition that reveals the new element beneath the first while wiping right. |
-| zoom | Function | A transition that scales out the first element before zooming in on the new element. |
+| fade | Function | A simple fade transition. Can be used with the `x-router` tag by setting the `router-transition` attribute to `fade`. |
+| wipeLeft | Function | A transition that reveals the new element beneath the first while wiping left. Can be used with the `x-router` tag by setting the `router-transition` attribute to `wipe-left`. |
+| wipeRight | Function | A transition that reveals the new element beneath the first while wiping right. Can be used with the `x-router` tag by setting the `router-transition` attribute to `wipe-right`. |
+| zoom | Function | A transition that scales out the first element before zooming in on the new element. Can be used with the `x-router` tag by setting the `router-transition` attribute to `zoom`. |
 
 ### <a name="router_transitions_createTransition">createTransition</a>
 ```typescript
