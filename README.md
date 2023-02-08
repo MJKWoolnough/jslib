@@ -1876,9 +1876,9 @@ For example, the following creates two path routes and a catch-all route:
 
 ```html
 <x-router>
-	<div route-match="/a">Route A</a>
-	<div route-match="/b"><span>Route B</span></a>
-	<div route-match="">404</a>
+	<div route-match="/a">Route A</div>
+	<div route-match="/b"><span>Route B</span></div>
+	<div route-match="">404</div>
 </x-router>
 ```
 
@@ -1886,9 +1886,9 @@ In addition to the `x-router` tag, there is also the `x-route` tag which can be 
 
 ```html
 <x-router>
-	<x-route title="Route A" id="route_a" class="dark" route-match="/a">Route A</a>
-	<x-route title="Route B" class="light" route-match="/b"><span>Route B</span></a>
-	<x-route title="Unknown Route" route-match="">404</a>
+	<x-route title="Route A" id="route_a" class="dark" route-match="/a">Route A</x-route>
+	<x-route title="Route B" class="light" route-match="/b"><span>Route B</span></x-route>
+	<x-route title="Unknown Route" route-match="">404</x-route>
 </x-router>
 ```
 
