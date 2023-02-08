@@ -2248,6 +2248,8 @@ The setLanguage function sets the language items used by the [ShellElement](#win
 
 The ShellElement class is a CustomElement that can contain a single [DesktopElement](#windows_desktopelement) and any number of  [WindowElement](#windows_windowelement)s.
 
+This element registers with the name `windows-shell`.
+
 This element handles the follow attributes.
 
 |  Attribute     |  Type  |  Description  |
@@ -2267,6 +2269,8 @@ In addition to the methods provided by [BaseElement](#windows_baseelement), the 
 The WindowElement class is a CustomElement that be added to a [ShellElement](#windows_shellelement) to provide a window-like interface to the contents of the element.
 
 The [ShellElement](#windows_shellelement) will determine whether `Windows` can be minimised and how they are handled when they are. The [ShellElement](#windows_shellelement) of this module disables minimising. It can be enabled by using the ShellElement of either the [windows_taskbar](#windows_taskbar) or [windows_taskmanager](#windows_taskmanager) modules.
+
+This element registers with the name `windows-windows`.
 
 This element handles the follow attributes:
 
