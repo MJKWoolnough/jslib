@@ -2361,7 +2361,7 @@ class WindowElement extends BaseElement {
 }
 ```
 
-The focus method will bring the unset a minimise attribute and bring the deepest child to the top of the window stack.
+The focus method will unset a set `minimise` attribute and bring the deepest child to the top of the window stack.
 
 ## <a name="windows_taskbar">windows_taskbar</a>
 
