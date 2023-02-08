@@ -2266,7 +2266,7 @@ In addition to the methods provided by [BaseElement](#windows_baseelement), the 
 
 ### <a name="windows_windowelement">WindowElement</a>
 
-The WindowElement class is a CustomElement that be added to a [ShellElement](#windows_shellelement) to provide a window-like interface to the contents of the element.
+The WindowElement class is a CustomElement that can be added to a [ShellElement](#windows_shellelement) to provide a window-like interface to the contents of the element.
 
 The [ShellElement](#windows_shellelement) will determine whether `Windows` can be minimised and how they are handled when they are. The [ShellElement](#windows_shellelement) of this module disables minimising. It can be enabled by using the ShellElement of either the [windows_taskbar](#windows_taskbar) or [windows_taskmanager](#windows_taskmanager) modules.
 
