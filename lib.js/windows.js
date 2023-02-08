@@ -463,7 +463,7 @@ export class ShellElement extends BaseElement {
 					amendNode(e, {"style": {"--window-top": "0px"}});
 				}
 			}
-		};
+		}
 	}
 }
 
