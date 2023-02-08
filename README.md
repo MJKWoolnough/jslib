@@ -2167,7 +2167,7 @@ This example creates an SVG image of a flame, printing the source of it to the c
 
 The windows module adds custom elements to implement a windowing system.
 
-This module directly imports the [css](#css), [dom](#dom), [html](#html), and [svg](#svg) modules.
+This module directly imports the [css](#css), [dom](#dom), [html](#html), [misc](#misc), and [svg](#svg) modules.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
