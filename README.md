@@ -2025,7 +2025,7 @@ The request method calls the remote procedure named by the `method` param, and s
 
 The typeCheck function can be specified to check that the data returned matches the format expected.
 
-The Promise will resolve with the returned data from from the remote procedure call.
+The Promise will resolve with the returned data from the remote procedure call.
 
 #### <a name="rpc_rpc_subscribe">subscribe</a>
 ```typescript
