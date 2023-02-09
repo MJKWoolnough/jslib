@@ -3,6 +3,8 @@ import {Subscription} from './inter.js';
 /**
  * The conn module contains some convenience wrappers around {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest | XMLHttpRequest} and {@link https://developer.mozilla.org/en-US/docs/Web/API/WebSocket | WebSocket}.
  *
+ * This module directly imports the {@link module:inter} module.
+ *
  * @module conn
  * @requires module:inter
  */
