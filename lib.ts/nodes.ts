@@ -1,3 +1,10 @@
+/**
+ * The nodes module contains Classes for aiding in the accessing of DOM {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s.
+ *
+ * @module nodes
+ */
+/** */
+
 export const
 /**
  * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | link} of a type.
