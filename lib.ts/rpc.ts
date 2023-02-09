@@ -1,5 +1,15 @@
 import {Subscription} from './inter.js';
 
+/**
+ * The rpc module implements a JSON RPC class.
+ *
+ * This module directly imports the {@link module:inter} module.
+ *
+ * @module rpc
+ * @requires module:inter
+ */
+/** */
+
 type MessageData = {
 	id: number;
 	result?: any;
@@ -8,6 +18,9 @@ type MessageData = {
 
 type handler = [(data: any) => void, (data: Error) => void];
 
+/**
+ * This unexported type is the interface used by {@link RPC} to send and receive data. This is implemented by {@link conn:WSConn | WSConn}.
+ */
 interface Conn {
 	close: () => void;
 	send: (data: string) => void;
@@ -22,6 +35,7 @@ const noop = () => {},
 	return s;
       };
 
+/** This class is the error type for RPC, and contains a `code` number, `message` string, and a data field for any addition information of the error. */
 export class RPCError implements Error {
 	code: number;
 	message: string;
@@ -40,11 +54,17 @@ export class RPCError implements Error {
 	}
 }
 
+
 export class RPC {
 	#c?: Conn | null;
 	#id: number = 0;
 	#r = new Map<number, handler>();
 	#a = new Map<number, Set<handler>>();
+	/**
+	 * Creates an RPC object with a [Conn](#rpc_conn)
+	 *
+	 * @param {Conn} conn An interface that is used to do the network communication.
+	 */
 	constructor(conn: Conn) {
 		this.#connInit(conn);
 	}
@@ -75,13 +95,30 @@ export class RPC {
 			}
 		});
 	}
+	/**
+	 * Reuses the RPC object with a new {@link Conn}.
+	 *
+	 * @param {Conn} conn An interface that is used to do the network communication.
+	 */
 	reconnect(conn: Conn) {
 		this.#c?.close();
 		this.#connInit(conn);
 	}
 	request<T = any>(method: string, typeCheck?: (a: any) => a is T): Promise<T>;
 	request<T = any>(method: string, params: any, typeCheck?: (a: any) => a is T): Promise<T>;
-	request<T = any>(method: string, paramsOrTypeCheck?: Exclude<any, Function> | ((a: any) => a is T), typeCheck?: (a: any) => a is T) {
+	/**
+	 * The request method calls the remote procedure named by the `method` param, and sends any `params` data, JSON encoded, to it.
+	 *
+	 * The typeCheck function can be specified to check that the data returned matches the format expected.
+	 *
+	 * @typeParam {any} T
+	 * @param {string} method                                                     The method name to be called.
+	 * @param {Exclude<any, Function> | ((a: any) => a is T)} [paramsOrTypeCheck] Either the params to be sent to the specified method, or a typecheck function.
+	 * @oaram {(a: any) => a is T} [typeCheck]                                    A typecheck function, if one was supplied to the second param.
+	 *
+	 * @return {Promise<T>} A Promise that will resolve with the returned data from the remote procedure call.
+	 */
+	request<T = any>(method: string, paramsOrTypeCheck?: Exclude<any, Function> | ((a: any) => a is T), typeCheck?: (a: any) => a is T): Promise<T> {
 		const c = this.#c;
 		return c ? new Promise<T>((sFn, eFn) => {
 			typeCheck ??= paramsOrTypeCheck instanceof Function ? paramsOrTypeCheck : undefined;
@@ -94,7 +131,17 @@ export class RPC {
 			}));
 		}) : Promise.reject("RPC Closed");
 	}
-	await<T = any>(id: number, typeCheck?: (a: any) => a is T) {
+	/**
+	 * The await method will wait for a message with a matching ID, which must be negative, and resolve the promise with the data that message contains.
+	 *
+	 * The typeCheck function can be specified to check that the data returned matches the format expected.
+	 *
+	 * @param {number} id                      The ID to wait for.
+	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
+	 *
+	 * @return {Promise<T>} A Promise that will resolve with the returned data.
+	 */
+	await<T = any>(id: number, typeCheck?: (a: any) => a is T): Promise<T> {
 		const h: handler = [noop, noop],
 		      a = this.#a,
 		      s = a.get(id) ?? newSet(a, id),
@@ -106,7 +153,17 @@ export class RPC {
 		p.finally(() => s.delete(h)).catch(() => {});
 		return p;
 	}
-	subscribe<T = any>(id: number, typeCheck?: (a: any) => a is T) {
+	/**
+	 * The subscribe method will wait for a message with a matching ID, which must be negative, and resolve the {@link inter:Subscription} with the data that message contains for each message with that ID.
+	 *
+	 * The typeCheck function can be specified to check that the data returned matches the format expected.
+	 *
+	 * @param {number} id                      The ID to wait for.
+	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
+	 *
+	 * @return {Subscription<T>} A Subscription that will resolve whenever data is received.
+	 */
+	subscribe<T = any>(id: number, typeCheck?: (a: any) => a is T): Subscription<T> {
 		return new Subscription<T>((sFn, eFn, cFn) => {
 			const h: handler = [a => (!typeCheck || typeCheck(a)) ? sFn(a) : eFn(new TypeError("invalid type")), eFn],
 			      a = this.#a,
@@ -115,6 +172,7 @@ export class RPC {
 			cFn(() => s.delete(h));
 		});
 	}
+	/** Closes the RPC connection. */
 	close() {
 		this.#c?.close();
 		this.#c = null;

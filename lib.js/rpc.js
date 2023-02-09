@@ -1,5 +1,24 @@
 import {Subscription} from './inter.js';
 
+/**
+ * The rpc module implements a JSON RPC class.
+ *
+ * This module directly imports the {@link module:inter} module.
+ *
+ * @module rpc
+ * @requires module:inter
+ */
+/** */
+
+/**
+ * This unexported type is the interface used by {@link RPC} to send and receive data. This is implemented by {@link conn:WSConn | WSConn}.
+ *
+ * @typedef {Object} Conn
+ * @property {() => void} close
+ * @property {(data: string) => void} send
+ * @property {(sFn: (data: {data: string}) => void, eFn: (error: Error) => void) => void} when
+ */
+
 const noop = () => {},
       noops = [noop, noop],
       newSet = (m, id) => {
@@ -8,6 +27,7 @@ const noop = () => {},
 	return s;
       };
 
+/** This class is the error type for RPC, and contains a `code` number, `message` string, and a data field for any addition information of the error. */
 export class RPCError {
 	constructor(code, message, data) {
 		this.code = code;
@@ -23,11 +43,17 @@ export class RPCError {
 	}
 }
 
+
 export class RPC {
 	#c;
 	#id = 0;
 	#r = new Map();
 	#a = new Map();
+	/**
+	 * Creates an RPC object with a [Conn](#rpc_conn)
+	 *
+	 * @param {Conn} conn An interface that is used to do the network communication.
+	 */
 	constructor(conn) {
 		this.#connInit(conn);
 	}
@@ -58,10 +84,27 @@ export class RPC {
 			}
 		});
 	}
+	/**
+	 * Reuses the RPC object with a new {@link Conn}.
+	 *
+	 * @param {Conn} conn An interface that is used to do the network communication.
+	 */
 	reconnect(conn) {
 		this.#c?.close();
 		this.#connInit(conn);
 	}
+	/**
+	 * The request method calls the remote procedure named by the `method` param, and sends any `params` data, JSON encoded, to it.
+	 *
+	 * The typeCheck function can be specified to check that the data returned matches the format expected.
+	 *
+	 * @typeParam {any} T
+	 * @param {string} method                                                     The method name to be called.
+	 * @param {Exclude<any, Function> | ((a: any) => a is T)} [paramsOrTypeCheck] Either the params to be sent to the specified method, or a typecheck function.
+	 * @oaram {(a: any) => a is T} [typeCheck]                                    A typecheck function, if one was supplied to the second param.
+	 *
+	 * @return {Promise<T>} A Promise that will resolve with the returned data from the remote procedure call.
+	 */
 	request(method, paramsOrTypeCheck, typeCheck) {
 		const c = this.#c;
 		return c ? new Promise((sFn, eFn) => {
@@ -75,8 +118,18 @@ export class RPC {
 			}));
 		}) : Promise.reject("RPC Closed");
 	}
+	/**
+	 * The await method will wait for a message with a matching ID, which must be negative, and resolve the promise with the data that message contains.
+	 *
+	 * The typeCheck function can be specified to check that the data returned matches the format expected.
+	 *
+	 * @param {number} id                      The ID to wait for.
+	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
+	 *
+	 * @return {Promise<T>} A Promise that will resolve with the returned data.
+	 */
 	await(id, typeCheck) {
-		const h: handler = [noop, noop],
+		const h = [noop, noop],
 		      a = this.#a,
 		      s = a.get(id) ?? newSet(a, id),
 		      p = new Promise((sFn, eFn) => {
@@ -87,15 +140,26 @@ export class RPC {
 		p.finally(() => s.delete(h)).catch(() => {});
 		return p;
 	}
+	/**
+	 * The subscribe method will wait for a message with a matching ID, which must be negative, and resolve the {@link inter:Subscription} with the data that message contains for each message with that ID.
+	 *
+	 * The typeCheck function can be specified to check that the data returned matches the format expected.
+	 *
+	 * @param {number} id                      The ID to wait for.
+	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
+	 *
+	 * @return {Subscription<T>} A Subscription that will resolve whenever data is received.
+	 */
 	subscribe(id, typeCheck) {
 		return new Subscription((sFn, eFn, cFn) => {
-			const h: handler = [a => (!typeCheck || typeCheck(a)) ? sFn(a) : eFn(new TypeError("invalid type")), eFn],
+			const h = [a => (!typeCheck || typeCheck(a)) ? sFn(a) : eFn(new TypeError("invalid type")), eFn],
 			      a = this.#a,
 			      s = a.get(id) ?? newSet(a, id);
 			s.add(h);
 			cFn(() => s.delete(h));
 		});
 	}
+	/** Closes the RPC connection. */
 	close() {
 		this.#c?.close();
 		this.#c = null;
