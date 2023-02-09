@@ -5,9 +5,12 @@ import {ns, slot} from './html.js';
 /**
  * The menu module adds custom elements to create context-menus.
  *
- * This module directly imports the {@link css}, {@link dom}, and {@link html} modules.
+ * This module directly imports the {@link module:css}, {@link module:dom}, and {@link module:html} modules.
  *
  * @module menu
+ * @requires module:css
+ * @requires module:dom
+ * @requires module:html
  */
 /** */
 
