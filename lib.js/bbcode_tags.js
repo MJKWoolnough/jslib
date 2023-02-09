@@ -5,7 +5,7 @@ import {a, audio as aaudio, blockquote, br, div, fieldset, h1 as ah1, h2 as ah2,
 /**
  * This module contains many standard [BBCode](https://en.wikipedia.org/wiki/BBCode) tags parsers, and a default text processor.
  *
- * This module directly imports the {@link bbcode}, {@link dom}, and {@link html} modules.
+ * This module directly imports the {@link module:bbcode}, {@link module:dom}, and {@link module:html} modules.
  *
  * @module bbcode_tags
  * @requires module:bbcode
