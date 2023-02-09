@@ -2202,7 +2202,7 @@ The alert method adds an [alert](https://developer.mozilla.org/en-US/docs/Web/AP
 
 The button text is set to the `OK` field of the language object, which can be set with [setLanguage](#windows_setlanguage).
 
-The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) will resolve to true if the button is clicked, and false if the dialog window was closed.
+The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) will resolve to true if the button is clicked, and false if the dialogue window was closed.
 
 #### <a name="windows_baseelement_confirm">confirm</a>
 ```typescript
@@ -2215,7 +2215,7 @@ The confirm method adds a [confirm](https://developer.mozilla.org/en-US/docs/Web
 
 The text of the two buttons is set to the `OK` and `CANCEL` fields of the language object, which can be set with [setLanguage](#windows_setlanguage).
 
-The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) will resolve to true if the `OK` button is clicked, and false if the `CANCEL` button was clicked or the dialog window was closed.
+The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) will resolve to true if the `OK` button is clicked, and false if the `CANCEL` button was clicked or the dialogue window was closed.
 
 #### <a name="windows_baseelement_prompt">prompt</a>
 ```typescript
@@ -2228,7 +2228,7 @@ The prompt method adds a [prompt](https://developer.mozilla.org/en-US/docs/Web/A
 
 The button text is set to the `OK` field of the language object, which can be set with [setLanguage](#windows_setlanguage).
 
-The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) will resolve to the text entered if the `OK` button is clicked, or null if the dialog window was closed.
+The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) will resolve to the text entered if the `OK` button is clicked, or null if the dialogue window was closed.
 
 ### <a name="windows_setlanguage">setLanguage</a>
 ```typescript
