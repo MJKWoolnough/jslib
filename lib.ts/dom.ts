@@ -83,7 +83,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	return res;
       },
       isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
-      isEventListenerOrEventListenerObject = (prop: unknown): prop is EventListenerOrEventListenerObject => prop instanceof Function || (isEventListenerObject(prop) && !(prop instanceof Bound)) || prop instanceof Bound && isEventListenerOrEventListenerObject(prop.value),
+      isEventListenerOrEventListenerObject = (prop: unknown): prop is EventListenerOrEventListenerObject => prop instanceof Bound ? isEventListenerOrEventListenerObject(prop.value) : prop instanceof Function || isEventListenerObject(prop),
       isEventObject = (prop: unknown): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !(prop instanceof Binding),
       isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
