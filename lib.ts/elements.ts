@@ -95,7 +95,7 @@ type WithAttrsOption<SelectedOptions extends Options> = WithChildrenOption<Selec
 
 type ElementFactory = WithAttrsOption<{pseudo?: false}> & WithAttrsOption<{pseudo: true}> & ((fn: (elem: HTMLElement & WithAttr & WithChildren) => Children) => DOMBind<HTMLElement & WithAttr & WithChildren>);
 
-class BindFn extends Bound {
+class BindFn extends Bound<any> {
 	#fn: AttrFn;
 	constructor(v: ToString, fn: AttrFn) {
 		super(v);
@@ -106,14 +106,14 @@ class BindFn extends Bound {
 	}
 }
 
-class BindMulti extends Bound {
+class BindMulti extends Bound<any> {
 	#fn: AttrFn;
 	constructor(elem: Node, names: string[], fn: Function) {
 		super(0);
 		let calling = false;
-		const obj: Record<string, Bound> = {},
+		const obj: Record<string, Bound<any>> = {},
 		      self = this;
-		this.#fn = function(this: Bound, val: ToString) {
+		this.#fn = function(this: Bound<any>, val: ToString) {
 			if (!calling) {
 				calling = true;
 				const o: Record<string, ToString> = {};
@@ -132,7 +132,7 @@ class BindMulti extends Bound {
 	}
 }
 
-const attrs = new WeakMap<Node, Map<string, Bound>>(),
+const attrs = new WeakMap<Node, Map<string, Bound<any>>>(),
       getAttr = (elem: Node, name: string) => {
 	const attrMap = attrs.get(elem)!;
 	return attrMap.get(name) ?? setAndReturn(attrMap, name, bind((elem as HTMLElement).getAttribute(name) ?? Null));
