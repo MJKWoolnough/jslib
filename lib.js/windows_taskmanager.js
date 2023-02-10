@@ -3,6 +3,19 @@ import {amendNode, bindElement, clearNode, event, eventOnce} from './dom.js';
 import {div, footer, ns, slot} from './html.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage, windows} from './windows.js';
 
+/**
+ * The windows_taskmanager module provides a replacement for the {@link module:windows} module {@link windows:ShellElement} that allows `Windows` to be minimised within the shell, appearing as just the title-bar at the bottom of the shell. This module directly re-exports the {@link windows:DesktopElement}, {@link windows:WindowElement}, {@link windows:desktop}, {@link windows:defaultIcon}, {@link windows:setDefaultIcon}, and {@link windows:windows} exports from the {@link module:windows} module.
+ *
+ * This module directly imports the {@link module:css}, {@link module:dom},{@link module:html}, and {@link module:windows} modules.
+ *
+ * @module windows_taskbar
+ * @requires module:css
+ * @requires module:dom
+ * @requires module:html
+ * @requires module:windows
+ */
+/** */
+
 export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, setLanguage, windows};
 
 const windowObservations = {
@@ -51,6 +64,11 @@ const windowObservations = {
 	}
       })];
 
+/**
+ * A drop-in replacement for the {@link module:windows} module {@link windows:ShellElement}. Registered with customElements as `windows-shell-taskmanager`.
+ *
+ * NB: Any {@link windows:WindowElement/addControlButton | custom control buttons} will not be displayed on the title-bar while minimised.
+ */
 export class ShellElement extends BaseShellElement {
 	constructor() {
 		super();
@@ -136,4 +154,8 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskmanager", ShellElement);
 
-export const shell = bindElement(ns, "windows-shell-taskmanager");
+export const
+/**
+ * A {@link dom:DOMBind} that creates a ShellElement.
+ */
+shell = bindElement(ns, "windows-shell-taskmanager");
