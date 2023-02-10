@@ -5,6 +5,19 @@ import {button, div, img, input, ns, slot, span} from './html.js';
 import {autoFocus} from './misc.js';
 import {ns as svgNS} from './svg.js';
 
+/**
+ * The windows module adds custom elements to implement a windowing system.
+ *
+ * This module directly imports the {@link module:css}, {@link module:dom}, {@link module:html}, {@link module:misc} and {@link module:svg} modules.
+ *
+ * @module windows
+ * @requires module:css
+ * @requires module:dom
+ * @requires module:html
+ * @requires module:misc
+ * @requires module:svg
+ */
+
 const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 	const shell = w.parentNode;
 	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
@@ -358,8 +371,22 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 
 let focusingWindow: WindowElement | null = null, dragging = false;
 
+/**
+ * This unexported class provides some methods for both {@link WindowElement} and {@link ShellElement}.
+ */
 abstract class BaseElement extends HTMLElement {
-	alert(title: string | Binding, message: Children, icon?: string | Binding) {
+	/**
+	 * The alert method adds an {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/alert | alert}-like window to the {@link WindowElement} or {@link ShellElement} it was called upon.
+	 *
+	 * The button text is set to the `OK` field of the language object, which can be set with {@link setLanguage}.
+	 *
+	 * @param {string | Binding} title  Title of the `alert` window.
+	 * @param {Children} message        Message to be displayed in the window.
+	 * @param {string | Binding} [icon] Optional icon.
+	 *
+	 * @return {Promise<boolean>} The returned {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} will resolve to true if the button is clicked, and false if the dialogue window was closed.
+	 */
+	alert(title: string | Binding, message: Children, icon?: string | Binding): Promise<boolean> {
 		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
 				"window-hide": true,
@@ -377,7 +404,18 @@ abstract class BaseElement extends HTMLElement {
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
-	confirm(title: string | Binding, message: Children, icon?: string | Binding) {
+	/**
+	 * The confirm method adds a {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm | confirm}-like window to the {@link WindowElement} or {@link ShellElement} it was called upon.
+	 *
+	 * The text of the two buttons is set to the `OK` and `CANCEL` fields of the language object, which can be set with {@link setLanguage}.
+	 *
+	 * @param {string | Binding} title  Title of the `alert` window.
+	 * @param {Children} message        Message to be displayed in the window.
+	 * @param {string | Binding} [icon] Optional icon.
+	 *
+	 * @return {Promise<boolean>} The returned {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} will resolve to true if the `OK` button is clicked, and false if the `CANCEL` button was clicked or the dialogue window was closed.
+	 */
+	confirm(title: string | Binding, message: Children, icon?: string | Binding): Promise<boolean> {
 		return new Promise<boolean>((resolve, reject) => {
 			const w = windows({
 				"window-hide": true,
@@ -398,8 +436,20 @@ abstract class BaseElement extends HTMLElement {
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
-	prompt(title: string | Binding, message: Children, defaultValue = "", icon?: string | Binding) {
-		return new Promise<string|null>((resolve, reject) => {
+	/**
+	 * The prompt method adds a {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt | prompt}-like window to the {@link WindowElement} or {@link ShellElement} it was called upon.
+	 *
+	 * The button text is set to the `OK` field of the language object, which can be set with {@link setLanguage}.
+	 *
+	 * @param {string | Binding} title   Title of the `alert` window.
+	 * @param {Children} message         Message to be displayed in the window.
+	 * @param {string} [defaultValue=""] The default value of the input box.
+	 * @param {string | Binding} [icon]  Optional icon.
+	 *
+	 * @return {Promise<string | null>} The returned {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} will resolve to the text entered if the `OK` button is clicked, or null if the dialogue window was closed.
+	 */
+	prompt(title: string | Binding, message: Children, defaultValue: string = "", icon?: string | Binding): Promise<string | null> {
+		return new Promise<string | null>((resolve, reject) => {
 			const ok = () => {
 				resolve(data.value);
 				w.remove();
@@ -430,6 +480,18 @@ abstract class BaseElement extends HTMLElement {
 	abstract addWindow(w: WindowElement): boolean;
 }
 
+/**
+ * The ShellElement class is a CustomElement that can contain a single {@link DesktopElement} and any number of {@link WindowElement}s.
+ *
+ * This element registers with the name `windows-shell`.
+ *
+ * This element handles the follow attributes.
+ *
+ * |  Attribute     |  Type  |  Description  |
+ * |----------------|--------|---------------|
+ * | --shell-height | Number | Used to specify the internal height of the `Shell`. |
+ * | --shell-width  | Number | Used to specify the internal width of the `Shell`. |
+ */
 export class ShellElement extends BaseElement {
 	constructor() {
 		super();
@@ -441,7 +503,14 @@ export class ShellElement extends BaseElement {
 			div(slot())
 		]).adoptedStyleSheets = shellStyle;
 	}
-	addWindow(w: WindowElement) {
+	/**
+	 * Adds a {@link WindowElement} to the Shell and focuses it.
+	 *
+	 * @param {WindowElement} w The WindowElement to add.
+	 *
+	 * @return {true} Returns true.
+	 */
+	addWindow(w: WindowElement): true {
 		if (w.parentNode !== this) {
 			amendNode(this, w);
 		} else if (w.nextElementSibling) {
@@ -449,6 +518,9 @@ export class ShellElement extends BaseElement {
 		}
 		return true;
 	}
+	/**
+	 * Repositions all {@link WindowElements} within the Shell to make sure they are all visible.
+	 */
 	realignWindows() {
 		const {offsetWidth: tw, offsetHeight: th} = this;
 		for (const e of this.childNodes) {
@@ -469,6 +541,9 @@ export class ShellElement extends BaseElement {
 	}
 }
 
+/**
+ * This class creates a desktop-like space with a {@link ShellElement}.
+ */
 export class DesktopElement extends HTMLElement {
 	constructor() {
 		super();
@@ -485,6 +560,51 @@ export class DesktopElement extends HTMLElement {
 	}
 }
 
+/**
+ * The WindowElement class is a CustomElement that can be added to a {@link ShellElement} to provide a window-like interface to the contents of the element.
+ *
+ * The {@link ShellElement} will determine whether `Windows` can be minimised and how they are handled when they are. The {@link ShellElement} of this module disables minimising. It can be enabled by using the ShellElement of either the {@link module:windows_taskbar} or {@link module_windows_taskmanager} modules.
+ *
+ * This element registers with the name `windows-windows`.
+ *
+ * This element handles the follow attributes:
+ *
+ * |  Attribute       |  Type  |  Description  |
+ * |------------------|--------|---------------|
+ * | --window-height | Number | CSS: Specifies the height of the `Window`. |
+ * | --window-left   | Number | CSS: Specifies the `x` coordinate of the `Window`. |
+ * | --window-top    | Number | CSS: Specifies the `y` coordinate of the `Window`. |
+ * | --window-width  | Number | CSS: Specifies the width of the `Window`. |
+ * | hide-close       | Toggle | Hides the `Close` button. |
+ * | hide-maximise    | Toggle | Hides the `Maximise` button. |
+ * | hide-minimise    | Toggle | Hides the `Minimise` button. |
+ * | hide-titlebar    | Toggle | Hides the titlebar. |
+ * | maximised        | Toggle | The window will expand to the size of the {@link ShellElement}. |
+ * | minimised        | Toggle | The window will be hidden and it will be up to the shell to allow restoring it. |
+ * | resizable        | Toggle | Allows the `Window` to be resized. |
+ * | window-icon      | String | Sets the window icon. |
+ * | window-title     | String | Sets the window title. |
+ *
+ * Hover text on the default buttons can be modified via the {@link setLanguage} function.
+ *
+ * The following entries affect this element:
+ *
+ * |  Entry     |  Default Value  |  Description  |
+ * |------------|-----------------|---------------|
+ * | `CLOSE`    | "Close"         | Hover text on the 'Close Window' button. |
+ * | `MAXIMISE` | "Maximise"      | Hover text on the 'Maximise Window' button. |
+ * | `MINIMISE` | "Minimise"      | Hover text on the 'Minimise Window' button. |
+ * | `RESTORE`  | "Restore"       | Hover text on the 'Restore Window' button. |
+ *
+ * The following customs events can be dispatched:
+ *
+ * |  Event  |  Description  |
+ * |---------|---------------|
+ * | close   | Dispatched when either the `Close` button is clicked or the {@link WindowElement/close} method is called. |
+ * | moved   | Dispatched when the `Window` is dragged around within the shell. |
+ * | remove  | Dispatched when the `Window` is removed from the DOM. |
+ * | resized | Dispatched when the `Window` is resized. |
+ */
 export class WindowElement extends BaseElement {
 	#title: HTMLSpanElement;
 	#icon: HTMLImageElement;
@@ -554,7 +674,13 @@ export class WindowElement extends BaseElement {
 	static get observedAttributes() {
 		return ["maximised", "window-icon", "window-title"];
 	}
-	addWindow(w: WindowElement) {
+	/**
+	 * This method adds a `Window` as a child. If there is already a child, it is added as a child of that `Window`.
+	 *
+	 * @param {WindowElement} w The child window to be added.
+	 * @return {boolean} Returns true if window was successfully added, and false otherwise, which should only occur if this window has no parent.
+	 */
+	addWindow(w: WindowElement): boolean {
 		if (!this.parentNode) {
 			return false;
 		}
@@ -568,11 +694,21 @@ export class WindowElement extends BaseElement {
 		amendNode(this.parentNode, w);
 		return true;
 	}
-	addControlButton(icon: string, onclick: (this: WindowElement) => void, title?: string | Binding) {
+	/**
+	 * The addControlButton method adds additional buttons to the titlebar of the `Window`.
+	 *
+	 * @param {string} icon                           The icon to be displayed on the button.
+	 * @param {(this: WindowElement) => void} onclick The function to call when the button is clicked.
+	 * @param {string | Binding} [title]              An optional title text for the button.
+	 *
+	 * @return {() => void} A Function to remove the button.
+	 */
+	addControlButton(icon: string, onclick: (this: WindowElement) => void, title?: string | Binding): () => void {
 		const b = button({"style": {"background-image": `url(${JSON.stringify(icon)})`}, "onclick": () => onclick.call(this), title});
 		amendNode(this.#extra, b);
 		return () => b.remove();
 	}
+	/** The focus method will unset a set `minimise` attribute and bring the deepest child to the top of the window stack. */
 	focus() {
 		this.toggleAttribute("minimised", false);
 		const c = this.#child;
@@ -613,10 +749,34 @@ customElements.define("windows-shell", ShellElement);
 customElements.define("windows-desktop", DesktopElement);
 customElements.define("windows-window", WindowElement);
 
-export const shell = bindElement<ShellElement>(ns, "windows-shell"),
+export const
+/**
+ * A {@link dom:DOMBind | DOMBind} that creates a {@link ShellElement}.
+ */
+shell = bindElement<ShellElement>(ns, "windows-shell"),
+/**
+ * A {@link dom:DOMBind | DOMBind} that creates a {@link DesktopElement}.
+ */
 desktop = bindElement<DesktopElement>(ns, "windows-desktop"),
+/**
+ * A {@link dom:DOMBind | DOMBind} that creates a {@link WindowsElement}.
+ */
 windows = bindElement<WindowElement>(ns, "windows-window"),
+/**
+ * This function sets the `defaultIcon` variable, which is the icon used on all `WindowElements` if it isn't overridden.
+ *
+ * @param {string} icon The icon to be set.
+ *
+ * @return {string} The icon.
+ * */
 setDefaultIcon = (icon: string) => defaultIcon = icon,
+/**
+ * The setLanguage function sets the language items used by the {@link ShellElement} and {@link WindowElement} classes.
+ *
+ * @param {{CANCEL?: string; CLOSE?: string; MAXIMISE?: string; MINIMISE?: string; OK?: string; RESTORE?: string;}} l The language to be changed.
+ * 	*/
 setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)};
 
+/**
+ * The current default icon. Can be changed with the {@link setDefaultIcon} function. */
 export let defaultIcon = `data:image/svg+xml,%3Csvg viewBox="0 0 14 18" xmlns="${svgNS}"%3E%3Cpath d="M9,1 h-8 v16 h12 v-12 Z v4 h4" stroke="black" fill="none" /%3E%3Cpath d="M3,8 h8 m-8,3 h8 m-8,3 h8" stroke="gray" /%3E%3C/svg%3E`;
