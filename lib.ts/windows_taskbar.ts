@@ -5,6 +5,20 @@ import {div, img, li, ns, slot, span, ul} from './html.js';
 import {item, menu} from './menu.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage as setOtherLanguage, windows} from './windows.js';
 
+/**
+ * The windows_taskbar module provides a replacement for the {@link module:windows} module {@link windows:ShellElement} that provides a taskbar for `Windows` to be managed from and allows the `Windows` to be minimised. This module directly re-exports the {@link windows:DesktopElement}, {@link windows:WindowElement}, {@link windows:desktop}, {@link windows:defaultIcon}, {@link windows:setDefaultIcon}, and {@link windows:windows} exports from the {@link module:windows} module.
+ *
+ * This module directly imports the {@link module:css}, {@link module:dom},{@link module:html}, {@link module:menu}, and {@link module:windows} modules.
+ *
+ * @module windows_taskbar
+ * @requires module:css
+ * @requires module:dom
+ * @requires module:html
+ * @requires module:menu
+ * @requires module:windows
+ */
+/** */
+
 export {DesktopElement, WindowElement, desktop, defaultIcon, setDefaultIcon, windows};
 
 const windowObservations = {
@@ -148,6 +162,19 @@ setMenuLang({
 	"RESTORE": "Restore"
 });
 
+/**
+ * A drop-in replacement for the {@link module:windows} module {@link windows:ShellElement}. Registered with customElements as `windows-shell-taskbar`.
+ *
+ * The ShellElement class can accept the following attributes:
+ *
+ * |  Attribute  |  Description  |
+ * |-------------|---------------|
+ * | autohide    | When set this attribute will hide the taskbar when it is not being hovered over. |
+ * | side        | When set to one of left, right, or top, is used to change the side on which the taskbar will reside. It defaults to the bottom. |
+ * | hide        | This attribute can be set to one of icon or title, which will hide either the icon or the text title of the window on the taskbar. |
+ *
+ * In addition the `--taskbar-size` style var can be used to set the width (or height, if vertical) of the taskbar.
+ */
 export class ShellElement extends BaseShellElement {
 	constructor() {
 		super();
@@ -215,7 +242,14 @@ export class ShellElement extends BaseShellElement {
 
 customElements.define("windows-shell-taskbar", ShellElement);
 
-export const shell = bindElement<ShellElement>(ns, "windows-shell-taskbar"),
+export const
+/**
+ * A {@link dom:DOMBind} that creates a ShellElement.
+ */
+shell = bindElement<ShellElement>(ns, "windows-shell-taskbar"),
+/**
+ * A replacement for the {@link windows:setLanguage} function, which in addition to calling the original, sets the language entries used for the context menu for the items on the taskbar. The menu access keys are set to the first character of the entry.
+ */
 setLanguage = (l: Parameters<typeof setOtherLanguage>[0]) => {
 	setOtherLanguage(l);
 	setMenuLang(l);
