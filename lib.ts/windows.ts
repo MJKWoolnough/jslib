@@ -1,4 +1,5 @@
-import type {Binding, Children} from './dom.js';
+import type {Binding} from './bind.js';
+import type {Children} from './dom.js';
 import CSS from './css.js';
 import {amendNode, bindElement, clearNode, event, eventCapture} from './dom.js';
 import {button, div, img, input, ns, slot, span} from './html.js';
