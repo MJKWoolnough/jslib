@@ -1,4 +1,4 @@
-import type {Binding} from './dom.js';
+import type {Binding} from './bind.js';
 import CSS from './css.js';
 import {amendNode, bindElement, event, eventOnce} from './dom.js';
 import {div, img, li, ns, slot, span, ul} from './html.js';
