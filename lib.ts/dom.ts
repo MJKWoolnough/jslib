@@ -218,7 +218,7 @@ export const
  *
  * @return {boolean} True is the passed value can be assigned to a Children type.
  */
-isChildren = (propertiesOrChildren: Props | Children): propertiesOrChildren is Children => typeof propertiesOrChildren === "string" || propertiesOrChildren instanceof Array || propertiesOrChildren instanceof NodeList || propertiesOrChildren instanceof HTMLCollection || propertiesOrChildren instanceof Node || propertiesOrChildren instanceof Binding,
+isChildren = (propertiesOrChildren: Props | Children): propertiesOrChildren is Children => propertiesOrChildren instanceof Array || typeof propertiesOrChildren === "string" || propertiesOrChildren instanceof Element || propertiesOrChildren instanceof DocumentFragment || propertiesOrChildren instanceof Text || propertiesOrChildren instanceof Binding || propertiesOrChildren instanceof NodeList || propertiesOrChildren instanceof HTMLCollection,
 /**
  * This function is used to set attributes and children on {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s, and events on {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s and other {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget | EventTarget}s.
  *
