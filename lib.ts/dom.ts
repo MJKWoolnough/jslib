@@ -23,7 +23,7 @@ type StyleObj = Record<string, ToString | undefined> | CSSStyleDeclaration;
 /**
  * This type can be used to set events with {@link amendNode} and {@link clearNode}. The boolean is true if the event is to be removed
  */
-type EventArray = [Exclude<EventListenerOrEventListenerObject, Bound> | Bound<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean];
+type EventArray = [Exclude<EventListenerOrEventListenerObject, Bound<any>> | Bound<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean];
 
 /**
  * This object is used to set attributes and events on a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node) or {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget | EventTarget} with the {@link amendNode} and {@link clearNode} functions.
@@ -56,8 +56,8 @@ export interface DOMBind<T extends Node> {
 }
 
 interface BindFn {
-	<T extends ToString = ToString>(t: T): Bound<T>;
-	(strings: TemplateStringsArray, ...bindings: (Bound | ToString)[]): Binding;
+	<T>(t: T): Bound<T>;
+	(strings: TemplateStringsArray, ...bindings: any[]): Binding;
 }
 
 interface NodeAttributes extends Node {
@@ -150,8 +150,8 @@ export abstract class Binding {
 
 class TemplateBind extends Binding {
 	#strings: TemplateStringsArray;
-	#bindings: (Bound | ToString)[];
-	constructor(strings: TemplateStringsArray, ...bindings: (Bound | ToString)[]) {
+	#bindings: any[];
+	constructor(strings: TemplateStringsArray, ...bindings: any[]) {
 		super();
 		this.#strings = strings;
 		this.#bindings = bindings;
@@ -175,7 +175,7 @@ class TemplateBind extends Binding {
  *
  * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
  */
-export class Bound<T extends ToString = ToString> extends Binding {
+export class Bound<T> extends Binding {
 	#value: T;
 	constructor(v: T) {
 		super();
@@ -206,7 +206,7 @@ export class Bound<T extends ToString = ToString> extends Binding {
 		}
 	}
 	toString() {
-		return this.value.toString();
+		return this.value?.toString() ?? "";
 	}
 }
 
@@ -325,7 +325,7 @@ eventRemove = 8,
  *
  * @return {EventArray} An array that can be used with {@link amendNode}, {@link clearNode}, or any DOMBind function to add or remove an event, as specified.
  */
-event = (fn: Function | Exclude<EventListenerObject, Bound> | Bound<Function | EventListenerObject>, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
+event = (fn: Function | Exclude<EventListenerObject, Bound<any>> | Bound<Function | EventListenerObject>, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
 /**
  * This function creates a {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment} that contains any {@link Children} passed to it, as with {@link amendNode}.
  *
@@ -380,12 +380,12 @@ clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Ch
  *
  * Both returned types can be used as attributes or children in amendNode and clearNode calls.
  *
- * @typeParam {ToString} T
+ * @typeParam T
  * @param {T} v Value to be bound so it can be changed when assigned to an element attribute or child.
  *
  * @return {Binding} Bound value.
  */
-bind = (<T extends ToString>(v: T | TemplateStringsArray, first?: Bound | ToString, ...bindings: (Bound | ToString)[]) => {
+bind = (<T>(v: T | TemplateStringsArray, first?: any, ...bindings: any[]) => {
 	if (v instanceof Array && first) {
 		return new TemplateBind(v, first, ...bindings);
 	}

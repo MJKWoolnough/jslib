@@ -181,7 +181,7 @@ export class Bound extends Binding {
 		}
 	}
 	toString() {
-		return this.value.toString();
+		return this.value?.toString() ?? "";
 	}
 }
 
@@ -355,7 +355,7 @@ clearNode = (node, properties, children) => {
  *
  * Both returned types can be used as attributes or children in amendNode and clearNode calls.
  *
- * @typeParam {ToString} T
+ * @typeParam T
  * @param {T} v Value to be bound so it can be changed when assigned to an element attribute or child.
  *
  * @return {Binding} Bound value.
