@@ -1017,6 +1017,17 @@ type Tests = {
 				b.value = "Dos";
 				return start === `1: One\n2: Two` && start2 === `1: Uno\n2: Two` && elm.getAttribute("text") === `1: Uno\n2: Dos`;
 			}
+		},
+		"function": async () => {
+			const {amendNode} = await import("./lib/dom.js"),
+			      {default: bind} = await import("./lib/bind.js"),
+			      onclick = bind(() => a++),
+			      elm = amendNode(document.createElement("div"), {onclick});
+			let a = 0;
+			elm.click();
+			onclick.value = () => a += 3;
+			elm.click();
+			return a === 4;
 		}
 	},
 	"html.js": {
