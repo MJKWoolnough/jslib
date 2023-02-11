@@ -23,7 +23,7 @@ type StyleObj = Record<string, ToString | undefined> | CSSStyleDeclaration;
 /**
  * This type can be used to set events with {@link amendNode} and {@link clearNode}. The boolean is true if the event is to be removed
  */
-type EventArray = [Exclude<EventListenerOrEventListenerObject, Bound<any>> | Bound<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean];
+type EventArray = [EventListenerOrEventListenerObject, AddEventListenerOptions, boolean];
 
 /**
  * This object is used to set attributes and events on a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node) or {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget | EventTarget} with the {@link amendNode} and {@link clearNode} functions.
@@ -47,17 +47,12 @@ export type Props = PropsObject | NamedNodeMap;
 /**
  * This type is a string, {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}, {@link https://developer.mozilla.org/en-US/docs/Web/API/NodeList | NodeList}, {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection | HTMLCollection}, {@link Binding}, or a recursive array of those.
  * */
-export type Children = string | Node | Children[] | NodeList | HTMLCollection | Binding;
+export type Children = string | Node | Children[] | NodeList | HTMLCollection | BoundChild;
 
 /** This type represents a binding of either {@link amendNode} or {@link clearNode} with the first param bound. */
 export interface DOMBind<T extends Node> {
 	(properties?: Props, children?: Children): T;
 	(children?: Children): T;
-}
-
-interface BindFn {
-	<T>(t: T): Bound<T>;
-	(strings: TemplateStringsArray, ...bindings: any[]): Binding;
 }
 
 interface NodeAttributes extends Node {
@@ -69,8 +64,8 @@ interface NodeAttributes extends Node {
 }
 
 const childrenArr = (children: Children, res: (Node | string)[] = []) => {
-	if (children instanceof Binding) {
-		res.push(children[setNode](new Text(children+"")));
+	if (isChild(children)) {
+		res.push(children[child]);
 	} else if (typeof children === "string" || children instanceof Node) {
 		res.push(children);
 	} else if (Array.isArray(children)) {
@@ -82,135 +77,26 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	}
 	return res;
       },
-      isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
-      isEventListenerOrEventListenerObject = (prop: unknown): prop is EventListenerOrEventListenerObject => prop instanceof Bound ? isEventListenerOrEventListenerObject(prop.value) : prop instanceof Function || isEventListenerObject(prop),
+      isEventListenerOrEventListenerObject = (prop: any): prop is EventListenerOrEventListenerObject => prop instanceof Object && value in prop ? isEventListenerOrEventListenerObject(prop[value]) : prop instanceof Function || isEventListenerObject(prop),
       isEventObject = (prop: unknown): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
-      isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !(prop instanceof Binding),
-      isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !(prop instanceof Binding)),
+      isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !isAttr(prop),
+      isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !isAttr(prop)),
       isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute,
-      setNode = Symbol("setNode"),
-      update = Symbol("update"),
-      remove = Symbol("remove");
-
-/**
- * An abstract class that is a parent class of both of the return types from the {@link bind} function.
- */
-export abstract class Binding {
-	#set = new Set<Attr | Text | Binding | WeakRef<Attr | Text | Binding>>();
-	#to!: Function;
-	#st = -1;
-	#cleanSet(b?: Binding) {
-		if (b) {
-			this.#set.delete(b);
-		}
-		for (const n of Array.from(this.#set)) {
-			if (n instanceof WeakRef) {
-				const ref = n.deref();
-				if (!ref || ref === b) {
-					this.#set.delete(n);
-				} else if (n instanceof Binding && n.#set.size || n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement) {
-					this.#set.delete(n);
-					this.#set.add(ref);
-				}
-			} else if (n instanceof Binding && !n.#set.size || n instanceof Text && !n.parentNode || n instanceof Attr && !n.ownerElement) {
-				this.#set.delete(n);
-				this.#set.add(new WeakRef(n));
-			}
-		}
-		if (this.#st !== -1) {
-			clearTimeout(this.#st);
-			this.#st = -1;
-		}
-		if (this.#set.size) {
-			this.#st = setTimeout(this.#to ??= () => this.#cleanSet(), 50000 + Math.floor(Math.random() * 20000));
-		}
-	}
-	[setNode]<T extends Attr | Text | Binding>(n: T) {
-		this.#cleanSet();
-		this.#set.add(n);
-		return n;
-	}
-	[update]() {
-		const text = this+"";
-		for (const wr of this.#set) {
-			const n = wr instanceof WeakRef ? wr.deref() : wr;
-			if (n instanceof Binding) {
-				n[update]();
-			} else if (n) {
-				n.textContent = text;
-			}
-		}
-		this.#cleanSet();
-	}
-	[remove](b: Binding) {
-		this.#cleanSet(b);
-	}
-	abstract toString(): string;
-}
-
-class TemplateBind extends Binding {
-	#strings: TemplateStringsArray;
-	#bindings: any[];
-	constructor(strings: TemplateStringsArray, ...bindings: any[]) {
-		super();
-		this.#strings = strings;
-		this.#bindings = bindings;
-		for (const b of bindings) {
-			if (b instanceof Binding) {
-				b[setNode](this);
-			}
-		}
-	}
-	toString() {
-		let str = "";
-		for (let i = 0; i < this.#strings.length; i++) {
-			str += this.#strings[i] + (this.#bindings[i] ?? "");
-		}
-		return str;
-	}
-}
-
-/**
- * Objects that implement this type can be used in place of both property values and Children in calls to {@link amendNode and {@link clearNode}, as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
- *
- * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
- */
-export class Bound<T> extends Binding {
-	#value: T;
-	constructor(v: T) {
-		super();
-		this.#value = v;
-		if (v instanceof Binding) {
-			v[setNode](this);
-		}
-	}
-	get value() { return this.#value instanceof Bound ? this.#value.value : this.#value; }
-	set value(v: T) {
-		if (this.#value !== v) {
-			if (this.#value instanceof Binding) {
-				this.#value[remove](this);
-			}
-			this.#value = v;
-			if (v instanceof Binding) {
-				v[setNode](this);
-			}
-		}
-		this[update]();
-	}
-	handleEvent(e: Event) {
-		const v = this.value;
-		if (v instanceof Function) {
-			v.call(e.currentTarget, e);
-		} else if (isEventListenerObject(v)) {
-			v.handleEvent(e);
-		}
-	}
-	toString() {
-		return this.value?.toString() ?? "";
-	}
-}
+      isAttr = (prop: any): prop is BoundAttr => prop instanceof Object && attr in prop,
+      isChild = (children: any): children is BoundChild => children instanceof Object && child in children,
+      makeAttr = (k: string, prop: string) => {
+	const attr = Object.assign(document.createAttributeNS(null, k), {"realValue": prop});
+	attr.textContent = prop + "";
+	return attr;
+      }
 
 export const
+/** */
+child = Symbol("child"),
+/** */
+attr = Symbol("attr"),
+/** */
+value = Symbol("value"),
 /**
  * This function determines whether the passed in object can be used as a {@link Children} type.
  *
@@ -218,7 +104,9 @@ export const
  *
  * @return {boolean} True is the passed value can be assigned to a Children type.
  */
-isChildren = (propertiesOrChildren: Props | Children): propertiesOrChildren is Children => propertiesOrChildren instanceof Array || typeof propertiesOrChildren === "string" || propertiesOrChildren instanceof Element || propertiesOrChildren instanceof DocumentFragment || propertiesOrChildren instanceof Text || propertiesOrChildren instanceof Binding || propertiesOrChildren instanceof NodeList || propertiesOrChildren instanceof HTMLCollection,
+isChildren = (propertiesOrChildren: Props | Children): propertiesOrChildren is Children => propertiesOrChildren instanceof Array || typeof propertiesOrChildren === "string" || propertiesOrChildren instanceof Element || propertiesOrChildren instanceof DocumentFragment || propertiesOrChildren instanceof Text || isChild(propertiesOrChildren) || propertiesOrChildren instanceof NodeList || propertiesOrChildren instanceof HTMLCollection,
+/** */
+isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
 /**
  * This function is used to set attributes and children on {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s, and events on {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s and other {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget | EventTarget}s.
  *
@@ -277,9 +165,7 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
 						}
 					}
 				} else if (prop !== null) {
-					const attr = Object.assign(document.createAttributeNS(null, k), {"realValue": prop});
-					attr.textContent = prop + "";
-					node.setAttributeNode(prop instanceof Binding ? prop[setNode](attr) : attr);
+					node.setAttributeNode(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop as string));
 				}
 			}
 		}
@@ -325,7 +211,7 @@ eventRemove = 8,
  *
  * @return {EventArray} An array that can be used with {@link amendNode}, {@link clearNode}, or any DOMBind function to add or remove an event, as specified.
  */
-event = (fn: Function | Exclude<EventListenerObject, Bound<any>> | Bound<Function | EventListenerObject>, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
+event = (fn: Function | EventListenerObject, options: number, signal?: AbortSignal): EventArray => [fn as EventListenerOrEventListenerObject, {"once": !!(options&eventOnce), "capture": !!(options&eventCapture), "passive": !!(options&eventPassive), signal}, !!(options&eventRemove)],
 /**
  * This function creates a {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment} that contains any {@link Children} passed to it, as with {@link amendNode}.
  *
@@ -370,24 +256,12 @@ clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Ch
 		}
 	}
 	return amendNode(node, properties, children);
-},
-/**
- * This function can be used either as a normal function, binding a single value, or as a template tag function.
- *
- * When used normally, this function takes a single starting value and returns a {@link Bound} class with that value set.
- *
- * When used as a tag function, this function will return a type that is bound to all Bind expressions used within the template.
- *
- * Both returned types can be used as attributes or children in amendNode and clearNode calls.
- *
- * @typeParam T
- * @param {T} v Value to be bound so it can be changed when assigned to an element attribute or child.
- *
- * @return {Binding} Bound value.
- */
-bind = (<T>(v: T | TemplateStringsArray, first?: any, ...bindings: any[]) => {
-	if (v instanceof Array && first) {
-		return new TemplateBind(v, first, ...bindings);
-	}
-	return new Bound<T>(v as T);
-}) as BindFn;
+};
+
+type BoundAttr = {
+	[attr]: (k: string) => Attr;
+}
+
+type BoundChild = {
+	[child]: Element | Text;
+}
