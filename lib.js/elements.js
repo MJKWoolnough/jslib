@@ -1,12 +1,14 @@
-import {Bound, amendNode, bind, isChildren} from './dom.js';
+import bind, {Bound} from './bind.js';
+import {amendNode, isChildren} from './dom.js';
 import {setAndReturn} from './misc.js';
 
 /**
  * The elements module allows for easy creation of custom elements, with simple attribute and event binding.
  *
- * This module directly imports the {@link module:dom}, {@link module:html}, and {@link module:misc} modules.
+ * This module directly imports the {@link module:bind}, {@link module:dom}, {@link module:html}, and {@link module:misc} modules.
  *
  * @module elements
+ * @requires module:bind
  * @requires module:dom
  * @requires module:html
  * @requires module:misc
