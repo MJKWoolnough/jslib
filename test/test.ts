@@ -924,10 +924,13 @@ type Tests = {
 				clearNode(n, {"property": "value"}, s);
 				return n.getAttribute("property") === "value" && n.firstChild === s;
 			}
-		},
+		}
+	},
+	"bind.js": {
 		"bind": {
 			"bind text": async () => {
-				const {amendNode, bind} = await import("./lib/dom.js"),
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
 				      text = bind("HELLO"),
 				      elm = amendNode(document.createElement("div"), text),
 				      start = elm.textContent;
@@ -935,7 +938,8 @@ type Tests = {
 				return start === "HELLO" && elm.textContent === "GOODBYE";
 			},
 			"bind text (multiple)": async () => {
-				const {amendNode, bind} = await import("./lib/dom.js"),
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
 				      text = bind("HELLO"),
 				      elm = amendNode(document.createElement("div"), text),
 				      elm2 = amendNode(document.createElement("div"), ["Other ", text, " Text"]),
@@ -945,7 +949,8 @@ type Tests = {
 				return start === "HELLO" && start2 == "Other HELLO Text" && elm.textContent === "GOODBYE" && elm2.textContent === "Other GOODBYE Text";
 			},
 			"bind attr": async () => {
-				const {amendNode, bind} = await import("./lib/dom.js"),
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
 				      attr = bind("FIRST"),
 				      elm = amendNode(document.createElement("div"), {"TEST": attr}),
 				      start = elm.getAttributeNS(null, "TEST");
@@ -953,7 +958,8 @@ type Tests = {
 				return start === "FIRST" && elm.getAttributeNS(null, "TEST") === "SECOND";
 			},
 			"bind attr (multiple)": async () => {
-				const {amendNode, bind} = await import("./lib/dom.js"),
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
 				      attr = bind("FIRST"),
 				      elm = amendNode(document.createElement("div"), {"TEST": attr, "TEST2": attr}),
 				      elm2 = amendNode(document.createElement("div"), {"TEST3": attr}),
@@ -964,9 +970,10 @@ type Tests = {
 				return start === "FIRST" && start2 === "FIRST" && start3 === "FIRST" && elm.getAttributeNS(null, "TEST") === "SECOND" && elm.getAttributeNS(null, "TEST2") === "SECOND" && elm2.getAttributeNS(null, "TEST3") === "SECOND";
 			}
 		},
-		"bind (template)": {
+		"template": {
 			"single bind": async () => {
-				const {amendNode, bind} = await import("./lib/dom.js"),
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
 				      a = bind(" "),
 				      text = bind`HELLO${a}WORLD`,
 				      elm = amendNode(document.createElement("div"), text),
@@ -975,7 +982,8 @@ type Tests = {
 				return start === "HELLO WORLD" && elm.textContent === "HELLO,WORLD";
 			},
 			"single bind (attr)": async () => {
-				const {amendNode, bind} = await import("./lib/dom.js"),
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
 				      a = bind(" "),
 				      text = bind`HELLO${a}WORLD`,
 				      elm = amendNode(document.createElement("div"), {text}),
@@ -984,7 +992,8 @@ type Tests = {
 				return start === "HELLO WORLD" && elm.getAttribute("text") === "HELLO,WORLD";
 			},
 			"double bind": async () => {
-				const {amendNode, bind} = await import("./lib/dom.js"),
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
 				      a = bind("One"),
 				      b = bind("Two"),
 				      text = bind`1: ${a}\n2: ${b}`,
@@ -996,7 +1005,8 @@ type Tests = {
 				return start === `1: One\n2: Two` && start2 === `1: Uno\n2: Two` && elm.textContent === `1: Uno\n2: Dos`;
 			},
 			"double bind (attr)": async () => {
-				const {amendNode, bind} = await import("./lib/dom.js"),
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
 				      a = bind("One"),
 				      b = bind("Two"),
 				      text = bind`1: ${a}\n2: ${b}`,
