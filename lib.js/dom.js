@@ -68,8 +68,8 @@ const childrenArr = (children, res = []) => {
       isAttr = prop => prop instanceof Object && attr in prop,
       isChild = children => children instanceof Object && child in children,
       makeAttr = (k, prop) => {
-	const attr = Object.assign(document.createAttributeNS(null, k), {"realValue": prop});
-	attr.textContent = prop + "";
+	const attr = document.createAttributeNS(null, k);
+	attr.textContent = prop;
 	return attr;
       };
 
@@ -148,7 +148,7 @@ amendNode = (node, properties, children) => {
 						}
 					}
 				} else if (prop !== null) {
-					node.setAttributeNode(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop));
+					node.setAttributeNode(Object.assign(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop), {"realValue": prop}));
 				}
 			}
 		}

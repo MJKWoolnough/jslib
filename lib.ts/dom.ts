@@ -85,8 +85,8 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       isAttr = (prop: any): prop is BoundAttr => prop instanceof Object && attr in prop,
       isChild = (children: any): children is BoundChild => children instanceof Object && child in children,
       makeAttr = (k: string, prop: string) => {
-	const attr = Object.assign(document.createAttributeNS(null, k), {"realValue": prop});
-	attr.textContent = prop + "";
+	const attr = document.createAttributeNS(null, k);
+	attr.textContent = prop;
 	return attr;
       };
 
@@ -165,7 +165,7 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
 						}
 					}
 				} else if (prop !== null) {
-					node.setAttributeNode(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop as string));
+					node.setAttributeNode(Object.assign(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop as string), {"realValue": prop}));
 				}
 			}
 		}
