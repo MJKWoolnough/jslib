@@ -113,9 +113,6 @@ export class Bound extends Binding {
 			v[setNode](this);
 		}
 	}
-	[attr](k) {
-		return Object.assign(super[attr](k), {"realValue": this.value});
-	}
 	[value]() {
 		return this.value;
 	}
