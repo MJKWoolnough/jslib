@@ -8,6 +8,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 |---------------------------------------------|---------------|
 | [bbcode](#bbcode)                           | A BBCode parser. |
 | [bbcode_tags](#bbcode_tags)                 | A collection of BBCode tags. |
+| [bind](#bind)                               | Function for creating [Attr](https://developer.mozilla.org/en-US/docs/Web/API/Attr) and [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) nodes that update their textContent automatically. |
 | [conn](#conn)                               | Convenience wrappers around [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket). |
 | [css](#css)                                 | A simple CSS management library. |
 | [dom](#dom)                                 | Functions for manipulating the DOM. |
@@ -37,7 +38,7 @@ Thematically, the above modules can be grouped into a few packages:
 
 |  Package  |  Description  |  Members  |
 |-----------|---------------|-----------|
-| Decorum   | A collection of DOM manipulation libs. | [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
+| Decorum   | A collection of DOM manipulation libs. | [Bind](#bind), [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), and [RPC](#rpc). |
 | Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
 | Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), [Misc](#misc), [Router](#router), [Transitions](#router_transitions), and [Settings](#settings). |
@@ -237,6 +238,45 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 | table         | The *table* tag is used to create an HTMLTableElement. This table allows *thead*, *tbody*, *tfoot*, *tr*, *th*, and *td*, all of which act like their HTML counterparts. |
 | u             | The *u* tag sets underline on the contained data. |
 | url           | The *url* tag creates an HTMLAnchorElement, with the href set to the attribute, wrapping the contained data. If no attribute is set, the URL is taken from the containing data. |
+
+## <a name="bind">bind</a>
+
+This modules contains a Function for creating [Attr](https://developer.mozilla.org/en-US/docs/Web/API/Attr) and [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) nodes that update their textContent automatically.
+
+This module directly imports the [dom](#dom) module.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| <a name="bind_binding">Binding</a> | Class | An abstract class that is a parent class of both of the return types from the [bind](#bind_bind) function. |
+| [bind](#bind_bind) | Function | Creates bound text objects that can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) functions. |
+| [Bound](#bind_bound) | Class | A subclass of Binding, Objects that implement this type can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
+
+### <a name="bind_bind">bind</a>
+```typescript
+<T extends ToString = ToString>(t: T): Bind<T>;
+(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]): Binder;
+```
+
+This function can be used either as a normal function, binding a single value, or as a template tag function.
+
+When used normally, this function takes a single starting value and returns a [Bound](#bind_bound) class with that value set.
+
+When used as a tag function, this function will return a type that is bound to all Bind expressions used within the template.
+
+Both returned types can be used as attributes or children in amendNode and clearNode calls.
+
+### <a name="bind_bound">Bound</a>
+```typescript
+export type Bound<T extends ToString = ToString> {
+	value: T;
+	constructor(value: T);
+	toString(): string;
+}
+```
+
+Objects that implement this type can be used in place of both property values and Children in calls to [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode), as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
+
+When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
 
 ## <a name="conn">conn</a>
 
@@ -511,11 +551,8 @@ The dom module can be used to manipulate DOM elements.
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
 | [amendNode](#dom_amendnode) | Function | This convenience function modifies a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget. |
-| <a name="dom_binding">Binding</a> | Class | An abstract class that is a parent class of both of the return types from the [bind](#dom_bind_fn) function. |
-| [bind](#dom_bind) | Function | Creates bound text objects that can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) functions. |
-| [Bound](#dom_bound) | Class | A subclass of Binding, Objects that implement this type can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
 | [bindElement](#dom_bindelement) | Function | This function simplifies binding of [amendNode](#dom_amendnode). |
-| [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), [Binding](#dom_binding), or a recursive array of those. |
+| [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), [Binding](#bind_binding), or a recursive array of those. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom_amendnode) except that it clears any children before amending. |
 | [createDocumentFragment](#dom_createdocumentfragment) | Function | This convenience function creates a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment). |
 | [DOMBind](#dom_dombind) | Type | This type represents a binding of either [amendNode](#dom_amendnode) or [clearNode](#dom_clearnode) with the first param bound. |
@@ -548,20 +585,6 @@ This function returns the element passed to it.
 
 NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with [window.open()](https://developer.mozilla.org/en-US/docs/Web/API/Window/open).
 
-### <a name="dom_bind">bind</a>
-```typescript
-<T extends ToString = ToString>(t: T): Bind<T>;
-(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]): Binder;
-```
-
-This function can be used either as a normal function, binding a single value, or as a template tag function.
-
-When used normally, this function takes a single starting value and returns a [Bound](#dom_bound) class with that value set.
-
-When used as a tag function, this function will return a type that is bound to all Bind expressions used within the template.
-
-Both returned types can be used as attributes or children in amendNode and clearNode calls.
-
 ### <a name="dom_bindelement">bindElement</a>
 ```typescript
 <T extends Element>(ns: string, value: string) => DOMBind<T>;
@@ -569,18 +592,6 @@ Both returned types can be used as attributes or children in amendNode and clear
 
 This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.
 
-### <a name="dom_bound">Bound</a>
-```typescript
-export type Bound<T extends ToString = ToString> {
-	value: T;
-	constructor(value: T);
-	toString(): string;
-}
-```
-
-Objects that implement this type can be used in place of both property values and Children in calls to [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode), as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
-
-When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
 
 ### <a name="dom_children">Children</a>
 ```typescript
@@ -834,7 +845,7 @@ This class is added to an element created with the [(default)](#elements_default
 
 The `act` method allows actions to be taken when attributes on the element are changed. When monitoring a single attribute, the newValue will be the new value assigned to that attribute. When monitoring multiple attributes, an Object will be passed to the function with keys on the attribute names set to the value of that attribute.
 
-The `attr` method acts similarly to the `act` method, but will return a [Binding](#dom_binding). When monitoring a single attribute, the value of the Binding object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
+The `attr` method acts similarly to the `act` method, but will return a [Binding](#bind_binding). When monitoring a single attribute, the value of the Binding object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
 
 ### <a name="elements_withchildren">WithChildren</a>
 ```typescript
