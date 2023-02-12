@@ -88,7 +88,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	const attr = Object.assign(document.createAttributeNS(null, k), {"realValue": prop});
 	attr.textContent = prop + "";
 	return attr;
-      }
+      };
 
 export const
 /** This symbol is used to denote a special Object that provides its own Children. */
