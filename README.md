@@ -551,7 +551,9 @@ The dom module can be used to manipulate DOM elements.
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
 | [amendNode](#dom_amendnode) | Function | This convenience function modifies a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget. |
+| attr     | Symbol | This symbol is used to denote a method on an object that will take an attribute name and return a new Attr Node. |
 | [bindElement](#dom_bindelement) | Function | This function simplifies binding of [amendNode](#dom_amendnode). |
+| child    | Symbol | This symbol is used to denote a special Object that provides its own Children. |
 | [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), [Binding](#bind_binding), or a recursive array of those. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom_amendnode) except that it clears any children before amending. |
 | [createDocumentFragment](#dom_createdocumentfragment) | Function | This convenience function creates a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment). |
@@ -564,6 +566,7 @@ The dom module can be used to manipulate DOM elements.
 | isChildren | Function | This function determines whether the passed in object can be used as a [Children](#dom_children) type. |
 | <a name="dom_props">Props</a> | Type | A [PropsObject](#dom_propsobject) or [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap). |
 | [PropsObject](#dom_propsobject) | Type | This object is used to set attributes and events on a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget with the [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode) functions. |
+| value    | Symbol | This symbol is used to denote a special Object that might be an EventListener. |
 
 ### <a name="dom_amendnode">amendNode</a>
 ```typescript
