@@ -74,11 +74,11 @@ const childrenArr = (children, res = []) => {
       }
 
 export const
-/** */
+/** This symbol is used to denote a special Object that provides its own Children. */
 child = Symbol("child"),
-/** */
+/** This symbol is used to denote a method on an object that will take an attribute name and return a new Attr Node. */
 attr = Symbol("attr"),
-/** */
+/** This symbol is used to denote a special Object that might be an EventListener. */
 value = Symbol("value"),
 /**
  * This function determines whether the passed in object can be used as a {@link Children} type.
@@ -240,3 +240,17 @@ clearNode = (node, properties, children) => {
 	}
 	return amendNode(node, properties, children);
 };
+
+/**
+ * This type represents an Object that uses the `attr` symbol to return a special Attr node.
+ *
+ * @typedef {Object} BoundAttr
+ * @property {(k: string) => Attr} {@link attr}
+ **/
+
+/**
+ * This type represents an Object that uses the `child` symbol to return a special Element or Text node.
+ *
+ * @typedef {Object} BoundChild
+ * @property {Element | Text} {@link Child}
+ **/
