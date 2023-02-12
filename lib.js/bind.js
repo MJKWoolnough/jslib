@@ -1,5 +1,15 @@
 import {attr, child, isEventListenerObject, value} from './dom.js';
 
+/**
+ * This modules contains a Function for creating {@link https://developer.mozilla.org/en-US/docs/Web/API/Attr | Attr} and {@link https://developer.mozilla.org/en-US/docs/Web/API/Text | Text} nodes that update their textContent automatically.
+ *
+ * This module directly imports the {@link module:dom} module.
+ *
+ * @module bind
+ * @requires module:dom
+ */
+/** */
+
 const setNode = Symbol("setNode"),
       update = Symbol("update"),
       remove = Symbol("remove");
@@ -142,7 +152,7 @@ export class Bound extends Binding {
  *
  * When used as a tag function, this function will return a type that is bound to all Bind expressions used within the template.
  *
- * Both returned types can be used as attributes or children in amendNode and clearNode calls.
+ * Both returned types can be used as attributes or children in {@link dom:amendNode} and {@link dom:clearNode} calls.
  *
  * @typeParam T
  * @param {T} v Value to be bound so it can be changed when assigned to an element attribute or child.
