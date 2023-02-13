@@ -148,7 +148,7 @@ amendNode = (node, properties, children) => {
 						}
 					}
 				} else if (prop !== null) {
-					node.setAttributeNode(Object.assign(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop), {"realValue": prop}));
+					node.setAttributeNode(prop instanceof Attr ? prop : Object.assign(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop), {"realValue": prop}));
 				}
 			}
 		}

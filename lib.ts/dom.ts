@@ -165,7 +165,7 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
 						}
 					}
 				} else if (prop !== null) {
-					node.setAttributeNode(Object.assign(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop as string), {"realValue": prop}));
+					node.setAttributeNode(prop instanceof Attr ? prop : Object.assign(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop as string), {"realValue": prop}));
 				}
 			}
 		}
