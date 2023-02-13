@@ -6292,5 +6292,22 @@ type Tests = {
 				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 2), 100));
 			}
 		},
+		"text2DOM": {
+			"html": async () => {
+				const {text2DOM} = await import("./lib/misc.js"),
+				      d = text2DOM("<div><br /></div>");
+				return d instanceof DocumentFragment && d.firstChild instanceof HTMLDivElement && d.firstChild?.firstChild instanceof HTMLBRElement;
+			},
+			"svg": async () => {
+				const {text2DOM} = await import("./lib/misc.js"),
+				      d = text2DOM("<svg><g></g></svg>");
+				return d instanceof DocumentFragment && d.firstChild instanceof SVGSVGElement && d.firstChild?.firstChild instanceof SVGGElement;
+			},
+			"mix": async () => {
+				const {text2DOM} = await import("./lib/misc.js"),
+				      d = text2DOM("<div><svg></svg></div>");
+				return d instanceof DocumentFragment && d.firstChild instanceof HTMLDivElement && d.firstChild?.firstChild instanceof SVGSVGElement;
+			},
+		}
 	}
 });
