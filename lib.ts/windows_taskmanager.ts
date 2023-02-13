@@ -119,7 +119,10 @@ export class ShellElement extends BaseShellElement {
 				if (!data.item) {
 					amendNode(taskbar, data.item = div());
 				}
-				const taskbarItem = windows({"window-icon": target.getAttribute("window-icon") ?? undefined, "window-title": target.getAttribute("window-title") ?? undefined, "hide-minimise": true, "maximised": true, "exportparts": "close, minimise, maximise, titlebar, title, controls, icon", "onclose": () => target.close(), "onremove": () => taskbarData.delete(taskbarItem)});
+				const taskbarItem = windows({"window-icon": target.getAttribute("window-icon") ?? undefined, "window-title": target.getAttribute("window-title") ?? undefined, "hide-minimise": true, "maximised": true, "exportparts": "close, minimise, maximise, titlebar, title, controls, icon", "onclose": (e: Event) => {
+					e.preventDefault();
+					target.close();
+				}, "onremove": () => taskbarData.delete(taskbarItem)});
 				taskbarData.set(taskbarItem, target);
 				amendNode(data.item, taskbarItem);
 				taskbarObserver.observe(taskbarItem, taskbarObservations);
