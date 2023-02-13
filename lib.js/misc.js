@@ -107,4 +107,16 @@ autoFocus = (node, inputSelect = true) => {
 		}
 	}, 0);
 	return node;
+},
+/**
+ * This function converts valid HTML/SVG/MathML text into DOM Nodes.
+ *
+ * @param {string} text The text to be converted.
+ *
+ * @return {DocumentFragment} The parsed DOM nodes stored in a DocumentFragment.
+ */
+text2DOM = text => {
+	const t = document.createElement("template");
+	t.innerHTML = text;
+	return t.content;
 };
