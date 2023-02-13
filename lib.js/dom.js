@@ -60,7 +60,7 @@ const childrenArr = (children, res = []) => {
 	}
 	return res;
       },
-      isEventListenerOrEventListenerObject = prop => prop instanceof Object && value in prop ? isEventListenerOrEventListenerObject(prop[value]) : prop instanceof Function || isEventListenerObject(prop),
+      isEventListenerOrEventListenerObject = prop => prop instanceof Function || isEventListenerObject(prop) && (value in prop ? isEventListenerOrEventListenerObject(prop[value]) : true),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object && !isAttr(prop),
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !isAttr(prop)),
