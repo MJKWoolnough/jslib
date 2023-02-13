@@ -1588,6 +1588,7 @@ The misc module contains various simple, dependency-free functions.
 | [pushAndReturn](#misc_pushandreturn) | This function adds a value to an Array and returns the value. |
 | [queue](#misc_queue) | The function allows the simple queueing of functions that require a definite order. |
 | [setAndReturn](#misc_setandreturn) | This function sets a value on a map and returns the value. |
+| [text2DOM](#misc_text2dom) | This function convers valid HTML/SVG/MathML text into DOM Nodes. |
 
 ### <a name="misc_addandreturn">addAndReturn</a>
 ```typescript
@@ -1656,6 +1657,13 @@ setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => V;
 This function takes a map-like object and calls the `set` method with the given key and value, before returning the value `v`.
 
 This functions is useful for one-liners where you need to store a value in a map and still work on that value.
+
+### <a name="misc_text2dom">text2DOM</a>
+```typescript
+(text: string) => DocumentFragment
+```
+
+This function converts valid HTML/SVG/MathML text into DOM Nodes, stored within a DocumentFragment.
 
 ## <a name="nodes">nodes</a>
 
