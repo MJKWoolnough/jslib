@@ -15,7 +15,7 @@ export const
  * This function creates simple transition function (as used with the {@link router:registerTransition | registerTranstition} function and the Router {@link router:Router/setTransition | setTransition} method of the router module.
  *
  * @param {Keyframe[]} forCurrent CSS Keyframes for the current Node.
- * @param {Keyframe[]} [forNext]  CSS Ketframes for the next Node. If `forNext` is not specified, then it will be determined by reversing the `forCurrent` array.
+ * @param {Keyframe[]} [forNext]  CSS Keyframes for the next Node. If `forNext` is not specified, then it will be determined by reversing the `forCurrent` array.
  * @param {number} [duration]     Total duration of the animation effect.
  */
 createTransition = (forCurrent, forNext = forCurrent.slice().reverse(), duration = 500) => (current, next) => {
