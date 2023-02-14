@@ -191,9 +191,9 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
  * | fill | Method | Not applicable and throws an error. |
  * | filterRemove | Method | New method that works like `filter` but also removes the filtered items. |
  * | {@link NodeArray/from | from} | Static Method | Takes very different params to initialise a NodeArray. |
- * | {@link NodeArray/reverse} | Method | Reverses the sorting of the [Item](#nodes_item)s. |
+ * | {@link NodeArray/reverse} | Method | Reverses the sorting of the {@link Item}s. |
  * | slice | Method | Returns a normal Array, not a NodeArray. |
- * | {@link NodeArray/sort | sort} | Method | Sorts the [Item](#nodes_item)s. |
+ * | {@link NodeArray/sort | sort} | Method | Sorts the {@link Item}s. |
  *
  * @typeParam {Node} H
  * @typeParam {Item} T
@@ -202,13 +202,13 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	#root: Root<T, H>;
 	[realTarget]!: this;
 	/*
-	 * The NodeArray constructor takes a parent element, onto which all [Item](#nodes_item) elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
+	 * The NodeArray constructor takes a parent element, onto which all {@link Item} elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
 	 *
-	 * The sorting function is used to order [Item](#nodes_item)s as they are inserted.
+	 * The sorting function is used to order {@link Item}s as they are inserted.
 	 *
 	 * The NodeArray type is wrapped with a Proxy to implement [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)-like indexing.
 	 *
-	 * @param {H} h A parent element, onto which all [Item](#nodes_item) elements will be attached.
+	 * @param {H} h A parent element, onto which all {@link Item} elements will be attached.
 	 * @param {Function} [s] An optional starting sort function.
 	 * @param {Iterable<T>} elements An optional set of starting elements of type `T`.
 	 */
@@ -664,7 +664,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return count;
 	}
 	/**
-	 * The reset method changes the key assigned to an [Item](#nodes_item) without performing any sorting.
+	 * The reset method changes the key assigned to an {@link Item} without performing any sorting.
 	 *
 	 * @param {K} k The key to be replaced.
 	 * @param {K} j The key replace with.
