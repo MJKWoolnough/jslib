@@ -8,7 +8,7 @@
 /**
  * This type can be used to set events with {@link amendNode} and {@link clearNode}. The boolean is true if the event is to be removed
  *
- * @typedef {[Exclude<EventListenerOrEventListenerObject, Bound> | Bound<EventListenerOrEventListenerObject>, AddEventListenerOptions, boolean]} EventArray
+ * @typedef {[EventListenerOrEventListenerObject, AddEventListenerOptions, boolean]} EventArray
  */
 
 /**
