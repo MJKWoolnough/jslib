@@ -251,7 +251,7 @@ clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Ch
 	} else if (children && node instanceof Element) {
 		children = void node.replaceChildren(...childrenArr(children));
 	} else {
-		while (node.lastChild !== null) {
+		while (node.lastChild) {
 			node.lastChild.remove();
 		}
 	}
