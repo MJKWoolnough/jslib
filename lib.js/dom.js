@@ -18,9 +18,9 @@
  *
  * |  Key  |  Description  |
  * |-------|---------------|
- * | `on*` | Used to set events. Can be a Function, [EventListenerObject](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#the_event_listener_callback), or [EventArray](#dom_eventarray).|
- * | `class` | An array of strings, a [DOMTokenList](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList), or an object with string keys and boolean or undefined values, to be used to toggle classes. For the array and DOMTokenList, if a class begins with a `!`, the class will be removed, if the class begins with a `~`, the class will be toggled, otherwise the class will be set. For the object, a value that equates to true will set the class, and a value that equates to false (except nullables, which will toggle the class) will unset the class. |
- * | `style` | A [CSSStyleDeclaration](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration) can be used to set the style directly, or an Object can be used to set individual style properties. |
+ * | `on*` | Used to set events. Can be a Function, {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#the_event_listener_callback EventListenerObject}, or {@link EventArray}.|
+ * | `class` | An array of strings, a {@link https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList | DOMTokenList}, or an object with string keys and boolean or undefined values, to be used to toggle classes. For the array and DOMTokenList, if a class begins with a `!`, the class will be removed, if the class begins with a `~`, the class will be toggled, otherwise the class will be set. For the object, a value that equates to true will set the class, and a value that equates to false (except nullables, which will toggle the class) will unset the class. |
+ * | `style` | A {@link https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration | CSSStyleDeclaration} can be used to set the style directly, or an Object can be used to set individual style properties. |
  * | `*` | For any key, a string or any object with a toString method can be used to set the field explicitly, a number can be used and converted to a string, a boolean can be used to toggle an attribute, and a undefined value can be used to remove an attribute. If a null value is specified, no action will be taken. |
  *
  * @typedef {Record<string, unknown>} PropsObject
