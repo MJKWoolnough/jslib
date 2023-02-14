@@ -311,7 +311,7 @@ router = () => new Router(),
  * This function may be called directly from HTML event handlers, as it is granted global scope in the page.
  *
  * @param {string} href                      The new location to 'go to'.
- * @param {Record<string, ToString>} [attrs] Attributes to add/override ones derrived from the URL.
+ * @param {Record<string, ToString>} [attrs] Attributes to add/override ones derived from the URL.
  *
  * @return {boolean} Will return `true` if any Router has a route that matches the location, and `false` otherwise.
  */
