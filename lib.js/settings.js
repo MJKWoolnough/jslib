@@ -205,9 +205,12 @@ export class JSONSetting extends Setting {
 	}
 	/**
 	 * This method will save any changes made to the stored `value` object, without having to re-set it.
+	 *
+	 * @return {this} Returns `this` for easy chaining.
 	 */
 	save() {
 		this.set(this.value);
+		return this;
 	}
 	[s](v) {
 		return JSON.stringify(v);
