@@ -104,7 +104,7 @@ isEventListenerObject = prop => prop instanceof Object && prop.handleEvent insta
  * @typeParam {EventTarget | null} T
  * @param {T} [node]                      The EventTarget or Node to be modified.
  * @param {Props | Children} [properties] The properties to be added to the EventTarget or Node. Can be ommitted with Children in its place.
- * @param {Children} [Children]           Children to be added to a Node. Should be ommitted if `properties` was set to a Children type.
+ * @param {Children} [children]           Children to be added to a Node. Should be ommitted if `properties` was set to a Children type.
  *
  * @return {T} The passed EventTarget or Node.
  */
