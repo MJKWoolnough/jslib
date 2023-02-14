@@ -6,7 +6,7 @@ import {registerTransition} from './router.js';
  * This module directly imports the {@link module:router}  module.
  *
  * @module router_transitions
- * @requires {@link module:router}
+ * @requires module:router
  */
 /** */
 
