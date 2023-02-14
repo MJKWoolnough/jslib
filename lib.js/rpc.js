@@ -101,7 +101,7 @@ export class RPC {
 	 * @typeParam {any} T
 	 * @param {string} method                                                     The method name to be called.
 	 * @param {Exclude<any, Function> | ((a: any) => a is T)} [paramsOrTypeCheck] Either the params to be sent to the specified method, or a typecheck function.
-	 * @oaram {(a: any) => a is T} [typeCheck]                                    A typecheck function, if one was supplied to the second param.
+	 * @param {(a: any) => a is T} [typeCheck]                                    A typecheck function, if one was supplied to the second param.
 	 *
 	 * @return {Promise<T>} A Promise that will resolve with the returned data from the remote procedure call.
 	 */
