@@ -210,7 +210,7 @@ id = defaultCSS.id.bind(defaultCSS),
 /**
  * A binding to the {@link CSS/ids | ids} method on a default instantiation of the CSS class.
  */
-ids = defaultCSS.ids.bind(defaultCSS),
+ids = defaultCSS.ids.bind(defaultCSS) as <N extends number>(length: N) => IDs<N>,
 /**
  * A binding to the {@link CSS/render | render} method on a default instantiation of the CSS class.
  */
