@@ -100,7 +100,7 @@ class TemplateBind extends Binding {
 }
 
 /**
- * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
+ * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.
  *
  * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
  */
