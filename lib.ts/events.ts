@@ -185,7 +185,7 @@ keyEvent = (key: string | string[], onkeydown?: KeyFn, onkeyup?: KeyFn, once = f
  * @param {(e: MouseEvent) => void} onmousemove Function to be called when the mouse is moved.
  * @param {() => void} [onend]  Function to be called when the event is stopped.
  *
- * @return {[() => void, (run = true) => void]} Array of Functions as descrived above.
+ * @return {[() => void, (run = true) => void]} Array of Functions as described above.
  */
 mouseMoveEvent = (onmousemove: MouseFn, onend?: () => void) => {
 	const id = nextMouseID++;
