@@ -22,7 +22,7 @@ export type WaitInfo = {
  */
 export class Pipe<T> {
 	#out: ((data: T) => void)[] = [];
-	/** The field contains the numner of functions currently registered on the Pipe. */
+	/** The field contains the number of functions currently registered on the Pipe. */
 	get length() { return this.#out.length }
 	/**
 	 * This function sends the data passed to any functions registered on the Pipe.
