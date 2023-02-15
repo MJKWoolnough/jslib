@@ -113,7 +113,7 @@ autoFocus = <T extends {focus(): void}>(node: T, inputSelect = true) => {
  *
  * @param {string} text The text to be converted.
  *
- * @return {DocumentFragment} The parsed DOM nodes stored in a DocumentFragment.
+ * @return {DocumentFragment} The parsed DOM nodes stored in a {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment}.
  */
 text2DOM = (text: string) => {
 	const t = document.createElement("template");
