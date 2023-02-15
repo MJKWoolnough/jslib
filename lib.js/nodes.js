@@ -167,16 +167,16 @@ const sortNodes = (root, n) => {
 export class NodeArray {
 	#root;
 	[realTarget];
-	/*
+	/**
 	 * The NodeArray constructor takes a parent element, onto which all {@link Item} elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
 	 *
 	 * The sorting function is used to order {@link Item}s as they are inserted.
 	 *
 	 * The NodeArray type is wrapped with a Proxy to implement [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)-like indexing.
 	 *
-	 * @param {H} h A parent element, onto which all {@link Item} elements will be attached.
-	 * @param {Function} [s] An optional starting sort function.
-	 * @param {Iterable<T>} elements An optional set of starting elements of type `T`.
+	 * @param {H} h                    A parent element, onto which all {@link Item} elements will be attached.
+	 * @param {Function} [s]           An optional starting sort function.
+	 * @param {Iterable<T>} [elements] An optional set of starting elements of type `T`.
 	 */
 	constructor(h, s = noSort, elements = []) {
 		const root = this.#root = {s, h, l: 0, o: 1};
