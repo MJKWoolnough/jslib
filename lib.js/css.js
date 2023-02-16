@@ -39,22 +39,6 @@ export default class CSS extends CSSStyleSheet {
 		this.#idPrefix = idRE.test(prefix) ? prefix : "_";
 		this.#id = idStart;
 	}
-	#compileRule(selector, def) {
-		const rules = [];
-		let data = "";
-		for (const key in def) {
-			const v = def[key];
-			if (isDef(v)) {
-				rules.push(...this.#compileRule(join(selector, key), v));
-			} else {
-				data += `${key}:${v};`;
-			}
-		}
-		if (data) {
-			rules.unshift(selector + "{" + data + "}");
-		}
-		return rules;
-	}
 	/**
 	 * This method can either be called with a CSS selector string and a {@link Def} object containing all of the style information, or and object with selector keys and {@link Def} values. The CSS instance is returned for simple method chaining.
 	 *
@@ -69,7 +53,7 @@ export default class CSS extends CSSStyleSheet {
 	 */
 	add(selectorOrDefs, defs = {}) {
 		for (const [selector, def] of typeof selectorOrDefs === "string" ? [[selectorOrDefs, defs]] : Object.entries(selectorOrDefs)) {
-			for (const rule of this.#compileRule(selector, def)) {
+			for (const rule of compileRule(selector, def)) {
 				this.insertRule(rule, this.cssRules.length);
 			}
 		}
@@ -87,7 +71,7 @@ export default class CSS extends CSSStyleSheet {
 		if (defs) {
 			let data = "";
 			for (const def in defs) {
-				for (const rule of this.#compileRule(def, defs[def])) {
+				for (const rule of compileRule(def, defs[def])) {
 					data += rule;
 				}
 			}
@@ -183,6 +167,22 @@ const split = selector => {
       },
       isDef = v => Object.getPrototypeOf(v) === Object.prototype,
       idRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
+      compileRule = (selector, def) => {
+	const rules = [];
+	let data = "";
+	for (const key in def) {
+		const v = def[key];
+		if (isDef(v)) {
+			rules.push(...compileRule(join(selector, key), v));
+		} else {
+			data += `${key}:${v};`;
+		}
+	}
+	if (data) {
+		rules.unshift(selector + "{" + data + "}");
+	}
+	return rules;
+      },
       defaultCSS = new CSS();
 
 export const
