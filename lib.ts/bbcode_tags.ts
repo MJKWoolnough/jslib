@@ -5,7 +5,7 @@ import {amendNode} from './dom.js';
 import {a, audio as aaudio, blockquote, br, div, fieldset, h1 as ah1, h2 as ah2, h3 as ah3, h4 as ah4, h5 as ah5, h6 as ah6, hr as ahr, img as aimg, legend, li, mark, ol, pre, span, table as atable, tbody, td, tfoot, th, thead, tr, ul} from './html.js';
 
 /**
- * This module contains many standard [BBCode](https://en.wikipedia.org/wiki/BBCode) tags parsers, and a default text processor.
+ * This module contains many standard {@link https://en.wikipedia.org/wiki/BBCode | BBCode} tags parsers, and a default text processor.
  *
  * This module directly imports the {@link module:bbcode}, {@link module:dom}, and {@link module:html} modules.
  *
