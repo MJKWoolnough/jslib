@@ -130,7 +130,7 @@ isCloseTag = (t: OpenTag | CloseTag | string): t is CloseTag => typeof t === "ob
 /**
  * Intended for tag parsers, this function determines if a token is a string.
  *
- * @param {OpenTag | CloseTag | string} t Tag to determine if it is a CloseTag.
+ * @param {OpenTag | CloseTag | string} t Tag to determine if it is a string.
  * 
  * @return {boolean} `true` if `t` is an `string`.
  */
