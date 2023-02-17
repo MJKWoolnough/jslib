@@ -112,7 +112,7 @@ export const
  */
 text = Symbol("text"),
 /**
- * Intended for tag parsers, this function determines if a token is an OpenTag.
+ * Intended for tag parsers, this function determines if a token is an {@link OpenTag}.
  *
  * @param {OpenTag | CloseTag | string} t Tag to determine if it is an OpenTag.
  *
@@ -120,7 +120,7 @@ text = Symbol("text"),
  */
 isOpenTag = (t: OpenTag | CloseTag | string): t is OpenTag => typeof t === "object" && (t as OpenTag).attr !== undefined,
 /**
- * Intended for tag parsers, this function determines if a token is a CloseTag.
+ * Intended for tag parsers, this function determines if a token is a {@link CloseTag}.
  *
  * @param {OpenTag | CloseTag | string} t Tag to determine if it is a CloseTag.
  *
