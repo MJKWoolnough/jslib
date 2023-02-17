@@ -129,7 +129,7 @@ amendNode = (node, properties, children) => {
 					node.removeAttribute(k);
 				} else if (prop instanceof Array || prop instanceof DOMTokenList) {
 					if (k === "class" && prop.length) {
-						for (let c of prop) {
+						for (const c of prop) {
 							const f = c.slice(0, 1),
 							      m = f !== '!' && (f !== '~' || undefined);
 							node.classList.toggle(m ? c : c.slice(1), m);
