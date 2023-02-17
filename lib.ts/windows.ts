@@ -362,7 +362,8 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 			"top": 0,
 			"left": 0,
 			"bottom": 0,
-			"right": 0
+			"right": 0,
+			"pointer-events": "none"
 		}
 	},
 	"([minimised]),>div:nth-child(1),([hide-titlebar])>div:nth-child(2),([hide-close])>div:nth-child(2)>div>button:nth-of-type(1),([hide-maximise])>div:nth-child(2)>div>button:nth-of-type(2),([hide-minimise])>div:nth-child(2)>div>button:nth-of-type(3),([window-hide])>div:nth-child(2)>div>button:nth-of-type(3)": {
@@ -617,7 +618,7 @@ export class WindowElement extends BaseElement {
 	constructor() {
 		super();
 		const onclick = () => this.focus();
-		amendNode(this.attachShadow({"mode": "closed"}), [
+		amendNode(this.attachShadow({"mode": "closed"}), {onclick}, [
 			div(Array.from({length: 8}, (_, n) => div({"onmousedown": (e: MouseEvent) => resizeWindow(this, n, e)}))),
 			div({"part": "titlebar", "onmousedown": (e: MouseEvent) => moveWindow(this, e), "ondblclick": (e: Event) => {
 				if (!(e.target instanceof HTMLButtonElement) && !this.hasAttribute("hide-maximise")) {
@@ -634,7 +635,7 @@ export class WindowElement extends BaseElement {
 				])
 			]),
 			this.#slot = div(slot()),
-			div({onclick})
+			div()
 		]).adoptedStyleSheets = windowStyle;
 		setTimeout(amendNode, 0, this, {"onmousedown": event(onclick, eventCapture)});
 	}
