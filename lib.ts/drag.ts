@@ -147,7 +147,7 @@ export class DragFiles {
 		return f;
 	}
 	/**
-	 * This method checks all items attached to the {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event | DragEvent}), returning true is all items are files that match the mime types provided to the constructor, and false otherwise.
+	 * This method checks all items attached to the {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event | DragEvent}, returning true is all items are files that match the mime types provided to the constructor, and false otherwise.
 	 *
 	 * This method also marks the DragEvent as a {@link CheckedDragEvent} if it returns true.
 	 *
