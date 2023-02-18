@@ -132,7 +132,7 @@ WS = (url: string) => new Promise<WSConn>((successFn, errorFn) => {
 });
 
 /**
- * WSConn extends the [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) class, allowing for the passed URL to be relative to the current URL.
+ * WSConn extends the {@link https://developer.mozilla.org/en-US/docs/Web/API/WebSocket | WebSocket} class, allowing for the passed URL to be relative to the current URL.
  *
  * In addition, it adds the {@link WSConn/when} method.
  */
@@ -147,7 +147,7 @@ export class WSConn extends WebSocket {
 		super(new URL(url, base), protocols);
 	}
 	/**
-	 * This method acts like the {@link module:inter/Subscription.when | when} method of the {@link inter:Subscription | Subscription} class from the {@link module:inter | inter} module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error. The method returns a [Subscription](#inter_subscription) object with the success and error functions set to those provided.
+	 * This method acts like the {@link module:inter/Subscription.when | when} method of the {@link inter:Subscription | Subscription} class from the {@link module:inter | inter} module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error. The method returns a {@link inter/Subscription} object with the success and error functions set to those provided.
 	 *
 	 * @typeParam {any} T = Success type
 	 * @typeParam {any} U = Error type
