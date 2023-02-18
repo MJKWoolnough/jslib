@@ -281,9 +281,9 @@ export const
 /**
  * The `router` function creates a new router, which should be added to the DOM in the place that you wish the matched routes to be placed.
  *
- * In addition to being able to be used from javascript, the Router can be added directly with HTML using the `x-router` tag. When used in this way, routes can be added by adding children to the Router with the `route-match` attribute set to the matching route, as per the [add](#router_router_add) method.
+ * In addition to being able to be used from javascript, the Router can be added directly with HTML using the `x-router` tag. When used in this way, routes can be added by adding children to the Router with the `route-match` attribute set to the matching route, as per the {@link Router/add | add} method.
  *
- * The `x-router` can take a `router-transition` attribute, the name of which can be set to a name/function combo that is registered with the [registerTransition](#router_registertransition) function to allow an animated transition between routes.
+ * The `x-router` can take a `router-transition` attribute, the name of which can be set to a name/function combo that is registered with the {@link registerTransition} function to allow an animated transition between routes.
  *
  * For example, the following creates two path routes and a catch-all route:
  *
