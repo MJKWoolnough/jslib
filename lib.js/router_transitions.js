@@ -1,7 +1,7 @@
 import {registerTransition} from './router.js';
 
 /**
- * This library defines some simple transitional effects for the [router](#router) library.
+ * This library defines some simple transitional effects for the {@link mod:router} library.
  *
  * This module directly imports the {@link module:router}  module.
  *
