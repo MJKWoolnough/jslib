@@ -182,9 +182,9 @@ export class StringSetting extends Setting {
  */
 export class JSONSetting extends Setting {
 	/**
-	 * The JSONSetting class extends the `constructor` of [Setting](#settings_setting) to, in addition to the string name and default starting value, takes a required validator function to confirm the retrieved value is of type `T`.
+	 * The JSONSetting class extends the `constructor` of {@link Setting} to, in addition to the string name and default starting value, takes a required validator function to confirm the retrieved value is of type `T`.
 	 *
-	 * Otherwise this class just extends the base [Setting](#settings_setting) class with the `T` type.
+	 * Otherwise this class just extends the base {@link Setting} class with the `T` type.
 	 *
 	 * @param {string} name            Setting name.
 	 * @param {T} starting             Default value.
