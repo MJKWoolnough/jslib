@@ -206,7 +206,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	 *
 	 * The sorting function is used to order {@link Item}s as they are inserted.
 	 *
-	 * The NodeArray type is wrapped with a Proxy to implement [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)-like indexing.
+	 * The NodeArray type is wrapped with a Proxy to implement {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array | Array}-like indexing.
 	 *
 	 * @param {H} h                    A parent element, onto which all {@link Item} elements will be attached.
 	 * @param {Function} [s]           An optional starting sort function.
