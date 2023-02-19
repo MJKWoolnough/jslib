@@ -734,7 +734,9 @@ export class WindowElement extends BaseElement {
 				elm.scrollLeft = scrollLeft;
 			}
 		}
-		super.focus();
+		if (!this.contains(document.activeElement)) {
+			super.focus();
+		}
 	}
 	close() {
 		if (this.#child) {
