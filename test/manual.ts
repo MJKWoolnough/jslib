@@ -60,7 +60,7 @@ type ManualTests = {
 							button.remove();
 						});
 						Object.assign(w, {"result": resultFn!});
-						w.addEventListener("unload", () => {
+						w.addEventListener("beforeunload", () => {
 							button.toggleAttribute("disabled", false)
 							s();
 						});
