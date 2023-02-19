@@ -15,6 +15,7 @@ type ManualTests = {
 			this.#parent?.add();
 		}
 	}
+	let queue = Promise.resolve();
 	const icon = document.head.getElementsByTagName("link")[0],
 	      processTests = (breadcrumbs: string, t: ManualTests, totalCount: Counter, successCount: Counter, errorCount: Counter) => {
 		const df = document.createDocumentFragment(),
@@ -27,50 +28,56 @@ type ManualTests = {
 				totalCount.add();
 				button.innerText = "Run Test";
 				button.addEventListener("click", () => {
-					const w = window.open("/test", "", ""),
-					      script = document.createElement("script");
-					if (!w) {
-						alert("Cannot create window");
-						return;
-					}
-					button.toggleAttribute("disabled", true);
-					let resultFn: (pass: boolean) => void,
-					    errorFn: (error: any) => void;
-					new Promise<boolean>((sFn, eFn) => {
-						resultFn = sFn;
-						errorFn = eFn;
-					}).catch(error => {
-						console.log({"section": breadcrumbs.slice(1, -1).split("/"), name, error});
-						alert(`Error in section ${breadcrumbs}, test "${name}": check console for details`);
-					}).then(pass => {
-						li.setAttribute("class", pass ? "pass" : "fail");
-						if (pass) {
-							successCount.add();
-						} else {
-							for (let node = li.parentNode; node; node = node.parentNode) {
-								if (node instanceof HTMLDetailsElement) {
-									node.toggleAttribute("open", true);
-								}
-							}
-							errorCount.add();
+					queue = queue.finally(() => new Promise<void>(s => {
+						const w = window.open("/test", "", ""),
+						      script = document.createElement("script");
+						if (!w) {
+							alert("Cannot create window");
+							return;
 						}
-						w.close();
-						button.remove();
-					});
-					Object.assign(w, {"result": resultFn!});
-					w.addEventListener("unload", () => button.toggleAttribute("disabled", false));
-					w.addEventListener("error", (e: ErrorEvent) => {
-						w.close();
-						errorFn(e.error);
-					});
-					script.setAttribute("type", "module");
-					script.innerText = test[0];
-					w.addEventListener("load", () => {
-						w.document.title = `${breadcrumbs}: ${name}`;
-						w.document.body.innerHTML = test[1] ?? "";
-						w.document.head.append(script);
-						w.document.head.append(icon.cloneNode());
-					});
+						button.toggleAttribute("disabled", true);
+						let resultFn: (pass: boolean) => void,
+						    errorFn: (error: any) => void;
+						new Promise<boolean>((sFn, eFn) => {
+							resultFn = sFn;
+							errorFn = eFn;
+						}).catch(error => {
+							console.log({"section": breadcrumbs.slice(1, -1).split("/"), name, error});
+							alert(`Error in section ${breadcrumbs}, test "${name}": check console for details`);
+						}).then(pass => {
+							li.setAttribute("class", pass ? "pass" : "fail");
+							if (pass) {
+								successCount.add();
+							} else {
+								for (let node = li.parentNode; node; node = node.parentNode) {
+									if (node instanceof HTMLDetailsElement) {
+										node.toggleAttribute("open", true);
+									}
+								}
+								errorCount.add();
+							}
+							w.close();
+							button.remove();
+						});
+						Object.assign(w, {"result": resultFn!});
+						w.addEventListener("unload", () => {
+							button.toggleAttribute("disabled", false)
+							s();
+						});
+						w.addEventListener("error", (e: ErrorEvent) => {
+							w.close();
+							errorFn(e.error);
+							s();
+						});
+						script.setAttribute("type", "module");
+						script.innerText = test[0];
+						w.addEventListener("load", () => {
+							w.document.title = `${breadcrumbs}: ${name}`;
+							w.document.body.innerHTML = test[1] ?? "";
+							w.document.head.append(script);
+							w.document.head.append(icon.cloneNode());
+						});
+					}));
 				});
 			} else {
 				const details = df.appendChild(document.createElement("details")),
