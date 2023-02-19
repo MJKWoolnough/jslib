@@ -84,7 +84,7 @@ addAndReturn = (s, v) => {
  *
  * @param {() => Promise<any>} fn The function to be queued.
  *
- * @return {Promise<any>} Promise that resolves after function runs.
+ * @return {Promise<void>} Promise that resolves after function runs.
  */
 queue = (() => {
 	let p = Promise.resolve();
