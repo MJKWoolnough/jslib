@@ -618,7 +618,7 @@ export class WindowElement extends BaseElement {
 	constructor() {
 		super();
 		const onclick = () => this.focus();
-		amendNode(this.attachShadow({"mode": "closed"}), {onclick}, [
+		amendNode(this.attachShadow({"mode": "closed"}), {"onclick": event(onclick, eventCapture)}, [
 			div(Array.from({length: 8}, (_, n) => div({"onmousedown": (e: MouseEvent) => resizeWindow(this, n, e)}))),
 			div({"part": "titlebar", "onmousedown": (e: MouseEvent) => moveWindow(this, e), "ondblclick": (e: Event) => {
 				if (!(e.target instanceof HTMLButtonElement) && !this.hasAttribute("hide-maximise")) {
