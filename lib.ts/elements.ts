@@ -26,7 +26,7 @@ type Options = {
 	attrs?: boolean;
 	/**
 	 * When true, the return from the default function will be the generated class, when false the return from the default function will be a @{link dom:DOMBind | DOMBind}. If the `name` option is set to empty string, the class will *not* be registered with the {@link https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry | Custom Elements Registry]}. (default: false)
-	 * */
+	 */
 	classOnly?: boolean;
 	/** When true, sets the `delegatesFocus` option during `attachShadow` call to true. Has no effect when `pseudo` is set to true. (default: false) */
 	delegatesFocus?: boolean;
