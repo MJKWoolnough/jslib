@@ -176,13 +176,21 @@ amendNode = (node, properties, children) => {
  * @return {(props? Props | Children, children?: Children) => T} Function used to create a `T` element with the specified properties and/or children.
  * */
 bindElement = (ns, value) => Object.defineProperty((props, children) => amendNode(document.createElementNS(ns, value), props, children), "name", {value}),
-/** Can be passed to the {@link event} function to set the `once` property on an event. */
+/**
+ * Can be passed to the {@link event} function to set the `once` property on an event.
+ */
 eventOnce = 1,
-/** Can be passed to the {@link event} function to set the `capture` property on an event. */
+/**
+ * Can be passed to the {@link event} function to set the `capture` property on an event.
+ */
 eventCapture = 2,
-/** Can be passed to the {@link event} function to set the `passive` property on an event. */
+/**
+ * Can be passed to the {@link event} function to set the `passive` property on an event.
+ */
 eventPassive = 4,
-/** Can be passed to the {@link event} function to set the event to be removed. */
+/**
+ * Can be passed to the {@link event} function to set the event to be removed.
+ */
 eventRemove = 8,
 /**
  * This helper function is used to create {@link EventArray}s.
