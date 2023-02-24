@@ -1,4 +1,4 @@
-import {attr, child, isEventListenerObject, value} from './dom.js';
+import {attr, child, value} from './dom.js';
 
 /**
  * This modules contains a Function for creating {@link https://developer.mozilla.org/en-US/docs/Web/API/Attr | Attr} and {@link https://developer.mozilla.org/en-US/docs/Web/API/Text | Text} nodes that update their textContent automatically.
@@ -12,7 +12,8 @@ import {attr, child, isEventListenerObject, value} from './dom.js';
 
 const setNode = Symbol("setNode"),
       update = Symbol("update"),
-      remove = Symbol("remove");
+      remove = Symbol("remove"),
+      isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function;
 
 /**
  * An abstract class that is a parent class of both of the return types from the {@link bind} function.

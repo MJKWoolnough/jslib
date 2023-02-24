@@ -60,6 +60,7 @@ const childrenArr = (children, res = []) => {
 	}
 	return res;
       },
+      isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || isEventListenerObject(prop) && (value in prop ? isEventListenerOrEventListenerObject(prop[value]) : true),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object && !isAttr(prop),
@@ -88,8 +89,6 @@ value = Symbol("value"),
  * @return {boolean} True is the passed value can be assigned to a Children type.
  */
 isChildren = propertiesOrChildren => propertiesOrChildren instanceof Array || typeof propertiesOrChildren === "string" || propertiesOrChildren instanceof Element || propertiesOrChildren instanceof DocumentFragment || propertiesOrChildren instanceof Text || isChild(propertiesOrChildren) || propertiesOrChildren instanceof NodeList || propertiesOrChildren instanceof HTMLCollection,
-/** */
-isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
 /**
  * This function is used to set attributes and children on {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s, and events on {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s and other {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget | EventTarget}s.
  *
