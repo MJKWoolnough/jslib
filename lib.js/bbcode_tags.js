@@ -81,7 +81,7 @@ size = (n, t, p) => {
 		}
 	}
 },
-/*
+/**
  * Font Tag, accepts any value that can be accepted by the {@link https://developer.mozilla.org/en-US/docs/Web/CSS/font-family | font-family} CSS property.
  */
 font = (n, t, p) => {

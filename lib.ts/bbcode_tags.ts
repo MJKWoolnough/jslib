@@ -83,7 +83,7 @@ size = (n: Node, t: Tokeniser, p: Parsers) => {
 		}
 	}
 },
-/*
+/**
  * Font Tag, accepts any value that can be accepted by the {@link https://developer.mozilla.org/en-US/docs/Web/CSS/font-family | font-family} CSS property.
  */
 font = (n: Node, t: Tokeniser, p: Parsers) => {
