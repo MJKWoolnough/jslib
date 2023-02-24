@@ -170,21 +170,35 @@ process = <T extends Node>(node: T, t: Tokeniser, p: Parsers, closeTag?: string)
 	return node;
 };
 
-/** Intended for tag parses, this defines an opening tag, with a possible attribute. */
+/**
+ * Intended for tag parses, this defines an opening tag, with a possible attribute.
+ */
 export type OpenTag = {
-	/** This is the parsed tag name for the opening tag. */
+	/**
+	 * This is the parsed tag name for the opening tag.
+	 */
 	tagName: string;
-	/** This is the parsed attribute, if one was provided, or `null` if one was not. */
+	/**
+	 * This is the parsed attribute, if one was provided, or `null` if one was not.
+	 */
 	attr: string | null;
-	/** This is the full text of the parsed opening tag, including brackets and any attribute. */
+	/**
+	 * This is the full text of the parsed opening tag, including brackets and any attribute.
+	 */
 	fullText: string;
 }
 
-/** Intended for tag parses, this defines a closing tag, with a possible attribute. */
+/**
+ * Intended for tag parses, this defines a closing tag, with a possible attribute.
+ */
 export type CloseTag = {
-	/** This is the parsed tag name for the closing tag. */
+	/**
+	 * This is the parsed tag name for the closing tag.
+	 */
 	tagName: string;
-	/** This is the full text of the parsed opening tag, including brackets. */
+	/**
+	 * This is the full text of the parsed opening tag, including brackets.
+	 */
 	fullText: string;
 }
 
