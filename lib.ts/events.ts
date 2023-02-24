@@ -104,9 +104,13 @@ const maxMouseButton = 16,
       };
 
 export let
-/** The current X coordinate of the mouse. */
+/**
+ * The current X coordinate of the mouse.
+ */
 mouseX = 0,
-/** The current Y coordinate of the mouse. */
+/**
+ * The current Y coordinate of the mouse.
+ */
 mouseY = 0;
 
 export const
