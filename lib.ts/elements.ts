@@ -16,31 +16,53 @@ import {setAndReturn} from './misc.js';
  * @requires module:misc
  */
 
-/** This unexported type is used to change how the elements are created and controlled. */
+/**
+ * This unexported type is used to change how the elements are created and controlled.
+ */
 type Options = {
-	/** Each string of this array is a reference to an parameter that is passed to the initialising function. The value for each parameter is taken either from the properties object passed to the {@link dom:DOMBind} creation function, or are specified directly in the constructor of the `classOnly` generated class. */
+	/**
+	 * Each string of this array is a reference to an parameter that is passed to the initialising function. The value for each parameter is taken either from the properties object passed to the {@link dom:DOMBind} creation function, or are specified directly in the constructor of the `classOnly` generated class.
+	 */
 	args?: string[];
-	/** When true, the resulting created element will send an 'attached' event when the element is attached to the document, and a 'removed' event when removed from the document. Has no effect when 'pseudo' is set to true. (default: true) */
+	/**
+	 * When true, the resulting created element will send an 'attached' event when the element is attached to the document, and a 'removed' event when removed from the document. Has no effect when 'pseudo' is set to true. (default: true)
+	 */
 	attachRemoveEvent?: boolean;
-	/** When true, enables both the 'act' and 'attr' methods on the element class. (default: true) */
+	/**
+	 * When true, enables both the 'act' and 'attr' methods on the element class. (default: true)
+	 */
 	attrs?: boolean;
 	/**
 	 * When true, the return from the default function will be the generated class, when false the return from the default function will be a @{link dom:DOMBind | DOMBind}. If the `name` option is set to empty string, the class will *not* be registered with the {@link https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry | Custom Elements Registry]}. (default: false)
 	 */
 	classOnly?: boolean;
-	/** When true, sets the `delegatesFocus` option during `attachShadow` call to true. Has no effect when `pseudo` is set to true. (default: false) */
+	/**
+	 * When true, sets the `delegatesFocus` option during `attachShadow` call to true. Has no effect when `pseudo` is set to true. (default: false)
+	 */
 	delegatesFocus?: boolean;
-	/**  Allows the generated class to be extended with a custom class. This extension will be applied before the passed fn function is called. */
+	/**
+	 * Allows the generated class to be extended with a custom class. This extension will be applied before the passed fn function is called.
+	 */
 	extend?: Function;
-	/** When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'pseudo' is set to true. (default: false) */
+	/**
+	 * When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'pseudo' is set to true. (default: false)
+	 */
 	manualSlot?: boolean;
-	/** Registers a custom element name for the generated element class, instead of a randomly generated one. Has no effect when 'pseudo' is set to true. */
+	/**
+	 * Registers a custom element name for the generated element class, instead of a randomly generated one. Has no effect when 'pseudo' is set to true.
+	 */
 	name?: string;
-	/** When true, enables the observeChildren method on the element class. (default: true) */
+	/**
+	 * When true, enables the observeChildren method on the element class. (default: true)
+	 */
 	observeChildren?: boolean;
-	/** When true, the class created is extended from DocumentFragment, instead of HTMLElement, and does not register a custom element. This will act, in many ways, like a custom element, but without a Shadow Root, any children are attached directly to the DOM on appending. (default: false) */
+	/**
+	 * When true, the class created is extended from DocumentFragment, instead of HTMLElement, and does not register a custom element. This will act, in many ways, like a custom element, but without a Shadow Root, any children are attached directly to the DOM on appending. (default: false)
+	 */
 	pseudo?: boolean;
-	/** Sets the adoptedStyleSheets options on the Shadow Root. Has no effect when 'pseudo' is set to true. */
+	/**
+	 * Sets the adoptedStyleSheets options on the Shadow Root. Has no effect when 'pseudo' is set to true.
+	 */
 	styles?: CSSStyleSheet[];
 }
 
