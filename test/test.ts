@@ -25,7 +25,7 @@ type Tests = {
 				li.setAttribute("title", test.toString());
 				totalCount.add();
 				test().catch(error => {
-					console.log({"section": breadcrumbs.slice(1, -1).split("/"), name, error});
+					console.error({"section": breadcrumbs.slice(1, -1).split("/"), name, error});
 					alert(`Error in section ${breadcrumbs}, test "${name}": check console for details`);
 				}).then(pass => {
 					li.setAttribute("class", pass ? "pass" : "fail");
