@@ -236,6 +236,9 @@
 	class KeyboardEvent extends UIEvent {
 	}
 
+	class PopStateEvent extends Event {
+	}
+
 	class StyleSheet {
 		constructor () {
 			if (!init) {
@@ -262,6 +265,14 @@
 	}
 
 	class MutationRecord {
+		constructor () {
+			if (!init) {
+				throw new TypeError(ILLEGAL_CONSTRUCTOR);
+			}
+		}
+	}
+
+	class History {
 		constructor () {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
@@ -301,12 +312,15 @@
 		["UIEvent", UIEvent],
 		["MouseEvent", MouseEvent],
 		["KeyboardEvent", KeyboardEvent],
+		["PopStateEvent", PopStateEvent],
 		["StyleSheet", StyleSheet],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
 		["MutationRecord", MutationRecord],
+		["History", History],
 		["document", new Document()],
+		["history", new History()],
 		["window", new Window()],
 	]) {
 		Object.assign(globalThis, name, val);
