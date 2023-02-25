@@ -66,6 +66,7 @@
 		#previousSibling: Node | null = null;
 		#parentNode: Node | null = null;
 		#preRemove = new Set<PreRemover>();
+		#childrenNodeList = new NodeList<Node>(this.#children);
 		constructor() {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
@@ -76,7 +77,7 @@
 			return "";
 		}
 		get childNodes() {
-			return new NodeList<Node>(this.#children);
+			return this.#childrenNodeList;
 		}
 		get firstChild() {
 			return this.#children.at(0);
