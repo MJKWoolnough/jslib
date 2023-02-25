@@ -280,6 +280,67 @@
 		}
 	}
 
+	class CustomElementRegistry {
+		static #nameRE = /^[a-z][-.0-9_a-z\xB7\#xC0-\xD6\xD8-\xF6\xF8-\x37D\x37F-\x1FFF\x200C-\x200D\x203F-\x2040\x2070-\x218F\x2C00-\x2FEF\x3001-\xD7FF\xF900-\xFDCF\xFDF0-\xFFFD\x10000-\xEFFFF]*-[-.0-9_a-z\xB7\#xC0-\xD6\xD8-\xF6\xF8-\x37D\x37F-\x1FFF\x200C-\x200D\x203F-\x2040\x2070-\x218F\x2C00-\x2FEF\x3001-\xD7FF\xF900-\xFDCF\xFDF0-\xFFFD\x10000-\xEFFFF]$/;
+		static #invalidNames = ["nnotation-xml", "color-profile", "font-face", "font-face-src", "font-face-uri", "font-face-format", "font-face-name", "missing-glyph"];
+		#elements: Map<string, CustomElementConstructor>;
+		#customElements = new Map<string, CustomElementConstructor>();
+		#constructors = new Map<CustomElementConstructor, string>();
+		#promises = new Map<string, [Promise<void>, Function]>();
+		constructor () {
+			if (!init) {
+				throw new TypeError(ILLEGAL_CONSTRUCTOR);
+			}
+			this.#elements = new Map();
+			// define standard elements
+		}
+		define(name: string, constructor: CustomElementConstructor, options?: ElementDefinitionOptions) {
+			if (!CustomElementRegistry.#nameRE.test(name) || CustomElementRegistry.#invalidNames.includes(name)) {
+				throw new SyntaxError(`'${JSON.stringify(name)}' is not a valid custom element name`);
+			}
+			if (!(constructor instanceof Function)) {
+				throw new TypeError("CustomElementRegistry.define: Argument 2 is not a constructor.");
+			}
+			if (this.#customElements.has(name)) {
+				throw new Error(`CustomElementRegistry.define: '${JSON.stringify(name)}' has already been defined as a custom element`);
+			}
+			if (this.#constructors.has(constructor)) {
+				throw new Error(`CustomElementRegistry.define: '${JSON.stringify(name)}' and '${JSON.stringify(this.#constructors.get(constructor))}' have the same constructor`);
+			}
+			if (options?.extends) {
+				if (CustomElementRegistry.#nameRE.test(options.extends)) {
+					throw new Error(`CustomElementRegistry.define: '${JSON.stringify(name)}' cannot extend a custom element`);
+				} else if (!this.#elements.has(options.extends)) {
+					throw new Error("Operation is not supported");
+				}
+			}
+			// handle extends?
+			this.#customElements.set(name, constructor);
+			this.#constructors.set(constructor, name);
+			this.#promises.get(name)?.[1]();
+			this.#promises.delete(name);
+		}
+		get(name: string) {
+			return this.#customElements.get(name);
+		}
+		upgrade(_root: Node) {
+			// not implemented
+		}
+		whenDefined(name: string) {
+			const p = this.#promises.get(name);
+			if (p) {
+				return p;
+			}
+			if (this.#customElements.has(name)) {
+				return Promise.resolve();
+			}
+			let fn!: Function;
+			const np = new Promise<void>(sFn => fn = sFn);
+			this.#promises.set(name, [np, fn]);
+			return np;
+		}
+	}
+
 	let init = true;
 
 	for (const [name, val] of [
@@ -319,6 +380,8 @@
 		["MutationEvent", MutationEvent],
 		["MutationRecord", MutationRecord],
 		["History", History],
+		["CustomElementRegistry", CustomElementRegistry],
+		["customElements", new CustomElementRegistry()],
 		["document", new Document()],
 		["history", new History()],
 		["window", new Window()],
