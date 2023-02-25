@@ -5,6 +5,9 @@
 
 	const ILLEGAL_CONSTRUCTOR = "Illegal constructor.",
 	      preRemove = Symbol("preRemove"),
+	      after = Symbol("after"),
+	      before = Symbol("before"),
+	      replaceWith = Symbol("replaceWith"),
 	      realTarget = Symbol("realTarget"),
 	      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
 		if (typeof name === "number") {
@@ -121,11 +124,34 @@
 			return this.#previousSibling;
 		}
 		get textContent() {
-			// TODO
-			return ""
+			return this.#children.map(child => child.textContent).reduce((a, b) => a + b, "");
 		}
-		set textContent(_text: string) {
-			// TODO
+		set textContent(text: string) {
+			this.#children.splice(0, this.#children.length, new Text(text));
+		}
+		[after](referenceNode: Node, ...nodes: Node[]) {
+			for (let i = 0; i < this.#children.length; i++) {
+				if (this.#children[i] === referenceNode) {
+					this.#children.splice(i + 1, 0, ...nodes);
+				}
+			}
+		}
+		[before](referenceNode: Node, ...nodes: Node[]) {
+			for (let i = 0; i < this.#children.length; i++) {
+				if (this.#children[i] === referenceNode) {
+					this.#children.splice(i, 0, ...nodes);
+				}
+			}
+		}
+		[replaceWith](referenceNode: Node, ...nodes: Node[]) {
+			for (let i = 0; i < this.#children.length; i++) {
+				if (this.#children[i] === referenceNode) {
+					for (const pr of referenceNode.#preRemove) {
+						pr[preRemove](referenceNode);
+					}
+					this.#children.splice(i, 1, ...nodes);
+				}
+			}
 		}
 		appendChild<T extends Node>(node: T) {
 			node?.parentNode?.removeChild(node);
@@ -280,15 +306,72 @@
 	}
 
 	class CharacterData extends Node {
-		constructor () {
+		data: string;
+		constructor (data: string) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super();
+			this.data = data;
+		}
+		get length() {
+			return this.data.length;
+		}
+		get nextElementSibling() {
+			let n = this.nextSibling;
+			while (n && !(n instanceof Element)) {
+				n = n.nextSibling;
+			}
+			return n;
+		}
+		get previousElementSibling() {
+			let n = this.previousSibling;
+			while (n && !(n instanceof Element)) {
+				n = n.previousSibling;
+			}
+			return n;
+		}
+		after(...nodes: Node[]) {
+			this.parentNode?.[after](this, ...nodes);
+		}
+		before(...nodes: Node[]) {
+			this.parentNode?.[before](this, ...nodes);
+		}
+		deleteData(offset: number, count: number) {
+			this.data = this.data.slice(0, offset) + this.data.slice(offset + count);
+		}
+		insertData(offset: number, data: string) {
+			this.data = this.data.slice(0, offset) + data + this.data.slice(offset);
+		}
+		remove() {
+			this.parentNode?.removeChild(this);
+		}
+		replaceData(offset: number, count: number, data: string) {
+			this.data = this.data.slice(0, offset) + data + this.data.slice(offset + count);
+		}
+		substringData(offset: number, count: number) {
+			return this.data.slice(offset, count);
 		}
 	}
 
 	class Text extends CharacterData {
+		constructor(text: string) {
+			init = true;
+			super(text);
+			init = false;
+		}
+		get assignedSlot() {
+			return null;
+		}
+		get wholeText() {
+			return "";
+		}
+		splitText(offset: number) {
+			const newText = new Text(this.data.slice(offset));
+			this.data = this.data.slice(0, offset);
+			this.after(newText);
+			return newText;
+		}
 	}
 
 	class Document extends Node {
