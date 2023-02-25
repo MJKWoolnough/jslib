@@ -139,10 +139,30 @@
 	}
 
 	class Storage {
+		#storage = new Map<string, string>();
+
 		constructor () {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
+		}
+		get length() {
+			return 0;
+		}
+		key(index: number) {
+			Array.from(this.#storage.keys())[index] ?? null;
+		}
+		getItem(keyName: string) {
+			return this.#storage.get(keyName) ?? null
+		}
+		setItem(keyName: string, keyValue: string) {
+			this.#storage.set(keyName, keyValue);
+		}
+		removeItem(keyName: string) {
+			this.#storage.delete(keyName);
+		}
+		clear() {
+			this.#storage.clear();
 		}
 	}
 
