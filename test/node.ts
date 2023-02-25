@@ -131,11 +131,36 @@
 	}
 
 	class Location {
+		protocol = "local:";
+		hostname = "" ;
+		port = "";
+		path = "";
+		search = "";
+		hash = "";
+		readonly origin = "null";
 		constructor () {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 		}
+		get host() {
+			if (this.port) {
+				return `${this.hostname}:${this.port}`;
+			}
+			return this.hostname;
+		}
+		get pathname() {
+			return "/" + this.path;
+		}
+		get href() {
+			return this.protocol + "//" + this.host + this.pathname;
+		}
+		toString() {
+			return this.href;
+		}
+		assign(_url: string | URL) {}
+		reload() {}
+		replace(_url: string | URL) {}
 	}
 
 	class Storage {
