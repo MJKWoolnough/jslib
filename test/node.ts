@@ -2,6 +2,12 @@
 	const ILLEGAL_CONSTRUCTOR = "Illegal constructor.";
 
 	class Node extends EventTarget {
+		nodeType: number = 0;
+		firstChild: ChildNode | null = null;
+		lastChild: ChildNode | null = null;
+		nextSibling: ChildNode | null = null;
+		previousSibling: ChildNode | null = null;
+		parentNode: ParentNode | null = null;
 		constructor() {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
@@ -341,6 +347,134 @@
 		}
 	}
 
+	class NodeFilter {
+		static readonly SHOW_ALL = 4294967295;
+		static readonly SHOW_ELEMENT = 1;
+		static readonly SHOW_ATTRIBUTE = 2;
+		static readonly SHOW_TEXT = 4;
+		static readonly SHOW_CDATA_SECTION = 8;
+		static readonly SHOW_ENTITY_REFERENCE = 16;
+		static readonly SHOW_ENTITY = 32;
+		static readonly SHOW_PROCESSING_INSTRUCTION = 64;
+		static readonly SHOW_COMMENT = 128;
+		static readonly SHOW_DOCUMENT = 256;
+		static readonly SHOW_DOCUMENT_TYPE = 512;
+		static readonly SHOW_DOCUMENT_FRAGMENT = 1024;
+		static readonly SHOW_NOTATION = 2048
+
+		static readonly FILTER_ACCEPT = 1;
+		static readonly FILTER_REJECT = 2;
+		static readonly FILTER_SKIP = 3;
+	}
+
+
+	class NodeIterator {
+		#root: Node;
+		#whatToShow: number;
+		#filter: ((node: Node) => number) | { acceptNode(node: Node): number; } | null;
+		#referenceNode: Node;
+		#pointerBeforeReferenceNode = true;
+		#active = false;
+		constructor (root: Node, whatToShow = NodeFilter.SHOW_ALL, filter: ((node: Node) => number) | { acceptNode(node: Node): number; } | null = null) {
+			if (!init) {
+				throw new TypeError(ILLEGAL_CONSTRUCTOR);
+			}
+			this.#root = this.#referenceNode  = root;
+			this.#whatToShow = whatToShow;
+			this.#filter = filter;
+		}
+		get root() {
+			return this.#root;
+		}
+		get whatToShow() {
+			return this.#whatToShow;
+		}
+		get filter() {
+			return this.#filter;
+		}
+		get referenceNode() {
+			return this.#referenceNode;
+		}
+		get pointerBeforeReferenceNode() {
+			return this.#pointerBeforeReferenceNode;
+		}
+		detach() {}
+		#runFilter(n: Node) {
+			if (this.#active) {
+				throw new Error("InvalidStateError");
+			}
+			if ((this.#whatToShow & n.nodeType) === 0) {
+				return NodeFilter.FILTER_SKIP;
+			}
+			if (this.#filter === null) {
+				return NodeFilter.FILTER_ACCEPT;
+			}
+			this.#active = true;
+			let result: number;
+			try {
+				result = this.#filter instanceof Function ? this.#filter(n) : this.#filter.acceptNode(n);
+			} catch (e) {
+				this.#active = false;
+				throw e;
+			}
+			this.#active = false;
+			return result;
+		}
+		#next(forwards: boolean) {
+			let node = this.#referenceNode,
+			    beforeNode = this.#pointerBeforeReferenceNode;
+			while (true) {
+				if (forwards) {
+					if (beforeNode) {
+						beforeNode = false;
+					} else if (node.firstChild) {
+						node = node.firstChild;
+					} else {
+						while (!node.nextSibling && node !== this.#root && node.parentNode) {
+							node = node.parentNode;
+						}
+						if (node === this.#root || !node.parentNode) {
+							return null;
+						}
+						node = node.nextSibling!;
+					}
+				} else {
+					if (!beforeNode) {
+						beforeNode = true;
+					} else if (node.previousSibling) {
+						node = node.previousSibling;
+						while (node.lastChild) {
+							node = node.lastChild;
+						}
+					} else {
+						while (!node.previousSibling && node !== this.#root && node.parentNode) {
+							node = node.parentNode;
+						}
+						if (node === this.#root || !node.parentNode) {
+							return null;
+						}
+						node = node.previousSibling!;
+						while (node.lastChild) {
+							node = node.lastChild;
+						}
+					}
+				}
+				if (this.#runFilter(this.#referenceNode) === NodeFilter.FILTER_ACCEPT) {
+					break;
+				}
+			}
+			this.#referenceNode = node;
+			this.#pointerBeforeReferenceNode = beforeNode;
+			return this.#referenceNode;
+		}
+		previousNode() {
+			this.#next(false);
+		}
+		nextNode() {
+			this.#next(true);
+		}
+	}
+
 	let init = true;
 
 	for (const [name, val] of [
@@ -381,6 +515,8 @@
 		["MutationRecord", MutationRecord],
 		["History", History],
 		["CustomElementRegistry", CustomElementRegistry],
+		["NodeFilter", NodeFilter],
+		["NodeIterator", NodeIterator],
 		["customElements", new CustomElementRegistry()],
 		["document", new Document()],
 		["history", new History()],
