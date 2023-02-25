@@ -1,18 +1,211 @@
 {
-	const ILLEGAL_CONSTRUCTOR = "Illegal constructor.";
+	interface PreRemover {
+		[preRemove](node: Node): void;
+	}
+
+	const ILLEGAL_CONSTRUCTOR = "Illegal constructor.",
+	      preRemove = Symbol("preRemove"),
+	      realTarget = Symbol("realTarget"),
+	      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
+		if (typeof name === "number") {
+			return fn(name);
+		} else if (typeof name === "string") {
+			const index = parseInt(name);
+			if (index.toString() === name) {
+				return fn(index);
+			}
+		}
+		return undefined;
+	      },
+	      nodeListProxyObj = {
+		has: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+		get: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
+	      };
 
 	class Node extends EventTarget {
-		nodeType: number = 0;
-		firstChild: ChildNode | null = null;
-		lastChild: ChildNode | null = null;
-		nextSibling: ChildNode | null = null;
-		previousSibling: ChildNode | null = null;
-		parentNode: ParentNode | null = null;
+		static readonly ELEMENT_NODE = 1;
+		static readonly ATTRIBUTE_NODE = 2;
+		static readonly TEXT_NODE = 3;
+		static readonly CDATA_SECTION_NODE = 4;
+		static readonly ENTITY_REFERENCE_NODE = 5;
+		static readonly ENTITY_NODE = 6;
+		static readonly PROCESSING_INSTRUCTION_NODE = 7
+		static readonly COMMENT_NODE = 8;
+		static readonly DOCUMENT_NODE = 9;
+		static readonly DOCUMENT_TYPE_NODE = 10;
+		static readonly DOCUMENT_FRAGMENT_NODE = 11;
+		static readonly NOTATION_NODE = 12;
+		static readonly DOCUMENT_POSITION_DISCONNECTED = 1;
+		static readonly DOCUMENT_POSITION_PRECEDING =  2;
+		static readonly DOCUMENT_POSITION_FOLLOWING = 4;
+		static readonly DOCUMENT_POSITION_CONTAINS = 8;
+		static readonly DOCUMENT_POSITION_CONTAINED_BY = 16;
+		static readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
+		readonly ELEMENT_NODE = 1;
+		readonly ATTRIBUTE_NODE = 2;
+		readonly TEXT_NODE = 3;
+		readonly CDATA_SECTION_NODE = 4;
+		readonly ENTITY_REFERENCE_NODE = 5;
+		readonly ENTITY_NODE = 6;
+		readonly PROCESSING_INSTRUCTION_NODE = 7
+		readonly COMMENT_NODE = 8;
+		readonly DOCUMENT_NODE = 9;
+		readonly DOCUMENT_TYPE_NODE = 10;
+		readonly DOCUMENT_FRAGMENT_NODE = 11;
+		readonly NOTATION_NODE = 12;
+		readonly DOCUMENT_POSITION_DISCONNECTED = 1;
+		readonly DOCUMENT_POSITION_PRECEDING =  2;
+		readonly DOCUMENT_POSITION_FOLLOWING = 4;
+		readonly DOCUMENT_POSITION_CONTAINS = 8;
+		readonly DOCUMENT_POSITION_CONTAINED_BY = 16;
+		readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
+		#nodeType: number = 0;
+		#nodeName: string = "";
+		#children: Node[] = [];
+		#nextSibling: Node | null = null;
+		#previousSibling: Node | null = null;
+		#parentNode: Node | null = null;
+		#preRemove = new Set<PreRemover>();
 		constructor() {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super();
+		}
+		get baseURI() {
+			return "";
+		}
+		get childNodes() {
+			return new NodeList<Node>(this.#children);
+		}
+		get firstChild() {
+			return this.#children.at(0);
+		}
+		get isConnected() {
+			return false;
+		}
+		get lastChild() {
+			return this.#children.at(-1);
+		}
+		get nextSibling() {
+			return this.#nextSibling;
+		}
+		get nodeName() {
+			return this.#nodeName;
+		}
+		get nodeType() {
+			return this.#nodeType;
+		}
+		get nodeValue() {
+			// TODO
+			return "";
+		}
+		get ownerDocument() {
+			return null;
+		}
+		get parentElement(): HTMLElement | null {
+			let p = this.#parentNode;
+			while (p) {
+				if (p instanceof HTMLElement) {
+					return p;
+				}
+				p = p.parentNode;
+			}
+			return null;
+		}
+		get parentNode() {
+			return this.#parentNode;
+		}
+		get previousSibling() {
+			return this.#previousSibling;
+		}
+		get textContent() {
+			// TODO
+			return ""
+		}
+		set textContent(_text: string) {
+			// TODO
+		}
+		appendChild<T extends Node>(node: T) {
+			node?.parentNode?.removeChild(node);
+			this.#children.push(node);
+			return node;
+		}
+		cloneNode(_deep?: boolean) {
+			// TODO
+			return this;
+		}
+		compareDocumentPosition(_other: Node) {
+			// TODO
+			return NaN;
+		}
+		contains(other: Node | null): boolean {
+			return this === other || this.#children.some(child => child.contains(other));
+		}
+		getRootNode(_options?: GetRootNodeOptions) {
+			// TODO
+			return this;
+		}
+		hasChildNodes() {
+			return !!this.#children.length;
+		}
+		insertBefore<T extends Node>(node: T, child: Node | null) {
+			if (child) {
+				for (let i = 0; i < this.#children.length; i++) {
+					if (this.#children[i] === child) {
+						this.#children.splice(i, 0, node);
+						return node;
+					}
+				}
+				throw new Error("Node.insertBefore: Child to insert before is not a child of this node");
+			} else {
+				return this.appendChild(node);
+			}
+		}
+		isDefaultNamespace(_namespace: string | null) {
+			// TODO
+			return false;
+		}
+		isEqualNode(_otherNode: Node | null) {
+			// TODO
+			return false;
+		}
+		isSameNode(otherNode: Node | null) {
+			return otherNode === this;
+		}
+		lookupNamespaceURI(_prefix: string | null) {
+			// TODO
+			return null;
+		}
+		lookupPrefix(_namespace: string | null) {
+			// TODO
+			return null;
+		}
+		normalize() {
+			// TODO
+		}
+		removeChild<T extends Node>(child: T) {
+			if ((child.#parentNode as Node | null) !== this) {
+				throw new Error("Node.removeChild: The node to be removed is not a child of this node");
+			}
+			for (const pr of child.#preRemove) {
+				pr[preRemove](child);
+			}
+			child.#preRemove.clear();
+			return child;
+		}
+		replaceChild<T extends Node>(node: Node, child: T) {
+			for (let i = 0; i < this.#children.length; i++) {
+				if (this.#children[i] === child) {
+					for (const pr of child.#preRemove) {
+						pr[preRemove](child);
+					}
+					child.#preRemove.clear();
+					this.#children.splice(i, 1, node);
+					return child;
+				}
+			}
+			throw new Error("Node.insertBefore: Child to insert before is not a child of this node");
 		}
 	}
 
@@ -40,12 +233,32 @@
 		}
 	}
 
-	class NodeList {
-		constructor () {
+	class NodeList<TNode extends Node> {
+		#nodes: TNode[];
+		#preRemove?: PreRemover
+		[realTarget]: NodeList<TNode>
+		constructor (nodes: TNode[], preRemove?: PreRemover) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
+			this.#nodes = nodes;
+			this.#preRemove = preRemove;
+			this[realTarget] = this;
+			return new Proxy<NodeList<TNode>>(this, nodeListProxyObj);
 		}
+		[preRemove](node: Node) {
+			this[realTarget].#preRemove?.[preRemove](node);
+		}
+		get length() {
+			return this[realTarget].#nodes.length;
+		}
+		item(index: number) {
+			return this[realTarget].#nodes[index];
+		}
+		forEach(callbackfn: (value: Node, key: number, parent: NodeList<TNode>) => void, thisArg?: any) {
+			this[realTarget].#nodes.forEach((value, key) => callbackfn(value, key, thisArg));
+		}
+		[index: number]: TNode;
 	}
 
 	class NamedNodeMap {
