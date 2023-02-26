@@ -709,6 +709,11 @@
 
 
 	class PopStateEvent extends Event {
+		readonly state: any;
+		constructor(type: string, eventInitDict?: PopStateEventInit) {
+			super(type, eventInitDict);
+			this.state = eventInitDict?.state;
+		}
 	}
 
 	class StyleSheet {
