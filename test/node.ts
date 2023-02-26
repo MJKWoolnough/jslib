@@ -499,6 +499,14 @@
 		}
 	}
 
+	class Comment extends CharacterData {
+		constructor(text: string) {
+			init = true;
+			super(Node.COMMENT_NODE, "#comment", document, text);
+			init = false;
+		}
+	}
+
 	class Document extends Node {
 		constructor() {
 			super(Node.DOCUMENT_NODE, "#document", null);
@@ -1024,6 +1032,7 @@
 		["Attr", Attr],
 		["CharacterData", CharacterData],
 		["Text", Text],
+		["Comment", Comment],
 		["Document", Document],
 		["HTMLDocument", Document],
 		["DocumentFragment", DocumentFragment],
