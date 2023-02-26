@@ -4,10 +4,11 @@
 	}
 
 	const ILLEGAL_CONSTRUCTOR = "Illegal constructor.",
+	      addPreRemove = Symbol("addPreRemove"),
+	      removePreRemove = Symbol("removePreRemove"),
 	      preRemove = Symbol("preRemove"),
 	      after = Symbol("after"),
 	      before = Symbol("before"),
-	      replaceWith = Symbol("replaceWith"),
 	      realTarget = Symbol("realTarget"),
 	      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
 		if (typeof name === "number") {
@@ -64,12 +65,13 @@
 		readonly DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
 		#nodeType: number = 0;
 		#nodeName: string = "";
-		#children: Node[] = [];
+		#firstChild: Node | null = null;
+		#lastChild: Node | null = null;
 		#nextSibling: Node | null = null;
 		#previousSibling: Node | null = null;
 		#parentNode: Node | null = null;
 		#preRemove = new Set<PreRemover>();
-		#childrenNodeList = new NodeList<Node>(this.#children);
+		#childrenNodeList = new NodeList<Node>(this);
 		constructor() {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
@@ -83,13 +85,13 @@
 			return this.#childrenNodeList;
 		}
 		get firstChild() {
-			return this.#children.at(0);
+			return this.#firstChild;
 		}
 		get isConnected() {
 			return false;
 		}
 		get lastChild() {
-			return this.#children.at(-1);
+			return this.#lastChild;
 		}
 		get nextSibling() {
 			return this.#nextSibling;
@@ -124,38 +126,74 @@
 			return this.#previousSibling;
 		}
 		get textContent() {
-			return this.#children.map(child => child.textContent).reduce((a, b) => a + b, "");
+			let text = "";
+			for (let n = this.#firstChild; n !== null; n = n.#nextSibling) {
+				text += n.textContent;
+			}
+			return text;
 		}
 		set textContent(text: string) {
-			this.#children.splice(0, this.#children.length, new Text(text));
+			let n = this.#firstChild;
+			while (n) {
+				const next = n.nextSibling;
+				this.removeChild(n);
+				n = next;
+			}
+			this.#firstChild = this.#lastChild = new Text(text);
 		}
-		[after](referenceNode: Node, ...nodes: Node[]) {
-			for (let i = 0; i < this.#children.length; i++) {
-				if (this.#children[i] === referenceNode) {
-					this.#children.splice(i + 1, 0, ...nodes);
+		[addPreRemove](pr: PreRemover) {
+			this.#preRemove.add(pr);
+		}
+		[removePreRemove](pr: PreRemover) {
+			this.#preRemove.delete(pr);
+		}
+		[after](referenceNode: Node, ...nodes: (Node | string)[]) {
+			for (const c of nodes) {
+				if (c instanceof DocumentFragment) {
+					referenceNode = this[after](referenceNode, ...Array.from(c.childNodes));
+				} else {
+					const n = c instanceof Node ? c : new Text(c);
+					n.#previousSibling = referenceNode;
+					n.#nextSibling = referenceNode.#nextSibling;
+					n.#parentNode?.removeChild(n);
+					n.#parentNode = this;
+					referenceNode = referenceNode.#nextSibling = n;
 				}
 			}
-		}
-		[before](referenceNode: Node, ...nodes: Node[]) {
-			for (let i = 0; i < this.#children.length; i++) {
-				if (this.#children[i] === referenceNode) {
-					this.#children.splice(i, 0, ...nodes);
-				}
+			if (!referenceNode.#nextSibling) {
+				this.#firstChild = referenceNode;
 			}
+			return referenceNode;
 		}
-		[replaceWith](referenceNode: Node, ...nodes: Node[]) {
-			for (let i = 0; i < this.#children.length; i++) {
-				if (this.#children[i] === referenceNode) {
-					for (const pr of referenceNode.#preRemove) {
-						pr[preRemove](referenceNode);
+		[before](referenceNode: Node, ...nodes: (Node | string)[]) {
+			for (const c of nodes) {
+				if (c instanceof DocumentFragment) {
+					referenceNode = this[before](referenceNode, ...Array.from(c.childNodes));
+				} else {
+					const n = c instanceof Node ? c : new Text(c);
+					n.#nextSibling = referenceNode;
+					n.#previousSibling = referenceNode.#previousSibling;
+					n.#parentNode?.removeChild(n);
+					n.#parentNode = this;
+					if (!n.#previousSibling) {
+						this.#lastChild = n;
 					}
-					this.#children.splice(i, 1, ...nodes);
+					referenceNode = referenceNode.#previousSibling = n;
 				}
 			}
+			if (!referenceNode.#nextSibling) {
+				this.#firstChild = referenceNode;
+			}
+			return referenceNode;
 		}
 		appendChild<T extends Node>(node: T) {
-			node?.parentNode?.removeChild(node);
-			this.#children.push(node);
+			if (node instanceof DocumentFragment) {
+				while (node.#firstChild) {
+					this.appendChild(node.#firstChild);
+				}
+			} else {
+
+			}
 			return node;
 		}
 		cloneNode(_deep?: boolean) {
@@ -167,24 +205,30 @@
 			return NaN;
 		}
 		contains(other: Node | null): boolean {
-			return this === other || this.#children.some(child => child.contains(other));
+			if (this === other) {
+				return true;
+			}
+			for (let n = this.firstChild; n; n = n.nextSibling) {
+				if (n.contains(other)) {
+					return true;
+				}
+			}
+			return false;
 		}
 		getRootNode(_options?: GetRootNodeOptions) {
 			// TODO
 			return this;
 		}
 		hasChildNodes() {
-			return !!this.#children.length;
+			return !!this.#firstChild;
 		}
 		insertBefore<T extends Node>(node: T, child: Node | null) {
-			if (child) {
-				for (let i = 0; i < this.#children.length; i++) {
-					if (this.#children[i] === child) {
-						this.#children.splice(i, 0, node);
-						return node;
-					}
-				}
+			if (child && child.#parentNode !== this) {
 				throw new Error("Node.insertBefore: Child to insert before is not a child of this node");
+			}
+			if (child) {
+				this[before](child, node);
+				return node;
 			} else {
 				return this.appendChild(node);
 			}
@@ -219,20 +263,25 @@
 				pr[preRemove](child);
 			}
 			child.#preRemove.clear();
+			if (child.#nextSibling) {
+				child.#nextSibling.#previousSibling = child.#previousSibling;
+			} else {
+				this.#lastChild = child.#previousSibling;
+			}
+			if (child.#previousSibling) {
+				child.#previousSibling.#nextSibling = child.#nextSibling;
+			} else {
+				this.#firstChild = child.#nextSibling;
+			}
+			child.#parentNode = null;
 			return child;
 		}
 		replaceChild<T extends Node>(node: Node, child: T) {
-			for (let i = 0; i < this.#children.length; i++) {
-				if (this.#children[i] === child) {
-					for (const pr of child.#preRemove) {
-						pr[preRemove](child);
-					}
-					child.#preRemove.clear();
-					this.#children.splice(i, 1, node);
-					return child;
-				}
+			if ((child.#parentNode as Node | null) !== this) {
+				throw new Error("Node.replaceChild: Child to replace is not a child of this node");
 			}
-			throw new Error("Node.insertBefore: Child to insert before is not a child of this node");
+			this[after](child, node);
+			return this.removeChild(child);
 		}
 	}
 
@@ -261,29 +310,73 @@
 	}
 
 	class NodeList<TNode extends Node> {
-		#nodes: TNode[];
-		#preRemove?: PreRemover
+		#nodes: Node | TNode[];
 		[realTarget]: NodeList<TNode>
-		constructor (nodes: TNode[], preRemove?: PreRemover) {
+		constructor (nodes: Node | TNode[]) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#nodes = nodes;
-			this.#preRemove = preRemove;
 			this[realTarget] = this;
 			return new Proxy<NodeList<TNode>>(this, nodeListProxyObj);
 		}
-		[preRemove](node: Node) {
-			this[realTarget].#preRemove?.[preRemove](node);
-		}
 		get length() {
+			if (this[realTarget].#nodes instanceof Node) {
+				let length = 0;
+				for (const _ of this.values()) {
+					length++;
+				}
+				return length;
+			}
 			return this[realTarget].#nodes.length;
 		}
+		*entries() {
+			let n = 0;
+			for (const node of this.values()) {
+				yield [n++, node];
+			}
+		}
 		item(index: number) {
-			return this[realTarget].#nodes[index];
+			let n = 0;
+			for (const node of this.values()) {
+				if (index === n) {
+					return node;
+				}
+			}
+			return null;
+		}
+		*keys() {
+			let n = 0;
+			for (const _ of this.values()) {
+				yield n++;
+			}
 		}
 		forEach(callbackfn: (value: Node, key: number, parent: NodeList<TNode>) => void, thisArg?: any) {
-			this[realTarget].#nodes.forEach((value, key) => callbackfn(value, key, thisArg));
+			let n = 0;
+			for (const node of this.values()) {
+				callbackfn(node, n, thisArg);
+			}
+		}
+		*values() {
+			if (this[realTarget].#nodes instanceof Node) {
+				let n = this[realTarget].#nodes.firstChild;
+				const pr = {
+					[preRemove]() {
+						n = n!.nextSibling;
+					}
+				      };
+				while (n) {
+					n[addPreRemove](pr);
+					yield n;
+					n[removePreRemove](pr);
+					n = n.nextSibling;
+				}
+			} else {
+				yield* this[realTarget].#nodes;
+			}
+		}
+		*[Symbol.iterator]() {
+			yield* this.values();
 		}
 		[index: number]: TNode;
 	}
@@ -316,6 +409,9 @@
 		}
 		get length() {
 			return this.data.length;
+		}
+		get textContent() {
+			return this.data;
 		}
 		get nextElementSibling() {
 			let n = this.nextSibling;
