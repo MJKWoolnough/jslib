@@ -68,15 +68,19 @@
 		#firstChild: Node | null = null;
 		#lastChild: Node | null = null;
 		#nextSibling: Node | null = null;
+		#ownerDocument: Document | null;
 		#previousSibling: Node | null = null;
 		#parentNode: Node | null = null;
 		#preRemove = new Set<PreRemover>();
 		#childrenNodeList = new NodeList<Node>(this);
-		constructor() {
+		constructor(type: number, name: string, ownerDocument: Document | null) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super();
+			this.#nodeType = type;
+			this.#nodeName = name;
+			this.#ownerDocument = ownerDocument
 		}
 		get baseURI() {
 			return "";
@@ -107,7 +111,7 @@
 			return "";
 		}
 		get ownerDocument() {
-			return null;
+			return this.#ownerDocument;
 		}
 		get parentElement(): HTMLElement | null {
 			let p = this.#parentNode;
@@ -395,11 +399,11 @@
 		#ownerElement: Element | null;
 		#prefix: string | null;
 		value: string;
-		constructor (ownerElement: Element | null, namespaceURI: string | null, prefix: string | null, name: string, value: string) {
+		constructor (ownerDocument: Document, ownerElement: Element | null, namespaceURI: string | null, prefix: string | null, name: string, value: string) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super();
+			super(Node.ATTRIBUTE_NODE, name, ownerDocument);
 			this.#ownerElement = ownerElement;
 			this.#namespaceURI = namespaceURI;
 			this.#prefix = prefix;
@@ -425,11 +429,11 @@
 
 	class CharacterData extends Node {
 		data: string;
-		constructor (data: string) {
+		constructor (nodeType: number, nodeName: string, ownerDocument: Document, data: string) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super();
+			super(nodeType, nodeName, ownerDocument);
 			this.data = data;
 		}
 		get length() {
@@ -478,7 +482,7 @@
 	class Text extends CharacterData {
 		constructor(text: string) {
 			init = true;
-			super(text);
+			super(Node.TEXT_NODE, "#text", document, text);
 			init = false;
 		}
 		get assignedSlot() {
@@ -496,9 +500,15 @@
 	}
 
 	class Document extends Node {
+		constructor() {
+			super(Node.DOCUMENT_NODE, "#document", null);
+		}
 	}
 
 	class DocumentFragment extends Node {
+		constructor() {
+			super(Node.DOCUMENT_FRAGMENT_NODE, "#document-fragment", document);
+		}
 	}
 
 	class ShadowRoot extends DocumentFragment {
@@ -511,11 +521,11 @@
 	}
 
 	class Element extends Node {
-		constructor () {
+		constructor (nodeName: string, ownerDocument: Document) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super();
+			super(Node.ELEMENT_NODE, nodeName, ownerDocument);
 		}
 	}
 
@@ -524,7 +534,7 @@
 			if (!init) { // check registry for valid Element type
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super();
+			super("", document);
 		}
 	}
 
@@ -533,7 +543,7 @@
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super();
+			super("", document);
 		}
 	}
 
@@ -542,7 +552,7 @@
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super();
+			super("", document);
 		}
 	}
 
@@ -1002,6 +1012,8 @@
 
 	let init = true;
 
+	const document = new Document();
+
 	for (const [name, val] of [
 		["Node", Node],
 		["DOMTokenList", DOMTokenList],
@@ -1043,7 +1055,7 @@
 		["NodeFilter", NodeFilter],
 		["NodeIterator", NodeIterator],
 		["customElements", new CustomElementRegistry()],
-		["document", new Document()],
+		["document", document],
 		["history", new History()],
 		["window", new Window()],
 	]) {
