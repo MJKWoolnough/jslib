@@ -390,11 +390,36 @@
 	}
 
 	class Attr extends Node {
-		constructor () {
+		#localName: string;
+		#namespaceURI: string | null;
+		#ownerElement: Element | null;
+		#prefix: string | null;
+		value: string;
+		constructor (ownerElement: Element | null, namespaceURI: string | null, prefix: string | null, name: string, value: string) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super();
+			this.#ownerElement = ownerElement;
+			this.#namespaceURI = namespaceURI;
+			this.#prefix = prefix;
+			this.#localName = name;
+			this.value = value;
+		}
+		get localName() {
+			return this.#localName;
+		}
+		get name() {
+			return (this.#prefix ? this.#prefix + ":" : "") + this.#localName;
+		}
+		get namespaceURI() {
+			return this.#namespaceURI;
+		}
+		get ownerElement() {
+			return this.#ownerElement;
+		}
+		get specified() {
+			return true;
 		}
 	}
 
