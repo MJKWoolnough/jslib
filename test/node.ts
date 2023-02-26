@@ -791,6 +791,29 @@
 		get pointerBeforeReferenceNode() {
 			return this.#pointerBeforeReferenceNode;
 		}
+		[preRemove](node: Node) {
+			if (this.#pointerBeforeReferenceNode) {
+				let next: Node | null = this.#referenceNode;
+				if (next.firstChild) {
+					next = next.firstChild;
+				} else {
+					while (!next.nextSibling && next !== this.#root && next.parentNode) {
+						next = next.parentNode;
+					}
+					if (next === this.#root || !next.parentNode) {
+						next = null;
+					} else {
+						next = next.nextSibling!;
+					}
+				}
+				if (next) {
+					this.#referenceNode = next;
+					return;
+				}
+				this.#pointerBeforeReferenceNode = false;
+			}
+			this.#referenceNode = node.parentNode!;
+		}
 		detach() {}
 		#runFilter(n: Node) {
 			if (this.#active) {
@@ -816,6 +839,9 @@
 		#next(forwards: boolean) {
 			let node = this.#referenceNode,
 			    beforeNode = this.#pointerBeforeReferenceNode;
+			for (let n: Node | null = node; n && n !== this.#root; n = n.parentNode) {
+				n[removePreRemove](this);
+			}
 			while (true) {
 				if (forwards) {
 					if (beforeNode) {
@@ -855,6 +881,9 @@
 				if (this.#runFilter(this.#referenceNode) === NodeFilter.FILTER_ACCEPT) {
 					break;
 				}
+			}
+			for (let n: Node | null = node; n && n !== this.#root; n = n.parentNode) {
+				n[addPreRemove](this);
 			}
 			this.#referenceNode = node;
 			this.#pointerBeforeReferenceNode = beforeNode;
