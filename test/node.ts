@@ -634,10 +634,10 @@
 	class UIEvent extends Event {
 		readonly detail: number | null;
 		readonly view: Window | null;
-		constructor(type: string, eventInitDict: UIEventInit) {
+		constructor(type: string, eventInitDict?: UIEventInit) {
 			super(type, eventInitDict);
-			this.detail = eventInitDict.detail ?? null;
-			this.view = eventInitDict.view ?? null;
+			this.detail = eventInitDict?.detail ?? null;
+			this.view = eventInitDict?.view ?? null;
 		}
 	}
 
@@ -662,17 +662,17 @@
 		readonly x: number = 0;
 		readonly y: number = 0;
 
-		constructor(type: string, eventInitDict: MouseEventInit) {
+		constructor(type: string, eventInitDict?: MouseEventInit) {
 			super(type, eventInitDict);
-			this.button = eventInitDict.button ?? 0;
-			this.buttons = eventInitDict.buttons ?? 0;
-			this.clientX = eventInitDict.clientX ?? 0;
-			this.clientY = eventInitDict.clientY ?? 0;
-			this.movementX = eventInitDict.movementX ?? 0;
-			this.movementY = eventInitDict.movementY ?? 0;
-			this.relatedTarget = eventInitDict.relatedTarget ?? null;
-			this.screenX = eventInitDict.screenX ?? 0;
-			this.screenY = eventInitDict.screenY ?? 0;
+			this.button = eventInitDict?.button ?? 0;
+			this.buttons = eventInitDict?.buttons ?? 0;
+			this.clientX = eventInitDict?.clientX ?? 0;
+			this.clientY = eventInitDict?.clientY ?? 0;
+			this.movementX = eventInitDict?.movementX ?? 0;
+			this.movementY = eventInitDict?.movementY ?? 0;
+			this.relatedTarget = eventInitDict?.relatedTarget ?? null;
+			this.screenX = eventInitDict?.screenX ?? 0;
+			this.screenY = eventInitDict?.screenY ?? 0;
 		}
 		getModifierState(key: string) {
 			return key === "Shift" && this.shiftKey || key === "Ctrl" && this.ctrlKey || key === "Alt" && this.altKey || key === "Meta" && this.metaKey;
@@ -680,7 +680,33 @@
 	}
 
 	class KeyboardEvent extends UIEvent {
+		static readonly DOM_KEY_LOCATION_STANDARD = 0;
+		static readonly DOM_KEY_LOCATION_LEFT = 1;
+		static readonly DOM_KEY_LOCATION_RIGHT = 2;
+		static readonly DOM_KEY_LOCATION_NUMPAD = 4;
+
+		readonly altKey: boolean = false;
+		readonly code: string;
+		readonly ctrlKey: boolean = false;
+		readonly isComposing: boolean = false;
+		readonly key: string;
+		readonly locale: string = "";
+		readonly location: number;
+		readonly metaKey: boolean = false;
+		readonly repeat: boolean;
+		readonly shiftKey: boolean = false;
+		constructor(type: string, eventInitDict?: KeyboardEventInit) {
+			super(type, eventInitDict);
+			this.code = eventInitDict?.code ?? "";
+			this.key = eventInitDict?.key ?? "";
+			this.location = eventInitDict?.location ?? 0;
+			this.repeat = eventInitDict?.repeat ?? false;
+		}
+		getModifierState(key: string) {
+			return key === "Shift" && this.shiftKey || key === "Ctrl" && this.ctrlKey || key === "Alt" && this.altKey || key === "Meta" && this.metaKey;
+		}
 	}
+
 
 	class PopStateEvent extends Event {
 	}
