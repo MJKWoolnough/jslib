@@ -623,7 +623,12 @@
 		}
 	}
 
-	class CustomEvent extends Event {
+	class CustomEvent<T = any> extends Event {
+		readonly detail: T | null;
+		constructor(type: string, eventInitDict: CustomEventInit<T>) {
+			super(type, eventInitDict);
+			this.detail = eventInitDict.detail ?? null;
+		}
 	}
 
 	class UIEvent extends Event {
