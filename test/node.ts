@@ -632,6 +632,13 @@
 	}
 
 	class UIEvent extends Event {
+		readonly detail: number | null;
+		readonly view: Window | null;
+		constructor(type: string, eventInitDict: UIEventInit) {
+			super(type, eventInitDict);
+			this.detail = eventInitDict.detail ?? null;
+			this.view = eventInitDict.view ?? null;
+		}
 	}
 
 	class MouseEvent extends UIEvent {
