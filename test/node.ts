@@ -642,6 +642,41 @@
 	}
 
 	class MouseEvent extends UIEvent {
+		readonly altKey: boolean = false;
+		readonly button: number;
+		readonly buttons: number;
+		readonly clientX: number;
+		readonly clientY: number;
+		readonly ctrlKey: boolean = false;
+		readonly metaKey: boolean = false;
+		readonly movementX: number;
+		readonly movementY: number;
+		readonly offsetX: number = 0;
+		readonly offsetY: number = 0;
+		readonly pageX: number = 0;
+		readonly pageY: number = 0;
+		readonly relatedTarget: EventTarget | null;
+		readonly screenX: number;
+		readonly screenY: number;
+		readonly shiftKey: boolean = false;
+		readonly x: number = 0;
+		readonly y: number = 0;
+
+		constructor(type: string, eventInitDict: MouseEventInit) {
+			super(type, eventInitDict);
+			this.button = eventInitDict.button ?? 0;
+			this.buttons = eventInitDict.buttons ?? 0;
+			this.clientX = eventInitDict.clientX ?? 0;
+			this.clientY = eventInitDict.clientY ?? 0;
+			this.movementX = eventInitDict.movementX ?? 0;
+			this.movementY = eventInitDict.movementY ?? 0;
+			this.relatedTarget = eventInitDict.relatedTarget ?? null;
+			this.screenX = eventInitDict.screenX ?? 0;
+			this.screenY = eventInitDict.screenY ?? 0;
+		}
+		getModifierState(key: string) {
+			return key === "Shift" && this.shiftKey || key === "Ctrl" && this.ctrlKey || key === "Alt" && this.altKey || key === "Meta" && this.metaKey;
+		}
 	}
 
 	class KeyboardEvent extends UIEvent {
