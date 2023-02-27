@@ -277,7 +277,7 @@
 			} else {
 				this.#firstChild = child.#nextSibling;
 			}
-			child.#parentNode = null;
+			child.#nextSibling = child.#previousSibling = child.#parentNode = null;
 			return child;
 		}
 		replaceChild<T extends Node>(node: Node, child: T) {
