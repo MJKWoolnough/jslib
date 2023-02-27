@@ -209,13 +209,22 @@
 			}
 			return referenceNode;
 		}
-		appendChild<T extends Node>(node: T) {
+		appendChild<T extends Node>(node: T): Node {
 			if (node instanceof DocumentFragment) {
 				while (node.#firstChild) {
 					this.appendChild(node.#firstChild);
 				}
 			} else {
-
+				node.#parentNode?.removeChild(node);
+				if (this.#lastChild) {
+					this.#lastChild.#nextSibling = node;
+					node.#previousSibling = this.#lastChild;
+				}
+				this.#lastChild = node;
+				if (!this.#firstChild) {
+					this.#firstChild = node;
+				}
+				node.#connect();
 			}
 			return node;
 		}
