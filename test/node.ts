@@ -480,9 +480,11 @@
 	}
 
 	class Text extends CharacterData {
-		constructor(text: string) {
+		constructor(text: string, type?: number) {
+			const t = init && type ? type : Node.TEXT_NODE,
+			      name = t === Node.TEXT_NODE ? "#text" : "#comment";
 			init = true;
-			super(Node.TEXT_NODE, "#text", document, text);
+			super(t, name, document, text);
 			init = false;
 		}
 		get assignedSlot() {
@@ -499,11 +501,36 @@
 		}
 	}
 
+	class CDATASection extends Text {
+		constructor(text: string) {
+			if (!init) {
+				throw new TypeError(ILLEGAL_CONSTRUCTOR);
+			}
+			super(text, Node.CDATA_SECTION_NODE);
+		}
+	}
+
 	class Comment extends CharacterData {
 		constructor(text: string) {
 			init = true;
 			super(Node.COMMENT_NODE, "#comment", document, text);
 			init = false;
+		}
+	}
+
+	class ProcessingInstruction extends CharacterData {
+		#sheet: StyleSheet | null;
+		#target: string;
+		constructor(sheet: StyleSheet | null, target: string) {
+			super(Node.PROCESSING_INSTRUCTION_NODE, "#comment", document, "");
+			this.#sheet = sheet;
+			this.#target = target;
+		}
+		get sheet() {
+			return this.#sheet;
+		}
+		get target() {
+			return this.#target;
 		}
 	}
 
@@ -1032,7 +1059,9 @@
 		["Attr", Attr],
 		["CharacterData", CharacterData],
 		["Text", Text],
+		["CDATASection", CDATASection],
 		["Comment", Comment],
+		["ProcessingInstruction", ProcessingInstruction],
 		["Document", Document],
 		["HTMLDocument", Document],
 		["DocumentFragment", DocumentFragment],
