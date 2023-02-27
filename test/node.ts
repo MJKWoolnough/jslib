@@ -73,6 +73,7 @@
 		#parentNode: Node | null = null;
 		#preRemove = new Set<PreRemover>();
 		#childrenNodeList = new NodeList<Node>(this);
+		#connected = false;
 		constructor(type: number, name: string, ownerDocument: Document | null) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
@@ -81,6 +82,14 @@
 			this.#nodeType = type;
 			this.#nodeName = name;
 			this.#ownerDocument = ownerDocument
+		}
+		#disconnect() {
+			if (this.#connected) {
+				this.#connected = false;
+				for (let n = this.#firstChild; n; n = n.nextSibling) {
+					n.#disconnect();
+				}
+			}
 		}
 		get baseURI() {
 			return "";
@@ -92,7 +101,7 @@
 			return this.#firstChild;
 		}
 		get isConnected() {
-			return false;
+			return this.#connected;
 		}
 		get lastChild() {
 			return this.#lastChild;
@@ -278,6 +287,7 @@
 				this.#firstChild = child.#nextSibling;
 			}
 			child.#nextSibling = child.#previousSibling = child.#parentNode = null;
+			child.#disconnect();
 			return child;
 		}
 		replaceChild<T extends Node>(node: Node, child: T) {
