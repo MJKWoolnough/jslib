@@ -83,6 +83,14 @@
 			this.#nodeName = name;
 			this.#ownerDocument = ownerDocument
 		}
+		#connect() {
+			if (this.#parentNode && this.#parentNode.#connected) {
+				this.#connected = true;
+				for (let n = this.#firstChild; n; n = n.nextSibling) {
+					n.#connect();
+				}
+			}
+		}
 		#disconnect() {
 			if (this.#connected) {
 				this.#connected = false;
@@ -171,6 +179,7 @@
 					n.#parentNode?.removeChild(n);
 					n.#parentNode = this;
 					referenceNode = referenceNode.#nextSibling = n;
+					n.#connect();
 				}
 			}
 			if (!referenceNode.#nextSibling) {
@@ -192,6 +201,7 @@
 						this.#lastChild = n;
 					}
 					referenceNode = referenceNode.#previousSibling = n;
+					n.#connect();
 				}
 			}
 			if (!referenceNode.#nextSibling) {
