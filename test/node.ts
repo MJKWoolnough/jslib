@@ -99,6 +99,59 @@
 				}
 			}
 		}
+		#validateChild(fn: string, node: Node) {
+			if (!(this instanceof Element) && !(this instanceof Document) && !(this instanceof DocumentFragment)) {
+				throw new Error(`${this[Symbol.toStringTag]()}.${fn}: Cannot add children to a ${this[Symbol.toStringTag]()}`);
+			}
+			if ((!(node instanceof Element) && !(node instanceof CharacterData) && !(node instanceof DocumentType) && !(node instanceof DocumentFragment)) || (node instanceof Text && this instanceof Document) || (node instanceof DocumentType && !(this instanceof Document))) {
+				throw new Error(`${this[Symbol.toStringTag]()}.${fn}: May not add a ${node[Symbol.toStringTag]()} as a child`)
+			}
+			if (node instanceof DocumentFragment && this instanceof Document) {
+				let hasElement = false;
+				for (let n = node.#firstChild; n; n = n.#nextSibling) {
+					if (n instanceof Element) {
+						if (hasElement) {
+							throw new Error(`${this[Symbol.toStringTag]()}.${fn}: Cannot have more than one Element child of a Document`);
+						}
+						hasElement = true;
+					} else if (n instanceof Text) {
+						throw new Error(`${this[Symbol.toStringTag]()}.${fn}: May not add a Text as a Child`);
+					}
+				}
+			}
+			if (this instanceof Document && node instanceof Element) {
+				for (let n = node.#firstChild; n; n = n.#nextSibling) {
+					if (n instanceof Element) {
+						throw new Error(`${this[Symbol.toStringTag]()}.${fn}: Cannot have more than one Element child of a Document`);
+					}
+				}
+			}
+			for (let n = this as Node | null; n; n = n.#parentNode) {
+				if (n === node) {
+					throw new Error(`${this[Symbol.toStringTag]()}.${fn}: The new child is an ancestor of the parent`);
+				}
+			}
+		}
+		#append(fn: string, node: Node) {
+			this.#validateChild(fn, node);
+			if (node instanceof DocumentFragment) {
+				while (node.#firstChild) {
+					this.appendChild(node.#firstChild);
+				}
+			} else {
+				node.#parentNode?.removeChild(node);
+				if (this.#lastChild) {
+					this.#lastChild.#nextSibling = node;
+					node.#previousSibling = this.#lastChild;
+				}
+				this.#lastChild = node;
+				if (!this.#firstChild) {
+					this.#firstChild = node;
+				}
+				node.#connect();
+			}
+			return node;
+		}
 		get baseURI() {
 			return "";
 		}
@@ -168,12 +221,13 @@
 		[removePreRemove](pr: PreRemover) {
 			this.#preRemove.delete(pr);
 		}
-		[after](referenceNode: Node, ...nodes: (Node | string)[]) {
+		[after](fn: string, referenceNode: Node, ...nodes: (Node | string)[]) {
 			for (const c of nodes) {
 				if (c instanceof DocumentFragment) {
-					referenceNode = this[after](referenceNode, ...Array.from(c.childNodes));
+					referenceNode = this[after](fn, referenceNode, ...Array.from(c.childNodes));
 				} else {
 					const n = c instanceof Node ? c : new Text(c);
+					this.#validateChild(fn, n);
 					n.#previousSibling = referenceNode;
 					n.#nextSibling = referenceNode.#nextSibling;
 					n.#parentNode?.removeChild(n);
@@ -187,12 +241,13 @@
 			}
 			return referenceNode;
 		}
-		[before](referenceNode: Node, ...nodes: (Node | string)[]) {
+		[before](fn: string, referenceNode: Node, ...nodes: (Node | string)[]) {
 			for (const c of nodes) {
 				if (c instanceof DocumentFragment) {
-					referenceNode = this[before](referenceNode, ...Array.from(c.childNodes));
+					referenceNode = this[before](fn, referenceNode, ...Array.from(c.childNodes));
 				} else {
 					const n = c instanceof Node ? c : new Text(c);
+					this.#validateChild(fn, n);
 					n.#nextSibling = referenceNode;
 					n.#previousSibling = referenceNode.#previousSibling;
 					n.#parentNode?.removeChild(n);
@@ -209,24 +264,8 @@
 			}
 			return referenceNode;
 		}
-		appendChild<T extends Node>(node: T): Node {
-			if (node instanceof DocumentFragment) {
-				while (node.#firstChild) {
-					this.appendChild(node.#firstChild);
-				}
-			} else {
-				node.#parentNode?.removeChild(node);
-				if (this.#lastChild) {
-					this.#lastChild.#nextSibling = node;
-					node.#previousSibling = this.#lastChild;
-				}
-				this.#lastChild = node;
-				if (!this.#firstChild) {
-					this.#firstChild = node;
-				}
-				node.#connect();
-			}
-			return node;
+		appendChild<T extends Node>(node: T) {
+			return this.#append("appendChild", node);
 		}
 		cloneNode(_deep?: boolean) {
 			// TODO
@@ -259,10 +298,10 @@
 				throw new Error("Node.insertBefore: Child to insert before is not a child of this node");
 			}
 			if (child) {
-				this[before](child, node);
+				this[before]("before", child, node);
 				return node;
 			} else {
-				return this.appendChild(node);
+				return this.#append("insertBefore", node);
 			}
 		}
 		isDefaultNamespace(_namespace: string | null) {
@@ -313,8 +352,11 @@
 			if ((child.#parentNode as Node | null) !== this) {
 				throw new Error("Node.replaceChild: Child to replace is not a child of this node");
 			}
-			this[after](child, node);
+			this[after]("replaceChild", child, node);
 			return this.removeChild(child);
+		}
+		[Symbol.toStringTag]() {
+			return "Node";
 		}
 	}
 
@@ -486,10 +528,10 @@
 			return n;
 		}
 		after(...nodes: Node[]) {
-			this.parentNode?.[after](this, ...nodes);
+			this.parentNode?.[after]("after", this, ...nodes);
 		}
 		before(...nodes: Node[]) {
-			this.parentNode?.[before](this, ...nodes);
+			this.parentNode?.[before]("before", this, ...nodes);
 		}
 		deleteData(offset: number, count: number) {
 			this.data = this.data.slice(0, offset) + this.data.slice(offset + count);
