@@ -295,7 +295,7 @@
 		}
 		insertBefore<T extends Node>(node: T, child: Node | null) {
 			if (child && child.#parentNode !== this) {
-				throw new Error("Node.insertBefore: Child to insert before is not a child of this node");
+				throw new Error(`${this[Symbol.toStringTag]()}.insertBefore: Child to insert before is not a child of this node`);
 			}
 			if (child) {
 				this[before]("before", child, node);
@@ -328,7 +328,7 @@
 		}
 		removeChild<T extends Node>(child: T) {
 			if ((child.#parentNode as Node | null) !== this) {
-				throw new Error("Node.removeChild: The node to be removed is not a child of this node");
+				throw new Error(`${this[Symbol.toStringTag]()}.removeChild: The node to be removed is not a child of this node`);
 			}
 			for (const pr of child.#preRemove) {
 				pr[preRemove](child);
@@ -350,7 +350,7 @@
 		}
 		replaceChild<T extends Node>(node: Node, child: T) {
 			if ((child.#parentNode as Node | null) !== this) {
-				throw new Error("Node.replaceChild: Child to replace is not a child of this node");
+				throw new Error(`${this[Symbol.toStringTag]()}.replaceChild: Child to replace is not a child of this node`);
 			}
 			this[after]("replaceChild", child, node);
 			return this.removeChild(child);
