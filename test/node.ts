@@ -494,7 +494,7 @@
 
 	class NodeList<TNode extends Node> {
 		#nodes: Node | TNode[];
-		[realTarget]: NodeList<TNode>
+		[realTarget]: this;
 		constructor (nodes: Node | TNode[]) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
