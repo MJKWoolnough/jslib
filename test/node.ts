@@ -21,6 +21,10 @@
 		}
 		return undefined;
 	      },
+	      htmlCollectionProxyObj = {
+		has: (target: HTMLCollection, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+		get: (target: HTMLCollection, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
+	      },
 	      nodeListProxyObj = {
 		has: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
 		get: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
@@ -477,10 +481,56 @@
 	}
 
 	class HTMLCollection {
-		constructor () {
+		#nodes: Node;
+		#onlyDirect: boolean;
+		#filter?: (e: Element) => boolean;
+		[realTarget]: this;
+		constructor (nodes: Node, onlyDirect: boolean, filter?: (e: Element) => boolean) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
+			this.#nodes = nodes;
+			this.#onlyDirect = onlyDirect;
+			this.#filter = filter;
+			this[realTarget] = this;
+			return new Proxy<HTMLCollection>(this, htmlCollectionProxyObj);
+		}
+		*#entries() {
+			let n = this.#nodes.firstChild;
+			while (n && n !== this.#nodes) {
+				if (n instanceof Element) {
+					if (!this.#filter || this.#filter(n)) {
+						yield n;
+					}
+					if (!this.#onlyDirect && n.firstChild) {
+						n = n.firstChild;
+						continue;
+					}
+				}
+				n = n.nextSibling ?? n.parentNode;
+			}
+		}
+		get length() {
+			let length = 0;
+			for (const n of this.#entries()) {
+				if (n instanceof Element) {
+					length++;
+				}
+			}
+			return length;
+		}
+		item(index: number) {
+			let count = 0;
+			for (const n of this.#entries()) {
+				if (count++ === index) {
+					return n;
+				}
+			}
+			return null;
+		}
+		namedItem(_key: string) {
+			// TODO
+			return null;
 		}
 	}
 
