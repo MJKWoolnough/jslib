@@ -203,34 +203,34 @@
 		}
 		#validateChild(fn: string, node: Node) {
 			if (!(this instanceof Element) && !(this instanceof Document) && !(this instanceof DocumentFragment)) {
-				throw new Error(`${this[Symbol.toStringTag]()}.${fn}: Cannot add children to a ${this[Symbol.toStringTag]()}`);
+				throw new DOMException(`${this[Symbol.toStringTag]()}.${fn}: Cannot add children to a ${this[Symbol.toStringTag]()}`, DOMException.ERROR_NAMES[DOMException.HIERARCHY_REQUEST_ERR]);
 			}
 			if ((!(node instanceof Element) && !(node instanceof CharacterData) && !(node instanceof DocumentType) && !(node instanceof DocumentFragment)) || (node instanceof Text && this instanceof Document) || (node instanceof DocumentType && !(this instanceof Document))) {
-				throw new Error(`${this[Symbol.toStringTag]()}.${fn}: May not add a ${node[Symbol.toStringTag]()} as a child`)
+				throw new DOMException(`${this[Symbol.toStringTag]()}.${fn}: May not add a ${node[Symbol.toStringTag]()} as a child`, DOMException.ERROR_NAMES[DOMException.HIERARCHY_REQUEST_ERR])
 			}
 			if (node instanceof DocumentFragment && this instanceof Document) {
 				let hasElement = false;
 				for (let n = node.#firstChild; n; n = n.#nextSibling) {
 					if (n instanceof Element) {
 						if (hasElement) {
-							throw new Error(`${this[Symbol.toStringTag]()}.${fn}: Cannot have more than one Element child of a Document`);
+							throw new DOMException(`${this[Symbol.toStringTag]()}.${fn}: Cannot have more than one Element child of a Document`, DOMException.ERROR_NAMES[DOMException.HIERARCHY_REQUEST_ERR]);
 						}
 						hasElement = true;
 					} else if (n instanceof Text) {
-						throw new Error(`${this[Symbol.toStringTag]()}.${fn}: May not add a Text as a Child`);
+						throw new DOMException(`${this[Symbol.toStringTag]()}.${fn}: May not add a Text as a Child`, DOMException.ERROR_NAMES[DOMException.HIERARCHY_REQUEST_ERR]);
 					}
 				}
 			}
 			if (this instanceof Document && node instanceof Element) {
 				for (let n = node.#firstChild; n; n = n.#nextSibling) {
 					if (n instanceof Element) {
-						throw new Error(`${this[Symbol.toStringTag]()}.${fn}: Cannot have more than one Element child of a Document`);
+						throw new DOMException(`${this[Symbol.toStringTag]()}.${fn}: Cannot have more than one Element child of a Document`, DOMException.ERROR_NAMES[DOMException.HIERARCHY_REQUEST_ERR]);
 					}
 				}
 			}
 			for (let n = this as Node | null; n; n = n.#parentNode) {
 				if (n === node) {
-					throw new Error(`${this[Symbol.toStringTag]()}.${fn}: The new child is an ancestor of the parent`);
+					throw new DOMException(`${this[Symbol.toStringTag]()}.${fn}: The new child is an ancestor of the parent`, DOMException.ERROR_NAMES[DOMException.HIERARCHY_REQUEST_ERR]);
 				}
 			}
 		}
@@ -397,7 +397,7 @@
 		}
 		insertBefore<T extends Node>(node: T, child: Node | null) {
 			if (child && child.#parentNode !== this) {
-				throw new Error(`${this[Symbol.toStringTag]()}.insertBefore: Child to insert before is not a child of this node`);
+				throw new DOMException(`${this[Symbol.toStringTag]()}.insertBefore: Child to insert before is not a child of this node`, DOMException.ERROR_NAMES[DOMException.NOT_FOUND_ERR]);
 			}
 			if (child) {
 				this[before]("before", child, node);
@@ -430,7 +430,7 @@
 		}
 		removeChild<T extends Node>(child: T) {
 			if ((child.#parentNode as Node | null) !== this) {
-				throw new Error(`${this[Symbol.toStringTag]()}.removeChild: The node to be removed is not a child of this node`);
+				throw new DOMException(`${this[Symbol.toStringTag]()}.removeChild: The node to be removed is not a child of this node`, DOMException.ERROR_NAMES[DOMException.NOT_FOUND_ERR]);
 			}
 			for (const pr of child.#preRemove) {
 				pr[preRemove](child);
@@ -452,7 +452,7 @@
 		}
 		replaceChild<T extends Node>(node: Node, child: T) {
 			if ((child.#parentNode as Node | null) !== this) {
-				throw new Error(`${this[Symbol.toStringTag]()}.replaceChild: Child to replace is not a child of this node`);
+				throw new DOMException(`${this[Symbol.toStringTag]()}.replaceChild: Child to replace is not a child of this node`, DOMException.ERROR_NAMES[DOMException.NOT_FOUND_ERR]);
 			}
 			this[after]("replaceChild", child, node);
 			return this.removeChild(child);
@@ -1022,16 +1022,16 @@
 				throw new TypeError("CustomElementRegistry.define: Argument 2 is not a constructor.");
 			}
 			if (this.#customElements.has(name)) {
-				throw new Error(`CustomElementRegistry.define: '${JSON.stringify(name)}' has already been defined as a custom element`);
+				throw new DOMException(`CustomElementRegistry.define: '${JSON.stringify(name)}' has already been defined as a custom element`, DOMException.ERROR_NAMES[DOMException.NOT_SUPPORTED_ERR]);
 			}
 			if (this.#constructors.has(constructor)) {
-				throw new Error(`CustomElementRegistry.define: '${JSON.stringify(name)}' and '${JSON.stringify(this.#constructors.get(constructor))}' have the same constructor`);
+				throw new DOMException(`CustomElementRegistry.define: '${JSON.stringify(name)}' and '${JSON.stringify(this.#constructors.get(constructor))}' have the same constructor`, DOMException.ERROR_NAMES[DOMException.NOT_SUPPORTED_ERR]);
 			}
 			if (options?.extends) {
 				if (CustomElementRegistry.#nameRE.test(options.extends)) {
-					throw new Error(`CustomElementRegistry.define: '${JSON.stringify(name)}' cannot extend a custom element`);
+					throw new DOMException(`CustomElementRegistry.define: '${JSON.stringify(name)}' cannot extend a custom element`, DOMException.ERROR_NAMES[DOMException.NOT_SUPPORTED_ERR]);
 				} else if (!this.#elements.has(options.extends)) {
-					throw new Error("Operation is not supported");
+					throw new DOMException("Operation is not supported", DOMException.ERROR_NAMES[DOMException.NOT_SUPPORTED_ERR]);
 				}
 			}
 			// handle extends?
@@ -1138,7 +1138,7 @@
 		detach() {}
 		#runFilter(n: Node) {
 			if (this.#active) {
-				throw new Error("InvalidStateError");
+				throw new DOMException("An attempt was made to use an object that is not, or is no longer, usable", DOMException.ERROR_NAMES[DOMException.INVALID_STATE_ERR]);
 			}
 			if ((this.#whatToShow & n.nodeType) === 0) {
 				return NodeFilter.FILTER_SKIP;
