@@ -667,6 +667,9 @@
 		set textContent(t: string) {
 			this.value = t;
 		}
+		cloneNode(_deep?: boolean) {
+			return new Attr(this.ownerDocument!, this.#ownerElement, this.#namespaceURI, this.#prefix, this.#localName, this.value);
+		}
 	}
 
 	class CharacterData extends Node {
