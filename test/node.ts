@@ -747,6 +747,9 @@
 		get wholeText() {
 			return "";
 		}
+		cloneNode(_deep?: boolean) {
+			return new Text(this.data);
+		}
 		splitText(offset: number) {
 			const newText = new Text(this.data.slice(offset));
 			this.data = this.data.slice(0, offset);
