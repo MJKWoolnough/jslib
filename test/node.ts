@@ -765,6 +765,9 @@
 			}
 			super(text, Node.CDATA_SECTION_NODE);
 		}
+		cloneNode(_deep?: boolean) {
+			return new CDATASection(this.data);
+		}
 	}
 
 	class Comment extends CharacterData {
