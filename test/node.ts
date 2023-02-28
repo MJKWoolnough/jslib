@@ -278,9 +278,8 @@
 		get nodeType() {
 			return this.#nodeType;
 		}
-		get nodeValue() {
-			// TODO
-			return "";
+		get nodeValue(): string | null {
+			return null;
 		}
 		get ownerDocument() {
 			return this.#ownerDocument;
@@ -592,11 +591,23 @@
 		get namespaceURI() {
 			return this.#namespaceURI;
 		}
+		get nodeValue() {
+			return this.value;
+		}
+		set nodeValue(v: string) {
+			this.value = v;
+		}
 		get ownerElement() {
 			return this.#ownerElement;
 		}
 		get specified() {
 			return true;
+		}
+		get textContent() {
+			return this.value;
+		}
+		set textContent(t: string) {
+			this.value = t;
 		}
 	}
 
@@ -612,9 +623,6 @@
 		get length() {
 			return this.data.length;
 		}
-		get textContent() {
-			return this.data;
-		}
 		get nextElementSibling() {
 			let n = this.nextSibling;
 			while (n && !(n instanceof Element)) {
@@ -622,12 +630,24 @@
 			}
 			return n;
 		}
+		get nodeValue() {
+			return this.data;
+		}
+		set nodeValue(v: string) {
+			this.data = v;
+		}
 		get previousElementSibling() {
 			let n = this.previousSibling;
 			while (n && !(n instanceof Element)) {
 				n = n.previousSibling;
 			}
 			return n;
+		}
+		get textContent() {
+			return this.data;
+		}
+		set textContent(t: string) {
+			this.data = t;
 		}
 		after(...nodes: Node[]) {
 			this.parentNode?.[after]("after", this, ...nodes);
