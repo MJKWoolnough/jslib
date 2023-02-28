@@ -7,6 +7,7 @@
 	      addPreRemove = Symbol("addPreRemove"),
 	      removePreRemove = Symbol("removePreRemove"),
 	      preRemove = Symbol("preRemove"),
+	      append = Symbol("append"),
 	      after = Symbol("after"),
 	      before = Symbol("before"),
 	      realTarget = Symbol("realTarget"),
@@ -238,26 +239,6 @@
 				}
 			}
 		}
-		#append(fn: string, node: Node) {
-			this.#validateChild(fn, node);
-			if (node instanceof DocumentFragment) {
-				while (node.#firstChild) {
-					this.appendChild(node.#firstChild);
-				}
-			} else {
-				node.#parentNode?.removeChild(node);
-				if (this.#lastChild) {
-					this.#lastChild.#nextSibling = node;
-					node.#previousSibling = this.#lastChild;
-				}
-				this.#lastChild = node;
-				if (!this.#firstChild) {
-					this.#firstChild = node;
-				}
-				node.#connect();
-			}
-			return node;
-		}
 		get baseURI() {
 			return "";
 		}
@@ -326,6 +307,26 @@
 		[removePreRemove](pr: PreRemover) {
 			this.#preRemove.delete(pr);
 		}
+		[append](fn: string, node: Node) {
+			this.#validateChild(fn, node);
+			if (node instanceof DocumentFragment) {
+				while (node.#firstChild) {
+					this.appendChild(node.#firstChild);
+				}
+			} else {
+				node.#parentNode?.removeChild(node);
+				if (this.#lastChild) {
+					this.#lastChild.#nextSibling = node;
+					node.#previousSibling = this.#lastChild;
+				}
+				this.#lastChild = node;
+				if (!this.#firstChild) {
+					this.#firstChild = node;
+				}
+				node.#connect();
+			}
+			return node;
+		}
 		[after](fn: string, referenceNode: Node, ...nodes: (Node | string)[]) {
 			for (const c of nodes) {
 				if (c instanceof DocumentFragment) {
@@ -370,7 +371,7 @@
 			return referenceNode;
 		}
 		appendChild<T extends Node>(node: T) {
-			return this.#append("appendChild", node);
+			return this[append]("appendChild", node);
 		}
 		cloneNode(deep?: boolean) {
 			init = true;
@@ -413,7 +414,7 @@
 				this[before]("before", child, node);
 				return node;
 			} else {
-				return this.#append("insertBefore", node);
+				return this[append]("insertBefore", node);
 			}
 		}
 		isDefaultNamespace(_namespace: string | null) {
@@ -793,6 +794,70 @@
 	class DocumentFragment extends Node {
 		constructor() {
 			super(Node.DOCUMENT_FRAGMENT_NODE, "#document-fragment", document);
+		}
+		get childElementCount() {
+			let count = 0;
+			for (let n = this.firstChild; n; n = n.nextSibling) {
+				if (n instanceof Element) {
+					count++;
+				}
+			}
+			return count;
+		}
+		get children() {
+			init = true;
+			const hc = new HTMLCollection(this, true);
+			init = false;
+			return hc;
+		}
+		get firstElementChild() {
+			for (let n = this.firstChild; n; n = n.nextSibling) {
+				if (n instanceof Element) {
+					return n;
+				}
+			}
+			return null;
+		}
+		get lastElementChild() {
+			for (let n = this.lastChild; n; n = n.previousSibling) {
+				if (n instanceof Element) {
+					return n;
+				}
+			}
+			return null;
+		}
+		#append(fn: string, nodes: (Node | string)[]) {
+			for (const n of nodes) {
+				this[append](fn, n instanceof Node ? n : new Text(n));
+			}
+		}
+		append(...nodes: (Node | string)[]) {
+			this.#append("DocumentFragment.append", nodes);
+		}
+		getElementById(_id: string) {
+			// TODO
+			return null;
+		}
+		prepend(...nodes: (Node | string)[]) {
+			if (this.firstChild) {
+				this[before]("DocumentFragment.prepend", this.firstChild, ...nodes);
+			} else {
+				this.#append("DocumentFragment.prepend", nodes);
+			}
+		}
+		querySelector(_selectors: any) {
+			// TODO
+			return null;
+		}
+		querySelectorAll(_selectors: any) {
+			// TODO
+			return null;
+		}
+		replaceChildren(...nodes: (Node | string)[]) {
+			while (this.firstChild) {
+				this.removeChild(this.firstChild);
+			}
+			this.#append("DocumentFragment.replaceChildren", nodes);
 		}
 	}
 
