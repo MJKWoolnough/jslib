@@ -776,6 +776,9 @@
 			super(Node.COMMENT_NODE, "#comment", document, text);
 			init = false;
 		}
+		cloneNode(_deep?: boolean) {
+			return new Comment(this.data);
+		}
 	}
 
 	class ProcessingInstruction extends CharacterData {
