@@ -795,6 +795,9 @@
 		get target() {
 			return this.#target;
 		}
+		cloneNode(_deep?: boolean) {
+			return new ProcessingInstruction(this.#sheet, this.#target);
+		}
 	}
 
 	class Document extends Node {
