@@ -368,9 +368,16 @@
 		appendChild<T extends Node>(node: T) {
 			return this.#append("appendChild", node);
 		}
-		cloneNode(_deep?: boolean) {
-			// TODO
-			return this;
+		cloneNode(deep?: boolean) {
+			init = true;
+			const cn = new (this.constructor as {new(): Node});
+			init = false;
+			if (deep) {
+				for (let n = this.#firstChild; n; n = n.#nextSibling) {
+					cn.appendChild(n.cloneNode(true));
+				}
+			}
+			return cn;
 		}
 		compareDocumentPosition(_other: Node) {
 			// TODO
