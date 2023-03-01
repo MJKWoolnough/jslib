@@ -663,10 +663,10 @@
 				yield n++;
 			}
 		}
-		forEach(callbackfn: (value: Node, key: number, parent: NodeList<TNode>) => void, thisArg?: any) {
+		forEach(callbackfn: (value: Node, key: number, parent: NodeList<TNode>) => void, thisArg: any = this) {
 			let n = 0;
 			for (const node of this.values()) {
-				callbackfn(node, n, thisArg);
+				callbackfn.call(thisArg, node, n, this);
 			}
 		}
 		*values() {
