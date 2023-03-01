@@ -474,10 +474,88 @@
 	}
 
 	class DOMTokenList {
+		static #whitespace = /\w/;
+		#tokens: string[] = [];
 		constructor () {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
+		}
+		get length() {
+			return this.#tokens.length;
+		}
+		get value() {
+			return this.#tokens.join(" ");
+		}
+		#add(fn: string, token: string) {
+			if (!token) {
+				throw new DOMException(`DOMTokenList.${fn}: The empty string is not a valid token.`, DOMException.ERROR_NAMES[DOMException.SYNTAX_ERR]);
+			}
+			if (DOMTokenList.#whitespace.test(token)) {
+				throw new DOMException(`DOMTokenList.${fn}: The token can not contain whitespace.`, DOMException.ERROR_NAMES[DOMException.INVALID_CHARACTER_ERR]);
+			}
+			if (!this.contains(token)) {
+				this.#tokens.push(token);
+			}
+		}
+		#remove(token: string) {
+			const index = this.#tokens.indexOf(token);
+			if (index >= 0) {
+				this.#tokens.splice(index, 1);
+			}
+		}
+		add(token: string, ...tokens: string[]) {
+			this.#add("add", token);
+			for (const t of tokens) {
+				this.#add("add", t);
+			}
+		}
+		contains(token: string) {
+			return this.#tokens.includes(token);
+		}
+		entries() {
+			this.#tokens.entries();
+		}
+		forEach(callbackfn: (value: string, key: number, parent: DOMTokenList) => void, thisArg: any = this) {
+			let i = 0;
+			for (const token of this.#tokens) {
+				callbackfn.call(thisArg, token, i++, this);
+			}
+		}
+		item(index: number) {
+			return this.#tokens[index] ?? null;
+		}
+		keys() {
+			return this.#tokens.keys();
+		}
+		remove(token: string, ...tokens: string[]) {
+			this.#remove(token);
+			for (const t of tokens) {
+				this.#remove(t);
+			}
+		}
+		replace(oldToken: string, newToken: string) {
+			const index = this.#tokens.indexOf(oldToken);
+			if (index === -1) {
+				return false;
+			}
+			this.#tokens.splice(index, 1, newToken);
+			return true;
+		}
+		supports(_token: string) {
+			// TODO
+			return false;
+		}
+		toggle(token: string, force?: boolean) {
+			if (force === false || this.contains(token)) {
+				this.#remove(token);
+				return false;
+			}
+			this.#add("toggle", token);
+			return true;
+		}
+		values() {
+			return this.#tokens.values();
 		}
 	}
 
