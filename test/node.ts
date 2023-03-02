@@ -14,8 +14,21 @@
 	      has = Symbol("has"),
 	      get = Symbol("get"),
 	      set = Symbol("set"),
+	      remove = Symbol("remove"),
 	      setElement = Symbol("setElement"),
 	      whitespace = /\s+/,
+	      camelToKebab = (name: string) => {
+		let ret = "";
+		for (const char of name) {
+			const code = char.charCodeAt(0);
+			if (code >= 65 && code <= 90) {
+				ret += "-" + char.toLowerCase();
+			} else {
+				ret += char;
+			}
+		}
+		return ret;
+	      },
 	      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
 		if (typeof name === "number") {
 			return fn(name);
@@ -38,7 +51,8 @@
 	      domStringMapProxyObj = {
 		has: (target: DOMStringMap, name: PropertyKey) => target[has](name),
 		get: (target: DOMStringMap, name: PropertyKey) => target[get](name),
-		set: (target: DOMStringMap, name: PropertyKey, value: any) => target[set](name, value)
+		set: (target: DOMStringMap, name: PropertyKey, value: any) => target[set](name, value),
+		deleteProperty: (target: DOMStringMap, name: PropertyKey) => target[remove](name)
 	      },
 	      namedNodeMapProxyObj = {
 		has: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
@@ -1470,13 +1484,22 @@
 			this.#element;
 			return new Proxy<DOMStringMap>(this, domStringMapProxyObj);
 		}
-		[has](_name: PropertyKey) {
-			return false;
+		[has](name: PropertyKey) {
+			return typeof name === "string" ? this.#element.hasAttribute("data-" + camelToKebab(name)) : false;
 		}
-		[get](_name: PropertyKey) {
-			return null;
+		[get](name: PropertyKey) {
+			return typeof name === "string" ? this.#element.getAttribute("data-" + camelToKebab(name)) : null;
 		}
-		[set](_name: PropertyKey, _value: any) {
+		[set](name: PropertyKey, value: any) {
+			if (typeof name === "string") {
+				this.#element.setAttribute("data-" + camelToKebab(name), value);
+			}
+			return true;
+		}
+		[remove](name: PropertyKey) {
+			if (typeof name === "string") {
+				this.#element.removeAttribute("data-" + camelToKebab(name));
+			}
 			return true;
 		}
 	}
