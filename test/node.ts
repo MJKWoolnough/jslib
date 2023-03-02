@@ -1251,7 +1251,7 @@
 		}
 		define(name: string, constructor: CustomElementConstructor, options?: ElementDefinitionOptions) {
 			if (!CustomElementRegistry.#nameRE.test(name) || CustomElementRegistry.#invalidNames.includes(name)) {
-				throw new SyntaxError(`'${JSON.stringify(name)}' is not a valid custom element name`);
+				throw new SyntaxError(`CustomElementRegistry.define: '${JSON.stringify(name)}' is not a valid custom element name`);
 			}
 			if (!(constructor instanceof Function)) {
 				throw new TypeError("CustomElementRegistry.define: Argument 2 is not a constructor.");
@@ -1266,7 +1266,7 @@
 				if (CustomElementRegistry.#nameRE.test(options.extends)) {
 					throw new DOMException(`CustomElementRegistry.define: '${JSON.stringify(name)}' cannot extend a custom element`, DOMException.ERROR_NAMES[DOMException.NOT_SUPPORTED_ERR]);
 				} else if (!this.#elements.has(options.extends)) {
-					throw new DOMException("Operation is not supported", DOMException.ERROR_NAMES[DOMException.NOT_SUPPORTED_ERR]);
+					throw new DOMException("CustomElementRegistry.define: Operation is not supported", DOMException.ERROR_NAMES[DOMException.NOT_SUPPORTED_ERR]);
 				}
 			}
 			// handle extends?
