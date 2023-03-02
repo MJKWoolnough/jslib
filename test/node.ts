@@ -16,6 +16,7 @@
 	      set = Symbol("set"),
 	      remove = Symbol("remove"),
 	      setElement = Symbol("setElement"),
+	      attrChanged = Symbol("attrChanged"),
 	      whitespace = /\s+/,
 	      camelToKebab = (name: string) => {
 		let ret = "";
@@ -765,6 +766,7 @@
 				if (item.name === qualifiedName && item.namespaceURI === null) {
 					this.#items.splice(pos, 1);
 					item[setElement](null);
+					this.#element[attrChanged](item.name, null);
 					return item;
 				}
 				pos++;
@@ -777,6 +779,7 @@
 				if (item.name === localName && item.namespaceURI === namespace) {
 					this.#items.splice(pos, 1);
 					item[setElement](null);
+					this.#element[attrChanged](item.name, null);
 					return item;
 				}
 				pos++;
@@ -789,11 +792,13 @@
 			for (const item of this.#items) {
 				if (item.name === attr.name && item.namespaceURI === null) {
 					this.#items.splice(pos, 1, attr);
+					this.#element[attrChanged](attr.name, attr);
 					return item;
 				}
 				pos++;
 			}
 			this.#items.push(attr);
+			this.#element[attrChanged](attr.name, attr);
 			return null;
 		}
 		setNamedItemNS(attr: Attr) {
@@ -802,11 +807,13 @@
 			for (const item of this.#items) {
 				if (item.name === attr.name && item.namespaceURI === attr.namespaceURI) {
 					this.#items.splice(pos, 1, attr);
+					this.#element[attrChanged](attr.name, attr);
 					return item;
 				}
 				pos++;
 			}
 			this.#items.push(attr);
+			this.#element[attrChanged](attr.name, attr);
 			return null;
 		}
 		[index: number]: Attr;
@@ -843,6 +850,7 @@
 		}
 		set nodeValue(v: string) {
 			this.value = v;
+			this.#ownerElement?.[attrChanged](this.#localName, this);
 		}
 		get ownerElement() {
 			return this.#ownerElement;
@@ -858,6 +866,7 @@
 		}
 		set textContent(t: string) {
 			this.value = t;
+			this.#ownerElement?.[attrChanged](this.#localName, this);
 		}
 		cloneNode(_deep?: boolean) {
 			return new Attr(this.ownerDocument!, this.#ownerElement, this.#namespaceURI, this.#prefix, this.#localName, this.value);
@@ -1225,6 +1234,13 @@
 			return this.nodeName;
 		}
 		// TODO: Aria?
+		[attrChanged](name: string, attr: Attr | null) {
+			if (attr?.namespaceURI === null) {
+				if (name === "class") {
+					this.#classList.value = attr.value ?? ""
+				}
+			}
+		}
 		after(...nodes: Node[]) {
 			this.parentNode?.[after]("Element.after", this, ...nodes);
 		}
