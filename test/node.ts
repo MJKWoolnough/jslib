@@ -1061,6 +1061,40 @@
 		}
 	}
 
+	class DOMRect {
+		#x: number;
+		#y: number;
+		#width: number;
+		#height: number;
+		constructor(x: number, y: number, width: number, height: number) {
+			this.#x = x;
+			this.#y = y;
+			this.#width = width;
+			this.#height = height;
+		}
+		static fromRect({x = 0, y = 0, width = 0, height = 0}: {x?: number, y?: number, width?: number, height?: number}) {
+			return new DOMRect(x, y, width, height);
+		}
+		get left() {
+			return this.#x;
+		}
+		get top () {
+			return this.#y;
+		}
+		get width() {
+			return this.#width;
+		}
+		get height() {
+			return this.#height;
+		}
+		get right() {
+			return this.#x + (this.#width < 0 ? 0 : this.#width);
+		}
+		get bottom() {
+			return this.#y + (this.#height < 0 ? 0 : this.#height);
+		}
+	}
+
 	class Location {
 		protocol = "local:";
 		hostname = "" ;
@@ -1533,6 +1567,7 @@
 		["SVGElement", SVGElement],
 		["MathMLElement", MathMLElement],
 		["DOMStringMap", DOMStringMap],
+		["DOMRect", DOMRect],
 		["Location", Location],
 		["Storage", Storage],
 		["Window", Window],
