@@ -14,6 +14,7 @@
 	      has = Symbol("has"),
 	      get = Symbol("get"),
 	      set = Symbol("set"),
+	      setElement = Symbol("setElement"),
 	      whitespace = /\s+/,
 	      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
 		if (typeof name === "number") {
@@ -503,6 +504,9 @@
 		get value() {
 			return this.#tokens.join(" ");
 		}
+		set value(tokens: string) {
+			this.#tokens.splice(0, this.#tokens.length, ...tokens.split(whitespace));
+		}
 		#add(fn: string, token: string) {
 			if (!token) {
 				throw new DOMException(`DOMTokenList.${fn}: The empty string is not a valid token.`, DOMException.ERROR_NAMES[DOMException.SYNTAX_ERR]);
@@ -711,36 +715,84 @@
 
 	class NamedNodeMap {
 		#element: Element;
+		#items: Attr[] = [];
 		constructor (element: Element) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#element = element;
-			this.#element;
 			return new Proxy<NamedNodeMap>(this, namedNodeMapProxyObj);
 		}
 		get length() {
 			return 0;
 		}
-		getNamedItem(_qualifiedName: string) {
+		getNamedItem(qualifiedName: string) {
+			for (const item of this.#items) {
+				if (item.name === qualifiedName && item.namespaceURI === null) {
+					return item;
+				}
+			}
 			return null;
 		}
-		getNamedItemNS(_namespace: string | null, _localName: string) {
+		getNamedItemNS(namespace: string | null, localName: string) {
+			for (const item of this.#items) {
+				if (item.name === localName && item.namespaceURI === namespace) {
+					return item;
+				}
+			}
 			return null;
 		}
-		item(_index: number) {
-			return null
+		item(index: number) {
+			return this.#items[index] ?? null;
 		}
-		removeNamedItem(_qualifiedName: string) {
+		removeNamedItem(qualifiedName: string) {
+			let pos = 0;
+			for (const item of this.#items) {
+				if (item.name === qualifiedName && item.namespaceURI === null) {
+					this.#items.splice(pos, 1);
+					item[setElement](null);
+					return item;
+				}
+				pos++;
+			}
 			return null;
 		}
-		removeNamedItemNS(_namespace: string | null, _localName: string) {
+		removeNamedItemNS(namespace: string | null, localName: string) {
+			let pos = 0;
+			for (const item of this.#items) {
+				if (item.name === localName && item.namespaceURI === namespace) {
+					this.#items.splice(pos, 1);
+					item[setElement](null);
+					return item;
+				}
+				pos++;
+			}
 			return null;
 		}
-		setNamedItem(_attr: Attr) {
+		setNamedItem(attr: Attr) {
+			let pos = 0;
+			attr[setElement](this.#element);
+			for (const item of this.#items) {
+				if (item.name === attr.name && item.namespaceURI === null) {
+					this.#items.splice(pos, 1, attr);
+					return item;
+				}
+				pos++;
+			}
+			this.#items.push(attr);
 			return null;
 		}
-		setNamedItemNS(_attr: Attr) {
+		setNamedItemNS(attr: Attr) {
+			let pos = 0;
+			attr[setElement](this.#element);
+			for (const item of this.#items) {
+				if (item.name === attr.name && item.namespaceURI === attr.namespaceURI) {
+					this.#items.splice(pos, 1, attr);
+					return item;
+				}
+				pos++;
+			}
+			this.#items.push(attr);
 			return null;
 		}
 		[index: number]: Attr;
@@ -780,6 +832,9 @@
 		}
 		get ownerElement() {
 			return this.#ownerElement;
+		}
+		[setElement](element: Element | null) {
+			this.#ownerElement = element;
 		}
 		get specified() {
 			return true;
@@ -1009,38 +1064,399 @@
 	}
 
 	class Element extends Node {
-		constructor (nodeName: string, ownerDocument: Document) {
+		#assignedSlot: HTMLSlotElement | null = null;
+		#attributes = new NamedNodeMap(this);
+		#classList = new DOMTokenList();
+		#children = new HTMLCollection(this, true);
+		#localName: string;
+		#namespaceURI: string;
+		scrollLeft = 0;
+		scrollTop = 0;
+		constructor (namespaceURI: string, localName: string, ownerDocument: Document) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super(Node.ELEMENT_NODE, nodeName, ownerDocument);
+			super(Node.ELEMENT_NODE, localName.toUpperCase(), ownerDocument);
+			this.#localName = localName;
+			this.#namespaceURI = namespaceURI;
+		}
+		get assignedSlot() {
+			return this.#assignedSlot;
+		}
+		get attributes() {
+			return this.#attributes;
+		}
+		get childElementCount() {
+			let count = 0;
+			for (let n = this.firstChild; n; n = n.nextSibling) {
+				if (n instanceof Element) {
+					count++;
+				}
+			}
+			return count;
+		}
+		get children() {
+			return this.#children;
+		}
+		get classList() {
+			return this.#classList;
+		}
+		get className() {
+			return this.#classList.value;
+		}
+		set className(className: string) {
+			this.#classList.value = className;
+		}
+		get clientHeight() {
+			return 0;
+		}
+		get clientLeft() {
+			return 0;
+		}
+		get clientTop() {
+			return 0;
+		}
+		get clientWidth() {
+			return 0;
+		}
+		get firstElementChild(): Element | null {
+			for (let n = this.firstChild; n; n = n.nextSibling) {
+				if (n instanceof Element) {
+					return n;
+				}
+			}
+			return null;
+		}
+		get id() {
+			return this.#attributes.getNamedItem("id")?.value ?? "";
+		}
+		set id(id: string) {
+			this.setAttribute("id", id);
+		}
+		get innerHTML() {
+			// TODO
+			return "";
+		}
+		set innerHTML(_html: string) {
+			// TODO;
+		}
+		get lastElementChild(): Element | null {
+			for (let n = this.lastChild; n; n = n.previousSibling) {
+				if (n instanceof Element) {
+					return n;
+				}
+			}
+			return null;
+		}
+		get localName() {
+			return this.#localName;
+		}
+		get namespaceURI() {
+			return this.#namespaceURI;
+		}
+		get nextElementSibling(): Element | null {
+			for (let n = this.nextSibling; n; n = n.nextSibling) {
+				if (n instanceof Element) {
+					return n;
+				}
+			}
+			return null;
+		}
+		get outerHTML() {
+			// TODO
+			return "";
+		}
+		set outerHTML(_html: string) {
+			// TODO
+		}
+		get part() {
+			return this.#attributes.getNamedItem("part")?.value ?? "";
+		}
+		set part(part: string) {
+			this.setAttribute("part", part);
+		}
+		get prefix() {
+			// TODO
+			return null;
+		}
+		get previousElementSibling(): Element | null {
+			for (let n = this.previousSibling; n; n = n.previousSibling) {
+				if (n instanceof Element) {
+					return n;
+				}
+			}
+			return null;
+		}
+		get scrollHeight() {
+			return 0;
+		}
+		get scrollLeftMax() {
+			return 0;
+		}
+		get scrollTopMax() {
+			return 0;
+		}
+		get scrollWidth() {
+			return 0;
+		}
+		get shadowRoot() {
+			// TODO
+			return null;
+		}
+		get slot() {
+			// TODO
+			return "";
+		}
+		get tagName() {
+			return this.nodeName;
+		}
+		// TODO: Aria?
+		after(...nodes: Node[]) {
+			this.parentNode?.[after]("Element.after", this, ...nodes);
+		}
+		attachShadow(_init: ShadowRootInit) {
+			// TODO
+			return null as any as ShadowRoot;
+		}
+		animate(_keyframes: Keyframe[] | PropertyIndexedKeyframes | null, _options?: number | KeyframeAnimationOptions) {
+			// TODO
+			return null as any as Animation;
+		}
+		#append(fn: string, nodes: (Node | string)[]) {
+			for (const n of nodes) {
+				this[append](fn, n instanceof Node ? n : new Text(n));
+			}
+		}
+		append(...nodes: (Node | string)[]) {
+			this.#append("Element.append", nodes);
+		}
+		before(...nodes: Node[]) {
+			this.parentNode?.[before]("Element.before", this, ...nodes);
+		}
+		closest(_selectors: string) {
+			// TODO
+			return null;
+		}
+		getAnimations(_options?: GetAnimationsOptions) {
+			return [] as Animation[];
+		}
+		getAttribute(attributeName: string) {
+			return this.#attributes.getNamedItem(attributeName)?.value ?? null;
+		}
+		getAttributeNames() {
+			const names: string[] = [];
+			for (let i = 0; i < this.#attributes.length; i++) {
+				names.push(this.#attributes.item(i).name);
+			}
+			return names;
+		}
+		getAttributeNode(attributeName: string) {
+			return this.#attributes.getNamedItem(attributeName);
+		}
+		getAttributeNodeNS(namespace: string | null, localName: string) {
+			return this.#attributes.getNamedItemNS(namespace, localName);
+		}
+		getBoundingClientRect() {
+			return new DOMRect(0, 0, 0, 0);
+		}
+		getClientRects() {
+			return new DOMRectList();
+		}
+		getElementsByClassName(names: string) {
+			const nameArr = names.split(whitespace);
+			return new HTMLCollection(this, false, e => nameArr.every(c => e.classList.contains(c)));
+		}
+		getElementsByTagName(tagName: string) {
+			return new HTMLCollection(this, false, tagName === "*" ? undefined : e => e.tagName === tagName);
+		}
+		getElementsByTagNameNS(namespaceURI: string, localName: string) {
+			return new HTMLCollection(this, false, localName === "*" ? e => e.namespaceURI === namespaceURI : e => e.namespaceURI === namespaceURI && e.localName === localName );
+		}
+		hasAttribute(attributeName: string) {
+			return !!this.#attributes.getNamedItem(attributeName);
+		}
+		hasAttributeNS(namespace: string | null, localName: string) {
+			return !!this.#attributes.getNamedItemNS(namespace, localName);
+		}
+		hasAttributes() {
+			return !!this.#attributes.length;
+		}
+		hasPointerCapture() {
+			// TODO
+			return false;
+		}
+		#insertAdjacentNode(fn: string, position: string, element: Node) {
+			if (!(element instanceof Element)) {
+				throw TypeError(`${fn}: Argument 2 does not implement interface Element.`);
+			}
+			switch (position) {
+			case "beforebegin":
+				if (!this.parentNode) {
+					return null;
+				}
+				this.parentNode[before](fn, this, element);
+				break;
+			case "afterbegin":
+				const child = this.firstChild;
+				if (child) {
+					this[before](fn, child, element);
+				} else {
+					this.#append(fn, [element]);
+				}
+				break;
+			case "beforeend":
+				this.#append(fn, [element]);
+				break;
+			case "afterend":
+				if (!this.parentNode) {
+					return null;
+				}
+				this.parentNode[after](fn, this, element);
+				break;
+			default:
+				throw new DOMException("An invalid or illegal string was specified", DOMException.ERROR_NAMES[DOMException.SYNTAX_ERR]);
+			}
+			return element;
+		}
+		insertAdjacentElement(position: string, element: Element) {
+			this.#insertAdjacentNode("Element.insertAdjacentElement", position, element);
+		}
+		insertAdjacentHTML(_position: string, _text: string) {
+			// TODO
+		}
+		insertAdjacentText(position: string, text: string) {
+			this.#insertAdjacentNode("Element.insertAdjacentText", position, new Text(text));
+		}
+		matches(_selectors: string) {
+			// TODO
+			return false;
+		}
+		prepend(...nodes: Node[]) {
+			if (this.firstChild) {
+				this[before]("Element.prepend", this.firstChild, ...nodes);
+			} else {
+				this.#append("Element.prepend", nodes);
+			}
+		}
+		querySelector(_selectors: string) {
+			// TODO
+			return null;
+		}
+		querySelectorAll(_selectors: string) {
+			// TODO
+			return new NodeList([])
+		}
+		releasePointerCapture(_pointerID: number) {
+			// TODO
+		}
+		remove() {
+			this.parentNode?.removeChild(this);
+		}
+		removeAttribute(qualifiedName: string) {
+			this.#attributes.removeNamedItem(qualifiedName);
+		}
+		removeAttributeNode(attr: Attr) {
+			if (attr.ownerElement === this) {
+				this.#attributes.removeNamedItemNS(attr.namespaceURI, attr.localName);
+			}
+		}
+		removeAttributeNS(namespaceURI: string, localName: string) {
+			this.#attributes.removeNamedItemNS(namespaceURI, localName);
+		}
+		replaceChildren(...nodes: (Node | string)[]) {
+			while (this.firstChild) {
+				this.removeChild(this.firstChild);
+			}
+			this.#append("Element.replaceChildren", nodes);
+		}
+		replaceWith(node: Node | string, ...nodes: (Node | string)[]) {
+			this.parentNode?.[after]("Element.replaceWith", this, node, ...nodes);
+			this.parentNode?.removeChild(this);
+		}
+		requestFullScreen(_options?: FullscreenOptions) {
+			return Promise.reject();
+		}
+		requestPointerLock(_options?: {unadjustedMovement?: boolean}) {
+			return Promise.reject();
+		}
+		scroll(x: number, y: number): void;
+		scroll(options?: ScrollToOptions): void;
+		scroll(_xOrOptions?: number | ScrollToOptions, _y?: number) {
+		}
+		scrollBy(x: number, y: number): void;
+		scrollBy(options?: ScrollToOptions): void;
+		scrollBy(_xOrOptions?: number | ScrollToOptions, _y?: number) {
+		}
+		scrollIntoView(_arg?: boolean | ScrollIntoViewOptions) {
+		}
+		scrollTo(x: number, y: number): void;
+		scrollTo(options?: ScrollToOptions): void;
+		scrollTo(_xOrOptions?: number | ScrollToOptions, _y?: number) {
+		}
+		setAttribute(qualifiedName: string, value: string) {
+			const attr = this.#attributes.getNamedItem(qualifiedName);
+			if (attr) {
+				attr.value = value;
+			} else {
+				init = true;
+				this.#attributes.setNamedItem(new Attr(this.ownerDocument!, this, null, null, qualifiedName, value));
+				init = false;
+			}
+		}
+		setAttributeNode(attribute: Attr) {
+			this.#attributes.setNamedItem(attribute);
+		}
+		setAttributeNodeNS(attribute: Attr) {
+			this.#attributes.setNamedItemNS(attribute);
+		}
+		setAttributeNS(namespace: string | null, localName: string, value: string) {
+			const attr = this.#attributes.getNamedItemNS(namespace, localName);
+			if (attr) {
+				attr.value = value;
+			} else {
+				init = true;
+				this.#attributes.setNamedItem(new Attr(this.ownerDocument!, this, namespace, null, localName, value));
+				init = false;
+			}
+		}
+		setPointerCapture(_pointerId: number) {
+		}
+		toggleAttribute(name: string, force?: boolean) {
+			if (force === false || this.#attributes.getNamedItem(name)) {
+				this.#attributes.removeNamedItem(name);
+				return false;
+			}
+			init = true;
+			this.#attributes.setNamedItem(new Attr(this.ownerDocument!, this, null, null, name, ""));
+			init = false;
+			return true;
 		}
 	}
 
 	class HTMLElement extends Element {
-		constructor () {
+		constructor (localName: string) {
 			if (!init) { // check registry for valid Element type
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super("", document);
+			super("https://www.w3.org/1999/xhtml/", localName, document);
 		}
 	}
 
 	class SVGElement extends Element {
-		constructor () {
+		constructor (localName: string) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super("", document);
+			super("http://www.w3.org/2000/svg", localName, document);
 		}
 	}
 
 	class MathMLElement extends Element {
-		constructor () {
+		constructor (localName: string) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
-			super("", document);
+			super("http://www.w3.org/1998/Math/MathML", localName, document);
 		}
 	}
 
