@@ -37,6 +37,10 @@
 		has: (target: DOMStringMap, name: PropertyKey) => target[has](name),
 		get: (target: DOMStringMap, name: PropertyKey) => target[get](name),
 		set: (target: DOMStringMap, name: PropertyKey, value: any) => target[set](name, value)
+	      },
+	      namedNodeMapProxyObj = {
+		has: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+		get: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
 	      };
 
 	class DOMException extends Error {
@@ -702,11 +706,40 @@
 	}
 
 	class NamedNodeMap {
-		constructor () {
+		#element: Element;
+		constructor (element: Element) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
+			this.#element = element;
+			this.#element;
+			return new Proxy<NamedNodeMap>(this, namedNodeMapProxyObj);
 		}
+		get length() {
+			return 0;
+		}
+		getNamedItem(_qualifiedName: string) {
+			return null;
+		}
+		getNamedItemNS(_namespace: string | null, _localName: string) {
+			return null;
+		}
+		item(_index: number) {
+			return null
+		}
+		removeNamedItem(_qualifiedName: string) {
+			return null;
+		}
+		removeNamedItemNS(_namespace: string | null, _localName: string) {
+			return null;
+		}
+		setNamedItem(_attr: Attr) {
+			return null;
+		}
+		setNamedItemNS(_attr: Attr) {
+			return null;
+		}
+		[index: number]: Attr;
 	}
 
 	class Attr extends Node {
