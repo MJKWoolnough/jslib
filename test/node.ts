@@ -14,6 +14,7 @@
 	      has = Symbol("has"),
 	      get = Symbol("get"),
 	      set = Symbol("set"),
+	      whitespace = /\s+/,
 	      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
 		if (typeof name === "number") {
 			return fn(name);
@@ -490,7 +491,6 @@
 	}
 
 	class DOMTokenList {
-		static #whitespace = /\w/;
 		#tokens: string[] = [];
 		constructor () {
 			if (!init) {
@@ -507,7 +507,7 @@
 			if (!token) {
 				throw new DOMException(`DOMTokenList.${fn}: The empty string is not a valid token.`, DOMException.ERROR_NAMES[DOMException.SYNTAX_ERR]);
 			}
-			if (DOMTokenList.#whitespace.test(token)) {
+			if (whitespace.test(token)) {
 				throw new DOMException(`DOMTokenList.${fn}: The token can not contain whitespace.`, DOMException.ERROR_NAMES[DOMException.INVALID_CHARACTER_ERR]);
 			}
 			if (!this.contains(token)) {
