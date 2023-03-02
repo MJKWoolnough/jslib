@@ -11,6 +11,9 @@
 	      after = Symbol("after"),
 	      before = Symbol("before"),
 	      realTarget = Symbol("realTarget"),
+	      has = Symbol("has"),
+	      get = Symbol("get"),
+	      set = Symbol("set"),
 	      pIFn = <T>(name: PropertyKey, fn: (index: number) => T): T | undefined => {
 		if (typeof name === "number") {
 			return fn(name);
@@ -29,6 +32,11 @@
 	      nodeListProxyObj = {
 		has: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
 		get: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
+	      },
+	      domStringMapProxyObj = {
+		has: (target: DOMStringMap, name: PropertyKey) => target[has](name),
+		get: (target: DOMStringMap, name: PropertyKey) => target[get](name),
+		set: (target: DOMStringMap, name: PropertyKey, value: any) => target[set](name, value)
 	      };
 
 	class DOMException extends Error {
@@ -1000,10 +1008,23 @@
 	}
 
 	class DOMStringMap {
-		constructor () {
+		#element: Element;
+		constructor (element: Element) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
+			this.#element = element;
+			this.#element;
+			return new Proxy<DOMStringMap>(this, domStringMapProxyObj);
+		}
+		[has](_name: PropertyKey) {
+			return false;
+		}
+		[get](_name: PropertyKey) {
+			return null;
+		}
+		[set](_name: PropertyKey, _value: any) {
+			return true;
 		}
 	}
 
