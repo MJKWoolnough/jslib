@@ -43,11 +43,11 @@
 	      },
 	      htmlCollectionProxyObj = {
 		has: (target: HTMLCollection, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-		get: (target: HTMLCollection, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
+		get: (target: HTMLCollection, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
 	      },
 	      nodeListProxyObj = {
 		has: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-		get: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
+		get: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
 	      },
 	      domStringMapProxyObj = {
 		has: (target: DOMStringMap, name: PropertyKey) => target[has](name),
@@ -57,11 +57,11 @@
 	      },
 	      namedNodeMapProxyObj = {
 		has: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-		get: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
+		get: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
 	      },
 	      domRectListProxyObj = {
 		has: (target: DOMRectList, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-		get: (target: DOMRectList, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
+		get: (target: DOMRectList, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
 	      };
 
 	class DOMException extends Error {
@@ -141,7 +141,7 @@
 			"QuotaExceededError",
 			"TimeoutError",
 			"InvalidNodeTypeError",
-			"DataCloneError",
+			"DataCloneError"
 		]);
 		#code: number;
 		#message: string;
@@ -173,7 +173,7 @@
 		static readonly CDATA_SECTION_NODE = 4;
 		static readonly ENTITY_REFERENCE_NODE = 5;
 		static readonly ENTITY_NODE = 6;
-		static readonly PROCESSING_INSTRUCTION_NODE = 7
+		static readonly PROCESSING_INSTRUCTION_NODE = 7;
 		static readonly COMMENT_NODE = 8;
 		static readonly DOCUMENT_NODE = 9;
 		static readonly DOCUMENT_TYPE_NODE = 10;
@@ -191,7 +191,7 @@
 		readonly CDATA_SECTION_NODE = 4;
 		readonly ENTITY_REFERENCE_NODE = 5;
 		readonly ENTITY_NODE = 6;
-		readonly PROCESSING_INSTRUCTION_NODE = 7
+		readonly PROCESSING_INSTRUCTION_NODE = 7;
 		readonly COMMENT_NODE = 8;
 		readonly DOCUMENT_NODE = 9;
 		readonly DOCUMENT_TYPE_NODE = 10;
@@ -1871,7 +1871,7 @@
 		static readonly SHOW_DOCUMENT = 256;
 		static readonly SHOW_DOCUMENT_TYPE = 512;
 		static readonly SHOW_DOCUMENT_FRAGMENT = 1024;
-		static readonly SHOW_NOTATION = 2048
+		static readonly SHOW_NOTATION = 2048;
 
 		static readonly FILTER_ACCEPT = 1;
 		static readonly FILTER_REJECT = 2;
@@ -2067,7 +2067,7 @@
 		["customElements", new CustomElementRegistry()],
 		["document", document],
 		["history", new History()],
-		["window", new Window()],
+		["window", new Window()]
 	]) {
 		Object.assign(globalThis, name, val);
 	}
