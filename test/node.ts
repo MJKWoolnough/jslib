@@ -41,6 +41,10 @@
 	      namedNodeMapProxyObj = {
 		has: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
 		get: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
+	      },
+	      domRectListProxyObj = {
+		has: (target: DOMRectList, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+		get: (target: DOMRectList, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name],
 	      };
 
 	class DOMException extends Error {
@@ -1095,6 +1099,21 @@
 		}
 	}
 
+	class DOMRectList {
+		#rects: DOMRect[];
+		constructor(...rects: DOMRect[]) {
+			this.#rects = rects;
+			return new Proxy<DOMRectList>(this, domRectListProxyObj);
+		}
+		get length() {
+			return this.#rects.length;
+		}
+		item(index: number) {
+			return this.#rects[index] ?? null;
+		}
+		[index: number]: DOMRect;
+	}
+
 	class Location {
 		protocol = "local:";
 		hostname = "" ;
@@ -1568,6 +1587,7 @@
 		["MathMLElement", MathMLElement],
 		["DOMStringMap", DOMStringMap],
 		["DOMRect", DOMRect],
+		["DOMRectList", DOMRectList],
 		["Location", Location],
 		["Storage", Storage],
 		["Window", Window],
