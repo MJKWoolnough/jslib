@@ -1985,6 +1985,20 @@
 		}
 	}
 
+	class CSSMediaRule extends CSSRule {
+		#media: MediaList;
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, media: MediaList) {
+			super(parentRule, parentStyleSheet, cssText);
+			this.#media = media;
+		}
+		get media() {
+			return this.#media;
+		}
+		get type() {
+			return CSSRule.MEDIA_RULE;
+		}
+	}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2279,6 +2293,7 @@
 		["CSSRule", CSSRule],
 		["CSSStyleRule", CSSStyleRule],
 		["CSSImportRule", CSSImportRule],
+		["CSSMediaRule", CSSMediaRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
