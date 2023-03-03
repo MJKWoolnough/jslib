@@ -1999,6 +1999,20 @@
 		}
 	}
 
+	class CSSFontFaceRule extends CSSRule {
+		#style: CSSStyleDeclaration;
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, style: CSSStyleDeclaration){
+			super(parentRule, parentStyleSheet, cssText);
+			this.#style = style;
+		}
+		get style() {
+			return this.#style;
+		}
+		get type() {
+			return CSSRule.FONT_FACE_RULE;
+		}
+	}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2294,6 +2308,7 @@
 		["CSSStyleRule", CSSStyleRule],
 		["CSSImportRule", CSSImportRule],
 		["CSSMediaRule", CSSMediaRule],
+		["CSSFontFaceRule", CSSFontFaceRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
