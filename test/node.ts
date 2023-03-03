@@ -45,12 +45,12 @@
 		has: (target: U, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
 		get: (target: U, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
 	      }),
-	      domStringMapProxyObj = {
-		has: (target: DOMStringMap, name: PropertyKey) => target[has](name),
-		get: (target: DOMStringMap, name: PropertyKey) => target[get](name),
-		set: (target: DOMStringMap, name: PropertyKey, value: any) => target[set](name, value),
-		deleteProperty: (target: DOMStringMap, name: PropertyKey) => target[remove](name)
-	      };
+	      keyedProxy = <T, U extends {[has](name: PropertyKey): boolean; [get](name: PropertyKey): T; [set](name: PropertyKey, value: unknown): boolean, [remove](name: PropertyKey): boolean}>(target: U) => new Proxy<U>(target, {
+		has: (target: U, name: PropertyKey) => target[has](name),
+		get: (target: U, name: PropertyKey) => target[get](name),
+		set: (target: U, name: PropertyKey, value: unknown) => target[set](name, value),
+		deleteProperty: (target: U, name: PropertyKey) => target[remove](name)
+	      });
 
 	class DOMException extends Error {
 		static readonly INDEX_SIZE_ERR = 1;
@@ -637,7 +637,7 @@
 	}
 
 	class CSSStyleDeclaration {
-		constructor () {
+		constructor() {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
@@ -1486,7 +1486,7 @@
 			}
 			this.#element = element;
 			this.#element;
-			return new Proxy<DOMStringMap>(this, domStringMapProxyObj);
+			return keyedProxy(this);
 		}
 		[has](name: PropertyKey) {
 			return typeof name === "string" ? this.#element.hasAttribute("data-" + camelToKebab(name)) : false;
@@ -1494,9 +1494,9 @@
 		[get](name: PropertyKey) {
 			return typeof name === "string" ? this.#element.getAttribute("data-" + camelToKebab(name)) : null;
 		}
-		[set](name: PropertyKey, value: any) {
+		[set](name: PropertyKey, value: unknown) {
 			if (typeof name === "string") {
-				this.#element.setAttribute("data-" + camelToKebab(name), value);
+				this.#element.setAttribute("data-" + camelToKebab(name), value + "");
 			}
 			return true;
 		}
