@@ -1744,6 +1744,40 @@
 		}
 	}
 
+	class MediaList {
+		#media: string[];
+		constructor (media: string[]) {
+			if (!init) {
+				throw new TypeError(ILLEGAL_CONSTRUCTOR);
+			}
+			this.#media = media.map(t => t.trim());
+			return indexedProxy(this);
+		}
+		get length() {
+			return this.#media.length;
+		}
+		get mediaText() {
+			return this.#media.join(", ");
+		}
+		set mediaText(media: string | null) {
+			this.#media.splice(0, this.#media.length, ...(media ?? "").split(",").map(t => t.trim()));
+		}
+		appendMedium(medium: string) {
+			if (!this.#media.includes(medium)) {
+				this.#media.push(medium.trim());
+			}
+		}
+		deleteMedium(medium: string) {
+			const index = this.#media.indexOf(medium);
+			if (index !== -1) {
+				this.#media.splice(index, 1);
+			}
+		}
+		item(index: number) {
+			return this.#media[index] ?? null;
+		}
+	}
+
 	class StyleSheet {
 		constructor () {
 			if (!init) {
