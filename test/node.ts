@@ -1779,10 +1779,42 @@
 	}
 
 	class StyleSheet {
-		constructor () {
+		#href: string | null;
+		#media: MediaList;
+		#ownerNode: Element | ProcessingInstruction | null;
+		#parentStyleSheet: CSSStyleSheet | null;
+		#title: string | null;
+		#type: string;
+		disabled: boolean;
+		constructor (type: string, title: string | null, href: string | null, ownerNode: Element | ProcessingInstruction | null, parentStyleSheet: CSSStyleSheet | null, media: MediaList, disabled: boolean) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
+			this.#href = href;
+			this.#media = media;
+			this.#ownerNode = ownerNode;
+			this.#parentStyleSheet = parentStyleSheet;
+			this.#title = title;
+			this.#type = type;
+			this.disabled = disabled;
+		}
+		get href() {
+			return this.#href;
+		}
+		get media() {
+			return this.#media;
+		}
+		get ownerNode() {
+			return this.#ownerNode;
+		}
+		get parentStyleSheet() {
+			return this.#parentStyleSheet;
+		}
+		get title() {
+			return this.#title;
+		}
+		get type() {
+			return this.#type;
 		}
 	}
 
