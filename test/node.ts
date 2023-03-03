@@ -1938,6 +1938,24 @@
 		}
 	}
 
+	class CSSStyleRule extends CSSRule {
+		#selector: string;
+		#style = new CSSStyleDeclaration();
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, selector: string) {
+			super(parentRule, parentStyleSheet, cssText);
+			this.#selector = selector;
+		}
+		get selector() {
+			return this.#selector;
+		}
+		get style() {
+			return this.#style;
+		}
+		get type() {
+			return CSSRule.STYLE_RULE;
+		}
+	}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2230,6 +2248,7 @@
 		["MediaList", MediaList],
 		["StyleSheet", StyleSheet],
 		["CSSRule", CSSRule],
+		["CSSStyleRule", CSSStyleRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
