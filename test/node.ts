@@ -1818,6 +1818,67 @@
 		}
 	}
 
+	class CSSRule {
+		static readonly UNKNOWN_RULE = 0;
+		static readonly STYLE_RULE = 1;
+		static readonly CHARSET_RULE = 2;
+		static readonly IMPORT_RULE = 3;
+		static readonly MEDIA_RULE = 4;
+		static readonly FONT_FACE_RULE = 5;
+		static readonly PAGE_RULE = 6;
+		static readonly KEYFRAMES_RULE = 7;
+		static readonly KEYFRAME_RULE = 8;
+		static readonly MARGIN_RULE = 9;
+		static readonly NAMESPACE_RULE = 10;
+		static readonly COUNTER_STYLE_RULE = 11;
+		static readonly SUPPORTS_RULE = 12;
+		static readonly DOCUMENT_RULE = 13;
+		static readonly FONT_FEATURE_VALUES_RULE = 14;
+		static readonly VIEWPORT_RULE = 15;
+		static readonly REGION_STYLE_RULE = 16;
+		readonly UNKNOWN_RULE = 0;
+		readonly STYLE_RULE = 1;
+		readonly CHARSET_RULE = 2;
+		readonly IMPORT_RULE = 3;
+		readonly MEDIA_RULE = 4;
+		readonly FONT_FACE_RULE = 5;
+		readonly PAGE_RULE = 6;
+		readonly KEYFRAMES_RULE = 7;
+		readonly KEYFRAME_RULE = 8;
+		readonly MARGIN_RULE = 9;
+		readonly NAMESPACE_RULE = 10;
+		readonly COUNTER_STYLE_RULE = 11;
+		readonly SUPPORTS_RULE = 12;
+		readonly DOCUMENT_RULE = 13;
+		readonly FONT_FEATURE_VALUES_RULE = 14;
+		readonly VIEWPORT_RULE = 15;
+		readonly REGION_STYLE_RULE = 16;
+		#cssText: string;
+		#parentRule: CSSRule | null;
+		#parentStyleSheet: CSSStyleSheet | null;
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string) {
+			if (!init) {
+				throw new TypeError(ILLEGAL_CONSTRUCTOR);
+			}
+			this.#cssText = cssText;
+			this.#parentRule = parentRule;
+			this.#parentStyleSheet = parentStyleSheet;
+		}
+		get cssText() {
+			return this.#cssText;
+		}
+		set cssText(_text: string) {}
+		get type() {
+			return CSSRule.UNKNOWN_RULE;
+		}
+		get parentRule() {
+			return this.#parentRule;
+		}
+		get parentStyleSheet() {
+			return this.#parentStyleSheet;
+		}
+	}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2109,6 +2170,7 @@
 		["PopStateEvent", PopStateEvent],
 		["MediaList", MediaList],
 		["StyleSheet", StyleSheet],
+		["CSSRule", CSSRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
