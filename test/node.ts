@@ -41,27 +41,15 @@
 		}
 		return undefined;
 	      },
-	      htmlCollectionProxyObj = {
-		has: (target: HTMLCollection, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-		get: (target: HTMLCollection, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
-	      },
-	      nodeListProxyObj = {
-		has: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-		get: <T extends Node>(target: NodeList<T>, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
-	      },
+	      indexedProxy = <T, U extends {length: number; item(index: number): T}>(target: U) => new Proxy<U>(target, {
+		has: (target: U, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+		get: (target: U, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
+	      }),
 	      domStringMapProxyObj = {
 		has: (target: DOMStringMap, name: PropertyKey) => target[has](name),
 		get: (target: DOMStringMap, name: PropertyKey) => target[get](name),
 		set: (target: DOMStringMap, name: PropertyKey, value: any) => target[set](name, value),
 		deleteProperty: (target: DOMStringMap, name: PropertyKey) => target[remove](name)
-	      },
-	      namedNodeMapProxyObj = {
-		has: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-		get: (target: NamedNodeMap, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
-	      },
-	      domRectListProxyObj = {
-		has: (target: DOMRectList, name: PropertyKey) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
-		get: (target: DOMRectList, name: PropertyKey) => pIFn(name, index => target.item(index)) || (target as any)[name]
 	      };
 
 	class DOMException extends Error {
@@ -607,7 +595,7 @@
 			this.#onlyDirect = onlyDirect;
 			this.#filter = filter;
 			this[realTarget] = this;
-			return new Proxy<HTMLCollection>(this, htmlCollectionProxyObj);
+			return indexedProxy(this);
 		}
 		*#entries() {
 			let n = this.#nodes.firstChild;
@@ -665,7 +653,7 @@
 			}
 			this.#nodes = nodes;
 			this[realTarget] = this;
-			return new Proxy<NodeList<TNode>>(this, nodeListProxyObj);
+			return indexedProxy(this);
 		}
 		get length() {
 			if (this[realTarget].#nodes instanceof Node) {
@@ -736,7 +724,7 @@
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#element = element;
-			return new Proxy<NamedNodeMap>(this, namedNodeMapProxyObj);
+			return indexedProxy(this);
 		}
 		get length() {
 			return 0;
@@ -1558,7 +1546,7 @@
 		#rects: DOMRect[];
 		constructor(...rects: DOMRect[]) {
 			this.#rects = rects;
-			return new Proxy<DOMRectList>(this, domRectListProxyObj);
+			return indexedProxy(this);
 		}
 		get length() {
 			return this.#rects.length;
@@ -1766,8 +1754,6 @@
 
 	class CSSStyleSheet extends StyleSheet {
 	}
-
-
 
 	class MutationObserver {
 	}
@@ -2055,6 +2041,7 @@
 		["MouseEvent", MouseEvent],
 		["KeyboardEvent", KeyboardEvent],
 		["PopStateEvent", PopStateEvent],
+		["MediaList", MediaList],
 		["StyleSheet", StyleSheet],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
