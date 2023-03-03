@@ -1956,6 +1956,35 @@
 		}
 	}
 
+	class CSSImportRule extends CSSRule {
+		#href: string;
+		#layerName: string | null;
+		#media: MediaList;
+		#stylesheet: CSSStyleSheet;
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, href: string, layerName: string | null, media: MediaList, stylesheet: CSSStyleSheet) {
+			super(parentRule, parentStyleSheet, cssText);
+			this.#href = href;
+			this.#layerName = layerName;
+			this.#media = media;
+			this.#stylesheet = stylesheet;
+		}
+		get href() {
+			return this.#href;
+		}
+		get layerName() {
+			return this.#layerName;
+		}
+		get media() {
+			return this.#media;
+		}
+		get stylesheet() {
+			return this.#stylesheet;
+		}
+		get type() {
+			return CSSRule.IMPORT_RULE;
+		}
+	}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2249,6 +2278,7 @@
 		["StyleSheet", StyleSheet],
 		["CSSRule", CSSRule],
 		["CSSStyleRule", CSSStyleRule],
+		["CSSImportRule", CSSImportRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
