@@ -1946,6 +1946,23 @@
 		}
 	}
 
+	class  CSSRuleList {
+		#items: CSSRule[];
+		[realTarget]: this;
+		constructor(items: CSSRule[]) {
+			this.#items = items;
+			this[realTarget] = this;
+			return indexedProxy(this);
+		}
+		get length() {
+			return this[realTarget].#items.length;
+		}
+		item(index: number) {
+			return this[realTarget].#items[index] ?? null;
+		}
+		[index: number]: CSSRule;
+	}
+
 	class CSSStyleRule extends CSSRule {
 		#selectorText: string;
 		#style = new CSSStyleDeclaration();
@@ -2042,7 +2059,7 @@
 	class CSSNamespaceRule extends CSSRule {
 		#namespaceURI: string;
 		#prefix: string;
-		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, namespaceURI: string, prefix: string;){
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, namespaceURI: string, prefix: string){
 			super(parentRule, parentStyleSheet, cssText);
 			this.#namespaceURI = namespaceURI;
 			this.#prefix = prefix;
@@ -2350,6 +2367,7 @@
 		["MediaList", MediaList],
 		["StyleSheet", StyleSheet],
 		["CSSRule", CSSRule],
+		["CSSRuleList", CSSRuleList],
 		["CSSStyleRule", CSSStyleRule],
 		["CSSImportRule", CSSImportRule],
 		["CSSMediaRule", CSSMediaRule],
