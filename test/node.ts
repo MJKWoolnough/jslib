@@ -2039,6 +2039,25 @@
 		}
 	}
 
+	class CSSNamespaceRule extends CSSRule {
+		#namespaceURI: string;
+		#prefix: string;
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, namespaceURI: string, prefix: string;){
+			super(parentRule, parentStyleSheet, cssText);
+			this.#namespaceURI = namespaceURI;
+			this.#prefix = prefix;
+		}
+		get namespaceURI() {
+			return this.#namespaceURI;
+		}
+		get prefix() {
+			return this.#prefix;
+		}
+		get type() {
+			return CSSRule.NAMESPACE_RULE;
+		}
+	}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2336,6 +2355,7 @@
 		["CSSMediaRule", CSSMediaRule],
 		["CSSFontFaceRule", CSSFontFaceRule],
 		["CSSPageRule", CSSPageRule],
+		["CSSNamespaceRule", CSSNamespaceRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
