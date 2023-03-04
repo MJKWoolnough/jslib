@@ -2075,6 +2075,21 @@
 		}
 	}
 
+	class CSSKeyframeRule extends CSSRule {
+		#style: CSSStyleDeclaration;
+		keyText = "";
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, style: CSSStyleDeclaration){
+			super(parentRule, parentStyleSheet, cssText);
+			this.#style = style;
+		}
+		get style() {
+			return this.#style;
+		}
+		get type() {
+			return CSSRule.KEYFRAME_RULE;
+		}
+	}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2374,6 +2389,7 @@
 		["CSSFontFaceRule", CSSFontFaceRule],
 		["CSSPageRule", CSSPageRule],
 		["CSSNamespaceRule", CSSNamespaceRule],
+		["CSSKeyframeRule", CSSKeyframeRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
