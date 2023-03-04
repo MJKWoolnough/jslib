@@ -2075,6 +2075,43 @@
 		}
 	}
 
+	class CSSKeyframesRule extends CSSRule {
+		#rules: CSSKeyframeRule[];
+		#cssRules: CSSRuleList;
+		name = "";
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string){
+			super(parentRule, parentStyleSheet, cssText);
+			this.#cssRules = new CSSRuleList(this.#rules = []);
+		}
+		get cssRules() {
+			return this.#cssRules;
+		}
+		appendRule(_rule: string) {
+			// TODO
+		}
+		deleteRule(select: string) {
+			let pos = 0;
+			for (const rule of this.#rules) {
+				if (rule.keyText === select) {
+					this.#rules.splice(pos, 1);
+					return;
+				}
+				pos++;
+			}
+		}
+		findRule(select: string) {
+			for (const rule of this.#rules) {
+				if (rule.keyText === select) {
+					return rule;
+				}
+			}
+			return null;
+		}
+		get type() {
+			return CSSRule.KEYFRAMES_RULE;
+		}
+	}
+
 	class CSSKeyframeRule extends CSSRule {
 		#style: CSSStyleDeclaration;
 		keyText = "";
@@ -2389,6 +2426,7 @@
 		["CSSFontFaceRule", CSSFontFaceRule],
 		["CSSPageRule", CSSPageRule],
 		["CSSNamespaceRule", CSSNamespaceRule],
+		["CSSKeyframesRule", CSSKeyframesRule],
 		["CSSKeyframeRule", CSSKeyframeRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
