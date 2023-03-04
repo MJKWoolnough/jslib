@@ -1946,7 +1946,7 @@
 		}
 	}
 
-	class  CSSRuleList {
+	class CSSRuleList {
 		#items: CSSRule[];
 		[realTarget]: this;
 		constructor(items: CSSRule[]) {
