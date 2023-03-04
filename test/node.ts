@@ -778,18 +778,20 @@
 	class NamedNodeMap {
 		#element: Element;
 		#items: Attr[] = [];
+		[realTarget]: this;
 		constructor (element: Element) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#element = element;
+			this[realTarget] = this;
 			return indexedProxy(this);
 		}
 		get length() {
 			return 0;
 		}
 		getNamedItem(qualifiedName: string) {
-			for (const item of this.#items) {
+			for (const item of this[realTarget].#items) {
 				if (item.name === qualifiedName && item.namespaceURI === null) {
 					return item;
 				}
@@ -797,7 +799,7 @@
 			return null;
 		}
 		getNamedItemNS(namespace: string | null, localName: string) {
-			for (const item of this.#items) {
+			for (const item of this[realTarget].#items) {
 				if (item.name === localName && item.namespaceURI === namespace) {
 					return item;
 				}
@@ -805,15 +807,15 @@
 			return null;
 		}
 		item(index: number) {
-			return this.#items[index] ?? null;
+			return this[realTarget].#items[index] ?? null;
 		}
 		removeNamedItem(qualifiedName: string) {
 			let pos = 0;
 			for (const item of this.#items) {
 				if (item.name === qualifiedName && item.namespaceURI === null) {
-					this.#items.splice(pos, 1);
+					this[realTarget].#items.splice(pos, 1);
 					item[setElement](null);
-					this.#element[attrChanged](item.name, null);
+					this[realTarget].#element[attrChanged](item.name, null);
 					return item;
 				}
 				pos++;
@@ -822,11 +824,11 @@
 		}
 		removeNamedItemNS(namespace: string | null, localName: string) {
 			let pos = 0;
-			for (const item of this.#items) {
+			for (const item of this[realTarget].#items) {
 				if (item.name === localName && item.namespaceURI === namespace) {
-					this.#items.splice(pos, 1);
+					this[realTarget].#items.splice(pos, 1);
 					item[setElement](null);
-					this.#element[attrChanged](item.name, null);
+					this[realTarget].#element[attrChanged](item.name, null);
 					return item;
 				}
 				pos++;
@@ -835,32 +837,32 @@
 		}
 		setNamedItem(attr: Attr) {
 			let pos = 0;
-			attr[setElement](this.#element);
-			for (const item of this.#items) {
+			attr[setElement](this[realTarget].#element);
+			for (const item of this[realTarget].#items) {
 				if (item.name === attr.name && item.namespaceURI === null) {
-					this.#items.splice(pos, 1, attr);
-					this.#element[attrChanged](attr.name, attr);
+					this[realTarget].#items.splice(pos, 1, attr);
+					this[realTarget].#element[attrChanged](attr.name, attr);
 					return item;
 				}
 				pos++;
 			}
-			this.#items.push(attr);
-			this.#element[attrChanged](attr.name, attr);
+			this[realTarget].#items.push(attr);
+			this[realTarget].#element[attrChanged](attr.name, attr);
 			return null;
 		}
 		setNamedItemNS(attr: Attr) {
 			let pos = 0;
-			attr[setElement](this.#element);
-			for (const item of this.#items) {
+			attr[setElement](this[realTarget].#element);
+			for (const item of this[realTarget].#items) {
 				if (item.name === attr.name && item.namespaceURI === attr.namespaceURI) {
-					this.#items.splice(pos, 1, attr);
-					this.#element[attrChanged](attr.name, attr);
+					this[realTarget].#items.splice(pos, 1, attr);
+					this[realTarget].#element[attrChanged](attr.name, attr);
 					return item;
 				}
 				pos++;
 			}
-			this.#items.push(attr);
-			this.#element[attrChanged](attr.name, attr);
+			this[realTarget].#items.push(attr);
+			this[realTarget].#element[attrChanged](attr.name, attr);
 			return null;
 		}
 		[index: number]: Attr;
@@ -1539,29 +1541,31 @@
 
 	class DOMStringMap {
 		#element: Element;
+		[realTarget]: this;
 		constructor (element: Element) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#element = element;
 			this.#element;
+			this[realTarget] = this;
 			return keyedProxy(this);
 		}
 		[has](name: PropertyKey) {
-			return typeof name === "string" ? this.#element.hasAttribute("data-" + camelToKebab(name)) : false;
+			return typeof name === "string" ? this[realTarget].#element.hasAttribute("data-" + camelToKebab(name)) : false;
 		}
 		[get](name: PropertyKey) {
-			return typeof name === "string" ? this.#element.getAttribute("data-" + camelToKebab(name)) : null;
+			return typeof name === "string" ? this[realTarget].#element.getAttribute("data-" + camelToKebab(name)) : null;
 		}
 		[set](name: PropertyKey, value: unknown) {
 			if (typeof name === "string") {
-				this.#element.setAttribute("data-" + camelToKebab(name), value + "");
+				this[realTarget].#element.setAttribute("data-" + camelToKebab(name), value + "");
 			}
 			return true;
 		}
 		[remove](name: PropertyKey) {
 			if (typeof name === "string") {
-				this.#element.removeAttribute("data-" + camelToKebab(name));
+				this[realTarget].#element.removeAttribute("data-" + camelToKebab(name));
 			}
 			return true;
 		}
@@ -1603,15 +1607,17 @@
 
 	class DOMRectList {
 		#rects: DOMRect[];
+		[realTarget]: this;
 		constructor(...rects: DOMRect[]) {
 			this.#rects = rects;
+			this[realTarget] = this;
 			return indexedProxy(this);
 		}
 		get length() {
-			return this.#rects.length;
+			return this[realTarget].#rects.length;
 		}
 		item(index: number) {
-			return this.#rects[index] ?? null;
+			return this[realTarget].#rects[index] ?? null;
 		}
 		[index: number]: DOMRect;
 	}
@@ -1805,35 +1811,37 @@
 
 	class MediaList {
 		#media: string[];
+		[realTarget]: this;
 		constructor (media: string[]) {
 			if (!init) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#media = media.map(t => t.trim());
+			this[realTarget] = this;
 			return indexedProxy(this);
 		}
 		get length() {
-			return this.#media.length;
+			return this[realTarget].#media.length;
 		}
 		get mediaText() {
-			return this.#media.join(", ");
+			return this[realTarget].#media.join(", ");
 		}
 		set mediaText(media: string | null) {
-			this.#media.splice(0, this.#media.length, ...(media ?? "").split(",").map(t => t.trim()));
+			this[realTarget].#media.splice(0, this[realTarget].#media.length, ...(media ?? "").split(",").map(t => t.trim()));
 		}
 		appendMedium(medium: string) {
-			if (!this.#media.includes(medium)) {
-				this.#media.push(medium.trim());
+			if (!this[realTarget].#media.includes(medium)) {
+				this[realTarget].#media.push(medium.trim());
 			}
 		}
 		deleteMedium(medium: string) {
-			const index = this.#media.indexOf(medium);
+			const index = this[realTarget].#media.indexOf(medium);
 			if (index !== -1) {
-				this.#media.splice(index, 1);
+				this[realTarget].#media.splice(index, 1);
 			}
 		}
 		item(index: number) {
-			return this.#media[index] ?? null;
+			return this[realTarget].#media[index] ?? null;
 		}
 	}
 
