@@ -2144,6 +2144,8 @@
 		}
 	}
 
+	class CSSSupportsRule extends CSSRule {}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2446,6 +2448,7 @@
 		["CSSKeyframesRule", CSSKeyframesRule],
 		["CSSKeyframeRule", CSSKeyframeRule],
 		["CSSCounterStyleRule", CSSCounterStyleRule],
+		["CSSSupportsRule", CSSSupportsRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
