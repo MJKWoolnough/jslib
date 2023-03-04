@@ -1947,14 +1947,14 @@
 	}
 
 	class CSSStyleRule extends CSSRule {
-		#selector: string;
+		#selectorText: string;
 		#style = new CSSStyleDeclaration();
-		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, selector: string) {
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, selectorText: string) {
 			super(parentRule, parentStyleSheet, cssText);
-			this.#selector = selector;
+			this.#selectorText = selectorText;
 		}
-		get selector() {
-			return this.#selector;
+		get selectorText() {
+			return this.#selectorText;
 		}
 		get style() {
 			return this.#style;
