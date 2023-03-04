@@ -2021,6 +2021,24 @@
 		}
 	}
 
+	class CSSPageRule extends CSSRule {
+		#selectorText: string;
+		#style = new CSSStyleDeclaration();
+		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string, selectorText: string) {
+			super(parentRule, parentStyleSheet, cssText);
+			this.#selectorText = selectorText;
+		}
+		get selectorText() {
+			return this.#selectorText;
+		}
+		get style() {
+			return this.#style;
+		}
+		get type() {
+			return CSSRule.PAGE_RULE;
+		}
+	}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2317,6 +2335,7 @@
 		["CSSImportRule", CSSImportRule],
 		["CSSMediaRule", CSSMediaRule],
 		["CSSFontFaceRule", CSSFontFaceRule],
+		["CSSPageRule", CSSPageRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
