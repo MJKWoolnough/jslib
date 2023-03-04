@@ -2127,6 +2127,23 @@
 		}
 	}
 
+	class CSSCounterStyleRule extends CSSRule {
+		additiveSymbols = "";
+		fallback = "";
+		name = "";
+		negative = "";
+		pad = "";
+		prefix = "";
+		range = "";
+		speakAs = "";
+		suffix = "";
+		symbols = "";
+		system = "";
+		get type() {
+			return CSSRule.COUNTER_STYLE_RULE;
+		}
+	}
+
 	class CSSStyleSheet extends StyleSheet {
 	}
 
@@ -2428,6 +2445,7 @@
 		["CSSNamespaceRule", CSSNamespaceRule],
 		["CSSKeyframesRule", CSSKeyframesRule],
 		["CSSKeyframeRule", CSSKeyframeRule],
+		["CSSCounterStyleRule", CSSCounterStyleRule],
 		["CSSStyleSheet", CSSStyleSheet],
 		["MutationObserver", MutationObserver],
 		["MutationEvent", MutationEvent],
