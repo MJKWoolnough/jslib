@@ -2147,6 +2147,37 @@
 	class CSSSupportsRule extends CSSRule {}
 
 	class CSSStyleSheet extends StyleSheet {
+		#rules: CSSRule[] = [];
+		#cssRules = new CSSRuleList(this.#rules);
+		#ownerRule: CSSRule | null = null;
+		constructor(options?: CSSStyleSheetInit) {
+			init = true;
+			super("text/css", null, options?.baseURL ?? null, null, null, options?.media instanceof MediaList ? options.media : new MediaList(typeof options?.media === "string" ? [options.media] : []), options?.disabled ?? false);
+			init = false;
+		}
+		get cssRules() {
+			return this.#cssRules;
+		}
+		get ownerRule() {
+			return this.#ownerRule;
+		}
+		deleteRule(index: number) {
+			this.#rules.splice(index, 1);
+		}
+		insertRule(_rule: string, index = 0) {
+			// TODO
+			const r: CSSRule = null as any as CSSRule;
+			this.#rules.splice(index, 0, r);
+		}
+		replace(text: string) {
+			return new Promise<this>(sFn => {
+				this.replaceSync(text);
+				sFn(this);
+			});
+		}
+		replaceSync(_text: string) {
+			// TODO
+		}
 	}
 
 	class MutationObserver {
