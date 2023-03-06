@@ -204,7 +204,7 @@
 		#childrenNodeList = new NodeList<Node>(this);
 		#connected = false;
 		constructor(type: number, name: string, ownerDocument: Document | null) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super();
@@ -396,9 +396,9 @@
 			return this[append]("appendChild", node);
 		}
 		cloneNode(deep?: boolean) {
-			init = true;
+			initAdd();
 			const cn = new (this.constructor as {new(): Node});
-			init = false;
+			initDel();
 			if (deep) {
 				for (let n = this.#firstChild; n; n = n.#nextSibling) {
 					cn.appendChild(n.cloneNode(true));
@@ -498,7 +498,7 @@
 	class DOMTokenList {
 		#tokens: string[] = [];
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 		}
@@ -589,7 +589,7 @@
 		#filter?: (e: Element) => boolean;
 		[realTarget]: this;
 		constructor (nodes: Node, onlyDirect: boolean, filter?: (e: Element) => boolean) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#nodes = nodes;
@@ -642,7 +642,7 @@
 		#readOnly: boolean;
 		[realTarget]: this;
 		constructor (initial = new Map<string, [string, boolean]>(), readonly = false) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#data = initial;
@@ -707,7 +707,7 @@
 		#nodes: Node | TNode[];
 		[realTarget]: this;
 		constructor (nodes: Node | TNode[]) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#nodes = nodes;
@@ -780,7 +780,7 @@
 		#items: Attr[] = [];
 		[realTarget]: this;
 		constructor (element: Element) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#element = element;
@@ -875,7 +875,7 @@
 		#prefix: string | null;
 		value: string;
 		constructor (ownerDocument: Document, ownerElement: Element | null, namespaceURI: string | null, prefix: string | null, name: string, value: string) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super(Node.ATTRIBUTE_NODE, name, ownerDocument);
@@ -925,7 +925,7 @@
 	class CharacterData extends Node {
 		data: string;
 		constructor (nodeType: number, nodeName: string, ownerDocument: Document, data: string) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super(nodeType, nodeName, ownerDocument);
@@ -985,11 +985,11 @@
 
 	class Text extends CharacterData {
 		constructor(text: string, type?: number) {
-			const t = init && type ? type : Node.TEXT_NODE,
+			const t = isInit() && type ? type : Node.TEXT_NODE,
 			      name = t === Node.TEXT_NODE ? "#text" : "#comment";
-			init = true;
+			initAdd();
 			super(t, name, document, text);
-			init = false;
+			initDel();
 		}
 		get assignedSlot() {
 			return null;
@@ -1010,7 +1010,7 @@
 
 	class CDATASection extends Text {
 		constructor(text: string) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super(text, Node.CDATA_SECTION_NODE);
@@ -1022,9 +1022,9 @@
 
 	class Comment extends CharacterData {
 		constructor(text: string) {
-			init = true;
+			initAdd();
 			super(Node.COMMENT_NODE, "#comment", document, text);
-			init = false;
+			initDel();
 		}
 		cloneNode(_deep?: boolean) {
 			return new Comment(this.data);
@@ -1070,9 +1070,9 @@
 			return count;
 		}
 		get children() {
-			init = true;
+			initAdd();
 			const hc = new HTMLCollection(this, true);
-			init = false;
+			initDel();
 			return hc;
 		}
 		get firstElementChild() {
@@ -1128,7 +1128,7 @@
 
 	class ShadowRoot extends DocumentFragment {
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super();
@@ -1145,7 +1145,7 @@
 		scrollLeft = 0;
 		scrollTop = 0;
 		constructor (namespaceURI: string, localName: string, ownerDocument: Document) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super(Node.ELEMENT_NODE, localName.toUpperCase(), ownerDocument);
@@ -1477,9 +1477,9 @@
 			if (attr) {
 				attr.value = value;
 			} else {
-				init = true;
+				initAdd();
 				this.#attributes.setNamedItem(new Attr(this.ownerDocument!, this, null, null, qualifiedName, value));
-				init = false;
+				initDel();
 			}
 		}
 		setAttributeNode(attribute: Attr) {
@@ -1493,9 +1493,9 @@
 			if (attr) {
 				attr.value = value;
 			} else {
-				init = true;
+				initAdd();
 				this.#attributes.setNamedItem(new Attr(this.ownerDocument!, this, namespace, null, localName, value));
-				init = false;
+				initDel();
 			}
 		}
 		setPointerCapture(_pointerId: number) {
@@ -1505,16 +1505,16 @@
 				this.#attributes.removeNamedItem(name);
 				return false;
 			}
-			init = true;
+			initAdd();
 			this.#attributes.setNamedItem(new Attr(this.ownerDocument!, this, null, null, name, ""));
-			init = false;
+			initDel();
 			return true;
 		}
 	}
 
 	class HTMLElement extends Element {
 		constructor (localName: string) {
-			if (!init) { // check registry for valid Element type
+			if (!isInit()) { // check registry for valid Element type
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super("https://www.w3.org/1999/xhtml/", localName, document);
@@ -1523,7 +1523,7 @@
 
 	class SVGElement extends Element {
 		constructor (localName: string) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super("http://www.w3.org/2000/svg", localName, document);
@@ -1532,7 +1532,7 @@
 
 	class MathMLElement extends Element {
 		constructor (localName: string) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super("http://www.w3.org/1998/Math/MathML", localName, document);
@@ -1543,7 +1543,7 @@
 		#element: Element;
 		[realTarget]: this;
 		constructor (element: Element) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#element = element;
@@ -1631,7 +1631,7 @@
 		hash = "";
 		readonly origin = "null";
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 		}
@@ -1659,7 +1659,7 @@
 		#storage = new Map<string, string>();
 
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 		}
@@ -1685,7 +1685,7 @@
 
 	class Window extends EventTarget {
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super();
@@ -1697,7 +1697,7 @@
 
 	class XMLHttpRequestEventTarget extends EventTarget {
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super();
@@ -1709,7 +1709,7 @@
 
 	class XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super();
@@ -1813,7 +1813,7 @@
 		#media: string[];
 		[realTarget]: this;
 		constructor (media: string[]) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#media = media.map(t => t.trim());
@@ -1854,7 +1854,7 @@
 		#type: string;
 		disabled: boolean;
 		constructor (type: string, title: string | null, href: string | null, ownerNode: Element | ProcessingInstruction | null, parentStyleSheet: CSSStyleSheet | null, media: MediaList, disabled: boolean) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#href = href;
@@ -1924,7 +1924,7 @@
 		#parentRule: CSSRule | null;
 		#parentStyleSheet: CSSStyleSheet | null;
 		constructor(parentRule: CSSRule | null, parentStyleSheet: CSSStyleSheet | null, cssText: string) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#cssText = cssText;
@@ -2151,9 +2151,9 @@
 		#cssRules = new CSSRuleList(this.#rules);
 		#ownerRule: CSSRule | null = null;
 		constructor(options?: CSSStyleSheetInit) {
-			init = true;
+			initAdd();
 			super("text/css", null, options?.baseURL ?? null, null, null, options?.media instanceof MediaList ? options.media : new MediaList(typeof options?.media === "string" ? [options.media] : []), options?.disabled ?? false);
-			init = false;
+			initDel();
 		}
 		get cssRules() {
 			return this.#cssRules;
@@ -2185,7 +2185,7 @@
 
 	class MutationEvent extends Event {
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super("MutationEvent");
@@ -2194,7 +2194,7 @@
 
 	class MutationRecord {
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 		}
@@ -2202,7 +2202,7 @@
 
 	class History {
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 		}
@@ -2216,7 +2216,7 @@
 		#constructors = new Map<CustomElementConstructor, string>();
 		#promises = new Map<string, [Promise<void>, Function]>();
 		constructor () {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#elements = new Map();
@@ -2298,7 +2298,7 @@
 		#pointerBeforeReferenceNode = true;
 		#active = false;
 		constructor (root: Node, whatToShow = NodeFilter.SHOW_ALL, filter: ((node: Node) => number) | { acceptNode(node: Node): number; } | null = null) {
-			if (!init) {
+			if (!isInit()) {
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			this.#root = this.#referenceNode  = root;
@@ -2426,10 +2426,13 @@
 		}
 	}
 
-	let init = true;
+	const document = new Document(),
+              [initAdd, initDel, isInit] = (() => {
+		      let init = 0;
+		      return [() => init++, () => init--, () => !!init];
+	      })();
 
-	const document = new Document();
-
+	initAdd();
 	for (const [name, val] of [
 		["Node", Node],
 		["DOMTokenList", DOMTokenList],
@@ -2495,6 +2498,5 @@
 	]) {
 		Object.assign(globalThis, name, val);
 	}
-
-	init = false;
+	initDel();
 }
