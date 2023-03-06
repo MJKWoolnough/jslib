@@ -1830,6 +1830,17 @@
 		}
 	}
 
+	class ClipboardEvent extends Event {
+		#clipboardData: DataTransfer | null;
+		constructor(type: string, eventInitDict?: ClipboardEventInit) {
+			super(type, eventInitDict);
+			this.#clipboardData = eventInitDict?.clipboardData ?? null;
+		}
+		get clipboardData() {
+			return this.#clipboardData;
+		}
+	}
+
 	class MediaList {
 		#media: string[];
 		[realTarget]: this;
@@ -2490,6 +2501,7 @@
 		["MouseEvent", MouseEvent],
 		["KeyboardEvent", KeyboardEvent],
 		["PopStateEvent", PopStateEvent],
+		["ClipboardEvent", ClipboardEvent],
 		["MediaList", MediaList],
 		["StyleSheet", StyleSheet],
 		["CSSRule", CSSRule],
