@@ -237,9 +237,9 @@ customElements.define("x-route", class extends HTMLElement {
 	#id;
 	#title;
 	connectedCallback() {
-		const c = this.#class ??= this.getAttribute("class") ?? "",
-		      i = this.#id ??= this.getAttribute("id") ?? "",
-		      t = this.#title ??= this.getAttribute("title") ?? "";
+		const c = this.#class ??= this.getAttribute("route-class") ?? "",
+		      i = this.#id ??= this.getAttribute("route-id") ?? "",
+		      t = this.#title ??= this.getAttribute("route-title") ?? "";
 		if (c) {
 			document.documentElement.classList.toggle(c, true);
 		}
@@ -279,13 +279,13 @@ export const
  * </x-router>
  * ```
  *
- * In addition to the `x-router` tag, there is also the `x-route` tag which can be used in HTML to set `title`, `class`, and `id` attributes which, when the route is selected, are set as the window title, html class, and html ID, respectively. An example is the following:
+ * In addition to the `x-router` tag, there is also the `x-route` tag which can be used in HTML to set `route-title`, `route-class`, and `route-id` attributes which, when the route is selected, are set as the window title, html class, and html ID, respectively. An example is the following:
  *
  * ```html
  * <x-router>
- *	<x-route title="Route A" id="route_a" class="dark" route-match="/a">Route A</x-route>
- *	<x-route title="Route B" class="light" route-match="/b"><span>Route B</span></x-route>
- *	<x-route title="Unknown Route" route-match="">404</x-route>
+ *	<x-route route-title="Route A" route-id="route_a" route-class="dark" route-match="/a">Route A</x-route>
+ *	<x-route route-title="Route B" route-class="light" route-match="/b"><span>Route B</span></x-route>
+ *	<x-route route-title="Unknown Route" route-match="">404</x-route>
  * </x-router>
  * ```
  *
