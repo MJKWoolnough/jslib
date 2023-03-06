@@ -459,7 +459,28 @@
 			return null;
 		}
 		normalize() {
-			// TODO
+			const toRemove: Text[] = [];
+			let lastText: Text | null = null;
+			for (let n = this.#firstChild; n; n = n.#nextSibling) {
+				if (n instanceof Text) {
+					if (n.data) {
+						if (lastText) {
+							lastText.data += n.data;
+							toRemove.push(n);
+						} else {
+							lastText = n;
+						}
+					} else {
+						toRemove.push(n);
+					}
+				} else {
+					lastText = null;
+					n.normalize();
+				}
+			}
+			for (const n of toRemove) {
+				this.removeChild(n);
+			}
 		}
 		removeChild<T extends Node>(child: T) {
 			if ((child.#parentNode as Node | null) !== this) {
