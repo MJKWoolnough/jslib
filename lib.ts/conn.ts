@@ -25,6 +25,8 @@ export type Properties = {
 	 * This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest | XMLHttpRequest} object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object.
 	 */
 	response?: "" | "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
+	/** This function is used to check whether parsed JSON matches the expected data structure. */
+	checker?: (data: unknown) => boolean;
 	/** This sets an event handler to monitor any upload progress. */
 	onuploadprogress?: (event: ProgressEvent) => void;
 	/** This sets an event handler to monitor any download process. */
@@ -40,12 +42,12 @@ export type Properties = {
 }
 
 interface requestReturn {
-	(url: string, props?: Properties & {"response"?: "text" | ""}): Promise<string>;
-	(url: string, props: Properties & {"response": "xml" | "document"}): Promise<XMLDocument>;
-	(url: string, props: Properties & {"response": "blob"}): Promise<Blob>;
-	(url: string, props: Properties & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
-	(url: string, props: Properties & {"response": "xh"}): Promise<XMLHttpRequest>;
-	<T = any>(url: string, props: Properties & {"response": "json"}): Promise<T>;
+	(url: string, props?: Exclude<Properties, "checker"> & {"response"?: "text" | ""}): Promise<string>;
+	(url: string, props: Exclude<Properties, "checker"> & {"response": "xml" | "document"}): Promise<XMLDocument>;
+	(url: string, props: Exclude<Properties, "checker"> & {"response": "blob"}): Promise<Blob>;
+	(url: string, props: Exclude<Properties, "checker"> & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
+	(url: string, props: Exclude<Properties, "checker"> & {"response": "xh"}): Promise<XMLHttpRequest>;
+	<T = any>(url: string, props: Properties & {"response": "json", "checker"?: (data: unknown) => data is T}): Promise<T>;
 }
 
 const once = {"once": true},
@@ -78,7 +80,11 @@ HTTPRequest: requestReturn = <T = any>(url: string, props: Properties = {}): Pro
 	xh.addEventListener("readystatechange", () => {
 		if (xh.readyState === 4) {
 			if (xh.status === 200) {
-				successFn(props["response"] === "xh" ? xh : xh.response);
+				if (props["response"] === "json" && props["checker"] && !props.checker(xh.response)) {
+					errorFn(new TypeError("received JSON does not match expected format"));
+				} else {
+					successFn(props["response"] === "xh" ? xh : xh.response);
+				}
 			} else {
 				errorFn(new Error(xh.responseText));
 			}

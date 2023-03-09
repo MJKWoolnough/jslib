@@ -17,6 +17,7 @@ import {Subscription} from './inter.js';
  * @property {Object} [headers]  An object to allow the setting or arbitrary headers.
  * @property {string} [type]     Sets the Content-Type of the request.
  * @property {"" | "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh"} [response] This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest | XMLHttpRequest} object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object.
+ * @property {(data: unknown) => boolean} [checker]                This function is used to check whether parsed JSON matches the expected data structure.
  * @property {(event: ProgressEvent) => void} [onuploadprogress]   This sets an event handler to monitor any upload progress.
  * @property {(event: ProgressEvent) => void} [ondownloadprogress] This sets an event handler to monitor any download process.
  * @property {XMLHttpRequestBodyInit} [data]                       This is an {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send#body | XMLHttpRequestBodyInit} and is send as the body of the request.
@@ -52,6 +53,9 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 	xh.addEventListener("readystatechange", () => {
 		if (xh.readyState === 4) {
 			if (xh.status === 200) {
+				if (props["response"] === "json" && props["checker"] && !props.checker(xh.response)) {
+					throw new TypeError("");
+				}
 				successFn(props["response"] === "xh" ? xh : xh.response);
 			} else {
 				errorFn(new Error(xh.responseText));
