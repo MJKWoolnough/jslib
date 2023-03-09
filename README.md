@@ -294,12 +294,12 @@ This module directly imports the [inter](#inter) module.
 ### <a name="conn_httprequest">HTTPRequest</a>
 ```typescript
 interface {
-	(url: string, props?: Properties & {"response"?: "text" | ""}): Promise<string>;
-	(url: string, props: Properties & {"response": "xml" | "document"}): Promise<XMLDocument>;
-	(url: string, props: Properties & {"response": "blob"}): Promise<Blob>;
-	(url: string, props: Properties & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
-	(url: string, props: Properties & {"response": "xh"}): Promise<XMLHttpRequest>;
-	<T = any>(url: string, props: Properties & {"response": "json"}): Promise<T>;
+        (url: string, props?: Exclude<Properties, "checker"> & {"response"?: "text" | ""}): Promise<string>;
+        (url: string, props: Exclude<Properties, "checker"> & {"response": "xml" | "document"}): Promise<XMLDocument>;
+        (url: string, props: Exclude<Properties, "checker"> & {"response": "blob"}): Promise<Blob>;
+        (url: string, props: Exclude<Properties, "checker"> & {"response": "arraybuffer"}): Promise<ArrayBuffer>;
+        (url: string, props: Exclude<Properties, "checker"> & {"response": "xh"}): Promise<XMLHttpRequest>;
+        <T = any>(url: string, props: Properties & {"response": "json", "checker"?: (data: unknown) => data is T}): Promise<T>;
 }
 ```
 
@@ -359,6 +359,7 @@ This object modifies an HTTPRequest. It allows setting of the following:
 | headers            | An object to allow the setting or arbitrary headers. |
 | type               | Sets the Content-Type of the request. |
 | response           | This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the [XMLHTTPRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object. |
+| checker            | This function is used to check whether parsed JSON matches the expected data structure. |
 | onuploadprogress   | This sets an event handler to monitor any upload progress. |
 | ondownloadprogress | This sets an event handler to monitor any download process. |
 | data               | This is an [XMLHttpRequestBodyInit](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send#body) and is send as the body of the request. |
