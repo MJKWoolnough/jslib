@@ -262,6 +262,14 @@ export class NodeArray {
 		}
 		return undefined;
 	}
+	findLastIndex(callback, thisArg) {
+		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
+			if (callback.call(thisArg, item, index, this)) {
+				return index;
+			}
+		}
+		return -1;
+	}
 	flat(depth) {
 		return Array.from(this.values()).flat(depth);
 	}
