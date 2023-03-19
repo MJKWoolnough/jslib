@@ -503,7 +503,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	*[Symbol.iterator]() {
 		yield* this.values();
 	}
-	[Symbol.unscopables]() {
+	get [Symbol.unscopables]() {
 		return {
 			__proto__: null,
 			"at": true,
@@ -518,8 +518,10 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 			"flatMap": true,
 			"includes": true,
 			"keys": true,
+			"toLocaleString": undefined,
+			"toString": undefined,
 			"values": true
-		}
+		};
 	}
 	[n: number]: T;
 }

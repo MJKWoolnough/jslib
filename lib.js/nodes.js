@@ -461,7 +461,7 @@ export class NodeArray {
 	*[Symbol.iterator]() {
 		yield* this.values();
 	}
-	[Symbol.unscopables]() {
+	get [Symbol.unscopables]() {
 		return {
 			__proto__: null,
 			"at": true,
@@ -477,7 +477,7 @@ export class NodeArray {
 			"includes": true,
 			"keys": true,
 			"values": true
-		}
+		};
 	}
 }
 
