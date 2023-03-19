@@ -47,7 +47,7 @@ const windowObservations = {
 				"position": "relative",
 				">windows-window": {
 					"min-height": "auto",
-					"position": "static",
+					"position": "relative",
 					"pointer-events": "auto",
 					"--overlay-on": "none",
 					":not([maximised])": {
