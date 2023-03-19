@@ -288,7 +288,9 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return -1;
 	}
-	findLast(callback: Callback<T, any, this>, thisArg?: any) {
+	findLast<S extends T>(predicate: (value: T, index: number, array: T[]) => value is S, thisArg?: any): S | undefined;
+	findLast(callback: Callback<T, any, this>, thisArg?: any): T | undefined;
+	findLast<S extends T>(callback: Callback<T, any, this> | ((value: T, index: number, array: T[]) => value is S), thisArg?: any) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (callback.call(thisArg, item, index, this)) {
 				return item;
