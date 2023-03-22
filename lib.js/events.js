@@ -42,7 +42,7 @@ const maxMouseButton = 16,
 				held.delete(k);
 			}
 		}
-	} else if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) && !held.has(kc)) {
+	} else if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || target instanceof HTMLButtonElement) && !held.has(kc)) {
 		processEvents(ev, downs.get(kc));
 		held.add(kc);
 	}
