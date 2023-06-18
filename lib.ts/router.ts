@@ -169,7 +169,7 @@ class Router extends HTMLElement {
 		}
 		matchObj.path = new RegExp(r + path + (path.endsWith("/") ? "" : "$"));
 		this.#matchers.push([matchObj, nodeFn]);
-		if (!this.#connected) {
+		if (!this.#connected  && this.#marker.isConnected) {
 			this.#match(matchObj, nodeFn);
 		}
 		return this;
