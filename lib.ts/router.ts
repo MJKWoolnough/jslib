@@ -195,7 +195,6 @@ class Router extends HTMLElement {
 			} else if (this.#setRoute(path, attrs)) {
 				return true;
 			}
-			this.#clear();
 		}
 		return false;
 	}
