@@ -23,6 +23,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [menu](#menu)                               | Library for creating right-click menus. |
 | [misc](#misc)                               | Miscellaneous, simple, dependency-free functions. |
 | [nodes](#nodes)                             | Classes for handling of collections of DOM Nodes. |
+| [pagination](#pagination)                   | Custom element for handling pagination. |
 | [router](#router)                           | Router element for SPAs. |
 | [router_transitions](#router_transitions)   | Transition effects for the Router. |
 | [rpc](#rpc)                                 | JSONRPC implementation. |
@@ -40,7 +41,7 @@ Thematically, the above modules can be grouped into a few packages:
 |-----------|---------------|-----------|
 | Decorum   | A collection of DOM manipulation libs. | [Bind](#bind), [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), and [RPC](#rpc). |
-| Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
+| Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), [Pagination](#pagination), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
 | Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), [Misc](#misc), [Router](#router), [Transitions](#router_transitions), and [Settings](#settings). |
 
 # Scripts
@@ -1848,6 +1849,60 @@ interface {
 ```
 
 This unexported type satisfies any type has used the [node](#nodes_node) [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) to delegate a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) element.
+
+## <a name="pagination">pagination</a>
+
+The pagination module defines a simple [pagination](https://en.wikipedia.org/wiki/Pagination) creator.
+
+This module directly imports the [dom](#dom), and [html](#html) modules.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| (default) | Function | A [DOMBind](#dom_dombind) that creates a Pagination. |
+| [Pagination](#pagination_pagination) | Class | This class represents the pagination custom element. |
+| [setLanguage](#pagination_setlanguage) | Function | Used to set language entries used for Pagination. |
+
+CSS part attributes have been set on the various elements of Pagination to make styling simple.
+
+|  Part     |  Description  |
+|-----------|---------------|
+| base      | The base HTMLUListElement. |
+| current   | The currently selected page. Will also be a 'page'. |
+| page      | An HTMLLIElement that contains the link and/or text for a page. |
+| prev      | The 'Prev' element. Will also be a 'page'. |
+| next      | The 'Next' element. Will also be a 'page'. |
+| separator | An empty HTMLLIElement that sits between beginning/end pages and the current page. |
+
+### <a name="pagination_pagination">Pagination</a>
+```typescript
+class Pagination extends HTMLElement {
+	getPageNumberFromEvent(e: Event): number;
+	static getPageNumberFromEvent(e: Event) : number;
+}
+```
+
+Pagination accepts the following attributes:
+
+|  Attribute  |  Description  |
+|-------------|---------------|
+| end         | This number will determine how many page elements are created at the ends of the list. |
+| href        | This string will be prefixed to the page number in any created links. If attribute not set, will not create links. |
+| page        | This number will determine the current page number. 0 indexed. |
+| surround    | This number will determine how many pages surround the current page in the list.
+| total       | This number will determine how many pages there are in total. |
+
+
+In addition to the control attributes, the class provides both static and non-static method named getPageNumberFromEvent which, when passed the Event object from a mouse event on the Pagination element, will return the page number associated with the child element that triggered the event. NB: If a non-page element triggered the event, will return -1.
+
+### <a name="pagination_setlanguage">setLanguage</a>
+```typescript
+setLanguage = (l: Partial<{
+	NEXT: string | Binding,
+	PREV: string | Binding,
+}) => void;
+```
+
+This function is used to set the language used for the `Next` and `Previous` page elements.
 
 ## <a name="router">router</a>
 
