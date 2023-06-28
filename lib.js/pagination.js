@@ -22,6 +22,28 @@ processPaginationSection = (ret, currPage, from, to, href) => {
 	"PREV": "Previous"
       };
 
+/**
+ * The pagination module defines a simple [pagination](https://en.wikipedia.org/wiki/Pagination) creator.
+ *
+ * This module directly imports the [dom](#dom), and [html](#html) modules.
+ *
+ * |  Export  |  Type  |  Description  |
+ * |----------|--------|---------------|
+ * | (default) | Function | A [DOMBind](#dom_dombind) that creates a Pagination. |
+ * | [Pagination](#pagination_pagination) | Class | This class represents the pagination custom element. |
+ * | [setLanguage](#pagination_setlanguage) | Function | Used to set language entries used for Pagination. |
+ *
+ * CSS part attributes have been set on the various elements of Pagination to make styling simple.
+ *
+ * |  Part     |  Description  |
+ * |-----------|---------------|
+ * | base      | The base HTMLUListElement. |
+ * | current   | The currently selected page. Will also be a 'page'. |
+ * | page      | An HTMLLIElement that contains the link and/or text for a page. |
+ * | prev      | The 'Prev' element. Will also be a 'page'. |
+ * | next      | The 'Next' element. Will also be a 'page'. |
+ * | separator | An empty HTMLLIElement that sits between beginning/end pages and the current page. |
+ */
 export class Pagination extends HTMLElement {
 	#end = 3;
 	#surround = 3;
@@ -112,17 +134,36 @@ export class Pagination extends HTMLElement {
 		]);
 	}
 
+	/**
+	 * Matches the static getPageNumberFromEvent.
+	 */
 	getPageNumberFromEvent(e) {
 		return Pagination.getPageNumberFromEvent(e);
 	}
 
+	/**
+	 * This method, when passed the Event object from a mouse event on the Pagination element, will return the page number associated with the child element that triggered the event.
+	 *
+	 * @param {Event} The event triggered from a mouse event on Pagination.
+	 *
+	 * @return {number} The page number of the element associated with the event. Returns -1 if no associated element is found.
+	 */
 	static getPageNumberFromEvent(e) {
 		return parseInt(e.composedPath()?.[0].dataset?.["page"] ?? "") ?? -1;
 	}
 }
 
-export const setLanguage = l => {Object.assign(lang, l)};
+export const
+/**
+ * The setLanguage function is used to set the language used for the `Next` and `Previous` page elements.
+ *
+ * @param {{NEXT?: string | Binding; PREV?: string | Binding;}} l The language to be changed.
+ */
+setLanguage = l => {Object.assign(lang, l)};
 
 customElements.define("page-numbers", Pagination);
 
+/**
+ * A {@link dom:DOMBind | DOMBind} that creates a {@link Pagination}.
+ */
 export default bindElement(ns, "page-numbers")
