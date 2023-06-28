@@ -774,7 +774,7 @@ setDefaultIcon = icon => defaultIcon = icon,
 /**
  * The setLanguage function sets the language items used by the {@link ShellElement} and {@link WindowElement} classes.
  *
- * @param {{CANCEL?: string; CLOSE?: string; MAXIMISE?: string; MINIMISE?: string; OK?: string; RESTORE?: string;}} l The language to be changed.
+ * @param {{CANCEL?: string | Binding; CLOSE?: string | Binding; MAXIMISE?: string | Binding; MINIMISE?: string | Binding; OK?: string | Binding; RESTORE?: string | Binding;}} l The language to be changed.
  * 	*/
 setLanguage = l => {Object.assign(lang, l)};
 
