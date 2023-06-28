@@ -2311,12 +2311,12 @@ The returned [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/R
 ### <a name="windows_setlanguage">setLanguage</a>
 ```typescript
 (language: {
-	CANCEL?: string;
-	CLOSE?: string;
-	MAXIMISE?: string;
-	MINIMISE?: string;
-	OK?: string;
-	RESTORE?: string;
+	CANCEL?: string | Binding;
+	CLOSE?: string | Binding;
+	MAXIMISE?: string | Binding;
+	MINIMISE?: string | Binding;
+	OK?: string | Binding;
+	RESTORE?: string | Binding;
 }) => void;
 ```
 
