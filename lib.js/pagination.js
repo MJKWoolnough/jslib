@@ -16,6 +16,10 @@ processPaginationSection = (ret, currPage, from, to, href) => {
 	for (let p = from; p <= to; p++) {
 		ret.push(currPage === p ? li({"part": "page current"}, (p+1)+"") : link(p, href));
 	}
+      },
+      lang = {
+	"NEXT": "Next",
+	"PREV": "Previous"
       };
 
 export class Pagination extends HTMLElement {
@@ -102,9 +106,9 @@ export class Pagination extends HTMLElement {
 		}
 
 		clearNode(this.#base, [
-			amendNode(currPage !== 0 ? link(currPage - 1, this.#hrefBase, "Previous") : li("Previous"), {"part": "page prev"}),
+			amendNode(currPage !== 0 ? link(currPage - 1, this.#hrefBase, lang["PREV"]) : li(lang["PREV"]), {"part": "page prev"}),
 			pageLinks,
-			amendNode(currPage !== total ? link(currPage + 1, this.#hrefBase, "Next") : li("Next"), {"part": "page next"})
+			amendNode(currPage !== total ? link(currPage + 1, this.#hrefBase, lang["NEXT"]) : li(lang["NEXT"]), {"part": "page next"})
 		]);
 	}
 
@@ -116,6 +120,8 @@ export class Pagination extends HTMLElement {
 		return parseInt(e.composedPath()?.[0].dataset?.["page"] ?? "") ?? -1;
 	}
 }
+
+export const setLanguage = l => {Object.assign(lang, l)};
 
 customElements.define("page-numbers", Pagination);
 

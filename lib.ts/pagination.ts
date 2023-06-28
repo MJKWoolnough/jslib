@@ -1,8 +1,9 @@
+import type {Binding} from './bind.js';
 import type {Children} from './dom.js';
 import {amendNode, bindElement, clearNode} from './dom.js';
 import {a, li, ns, ul} from './html.js';
 
-const link = (page: number, href: string | null, contents?: string) => {
+const link = (page: number, href: string | null, contents?: string | Binding) => {
 	if (href !== null) {
 		return li({"part": "page"}, a({"href": href + page, "data-page": page}, contents ?? (page + 1) + ""));
 	}
@@ -17,6 +18,10 @@ processPaginationSection = (ret: Children[], currPage: number, from: number, to:
 	for (let p = from; p <= to; p++) {
 		ret.push(currPage === p ? li({"part": "page current"}, (p+1)+"") : link(p, href));
 	}
+      },
+      lang = {
+	"NEXT": "Next" as string | Binding,
+	"PREV": "Previous" as string | Binding
       };
 
 export class Pagination extends HTMLElement {
@@ -103,9 +108,9 @@ export class Pagination extends HTMLElement {
 		}
 
 		clearNode(this.#base, [
-			amendNode(currPage !== 0 ? link(currPage - 1, this.#hrefBase, "Previous") : li("Previous"), {"part": "page prev"}),
+			amendNode(currPage !== 0 ? link(currPage - 1, this.#hrefBase, lang["PREV"]) : li(lang["PREV"]), {"part": "page prev"}),
 			pageLinks,
-			amendNode(currPage !== total ? link(currPage + 1, this.#hrefBase, "Next") : li("Next"), {"part": "page next"})
+			amendNode(currPage !== total ? link(currPage + 1, this.#hrefBase, lang["NEXT"]) : li(lang["NEXT"]), {"part": "page next"})
 		]);
 	}
 
@@ -117,6 +122,8 @@ export class Pagination extends HTMLElement {
 		return parseInt((e.composedPath() as HTMLElement[])?.[0].dataset?.["page"] ?? "") ?? -1;
 	}
 }
+
+export const setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)};
 
 customElements.define("page-numbers", Pagination);
 
