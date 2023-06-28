@@ -146,11 +146,11 @@ export class Pagination extends HTMLElement {
 	/**
 	 * This method, when passed the Event object from a mouse event on the Pagination element, will return the page number associated with the child element that triggered the event.
 	 *
-	 * @param {Event} The event triggered from a mouse event on Pagination.
+	 * @param {Event} e The event triggered from a mouse event on Pagination.
 	 *
 	 * @return {number} The page number of the element associated with the event. Returns -1 if no associated element is found.
 	 */
-	static getPageNumberFromEvent(e: Event) {
+	static getPageNumberFromEvent(e: Event): number {
 		return parseInt((e.composedPath() as HTMLElement[])?.[0].dataset?.["page"] ?? "") ?? -1;
 	}
 }
