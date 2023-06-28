@@ -105,7 +105,7 @@ export class Pagination extends HTMLElement {
 
 		const pageLinks = [],
 		      total = this.#total - 1,
-		      currPage = this.#page < this.#total ? this.#page : total
+		      currPage = this.#page < this.#total ? this.#page : total;
 		
 		let start = 0;
 
