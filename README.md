@@ -1891,7 +1891,6 @@ Pagination accepts the following attributes:
 | surround    | This number will determine how many pages surround the current page in the list.
 | total       | This number will determine how many pages there are in total. |
 
-
 In addition to the control attributes, the class provides both static and non-static method named getPageNumberFromEvent which, when passed the Event object from a mouse event on the Pagination element, will return the page number associated with the child element that triggered the event. NB: If a non-page element triggered the event, will return -1.
 
 ### <a name="pagination_setlanguage">setLanguage</a>
