@@ -3,7 +3,7 @@ import {a, li, ns, ul} from './html.js';
 
 const link = (page, href, contents) => {
 	if (href !== null) {
-		return li({"part": "page"}, a({"href": href + page, "data-page": page}, contents ?? (page + 1) + ""));
+		return li({"part": "page"}, a({"href": href instanceof Function ? href(page) : href + page, "data-page": page}, contents ?? (page + 1) + ""));
 	}
 
 	return li({"part": "page", "data-page": page}, contents ?? (page + 1) + "");
@@ -96,6 +96,22 @@ export class Pagination extends HTMLElement {
 
 	static get observedAttributes() {
 		return ["href", "end", "surround", "total", "page"];
+	}
+
+	setAttributeNode(attribute) {
+		if ("realValue" in attribute) {
+			const rv = attribute["realValue"];
+
+			if (rv instanceof Function && attribute.name === "href") {
+				this.#hrefBase = rv;
+
+				this.#build();
+
+				return null;
+			}
+		}
+
+		return super.setAttributeNode(attribute);
 	}
 
 	#build() {

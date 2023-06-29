@@ -3,14 +3,16 @@ import type {Children} from './dom.js';
 import {amendNode, bindElement, clearNode} from './dom.js';
 import {a, li, ns, ul} from './html.js';
 
-const link = (page: number, href: string | null, contents?: string | Binding) => {
+type Href = string | ((page: number) => string);
+
+const link = (page: number, href: Href | null, contents?: string | Binding) => {
 	if (href !== null) {
-		return li({"part": "page"}, a({"href": href + page, "data-page": page}, contents ?? (page + 1) + ""));
+		return li({"part": "page"}, a({"href": href instanceof Function ? href(page) : href + page, "data-page": page}, contents ?? (page + 1) + ""));
 	}
 
 	return li({"part": "page", "data-page": page}, contents ?? (page + 1) + "");
 },
-processPaginationSection = (ret: Children[], currPage: number, from: number, to: number, href: string | null) => {
+processPaginationSection = (ret: Children[], currPage: number, from: number, to: number, href: Href | null) => {
 	if (ret.length !== 0) {
 		ret.push(li({"part": "separator"}));
 	}
@@ -51,7 +53,7 @@ export class Pagination extends HTMLElement {
 	#surround = 3;
 	#total = 1;
 	#page = 0;
-	#hrefBase: string | null = null;
+	#hrefBase: Href | null = null;
 	#base: HTMLUListElement;
 
 	constructor() {
@@ -98,6 +100,24 @@ export class Pagination extends HTMLElement {
 
 	static get observedAttributes() {
 		return ["href", "end", "surround", "total", "page"];
+	}
+
+	setAttributeNode(attribute: Attr) {
+		if ("realValue" in attribute) {
+			const rv = attribute["realValue"];
+
+			if (rv instanceof Function) {
+				if (attribute.name === "href") {
+					this.#hrefBase = rv as Href;
+
+					this.#build();
+
+					return null;
+				}
+			}
+		}
+
+		return super.setAttributeNode(attribute);
 	}
 
 	#build() {
