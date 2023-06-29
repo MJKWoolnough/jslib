@@ -1,5 +1,4 @@
 import type {Binding} from './bind.js';
-import type {Children} from './dom.js';
 import {amendNode, bindElement, clearNode} from './dom.js';
 import {a, li, ns, ul} from './html.js';
 
@@ -12,7 +11,7 @@ const link = (page: number, href: Href | null, contents?: string | Binding) => {
 
 	return li({"part": "page", "data-page": page}, contents ?? (page + 1) + "");
 },
-processPaginationSection = (ret: Children[], currPage: number, from: number, to: number, href: Href | null) => {
+processPaginationSection = (ret: HTMLLIElement[], currPage: number, from: number, to: number, href: Href | null) => {
 	if (ret.length !== 0) {
 		ret.push(li({"part": "separator"}));
 	}
@@ -135,7 +134,7 @@ export class Pagination extends HTMLElement {
 			return;
 		}
 
-		const pageLinks: Children[] = [],
+		const pageLinks: HTMLLIElement[] = [],
 		      total = this.#total - 1,
 		      currPage = this.#page < this.#total ? this.#page : total;
 		
