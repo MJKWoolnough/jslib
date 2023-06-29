@@ -47,6 +47,16 @@ processPaginationSection = (ret: Children[], currPage: number, from: number, to:
  * | prev      | The 'Prev' element. Will also be a 'page'. |
  * | next      | The 'Next' element. Will also be a 'page'. |
  * | separator | An empty HTMLLIElement that sits between beginning/end pages and the current page. |
+ *
+ * Pagination accepts the following attributes:
+ *
+ * |  Attribute  |  Description  |
+ * |-------------|---------------|
+ * | end         | This number will determine how many page elements are created at the ends of the list. |
+ * | href        | This string will be prefixed to the page number in any created links. If attribute not set, will not create links. A function of the type (page: number) => string can be used to create more complex links; this should be set using amendNode/clearNode. |
+ * | page        | This number will determine the current page number. 0 indexed. |
+ * | surround    | This number will determine how many pages surround the current page in the list.
+ * | total       | This number will determine how many pages there are in total. |
  */
 export class Pagination extends HTMLElement {
 	#end = 3;
