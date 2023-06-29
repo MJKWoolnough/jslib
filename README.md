@@ -1885,11 +1885,11 @@ Pagination accepts the following attributes:
 
 |  Attribute  |  Description  |
 |-------------|---------------|
-| end         | This number will determine how many page elements are created at the ends of the list. |
+| end         | This number will determine how many page elements are created at the ends of the list. (default: 3) |
 | href        | This string will be prefixed to the page number in any created links. If attribute not set, will not create links. A function of the type (page: number) => string can be used to create more complex links; this should be set using amendNode/clearNode. |
-| page        | This number will determine the current page number. 0 indexed. |
-| surround    | This number will determine how many pages surround the current page in the list.
-| total       | This number will determine how many pages there are in total. |
+| page        | This number will determine the current page number. 0 indexed. (default: 0) |
+| surround    | This number will determine how many pages surround the current page in the list. (default: 3) |
+| total       | This number will determine how many pages there are in total. (default: 1) |
 
 In addition to the control attributes, the class provides both static and non-static method named getPageNumberFromEvent which, when passed the Event object from a mouse event on the Pagination element, will return the page number associated with the child element that triggered the event. NB: If a non-page element triggered the event, will return -1.
 
