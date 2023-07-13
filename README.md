@@ -1982,6 +1982,8 @@ x-router {
 
 This will hide the flash of elements that will appear of the page before the x-router element is registered.
 
+NB: You can retrieve the number of routes added with the Router.count field.
+
 #### <a name="router_router_add">add</a>
 ```typescript
 class Router {
