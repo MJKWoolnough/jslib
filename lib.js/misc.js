@@ -105,7 +105,7 @@ autoFocus = (node, inputSelect = true) => {
 		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
 			node.select();
 		}
-	}, 0);
+	});
 	return node;
 },
 /**
