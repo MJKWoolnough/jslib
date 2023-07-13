@@ -1534,11 +1534,133 @@
 	}
 
 	class HTMLElement extends Element {
+		#dataset = new DOMStringMap(this);
+		#style = new CSSStyleDeclaration();
+		accessKey = "";
+		autocapitalize = "";
+		autofocus = false;
+		dir = "";
+		enterKeyHint = "";
+		inert = false;
+		inputMode = "";
+		nonce?: string;
+		tabIndex = -1;
+		translate = false;
 		constructor (localName: string) {
 			if (!isInit()) { // check registry for valid Element type
 				throw new TypeError(ILLEGAL_CONSTRUCTOR);
 			}
 			super("https://www.w3.org/1999/xhtml/", localName, document);
+		}
+		get accessKeyLabel() {
+			// TODO
+			return this.accessKey;
+		}
+		get contentEditable() {
+			return this.attributes.getNamedItem("contenteditable")?.value ?? "false";
+		}
+		set contentEditable(editable: string) {
+			if (editable === "true" || editable === "inherit") {
+				this.setAttribute("contenteditable", editable);
+			} else {
+				this.removeAttribute("contenteditable");
+			}
+		}
+		get dataset() {
+			return this.#dataset;
+		}
+		get draggable() {
+			return this.getAttribute("draggable") === "true";
+		}
+		set draggable(draggable: boolean) {
+			if (draggable) {
+				this.setAttribute("draggable", "true");
+			} else {
+				this.removeAttribute("draggable");
+			}
+		}
+		get hidden() {
+			return this.hasAttribute("hidden");
+		}
+		set hidden(hidden: boolean) {
+			if (hidden) {
+				this.setAttribute("hidden", "true");
+			} else {
+				this.removeAttribute("hidden");
+			}
+		}
+		get innerText() {
+			let text = "";
+			for (let n = this.firstChild; n; n = n.nextSibling) {
+				if (n instanceof Text) {
+					text += n.data;
+				} else if (n instanceof HTMLElement) {
+					text += n.innerText;
+				}
+				// TODO: Update with other elements once written
+			}
+			return text;
+		}
+		set innerText(_text: string) {
+			while(this.firstChild) {
+				this.removeChild(this.firstChild);
+			}
+			// TODO: Split text and joing with <br> elements
+		}
+		get isContentEditable(): boolean {
+			return this.contentEditable === "true" || (this.contentEditable === "inherit" && this.parentNode instanceof HTMLElement && this.parentNode.isContentEditable);
+		}
+		get lang() {
+			return this.getAttribute("lang") ?? "";
+		}
+		set lang(lang: string) {
+			this.setAttribute("lang", lang);
+		}
+		get offsetHeight() { return 0; }
+		get offsetLeft() { return 0; }
+		get offsetParent() {
+			// TODO
+			return null;
+		}
+		get offsetTop() { return 0; }
+		get offsetWidth() { return 0; }
+		get outerText() {
+			return this.innerText;
+		}
+		set outerText(_text: string) {
+			// TODO: Split text and joing with <br> elements
+			// replace this element with above
+		}
+		get spellcheck() {
+			return this.getAttribute("spellcheck") === "true";
+		}
+		set spellcheck(spellcheck: boolean) {
+			if (spellcheck) {
+				this.setAttribute("spellcheck", "true");
+			} else {
+				this.removeAttribute("spellcheck");
+			}
+		}
+		get style() {
+			return this.#style;
+		}
+		get title() {
+			return this.getAttribute("title") ?? "";
+		}
+		set title(title: string) {
+			this.setAttribute("title", title);
+		}
+		attachInternals() {
+			// TODO
+		}
+		blur() {
+			// TODO
+		}
+		click() {
+			this.dispatchEvent(new MouseEvent("click", {"button": 0, "buttons": 1, "relatedTarget": this}));
+		}
+		focus(_options?: FocusOptions) {
+			// TODO
 		}
 	}
 
