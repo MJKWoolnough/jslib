@@ -80,6 +80,9 @@ class Router extends HTMLElement {
 		super();
 		mo.observe(this, {"childList": true});
 	}
+	get count() {
+		return this.#matchers.length;
+	}
 	#clear() {
 		this.#connected = false;
 		this.#marker.replaceWith(this.#marker = new Text());
