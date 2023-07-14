@@ -109,4 +109,4 @@ export default <T>(name: string, value: T, checker?: (v: unknown) => v is T) => 
 		setState(name, v, defStr);
 		sFn(v);
 	}];
-}
+};
