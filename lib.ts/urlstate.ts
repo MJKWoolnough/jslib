@@ -29,9 +29,8 @@ const state = new Map<string, string>(),
 
 	debounceSet  = -1;
       },
-      setState = <T>(name: string, value: T, def: string) => {
-	const existingState = state.get(name),
-	      newState = JSON.stringify(value);
+      setState = (name: string, newState: string, def: string) => {
+	const existingState = state.get(name);
 
 	if (existingState === newState) {
 		return;
@@ -49,6 +48,17 @@ const state = new Map<string, string>(),
 		} else {
 			sFn(newState ? JSON.parse(newState) : def);
 		}
+      },
+      processState = () => {
+	for (const [key, [sFn, eFn, def, last, checker]] of subscribed) {
+		const newState = state.get(key);
+
+		if (newState === last) {
+			continue;
+		}
+
+		restoreState(sFn, eFn, def, newState, checker);
+	}
       },
       subscribed = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | CheckerFn<any>]>();
 
@@ -68,15 +78,7 @@ window.addEventListener("click", (e: Event) => {
 window.addEventListener("popstate", () => {
 	getStateFromURL();
 
-	for (const [key, [sFn, eFn, def, last, checker]] of subscribed) {
-		const newState = state.get(key);
-
-		if (newState === last) {
-			continue;
-		}
-
-		restoreState(sFn, eFn, def, newState, checker);
-	}
+	processState();
 });
 
 getStateFromURL();
@@ -107,7 +109,15 @@ subscribe = <T>(name: string, value: T, checker?: CheckerFn<T>) => {
 	setTimeout(restoreState, 0, sFn, eFn, value, state.has(name) ? state.get(name) : defStr, checker);
 
 	return [s, (v: T) => {
-		setState(name, v, defStr);
+		setState(name, JSON.stringify(v), defStr);
 		sFn(v);
 	}];
+},
+setParam = (name: string, val: string) => {
+	if (!subscribed.has(name)) {
+		return;
+	}
+
+	setState(name, val, subscribed.get(name)?.[3] ?? "");
+	setTimeout(processState);
 };
