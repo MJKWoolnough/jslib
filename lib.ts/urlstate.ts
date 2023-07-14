@@ -41,6 +41,13 @@ const state = new Map<string, string>(),
 		debounceSet = setTimeout(addStateToURL);
 	}
       },
+      restoreState = <T>(sFn: (v: T) => void, eFn: (v: any) => void, def: T, newState?: string, checker?: (v: unknown) => v is T) => {
+		if (newState && checker && !checker(newState)) {
+			eFn(newState);
+		} else {
+			sFn(newState ? JSON.parse(newState) : def);
+		}
+      },
       bound = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | ((v: unknown) => v is any)]>();
 
 window.addEventListener("click", (e: Event) => {
@@ -66,11 +73,7 @@ window.addEventListener("popstate", () => {
 			continue;
 		}
 
-		if (newState && checker && !checker(newState)) {
-			eFn(newState);
-		} else {
-			sFn(newState ? JSON.parse(newState) : def);
-		}
+		restoreState(sFn, eFn, def, newState, checker);
 	}
 });
 
@@ -100,7 +103,7 @@ export default <T>(name: string, value: T, checker?: (v: unknown) => v is T) => 
 
 	cFn(() => bound.delete(name));
 
-	setTimeout(() => sFn(state.has(name) ? JSON.parse(state.get(name)!) : value));
+	setTimeout(restoreState, 0, sFn, eFn, value, state.has(name) ? state.get(name) : defStr, checker);
 
 	return [s, (v: T) => {
 		setState(name, v, defStr);
