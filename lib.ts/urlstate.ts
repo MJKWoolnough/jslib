@@ -35,39 +35,43 @@ const state = new Map<string, string>(),
 		return;
 	}
 
-	state.set(name, bound.get(name)![2] = def === newState ? "" : newState);
+	state.set(name, bound.get(name)![3] = def === newState ? "" : newState);
 	
 	if (debounceSet === -1) {
 		debounceSet = setTimeout(addStateToURL);
 	}
       },
-      bound = new Map<string, [(v: any) => void, any, string]>();
+      bound = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | ((v: unknown) => v is any)]>();
 
 window.addEventListener("popstate", () => {
 	getStateFromURL();
 
-	for (const [key, [fn, def, last]] of bound) {
+	for (const [key, [sFn, eFn, def, last, checker]] of bound) {
 		const newState = state.get(key);
 
 		if (newState === last) {
 			continue;
 		}
 
-		fn(newState ? JSON.parse(newState) : def);
+		if (newState && checker && !checker(newState)) {
+			eFn(newState);
+		} else {
+			sFn(newState ? JSON.parse(newState) : def);
+		}
 	}
 });
 
 getStateFromURL();
 
-export default <T>(name: string, value: T) => {
+export default <T>(name: string, value: T, checker?: (v: unknown) => v is T) => {
 	if (bound.has(name)) {
 		return null;
 	}
 
-	const [s, sFn,, cFn] = Subscription.bind<T>(5),
+	const [s, sFn, eFn, cFn] = Subscription.bind<T>(),
 	      defStr = JSON.stringify(value);
 
-	bound.set(name, [sFn, value, defStr]);
+	bound.set(name, [sFn, eFn, value, defStr, checker]);
 
 	cFn(() => bound.delete(name));
 
