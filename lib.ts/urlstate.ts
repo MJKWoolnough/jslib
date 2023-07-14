@@ -35,7 +35,7 @@ const state = new Map<string, string>(),
 		return;
 	}
 
-	state.set(name, bound.get(name)![3] = def === newState ? "" : newState);
+	state.set(name, subscribed.get(name)![3] = def === newState ? "" : newState);
 	
 	if (debounceSet === -1) {
 		debounceSet = setTimeout(addStateToURL);
@@ -48,7 +48,7 @@ const state = new Map<string, string>(),
 			sFn(newState ? JSON.parse(newState) : def);
 		}
       },
-      bound = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | ((v: unknown) => v is any)]>();
+      subscribed = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | ((v: unknown) => v is any)]>();
 
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;
@@ -66,7 +66,7 @@ window.addEventListener("click", (e: Event) => {
 window.addEventListener("popstate", () => {
 	getStateFromURL();
 
-	for (const [key, [sFn, eFn, def, last, checker]] of bound) {
+	for (const [key, [sFn, eFn, def, last, checker]] of subscribed) {
 		const newState = state.get(key);
 
 		if (newState === last) {
@@ -89,19 +89,18 @@ export const goto = (href: string) => {
 	}
 
 	return false;
-};
-
-export default <T>(name: string, value: T, checker?: (v: unknown) => v is T) => {
-	if (bound.has(name)) {
+},
+subscribe = <T>(name: string, value: T, checker?: (v: unknown) => v is T) => {
+	if (subscribed.has(name)) {
 		return null;
 	}
 
 	const [s, sFn, eFn, cFn] = Subscription.bind<T>(),
 	      defStr = JSON.stringify(value);
 
-	bound.set(name, [sFn, eFn, value, defStr, checker]);
+	subscribed.set(name, [sFn, eFn, value, defStr, checker]);
 
-	cFn(() => bound.delete(name));
+	cFn(() => subscribed.delete(name));
 
 	setTimeout(restoreState, 0, sFn, eFn, value, state.has(name) ? state.get(name) : defStr, checker);
 
