@@ -43,6 +43,19 @@ const state = new Map<string, string>(),
       },
       bound = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | ((v: unknown) => v is any)]>();
 
+window.addEventListener("click", (e: Event) => {
+        let target = e.target as Element | null;
+        while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
+                target = target.parentNode as Element;
+        }
+
+        const href = target?.getAttribute("href");
+
+        if (href && goto(href)) {
+                e.preventDefault();
+        }
+});
+
 window.addEventListener("popstate", () => {
 	getStateFromURL();
 
@@ -62,6 +75,18 @@ window.addEventListener("popstate", () => {
 });
 
 getStateFromURL();
+
+export const goto = (href: string) => {
+	const url = new URL(href, window.location + "");
+
+	if (url.host === window.location.host && url.port === window.location.pathname) {
+		history.pushState(Date.now(), "", url + "");
+
+		return true;
+	}
+
+	return false;
+};
 
 export default <T>(name: string, value: T, checker?: (v: unknown) => v is T) => {
 	if (bound.has(name)) {
