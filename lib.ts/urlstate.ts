@@ -4,7 +4,7 @@ let debounceSet = -1;
 
 const state = new Map<string, string>(),
       getStateFromURL = () => {
-      	state.clear();
+	state.clear();
 
 	for (const [key, value] of new URLSearchParams(window.location.search)) {
 		state.set(key, JSON.parse(value));
@@ -44,16 +44,16 @@ const state = new Map<string, string>(),
       bound = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | ((v: unknown) => v is any)]>();
 
 window.addEventListener("click", (e: Event) => {
-        let target = e.target as Element | null;
-        while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
-                target = target.parentNode as Element;
-        }
+	let target = e.target as Element | null;
+	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
+		target = target.parentNode as Element;
+	}
 
-        const href = target?.getAttribute("href");
+	const href = target?.getAttribute("href");
 
-        if (href && goto(href)) {
-                e.preventDefault();
-        }
+	if (href && goto(href)) {
+		e.preventDefault();
+	}
 });
 
 window.addEventListener("popstate", () => {
