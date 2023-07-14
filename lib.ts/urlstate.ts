@@ -1,5 +1,7 @@
 import {Subscription} from './inter.js';
 
+type CheckerFn<T> = (v: unknown) => v is T;
+
 let debounceSet = -1;
 
 const state = new Map<string, string>(),
@@ -41,14 +43,14 @@ const state = new Map<string, string>(),
 		debounceSet = setTimeout(addStateToURL);
 	}
       },
-      restoreState = <T>(sFn: (v: T) => void, eFn: (v: any) => void, def: T, newState?: string, checker?: (v: unknown) => v is T) => {
+      restoreState = <T>(sFn: (v: T) => void, eFn: (v: any) => void, def: T, newState?: string, checker?: CheckerFn<T>) => {
 		if (newState && checker && !checker(newState)) {
 			eFn(newState);
 		} else {
 			sFn(newState ? JSON.parse(newState) : def);
 		}
       },
-      subscribed = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | ((v: unknown) => v is any)]>();
+      subscribed = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | CheckerFn<any>]>();
 
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;
@@ -90,7 +92,7 @@ export const goto = (href: string) => {
 
 	return false;
 },
-subscribe = <T>(name: string, value: T, checker?: (v: unknown) => v is T) => {
+subscribe = <T>(name: string, value: T, checker?: CheckerFn<T>) => {
 	if (subscribed.has(name)) {
 		return null;
 	}
