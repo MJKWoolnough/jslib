@@ -117,6 +117,7 @@ export class Requester<T, U extends any[] = any[]> {
 	}
 }
 
+/** The Subscribed type returns the resolution type of the passed Subscription. Subscribed<Subscription<T>> returns T. */
 export type Subscribed<T> = T extends Subscription<infer U> ? U : never;
 
 /**
