@@ -240,6 +240,36 @@ export class Subscription {
 			});
 		});
 	}
+	static any(...subs) {
+		let debounce = -1;
+
+		const [s, sFn, eFn, cFn] = Subscription.bind(),
+		      defs = subs.map(s => s instanceof Subscription ? undefined : s[1]);
+
+		for (const [n, s] of subs.entries()) {
+			const t = s instanceof Subscription ? s : s[0];
+
+			t.when(v => {
+				defs[n] = v;
+
+				if (debounce === -1) {
+					debounce = setTimeout(() => {
+						sFn(defs);
+						debounce = -1;
+					});
+				}
+			});
+			t.catch(eFn);
+		}
+
+		cFn(() => {
+			for (const s of subs) {
+				(s instanceof Subscription ? s : s[0]).cancel();
+			}
+		});
+
+		return s;
+	}
 	/**
 	 * This method returns an Array of functions bound to the when, error, and cancel methods of the Subscription Class. The bindmask determines which methods are bound.
 	 *

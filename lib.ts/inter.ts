@@ -120,6 +120,12 @@ export class Requester<T, U extends any[] = any[]> {
 /** The Subscribed type returns the resolution type of the passed Subscription. Subscribed<Subscription<T>> returns T. */
 export type Subscribed<T> = T extends Subscription<infer U> ? U : never;
 
+type SubscriptionWithDefault<T> = readonly [Subscription<T>, T];
+
+type RetArr<T extends readonly unknown[] | []> = {
+	-readonly [K in keyof T]: T[K] extends SubscriptionWithDefault<infer U> ? U : Subscribed<T[K]> | undefined;
+}
+
 /**
  * The Subscription Class is similar to the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} class, but any success and error functions can be called multiple times.
  */
@@ -252,6 +258,36 @@ export class Subscription<T> {
 				}
 			});
 		});
+	}
+	static any<const T extends readonly (Subscription<unknown> | SubscriptionWithDefault<unknown>)[] | []>(...subs: T) {
+		let debounce = -1;
+
+		const [s, sFn, eFn, cFn] = Subscription.bind<RetArr<T>>(),
+		      defs = subs.map(s => s instanceof Subscription ? undefined : s[1]) as RetArr<T>;
+
+		for (const [n, s] of subs.entries()) {
+			const t = s instanceof Subscription ? s : s[0];
+
+			t.when((v: any) => {
+				defs[n] = v;
+
+				if (debounce === -1) {
+					debounce = setTimeout(() => {
+						sFn(defs);
+						debounce = -1;
+					});
+				}
+			});
+			t.catch(eFn);
+		}
+
+		cFn(() => {
+			for (const s of subs) {
+				(s instanceof Subscription ? s : s[0]).cancel();
+			}
+		});
+
+		return s;
 	}
 	/**
 	 * This method returns an Array of functions bound to the when, error, and cancel methods of the Subscription Class. The bindmask determines which methods are bound.
