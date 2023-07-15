@@ -240,6 +240,20 @@ export class Subscription {
 			});
 		});
 	}
+	/**
+	 *
+	 * This method combines the passed in Subscriptions into a single Subscription that fires whenever any of the passed Subscriptions do. The data passed to the success function is an array of the latest value from each of the Subscriptions.
+	 *
+	 * Initial data for a Subscription can be set by putting the Subscription in a tuple with the default value as the second element (SubscriptionWithDefault).
+	 * 
+	 * If no default is specified, the default is undefined.
+	 * 
+	 * NB: The combined Subscription will fire in the next event loop, in order to collect all simultaneous changes.
+	 *
+	 * @param {...(Subscription | [Subscription, any])} subs The subscriptions to be merged, and with an option default type in a tuple.
+	 *
+	 * @return {Subscription} The combined Subscription that will fire when any of the passed subscriptions fire.
+	 */
 	static any(...subs) {
 		let debounce = -1;
 
