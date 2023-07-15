@@ -1343,6 +1343,7 @@ The Subscription Class is similar to the [Promise](https://developer.mozilla.org
 
 |  Method  |  Type  |  Description  |
 |----------|--------|---------------|
+| [any](#inter_subscription_any) | Static Method | This method creates a new Subscription that fires when any of the passed Subscriptions fire. |
 | [bind](#inter_subscription_bind) | Static Method | This method binds the when, error, and cancel functions. |
 | [cancel](#inter_subscription_cancel) | Method | This method sends a cancel signal up the Subscription chain. |
 | [catch](#inter_subscription_catch) | Method | This method acts like the [Promise.catch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch) method. |
@@ -1351,6 +1352,23 @@ The Subscription Class is similar to the [Promise](https://developer.mozilla.org
 | [merge](#inter_subscription_merge) | Static Method | This combines several Subscriptions into one. |
 | [splitCancel](#inter_subscription_splitcancel) | Method | This method set all child Subscription objects to remove themselves from this Subscription using the cancel method. |
 | [when](#inter_subscription_when) | Method | This method acts like the [Promise.then](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) method. |
+
+#### <a name="inter_subscription_any">any</a>
+```typescript
+type SubscriptionWithDefault<T> = [Subscription<T>, T];
+
+class Subscription {
+	static any<T extends readonly (Subscription<T> | SubscriptionWithDefault<T>)[]>(...subs: T): Subscription<Subscribed<T>[]>;
+}
+```
+
+This method combines the passed in Subscriptions into a single Subscription that fires whenever any of the passed Subscriptions do. The data passed to the success function is an array of the latest value from each of the Subscriptions.
+
+Initial data for a Subscription can be set by putting the Subscription in a tuple with the default value as the second element (SubscriptionWithDefault).
+
+If no default is specified, the default is undefined.
+
+NB: The combined Subscription will fire in the next event loop, in order to collect all simultaneous changes.
 
 #### <a name="inter_subscription_bind">bind</a>
 ```typescript
