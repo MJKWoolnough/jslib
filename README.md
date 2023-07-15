@@ -1171,6 +1171,7 @@ The inter module provides classes to aid with communication between otherwise un
 | [Pickup](#inter_pickup) | Class | A type that lets a setter 'drop of' a value for a getter to 'pick up', after which the value is removed. |
 | [Pipe](#inter_pipe) | Class | A simple communication class for sending data to multiple clients. |
 | [Requester](#inter_requester) | Class | A simple communication class for multiple clients to request data from a server. |
+| Subscribed | Type | The Subscribed type returns the resolution type of the passed Subscription. Subscribed<Subscription<T>> returns T. |
 | [Subscription](#inter_subscription) | Class | This class provides a multi-firing version of a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise). |
 | [WaitGroup](#inter_waitgroup) | Class | This Class updates clients on the status of multiple threads of operation. |
 | [WaitInfo](#inter_waitinfo) | Type | This type is the info delivered to clients of WaitGroup. |
