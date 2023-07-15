@@ -117,6 +117,8 @@ export class Requester<T, U extends any[] = any[]> {
 	}
 }
 
+export type Subscribed<T> = T extends Subscription<infer U> ? U : never;
+
 /**
  * The Subscription Class is similar to the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} class, but any success and error functions can be called multiple times.
  */
