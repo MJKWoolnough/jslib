@@ -261,9 +261,7 @@ export class Subscription {
 		      defs = subs.map(s => s instanceof Subscription ? undefined : s[1]);
 
 		for (const [n, s] of subs.entries()) {
-			const t = s instanceof Subscription ? s : s[0];
-
-			t.when(v => {
+			(s instanceof Array ? s[0] : s).when(v => {
 				defs[n] = v;
 
 				if (debounce === -1) {
@@ -272,8 +270,7 @@ export class Subscription {
 						debounce = -1;
 					});
 				}
-			});
-			t.catch(eFn);
+			}, eFn);
 		}
 
 		cFn(() => {

@@ -172,9 +172,9 @@ export class Subscription<T> implements SubscriptionType<T> {
 	 * @param {((data: T) => TResult1) | null} [successFn] The Function to be called on a success.
 	 * @param {((data: any) => TResult2) | null} [errorFn] The Function to be called on an error.
 	 *
-	 * @return {SubscriptionType} A new Subscription that continues the Subscription chain.
+	 * @return {Subscription} A new Subscription that continues the Subscription chain.
 	 */
-	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): SubscriptionType<TResult1 | TResult2> {
+	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): Subscription<TResult1 | TResult2> {
 		const s = new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void) => {
 			this.#success(successFn instanceof Function ? (data: T) => {
 				try {
@@ -203,9 +203,9 @@ export class Subscription<T> implements SubscriptionType<T> {
 	 *
 	 * @param {(data: any) => TResult} errorFn A Function to be called when the Subscription throws an error.
 	 *
-	 * @return {SubscriptionType} A new Subscription that can respond to the output of the supplied Function.
+	 * @return {Subscription} A new Subscription that can respond to the output of the supplied Function.
 	 */
-	catch<TResult = never>(errorFn: (data: any) => TResult): SubscriptionType<T | TResult> {
+	catch<TResult = never>(errorFn: (data: any) => TResult): Subscription<T | TResult> {
 		return this.when(undefined, errorFn);
 	}
 	/**
@@ -213,9 +213,9 @@ export class Subscription<T> implements SubscriptionType<T> {
 	 *
 	 * @param {() => void} afterFn A Function that will be called whenever this Subscription is activated.
 	 *
-	 * @return {SubscriptionType} A new Subscription that responds to the output of the parent Subscription Object.
+	 * @return {Subscription} A new Subscription that responds to the output of the parent Subscription Object.
 	 */
-	finally(afterFn: () => void): SubscriptionType<T> {
+	finally(afterFn: () => void): Subscription<T> {
 		return this.when((data: T) => (afterFn(), data), (error: any) => {
 			afterFn();
 			throw error;
@@ -226,7 +226,7 @@ export class Subscription<T> implements SubscriptionType<T> {
 	 *
 	 * @param {boolean} [cancelOnEmpty] When true, will send an actual cancel signal all the way up the chain when called on the last split child.
 	 *
-	 * @return {() => SubscriptionType} A Function that returns a new Subscription with the cancel signal intercepted.
+	 * @return {() => Subscription} A Function that returns a new Subscription with the cancel signal intercepted.
 	 */
 	splitCancel(cancelOnEmpty: boolean = false): () => Subscription<T> {
 		const [successSend, successReceive, successRemove] = new Pipe<T>().bind(),
@@ -287,9 +287,7 @@ export class Subscription<T> implements SubscriptionType<T> {
 		      defs = subs.map(s => s instanceof Array ?  s[1] : undefined) as RetArr<T>;
 
 		for (const [n, s] of subs.entries()) {
-			const t = s instanceof Array ? s[0] : s;
-
-			t.when((v: any) => {
+			(s instanceof Array ? s[0] : s).when((v: any) => {
 				defs[n] = v;
 
 				if (debounce === -1) {
@@ -298,8 +296,7 @@ export class Subscription<T> implements SubscriptionType<T> {
 						debounce = -1;
 					});
 				}
-			});
-			t.catch(eFn);
+			}, eFn);
 		}
 
 		cFn(() => {
