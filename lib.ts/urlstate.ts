@@ -128,10 +128,10 @@ window.addEventListener("popstate", () => {
 getStateFromURL();
 
 export const goto = (href: string) => {
-	const url = new URL(href, window.location + "");
-
-	if (url.host === window.location.host && url.port === window.location.pathname) {
-		history.pushState(Date.now(), "", url + "");
+	if (href.startsWith("?")) {
+		history.pushState(Date.now(), "", href);
+		getStateFromURL();
+		processState();
 
 		return true;
 	}
