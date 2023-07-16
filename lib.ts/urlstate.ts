@@ -1,4 +1,48 @@
+import {Bound} from './bind.js';
 import {Subscription} from './inter.js';
+
+const badValue = Symbol("bad");
+
+class StateBound<T> extends Bound<T> {
+	#name: string;
+	#s: Subscription<T>;
+	#sFn: (data: T) => void;
+	#eFn: (data: string) => void;
+	constructor(name: string, v: T, cancel: () => void) {
+		super(v);
+
+		const [s, sFn, eFn, cFn] = Subscription.bind<T>();
+
+		this.#name = name;
+		this.#s = s;
+		this.#sFn = sFn;
+		this.#eFn = eFn;
+		cFn(cancel);
+	}
+
+	get name() {
+		return this.#name;
+	}
+	set value(v: T) {
+		super.value = v;
+		this.#sFn(v);
+	}
+	[badValue](v: string) {
+		this.#eFn(v);
+	}
+	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
+		return this.#s.when(successFn, errorFn);
+	}
+	catch<TResult = never>(errorFn: (data: any) => TResult) {
+		return this.#s.catch(errorFn);
+	}
+	finally(afterFn: () => void) {
+		return this.#s.finally(afterFn);
+	}
+	cancel() {
+		this.#s.cancel();
+	}
+}
 
 type CheckerFn<T> = (v: unknown) => v is T;
 
@@ -36,31 +80,31 @@ const state = new Map<string, string>(),
 		return;
 	}
 
-	state.set(name, subscribed.get(name)![3] = def === newState ? "" : newState);
+	state.set(name, subscribed.get(name)![2] = def === newState ? "" : newState);
 	
 	if (debounceSet === -1) {
 		debounceSet = setTimeout(addStateToURL);
 	}
       },
-      restoreState = <T>(sFn: (v: T) => void, eFn: (v: any) => void, def: T, newState?: string, checker?: CheckerFn<T>) => {
+      restoreState = <T>(sb: StateBound<T>, def: T, newState?: string, checker?: CheckerFn<T>) => {
 		if (newState && checker && !checker(newState)) {
-			eFn(newState);
+			sb[badValue](newState);
 		} else {
-			sFn(newState ? JSON.parse(newState) : def);
+			sb.value = (newState ? JSON.parse(newState) : def);
 		}
       },
       processState = () => {
-	for (const [key, [sFn, eFn, def, last, checker]] of subscribed) {
+	for (const [key, [sb, def, last, checker]] of subscribed) {
 		const newState = state.get(key);
 
 		if (newState === last) {
 			continue;
 		}
 
-		restoreState(sFn, eFn, def, newState, checker);
+		restoreState(sb, def, newState, checker);
 	}
       },
-      subscribed = new Map<string, [(v: any) => void, (e: any) => void, any, string, undefined | CheckerFn<any>]>();
+      subscribed = new Map<string, [StateBound<any>, any, string, undefined | CheckerFn<any>]>();
 
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;
@@ -99,25 +143,20 @@ subscribe = <T>(name: string, value: T, checker?: CheckerFn<T>) => {
 		return null;
 	}
 
-	const [s, sFn, eFn, cFn] = Subscription.bind<T>(),
+	const s = new StateBound(name, value, () => subscribed.delete(name)),
 	      defStr = JSON.stringify(value);
 
-	subscribed.set(name, [sFn, eFn, value, defStr, checker]);
+	subscribed.set(name, [s, value, defStr, checker]);
 
-	cFn(() => subscribed.delete(name));
+	setTimeout(restoreState, 0, s, value, state.has(name) ? state.get(name) : defStr, checker);
 
-	setTimeout(restoreState, 0, sFn, eFn, value, state.has(name) ? state.get(name) : defStr, checker);
-
-	return [s, (v: T) => {
-		setState(name, JSON.stringify(v), defStr);
-		sFn(v);
-	}];
+	return s
 },
 setParam = (name: string, val: string) => {
 	if (!subscribed.has(name)) {
 		return;
 	}
 
-	setState(name, val, subscribed.get(name)?.[3] ?? "");
+	setState(name, val, subscribed.get(name)?.[2] ?? "");
 	setTimeout(processState);
 };
