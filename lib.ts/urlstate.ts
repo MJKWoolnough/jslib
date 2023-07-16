@@ -93,7 +93,11 @@ const state = new Map<string, string>(),
 		if (newState && checker && !checker(newState)) {
 			sb[badValue](newState);
 		} else {
-			sb.value = (newState ? JSON.parse(newState) : def);
+			try {
+				sb.value = (newState ? JSON.parse(newState) : def);
+			} catch {
+				sb[badValue](newState ?? "");
+			}
 		}
       },
       processState = () => {
