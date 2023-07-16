@@ -56,7 +56,7 @@ const state = new Map<string, string>(),
 	state.clear();
 
 	for (const [key, value] of new URLSearchParams(window.location.search)) {
-		state.set(key, JSON.parse(value));
+		state.set(key, value);
 	}
       },
       addStateToURL = () => {
