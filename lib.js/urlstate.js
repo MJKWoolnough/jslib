@@ -1,4 +1,51 @@
+import {Bound} from './bind.js';
 import {Subscription} from './inter.js';
+
+const badValue = Symbol("bad");
+
+class StateBound extends Bound {
+	#name;
+	#s;
+	#sFn;
+	#eFn;
+	constructor(name, v, cancel) {
+		super(v);
+
+		const [s, sFn, eFn, cFn] = Subscription.bind();
+
+		this.#name = name;
+		this.#s = s;
+		this.#sFn = sFn;
+		this.#eFn = eFn;
+		cFn(cancel);
+	}
+
+	get name() {
+		return this.#name;
+	}
+	get value() {
+		return super.value;
+	}
+	set value(v) {
+		super.value = v;
+		this.#sFn(v);
+	}
+	[badValue](v) {
+		this.#eFn(v);
+	}
+	when(successFn, errorFn) {
+		return this.#s.when(successFn, errorFn);
+	}
+	catch(errorFn) {
+		return this.#s.catch(errorFn);
+	}
+	finally(afterFn) {
+		return this.#s.finally(afterFn);
+	}
+	cancel() {
+		this.#s.cancel();
+	}
+}
 
 let debounceSet = -1;
 
@@ -7,7 +54,7 @@ const state = new Map(),
 	state.clear();
 
 	for (const [key, value] of new URLSearchParams(window.location.search)) {
-		state.set(key, JSON.parse(value));
+		state.set(key, value);
 	}
       },
       addStateToURL = () => {
@@ -34,28 +81,32 @@ const state = new Map(),
 		return;
 	}
 
-	state.set(name, subscribed.get(name)[3] = def === newState ? "" : newState);
+	state.set(name, subscribed.get(name)[2] = def === newState ? "" : newState);
 	
 	if (debounceSet === -1) {
 		debounceSet = setTimeout(addStateToURL);
 	}
       },
-      restoreState = (sFn, eFn, def, newState, checker) => {
+      restoreState = (sb, def, newState, checker) => {
 		if (newState && checker && !checker(newState)) {
-			eFn(newState);
+			sb[badValue](newState);
 		} else {
-			sFn(newState ? JSON.parse(newState) : def);
+			try {
+				sb.value = (newState ? JSON.parse(newState) : def);
+			} catch {
+				sb[badValue](newState ?? "");
+			}
 		}
       },
       processState = () => {
-	for (const [key, [sFn, eFn, def, last, checker]] of subscribed) {
+	for (const [key, [sb, def, last, checker]] of subscribed) {
 		const newState = state.get(key);
 
 		if (newState === last) {
 			continue;
 		}
 
-		restoreState(sFn, eFn, def, newState, checker);
+		restoreState(sb, def, newState, checker);
 	}
       },
       subscribed = new Map();
@@ -82,10 +133,10 @@ window.addEventListener("popstate", () => {
 getStateFromURL();
 
 export const goto = href => {
-	const url = new URL(href, window.location + "");
-
-	if (url.host === window.location.host && url.port === window.location.pathname) {
-		history.pushState(Date.now(), "", url + "");
+	if (href.startsWith("?")) {
+		history.pushState(Date.now(), "", href);
+		getStateFromURL();
+		processState();
 
 		return true;
 	}
@@ -97,25 +148,20 @@ subscribe = (name, value, checker) => {
 		return null;
 	}
 
-	const [s, sFn, eFn, cFn] = Subscription.bind(),
+	const s = new StateBound(name, value, () => subscribed.delete(name)),
 	      defStr = JSON.stringify(value);
 
-	subscribed.set(name, [sFn, eFn, value, defStr, checker]);
+	subscribed.set(name, [s, value, defStr, checker]);
 
-	cFn(() => subscribed.delete(name));
+	setTimeout(restoreState, 0, s, value, state.has(name) ? state.get(name) : defStr, checker);
 
-	setTimeout(restoreState, 0, sFn, eFn, value, state.has(name) ? state.get(name) : defStr, checker);
-
-	return [s, v => {
-		setState(name, JSON.stringify(v), defStr);
-		sFn(v);
-	}];
+	return s
 },
 setParam = (name, val) => {
 	if (!subscribed.has(name)) {
 		return;
 	}
 
-	setState(name, val, subscribed.get(name)?.[3] ?? "");
+	setState(name, val, subscribed.get(name)?.[2] ?? "");
 	setTimeout(processState);
 };
