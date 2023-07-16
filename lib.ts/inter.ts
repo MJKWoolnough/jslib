@@ -117,10 +117,17 @@ export class Requester<T, U extends any[] = any[]> {
 	}
 }
 
-/** The Subscribed type returns the resolution type of the passed Subscription. Subscribed<Subscription<T>> returns T. */
-export type Subscribed<T> = T extends Subscription<infer U> ? U : never;
+type SubscriptionType<T> = {
+	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): SubscriptionType<TResult1 | TResult2>;
+	catch<TResult = never>(errorFn: (data: any) => TResult): SubscriptionType<T | TResult>;
+	finally(afterFn: () => void): SubscriptionType<T>;
+	cancel(): void;
+}
 
-type SubscriptionWithDefault<T> = readonly [Subscription<T>, T];
+/** The Subscribed type returns the resolution type of the passed Subscription. Subscribed<Subscription<T>> returns T. */
+export type Subscribed<T> = T extends SubscriptionType<infer U> ? U : never;
+
+type SubscriptionWithDefault<T> = readonly [SubscriptionType<T>, T];
 
 type RetArr<T extends readonly unknown[] | []> = {
 	-readonly [K in keyof T]: T[K] extends SubscriptionWithDefault<infer U> ? U : Subscribed<T[K]> | undefined;
@@ -129,7 +136,7 @@ type RetArr<T extends readonly unknown[] | []> = {
 /**
  * The Subscription Class is similar to the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} class, but any success and error functions can be called multiple times.
  */
-export class Subscription<T> {
+export class Subscription<T> implements SubscriptionType<T> {
 	#success: (fn: (data: T) => void) => void;
 	#error: (fn: (data: any) => void) => void;
 	#cancel?: () => void;
@@ -165,9 +172,9 @@ export class Subscription<T> {
 	 * @param {((data: T) => TResult1) | null} [successFn] The Function to be called on a success.
 	 * @param {((data: any) => TResult2) | null} [errorFn] The Function to be called on an error.
 	 *
-	 * @return {Subscription} A new Subscription that continues the Subscription chain.
+	 * @return {SubscriptionType} A new Subscription that continues the Subscription chain.
 	 */
-	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): Subscription<TResult1 | TResult2> {
+	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): SubscriptionType<TResult1 | TResult2> {
 		const s = new Subscription<TResult1 | TResult2>((sFn: (data: TResult1 | TResult2) => void, eFn: (data: any) => void) => {
 			this.#success(successFn instanceof Function ? (data: T) => {
 				try {
@@ -196,9 +203,9 @@ export class Subscription<T> {
 	 *
 	 * @param {(data: any) => TResult} errorFn A Function to be called when the Subscription throws an error.
 	 *
-	 * @return {Subscription} A new Subscription that can respond to the output of the supplied Function.
+	 * @return {SubscriptionType} A new Subscription that can respond to the output of the supplied Function.
 	 */
-	catch<TResult = never>(errorFn: (data: any) => TResult): Subscription<T | TResult> {
+	catch<TResult = never>(errorFn: (data: any) => TResult): SubscriptionType<T | TResult> {
 		return this.when(undefined, errorFn);
 	}
 	/**
@@ -206,9 +213,9 @@ export class Subscription<T> {
 	 *
 	 * @param {() => void} afterFn A Function that will be called whenever this Subscription is activated.
 	 *
-	 * @return {Subscription} A new Subscription that responds to the output of the parent Subscription Object.
+	 * @return {SubscriptionType} A new Subscription that responds to the output of the parent Subscription Object.
 	 */
-	finally(afterFn: () => void): Subscription<T> {
+	finally(afterFn: () => void): SubscriptionType<T> {
 		return this.when((data: T) => (afterFn(), data), (error: any) => {
 			afterFn();
 			throw error;
@@ -219,7 +226,7 @@ export class Subscription<T> {
 	 *
 	 * @param {boolean} [cancelOnEmpty] When true, will send an actual cancel signal all the way up the chain when called on the last split child.
 	 *
-	 * @return {() => Subscription} A Function that returns a new Subscription with the cancel signal intercepted.
+	 * @return {() => SubscriptionType} A Function that returns a new Subscription with the cancel signal intercepted.
 	 */
 	splitCancel(cancelOnEmpty: boolean = false): () => Subscription<T> {
 		const [successSend, successReceive, successRemove] = new Pipe<T>().bind(),
@@ -243,11 +250,11 @@ export class Subscription<T> {
 	/**
 	 * The merge static method combines any number of Subscription objects into a single subscription, so that all parent success and catch calls are combined, and any cancel signal will be sent to all parents.
 	 *
-	 * @param {...Subscription} subs The Subscriptions to be merged.
+	 * @param {...SubscriptionType} subs The Subscriptions to be merged.
 	 *
 	 * @return {Subscription} The merged Subscription Object.
 	 */
-	static merge<T>(...subs: Subscription<T>[]): Subscription<T> {
+	static merge<T>(...subs: SubscriptionType<T>[]): Subscription<T> {
 		return new Subscription<T>((success: (data: T) => void, error: (data: any) => void, cancel: (data: () => void) => void) => {
 			for (const s of subs) {
 				s.when(success, error);
@@ -269,18 +276,18 @@ export class Subscription<T> {
 	 * 
 	 * NB: The combined Subscription will fire in the next event loop, in order to collect all simultaneous changes.
 	 *
-	 * @param {...(Subscription | [Subscription, any])} subs The subscriptions to be merged, and with an option default type in a tuple.
+	 * @param {...(SubscriptionType | [SubscriptionType, any])} subs The subscriptions to be merged, and with an option default type in a tuple.
 	 *
 	 * @return {Subscription} The combined Subscription that will fire when any of the passed subscriptions fire.
 	 */
-	static any<const T extends readonly (Subscription<unknown> | SubscriptionWithDefault<unknown>)[] | []>(...subs: T): Subscription<RetArr<T>> {
+	static any<const T extends readonly (SubscriptionType<unknown> | SubscriptionWithDefault<unknown>)[] | []>(...subs: T): Subscription<RetArr<T>> {
 		let debounce = -1;
 
 		const [s, sFn, eFn, cFn] = Subscription.bind<RetArr<T>>(),
-		      defs = subs.map(s => s instanceof Subscription ? undefined : s[1]) as RetArr<T>;
+		      defs = subs.map(s => s instanceof Array ?  s[1] : undefined) as RetArr<T>;
 
 		for (const [n, s] of subs.entries()) {
-			const t = s instanceof Subscription ? s : s[0];
+			const t = s instanceof Array ? s[0] : s;
 
 			t.when((v: any) => {
 				defs[n] = v;
@@ -297,7 +304,7 @@ export class Subscription<T> {
 
 		cFn(() => {
 			for (const s of subs) {
-				(s instanceof Subscription ? s : s[0]).cancel();
+				(s instanceof Array ? s[0] : s).cancel();
 			}
 		});
 
