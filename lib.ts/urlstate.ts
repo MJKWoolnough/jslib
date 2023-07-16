@@ -23,6 +23,9 @@ class StateBound<T> extends Bound<T> {
 	get name() {
 		return this.#name;
 	}
+	get value() {
+		return super.value;
+	}
 	set value(v: T) {
 		super.value = v;
 		this.#sFn(v);
