@@ -88,15 +88,15 @@ const state = new Map(),
 	}
       },
       restoreState = (sb, def, newState, checker) => {
-		if (newState && checker && !checker(newState)) {
-			sb[badValue](newState);
-		} else {
-			try {
-				sb.value = (newState ? JSON.parse(newState) : def);
-			} catch {
-				sb[badValue](newState ?? "");
-			}
+	if (newState && checker && !checker(newState)) {
+		sb[badValue](newState);
+	} else {
+		try {
+			sb.value = (newState ? JSON.parse(newState) : def);
+		} catch {
+			sb[badValue](newState ?? "");
 		}
+	}
       },
       processState = () => {
 	for (const [key, [sb, def, last, checker]] of subscribed) {
