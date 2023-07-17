@@ -105,6 +105,27 @@ class TemplateBind extends Binding {
 		}
 		return str;
 	}
+	transform(fn: (v: string) => string) {
+		const ttb = new TransformedTemplateBind(this, fn);
+
+		this[setNode](ttb);
+
+		return ttb;
+	}
+}
+
+class TransformedTemplateBind extends Binding {
+	#bound: TemplateBind;
+	#fn: (v: string) => string;
+	constructor(b: TemplateBind, fn: (v: string) => string) {
+		super();
+		this.#bound = b;
+		this.#fn = fn;
+	}
+
+	toString() {
+		return this.#fn(this.#bound.toString());
+	}
 }
 
 /**
