@@ -148,6 +148,29 @@ export class Bound<T> extends Binding {
 	toString() {
 		return this.value?.toString() ?? "";
 	}
+	transform<U>(fn: (v: T) => U): TransformedBound<T, U> {
+		const tb = new TransformedBound(this, fn);
+
+		this[setNode](tb);
+
+		return tb;
+	}
+}
+
+class TransformedBound<T, U> extends Binding {
+	#bound: Bound<T>;
+	#fn: (v: T) => U;
+	constructor(b: Bound<T>, fn: (v: T) => U) {
+		super();
+		this.#bound = b;
+		this.#fn = fn;
+	}
+
+	get value() { return this.#fn(this.#bound.value); }
+
+	toString() {
+		return this.value + "";
+	}
 }
 
 /**

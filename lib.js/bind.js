@@ -141,6 +141,29 @@ export class Bound extends Binding {
 	toString() {
 		return this.value?.toString() ?? "";
 	}
+	transform(fn) {
+		const tb = new TransformedBound(this, fn);
+
+		this[setNode](tb);
+
+		return tb;
+	}
+}
+
+class TransformedBound extends Binding {
+	#bound;
+	#fn;
+	constructor(b, fn) {
+		super();
+		this.#bound = b;
+		this.#fn = fn;
+	}
+
+	get value() { return this.#fn(this.#bound.value); }
+
+	toString() {
+		return this.value + "";
+	}
 }
 
 /**
