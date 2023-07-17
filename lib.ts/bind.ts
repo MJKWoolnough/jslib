@@ -105,7 +105,14 @@ class TemplateBind extends Binding {
 		}
 		return str;
 	}
-	transform(fn: (v: string) => string) {
+	/**
+	 * This method returns a new Binding that transforms the result of the template according to the specified function.
+	 *
+	 * @param {(v: string) => string} fn The transformation function.
+	 *
+	 * @return {Binding} A binding that transforms the value of this binding.
+	 */
+	transform(fn: (v: string) => string): Binding {
 		const ttb = new TransformedTemplateBind(this, fn);
 
 		this[setNode](ttb);
@@ -169,6 +176,15 @@ export class Bound<T> extends Binding {
 	toString() {
 		return this.value?.toString() ?? "";
 	}
+	/**
+	 * This method returns a new Binding that transforms the result of this binding according to the specified function.
+	 *
+	 * @typeParam {any} U = Transformed type
+	 *
+	 * @param {(v: T) => U} fn The transformation function.
+	 *
+	 * @return {Binding} A binding that transforms the value of this binding.
+	 */
 	transform<U>(fn: (v: T) => U): TransformedBound<T, U> {
 		const tb = new TransformedBound(this, fn);
 
