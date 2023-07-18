@@ -117,7 +117,7 @@ export class Requester<T, U extends any[] = any[]> {
 	}
 }
 
-type SubscriptionType<T> = {
+export type SubscriptionType<T> = {
 	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): SubscriptionType<TResult1 | TResult2>;
 	catch<TResult = never>(errorFn: (data: any) => TResult): SubscriptionType<T | TResult>;
 	finally(afterFn: () => void): SubscriptionType<T>;
