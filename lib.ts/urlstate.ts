@@ -1,9 +1,44 @@
 import {Bound} from './bind.js';
 import {Subscription} from './inter.js';
 
+type CheckerFn<T> = (v: unknown) => v is T;
+
+let debounceSet = -1;
+
 const restore = Symbol("restore"),
       goodValue = Symbol("good"),
-      badValue = Symbol("bad");
+      badValue = Symbol("bad"),
+      state = new Map<string, string>(),
+      subscribed = new Map<string, StateBound<any>>(),
+      getStateFromURL = () => {
+	state.clear();
+
+	for (const [key, value] of new URLSearchParams(window.location.search)) {
+		state.set(key, value);
+	}
+      },
+      addStateToURL = () => {
+	const query: string[] = [];
+
+	for (const [key, value] of state) {
+		if (value) {
+			query.push(`${key}=${encodeURIComponent(value)}`);
+		}
+	}
+
+	const queryStr = query.join("&");
+
+	if (queryStr !== window.location.search.slice(1)) {
+		window.history.pushState(Date.now(), "", "?" + queryStr);
+	}
+
+	debounceSet  = -1;
+      },
+      processState = () => {
+	for (const [key, sb] of subscribed) {
+		sb[restore](state.get(key) ?? "");
+	}
+      };
 
 class StateBound<T> extends Bound<T> {
 	#name: string;
@@ -94,41 +129,6 @@ class StateBound<T> extends Bound<T> {
 	}
 }
 
-type CheckerFn<T> = (v: unknown) => v is T;
-
-let debounceSet = -1;
-
-const state = new Map<string, string>(),
-      subscribed = new Map<string, StateBound<any>>(),
-      getStateFromURL = () => {
-	state.clear();
-
-	for (const [key, value] of new URLSearchParams(window.location.search)) {
-		state.set(key, value);
-	}
-      },
-      addStateToURL = () => {
-	const query: string[] = [];
-
-	for (const [key, value] of state) {
-		if (value) {
-			query.push(`${key}=${encodeURIComponent(value)}`);
-		}
-	}
-
-	const queryStr = query.join("&");
-
-	if (queryStr !== window.location.search.slice(1)) {
-		window.history.pushState(Date.now(), "", "?" + queryStr);
-	}
-
-	debounceSet  = -1;
-      },
-      processState = () => {
-	for (const [key, sb] of subscribed) {
-		sb[restore](state.get(key) ?? "");
-	}
-      };
 
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;

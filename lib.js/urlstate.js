@@ -1,9 +1,42 @@
 import {Bound} from './bind.js';
 import {Subscription} from './inter.js';
 
+let debounceSet = -1;
+
 const restore = Symbol("restore"),
       goodValue = Symbol("good"),
-      badValue = Symbol("bad");
+      badValue = Symbol("bad"),
+      state = new Map(),
+      subscribed = new Map(),
+      getStateFromURL = () => {
+	state.clear();
+
+	for (const [key, value] of new URLSearchParams(window.location.search)) {
+		state.set(key, value);
+	}
+      },
+      addStateToURL = () => {
+	const query = [];
+
+	for (const [key, value] of state) {
+		if (value) {
+			query.push(`${key}=${encodeURIComponent(value)}`);
+		}
+	}
+
+	const queryStr = query.join("&");
+
+	if (queryStr !== window.location.search.slice(1)) {
+		window.history.pushState(Date.now(), "", "?" + queryStr);
+	}
+
+	debounceSet  = -1;
+      },
+      processState = () => {
+	for (const [key, sb] of subscribed) {
+		sb[restore](state.get(key) ?? "");
+	}
+      };
 
 class StateBound extends Bound {
 	#name;
@@ -93,40 +126,6 @@ class StateBound extends Bound {
 		this.#s.cancel();
 	}
 }
-
-let debounceSet = -1;
-
-const state = new Map(),
-      subscribed = new Map(),
-      getStateFromURL = () => {
-	state.clear();
-
-	for (const [key, value] of new URLSearchParams(window.location.search)) {
-		state.set(key, value);
-	}
-      },
-      addStateToURL = () => {
-	const query = [];
-
-	for (const [key, value] of state) {
-		if (value) {
-			query.push(`${key}=${encodeURIComponent(value)}`);
-		}
-	}
-
-	const queryStr = query.join("&");
-
-	if (queryStr !== window.location.search.slice(1)) {
-		window.history.pushState(Date.now(), "", "?" + queryStr);
-	}
-
-	debounceSet  = -1;
-      },
-      processState = () => {
-	for (const [key, sb] of subscribed) {
-		sb[restore](state.get(key) ?? "");
-	}
-      };
 
 window.addEventListener("click", e => {
 	let target = e.target;
