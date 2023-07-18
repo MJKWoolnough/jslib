@@ -157,7 +157,7 @@ export const goto = href => {
 },
 subscribe = (name, value, checker) => {
 	if (subscribed.has(name)) {
-		return null;
+		throw new Error(`key (${name}) already exists`);
 	}
 
 	return new StateBound(name, value, checker);
