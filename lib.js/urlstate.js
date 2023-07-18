@@ -1,23 +1,30 @@
 import {Bound} from './bind.js';
 import {Subscription} from './inter.js';
 
-const badValue = Symbol("bad");
+const goodValue = Symbol("good"),
+      badValue = Symbol("bad");
 
 class StateBound extends Bound {
 	#name;
 	#s;
 	#sFn;
 	#eFn;
-	constructor(name, v, cancel) {
+	#defStr;
+	constructor(name, v, checker) {
 		super(v);
 
 		const [s, sFn, eFn, cFn] = Subscription.bind();
 
+		this.#defStr = JSON.stringify(v);
 		this.#name = name;
 		this.#s = s;
 		this.#sFn = sFn;
 		this.#eFn = eFn;
-		cFn(cancel);
+
+		subscribed.set(name, [this, v, this.#defStr, checker]);
+		cFn(() => subscribed.delete(name));
+
+		setTimeout(restoreState, 0, s, v, state.has(name) ? state.get(name) : this.#defStr, checker);
 	}
 
 	get name() {
@@ -27,6 +34,11 @@ class StateBound extends Bound {
 		return super.value;
 	}
 	set value(v) {
+		setState(this.#name, JSON.stringify(v), this.#defStr)
+
+		this[goodValue](v);
+	}
+	[goodValue](v) {
 		super.value = v;
 		this.#sFn(v);
 	}
@@ -92,7 +104,7 @@ const state = new Map(),
 		sb[badValue](newState);
 	} else {
 		try {
-			sb.value = (newState ? JSON.parse(newState) : def);
+			sb[goodValue](newState ? JSON.parse(newState) : def);
 		} catch {
 			sb[badValue](newState ?? "");
 		}
@@ -148,14 +160,7 @@ subscribe = (name, value, checker) => {
 		return null;
 	}
 
-	const s = new StateBound(name, value, () => subscribed.delete(name)),
-	      defStr = JSON.stringify(value);
-
-	subscribed.set(name, [s, value, defStr, checker]);
-
-	setTimeout(restoreState, 0, s, value, state.has(name) ? state.get(name) : defStr, checker);
-
-	return s
+	return new StateBound(name, value, checker);
 },
 setParam = (name, val) => {
 	if (!subscribed.has(name)) {
