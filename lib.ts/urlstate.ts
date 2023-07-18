@@ -1,7 +1,8 @@
 import {Bound} from './bind.js';
 import {Subscription} from './inter.js';
 
-const goodValue = Symbol("good"),
+const restore = Symbol("restore"),
+      goodValue = Symbol("good"),
       badValue = Symbol("bad");
 
 class StateBound<T> extends Bound<T> {
@@ -9,22 +10,34 @@ class StateBound<T> extends Bound<T> {
 	#s: Subscription<T>;
 	#sFn: (data: T) => void;
 	#eFn: (data: string) => void;
-	#defStr: string;
-	constructor(name: string, v: T, checker?: (v: any) =>v is T) {
+	#def: T;
+	#last: string;
+	#checker?: (v: any) => v is T;
+	constructor(name: string, v: T, checker?: (v: any) => v is T) {
 		super(v);
 
 		const [s, sFn, eFn, cFn] = Subscription.bind<T>();
 
-		this.#defStr = JSON.stringify(v);
+		this.#def = v;
+		this.#last = JSON.stringify(v);
 		this.#name = name;
 		this.#s = s;
 		this.#sFn = sFn;
 		this.#eFn = eFn;
+		this.#checker = checker;
 
-		subscribed.set(name, [this, v, this.#defStr, checker]);
+		subscribed.set(name, this);
 		cFn(() => subscribed.delete(name));
 
-		setTimeout(restoreState, 0, s, v, state.has(name) ? state.get(name) : this.#defStr, checker);
+		setTimeout(() => {
+			const s = state.get(name);
+
+			if (s) {
+				this[restore](s);
+			} else {
+				sFn(v);
+			}
+		});
 	}
 
 	get name() {
@@ -34,9 +47,31 @@ class StateBound<T> extends Bound<T> {
 		return super.value;
 	}
 	set value(v: T) {
-		setState(this.#name, JSON.stringify(v), this.#defStr)
+		state.set(this.#name, v === this.#def ? "" : JSON.stringify(v));
+
+		if (debounceSet === -1) {
+			debounceSet = setTimeout(addStateToURL);
+		}
 
 		this[goodValue](v);
+	}
+	[restore](newState: string) {
+		if (newState === this.#last) {
+			return;
+		}
+
+		if (newState && this.#checker && !this.#checker(newState)) {
+			this.#eFn(newState);
+		} else {
+			try {
+				const v = newState ? JSON.parse(newState) : this.#def;
+
+				super.value = v;
+				this.#sFn(v);
+			} catch {
+				this.#eFn(newState ?? "");
+			}
+		}
 	}
 	[goodValue](v: T) {
 		super.value = v;
@@ -64,7 +99,7 @@ type CheckerFn<T> = (v: unknown) => v is T;
 let debounceSet = -1;
 
 const state = new Map<string, string>(),
-      subscribed = new Map<string, [StateBound<any>, any, string, undefined | CheckerFn<any>]>(),
+      subscribed = new Map<string, StateBound<any>>(),
       getStateFromURL = () => {
 	state.clear();
 
@@ -89,39 +124,9 @@ const state = new Map<string, string>(),
 
 	debounceSet  = -1;
       },
-      setState = (name: string, newState: string, def: string) => {
-	const existingState = state.get(name);
-
-	if (existingState === newState) {
-		return;
-	}
-
-	state.set(name, subscribed.get(name)![2] = def === newState ? "" : newState);
-	
-	if (debounceSet === -1) {
-		debounceSet = setTimeout(addStateToURL);
-	}
-      },
-      restoreState = <T>(sb: StateBound<T>, def: T, newState?: string, checker?: CheckerFn<T>) => {
-	if (newState && checker && !checker(newState)) {
-		sb[badValue](newState);
-	} else {
-		try {
-			sb[goodValue](newState ? JSON.parse(newState) : def);
-		} catch {
-			sb[badValue](newState ?? "");
-		}
-	}
-      },
       processState = () => {
-	for (const [key, [sb, def, last, checker]] of subscribed) {
-		const newState = state.get(key);
-
-		if (newState === last) {
-			continue;
-		}
-
-		restoreState(sb, def, newState, checker);
+	for (const [key, sb] of subscribed) {
+		sb[restore](state.get(key) ?? "");
 	}
       };
 
@@ -165,10 +170,11 @@ subscribe = <T>(name: string, value: T, checker?: CheckerFn<T>) => {
 	return new StateBound(name, value, checker);
 },
 setParam = (name: string, val: string) => {
-	if (!subscribed.has(name)) {
+	const s = subscribed.get(name);
+
+	if (!s) {
 		return;
 	}
 
-	setState(name, val, subscribed.get(name)?.[2] ?? "");
-	setTimeout(processState);
+	s.value = val;
 };
