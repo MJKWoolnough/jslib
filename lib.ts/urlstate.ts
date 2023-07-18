@@ -1,3 +1,4 @@
+import type {SubscriptionType} from './inter.js';
 import {Bound} from './bind.js';
 import {Subscription} from './inter.js';
 
@@ -40,7 +41,7 @@ const restore = Symbol("restore"),
 	}
       };
 
-class StateBound<T> extends Bound<T> {
+class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
 	#name: string;
 	#s: Subscription<T>;
 	#sFn: (data: T) => void;
