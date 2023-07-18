@@ -62,6 +62,7 @@ class StateBound extends Bound {
 let debounceSet = -1;
 
 const state = new Map(),
+      subscribed = new Map(),
       getStateFromURL = () => {
 	state.clear();
 
@@ -120,8 +121,7 @@ const state = new Map(),
 
 		restoreState(sb, def, newState, checker);
 	}
-      },
-      subscribed = new Map();
+      };
 
 window.addEventListener("click", e => {
 	let target = e.target;

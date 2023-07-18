@@ -64,6 +64,7 @@ type CheckerFn<T> = (v: unknown) => v is T;
 let debounceSet = -1;
 
 const state = new Map<string, string>(),
+      subscribed = new Map<string, [StateBound<any>, any, string, undefined | CheckerFn<any>]>(),
       getStateFromURL = () => {
 	state.clear();
 
@@ -122,8 +123,7 @@ const state = new Map<string, string>(),
 
 		restoreState(sb, def, newState, checker);
 	}
-      },
-      subscribed = new Map<string, [StateBound<any>, any, string, undefined | CheckerFn<any>]>();
+      };
 
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;
