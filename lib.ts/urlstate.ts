@@ -162,13 +162,6 @@ export const goto = (href: string) => {
 
 	return false;
 },
-subscribe = <T>(name: string, value: T, checker?: CheckerFn<T>) => {
-	if (subscribed.has(name)) {
-		throw new Error(`key (${name}) already exists`);
-	}
-
-	return new StateBound(name, value, checker);
-},
 setParam = (name: string, val: string) => {
 	const s = subscribed.get(name);
 
@@ -177,4 +170,12 @@ setParam = (name: string, val: string) => {
 	}
 
 	s.value = val;
+};
+
+export default <T>(name: string, value: T, checker?: CheckerFn<T>) => {
+	if (subscribed.has(name)) {
+		throw new Error(`key (${name}) already exists`);
+	}
+
+	return new StateBound(name, value, checker);
 };
