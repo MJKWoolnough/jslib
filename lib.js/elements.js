@@ -53,17 +53,6 @@ import {setAndReturn} from './misc.js';
  * NB: For pseudo-elements, the callback function will not be triggered during construction.
  */
 
-class BindFn extends Bound {
-	#fn;
-	constructor(v, fn) {
-		super(v);
-		this.#fn = fn;
-	}
-	get value() {
-		return this.#fn(super.value) ?? Null;
-	}
-}
-
 class BindMulti extends Bound {
 	#fn;
 	constructor(elem, names, fn) {
@@ -84,7 +73,7 @@ class BindMulti extends Bound {
 			return val;
 		};
 		for (const n of names) {
-			obj[n] = new BindFn(getAttr(elem, n), this.#fn);
+			obj[n] = getAttr(elem, n).transform(this.#fn);
 		}
 		this.#fn(0);
 	}
@@ -115,7 +104,7 @@ const attrs = new WeakMap(),
 	} else {
 		const attr = getAttr(c, names);
 		fn(attr.value);
-		return new BindFn(attr, fn);
+		return attr.transform(fn);
 	}
       },
       attr = (c, names, fn) => {
@@ -123,7 +112,7 @@ const attrs = new WeakMap(),
 		return new BindMulti(c, names, fn);
 	}
 	const attr = getAttr(c, names);
-	return fn instanceof Function ? new BindFn(attr, fn) : attr;
+	return fn instanceof Function ? attr.transform(fn) : attr;
       },
       childList = {"childList": true},
       classes = Array.from({"length": 8}),

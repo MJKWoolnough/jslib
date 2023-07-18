@@ -120,23 +120,12 @@ type WithAttrsOption<SelectedOptions extends Options> = WithChildrenOption<Selec
 
 type ElementFactory = WithAttrsOption<{pseudo?: false}> & WithAttrsOption<{pseudo: true}> & ((fn: (elem: HTMLElement & WithAttr & WithChildren) => Children) => DOMBind<HTMLElement & WithAttr & WithChildren>);
 
-class BindFn extends Bound<any> {
-	#fn: AttrFn;
-	constructor(v: ToString, fn: AttrFn) {
-		super(v);
-		this.#fn = fn;
-	}
-	get value() {
-		return this.#fn(super.value) ?? Null;
-	}
-}
-
 class BindMulti extends Bound<any> {
 	#fn: AttrFn;
 	constructor(elem: Node, names: string[], fn: Function) {
 		super(0);
 		let calling = false;
-		const obj: Record<string, Bound<any>> = {},
+		const obj: Record<string, Binding & {value: any}> = {},
 		      self = this;
 		this.#fn = function(this: Bound<any>, val: ToString) {
 			if (!calling) {
@@ -151,7 +140,7 @@ class BindMulti extends Bound<any> {
 			return val;
 		};
 		for (const n of names) {
-			obj[n] = new BindFn(getAttr(elem, n), this.#fn);
+			obj[n] = getAttr(elem, n).transform(this.#fn);
 		}
 		this.#fn(0);
 	}
@@ -182,7 +171,7 @@ const attrs = new WeakMap<Node, Map<string, Bound<any>>>(),
 	} else {
 		const attr = getAttr(c, names);
 		fn(attr.value);
-		return new BindFn(attr, fn);
+		return attr.transform(fn);
 	}
       },
       attr = (c: Node, names: string | string[], fn?: AttrFn) => {
@@ -190,7 +179,7 @@ const attrs = new WeakMap<Node, Map<string, Bound<any>>>(),
 		return new BindMulti(c, names, fn!);
 	}
 	const attr = getAttr(c, names);
-	return fn instanceof Function ? new BindFn(attr, fn) : attr;
+	return fn instanceof Function ? attr.transform(fn) : attr;
       },
       childList = {"childList": true},
       classes: (ConstructorOf<HTMLElement> | undefined)[] = Array.from({"length": 8}),
