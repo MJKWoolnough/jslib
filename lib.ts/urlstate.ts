@@ -7,6 +7,7 @@ type CheckerFn<T> = (v: unknown) => v is T;
 let debounceSet = -1;
 
 const restore = Symbol("restore"),
+      setValue = Symbol("set"),
       state = new Map<string, string>(),
       subscribed = new Map<string, StateBound<any>>(),
       getStateFromURL = () => {
@@ -39,23 +40,52 @@ const restore = Symbol("restore"),
 	}
       };
 
-class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
-	#name: string;
+class SubBound<T> extends Bound<T> implements SubscriptionType<T> {
 	#sub: Subscription<T>;
+	constructor(v: T, sub: Subscription<T>) {
+		super(v);
+
+		this.#sub = sub;
+	}
+	get value() {
+		return super.value;
+	}
+	[setValue](v: T) {
+		return super.value = v;
+	}
+	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): SubBound<TResult1 | TResult2> {
+		let val: TResult1 | TResult2 = undefined!;
+
+		const sub = this.#sub.when(successFn ? v => val = successFn(v) : undefined, errorFn ? v => val = errorFn(v) : undefined);
+
+		return new SubBound(val, sub);
+	}
+	catch<TResult = never>(errorFn: (data: any) => TResult) {
+		return this.when(undefined, errorFn);
+	}
+	finally(afterFn: () => void) {
+		return new SubBound(this.value, this.#sub.finally(afterFn));
+	}
+	cancel() {
+		this.#sub.cancel();
+	}
+}
+
+class StateBound<T> extends SubBound<T> {
+	#name: string;
 	#sFn: (data: T) => void;
 	#eFn: (data: string) => void;
 	#def: T;
 	#last: string;
 	#checker?: (v: any) => v is T;
 	constructor(name: string, v: T, checker?: (v: any) => v is T) {
-		super(v);
-
 		const [sub, sFn, eFn, cFn] = Subscription.bind<T>();
+
+		super(v, sub);
 
 		this.#def = v;
 		this.#last = JSON.stringify(v);
 		this.#name = name;
-		this.#sub = sub;
 		this.#sFn = sFn;
 		this.#eFn = eFn;
 		this.#checker = checker;
@@ -73,7 +103,6 @@ class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
 			}
 		});
 	}
-
 	get name() {
 		return this.#name;
 	}
@@ -87,7 +116,7 @@ class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
 			debounceSet = setTimeout(addStateToURL);
 		}
 
-		this.#sFn(super.value = v);
+		this.#sFn(this[setValue](v));
 	}
 	[restore](newState: string) {
 		if (newState === this.#last) {
@@ -98,26 +127,11 @@ class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
 			this.#eFn(newState);
 		} else {
 			try {
-				const v = newState ? JSON.parse(newState) : this.#def;
-
-				super.value = v;
-				this.#sFn(v);
+				this.#sFn(this[setValue](newState ? JSON.parse(newState) : this.#def));
 			} catch {
 				this.#eFn(newState ?? "");
 			}
 		}
-	}
-	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
-		return this.#sub.when(successFn, errorFn);
-	}
-	catch<TResult = never>(errorFn: (data: any) => TResult) {
-		return this.#sub.catch(errorFn);
-	}
-	finally(afterFn: () => void) {
-		return this.#sub.finally(afterFn);
-	}
-	cancel() {
-		this.#sub.cancel();
 	}
 }
 

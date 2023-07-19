@@ -4,6 +4,7 @@ import {Subscription} from './inter.js';
 let debounceSet = -1;
 
 const restore = Symbol("restore"),
+      setValue = Symbol("set"),
       state = new Map(),
       subscribed = new Map(),
       getStateFromURL = () => {
@@ -36,23 +37,52 @@ const restore = Symbol("restore"),
 	}
       };
 
-class StateBound extends Bound {
-	#name;
+class SubBound extends Bound {
 	#sub;
+	constructor(v, sub) {
+		super(v);
+
+		this.#sub = sub;
+	}
+	get value() {
+		return super.value;
+	}
+	[setValue](v) {
+		return super.value = v;
+	}
+	when(successFn, errorFn) {
+		let val = undefined;
+
+		const sub = this.#sub.when(successFn ? v => val = successFn(v) : undefined, errorFn ? v => val = errorFn(v) : undefined);
+
+		return new SubBound(val, sub);
+	}
+	catch(errorFn) {
+		return this.when(undefined, errorFn);
+	}
+	finally(afterFn) {
+		return new SubBound(this.value, this.#sub.finally(afterFn));
+	}
+	cancel() {
+		this.#sub.cancel();
+	}
+}
+
+class StateBound extends SubBound {
+	#name;
 	#sFn;
 	#eFn;
 	#def;
 	#last;
 	#checker;
 	constructor(name, v, checker) {
-		super(v);
-
 		const [sub, sFn, eFn, cFn] = Subscription.bind();
+
+		super(v, sub);
 
 		this.#def = v;
 		this.#last = JSON.stringify(v);
 		this.#name = name;
-		this.#sub = sub;
 		this.#sFn = sFn;
 		this.#eFn = eFn;
 		this.#checker = checker;
@@ -70,7 +100,6 @@ class StateBound extends Bound {
 			}
 		});
 	}
-
 	get name() {
 		return this.#name;
 	}
@@ -84,7 +113,7 @@ class StateBound extends Bound {
 			debounceSet = setTimeout(addStateToURL);
 		}
 
-		this.#sFn(super.value = v);
+		this.#sFn(this[setValue](v));
 	}
 	[restore](newState) {
 		if (newState === this.#last) {
@@ -95,26 +124,11 @@ class StateBound extends Bound {
 			this.#eFn(newState);
 		} else {
 			try {
-				const v = newState ? JSON.parse(newState) : this.#def;
-
-				super.value = v;
-				this.#sFn(v);
+				this.#sFn(this[setValue](newState ? JSON.parse(newState) : this.#def));
 			} catch {
 				this.#eFn(newState ?? "");
 			}
 		}
-	}
-	when(successFn, errorFn) {
-		return this.#sub.when(successFn, errorFn);
-	}
-	catch(errorFn) {
-		return this.#sub.catch(errorFn);
-	}
-	finally(afterFn) {
-		return this.#sub.finally(afterFn);
-	}
-	cancel() {
-		this.#sub.cancel();
 	}
 }
 
