@@ -135,7 +135,6 @@ window.addEventListener("click", e => {
 	}
 
 	const href = target?.getAttribute("href");
-
 	if (href && goto(href)) {
 		e.preventDefault();
 	}
