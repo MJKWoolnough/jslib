@@ -345,7 +345,7 @@ goto = (window as any).goto = (href: string, attrs?: Record<string, ToString>): 
 		}
 		lastState = now;
 		if (handled) {
-			history.pushState(now, "", new URL(href, url + "") + "");
+			history.pushState(now, "", new URL(href, url));
 		}
 	}
 	return handled;
