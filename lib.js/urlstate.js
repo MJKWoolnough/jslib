@@ -40,7 +40,7 @@ const restore = Symbol("restore"),
 
 class StateBound extends Bound {
 	#name;
-	#s;
+	#sub;
 	#sFn;
 	#eFn;
 	#def;
@@ -49,12 +49,12 @@ class StateBound extends Bound {
 	constructor(name, v, checker) {
 		super(v);
 
-		const [s, sFn, eFn, cFn] = Subscription.bind();
+		const [sub, sFn, eFn, cFn] = Subscription.bind();
 
 		this.#def = v;
 		this.#last = JSON.stringify(v);
 		this.#name = name;
-		this.#s = s;
+		this.#sub = sub;
 		this.#sFn = sFn;
 		this.#eFn = eFn;
 		this.#checker = checker;
@@ -114,16 +114,16 @@ class StateBound extends Bound {
 		this.#eFn(v);
 	}
 	when(successFn, errorFn) {
-		return this.#s.when(successFn, errorFn);
+		return this.#sub.when(successFn, errorFn);
 	}
 	catch(errorFn) {
-		return this.#s.catch(errorFn);
+		return this.#sub.catch(errorFn);
 	}
 	finally(afterFn) {
-		return this.#s.finally(afterFn);
+		return this.#sub.finally(afterFn);
 	}
 	cancel() {
-		this.#s.cancel();
+		this.#sub.cancel();
 	}
 }
 

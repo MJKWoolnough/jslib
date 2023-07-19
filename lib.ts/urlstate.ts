@@ -43,7 +43,7 @@ const restore = Symbol("restore"),
 
 class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
 	#name: string;
-	#s: Subscription<T>;
+	#sub: Subscription<T>;
 	#sFn: (data: T) => void;
 	#eFn: (data: string) => void;
 	#def: T;
@@ -52,12 +52,12 @@ class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
 	constructor(name: string, v: T, checker?: (v: any) => v is T) {
 		super(v);
 
-		const [s, sFn, eFn, cFn] = Subscription.bind<T>();
+		const [sub, sFn, eFn, cFn] = Subscription.bind<T>();
 
 		this.#def = v;
 		this.#last = JSON.stringify(v);
 		this.#name = name;
-		this.#s = s;
+		this.#sub = sub;
 		this.#sFn = sFn;
 		this.#eFn = eFn;
 		this.#checker = checker;
@@ -117,16 +117,16 @@ class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
 		this.#eFn(v);
 	}
 	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
-		return this.#s.when(successFn, errorFn);
+		return this.#sub.when(successFn, errorFn);
 	}
 	catch<TResult = never>(errorFn: (data: any) => TResult) {
-		return this.#s.catch(errorFn);
+		return this.#sub.catch(errorFn);
 	}
 	finally(afterFn: () => void) {
-		return this.#s.finally(afterFn);
+		return this.#sub.finally(afterFn);
 	}
 	cancel() {
-		this.#s.cancel();
+		this.#sub.cancel();
 	}
 }
 
