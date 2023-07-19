@@ -158,8 +158,9 @@ window.addEventListener("popstate", () => {
 getStateFromURL();
 
 export const goto = (href: string) => {
-	if (href.startsWith("?")) {
-		history.pushState(Date.now(), "", href);
+	const url = new URL(href, window.location + "");
+	if (url.host === window.location.host && url.pathname === window.location.pathname) {
+		history.pushState(Date.now(), "", url);
 		getStateFromURL();
 		processState();
 
