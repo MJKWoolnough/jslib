@@ -7,7 +7,6 @@ type CheckerFn<T> = (v: unknown) => v is T;
 let debounceSet = -1;
 
 const restore = Symbol("restore"),
-      setValue = Symbol("set"),
       state = new Map<string, string>(),
       subscribed = new Map<string, StateBound<any>>(),
       getStateFromURL = () => {
@@ -45,13 +44,10 @@ class SubBound<T> extends Bound<T> implements SubscriptionType<T> {
 	constructor(v: T, sub: Subscription<T>) {
 		super(v);
 
-		this.#sub = sub;
+		(this.#sub = sub).when(v => super.value = v);
 	}
 	get value() {
 		return super.value;
-	}
-	[setValue](v: T) {
-		return super.value = v;
 	}
 	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): SubBound<TResult1 | TResult2> {
 		let val: TResult1 | TResult2 = undefined!;
@@ -116,7 +112,7 @@ class StateBound<T> extends SubBound<T> {
 			debounceSet = setTimeout(addStateToURL);
 		}
 
-		this.#sFn(this[setValue](v));
+		this.#sFn(v);
 	}
 	[restore](newState: string) {
 		if (newState === this.#last) {
@@ -127,14 +123,13 @@ class StateBound<T> extends SubBound<T> {
 			this.#eFn(newState);
 		} else {
 			try {
-				this.#sFn(this[setValue](newState ? JSON.parse(newState) : this.#def));
+				this.#sFn(newState ? JSON.parse(newState) : this.#def);
 			} catch {
 				this.#eFn(newState ?? "");
 			}
 		}
 	}
 }
-
 
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;

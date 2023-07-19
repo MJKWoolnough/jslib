@@ -4,7 +4,6 @@ import {Subscription} from './inter.js';
 let debounceSet = -1;
 
 const restore = Symbol("restore"),
-      setValue = Symbol("set"),
       state = new Map(),
       subscribed = new Map(),
       getStateFromURL = () => {
@@ -42,13 +41,10 @@ class SubBound extends Bound {
 	constructor(v, sub) {
 		super(v);
 
-		this.#sub = sub;
+		(this.#sub = sub).when(v => super.value = v);
 	}
 	get value() {
 		return super.value;
-	}
-	[setValue](v) {
-		return super.value = v;
 	}
 	when(successFn, errorFn) {
 		let val = undefined;
@@ -113,7 +109,7 @@ class StateBound extends SubBound {
 			debounceSet = setTimeout(addStateToURL);
 		}
 
-		this.#sFn(this[setValue](v));
+		this.#sFn(v);
 	}
 	[restore](newState) {
 		if (newState === this.#last) {
@@ -124,7 +120,7 @@ class StateBound extends SubBound {
 			this.#eFn(newState);
 		} else {
 			try {
-				this.#sFn(this[setValue](newState ? JSON.parse(newState) : this.#def));
+				this.#sFn(newState ? JSON.parse(newState) : this.#def);
 			} catch {
 				this.#eFn(newState ?? "");
 			}
