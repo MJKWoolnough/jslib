@@ -4,8 +4,6 @@ import {Subscription} from './inter.js';
 let debounceSet = -1;
 
 const restore = Symbol("restore"),
-      goodValue = Symbol("good"),
-      badValue = Symbol("bad"),
       state = new Map(),
       subscribed = new Map(),
       getStateFromURL = () => {
@@ -86,7 +84,7 @@ class StateBound extends Bound {
 			debounceSet = setTimeout(addStateToURL);
 		}
 
-		this[goodValue](v);
+		this.#sFn(super.value = v);
 	}
 	[restore](newState) {
 		if (newState === this.#last) {
@@ -105,13 +103,6 @@ class StateBound extends Bound {
 				this.#eFn(newState ?? "");
 			}
 		}
-	}
-	[goodValue](v) {
-		super.value = v;
-		this.#sFn(v);
-	}
-	[badValue](v) {
-		this.#eFn(v);
 	}
 	when(successFn, errorFn) {
 		return this.#sub.when(successFn, errorFn);

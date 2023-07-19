@@ -7,8 +7,6 @@ type CheckerFn<T> = (v: unknown) => v is T;
 let debounceSet = -1;
 
 const restore = Symbol("restore"),
-      goodValue = Symbol("good"),
-      badValue = Symbol("bad"),
       state = new Map<string, string>(),
       subscribed = new Map<string, StateBound<any>>(),
       getStateFromURL = () => {
@@ -89,7 +87,7 @@ class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
 			debounceSet = setTimeout(addStateToURL);
 		}
 
-		this[goodValue](v);
+		this.#sFn(super.value = v);
 	}
 	[restore](newState: string) {
 		if (newState === this.#last) {
@@ -108,13 +106,6 @@ class StateBound<T> extends Bound<T> implements SubscriptionType<T> {
 				this.#eFn(newState ?? "");
 			}
 		}
-	}
-	[goodValue](v: T) {
-		super.value = v;
-		this.#sFn(v);
-	}
-	[badValue](v: string) {
-		this.#eFn(v);
 	}
 	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null) {
 		return this.#sub.when(successFn, errorFn);
