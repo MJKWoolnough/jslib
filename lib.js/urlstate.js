@@ -164,11 +164,9 @@ export const goto = href => {
 setParam = (name, val) => {
 	const s = subscribed.get(name);
 
-	if (!s) {
-		return;
+	if (s) {
+		s.value = val;
 	}
-
-	s.value = val;
 };
 
 export default (name, value, checker) => {
