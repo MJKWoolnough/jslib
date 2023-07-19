@@ -20,7 +20,7 @@ const restore = Symbol("restore"),
 
 	for (const [key, value] of state) {
 		if (value) {
-			query.push(`${key}=${encodeURIComponent(value)}`);
+			query.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
 		}
 	}
 
