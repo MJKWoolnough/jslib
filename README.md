@@ -1145,20 +1145,20 @@ This module directly imports the [dom](#dom) module.
 import {table, tbody, th, thead,tr, td} from './html.js';
 
 console.log(table({"class": "myTable"}, [
-        thead(tr([
-                th({"style": "background-color: #ff0"}, "Title 1"),
-                th("Title 2"),
-        ])),
-        tbody([
-                tr([
-                        td({"id": "cell_1"}, "Cell 1"),
-                        td("Cell 2"),
-                ]),
-                tr([
-                        td("Cell 3"),
-                        td("Cell 4"),
-                ])
-        ])
+	thead(tr([
+		th({"style": "background-color: #ff0"}, "Title 1"),
+		th("Title 2"),
+	])),
+	tbody([
+		tr([
+			td({"id": "cell_1"}, "Cell 1"),
+			td("Cell 2"),
+		]),
+		tr([
+			td("Cell 3"),
+			td("Cell 4"),
+		])
+	])
 ]).outerHTML);
 ```
 
