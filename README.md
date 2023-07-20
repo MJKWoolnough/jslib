@@ -274,12 +274,15 @@ export type Bound<T extends ToString = ToString> {
 	value: T;
 	constructor(value: T);
 	toString(): string;
+	transform(fn: (v: string) => string): Binding
 }
 ```
 
 Objects that extend this type can be used in place of both property values and Children in calls to [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode), as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
 
 When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
+
+The method returns a new Binding that transforms the result of the template according to the specified function.
 
 ## <a name="conn">conn</a>
 
