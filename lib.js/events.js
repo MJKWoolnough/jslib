@@ -115,7 +115,7 @@ export const
  *
  * The function returns an array of three functions, the first of which activates the event, the second of which deactivates the event and will run any keyup event handler unless false is passed into the function.
  *
- * The last function returned, allows the registered key(s) to be changed to the newKey string/array passed. The now param will be passed to the stop function when cancelling the previously assigned keys.
+ * The last function returned allows the registered key(s) to be changed to the newKey string/array passed. The `now` param will be passed to the stop function when cancelling the previously assigned keys.
  *
  * NB: If the window loses focus, the module will generate a keyup event. This can be detected be checking the {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted| Event.isTrusted} field.
  *
