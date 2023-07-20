@@ -360,7 +360,7 @@ This object modifies an HTTPRequest. It allows setting of the following:
 |  Field             |  Description  |
 |--------------------|---------------|
 | method             | Can change the request method. |
-| user               | Allows the setting of a Basic Authorization username.  |
+| user               | Allows the setting of a Basic Authorization username. |
 | password           | Allows the settings of a Basic Authorization password. |
 | headers            | An object to allow the setting or arbitrary headers. |
 | type               | Sets the Content-Type of the request. |
