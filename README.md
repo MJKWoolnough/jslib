@@ -60,6 +60,8 @@ Thematically, the above modules can be grouped into a few packages:
 
 This module contains a full [BBCode](https://en.wikipedia.org/wiki/BBCode) parser, allowing for custom tags and text handling.
 
+The current implementation requires tags be properly nested.
+
 |  Export    |  Type  | Description  |
 |------------|--------|--------------|
 | [(default)](#bbcode_default) | Function | This function is the main BBCode parsing function. |
