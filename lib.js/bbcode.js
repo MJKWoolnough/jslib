@@ -1,6 +1,8 @@
 /**
  * This module contains a full {@link https://en.wikipedia.org/wiki/BBCode | BBCode} parser, allowing for custom tags and text handling.
  *
+ * The current implementation requires tags be properly nested.
+ *
  * @module bbcode
  */
 /** */
