@@ -1254,7 +1254,7 @@ This method returns an Array of functions bound to the send, receive, and remove
 | 4                | [remove](#inter_pipe_remove) |
 
 The return will return the following:
-[*send bound function*,  *receive bound function*, *remove bound function*]
+[*send bound function*, *receive bound function*, *remove bound function*]
 
 #### <a name="inter_pipe_receive">receive</a>
 ```typescript
