@@ -28,7 +28,7 @@ const once = {"once": true},
       base = new URL(window.location+"");
 
 /**
- * In its simplest incarnation, this function takes a URL a returns a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} which will return the string response from that URL. However, the passed {@link Properties} object can modify both how the request is sent and the response interpreted.
+ * In its simplest incarnation, this function takes a URL and returns a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} which will return the string response from that URL. However, the passed {@link Properties} object can modify both how the request is sent and the response interpreted.
  *
  * @typeParam T
  * @param {string} url         The URL to request.
