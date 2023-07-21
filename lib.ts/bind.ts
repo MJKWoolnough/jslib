@@ -61,8 +61,28 @@ export class Binding<T> {
 		return this.#node(t);
 	}
 
-	#node(n: Text | Attr) {
-		this.#pipe.receive(v => n.textContent = v + "");
+	#node<U extends Text | Attr>(n: U) {
+		let node: U | null = n;
+
+		const ref = new WeakRef(n!),
+		      fn = (v: T) => {
+			const n = node ?? ref.deref();
+
+			if (!n) {
+				this.#pipe.remove(fn);
+				return;
+			}
+
+			if (n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement) {
+				node = n;
+			} else {
+				node = null;
+			}
+
+			n.textContent = v + "";
+		      };
+
+		this.#pipe.receive(fn);
 
 		return n;
 	}
