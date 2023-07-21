@@ -17,6 +17,12 @@ export type WaitInfo = {
 	waits: number;
 }
 
+type PipeWithDefault<T> = readonly [Pipe<T>, T];
+
+type PipeRetArr<T extends readonly unknown[] | []> = {
+	-readonly [K in keyof T]: T[K] extends PipeWithDefault<infer U> ? U : Pipe<T[K]> | undefined;
+}
+
 /**
  * The Pipe Class is used to pass values to multiple registered functions.
  */
@@ -86,6 +92,37 @@ export class Pipe<T> {
 	bind(bindmask: 1 | 2 | 3 | 4 | 5 | 6 | 7 = 7) {
 		return [bindmask&1 ? (data: T) => this.send(data) : undefined, bindmask&2 ? (fn: (data: T) => void) => this.receive(fn) : undefined, bindmask&4 ? (fn: (data: T) => void) => this.remove(fn) : undefined] as const;
 	}
+
+	static any<const T extends readonly (Pipe<unknown> | PipeWithDefault<unknown>)[] | []>(cb: (v: PipeRetArr<T>) => void, ...pipes: T) {
+		let debounce = -1;
+
+		const defs = pipes.map(p => p instanceof Array ?  p[1] : undefined) as PipeRetArr<T>,
+		      cancels: (() => void)[] = [];
+
+		for (const [n, p] of pipes.entries()) {
+			const pipe = (p instanceof Array ? p[0] : p),
+			      fn = (v: any) => {
+				defs[n] = v;
+
+				if (debounce === -1) {
+					debounce = setTimeout(() => {
+						cb(defs);
+						debounce = -1;
+					});
+				}
+			      };
+
+
+			pipe.receive(fn);
+			cancels.push(() => pipe.remove(fn));
+		}
+
+		return () => {
+			for (const fn of cancels) {
+				fn();
+			}
+		};
+	}
 }
 
 /** The Requester Class is used to allow a server to set a function or value for multiple clients to query. */
@@ -130,7 +167,7 @@ export type Subscribed<T> = T extends SubscriptionType<infer U> ? U : never;
 
 type SubscriptionWithDefault<T> = readonly [SubscriptionType<T>, T];
 
-type RetArr<T extends readonly unknown[] | []> = {
+type SubscriptionRetArr<T extends readonly unknown[] | []> = {
 	-readonly [K in keyof T]: T[K] extends SubscriptionWithDefault<infer U> ? U : Subscribed<T[K]> | undefined;
 }
 
@@ -281,11 +318,11 @@ export class Subscription<T> implements SubscriptionType<T> {
 	 *
 	 * @return {Subscription} The combined Subscription that will fire when any of the passed subscriptions fire.
 	 */
-	static any<const T extends readonly (SubscriptionType<unknown> | SubscriptionWithDefault<unknown>)[] | []>(...subs: T): Subscription<RetArr<T>> {
+	static any<const T extends readonly (SubscriptionType<unknown> | SubscriptionWithDefault<unknown>)[] | []>(...subs: T): Subscription<SubscriptionRetArr<T>> {
 		let debounce = -1;
 
-		const [s, sFn, eFn, cFn] = Subscription.bind<RetArr<T>>(),
-		      defs = subs.map(s => s instanceof Array ?  s[1] : undefined) as RetArr<T>;
+		const [s, sFn, eFn, cFn] = Subscription.bind<SubscriptionRetArr<T>>(),
+		      defs = subs.map(s => s instanceof Array ?  s[1] : undefined) as SubscriptionRetArr<T>;
 
 		for (const [n, s] of subs.entries()) {
 			(s instanceof Array ? s[0] : s).when((v: any) => {

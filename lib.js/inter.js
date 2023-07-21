@@ -76,6 +76,36 @@ export class Pipe {
 	bind(bindmask = 7) {
 		return [bindmask&1 ? data => this.send(data) : undefined, bindmask&2 ? fn => this.receive(fn) : undefined, bindmask&4 ? fn => this.remove(fn) : undefined];
 	}
+	static any(cb, ...pipes) {
+		let debounce = -1;
+
+		const defs = pipes.map(p => p instanceof Array ?  p[1] : undefined),
+		      cancels = [];
+
+		for (const [n, p] of pipes.entries()) {
+			const pipe = (p instanceof Array ? p[0] : p),
+			      fn = v => {
+				defs[n] = v;
+
+				if (debounce === -1) {
+					debounce = setTimeout(() => {
+						cb(defs);
+						debounce = -1;
+					});
+				}
+			      };
+
+
+			pipe.receive(fn);
+			cancels.push(() => pipe.remove(fn));
+		}
+
+		return () => {
+			for (const fn of cancels) {
+				fn();
+			}
+		};
+	}
 }
 
 /** The Requester Class is used to allow a server to set a function or value for multiple clients to query. */
