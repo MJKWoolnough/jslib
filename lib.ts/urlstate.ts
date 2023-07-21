@@ -1,5 +1,5 @@
 import type {SubscriptionType} from './inter.js';
-import {Bound} from './bind.js';
+import {Binding} from './bind.js';
 import {Subscription} from './inter.js';
 
 type CheckerFn<T> = (v: unknown) => v is T;
@@ -39,7 +39,7 @@ const restore = Symbol("restore"),
 	}
       };
 
-class SubBound<T> extends Bound<T> implements SubscriptionType<T> {
+class SubBound<T> extends Binding<T> implements SubscriptionType<T> {
 	#sub: Subscription<T>;
 	constructor(v: T, sub: Subscription<T>) {
 		super(v);
