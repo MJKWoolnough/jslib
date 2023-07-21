@@ -106,6 +106,10 @@ export class Binding<T = string> {
 	onChange<U>(fn: (v: T) => U) {
 		this.#pipe.receive(v => fn(v));
 	}
+
+	toString() {
+		return this.#value + "";
+	}
 }
 
 const processTemplate = (strings: TemplateStringsArray, ...values: any[]) => {
