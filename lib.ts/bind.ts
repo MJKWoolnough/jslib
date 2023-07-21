@@ -52,17 +52,19 @@ export class Binding<T> {
 		const a = document.createAttributeNS(null, name);
 		a.textContent = this.#value + "";
 
-		this.#pipe.receive(v => a.textContent = v + "");
-
-		return a;
+		return this.#node(a);
 	}
 
 	get [child]() {
 		const t = new Text(this.#value + "");
 
-		this.#pipe.receive(v => t.textContent = v + "");
+		return this.#node(t);
+	}
 
-		return t;
+	#node(n: Text | Attr) {
+		this.#pipe.receive(v => n.textContent = v + "");
+
+		return n;
 	}
 
 	handleEvent(e: Event) {
