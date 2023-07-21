@@ -1,4 +1,5 @@
 import {attr, child, value} from './dom.js';
+import {Pipe} from './inter.js';
 
 /**
  * This modules contains a Function for creating {@link https://developer.mozilla.org/en-US/docs/Web/API/Attr | Attr} and {@link https://developer.mozilla.org/en-US/docs/Web/API/Text | Text} nodes that update their textContent automatically.
@@ -11,160 +12,59 @@ import {attr, child, value} from './dom.js';
 /** */
 
 interface BindFn {
-	<T>(t: T): Bound<T>;
-	(strings: TemplateStringsArray, ...bindings: any[]): Binding;
+	<T>(t: T): Binding<T>;
+	(strings: TemplateStringsArray, ...bindings: any[]): TemplateBind;
 }
 
-
-const setNode = Symbol("setNode"),
-      update = Symbol("update"),
-      remove = Symbol("remove"),
-      isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function;
-
-/**
- * An abstract class that is a parent class of both of the return types from the {@link bind} function.
- */
-export abstract class Binding {
-	#set = new Set<Attr | Text | Binding | WeakRef<Attr | Text | Binding>>();
-	#to!: Function;
-	#st = -1;
-	#cleanSet(b?: Binding) {
-		if (b) {
-			this.#set.delete(b);
-		}
-		for (const n of Array.from(this.#set)) {
-			if (n instanceof WeakRef) {
-				const ref = n.deref();
-				if (!ref || ref === b) {
-					this.#set.delete(n);
-				} else if (n instanceof Binding && n.#set.size || n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement) {
-					this.#set.delete(n);
-					this.#set.add(ref);
-				}
-			} else if (n instanceof Binding && !n.#set.size || n instanceof Text && !n.parentNode || n instanceof Attr && !n.ownerElement) {
-				this.#set.delete(n);
-				this.#set.add(new WeakRef(n));
-			}
-		}
-		if (this.#st !== -1) {
-			clearTimeout(this.#st);
-			this.#st = -1;
-		}
-		if (this.#set.size) {
-			this.#st = setTimeout(this.#to ??= () => this.#cleanSet(), 50000 + Math.floor(Math.random() * 20000));
-		}
-	}
-	[attr](k: string) {
-		const a = document.createAttributeNS(null, k);
-		a.textContent = this + "";
-		return this[setNode](a);
-	}
-	get [child]() {
-		return this[setNode](new Text(this + ""));
-	}
-	[setNode]<T extends Attr | Text | Binding>(n: T) {
-		this.#cleanSet();
-		this.#set.add(n);
-		return n;
-	}
-	[update]() {
-		const text = this+"";
-		for (const wr of this.#set) {
-			const n = wr instanceof WeakRef ? wr.deref() : wr;
-			if (n instanceof Binding) {
-				n[update]();
-			} else if (n) {
-				n.textContent = text;
-			}
-		}
-		this.#cleanSet();
-	}
-	[remove](b: Binding) {
-		this.#cleanSet(b);
-	}
-	abstract toString(): string;
-}
-
-class TemplateBind extends Binding {
-	#strings: TemplateStringsArray;
-	#bindings: any[];
-	constructor(strings: TemplateStringsArray, ...bindings: any[]) {
-		super();
-		this.#strings = strings;
-		this.#bindings = bindings;
-		for (const b of bindings) {
-			if (b instanceof Binding) {
-				b[setNode](this);
-			}
-		}
-	}
-	toString() {
-		let str = "";
-		for (let i = 0; i < this.#strings.length; i++) {
-			str += this.#strings[i] + (this.#bindings[i] ?? "");
-		}
-		return str;
-	}
-	/**
-	 * This method returns a new Binding that transforms the result of the template according to the specified function.
-	 *
-	 * @param {(v: string) => string} fn The transformation function.
-	 *
-	 * @return {Binding} A binding that transforms the value of this binding.
-	 */
-	transform(fn: (v: string) => string): Binding {
-		const ttb = new TransformedTemplateBind(this, fn);
-
-		this[setNode](ttb);
-
-		return ttb;
-	}
-}
-
-class TransformedTemplateBind extends Binding {
-	#bound: TemplateBind;
-	#fn: (v: string) => string;
-	constructor(b: TemplateBind, fn: (v: string) => string) {
-		super();
-		this.#bound = b;
-		this.#fn = fn;
-	}
-
-	toString() {
-		return this.#fn(this.#bound.toString());
-	}
-}
+const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function;
 
 /**
  * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.
  *
  * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
  */
-export class Bound<T> extends Binding {
+
+export class Binding<T> {
+	#pipe = new Pipe<T>
 	#value: T;
-	constructor(v: T) {
-		super();
-		this.#value = v;
-		if (v instanceof Binding) {
-			v[setNode](this);
-		}
+
+	constructor(value: T) {
+		this.#value = value;
 	}
-	[value]() {
-		return this.value;
+
+	get [value]() {
+		return this.#value;
 	}
-	get value() { return this.#value instanceof Bound ? this.#value.value : this.#value; }
+
+	get value() {
+		return this.#value;
+	}
+
 	set value(v: T) {
-		if (this.#value !== v) {
-			if (this.#value instanceof Binding) {
-				this.#value[remove](this);
-			}
-			this.#value = v;
-			if (v instanceof Binding) {
-				v[setNode](this);
-			}
-		}
-		this[update]();
+		this.#set(v);
 	}
+
+	#set(v: T) {
+		this.#pipe.send(this.#value = v);
+	}
+
+	[attr](name: string) {
+		const a = document.createAttributeNS(null, name);
+		a.textContent = this.#value + "";
+
+		this.#pipe.receive(v => a.textContent = v + "");
+
+		return a;
+	}
+
+	get [child]() {
+		const t = new Text(this.#value + "");
+
+		this.#pipe.receive(v => t.textContent = v + "");
+
+		return t;
+	}
+
 	handleEvent(e: Event) {
 		const v = this.value;
 		if (v instanceof Function) {
@@ -173,40 +73,68 @@ export class Bound<T> extends Binding {
 			v.handleEvent(e);
 		}
 	}
-	toString() {
-		return this.value?.toString() ?? "";
-	}
-	/**
-	 * This method returns a new Binding that transforms the result of this binding according to the specified function.
-	 *
-	 * @typeParam {any} U = Transformed type
-	 *
-	 * @param {(v: T) => U} fn The transformation function.
-	 *
-	 * @return {Binding} A binding that transforms the value of this binding.
-	 */
-	transform<U>(fn: (v: T) => U): TransformedBound<T, U> {
-		const tb = new TransformedBound(this, fn);
 
-		this[setNode](tb);
+	transform<U>(fn: (v: T) => U): TransformedBinding<U> {
+		const tb = new TransformedBinding(fn(this.#value));
+
+		this.#pipe.receive(v => tb.#set(fn(v)));
 
 		return tb;
 	}
+
+	onChange<U>(fn: (v: T) => U) {
+		this.#pipe.receive(v => fn(v));
+	}
 }
 
-class TransformedBound<T, U> extends Binding {
-	#bound: Bound<T>;
-	#fn: (v: T) => U;
-	constructor(b: Bound<T>, fn: (v: T) => U) {
-		super();
-		this.#bound = b;
-		this.#fn = fn;
+const processTemplate = (strings: TemplateStringsArray, ...values: any[]) => {
+	let str = "";
+
+	for (let i = 0; i < strings.length; i++) {
+		str += strings[i] + (values[i] ?? "");
 	}
 
-	get value() { return this.#fn(this.#bound.value); }
+	return str;
+}
 
-	toString() {
-		return this.value + "";
+class TemplateBind extends Binding<string> {
+	constructor(strings: TemplateStringsArray, ...values: any[]) {
+		const vals: any[] = [];
+		
+		let debounce = -1;
+
+		for (const v of values) {
+			if (v instanceof Binding) {
+				const index = vals.length;
+
+				v.onChange(val => {
+					vals[index] = val;
+
+					if (debounce === -1) {
+						debounce = setTimeout(() => {
+							super.value = processTemplate(strings, vals);
+							debounce = -1;
+						});
+					}
+				});
+
+				vals.push(v.value);
+			} else {
+				vals.push(v);
+			}
+		}
+
+		super(processTemplate(strings, vals));
+	}
+
+	get value() {
+		return super.value;
+	}
+}
+
+class TransformedBinding<T> extends Binding<T> {
+	get value() {
+		return super.value;
 	}
 }
 
@@ -228,5 +156,5 @@ export default (<T>(v: T | TemplateStringsArray, first?: any, ...bindings: any[]
 	if (v instanceof Array && first) {
 		return new TemplateBind(v, first, ...bindings);
 	}
-	return new Bound<T>(v as T);
+	return new Binding<T>(v as T);
 }) as BindFn;
