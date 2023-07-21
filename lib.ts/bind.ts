@@ -95,7 +95,7 @@ const processTemplate = (strings: TemplateStringsArray, ...values: any[]) => {
 	}
 
 	return str;
-}
+      };
 
 class TemplateBind extends Binding<string> {
 	constructor(strings: TemplateStringsArray, ...values: any[]) {
