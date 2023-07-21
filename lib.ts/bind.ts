@@ -88,11 +88,10 @@ export class Binding<T = string> {
 	}
 
 	handleEvent(e: Event) {
-		const v = this.value;
-		if (v instanceof Function) {
-			v.call(e.currentTarget, e);
-		} else if (isEventListenerObject(v)) {
-			v.handleEvent(e);
+		if (this.#value instanceof Function) {
+			this.#value.call(e.currentTarget, e);
+		} else if (isEventListenerObject(this.#value)) {
+			this.#value.handleEvent(e);
 		}
 	}
 
