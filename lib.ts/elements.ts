@@ -1,6 +1,5 @@
-import type {Binding} from './bind.js';
 import type {Children, DOMBind, Props, PropsObject} from './dom.js';
-import bind, {Bound} from './bind.js';
+import bind, {Binding} from './bind.js';
 import {amendNode, isChildren} from './dom.js';
 import {setAndReturn} from './misc.js';
 
@@ -118,14 +117,14 @@ type WithAttrsOption<SelectedOptions extends Options> = WithChildrenOption<Selec
 
 type ElementFactory = WithAttrsOption<{pseudo?: false}> & WithAttrsOption<{pseudo: true}> & ((fn: (elem: HTMLElement & WithAttr & WithChildren) => Children) => DOMBind<HTMLElement & WithAttr & WithChildren>);
 
-class BindMulti extends Bound<any> {
+class BindMulti extends Binding<any> {
 	#fn: AttrFn;
 	constructor(elem: Node, names: string[], fn: Function) {
 		super(0);
 		let calling = false;
-		const obj: Record<string, Binding & {value: any}> = {},
+		const obj: Record<string, Binding<any>> = {},
 		      self = this;
-		this.#fn = function(this: Bound<any>, val: ToString) {
+		this.#fn = function(this: Binding<any>, val: ToString) {
 			if (!calling) {
 				calling = true;
 				const o: Record<string, ToString> = {};
@@ -144,7 +143,7 @@ class BindMulti extends Bound<any> {
 	}
 }
 
-const attrs = new WeakMap<Node, Map<string, Bound<any>>>(),
+const attrs = new WeakMap<Node, Map<string, Binding<any>>>(),
       getAttr = (elem: Node, name: string) => {
 	const attrMap = attrs.get(elem)!;
 	return attrMap.get(name) ?? setAndReturn(attrMap, name, bind((elem as HTMLElement).getAttribute(name) ?? Null));
@@ -189,7 +188,7 @@ const attrs = new WeakMap<Node, Map<string, Bound<any>>>(),
 		this.dispatchEvent(new CustomEvent("removed"));
 	}
       } : handleAttrs ? class extends getClass(false, false, children) {
-	#acts: Binding[] = [];
+	#acts: Binding<any>[] = [];
 	constructor() {
 		super();
 		attrs.set(this, new Map());
@@ -240,7 +239,7 @@ const attrs = new WeakMap<Node, Map<string, Bound<any>>>(),
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
       } : handleAttrs ? class extends DocumentFragment {
-	#acts: Binding[] = [];
+	#acts: Binding<any>[] = [];
 	readonly classList = classList;
 	readonly style = style;
 	constructor() {
