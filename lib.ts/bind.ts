@@ -57,9 +57,7 @@ export class Binding<T = string> {
 	}
 
 	get [child]() {
-		const t = new Text(this.#value + "");
-
-		return this.#node(t);
+		return this.#node(new Text(this.#value + ""));
 	}
 
 	#node<U extends Text | Attr>(n: U) {
