@@ -98,12 +98,13 @@ export class Binding<T = string> {
 	}
 
 	transform<U>(fn: (v: T) => U): TransformedBinding<U> {
-		let tb: TransformedBinding<U> | WeakRef<TransformedBinding<U>> = new TransformedBinding(fn(this.#value));
+		let tb: TransformedBinding<U> | null = new TransformedBinding(fn(this.#value));
 
 		this.#refs++;
 
-		const bFn = (v: T) => {
-			const b = tb instanceof TransformedBinding ? tb : tb.deref();
+		const ref = new WeakRef(tb!),
+		      bFn = (v: T) => {
+			const b = tb ?? ref.deref();
 
 			if (!b) {
 				this.#pipe.remove(bFn);
@@ -114,16 +115,12 @@ export class Binding<T = string> {
 
 			b.#set(fn(v))
 
-			if (b.#refs > 0) {
-				tb = b;
-			} else if (tb instanceof TransformedBinding) {
-				tb = new WeakRef(b);
-			}
+			tb = b.#refs ? b : null;
 		      };
 
 		this.#pipe.receive(bFn);
 
-		return tb as TransformedBinding<U>;
+		return tb!;
 	}
 
 	onChange<U>(fn: (v: T) => U) {
