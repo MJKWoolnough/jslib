@@ -27,6 +27,7 @@ const isEventListenerObject = (prop: unknown): prop is EventListenerObject => pr
 export class Binding<T = string> {
 	#pipe = new Pipe<T>
 	#value: T;
+	#refs = 0;
 
 	constructor(value: T) {
 		this.#value = value;
@@ -64,12 +65,16 @@ export class Binding<T = string> {
 	#node<U extends Text | Attr>(n: U) {
 		let node: U | null = n;
 
+		this.#refs++;
+
 		const ref = new WeakRef(n!),
 		      fn = (v: T) => {
 			const n = node ?? ref.deref();
 
 			if (!n) {
 				this.#pipe.remove(fn);
+				this.#refs--;
+
 				return;
 			}
 
@@ -96,11 +101,32 @@ export class Binding<T = string> {
 	}
 
 	transform<U>(fn: (v: T) => U): TransformedBinding<U> {
-		const tb = new TransformedBinding(fn(this.#value));
+		let tb: TransformedBinding<U> | WeakRef<TransformedBinding<U>> = new TransformedBinding(fn(this.#value));
 
-		this.#pipe.receive(v => tb.#set(fn(v)));
+		this.#refs++;
 
-		return tb;
+		const bFn = (v: T) => {
+			const b = tb instanceof TransformedBinding ? tb : tb.deref();
+
+			if (!b) {
+				this.#pipe.remove(bFn);
+				this.#refs--;
+
+				return;
+			}
+
+			b.#set(fn(v))
+
+			if (b.#refs > 0) {
+				tb = b;
+			} else if (tb instanceof TransformedBinding) {
+				tb = new WeakRef(b);
+			}
+		      };
+
+		this.#pipe.receive(bFn);
+
+		return tb as TransformedBinding<U>;
 	}
 
 	onChange<U>(fn: (v: T) => U) {
