@@ -63,30 +63,33 @@ export class Binding<T = string> {
 	}
 
 	#node<U extends Text | Attr>(n: U) {
-		let node: U | null = n;
+		return this.#handleRef(Object.assign(n, {[binding]: this}), (n, v) => n.textContent = v + "", n => !!(n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement));
+	}
+
+	#handleRef<U extends Text | Attr | TransformedBinding<any>>(r: U, update: (ref: U, value: T) => void, isActive: (ref: U) => boolean) {
+		let ref: U | null = r;
 
 		this.#refs++;
 
-		const ref = new WeakRef(n),
+		const wref = new WeakRef(r),
 		      fn = (v: T) => {
-			const n = node ?? ref.deref();
+			const r = ref ?? wref.deref();
 
-			if (!n) {
+			if (!r) {
 				this.#pipe.remove(fn);
 				this.#refs--;
 
 				return;
 			}
 
-			node = n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement ? n : null;
+			ref = isActive(r) ? r : null;
 
-			n.textContent = v + "";
+			update(r, v);
 		      };
 
 		this.#pipe.receive(fn);
-		Object.assign(n, {[binding]: this});
 
-		return n;
+		return r;
 	}
 
 	handleEvent(e: Event) {
@@ -98,29 +101,7 @@ export class Binding<T = string> {
 	}
 
 	transform<U>(fn: (v: T) => U): TransformedBinding<U> {
-		let tb: TransformedBinding<U> | null = new TransformedBinding(fn(this.#value));
-
-		this.#refs++;
-
-		const ref = new WeakRef(tb!),
-		      bFn = (v: T) => {
-			const b = tb ?? ref.deref();
-
-			if (!b) {
-				this.#pipe.remove(bFn);
-				this.#refs--;
-
-				return;
-			}
-
-			b.#set(fn(v))
-
-			tb = b.#refs ? b : null;
-		      };
-
-		this.#pipe.receive(bFn);
-
-		return tb!;
+		return this.#handleRef(new TransformedBinding(fn(this.#value)), (n, v) => n.#set(fn(v)), n => n.#refs > 0);
 	}
 
 	onChange<U>(fn: (v: T) => U) {
