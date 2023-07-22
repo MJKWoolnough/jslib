@@ -104,7 +104,11 @@ export class Binding<T = string> {
 	}
 
 	onChange<U>(fn: (v: T) => U) {
-		this.#pipe.receive(v => fn(v));
+		const bFn = (v: T) => fn(v);
+
+		this.#pipe.receive(bFn);
+
+		return () => this.#pipe.remove(bFn);
 	}
 
 	toString() {
