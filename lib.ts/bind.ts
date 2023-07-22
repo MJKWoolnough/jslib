@@ -68,7 +68,7 @@ export class Binding<T = string> {
 
 		this.#refs++;
 
-		const ref = new WeakRef(n!),
+		const ref = new WeakRef(n),
 		      fn = (v: T) => {
 			const n = node ?? ref.deref();
 
