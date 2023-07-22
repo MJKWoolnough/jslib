@@ -79,11 +79,7 @@ export class Binding<T = string> {
 				return;
 			}
 
-			if (n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement) {
-				node = n;
-			} else {
-				node = null;
-			}
+			node = n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement ? n : null;
 
 			n.textContent = v + "";
 		      };
