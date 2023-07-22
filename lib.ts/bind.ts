@@ -16,7 +16,8 @@ interface BindFn {
 	(strings: TemplateStringsArray, ...bindings: any[]): TemplateBind;
 }
 
-const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function;
+const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
+      binding = Symbol("binding");
 
 /**
  * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.
@@ -88,6 +89,7 @@ export class Binding<T = string> {
 		      };
 
 		this.#pipe.receive(fn);
+		Object.assign(n, {[binding]: this});
 
 		return n;
 	}
