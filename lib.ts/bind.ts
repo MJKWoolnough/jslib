@@ -107,10 +107,12 @@ export class Binding<T = string> {
 		}
 	}
 
+	/** This method returns a new Binding that transforms the result of the template according to the specified function. */
 	transform<U>(fn: (v: T) => U): ReadOnlyBinding<U> {
 		return this.#handleRef(new ReadOnlyBinding(fn(this.#value)), (n, v) => n.#set(fn(v)), n => n.#refs > 0);
 	}
 
+	/** This method runs the provided callback whenever the value changes, passing the function the current value. */
 	onChange<U>(fn: (v: T) => U) {
 		const bFn = (v: T) => fn(v);
 
