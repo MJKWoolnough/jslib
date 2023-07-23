@@ -13,7 +13,7 @@ import {Pipe} from './inter.js';
 
 interface BindFn {
 	<T>(t: T): Binding<T>;
-	(strings: TemplateStringsArray, ...bindings: any[]): TemplateBind;
+	(strings: TemplateStringsArray, ...bindings: any[]): ReadOnlyBinding<string>;
 }
 
 const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
@@ -73,7 +73,7 @@ export class Binding<T = string> {
 		return this.#handleRef(Object.assign(n, {[binding]: this}), (n, v) => n.textContent = v + "", n => !!(n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement));
 	}
 
-	#handleRef<U extends Text | Attr | TransformedBinding<any>>(r: U, update: (ref: U, value: T) => void, isActive: (ref: U) => boolean) {
+	#handleRef<U extends Text | Attr | ReadOnlyBinding<any>>(r: U, update: (ref: U, value: T) => void, isActive: (ref: U) => boolean) {
 		let ref: U | null = r;
 
 		this.#refs++;
@@ -107,8 +107,8 @@ export class Binding<T = string> {
 		}
 	}
 
-	transform<U>(fn: (v: T) => U): TransformedBinding<U> {
-		return this.#handleRef(new TransformedBinding(fn(this.#value)), (n, v) => n.#set(fn(v)), n => n.#refs > 0);
+	transform<U>(fn: (v: T) => U): ReadOnlyBinding<U> {
+		return this.#handleRef(new ReadOnlyBinding(fn(this.#value)), (n, v) => n.#set(fn(v)), n => n.#refs > 0);
 	}
 
 	onChange<U>(fn: (v: T) => U) {
@@ -124,7 +124,7 @@ export class Binding<T = string> {
 	}
 
 	static template(strings: TemplateStringsArray, ...values: any[]) {
-		let ref: Binding | null = new TemplateBind(processTemplate(strings, values));
+		let ref: Binding | null = new ReadOnlyBinding(processTemplate(strings, values));
 
 		const wref = new WeakRef(ref),
 		      cancel = Pipe.any(vals => {
@@ -157,13 +157,7 @@ export class Binding<T = string> {
 	}
 }
 
-class TemplateBind extends Binding<string> {
-	get value() {
-		return super.value;
-	}
-}
-
-class TransformedBinding<T> extends Binding<T> {
+class ReadOnlyBinding<T> extends Binding<T> {
 	get value() {
 		return super.value;
 	}
