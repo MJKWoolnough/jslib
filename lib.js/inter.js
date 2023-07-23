@@ -14,6 +14,8 @@
  * @property {number} waits The total number of registered tasks.
  */
 
+const isPipeWithDefault = v => v instanceof Array && v.length === 2 && v[0] instanceof Pipe;
+
 /**
  * The Pipe Class is used to pass values to multiple registered functions.
  */
@@ -79,25 +81,27 @@ export class Pipe {
 	static any(cb, ...pipes) {
 		let debounce = -1;
 
-		const defs = pipes.map(p => p instanceof Array ?  p[1] : undefined),
+		const defs = pipes.map(p => p instanceof Pipe ? undefined : isPipeWithDefault(p) ? p[1] : p),
 		      cancels = [];
 
 		for (const [n, p] of pipes.entries()) {
-			const pipe = (p instanceof Array ? p[0] : p),
-			      fn = v => {
-				defs[n] = v;
+			if (p instanceof Pipe || isPipeWithDefault(p)) {
+				const pipe = (p instanceof Array ? p[0] : p),
+				      fn = v => {
+					defs[n] = v;
 
-				if (debounce === -1) {
-					debounce = setTimeout(() => {
-						cb(defs);
-						debounce = -1;
-					});
-				}
-			      };
+					if (debounce === -1) {
+						debounce = setTimeout(() => {
+							cb(defs);
+							debounce = -1;
+						});
+					}
+				      };
 
 
-			pipe.receive(fn);
-			cancels.push(() => pipe.remove(fn));
+				pipe.receive(fn);
+				cancels.push(() => pipe.remove(fn));
+			}
 		}
 
 		return () => {
