@@ -17,7 +17,16 @@ interface BindFn {
 }
 
 const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
-      binding = Symbol("binding");
+      binding = Symbol("binding"),
+      processTemplate = (strings: TemplateStringsArray, values: any[]) => {
+	let str = "";
+
+	for (let i = 0; i < strings.length; i++) {
+		str += strings[i] + (values[i] ?? "");
+	}
+
+	return str;
+      };
 
 /**
  * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.
@@ -147,16 +156,6 @@ export class Binding<T = string> {
 		return ref;
 	}
 }
-
-const processTemplate = (strings: TemplateStringsArray, values: any[]) => {
-	let str = "";
-
-	for (let i = 0; i < strings.length; i++) {
-		str += strings[i] + (values[i] ?? "");
-	}
-
-	return str;
-      };
 
 class TemplateBind extends Binding<string> {
 	get value() {
