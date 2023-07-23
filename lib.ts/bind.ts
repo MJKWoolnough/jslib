@@ -17,7 +17,6 @@ interface BindFn {
 }
 
 const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
-      binding = Symbol("binding"),
       processTemplate = (strings: TemplateStringsArray, values: any[]) => {
 	let str = "";
 
@@ -70,7 +69,7 @@ export class Binding<T = string> {
 	}
 
 	#node<U extends Text | Attr>(n: U) {
-		return this.#handleRef(Object.assign(n, {[binding]: this}), (n, v) => n.textContent = v + "", n => !!(n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement));
+		return this.#handleRef(n, (n, v) => n.textContent = v + "", n => !!(n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement));
 	}
 
 	#handleRef<U extends Text | Attr | ReadOnlyBinding<any>>(r: U, update: (ref: U, value: T) => void, isActive: (ref: U) => boolean) {
