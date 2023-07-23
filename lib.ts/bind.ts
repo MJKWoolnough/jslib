@@ -113,9 +113,42 @@ export class Binding<T = string> {
 	toString() {
 		return this.#value + "";
 	}
+
+	static template(strings: TemplateStringsArray, ...values: any[]) {
+		let ref: Binding | null = new TemplateBind(processTemplate(strings, values));
+
+		const wref = new WeakRef(ref),
+		      cancel = Pipe.any(vals => {
+			const r = ref ?? wref.deref();
+
+			if (!r) {
+				for (const b of values) {
+					if (b instanceof Binding) {
+						b.#refs--;
+					}
+				}
+
+				cancel();
+
+				return;
+			}
+
+			ref = r.#refs ? r : null;
+
+			r.#set(processTemplate(strings, vals));
+		      }, ...values.map(v => v instanceof Binding ? [v.#pipe, v.value] : v));
+
+		for (const b of values) {
+			if (b instanceof Binding) {
+				b.#refs++;
+			}
+		}
+
+		return ref;
+	}
 }
 
-const processTemplate = (strings: TemplateStringsArray, ...values: any[]) => {
+const processTemplate = (strings: TemplateStringsArray, values: any[]) => {
 	let str = "";
 
 	for (let i = 0; i < strings.length; i++) {
@@ -126,35 +159,6 @@ const processTemplate = (strings: TemplateStringsArray, ...values: any[]) => {
       };
 
 class TemplateBind extends Binding<string> {
-	constructor(strings: TemplateStringsArray, ...values: any[]) {
-		const vals: any[] = [];
-		
-		let debounce = -1;
-
-		for (const v of values) {
-			if (v instanceof Binding) {
-				const index = vals.length;
-
-				v.onChange(val => {
-					vals[index] = val;
-
-					if (debounce === -1) {
-						debounce = setTimeout(() => {
-							super.value = processTemplate(strings, vals);
-							debounce = -1;
-						});
-					}
-				});
-
-				vals.push(v.value);
-			} else {
-				vals.push(v);
-			}
-		}
-
-		super(processTemplate(strings, vals));
-	}
-
 	get value() {
 		return super.value;
 	}
@@ -182,7 +186,7 @@ class TransformedBinding<T> extends Binding<T> {
  */
 export default (<T>(v: T | TemplateStringsArray, first?: any, ...bindings: any[]) => {
 	if (v instanceof Array && first) {
-		return new TemplateBind(v, first, ...bindings);
+		return Binding.template(v, first, ...bindings);
 	}
 	return new Binding<T>(v as T);
 }) as BindFn;
