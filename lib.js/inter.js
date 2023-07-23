@@ -14,7 +14,8 @@
  * @property {number} waits The total number of registered tasks.
  */
 
-const isPipeWithDefault = v => v instanceof Array && v.length === 2 && v[0] instanceof Pipe;
+const isPipeWithDefault = v => v instanceof Array && v.length === 2 && v[0] instanceof Pipe,
+      isSubscriptionWithDefault = v => v instanceof Array && v.length === 2 && v[0] instanceof Subscription;
 
 /**
  * The Pipe Class is used to pass values to multiple registered functions.
@@ -292,24 +293,28 @@ export class Subscription {
 		let debounce = -1;
 
 		const [s, sFn, eFn, cFn] = Subscription.bind(),
-		      defs = subs.map(s => s instanceof Subscription ? undefined : s[1]);
+		      defs = subs.map(s => s instanceof Subscription ? undefined : isSubscriptionWithDefault(s) ? s[1] : s);
 
 		for (const [n, s] of subs.entries()) {
-			(s instanceof Array ? s[0] : s).when(v => {
-				defs[n] = v;
+			if (s instanceof Subscription || isSubscriptionWithDefault(s)) {
+				(s instanceof Array ? s[0] : s).when(v => {
+					defs[n] = v;
 
-				if (debounce === -1) {
-					debounce = setTimeout(() => {
-						sFn(defs);
-						debounce = -1;
-					});
-				}
-			}, eFn);
+					if (debounce === -1) {
+						debounce = setTimeout(() => {
+							sFn(defs);
+							debounce = -1;
+						});
+					}
+				}, eFn);
+			}
 		}
 
 		cFn(() => {
 			for (const s of subs) {
-				(s instanceof Subscription ? s : s[0]).cancel();
+				if (s instanceof Subscription || isSubscriptionWithDefault(s)) {
+					(s instanceof Array ? s[0] : s).cancel();
+				}
 			}
 		});
 

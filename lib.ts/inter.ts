@@ -23,7 +23,25 @@ type PipeRetArr<T extends readonly unknown[] | []> = {
 	-readonly [K in keyof T]: T[K] extends PipeWithDefault<infer U> ? U : T[K] extends Pipe<infer V> ? V | undefined : T[K];
 }
 
-const isPipeWithDefault = (v: unknown): v is PipeWithDefault<any> => v instanceof Array && v.length === 2 && v[0] instanceof Pipe;
+/** This type represents any type that implements the various methods required to be considered a Subscription for the purposes of Subscription.merge and Subscription.any. */
+export type SubscriptionType<T> = {
+	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): SubscriptionType<TResult1 | TResult2>;
+	catch<TResult = never>(errorFn: (data: any) => TResult): SubscriptionType<T | TResult>;
+	finally(afterFn: () => void): SubscriptionType<T>;
+	cancel(): void;
+}
+
+/** The Subscribed type returns the resolution type of the passed Subscription. Subscribed<Subscription<T>> returns T. */
+export type Subscribed<T> = T extends SubscriptionType<infer U> ? U : never;
+
+type SubscriptionWithDefault<T> = readonly [SubscriptionType<T>, T];
+
+type SubscriptionRetArr<T extends readonly unknown[] | []> = {
+	-readonly [K in keyof T]: T[K] extends SubscriptionWithDefault<infer U> ? U : Subscribed<T[K]> | undefined;
+}
+
+const isPipeWithDefault = (v: unknown): v is PipeWithDefault<any> => v instanceof Array && v.length === 2 && v[0] instanceof Pipe,
+      isSubscriptionWithDefault = (v: unknown): v is SubscriptionWithDefault<any> => v instanceof Array && v.length === 2 && v[0] instanceof Subscription;
 
 /**
  * The Pipe Class is used to pass values to multiple registered functions.
@@ -156,23 +174,6 @@ export class Requester<T, U extends any[] = any[]> {
 	responder(f: ((...data: U) => T) | T) {
 		this.#responder = f;
 	}
-}
-
-/** This type represents any type that implements the various methods required to be considered a Subscription for the purposes of Subscription.merge and Subscription.any. */
-export type SubscriptionType<T> = {
-	when<TResult1 = T, TResult2 = never>(successFn?: ((data: T) => TResult1) | null, errorFn?: ((data: any) => TResult2) | null): SubscriptionType<TResult1 | TResult2>;
-	catch<TResult = never>(errorFn: (data: any) => TResult): SubscriptionType<T | TResult>;
-	finally(afterFn: () => void): SubscriptionType<T>;
-	cancel(): void;
-}
-
-/** The Subscribed type returns the resolution type of the passed Subscription. Subscribed<Subscription<T>> returns T. */
-export type Subscribed<T> = T extends SubscriptionType<infer U> ? U : never;
-
-type SubscriptionWithDefault<T> = readonly [SubscriptionType<T>, T];
-
-type SubscriptionRetArr<T extends readonly unknown[] | []> = {
-	-readonly [K in keyof T]: T[K] extends SubscriptionWithDefault<infer U> ? U : Subscribed<T[K]> | undefined;
 }
 
 /**
@@ -322,28 +323,32 @@ export class Subscription<T> implements SubscriptionType<T> {
 	 *
 	 * @return {Subscription} The combined Subscription that will fire when any of the passed subscriptions fire.
 	 */
-	static any<const T extends readonly (SubscriptionType<unknown> | SubscriptionWithDefault<unknown>)[] | []>(...subs: T): Subscription<SubscriptionRetArr<T>> {
+	static any<const T extends readonly (SubscriptionType<unknown> | SubscriptionWithDefault<unknown> | unknown)[] | []>(...subs: T): Subscription<SubscriptionRetArr<T>> {
 		let debounce = -1;
 
 		const [s, sFn, eFn, cFn] = Subscription.bind<SubscriptionRetArr<T>>(),
-		      defs = subs.map(s => s instanceof Array ?  s[1] : undefined) as SubscriptionRetArr<T>;
+		      defs = subs.map(s => s instanceof Subscription ? undefined : isSubscriptionWithDefault(s) ? s[1] : s) as SubscriptionRetArr<T>;
 
 		for (const [n, s] of subs.entries()) {
-			(s instanceof Array ? s[0] : s).when((v: any) => {
-				defs[n] = v;
+			if (s instanceof Subscription || isSubscriptionWithDefault(s)) {
+				(s instanceof Array ? s[0] : s).when((v: any) => {
+					defs[n] = v;
 
-				if (debounce === -1) {
-					debounce = setTimeout(() => {
-						sFn(defs);
-						debounce = -1;
-					});
-				}
-			}, eFn);
+					if (debounce === -1) {
+						debounce = setTimeout(() => {
+							sFn(defs);
+							debounce = -1;
+						});
+					}
+				}, eFn);
+			}
 		}
 
 		cFn(() => {
 			for (const s of subs) {
-				(s instanceof Array ? s[0] : s).cancel();
+				if (s instanceof Subscription || isSubscriptionWithDefault(s)) {
+					(s instanceof Array ? s[0] : s).cancel();
+				}
 			}
 		});
 
