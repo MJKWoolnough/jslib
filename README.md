@@ -246,13 +246,12 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 
 This modules contains a Function for creating [Attr](https://developer.mozilla.org/en-US/docs/Web/API/Attr) and [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) nodes that update their textContent automatically.
 
-This module directly imports the [dom](#dom) module.
+This module directly imports the [dom](#dom), and [inter](#inter) modules.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
-| <a name="bind_binding">Binding</a> | Class | An abstract class that is a parent class of both of the return types from the [bind](#bind_bind) function. |
 | [bind](#bind_bind) | Function | Creates bound text objects that can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) functions. |
-| [Bound](#bind_bound) | Class | A subclass of Binding, Objects that implement this type can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
+| [Binding](#bind_binding) | Class | Objects that extend this class can be used with [amendNode](#dom_amendnode)/[clearNode](#dom_clearnode) to create Children and Attributes that can be updated just by setting a value. |
 
 ### <a name="bind_bind">bind</a>
 ```typescript
@@ -262,19 +261,20 @@ This module directly imports the [dom](#dom) module.
 
 This function can be used either as a normal function, binding a single value, or as a template tag function.
 
-When used normally, this function takes a single starting value and returns a [Bound](#bind_bound) class with that value set.
+When used normally, this function takes a single starting value and returns a [Binding](#bind_binding) class with that value set.
 
-When used as a tag function, this function will return a type that is bound to all Bind expressions used within the template.
+When used as a tag function, this function will return a readonly [Binding](#bind_binding) that is bound to all Bind expressions used within the template.
 
 Both returned types can be used as attributes or children in amendNode and clearNode calls.
 
-### <a name="bind_bound">Bound</a>
+### <a name="bind_binding">Binding</a>
 ```typescript
-export type Bound<T extends ToString = ToString> {
+export type Binding<T = string> {
 	value: T;
 	constructor(value: T);
 	toString(): string;
-	transform(fn: (v: string) => string): Binding
+	transform<U>(fn: (v: T) => U): Binding<U>;
+	onChange(fn: (v: T) => void);
 }
 ```
 
@@ -282,7 +282,9 @@ Objects that extend this type can be used in place of both property values and C
 
 When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
 
-The method returns a new Binding that transforms the result of the template according to the specified function.
+The transform method returns a new Binding that transforms the result of the template according to the specified function.
+
+The onChange method runs the provided callback whenever the value changes, passing the function the current value.
 
 ## <a name="conn">conn</a>
 
