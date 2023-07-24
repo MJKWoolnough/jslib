@@ -30,9 +30,17 @@ const state = new Map(),
       },
       jsonCodec = {
 	encode(v) {
+		if (v === undefined) {
+			return "";
+		}
+
 		return JSON.stringify(v);
 	},
 	decode(v) {
+		if (v === "") {
+			return undefined;
+		}
+
 		return JSON.parse(v);
 	}
       };
