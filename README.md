@@ -846,18 +846,14 @@ If the `classOnly` Option is set to true, the function will just return the gene
 ### <a name="elements_withattr">WithAttr</a>
 ```typescript
 class WithAttr {
-	act(name: string, fn: (newValue: ToString) => void): void;
-	act(name: string[], fn: (values: Object) => void): void;
-	attr(name: string, fn?: (newValue: ToString) => ToString | null | undefined): Binding;
-	attr(name: string[], fn: (values: Object) => ToString | null | undefined): Binding;
+	attr(name: string): Binding;
+	attr(name: string[]): Binding;
 }
 ```
 
 This class is added to an element created with the [(default)](#elements_default) function when the `attr` is `true` (or unset).
 
-The `act` method allows actions to be taken when attributes on the element are changed. When monitoring a single attribute, the newValue will be the new value assigned to that attribute. When monitoring multiple attributes, an Object will be passed to the function with keys on the attribute names set to the value of that attribute.
-
-The `attr` method acts similarly to the `act` method, but will return a [Binding](#bind_binding). When monitoring a single attribute, the value of the Binding object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
+The `attr` method returns a {@link dom:Binding}. When monitoring a single attribute, the value of the Binding object will be set the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to a Map of the name to the value.
 
 ### <a name="elements_withchildren">WithChildren</a>
 ```typescript
