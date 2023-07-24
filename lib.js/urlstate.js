@@ -27,6 +27,14 @@ const state = new Map(),
 	}
 
 	debounceSet  = -1;
+      },
+      jsonCodec = {
+	encode(v) {
+		return JSON.stringify(v);
+	},
+	decode(v) {
+		return JSON.parse(v);
+	}
       };
 
 class StateBound extends Binding {
@@ -42,13 +50,15 @@ class StateBound extends Binding {
 	#def;
 	#last;
 	#checker;
-	constructor(name, v, checker = () => true) {
+	#codec;
+	constructor(name, v, checker = () => true, codec) {
 		super(v);
 
 		this.#def = v;
-		this.#last = JSON.stringify(v);
+		this.#last = codec.encode(v);
 		this.#name = name;
 		this.#checker = checker;
+		this.#codec = codec;
 
 		subscribed.set(name, this);
 
@@ -60,7 +70,7 @@ class StateBound extends Binding {
 		return super.value;
 	}
 	set value(v) {
-		state.set(this.#name, v === this.#def ? "" : JSON.stringify(v));
+		state.set(this.#name, v === this.#def ? "" : this.#codec.encode(v));
 
 		if (debounceSet === -1) {
 			debounceSet = setTimeout(addStateToURL);
@@ -74,7 +84,7 @@ class StateBound extends Binding {
 		let v;
 
 		try {
-			v = JSON.parse(newState);
+			v = this.#codec.decode(newState);
 
 			if (!this.#checker(v)) {
 				v = this.#def;
@@ -106,6 +116,7 @@ class StateBound extends Binding {
 	}
 }
 
+
 window.addEventListener("click", e => {
 	let target = e.target;
 	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
@@ -134,5 +145,5 @@ export default (name, value, checker) => {
 		throw new Error(`key (${name}) already exists`);
 	}
 
-	return new StateBound(name, value, checker);
+	return new StateBound(name, value, checker, jsonCodec);
 };

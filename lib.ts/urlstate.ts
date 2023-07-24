@@ -2,6 +2,11 @@ import {Binding} from './bind.js';
 
 type CheckerFn<T> = (v: unknown) => v is T;
 
+type Codec = {
+	encode(v: any): string;
+	decode(v: string): any;
+}
+
 let debounceSet = -1;
 
 const state = new Map<string, string>(),
@@ -29,6 +34,14 @@ const state = new Map<string, string>(),
 	}
 
 	debounceSet  = -1;
+      },
+      jsonCodec = {
+	encode(v: any) {
+		return JSON.stringify(v);
+	},
+	decode(v: string) {
+		return JSON.parse(v);
+	}
       };
 
 class StateBound<T> extends Binding<T> {
@@ -44,13 +57,15 @@ class StateBound<T> extends Binding<T> {
 	#def: T;
 	#last: string;
 	#checker: (v: any) => v is T;
-	constructor(name: string, v: T, checker: (v: any) => v is T = (_: unknown): _ is T => true) {
+	#codec: Codec;
+	constructor(name: string, v: T, checker: (v: any) => v is T = (_: unknown): _ is T => true, codec: Codec) {
 		super(v);
 
 		this.#def = v;
-		this.#last = JSON.stringify(v);
+		this.#last = codec.encode(v);
 		this.#name = name;
 		this.#checker = checker;
+		this.#codec = codec;
 
 		subscribed.set(name, this);
 
@@ -62,7 +77,7 @@ class StateBound<T> extends Binding<T> {
 		return super.value;
 	}
 	set value(v: T) {
-		state.set(this.#name, v === this.#def ? "" : JSON.stringify(v));
+		state.set(this.#name, v === this.#def ? "" : this.#codec.encode(v));
 
 		if (debounceSet === -1) {
 			debounceSet = setTimeout(addStateToURL);
@@ -76,7 +91,7 @@ class StateBound<T> extends Binding<T> {
 		let v: T;
 
 		try {
-			v = JSON.parse(newState);
+			v = this.#codec.decode(newState);
 
 			if (!this.#checker(v)) {
 				v = this.#def;
@@ -108,6 +123,7 @@ class StateBound<T> extends Binding<T> {
 	}
 }
 
+
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;
 	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
@@ -136,5 +152,5 @@ export default <T>(name: string, value: T, checker?: CheckerFn<T>) => {
 		throw new Error(`key (${name}) already exists`);
 	}
 
-	return new StateBound(name, value, checker);
+	return new StateBound(name, value, checker, jsonCodec);
 };
