@@ -113,7 +113,15 @@ export class Pipe<T> {
 		return [bindmask&1 ? (data: T) => this.send(data) : undefined, bindmask&2 ? (fn: (data: T) => void) => this.receive(fn) : undefined, bindmask&4 ? (fn: (data: T) => void) => this.remove(fn) : undefined] as const;
 	}
 
-	static any<const T extends readonly (Pipe<unknown> | PipeWithDefault<unknown> | unknown)[] | []>(cb: (v: PipeRetArr<T>) => void, ...pipes: T) {
+	/**
+	 * This method calls the passed function with the values retrieved from the passed pipes and values.
+	 *
+	 * @param {Function} cb         The function that will be called with the values from all of the pipes.
+	 * @param {...(Pipe | [Pipe, any] | any)} pipes The pipes or values to combine and pass to the callback function. A Pipe can be combined with an initial value in a tuple.
+	 *
+	 * @return {Function} Cancel function to stop the pipes being merged.
+	 */
+	static any<const T extends readonly (Pipe<unknown> | PipeWithDefault<unknown> | unknown)[] | []>(cb: (v: PipeRetArr<T>) => void, ...pipes: T): () => void {
 		let debounce = -1;
 
 		const defs = pipes.map(p => p instanceof Pipe ? undefined : isPipeWithDefault(p) ? p[1] : p) as PipeRetArr<T>,

@@ -79,6 +79,14 @@ export class Pipe {
 	bind(bindmask = 7) {
 		return [bindmask&1 ? data => this.send(data) : undefined, bindmask&2 ? fn => this.receive(fn) : undefined, bindmask&4 ? fn => this.remove(fn) : undefined];
 	}
+	/**
+	 * This method calls the passed function with the values retrieved from the passed pipes and values.
+	 *
+	 * @param {Function} cb         The function that will be called with the values from all of the pipes.
+	 * @param {...(Pipe | [Pipe, any] | any)} pipes The pipes or values to combine and pass to the callback function. A Pipe can be combined with an initial value in a tuple.
+	 *
+	 * @return {Function} Cancel function to stop the pipes being merged.
+	 */
 	static any(cb, ...pipes) {
 		let debounce = -1;
 
