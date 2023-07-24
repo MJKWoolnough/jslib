@@ -1,5 +1,4 @@
 import {Binding} from './bind.js';
-import {Subscription} from './inter.js';
 
 let debounceSet = -1;
 
@@ -30,35 +29,7 @@ const state = new Map(),
 	debounceSet  = -1;
       };
 
-class SubBound extends Binding {
-	#sub;
-	constructor(v, sub) {
-		super(v);
-
-		(this.#sub = sub).when(v => super.value = v);
-	}
-	get value() {
-		return super.value;
-	}
-	when(successFn, errorFn) {
-		let val = undefined;
-
-		const sub = this.#sub.when(successFn ? v => val = successFn(v) : undefined, errorFn ? v => val = errorFn(v) : undefined);
-
-		return new SubBound(val, sub);
-	}
-	catch(errorFn) {
-		return this.when(undefined, errorFn);
-	}
-	finally(afterFn) {
-		return new SubBound(this.value, this.#sub.finally(afterFn));
-	}
-	cancel() {
-		this.#sub.cancel();
-	}
-}
-
-class StateBound extends SubBound {
+class StateBound extends Binding {
 	static {
 		window.addEventListener("popstate", () => {
 			getStateFromURL();
@@ -68,35 +39,19 @@ class StateBound extends SubBound {
 	}
 
 	#name;
-	#sFn;
-	#eFn;
 	#def;
 	#last;
 	#checker;
-	constructor(name, v, checker) {
-		const [sub, sFn, eFn, cFn] = Subscription.bind();
-
-		super(v, sub);
+	constructor(name, v, checker = () => true) {
+		super(v);
 
 		this.#def = v;
 		this.#last = JSON.stringify(v);
 		this.#name = name;
-		this.#sFn = sFn;
-		this.#eFn = eFn;
 		this.#checker = checker;
 
 		subscribed.set(name, this);
-		cFn(() => subscribed.delete(name));
 
-		setTimeout(() => {
-			const s = state.get(name);
-
-			if (s) {
-				this.#restore(s);
-			} else {
-				sFn(v);
-			}
-		});
 	}
 	get name() {
 		return this.#name;
@@ -110,23 +65,25 @@ class StateBound extends SubBound {
 		if (debounceSet === -1) {
 			debounceSet = setTimeout(addStateToURL);
 		}
-
-		this.#sFn(v);
 	}
 	#restore(newState) {
 		if (newState === this.#last) {
 			return;
 		}
 
-		if (newState && this.#checker && !this.#checker(newState)) {
-			this.#eFn(newState);
-		} else {
-			try {
-				this.#sFn(newState ? JSON.parse(newState) : this.#def);
-			} catch {
-				this.#eFn(newState ?? "");
+		let v;
+
+		try {
+			v = JSON.parse(newState);
+
+			if (!this.#checker(v)) {
+				v = this.#def;
 			}
+		} catch(e) {
+			v = this.#def;
 		}
+
+		super.value = v;
 	}
 
 	static #processState() {
