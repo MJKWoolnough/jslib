@@ -1,10 +1,9 @@
-import {Bound} from './bind.js';
+import {Binding} from './bind.js';
 import {Subscription} from './inter.js';
 
 let debounceSet = -1;
 
-const restore = Symbol("restore"),
-      state = new Map(),
+const state = new Map(),
       subscribed = new Map(),
       getStateFromURL = () => {
 	state.clear();
@@ -29,14 +28,9 @@ const restore = Symbol("restore"),
 	}
 
 	debounceSet  = -1;
-      },
-      processState = () => {
-	for (const [key, sb] of subscribed) {
-		sb[restore](state.get(key) ?? "");
-	}
       };
 
-class SubBound extends Bound {
+class SubBound extends Binding {
 	#sub;
 	constructor(v, sub) {
 		super(v);
@@ -65,6 +59,14 @@ class SubBound extends Bound {
 }
 
 class StateBound extends SubBound {
+	static {
+		window.addEventListener("popstate", () => {
+			getStateFromURL();
+
+			StateBound.#processState();
+		});
+	}
+
 	#name;
 	#sFn;
 	#eFn;
@@ -90,7 +92,7 @@ class StateBound extends SubBound {
 			const s = state.get(name);
 
 			if (s) {
-				this[restore](s);
+				this.#restore(s);
 			} else {
 				sFn(v);
 			}
@@ -111,7 +113,7 @@ class StateBound extends SubBound {
 
 		this.#sFn(v);
 	}
-	[restore](newState) {
+	#restore(newState) {
 		if (newState === this.#last) {
 			return;
 		}
@@ -125,6 +127,25 @@ class StateBound extends SubBound {
 				this.#eFn(newState ?? "");
 			}
 		}
+	}
+
+	static #processState() {
+		for (const [key, sb] of subscribed) {
+			sb.#restore(state.get(key) ?? "");
+		}
+	}
+
+	static goto(href) {
+		const url = new URL(href, window.location + "");
+		if (url.host === window.location.host && url.pathname === window.location.pathname) {
+			history.pushState(Date.now(), "", url);
+			getStateFromURL();
+			StateBound.#processState();
+
+			return true;
+		}
+
+		return false;
 	}
 }
 
@@ -140,26 +161,9 @@ window.addEventListener("click", e => {
 	}
 });
 
-window.addEventListener("popstate", () => {
-	getStateFromURL();
-
-	processState();
-});
-
 getStateFromURL();
 
-export const goto = href => {
-	const url = new URL(href, window.location + "");
-	if (url.host === window.location.host && url.pathname === window.location.pathname) {
-		history.pushState(Date.now(), "", url);
-		getStateFromURL();
-		processState();
-
-		return true;
-	}
-
-	return false;
-},
+export const goto = StateBound.goto,
 setParam = (name, val) => {
 	const s = subscribed.get(name);
 
