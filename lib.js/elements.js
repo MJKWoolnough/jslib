@@ -40,8 +40,7 @@ import {setAndReturn} from './misc.js';
  * This class is added to an element created with the (default) function when the `attr` is `true` (or unset).
  *
  * @typedef {Object} WithAttr
- * @property {Function} act The `act` method allows actions to be taken when attributes on the element are changed. When monitoring a single attribute, the newValue will be the new value assigned to that attribute. When monitoring multiple attributes, an Object will be passed to the function with keys on the attribute names set to the value of that attribute.
- * @property {Function} attr The `attr` method acts similarly to the `act` method, but will return a {@link dom:Binding}. When monitoring a single attribute, the value of the Binding object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
+ * @property {Function} attr The `attr` method returns a {@link dom:Binding}. When monitoring a single attribute, the value of the Binding object will be set the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to a Map of the name to the value.
  */
 
 /**
@@ -82,6 +81,7 @@ class BindMulti extends Bound {
 const attrs = new WeakMap(),
       getAttr = (elem, name) => {
 	const attrMap = attrs.get(elem);
+
 	return attrMap.get(name) ?? setAndReturn(attrMap, name, bind(elem.getAttribute(name) ?? Null));
       },
       cw = new WeakMap(),
@@ -96,23 +96,15 @@ const attrs = new WeakMap(),
       }),
       setAttr = (elem, name, value) => {
 	const attr = attrs.get(elem)?.get(name);
+
 	return attr ? (attr.value = value === null ? attr.value ? Null : name : value) !== Null : null;
       },
-      act = (c, names, fn) => {
+      attr = (c, names) => {
 	if (names instanceof Array) {
-		return new BindMulti(c, names, fn);
-	} else {
-		const attr = getAttr(c, names);
-		fn(attr.value);
-		return attr.transform(fn);
+		return new BindMulti(c, names);
 	}
-      },
-      attr = (c, names, fn) => {
-	if (names instanceof Array) {
-		return new BindMulti(c, names, fn);
-	}
-	const attr = getAttr(c, names);
-	return fn instanceof Function ? attr.transform(fn) : attr;
+
+	return getAttr(c, names);
       },
       childList = {"childList": true},
       classes = Array.from({"length": 8}),
@@ -124,16 +116,12 @@ const attrs = new WeakMap(),
 		this.dispatchEvent(new CustomEvent("removed"));
 	}
       } : handleAttrs ? class extends getClass(false, false, children) {
-	#acts = [];
 	constructor() {
 		super();
 		attrs.set(this, new Map());
 	}
-	act(names, fn) {
-		this.#acts.push(act(this, names, fn));
-	}
-	attr(names, fn) {
-		return attr(this, names, fn);
+	attr(names) {
+		return attr(this, names);
 	}
 	addEventListener(type, listener, options) {
 		setAttr(this, "on" + type, listener) ?? super.addEventListener(type, listener, options);
@@ -175,18 +163,14 @@ const attrs = new WeakMap(),
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
       } : handleAttrs ? class extends DocumentFragment {
-	#acts = [];
 	classList = classList;
 	style = style;
 	constructor() {
 		super();
 		attrs.set(this, new Map());
 	}
-	act(names, fn) {
-		this.#acts.push(act(this, names, fn));
-	}
-	attr(names, fn) {
-		return attr(this, names, fn);
+	attr(names) {
+		return attr(this, names);
 	}
 	addEventListener(type, listener, _options) {
 		setAttr(this, "on" + type, listener);

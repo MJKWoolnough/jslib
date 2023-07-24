@@ -69,21 +69,15 @@ interface ToString {
 	toString(): string;
 }
 
-type AttrFn = (newValue: ToString) => ToString | void;
-
 type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
 
 /**
  * This class is added to an element created with the (default) function when the `attr` is `true` (or unset).
  *
- * The `act` method allows actions to be taken when attributes on the element are changed. When monitoring a single attribute, the newValue will be the new value assigned to that attribute. When monitoring multiple attributes, an Object will be passed to the function with keys on the attribute names set to the value of that attribute.
- *
- * The `attr` method acts similarly to the `act` method, but will return a {@link dom:Binding}. When monitoring a single attribute, the value of the Binding object will be set the return of the fn function, or just the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to the return of the fn function. The fn function works similarly to that used in the `act` method.
+ * The `attr` method returns a {@link dom:Binding}. When monitoring a single attribute, the value of the Binding object will be set the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to a Map of the name to the value.
  */
 export type WithAttr = {
-	act(name: string | string[], fn: Function): void;
-	attr(name: string[], fn: Function): Binding;
-	attr(name: string, fn?: Function): Binding;
+	attr(name: string | string[]): Binding;
 }
 
 /**
@@ -117,35 +111,29 @@ type WithAttrsOption<SelectedOptions extends Options> = WithChildrenOption<Selec
 
 type ElementFactory = WithAttrsOption<{pseudo?: false}> & WithAttrsOption<{pseudo: true}> & ((fn: (elem: HTMLElement & WithAttr & WithChildren) => Children) => DOMBind<HTMLElement & WithAttr & WithChildren>);
 
-class BindMulti extends Binding<any> {
-	#fn: AttrFn;
-	constructor(elem: Node, names: string[], fn: Function) {
-		super(0);
-		let calling = false;
-		const obj: Record<string, Binding<any>> = {},
-		      self = this;
-		this.#fn = function(this: Binding<any>, val: ToString) {
-			if (!calling) {
-				calling = true;
-				const o: Record<string, ToString> = {};
-				for (const n in obj) {
-					o[n] = obj[n] === this ? val : obj[n].value;
-				}
-				calling = false;
-				self.value = fn(o) ?? Null;
-			}
-			return val;
-		};
+class BindMulti extends Binding<Map<string, any>> {
+	constructor(elem: Node, names: string[]) {
+		const m = new Map<string, any>();
+
 		for (const n of names) {
-			obj[n] = getAttr(elem, n).transform(this.#fn);
+			const attr = getAttr(elem, n);
+
+			attr.onChange(v => m.set(n, v));
+			m.set(n, attr.value);
 		}
-		this.#fn(0);
+
+		super(m);
+	}
+
+	get value() {
+		return super.value;
 	}
 }
 
 const attrs = new WeakMap<Node, Map<string, Binding<any>>>(),
       getAttr = (elem: Node, name: string) => {
 	const attrMap = attrs.get(elem)!;
+
 	return attrMap.get(name) ?? setAndReturn(attrMap, name, bind((elem as HTMLElement).getAttribute(name) ?? Null));
       },
       cw = new WeakMap<Node, ChildWatchFn[]>(),
@@ -160,23 +148,15 @@ const attrs = new WeakMap<Node, Map<string, Binding<any>>>(),
       }),
       setAttr = (elem: Node, name: string, value: ToString | null) => {
 	const attr = attrs.get(elem)?.get(name);
+
 	return attr ? (attr.value = value === null ? attr.value ? Null : name : value) !== Null : null;
       },
-      act = (c: Node, names: string | string[], fn: (newValue: ToString) => void) => {
+      attr = (c: Node, names: string | string[]) => {
 	if (names instanceof Array) {
-		return new BindMulti(c, names, fn);
-	} else {
-		const attr = getAttr(c, names);
-		fn(attr.value);
-		return attr.transform(fn);
+		return new BindMulti(c, names);
 	}
-      },
-      attr = (c: Node, names: string | string[], fn?: AttrFn) => {
-	if (names instanceof Array) {
-		return new BindMulti(c, names, fn!);
-	}
-	const attr = getAttr(c, names);
-	return fn instanceof Function ? attr.transform(fn) : attr;
+
+	return getAttr(c, names);
       },
       childList = {"childList": true},
       classes: (ConstructorOf<HTMLElement> | undefined)[] = Array.from({"length": 8}),
@@ -188,16 +168,12 @@ const attrs = new WeakMap<Node, Map<string, Binding<any>>>(),
 		this.dispatchEvent(new CustomEvent("removed"));
 	}
       } : handleAttrs ? class extends getClass(false, false, children) {
-	#acts: Binding<any>[] = [];
 	constructor() {
 		super();
 		attrs.set(this, new Map());
 	}
-	act(names: string | string[], fn: (newValue: ToString) => void) {
-		this.#acts.push(act(this, names, fn));
-	}
-	attr(names: string | string[], fn?: AttrFn) {
-		return attr(this, names, fn);
+	attr(names: string | string[]) {
+		return attr(this, names);
 	}
 	addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
 		setAttr(this, "on" + type, listener) ?? super.addEventListener(type, listener, options);
@@ -239,18 +215,14 @@ const attrs = new WeakMap<Node, Map<string, Binding<any>>>(),
 		(cw.get(this) ?? setAndReturn(cw, this, [])).push(fn);
 	}
       } : handleAttrs ? class extends DocumentFragment {
-	#acts: Binding<any>[] = [];
 	readonly classList = classList;
 	readonly style = style;
 	constructor() {
 		super();
 		attrs.set(this, new Map());
 	}
-	act(names: string | string[], fn: (newValue: ToString) => void) {
-		this.#acts.push(act(this, names, fn));
-	}
-	attr(names: string | string[], fn?: AttrFn) {
-		return attr(this, names, fn);
+	attr(names: string | string[]) {
+		return attr(this, names);
 	}
 	addEventListener(type: string, listener: EventListenerOrEventListenerObject, _options?: boolean | AddEventListenerOptions) {
 		setAttr(this, "on" + type, listener);
