@@ -16,6 +16,14 @@ export class Codec {
 	decode(v) {
 		return this.#decoder(v);
 	}
+
+	bind(name, value, checker) {
+		if (subscribed.has(name)) {
+			throw new Error(`key (${name}) already exists`);
+		}
+
+		return new StateBound(name, value, checker, this);
+	}
 }
 
 let debounceSet = -1;
@@ -163,10 +171,4 @@ setParam = (name, val) => {
 	}
 };
 
-export default (name, value, checker) => {
-	if (subscribed.has(name)) {
-		throw new Error(`key (${name}) already exists`);
-	}
-
-	return new StateBound(name, value, checker, jsonCodec);
-};
+export default (name, value, checker) => jsonCodec.bind(name, value, checker);
