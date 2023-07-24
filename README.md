@@ -1204,6 +1204,7 @@ The Pipe Class is used to pass values to multiple registered functions, and cont
 
 |  Method  |  Description  |
 |----------|---------------|
+| [any](#inter_pipe_any) | This static method can be used to combine the output of multiple pipes. |
 | [bind](#inter_pipe_bind) | This method can create simple bound functions for the receive, remove, and send methods. |
 | length   |  The field contains the numner of functions currently registered on the Pipe. |
 | [receive](#inter_pipe_receive) | The method is used to register a function to receive data from the Pipe. |
@@ -1233,6 +1234,19 @@ In this example, a Pipe is used to transmit values to two different receivers, r
 2
 12
 ```
+
+#### <a name="inter_pipe_any">any</a>
+```
+class Pipe {
+	static any<const T extends readonly (Pipe<unknown> | [Pipe<unknown>, unknown>] | unknown)[] | []>(cb: (v: any[]) => void, ...pipes: T): () => void;
+}
+```
+
+This method calls the passed function whenever a value from any of the pipes is received.
+
+Initial values for the Pipes can be set by using the Pipe in a typle with the default value.
+
+The returned function can be used to cancel the updates.
 
 #### <a name="inter_pipe_bind">bind</a>
 ```typescript
