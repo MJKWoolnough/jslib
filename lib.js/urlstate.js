@@ -1,5 +1,23 @@
 import {Binding} from './bind.js';
 
+export class Codec {
+	#encoder;
+	#decoder;
+
+	constructor(encoder, decoder) {
+		this.#encoder = encoder;
+		this.#decoder = decoder;
+	}
+
+	encode(v) {
+		return this.#encoder(v);
+	}
+
+	decode(v) {
+		return this.#decoder(v);
+	}
+}
+
 let debounceSet = -1;
 
 const state = new Map(),
@@ -28,22 +46,19 @@ const state = new Map(),
 
 	debounceSet  = -1;
       },
-      jsonCodec = {
-	encode(v) {
+      jsonCodec = new Codec(v => {
 		if (v === undefined) {
 			return "";
 		}
 
 		return JSON.stringify(v);
-	},
-	decode(v) {
+      }, v => {
 		if (v === "") {
 			return undefined;
 		}
 
 		return JSON.parse(v);
-	}
-      };
+      });
 
 class StateBound extends Binding {
 	static {

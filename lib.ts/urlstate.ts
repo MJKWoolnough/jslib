@@ -2,9 +2,26 @@ import {Binding} from './bind.js';
 
 type CheckerFn<T> = (v: unknown) => v is T;
 
-type Codec = {
-	encode(v: any): string;
-	decode(v: string): any;
+type Encoder = (v: any) => string;
+
+type Decoder = (v: string) => any;
+
+export class Codec {
+	#encoder: Encoder;
+	#decoder: Decoder;
+
+	constructor(encoder: Encoder, decoder: Decoder) {
+		this.#encoder = encoder;
+		this.#decoder = decoder;
+	}
+
+	encode(v: any) {
+		return this.#encoder(v);
+	}
+
+	decode(v: string) {
+		return this.#decoder(v);
+	}
 }
 
 let debounceSet = -1;
@@ -35,22 +52,19 @@ const state = new Map<string, string>(),
 
 	debounceSet  = -1;
       },
-      jsonCodec = {
-	encode(v: any) {
+      jsonCodec = new Codec(v => {
 		if (v === undefined) {
 			return "";
 		}
 
 		return JSON.stringify(v);
-	},
-	decode(v: string) {
+      }, v => {
 		if (v === "") {
 			return undefined;
 		}
 
 		return JSON.parse(v);
-	}
-      };
+      });
 
 class StateBound<T> extends Binding<T> {
 	static {
