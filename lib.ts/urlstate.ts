@@ -208,6 +208,12 @@ export const
  * @return {boolean} Returns true if href matches current path, false otherwise.
  */
 goto = (href: string) => StateBound.goto(href),
+/**
+ * This function sets the named state to the given value, which will be parsed by the StateBound object.
+ *
+ * @param {string} name  The name to be set.
+ * @param {string} value The string version of the value to be set.
+ */
 setParam = (name: string, value: string) => StateBound.setParam(name, value);
 
 /**
