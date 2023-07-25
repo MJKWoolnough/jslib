@@ -32,7 +32,16 @@ export class Codec {
 		return this.#decoder(v);
 	}
 
-	bind<T>(name: string, value: T, checker?: CheckerFn<T>) {
+	/**
+	 * This method creates a new StateBound object, bound to the given name.
+	 *
+	 * @param {string} name              Name to be used for the URL param.
+	 * @param {T}      value             Default value for the state.
+	 * @param {(v: T) => v is T} checker Function to confirm valid values.
+	 *
+	 * @return {StateBound<T>}
+	 */
+	bind<T>(name: string, value: T, checker?: CheckerFn<T>): StateBound<T> {
 		if (subscribed.has(name)) {
 			throw new Error(`key (${name}) already exists`);
 		}
