@@ -13,6 +13,12 @@ export class Codec {
 	#encoder: Encoder;
 	#decoder: Decoder;
 
+	/**
+	 * The constructor creates a new Codec to be used for encode/decode.
+	 *
+	 * @param {(v: any) => string} encoder Used to encoder arbitrary values to strings.
+	 * @param {(v: string) => any} decoder Used to decode strings into values. Can throw errors for invalid strings.
+	 */
 	constructor(encoder: Encoder, decoder: Decoder) {
 		this.#encoder = encoder;
 		this.#decoder = decoder;
