@@ -198,4 +198,13 @@ setParam = (name: string, val: string) => {
 	}
 };
 
-export default <T>(name: string, value: T, checker?: CheckerFn<T>) => jsonCodec.bind(name, value, checker);
+/**
+ * This default export creates a new StateBound object, bound to the given name, that uses JSON for encoding an decoding.
+ *
+ * @param {string} name              Name to be used for the URL param.
+ * @param {T}      value             Default value for the state.
+ * @param {(v: T) => v is T} checker Function to confirm valid values.
+ *
+ * @return {StateBound<T>}
+ */
+export default <T>(name: string, value: T, checker?: CheckerFn<T>): StateBound<T> => jsonCodec.bind(name, value, checker);
