@@ -172,6 +172,16 @@ class StateBound<T> extends Binding<T> {
 
 		return false;
 	}
+
+	static setParam(name: string, val: string) {
+		const s = subscribed.get(name);
+
+		if (s) {
+			s.#restore(val);
+		}
+
+		state.set(name, val);
+	}
 }
 
 
@@ -197,14 +207,8 @@ export const
  *
  * @return {boolean} Returns true if href matches current path, false otherwise.
  */
-goto = StateBound.goto,
-setParam = (name: string, val: string) => {
-	const s = subscribed.get(name);
-
-	if (s) {
-		s.value = val;
-	}
-};
+goto = (href: string) => StateBound.goto(href),
+setParam = (name: string, value: string) => StateBound.setParam(name, value);
 
 /**
  * This default export creates a new StateBound object, bound to the given name, that uses JSON for encoding an decoding.
