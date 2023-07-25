@@ -83,6 +83,9 @@ const state = new Map<string, string>(),
 		return JSON.parse(v);
       });
 
+/**
+ * StateBound extends a {@link bind:Binding} to get and set state from and to the URL.
+ */
 class StateBound<T> extends Binding<T> {
 	static {
 		window.addEventListener("popstate", () => {
