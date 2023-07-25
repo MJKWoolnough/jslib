@@ -120,6 +120,11 @@ class StateBound<T> extends Binding<T> {
 
 		subscribed.set(name, this);
 
+		const newState = state.get(name);
+
+		if (newState !== undefined) {
+			this.#restore(newState);
+		}
 	}
 	get name() {
 		return this.#name;
