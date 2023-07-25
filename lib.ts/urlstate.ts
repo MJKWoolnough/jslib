@@ -186,6 +186,10 @@ class StateBound<T> extends Binding<T> {
 		}
 
 		state.set(name, val);
+
+		if (debounceSet === -1) {
+			debounceSet = setTimeout(addStateToURL);
+		}
 	}
 }
 
