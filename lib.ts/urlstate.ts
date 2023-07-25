@@ -189,7 +189,15 @@ window.addEventListener("click", (e: Event) => {
 
 getStateFromURL();
 
-export const goto = StateBound.goto,
+export const
+/**
+ * This function processes the passed URL and, if it matches the current path, process the state from the query string.
+ *
+ * @param {string} href New URL to go to.
+ *
+ * @return {boolean} Returns true if href matches current path, false otherwise.
+ */
+goto = StateBound.goto,
 setParam = (name: string, val: string) => {
 	const s = subscribed.get(name);
 
