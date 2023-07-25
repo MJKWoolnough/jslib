@@ -6,6 +6,9 @@ type Encoder = (v: any) => string;
 
 type Decoder = (v: string) => any;
 
+/**
+ * This class allows for custom encoding and decoding to state in the URL query.
+ */
 export class Codec {
 	#encoder: Encoder;
 	#decoder: Decoder;
