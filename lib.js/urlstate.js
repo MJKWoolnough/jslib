@@ -187,7 +187,6 @@ class StateBound extends Binding {
 	}
 }
 
-
 window.addEventListener("click", e => {
 	let target = e.target;
 	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
