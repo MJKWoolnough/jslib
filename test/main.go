@@ -13,6 +13,7 @@ import (
 
 	"golang.org/x/net/websocket"
 	"vimagination.zapto.org/jsonrpc"
+	"vimagination.zapto.org/tsserver"
 )
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 
 func run() error {
 	m := http.NewServeMux()
-	m.Handle("/", http.FileServer(http.Dir("./")))
+	m.Handle("/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("./")))))
 	m.Handle("/static", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("123")) }))
 	m.Handle("/echo", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ct := r.Header.Get("Content-Type")
