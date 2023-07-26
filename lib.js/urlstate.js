@@ -1,9 +1,18 @@
 import {Binding} from './bind.js';
 
+/**
+ * This class allows for custom encoding and decoding to state in the URL query.
+ */
 export class Codec {
 	#encoder;
 	#decoder;
 
+	/**
+	 * The constructor creates a new Codec to be used for encode/decode.
+	 *
+	 * @param {(v: any) => string} encoder Used to encoder arbitrary values to strings.
+	 * @param {(v: string) => any} decoder Used to decode strings into values. Can throw errors for invalid strings.
+	 */
 	constructor(encoder, decoder) {
 		this.#encoder = encoder;
 		this.#decoder = decoder;
@@ -17,12 +26,21 @@ export class Codec {
 		return this.#decoder(v);
 	}
 
+	/**
+	 * This method creates a new StateBound object, bound to the given name.
+	 *
+	 * @param {string} name              Name to be used for the URL param.
+	 * @param {T}      value             Default value for the state.
+	 * @param {(v: T) => v is T} checker Function to confirm valid values.
+	 *
+	 * @return {StateBound<T>}
+	 */
 	bind(name, value, checker) {
 		if (subscribed.has(name)) {
 			throw new Error(`key (${name}) already exists`);
 		}
 
-		return new StateBound(name, value, checker, this);
+		return new StateBound(name, value, this, checker);
 	}
 }
 
@@ -68,6 +86,9 @@ const state = new Map(),
 		return JSON.parse(v);
       });
 
+/**
+ * StateBound extends a {@link bind:Binding} to get and set state from and to the URL.
+ */
 class StateBound extends Binding {
 	static {
 		window.addEventListener("popstate", () => {
@@ -82,7 +103,7 @@ class StateBound extends Binding {
 	#last;
 	#checker;
 	#codec;
-	constructor(name, v, checker = () => true, codec) {
+	constructor(name, v, codec, checker = () => true) {
 		super(v);
 
 		this.#def = v;
@@ -93,6 +114,11 @@ class StateBound extends Binding {
 
 		subscribed.set(name, this);
 
+		const newState = state.get(name);
+
+		if (newState !== undefined) {
+			this.#restore(newState);
+		}
 	}
 	get name() {
 		return this.#name;
@@ -145,6 +171,20 @@ class StateBound extends Binding {
 
 		return false;
 	}
+
+	static setParam(name, val) {
+		const s = subscribed.get(name);
+
+		if (s) {
+			s.#restore(val);
+		}
+
+		state.set(name, val);
+
+		if (debounceSet === -1) {
+			debounceSet = setTimeout(addStateToURL);
+		}
+	}
 }
 
 
@@ -162,13 +202,30 @@ window.addEventListener("click", e => {
 
 getStateFromURL();
 
-export const goto = StateBound.goto,
-setParam = (name, val) => {
-	const s = subscribed.get(name);
+export const
+/**
+ * This function processes the passed URL and, if it matches the current path, process the state from the query string.
+ *
+ * @param {string} href New URL to go to.
+ *
+ * @return {boolean} Returns true if href matches current path, false otherwise.
+ */
+goto = href => StateBound.goto(href),
+/**
+ * This function sets the named state to the given value, which will be parsed by the StateBound object.
+ *
+ * @param {string} name  The name to be set.
+ * @param {string} value The string version of the value to be set.
+ */
+setParam = (name, value) => StateBound.setParam(name, value);
 
-	if (s) {
-		s.value = val;
-	}
-};
-
+/**
+ * This default export creates a new StateBound object, bound to the given name, that uses JSON for encoding an decoding.
+ *
+ * @param {string} name              Name to be used for the URL param.
+ * @param {T}      value             Default value for the state.
+ * @param {(v: T) => v is T} checker Function to confirm valid values.
+ *
+ * @return {StateBound<T>}
+ */
 export default (name, value, checker) => jsonCodec.bind(name, value, checker);
