@@ -46,7 +46,7 @@ export class Codec {
 			throw new Error(`key (${name}) already exists`);
 		}
 
-		return new StateBound(name, value, checker, this);
+		return new StateBound(name, value, this, checker);
 	}
 }
 
@@ -109,7 +109,7 @@ class StateBound<T> extends Binding<T> {
 	#last: string;
 	#checker: (v: any) => v is T;
 	#codec: Codec;
-	constructor(name: string, v: T, checker: (v: any) => v is T = (_: unknown): _ is T => true, codec: Codec) {
+	constructor(name: string, v: T, codec: Codec, checker: (v: any) => v is T = (_: unknown): _ is T => true) {
 		super(v);
 
 		this.#def = v;
