@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -24,8 +25,18 @@ func main() {
 }
 
 func run() error {
+	var js bool
+
+	flag.BoolVar(&js, "js", false, "use JS versions")
+	flag.Parse()
+
 	m := http.NewServeMux()
-	m.Handle("/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("./")))))
+
+	if js {
+		m.Handle("/", http.FileServer(http.Dir("./")))
+	} else {
+		m.Handle("/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("./")))))
+	}
 	m.Handle("/static", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("123")) }))
 	m.Handle("/echo", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ct := r.Header.Get("Content-Type")
