@@ -29,7 +29,7 @@ const isEventListenerObject = prop => prop instanceof Object && prop.handleEvent
  * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
  */
 export class Binding {
-	#pipe = new Pipe;
+	#pipe = new Pipe();
 	#value;
 	#refs = 0;
 
