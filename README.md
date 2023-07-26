@@ -29,6 +29,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [rpc](#rpc)                                 | JSONRPC implementation. |
 | [settings](#settings)                       | Type-safe wrappers around localStorage. |
 | [svg](#svg)                                 | Functions to create SVG elements. |
+| [urlstate](#urlstate)                       | Store and retrieve state from the URL. |
 | [windows](#windows)                         | Custom Elements that act as application Windows. |
 | [windows_taskbar](#windows_taskbar)         | Custom Element that lists Windows on a TaskBar. |
 | [windows_taskmanager](#windows_taskmanager) | Custom Element that allows minimisation of Windows. |
@@ -2277,6 +2278,60 @@ This example creates an SVG image of a flame, printing the source of it to the c
 ```svg
 <svg viewBox="0 0 100 100"><defs><radialGradient id="burning" cy="0.55" fy="1"><stop offset="0%" stop-color="#fff"></stop><stop offset="20%" stop-color="#ff0"></stop><stop offset="100%" stop-color="#f00"></stop></radialGradient></defs><path d="M43,99 c-20,0 -60,-30 -30,-70 q0,20 10,30 c0,-20 25,-40 20,-58 q20,30 20,58 q10,-10 5,-30 q10,15 15,35 q5,-10 0,-25 c40,50 -10,62 -40,60 z M25,20 c-15,30 5,30 0,0 z M60,20 c0,20 10,20 0,0 z" stroke="#000" fill="url(#burning)" stroke-linejoin="round"></path></svg>
 ```
+
+## <a name="urlstate">urlstate</a>
+
+The urlstate module provides classes to create [Binding](#bind_binding)s that store and retrieve data from the URL query string.
+
+This module directly imports the [bind](#bind) module.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [(default)](#urlstate_default) | Create a new object that binds a URL param to a value. |
+| [Codec](#urlstate_codec) | Allows for custom encoding/decoding of values to/from the URL. |
+| [goto](#urlstate_goto) | Process the parsed URL for state to be set and read. |
+| [setParam](#urlstate_setparam) | Set a single param value. |
+
+### <a name="urlstate_default">(default)</a>
+```typescript
+<T>(name: string, value: T, checker?: (v: unknown) => v is T): Binding<T>;
+```
+
+This default export creates a new StateBound object, bound to the given name, that uses JSON for encoding an decoding.
+
+It takes a name for the URL param, and a default value, which will not be encoded to the URL. Lastly, it takes an optional checker function to confirm that the value decoded is a valid value.
+
+Returns a special binding that encoded and decodes its values to and from the URL.
+
+To encode and decode, this function uses the built-in JSON object, extended to support the `undefined` value.
+
+### <a name="urlstate_codec">Codec</a>
+```typescript
+class Codec {
+	constructor(encoder: (v: any) => string, decoder: (v: string) => any);
+	bind<T>(name: string, value: T, checker?: (v: unknown) => v is T): Binding<T>;
+}
+```
+
+This class allows for custom encoding and decoding to state in the URL query.
+
+The bind method matches the call for the [(default][#urlstate_default] export, but replaces the default codec with this one.
+
+### <a name="urlstate_goto">goto</a>
+```typescript
+(href: string) => boolean;
+```
+
+This function processes the passed URL and, if it matches the current path, process the state from the query string
+
+Returns true if href matches current path, false otherwise
+
+### <a name="urlstate_setparam">setParam</a>
+```typescript
+(name: string, value: string) => void;
+```
+
+This function sets the named state to the given value, which will be decoded by the codec associated with that state, if one exists.
 
 ## <a name="windows">windows</a>
 
