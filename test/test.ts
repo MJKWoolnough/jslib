@@ -4302,7 +4302,7 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)}))();
+				      t = e(e => amendNode(div, {"someAttr": e.attr("thatAttr").transform((a: number) => a + 1)}))();
 				res += +(div.getAttributeNS(null, "someAttr") === "1");
 				amendNode(t, {"thatAttr": 5});
 				res += +(div.getAttributeNS(null, "someAttr") === "6");
@@ -4313,7 +4313,7 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e(e => amendNode(div, {"someAttr": e.attr(["thatAttr", "otherAttr"], ({thatAttr, otherAttr}: {thatAttr: number, otherAttr: number}) => ((+thatAttr || 0) + 1) * ((+otherAttr || 0) + 1))}))();
+				      t = e(e => amendNode(div, {"someAttr": e.attr(["thatAttr", "otherAttr"]).transform(v => ((+(v.get("thatAttr") ?? 0) || 0) + 1) * ((+(v.get("otherAttr") ?? 0) || 0) + 1))}))();
 				res += +(div.getAttributeNS(null, "someAttr") === "1");
 				amendNode(t, {"thatAttr": 3});
 				res += +(div.getAttributeNS(null, "someAttr") === "4");
@@ -4326,7 +4326,7 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      t = e(e => {
-					e.act("thatAttr", (a: number) => res += +a || 0);
+					e.attr("thatAttr").onChange((a: number) => res += +a || 0);
 					return [];
 				      })();
 				amendNode(t, {"thatAttr": 5});
@@ -4353,7 +4353,7 @@ type Tests = {
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
 				      t = e(e => {
-					amendNode(div, {"onclick": e.attr("onclick", (fn: Function) => () => fn(2))});
+					amendNode(div, {"onclick": e.attr("onclick").transform((fn: Function) => () => fn(2))});
 					return div;
 				      })();
 				amendNode(t, {"onclick": (n: number) => res += n});
@@ -4379,7 +4379,7 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e({"pseudo": true}, e => amendNode(div, {"someAttr": e.attr("thatAttr", (a: number) => a + 1)}))();
+				      t = e({"pseudo": true}, e => amendNode(div, {"someAttr": e.attr("thatAttr").transform((a: number) => a + 1)}))();
 				res += +(div.getAttributeNS(null, "someAttr") === "1");
 				amendNode(t, {"thatAttr": 5});
 				res += +(div.getAttributeNS(null, "someAttr") === "6");
@@ -4390,7 +4390,7 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      t = e({"pseudo": true}, e => {
-					e.act("thatAttr", (a: number) => res += +a || 0);
+					e.attr("thatAttr").onChange((a: number) => res += +a || 0);
 					return [];
 				      })();
 				amendNode(t, {"thatAttr": 5});
@@ -4419,7 +4419,7 @@ type Tests = {
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
 				      t = e({"pseudo": true}, e => {
-					amendNode(div, {"onclick": e.attr("onclick", (fn: Function) => () => fn(2))});
+					amendNode(div, {"onclick": e.attr("onclick").transform((fn: Function) => () => fn(2))});
 					return div;
 				      })();
 				amendNode(t, {"onclick": (n: number) => res += n});
