@@ -1,4 +1,4 @@
-import bind, {Bound} from './bind.js';
+import bind, {Binding} from './bind.js';
 import {amendNode, isChildren} from './dom.js';
 import {setAndReturn} from './misc.js';
 
@@ -52,29 +52,25 @@ import {setAndReturn} from './misc.js';
  * NB: For pseudo-elements, the callback function will not be triggered during construction.
  */
 
-class BindMulti extends Bound {
-	#fn;
-	constructor(elem, names, fn) {
-		super(0);
-		let calling = false;
-		const obj = {},
-		      self = this;
-		this.#fn = function(val) {
-			if (!calling) {
-				calling = true;
-				const o = {};
-				for (const n in obj) {
-					o[n] = obj[n] === this ? val : obj[n].value;
-				}
-				calling = false;
-				self.value = fn(o) ?? Null;
-			}
-			return val;
-		};
+class BindMulti extends Binding {
+	constructor(elem, names) {
+		const m = new Map();
+
 		for (const n of names) {
-			obj[n] = getAttr(elem, n).transform(this.#fn);
+			const attr = getAttr(elem, n);
+
+			attr.onChange(v => {
+				m.set(n, v);
+				super.value = m;
+			});
+			m.set(n, attr.value);
 		}
-		this.#fn(0);
+
+		super(m);
+	}
+
+	get value() {
+		return super.value;
 	}
 }
 

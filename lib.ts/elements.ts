@@ -119,7 +119,10 @@ class BindMulti extends Binding<Map<string, any>> {
 		for (const n of names) {
 			const attr = getAttr(elem, n);
 
-			attr.onChange(v => m.set(n, v));
+			attr.onChange(v => {
+				m.set(n, v);
+				super.value = m;
+			});
 			m.set(n, attr.value);
 		}
 
