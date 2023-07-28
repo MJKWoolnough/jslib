@@ -77,7 +77,8 @@ type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
  * The `attr` method returns a {@link dom:Binding}. When monitoring a single attribute, the value of the Binding object will be set the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to a Map of the name to the value.
  */
 export type WithAttr = {
-	attr(name: string | string[]): Binding;
+	attr(name: string[]): BindMulti;
+	attr(name: string): Binding<any>;
 }
 
 /**
