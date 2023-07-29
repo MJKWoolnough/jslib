@@ -10,7 +10,21 @@ Null = () => (v: unknown): v is null => v === null,
 Num = () => (v: unknown): v is number => typeof v === "number",
 BigInt = () => (v: unknown): v is bigint => typeof v === "bigint",
 Sym = () => (v: unknown): v is Symbol => typeof v === "symbol",
-Arr = () => (v: unknown): v is Array<any> => v instanceof Array,
+Arr = <T>(t?: (v: unknown) => v is T) => (v: unknown): v is Array<T> => {
+	if (!(v instanceof Array)) {
+		return false;
+	}
+
+	if (t) {
+		for (const e of v) {
+			if (!t(e)) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+},
 Obj = () => (v: unknown): v is Object => v instanceof Object,
 Or = <T extends readonly ((v: unknown) => v is any)[]>(...tgs: T) => (v: unknown): v is OR<T> => {
 	for (const tg of tgs) {
