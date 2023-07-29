@@ -1,6 +1,7 @@
 export type TypeGuardOf<T> = T extends (v: unknown) => v is infer U ? U : never;
 
 type OR<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> | OR<Rest> : never;
+type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> & AND<Rest> : never;
 
 export const Bool = () => (v: unknown): v is boolean => typeof v === "boolean",
 Str = () => (v: unknown): v is string => typeof v === "string",
@@ -19,4 +20,13 @@ Or = <T extends readonly ((v: unknown) => v is any)[]>(...tgs: T) => (v: unknown
 	}
 
 	return false;
+},
+And = <T extends readonly ((v: unknown) => v is any)[]>(...tgs: T) => (v: unknown): v is AND<T> => {
+	for (const tg of tgs) {
+		if (!tg(v)) {
+			return false;
+		}
+	}
+
+	return true;
 };
