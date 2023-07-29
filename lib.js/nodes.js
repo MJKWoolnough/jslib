@@ -197,7 +197,6 @@ export class NodeArray {
 		const [node, pos] = getNode(this[realTarget].#root, index);
 		return pos !== -1 ? node.i : undefined;
 	}
-	concat(...items);
 	concat(...items) {
 		return Array.from(this.values()).concat(...items);
 	}
