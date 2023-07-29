@@ -1,3 +1,5 @@
+export type TypeGuardOf<T> = T extends (v: unknown) => v is infer U ? U : never;
+
 export const Bool = () => (v: unknown): v is boolean => typeof v === "boolean",
 Str = () => (v: unknown): v is string => typeof v === "string",
 Undefined = () => (v: unknown): v is undefined => v === undefined,
