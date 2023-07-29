@@ -25,7 +25,23 @@ Arr = <T>(t?: (v: unknown) => v is T) => (v: unknown): v is Array<T> => {
 
 	return true;
 },
-Obj = () => (v: unknown): v is Object => v instanceof Object,
+Obj = <T extends {[K: string]: (v: unknown) => v is any}>(t?: T) => (v: unknown): v is {[K in keyof T]: TypeGuardOf<T[K]>;} => {
+	if (!(v instanceof Object)) {
+		return false;
+	}
+
+	if (t) {
+		for (const [k, e] of Object.entries(v)) {
+			const tg = t[k];
+
+			if (tg && !tg(e)) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+},
 Or = <T extends readonly ((v: unknown) => v is any)[]>(...tgs: T) => (v: unknown): v is OR<T> => {
 	for (const tg of tgs) {
 		if (tg(v)) {
