@@ -33,10 +33,11 @@ func run() error {
 	m := http.NewServeMux()
 
 	if js {
-		m.Handle("/", http.FileServer(http.Dir("./")))
+		m.Handle("/lib/", http.StripPrefix("/lib/", http.FileServer(http.Dir("../lib.js"))))
 	} else {
-		m.Handle("/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("./")))))
+		m.Handle("/lib/", http.StripPrefix("/lib/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("../lib.ts"))))))
 	}
+	m.Handle("/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("./")))))
 	m.Handle("/static", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("123")) }))
 	m.Handle("/echo", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ct := r.Header.Get("Content-Type")
