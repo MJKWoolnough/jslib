@@ -19,9 +19,6 @@
  * @typedef DragEvent CheckedDragEvent
  * @property {DataTransfer} dataTransfer
  */
-interface CheckedDragEvent extends DragEvent {
-	dataTransfer: DataTransfer;
-}
 
 /**
  * This unexported type is used by {@link DragTransfer}s {@link DragTransfer.is | is} method to mark the DragTransfers {@link DataTransfer.get | get} method as guaranteed to return a `T`.
