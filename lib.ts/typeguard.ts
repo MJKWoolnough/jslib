@@ -1,5 +1,7 @@
 export type TypeGuardOf<T> = T extends (v: unknown) => v is infer U ? U : never;
 
+type OR<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> | OR<Rest> : never;
+
 export const Bool = () => (v: unknown): v is boolean => typeof v === "boolean",
 Str = () => (v: unknown): v is string => typeof v === "string",
 Undefined = () => (v: unknown): v is undefined => v === undefined,
@@ -8,4 +10,13 @@ Num = () => (v: unknown): v is number => typeof v === "number",
 BigInt = () => (v: unknown): v is bigint => typeof v === "bigint",
 Sym = () => (v: unknown): v is Symbol => typeof v === "symbol",
 Arr = () => (v: unknown): v is Array<any> => v instanceof Array,
-Obj = () => (v: unknown): v is Object => v instanceof Object;
+Obj = () => (v: unknown): v is Object => v instanceof Object,
+Or = <T extends readonly ((v: unknown) => v is any)[]>(...tgs: T) => (v: unknown): v is OR<T> => {
+	for (const tg of tgs) {
+		if (tg(v)) {
+			return true;
+		}
+	}
+
+	return false;
+};
