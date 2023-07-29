@@ -54,9 +54,10 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		if (xh.readyState === 4) {
 			if (xh.status === 200) {
 				if (props["response"] === "json" && props["checker"] && !props.checker(xh.response)) {
-					throw new TypeError("");
+					errorFn(new TypeError("received JSON does not match expected format"));
+				} else {
+					successFn(props["response"] === "xh" ? xh : xh.response);
 				}
-				successFn(props["response"] === "xh" ? xh : xh.response);
 			} else {
 				errorFn(new Error(xh.responseText));
 			}
