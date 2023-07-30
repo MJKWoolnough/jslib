@@ -15,7 +15,7 @@ export const makeSpreadable = <T extends (v: unknown) => v is any>(tg: T) => {
 		}
 	});
 },
-Bool = () => makeSpreadable((v: unknown): v is boolean => typeof v === "boolean"),
+Bool = <T extends boolean>(d?: T) => makeSpreadable((v: unknown): v is T => typeof v === "boolean" && (d === undefined || v === d)),
 Str = () => makeSpreadable((v: unknown): v is string => typeof v === "string"),
 Undefined = () => makeSpreadable((v: unknown): v is undefined => v === undefined),
 Null = () => makeSpreadable((v: unknown): v is null => v === null),
