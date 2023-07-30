@@ -23,6 +23,7 @@ Num = (min = -Infinity, max = Infinity) => makeSpreadable((v: unknown): v is num
 Int = (min = -Infinity, max = Infinity) => makeSpreadable((v: unknown): v is number => typeof v === "number" && (v|0) === v &&  v >= min && v <= max),
 BigInt = (min?: bigint, max?: bigint) => makeSpreadable((v: unknown): v is bigint => typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max)),
 Sym = () => makeSpreadable((v: unknown): v is Symbol => typeof v === "symbol"),
+Val = <const T>(val: T) => makeSpreadable((v: unknown): v is T => v === val),
 Arr = <T>(t?: (v: unknown) => v is T) => makeSpreadable((v: unknown): v is Array<T> => {
 	if (!(v instanceof Array)) {
 		return false;
