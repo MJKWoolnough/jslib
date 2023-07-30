@@ -16,7 +16,7 @@ export const makeSpreadable = <T extends (v: unknown) => v is any>(tg: T) => {
 	});
 },
 Bool = <T extends boolean>(d?: T) => makeSpreadable((v: unknown): v is T => typeof v === "boolean" && (d === undefined || v === d)),
-Str = () => makeSpreadable((v: unknown): v is string => typeof v === "string"),
+Str = (r?: RegExp) => makeSpreadable((v: unknown): v is string => typeof v === "string" && (r === undefined || r.test(v))),
 Undefined = () => makeSpreadable((v: unknown): v is undefined => v === undefined),
 Null = () => makeSpreadable((v: unknown): v is null => v === null),
 Num = () => makeSpreadable((v: unknown): v is number => typeof v === "number"),
