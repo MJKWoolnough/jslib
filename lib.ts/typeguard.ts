@@ -19,7 +19,7 @@ Bool = <T extends boolean>(d?: T) => makeSpreadable((v: unknown): v is T => type
 Str = (r?: RegExp) => makeSpreadable((v: unknown): v is string => typeof v === "string" && (r === undefined || r.test(v))),
 Undefined = () => makeSpreadable((v: unknown): v is undefined => v === undefined),
 Null = () => makeSpreadable((v: unknown): v is null => v === null),
-Num = () => makeSpreadable((v: unknown): v is number => typeof v === "number"),
+Num = (min = -Infinity, max = Infinity) => makeSpreadable((v: unknown): v is number => typeof v === "number" && v >= min && v <= max),
 BigInt = () => makeSpreadable((v: unknown): v is bigint => typeof v === "bigint"),
 Sym = () => makeSpreadable((v: unknown): v is Symbol => typeof v === "symbol"),
 Arr = <T>(t?: (v: unknown) => v is T) => makeSpreadable((v: unknown): v is Array<T> => {
