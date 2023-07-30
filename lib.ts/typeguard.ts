@@ -83,6 +83,19 @@ Obj = <T extends {[K: string]: (v: unknown) => v is any}>(t?: T) => makeSpreadab
 
 	return true;
 }),
+Rec = <K extends (v: unknown) => v is keyof any, V extends (v: unknown) => v is any>(key: K, value: V) => (v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
+	if (!(v instanceof Object)) {
+		return false;
+	}
+
+	for (const k of Reflect.ownKeys(v)) {
+		if (!key(k) || !value(v[k as keyof typeof v])) {
+			return false;
+		}
+	}
+
+	return true;
+},
 Or = <T extends readonly ((v: unknown) => v is any)[]>(...tgs: T) => makeSpreadable((v: unknown): v is OR<T> => {
 	for (const tg of tgs) {
 		if (tg(v)) {
