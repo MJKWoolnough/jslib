@@ -5,11 +5,6 @@ export type TypeGuardOf<T> = T extends TypeGuard<infer U> ? U : never;
 type OR<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> | OR<Rest> : never;
 type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> & AND<Rest> : never;
 
-const spreadable = Symbol("spread"),
-      asSpreadable = {
-	[spreadable]: true
-      };
-
 class SpreadableTypeGuard<T> extends Function {
 	#spread?: TypeGuard<T>;
 
@@ -18,7 +13,13 @@ class SpreadableTypeGuard<T> extends Function {
 	}
 
 	*[Symbol.iterator]() {
-		yield this.#spread ??= Object.assign((v: unknown): v is TypeGuardOf<T> => this(v), asSpreadable) as TypeGuard<T>;
+		yield this.#spread ??= SpreadTypeGuard.from<T>(this);
+	}
+}
+
+class SpreadTypeGuard extends Function {
+	static from<T>(tg: SpreadableTypeGuard<T>) {
+		return Object.setPrototypeOf(tg, SpreadableTypeGuard) as TypeGuard<T>;
 	}
 }
 
@@ -56,7 +57,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 		return v.length === 0;
 	}
 
-	const lastIsSpread = spreadable in t[t.length];
+	const lastIsSpread = t[t.length] instanceof SpreadTypeGuard;
 
 	let pos = 0;
 
