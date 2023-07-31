@@ -13,7 +13,7 @@ const spreadable = Symbol("spread"),
 export const makeSpreadable = <T extends TypeGuard<any>>(tg: T) => {
 	return Object.assign(tg, {
 		*[Symbol.iterator]() {
-			yield Object.assign((v: unknown): v is TypeGuardOf<T> => tg(v), asSpreadable);
+			yield Object.assign((v: unknown): v is TypeGuardOf<T> => tg(v), asSpreadable) as TypeGuard<T>;
 		}
 	});
 },
