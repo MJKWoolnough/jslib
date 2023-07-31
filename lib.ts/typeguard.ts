@@ -86,6 +86,13 @@ Obj = <T extends {}, U extends {[K in keyof T]: (v: unknown) => v is T[K]} = {[K
 
 	return true;
 }),
+Recur = <T>(tg: () => (v: unknown) => v is T) => {
+	let ttg: (v: unknown) => v is T;
+
+	return (v: unknown): v is T => {
+		return (ttg ??= tg())(v);
+	};
+},
 Rec = <K extends (v: unknown) => v is keyof any, V extends (v: unknown) => v is any>(key: K, value: V) => makeSpreadable((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
 	if (!(v instanceof Object)) {
 		return false;
