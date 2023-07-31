@@ -40,7 +40,7 @@ Arr = <T>(t?: (v: unknown) => v is T) => makeSpreadable((v: unknown): v is Array
 
 	return true;
 }),
-Tuple = <const T extends readonly ((v: unknown) => v is any)[]>(...t: T) => makeSpreadable((v: unknown): v is {-readonly [K in keyof T]: TypeGuardOf<T[K]>;} => {
+Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: (v: unknown) => v is T[K]} = {[K in keyof T]: (v: unknown) => v is T[K]}>(...t: U) => makeSpreadable((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Array)) {
 		return false;
 	}
