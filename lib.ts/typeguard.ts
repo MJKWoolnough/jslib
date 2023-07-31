@@ -11,12 +11,14 @@ const spreadable = Symbol("spread"),
       };
 
 class SpreadableTypeGuard<T> extends Function {
+	#spread?: TypeGuard<T>;
+
 	static from<T>(tg: TypeGuard<T>) {
 		return Object.setPrototypeOf(tg, SpreadableTypeGuard) as TypeGuard<T> & SpreadableTypeGuard<T>;
 	}
 
 	*[Symbol.iterator]() {
-		yield Object.assign((v: unknown): v is TypeGuardOf<T> => this(v), asSpreadable) as TypeGuard<T>;
+		yield this.#spread ??= Object.assign((v: unknown): v is TypeGuardOf<T> => this(v), asSpreadable) as TypeGuard<T>;
 	}
 }
 
