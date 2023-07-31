@@ -8,7 +8,7 @@ type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGua
 const spreadable = Symbol("spread"),
       asSpreadable = {
 	[spreadable]: true
-      }
+      };
 
 export const makeSpreadable = <T extends TypeGuard<any>>(tg: T) => {
 	return Object.assign(tg, {
