@@ -10,24 +10,27 @@ const spreadable = Symbol("spread"),
 	[spreadable]: true
       };
 
-export const makeSpreadable = <T extends TypeGuard<any>>(tg: T) => {
-	return Object.assign(tg, {
-		*[Symbol.iterator]() {
-			yield Object.assign((v: unknown): v is TypeGuardOf<T> => tg(v), asSpreadable) as TypeGuard<T>;
-		}
-	});
-},
-Bool = <T extends boolean>(d?: T) => makeSpreadable((v: unknown): v is T => typeof v === "boolean" && (d === undefined || v === d)),
-Str = (r?: RegExp) => makeSpreadable((v: unknown): v is string => typeof v === "string" && (r === undefined || r.test(v))),
-Undefined = () => makeSpreadable((v: unknown): v is undefined => v === undefined),
-Null = () => makeSpreadable((v: unknown): v is null => v === null),
-Num = (min = -Infinity, max = Infinity) => makeSpreadable((v: unknown): v is number => typeof v === "number" && v >= min && v <= max),
-Int = (min = -Infinity, max = Infinity) => makeSpreadable((v: unknown): v is number => typeof v === "number" && (v|0) === v &&  v >= min && v <= max),
-BigInt = (min?: bigint, max?: bigint) => makeSpreadable((v: unknown): v is bigint => typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max)),
-Sym = () => makeSpreadable((v: unknown): v is Symbol => typeof v === "symbol"),
-Val = <const T>(val: T) => makeSpreadable((v: unknown): v is T => v === val),
-Any = () => makeSpreadable((_: unknown): _ is any => true),
-Arr = <T>(t?: TypeGuard<T>) => makeSpreadable((v: unknown): v is Array<T> => {
+class SpreadableTypeGuard<T> extends Function {
+	static from<T>(tg: TypeGuard<T>) {
+		return Object.setPrototypeOf(tg, SpreadableTypeGuard) as TypeGuard<T> & SpreadableTypeGuard<T>;
+	}
+
+	*[Symbol.iterator]() {
+		yield Object.assign((v: unknown): v is TypeGuardOf<T> => this(v), asSpreadable) as TypeGuard<T>;
+	}
+}
+
+export const Bool = <T extends boolean>(d?: T) => SpreadableTypeGuard.from((v: unknown): v is T => typeof v === "boolean" && (d === undefined || v === d)),
+Str = (r?: RegExp) => SpreadableTypeGuard.from((v: unknown): v is string => typeof v === "string" && (r === undefined || r.test(v))),
+Undefined = () => SpreadableTypeGuard.from((v: unknown): v is undefined => v === undefined),
+Null = () => SpreadableTypeGuard.from((v: unknown): v is null => v === null),
+Num = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from((v: unknown): v is number => typeof v === "number" && v >= min && v <= max),
+Int = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from((v: unknown): v is number => typeof v === "number" && (v|0) === v &&  v >= min && v <= max),
+BigInt = (min?: bigint, max?: bigint) => SpreadableTypeGuard.from((v: unknown): v is bigint => typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max)),
+Sym = () => SpreadableTypeGuard.from((v: unknown): v is Symbol => typeof v === "symbol"),
+Val = <const T>(val: T) => SpreadableTypeGuard.from((v: unknown): v is T => v === val),
+Any = () => SpreadableTypeGuard.from((_: unknown): _ is any => true),
+Arr = <T>(t?: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Array<T> => {
 	if (!(v instanceof Array)) {
 		return false;
 	}
@@ -42,7 +45,7 @@ Arr = <T>(t?: TypeGuard<T>) => makeSpreadable((v: unknown): v is Array<T> => {
 
 	return true;
 }),
-Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(...t: U) => makeSpreadable((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
+Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(...t: U) => SpreadableTypeGuard.from((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Array)) {
 		return false;
 	}
@@ -71,7 +74,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 
 	return true;
 }),
-Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => makeSpreadable((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
+Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => SpreadableTypeGuard.from((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Object)) {
 		return false;
 	}
@@ -95,7 +98,7 @@ Recur = <T>(tg: () => TypeGuard<T>) => {
 		return (ttg ??= tg())(v);
 	};
 },
-Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: V) => makeSpreadable((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
+Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: V) => SpreadableTypeGuard.from((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
 	if (!(v instanceof Object)) {
 		return false;
 	}
@@ -108,7 +111,7 @@ Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: 
 
 	return true;
 }),
-Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => makeSpreadable((v: unknown): v is OR<T> => {
+Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.from((v: unknown): v is OR<T> => {
 	for (const tg of tgs) {
 		if (tg(v)) {
 			return true;
@@ -117,7 +120,7 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => makeSpreadable((v: unkn
 
 	return false;
 }),
-And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => makeSpreadable((v: unknown): v is AND<T> => {
+And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.from((v: unknown): v is AND<T> => {
 	for (const tg of tgs) {
 		if (!tg(v)) {
 			return false;
