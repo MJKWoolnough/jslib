@@ -1,6 +1,6 @@
-export type TypeGuardOf<T> = T extends (v: unknown) => v is infer U ? U : never;
-
 export type TypeGuard<T> = (v: unknown) => v is T;
+
+export type TypeGuardOf<T> = T extends TypeGuard<infer U> ? U : never;
 
 type OR<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> | OR<Rest> : never;
 type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> & AND<Rest> : never;
@@ -10,7 +10,7 @@ const spreadable = Symbol("spread"),
 	[spreadable]: true
       }
 
-export const makeSpreadable = <T extends (v: unknown) => v is any>(tg: T) => {
+export const makeSpreadable = <T extends TypeGuard<any>>(tg: T) => {
 	return Object.assign(tg, {
 		*[Symbol.iterator]() {
 			yield Object.assign((v: unknown): v is TypeGuardOf<T> => tg(v), asSpreadable);
@@ -27,7 +27,7 @@ BigInt = (min?: bigint, max?: bigint) => makeSpreadable((v: unknown): v is bigin
 Sym = () => makeSpreadable((v: unknown): v is Symbol => typeof v === "symbol"),
 Val = <const T>(val: T) => makeSpreadable((v: unknown): v is T => v === val),
 Any = () => makeSpreadable((_: unknown): _ is any => true),
-Arr = <T>(t?: (v: unknown) => v is T) => makeSpreadable((v: unknown): v is Array<T> => {
+Arr = <T>(t?: TypeGuard<T>) => makeSpreadable((v: unknown): v is Array<T> => {
 	if (!(v instanceof Array)) {
 		return false;
 	}
@@ -42,7 +42,7 @@ Arr = <T>(t?: (v: unknown) => v is T) => makeSpreadable((v: unknown): v is Array
 
 	return true;
 }),
-Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: (v: unknown) => v is T[K]} = {[K in keyof T]: (v: unknown) => v is T[K]}>(...t: U) => makeSpreadable((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
+Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(...t: U) => makeSpreadable((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Array)) {
 		return false;
 	}
@@ -71,7 +71,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: (v: un
 
 	return true;
 }),
-Obj = <T extends {}, U extends {[K in keyof T]: (v: unknown) => v is T[K]} = {[K in keyof T]: (v: unknown) => v is T[K]}>(t?: U) => makeSpreadable((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
+Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => makeSpreadable((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Object)) {
 		return false;
 	}
@@ -88,14 +88,14 @@ Obj = <T extends {}, U extends {[K in keyof T]: (v: unknown) => v is T[K]} = {[K
 
 	return true;
 }),
-Recur = <T>(tg: () => (v: unknown) => v is T) => {
-	let ttg: (v: unknown) => v is T;
+Recur = <T>(tg: () => TypeGuard<T>) => {
+	let ttg: TypeGuard<T>;
 
 	return (v: unknown): v is T => {
 		return (ttg ??= tg())(v);
 	};
 },
-Rec = <K extends (v: unknown) => v is keyof any, V extends (v: unknown) => v is any>(key: K, value: V) => makeSpreadable((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
+Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: V) => makeSpreadable((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
 	if (!(v instanceof Object)) {
 		return false;
 	}
@@ -108,7 +108,7 @@ Rec = <K extends (v: unknown) => v is keyof any, V extends (v: unknown) => v is 
 
 	return true;
 }),
-Or = <T extends readonly ((v: unknown) => v is any)[]>(...tgs: T) => makeSpreadable((v: unknown): v is OR<T> => {
+Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => makeSpreadable((v: unknown): v is OR<T> => {
 	for (const tg of tgs) {
 		if (tg(v)) {
 			return true;
@@ -117,7 +117,7 @@ Or = <T extends readonly ((v: unknown) => v is any)[]>(...tgs: T) => makeSpreada
 
 	return false;
 }),
-And = <T extends readonly ((v: unknown) => v is any)[]>(...tgs: T) => makeSpreadable((v: unknown): v is AND<T> => {
+And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => makeSpreadable((v: unknown): v is AND<T> => {
 	for (const tg of tgs) {
 		if (!tg(v)) {
 			return false;
