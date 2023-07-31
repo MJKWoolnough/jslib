@@ -69,14 +69,14 @@ Tuple = <const T extends readonly ((v: unknown) => v is any)[]>(...t: T) => make
 
 	return true;
 }),
-Obj = <T extends {[K: string]: (v: unknown) => v is any}>(t?: T) => makeSpreadable((v: unknown): v is {[K in keyof T]: TypeGuardOf<T[K]>;} => {
+Obj = <T extends {}, U extends {[K in keyof T]: (v: unknown) => v is T[K]} = {[K in keyof T]: (v: unknown) => v is T[K]}>(t?: U) => makeSpreadable((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Object)) {
 		return false;
 	}
 
 	if (t) {
 		for (const [k, e] of Object.entries(v)) {
-			const tg = t[k];
+			const tg = t[k as keyof typeof t];
 
 			if (tg && !tg(e)) {
 				return false;
