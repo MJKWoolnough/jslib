@@ -202,4 +202,29 @@ And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.fr
 	}
 
 	return true;
+}),
+MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V) => SpreadableTypeGuard.from((v: unknown): v is Map<TypeGuardOf<K>, TypeGuardOf<V>> => {
+	if (!(v instanceof Map)) {
+		return throwOrReturn(false, "map");
+	}
+
+	for (const [k, val] of v) {
+		try {
+			if (!key(k)) {
+				return false;
+			}
+		} catch (err) {
+			throwOrReturn(false, "map-key", k.toString(), (err as Error).message);
+		}
+
+		try {
+			if (!value(val)) {
+				return false;
+			}
+		} catch (err) {
+			throwOrReturn(false, "map", k.toString(), (err as Error).message);
+		}
+	}
+
+	return true;
 });
