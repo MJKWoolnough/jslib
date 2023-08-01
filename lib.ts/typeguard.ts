@@ -5,11 +5,21 @@ export type TypeGuardOf<T> = T extends TypeGuard<infer U> ? U : never;
 type OR<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> | OR<Rest> : never;
 type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> & AND<Rest> : never;
 
+let throwErrors = false;
+
 class SpreadableTypeGuard<T> extends Function {
 	#spread?: TypeGuard<T>;
 
 	static from<T>(tg: TypeGuard<T>) {
 		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype) as TypeGuard<T> & SpreadableTypeGuard<T>;
+	}
+
+	throw() {
+		throwErrors = true;
+
+		this();
+
+		throwErrors = false;
 	}
 
 	*[Symbol.iterator]() {
@@ -23,26 +33,46 @@ class SpreadTypeGuard extends Function {
 	}
 }
 
-export const Bool = <T extends boolean>(d?: T) => SpreadableTypeGuard.from((v: unknown): v is T => typeof v === "boolean" && (d === undefined || v === d)),
-Str = (r?: RegExp) => SpreadableTypeGuard.from((v: unknown): v is string => typeof v === "string" && (r === undefined || r.test(v))),
-Undefined = () => SpreadableTypeGuard.from((v: unknown): v is undefined => v === undefined),
-Null = () => SpreadableTypeGuard.from((v: unknown): v is null => v === null),
-Num = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from((v: unknown): v is number => typeof v === "number" && v >= min && v <= max),
-Int = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from((v: unknown): v is number => typeof v === "number" && (v|0) === v &&  v >= min && v <= max),
-BigInt = (min?: bigint, max?: bigint) => SpreadableTypeGuard.from((v: unknown): v is bigint => typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max)),
-Sym = () => SpreadableTypeGuard.from((v: unknown): v is Symbol => typeof v === "symbol"),
-Val = <const T>(val: T) => SpreadableTypeGuard.from((v: unknown): v is T => v === val),
+const throwOrReturn = (v: boolean, name: string, key?: string, err?: string) => {
+	if (!v && throwErrors) {
+		if (key && err) {
+			throw new TypeError(`invalid value: ${name}[${key}]: ${err}`);
+		}
+
+		throw new TypeError(`invalid value: ${name}`);
+	}
+
+	return v;
+};
+
+export const Bool = <T extends boolean>(d?: T) => SpreadableTypeGuard.from((v: unknown): v is T => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
+Str = (r?: RegExp) => SpreadableTypeGuard.from((v: unknown): v is string => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
+Undefined = () => SpreadableTypeGuard.from((v: unknown): v is undefined => throwOrReturn(v === undefined, "undefined")),
+Null = () => SpreadableTypeGuard.from((v: unknown): v is null => throwOrReturn(v === null, "null")),
+Num = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from((v: unknown): v is number => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
+Int = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from((v: unknown): v is number => throwOrReturn(typeof v === "number" && (v|0) === v &&  v >= min && v <= max, "integer")),
+BigInt = (min?: bigint, max?: bigint) => SpreadableTypeGuard.from((v: unknown): v is bigint => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
+Sym = () => SpreadableTypeGuard.from((v: unknown): v is Symbol => throwOrReturn(typeof v === "symbol", "symbol")),
+Val = <const T>(val: T) => SpreadableTypeGuard.from((v: unknown): v is T => throwOrReturn(v === val, "value")),
 Any = () => SpreadableTypeGuard.from((_: unknown): _ is any => true),
 Arr = <T>(t?: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Array<T> => {
 	if (!(v instanceof Array)) {
-		return false;
+		return throwOrReturn(false, "array");
 	}
 
 	if (t) {
+		let pos = 0;
+
 		for (const e of v) {
-			if (!t(e)) {
-				return false;
+			try {
+				if (!t(e)) {
+					return false;
+				}
+			} catch (err) {
+				throwOrReturn(false, "array", pos + "", (err as Error).message);
 			}
+
+			pos++;
 		}
 	}
 
@@ -50,11 +80,11 @@ Arr = <T>(t?: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Array
 }),
 Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(...t: U) => SpreadableTypeGuard.from((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Array)) {
-		return false;
+		return throwOrReturn(false, "tuple");
 	}
 
 	if (t.length === 0) {
-		return v.length === 0;
+		return throwOrReturn(v.length === 0, "tuple");
 	}
 
 	const lastIsSpread = t[t.length] instanceof SpreadTypeGuard;
@@ -62,16 +92,22 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 	let pos = 0;
 
 	for (const tg of t) {
-		if (lastIsSpread && pos === t.length) {
-			for (; pos < v.length; pos++) {
-				if (!tg(v[pos])) {
+		try {
+			if (lastIsSpread && pos === t.length) {
+				for (; pos < v.length; pos++) {
+					if (!tg(v[pos])) {
+						return false;
+					}
+				}
+			} else {
+				if (tg(v[pos])) {
 					return false;
 				}
+
+				pos++;
 			}
-		} else {
-			if (tg(v[pos++])) {
-				return false;
-			}
+		} catch (err) {
+			throwOrReturn(false, "tuple", pos + "", (err as Error).message);
 		}
 	}
 
@@ -79,15 +115,19 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 }),
 Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => SpreadableTypeGuard.from((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Object)) {
-		return false;
+		return throwOrReturn(false, "object");
 	}
 
 	if (t) {
 		for (const [k, e] of Object.entries(v)) {
 			const tg = t[k as keyof typeof t];
 
-			if (tg && !tg(e)) {
-				return false;
+			try {
+				if (tg && !tg(e)) {
+					return false;
+				}
+			} catch (err) {
+				throwOrReturn(false, "object", k, (err as Error).message);
 			}
 		}
 	}
@@ -103,31 +143,57 @@ Recur = <T>(tg: () => TypeGuard<T>) => {
 },
 Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: V) => SpreadableTypeGuard.from((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
 	if (!(v instanceof Object)) {
-		return false;
+		return throwOrReturn(false, "record");
 	}
 
 	for (const k of Reflect.ownKeys(v)) {
-		if (!key(k) || !value(v[k as keyof typeof v])) {
-			return false;
+		try {
+			if (!key(k)) {
+				return false;
+			}
+		} catch (err) {
+			throwOrReturn(false, "record-key", k.toString(), (err as Error).message);
+		}
+
+		try {
+			if (!value(v[k as keyof typeof v])) {
+				return false;
+			}
+		} catch (err) {
+			throwOrReturn(false, "record", k.toString(), (err as Error).message);
 		}
 	}
 
 	return true;
 }),
 Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.from((v: unknown): v is OR<T> => {
+	const errs: string[] = [];
+
 	for (const tg of tgs) {
-		if (tg(v)) {
-			return true;
+		try {
+			if (tg(v)) {
+				return true;
+			}
+		} catch (err) {
+			errs.push((err as Error).message);
 		}
 	}
 
-	return false;
+	return throwOrReturn(false, "OR", "~", errs.join(" | "));
 }),
 And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.from((v: unknown): v is AND<T> => {
+	let pos = 0;
+
 	for (const tg of tgs) {
-		if (!tg(v)) {
-			return false;
+		try {
+			if (!tg(v)) {
+				return false;
+			}
+		} catch (err) {
+			throwOrReturn(false, "AND", pos + "", (err as Error).message);
 		}
+
+		pos++;
 	}
 
 	return true;
