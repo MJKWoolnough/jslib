@@ -9,6 +9,7 @@ let throwErrors = false;
 
 class SpreadableTypeGuard<T> extends Function {
 	#spread?: TypeGuard<T>;
+	#throwable?: () => TypeGuard<T> & SpreadableTypeGuard<T>
 
 	static from<T>(tg: TypeGuard<T>) {
 		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype) as TypeGuard<T> & SpreadableTypeGuard<T>;
@@ -20,6 +21,10 @@ class SpreadableTypeGuard<T> extends Function {
 		this();
 
 		throwErrors = false;
+	}
+
+	asThrowable(): () => TypeGuard<T> & SpreadableTypeGuard<T> {
+		return this.#throwable ??= () => this();
 	}
 
 	*[Symbol.iterator]() {
