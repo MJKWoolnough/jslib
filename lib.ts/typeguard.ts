@@ -140,9 +140,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 Recur = <T>(tg: () => TypeGuard<T>) => {
 	let ttg: TypeGuard<T>;
 
-	return (v: unknown): v is T => {
-		return (ttg ??= tg())(v);
-	};
+	return (v: unknown): v is T => (ttg ??= tg())(v);
 },
 Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: V) => SpreadableTypeGuard.from((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
 	if (!(v instanceof Object)) {
