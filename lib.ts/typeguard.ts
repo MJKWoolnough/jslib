@@ -227,4 +227,25 @@ MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V)
 	}
 
 	return true;
+}),
+SetType = <T>(t: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Set<T> => {
+	if (!(v instanceof Set)) {
+		return throwOrReturn(false, "set");
+	}
+
+	let pos = 0;
+
+	for (const val of v) {
+		try {
+			if (!t(val)) {
+				return false;
+			}
+		} catch (err) {
+			throwOrReturn(false, "set", pos + "", (err as Error).message);
+		}
+
+		pos++;
+	}
+
+	return true;
 });
