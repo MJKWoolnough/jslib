@@ -40,7 +40,7 @@ class SpreadTypeGuard extends Function {
 
 const throwOrReturn = (v: boolean, name: string, key?: string, err?: string) => {
 	if (!v && throwErrors) {
-		if (key && err) {
+		if (key !== undefined && err) {
 			throw new TypeError(`invalid value: ${name}[${key}]: ${err}`);
 		}
 
@@ -180,7 +180,7 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.fro
 		}
 	}
 
-	return throwOrReturn(false, "OR", "~", errs.join(" | "));
+	return throwOrReturn(false, "OR", "", errs.join(" | "));
 }),
 And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.from((v: unknown): v is AND<T> => {
 	let pos = 0;
