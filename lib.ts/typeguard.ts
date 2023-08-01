@@ -9,7 +9,7 @@ class SpreadableTypeGuard<T> extends Function {
 	#spread?: TypeGuard<T>;
 
 	static from<T>(tg: TypeGuard<T>) {
-		return Object.setPrototypeOf(tg, SpreadableTypeGuard) as TypeGuard<T> & SpreadableTypeGuard<T>;
+		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype) as TypeGuard<T> & SpreadableTypeGuard<T>;
 	}
 
 	*[Symbol.iterator]() {
@@ -19,7 +19,7 @@ class SpreadableTypeGuard<T> extends Function {
 
 class SpreadTypeGuard extends Function {
 	static from<T>(tg: SpreadableTypeGuard<T>) {
-		return Object.setPrototypeOf(tg, SpreadableTypeGuard) as TypeGuard<T>;
+		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype) as TypeGuard<T>;
 	}
 }
 
