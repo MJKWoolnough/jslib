@@ -60,25 +60,23 @@ BigInt = (min?: bigint, max?: bigint) => SpreadableTypeGuard.from((v: unknown): 
 Sym = () => SpreadableTypeGuard.from((v: unknown): v is Symbol => throwOrReturn(typeof v === "symbol", "symbol")),
 Val = <const T>(val: T) => SpreadableTypeGuard.from((v: unknown): v is T => throwOrReturn(v === val, "value")),
 Any = () => SpreadableTypeGuard.from((_: unknown): _ is any => true),
-Arr = <T>(t?: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Array<T> => {
+Arr = <T>(t: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Array<T> => {
 	if (!(v instanceof Array)) {
 		return throwOrReturn(false, "array");
 	}
 
-	if (t) {
-		let pos = 0;
+	let pos = 0;
 
-		for (const e of v) {
-			try {
-				if (!t(e)) {
-					return false;
-				}
-			} catch (err) {
-				throwOrReturn(false, "array", pos + "", (err as Error).message);
+	for (const e of v) {
+		try {
+			if (!t(e)) {
+				return false;
 			}
-
-			pos++;
+		} catch (err) {
+			throwOrReturn(false, "array", pos + "", (err as Error).message);
 		}
+
+		pos++;
 	}
 
 	return true;
