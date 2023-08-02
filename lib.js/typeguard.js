@@ -67,7 +67,7 @@ Arr = t => SpreadableTypeGuard.from(v => {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "array", pos + "", err.message);
+			throwOrReturn(false, "array", pos, err.message);
 		}
 
 		pos++;
@@ -112,7 +112,7 @@ Tuple = (...t) => {
 				}
 			}
 		} catch (err) {
-			throwOrReturn(false, "tuple", pos + "", err.message);
+			throwOrReturn(false, "tuple", pos, err.message);
 		}
 
 		return throwOrReturn(pos === t.length, "tuple");
@@ -155,7 +155,7 @@ Rec = (key, value) => SpreadableTypeGuard.from(v => {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "record-key", k.toString(), err.message);
+			throwOrReturn(false, "record-key", k, err.message);
 		}
 
 		try {
@@ -163,7 +163,7 @@ Rec = (key, value) => SpreadableTypeGuard.from(v => {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "record", k.toString(), err.message);
+			throwOrReturn(false, "record", k, err.message);
 		}
 	}
 
@@ -193,7 +193,7 @@ And = (...tgs) => SpreadableTypeGuard.from(v => {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "AND", pos + "", err.message);
+			throwOrReturn(false, "AND", pos, err.message);
 		}
 
 		pos++;
@@ -212,7 +212,7 @@ MapType = (key, value) => SpreadableTypeGuard.from(v => {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "map-key", k.toString(), err.message);
+			throwOrReturn(false, "map-key", k, err.message);
 		}
 
 		try {
@@ -220,7 +220,7 @@ MapType = (key, value) => SpreadableTypeGuard.from(v => {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "map", k.toString(), err.message);
+			throwOrReturn(false, "map", k, err.message);
 		}
 	}
 
@@ -239,7 +239,7 @@ SetType = t => SpreadableTypeGuard.from(v => {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "set", pos + "", err.message);
+			throwOrReturn(false, "set", pos, err.message);
 		}
 
 		pos++;

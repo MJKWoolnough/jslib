@@ -40,7 +40,7 @@ class SpreadTypeGuard extends Function {
 }
 
 const noopTG = (_: unknown): _ is any => true,
-      throwOrReturn = (v: boolean, name: string, key?: string, err?: string) => {
+      throwOrReturn = (v: boolean, name: string, key?: any, err?: string) => {
 	if (!v && throwErrors) {
 		if (key !== undefined && err) {
 			throw new TypeError(`invalid value: ${name}[${key}]: ${err}`);
@@ -75,7 +75,7 @@ Arr = <T>(t: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Array<
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "array", pos + "", (err as Error).message);
+			throwOrReturn(false, "array", pos, (err as Error).message);
 		}
 
 		pos++;
@@ -120,7 +120,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 				}
 			}
 		} catch (err) {
-			throwOrReturn(false, "tuple", pos + "", (err as Error).message);
+			throwOrReturn(false, "tuple", pos, (err as Error).message);
 		}
 
 		return throwOrReturn(pos === t.length, "tuple");
@@ -163,7 +163,7 @@ Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: 
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "record-key", k.toString(), (err as Error).message);
+			throwOrReturn(false, "record-key", k, (err as Error).message);
 		}
 
 		try {
@@ -171,7 +171,7 @@ Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: 
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "record", k.toString(), (err as Error).message);
+			throwOrReturn(false, "record", k, (err as Error).message);
 		}
 	}
 
@@ -201,7 +201,7 @@ And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.fr
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "AND", pos + "", (err as Error).message);
+			throwOrReturn(false, "AND", pos, (err as Error).message);
 		}
 
 		pos++;
@@ -220,7 +220,7 @@ MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V)
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "map-key", k.toString(), (err as Error).message);
+			throwOrReturn(false, "map-key", k, (err as Error).message);
 		}
 
 		try {
@@ -228,7 +228,7 @@ MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V)
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "map", k.toString(), (err as Error).message);
+			throwOrReturn(false, "map", k, (err as Error).message);
 		}
 	}
 
@@ -247,7 +247,7 @@ SetType = <T>(t: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Se
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "set", pos + "", (err as Error).message);
+			throwOrReturn(false, "set", pos, (err as Error).message);
 		}
 
 		pos++;
