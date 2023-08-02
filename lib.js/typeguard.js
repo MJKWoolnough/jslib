@@ -116,8 +116,7 @@ Tuple = (...t) => {
 		}
 
 		return throwOrReturn(pos === t.length, "tuple");
-	}
-	);
+	});
 },
 Obj = t => SpreadableTypeGuard.from(v => {
 	if (!(v instanceof Object)) {
