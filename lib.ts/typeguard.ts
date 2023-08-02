@@ -40,6 +40,13 @@ class SpreadTypeGuard extends Function {
 }
 
 const noopTG = (_: unknown): _ is any => true,
+      throwUnknownError = (v: boolean) => {
+	if (!v) {
+		throw new Error("unknown type error");
+	}
+
+	return v;
+      },
       throwOrReturn = (v: boolean, name: string, key?: any, err?: string) => {
 	if (!v && throwErrors) {
 		if (key !== undefined && err) {
@@ -71,11 +78,11 @@ Arr = <T>(t: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Array<
 
 	for (const e of v) {
 		try {
-			if (!t(e)) {
+			if (!throwUnknownError(t(e))) {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "array", pos, (err as Error).message);
+			return throwOrReturn(false, "array", pos, (err as Error).message);
 		}
 
 		pos++;
@@ -105,7 +112,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 
 		try {
 			for (const tg of tgs) {
-				if (!tg(v[pos])) {
+				if (!throwUnknownError(tg(v[pos]))) {
 					return false;
 				}
 
@@ -114,13 +121,13 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 
 			if (pos < t.length) {
 				for (; pos < v.length; pos++) {
-					if (!spread(v[pos])) {
+					if (!throwUnknownError(spread(v[pos]))) {
 						return false;
 					}
 				}
 			}
 		} catch (err) {
-			throwOrReturn(false, "tuple", pos, (err as Error).message);
+			return throwOrReturn(false, "tuple", pos, (err as Error).message);
 		}
 
 		return throwOrReturn(pos === t.length, "tuple");
@@ -136,11 +143,11 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 			const tg = t[k as keyof typeof t];
 
 			try {
-				if (tg && !tg(e)) {
+				if (tg && !throwUnknownError(tg(e))) {
 					return false;
 				}
 			} catch (err) {
-				throwOrReturn(false, "object", k, (err as Error).message);
+				return throwOrReturn(false, "object", k, (err as Error).message);
 			}
 		}
 	}
@@ -159,19 +166,19 @@ Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: 
 
 	for (const k of Reflect.ownKeys(v)) {
 		try {
-			if (!key(k)) {
+			if (!throwUnknownError(key(k))) {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "record-key", k, (err as Error).message);
+			return throwOrReturn(false, "record-key", k, (err as Error).message);
 		}
 
 		try {
-			if (!value(v[k as keyof typeof v])) {
+			if (!throwUnknownError(value(v[k as keyof typeof v]))) {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "record", k, (err as Error).message);
+			return throwOrReturn(false, "record", k, (err as Error).message);
 		}
 	}
 
@@ -185,6 +192,8 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.fro
 			if (tg(v)) {
 				return true;
 			}
+
+			throwUnknownError(false);
 		} catch (err) {
 			errs.push((err as Error).message);
 		}
@@ -197,11 +206,11 @@ And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => SpreadableTypeGuard.fr
 
 	for (const tg of tgs) {
 		try {
-			if (!tg(v)) {
+			if (!throwUnknownError(tg(v))) {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "AND", pos, (err as Error).message);
+			return throwOrReturn(false, "AND", pos, (err as Error).message);
 		}
 
 		pos++;
@@ -216,19 +225,19 @@ MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V)
 
 	for (const [k, val] of v) {
 		try {
-			if (!key(k)) {
+			if (!throwUnknownError(key(k))) {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "map-key", k, (err as Error).message);
+			return throwOrReturn(false, "map-key", k, (err as Error).message);
 		}
 
 		try {
-			if (!value(val)) {
+			if (!throwUnknownError(value(val))) {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "map", k, (err as Error).message);
+			return throwOrReturn(false, "map", k, (err as Error).message);
 		}
 	}
 
@@ -243,11 +252,11 @@ SetType = <T>(t: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Se
 
 	for (const val of v) {
 		try {
-			if (!t(val)) {
+			if (!throwUnknownError(t(val))) {
 				return false;
 			}
 		} catch (err) {
-			throwOrReturn(false, "set", pos, (err as Error).message);
+			return throwOrReturn(false, "set", pos, (err as Error).message);
 		}
 
 		pos++;

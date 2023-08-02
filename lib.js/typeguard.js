@@ -32,6 +32,13 @@ class SpreadTypeGuard extends Function {
 }
 
 const noopTG = _ => true,
+      throwUnknownError = v => {
+	if (!v) {
+		throw new Error("unknown type error");
+	}
+
+	return v;
+      },
       throwOrReturn = (v, name, key, err) => {
 	if (!v && throwErrors) {
 		if (key != undefined && err) {
@@ -63,7 +70,7 @@ Arr = t => SpreadableTypeGuard.from(v => {
 
 	for (const e of v) {
 		try {
-			if (!t(e)) {
+			if (!throwUnknownError(t(e))) {
 				return false;
 			}
 		} catch (err) {
@@ -97,7 +104,7 @@ Tuple = (...t) => {
 
 		try {
 			for (const tg of tgs) {
-				if (!tg(v[pos])) {
+				if (!throwUnknownError(tg(v[pos]))) {
 					return false;
 				}
 
@@ -106,7 +113,7 @@ Tuple = (...t) => {
 
 			if (pos < t.length) {
 				for (; pos < v.length; pos++) {
-					if (!spread(v[pos])) {
+					if (!throwUnknownError(spread(v[pos]))) {
 						return false;
 					}
 				}
@@ -128,7 +135,7 @@ Obj = t => SpreadableTypeGuard.from(v => {
 			const tg = t[k];
 
 			try {
-				if (tg && !tg(e)) {
+				if (tg && !throwUnknownError(tg(e))) {
 					return false;
 				}
 			} catch (err) {
@@ -151,7 +158,7 @@ Rec = (key, value) => SpreadableTypeGuard.from(v => {
 
 	for (const k of Reflect.ownKeys(v)) {
 		try {
-			if (!key(k)) {
+			if (!throwUnknownError(key(k))) {
 				return false;
 			}
 		} catch (err) {
@@ -159,7 +166,7 @@ Rec = (key, value) => SpreadableTypeGuard.from(v => {
 		}
 
 		try {
-			if (!value(v[k])) {
+			if (!throwUnknownError(value(v[k]))) {
 				return false;
 			}
 		} catch (err) {
@@ -177,6 +184,8 @@ Or = (...tgs) => SpreadableTypeGuard.from(v => {
 			if (tg(v)) {
 				return true;
 			}
+
+			throwUnknownError(false);
 		} catch (err) {
 			errs.push(err.message);
 		}
@@ -189,7 +198,7 @@ And = (...tgs) => SpreadableTypeGuard.from(v => {
 
 	for (const tg of tgs) {
 		try {
-			if (!tg(v)) {
+			if (!throwUnknownError(tg(v))) {
 				return false;
 			}
 		} catch (err) {
@@ -208,7 +217,7 @@ MapType = (key, value) => SpreadableTypeGuard.from(v => {
 
 	for (const [k, val] of v) {
 		try {
-			if (!key(k)) {
+			if (!throwUnknownError(key(k))) {
 				return false;
 			}
 		} catch (err) {
@@ -216,7 +225,7 @@ MapType = (key, value) => SpreadableTypeGuard.from(v => {
 		}
 
 		try {
-			if (!value(val)) {
+			if (!throwUnknownError(value(val))) {
 				return false;
 			}
 		} catch (err) {
@@ -235,7 +244,7 @@ SetType = t => SpreadableTypeGuard.from(v => {
 
 	for (const val of v) {
 		try {
-			if (!t(val)) {
+			if (!throwUnknownError(t(val))) {
 				return false;
 			}
 		} catch (err) {
