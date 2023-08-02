@@ -81,41 +81,50 @@ Arr = <T>(t: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Array<
 
 	return true;
 }),
-Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(...t: U) => SpreadableTypeGuard.from((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
-	if (!(v instanceof Array)) {
-		return throwOrReturn(false, "tuple");
-	}
-
-	if (t.length === 0) {
-		return throwOrReturn(v.length === 0, "tuple");
-	}
-
-	const lastIsSpread = t[t.length] instanceof SpreadTypeGuard;
-
-	let pos = 0;
+Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(...t: U) => {
+	const tgs: TypeGuard<any>[] = [];
 
 	for (const tg of t) {
+		if (tg instanceof SpreadTypeGuard) {
+			break;
+		}
+
+		tgs.push(tg);
+	}
+
+	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : (_: any): _ is any => false;
+
+	return SpreadableTypeGuard.from((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
+		if (!(v instanceof Array)) {
+			return throwOrReturn(false, "tuple");
+		}
+
+		let pos = 0;
+
 		try {
-			if (lastIsSpread && pos === t.length) {
-				for (; pos < v.length; pos++) {
-					if (!tg(v[pos])) {
-						return false;
-					}
-				}
-			} else {
+			for (const tg of tgs) {
 				if (tg(v[pos])) {
 					return false;
 				}
 
 				pos++;
 			}
+
+			if (pos < t.length) {
+				for (; pos < v.length; pos++) {
+					if (!spread(v[pos])) {
+						return false;
+					}
+				}
+			}
 		} catch (err) {
 			throwOrReturn(false, "tuple", pos + "", (err as Error).message);
 		}
-	}
 
-	return true;
-}),
+		return throwOrReturn(pos === t.length, "tuple");
+	}
+	);
+},
 Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => SpreadableTypeGuard.from((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");

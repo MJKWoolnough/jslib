@@ -74,41 +74,50 @@ Arr = t => SpreadableTypeGuard.from(v => {
 
 	return true;
 }),
-Tuple = (...t) => SpreadableTypeGuard.from(v => {
-	if (!(v instanceof Array)) {
-		return throwOrReturn(false, "tuple");
-	}
-
-	if (t.length === 0) {
-		return throwOrReturn(v.length === 0, "tuple");
-	}
-
-	const lastIsSpread = t[t.length] instanceof SpreadTypeGuard;
-
-	let pos = 0;
+Tuple = (...t) => {
+	const tgs = [];
 
 	for (const tg of t) {
+		if (tg instanceof SpreadTypeGuard) {
+			break;
+		}
+
+		tgs.push(tg);
+	}
+
+	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : _ => false;
+
+	return SpreadableTypeGuard.from(v => {
+		if (!(v instanceof Array)) {
+			return throwOrReturn(false, "tuple");
+		}
+
+		let pos = 0;
+
 		try {
-			if (lastIsSpread && pos === t.length) {
-				for (; pos < v.length; pos++) {
-					if (!tg(v[pos])) {
-						return false;
-					}
-				}
-			} else {
+			for (const tg of tgs) {
 				if (tg(v[pos])) {
 					return false;
 				}
 
 				pos++;
 			}
+
+			if (pos < t.length) {
+				for (; pos < v.length; pos++) {
+					if (!spread(v[pos])) {
+						return false;
+					}
+				}
+			}
 		} catch (err) {
 			throwOrReturn(false, "tuple", pos + "", err.message);
 		}
-	}
 
-	return true;
-}),
+		return throwOrReturn(pos === t.length, "tuple");
+	}
+	);
+},
 Obj = t => SpreadableTypeGuard.from(v => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
