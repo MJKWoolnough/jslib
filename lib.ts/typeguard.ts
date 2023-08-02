@@ -38,7 +38,8 @@ class SpreadTypeGuard extends Function {
 	}
 }
 
-const throwOrReturn = (v: boolean, name: string, key?: string, err?: string) => {
+const noopTG = (_: unknown): _ is any => true,
+      throwOrReturn = (v: boolean, name: string, key?: string, err?: string) => {
 	if (!v && throwErrors) {
 		if (key !== undefined && err) {
 			throw new TypeError(`invalid value: ${name}[${key}]: ${err}`);
@@ -59,7 +60,7 @@ Int = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from((v: unknown)
 BigInt = (min?: bigint, max?: bigint) => SpreadableTypeGuard.from((v: unknown): v is bigint => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
 Sym = () => SpreadableTypeGuard.from((v: unknown): v is Symbol => throwOrReturn(typeof v === "symbol", "symbol")),
 Val = <const T>(val: T) => SpreadableTypeGuard.from((v: unknown): v is T => throwOrReturn(v === val, "value")),
-Any = () => SpreadableTypeGuard.from((_: unknown): _ is any => true),
+Any = () => SpreadableTypeGuard.from(noopTG),
 Arr = <T>(t: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Array<T> => {
 	if (!(v instanceof Array)) {
 		return throwOrReturn(false, "array");
@@ -92,7 +93,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 		tgs.push(tg);
 	}
 
-	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : (_: any): _ is any => false;
+	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : noopTG;
 
 	return SpreadableTypeGuard.from((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
 		if (!(v instanceof Array)) {

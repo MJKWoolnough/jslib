@@ -31,7 +31,8 @@ class SpreadTypeGuard extends Function {
 	}
 }
 
-const throwOrReturn = (v, name, key, err) => {
+const noopTG = _ => true,
+      throwOrReturn = (v, name, key, err) => {
 	if (!v && throwErrors) {
 		if (key != undefined && err) {
 			throw new TypeError(`invalid value: ${name}[${key}]: ${err}`);
@@ -85,7 +86,7 @@ Tuple = (...t) => {
 		tgs.push(tg);
 	}
 
-	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : _ => false;
+	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : noopTG;
 
 	return SpreadableTypeGuard.from(v => {
 		if (!(v instanceof Array)) {
