@@ -41,7 +41,7 @@ const throwOrReturn = (v, name, key, err) => {
 	}
 
 	return v;
-};
+      };
 
 export const Bool = d => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
 Str = r => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
