@@ -105,7 +105,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 
 		try {
 			for (const tg of tgs) {
-				if (tg(v[pos])) {
+				if (!tg(v[pos])) {
 					return false;
 				}
 

@@ -97,7 +97,7 @@ Tuple = (...t) => {
 
 		try {
 			for (const tg of tgs) {
-				if (tg(v[pos])) {
+				if (!tg(v[pos])) {
 					return false;
 				}
 
