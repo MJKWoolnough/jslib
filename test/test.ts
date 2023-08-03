@@ -6357,6 +6357,20 @@ type Tests = {
 
 				return !s("") && s("abc") && !s("123");
 			}
+		},
+		"Undefined": {
+			"valid": async () => {
+				const {Undefined} = await import("./lib/typeguard.js"),
+				      u = Undefined();
+
+				return u(undefined);
+			},
+			"invalid": async () => {
+				const {Undefined} = await import("./lib/typeguard.js"),
+				      u = Undefined();
+
+				return !u(null) && !u("") && !u(123);
+			}
 		}
 	}
 });
