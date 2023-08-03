@@ -6371,6 +6371,20 @@ type Tests = {
 
 				return !u(null) && !u("") && !u(123);
 			}
+		},
+		"Null": {
+			"valid": async () => {
+				const {Null} = await import("./lib/typeguard.js"),
+				      n = Null();
+
+				return n(null);
+			},
+			"invalid": async () => {
+				const {Null} = await import("./lib/typeguard.js"),
+				      n = Null();
+
+				return !n(undefined) && !n("") && !n(123);
+			}
 		}
 	}
 });
