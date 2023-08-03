@@ -6315,5 +6315,28 @@ type Tests = {
 				return d instanceof DocumentFragment && d.firstChild instanceof HTMLDivElement && d.firstChild?.firstChild instanceof SVGSVGElement;
 			},
 		}
+	},
+	"typeguard.js": {
+		"Bool": {
+			"valid": async () => {
+				const {Bool} = await import("./lib/typeguard.js"),
+				      b = Bool();
+
+				return b(true) && b(false);
+			},
+			"invalid": async () => {
+				const {Bool} = await import("./lib/typeguard.js"),
+				      b = Bool();
+
+				return !b(1) && !b("");
+			},
+			"true or false": async() => {
+				const {Bool} = await import("./lib/typeguard.js"),
+				      t = Bool(true),
+				      f = Bool(false);
+
+				return t(true) && !t(false) && !f(true) && f(false);
+			}
+		}
 	}
 });
