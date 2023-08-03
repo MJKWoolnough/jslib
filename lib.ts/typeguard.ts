@@ -10,22 +10,24 @@ let throwErrors = false;
 
 class SpreadableTypeGuard<T> extends Function {
 	#spread?: TypeGuard<T>;
-	#throwable?: () => TypeGuard<T> & SpreadableTypeGuard<T>;
 
 	static from<T>(tg: TypeGuard<T>) {
 		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype) as TypeGuard<T> & SpreadableTypeGuard<T>;
 	}
 
-	throw() {
+	throw(v: unknown): v is T {
 		throwErrors = true;
 
-		this();
+		let ret: boolean;
 
-		throwErrors = false;
-	}
+		try {
+			ret = this(v);
+		} finally {
+			throwErrors = false;
+		}
 
-	asThrowable(): () => TypeGuard<T> & SpreadableTypeGuard<T> {
-		return this.#throwable ??= () => this();
+
+		return ret;
 	}
 
 	*[Symbol.iterator]() {
