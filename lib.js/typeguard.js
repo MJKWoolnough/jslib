@@ -33,7 +33,7 @@ class SpreadTypeGuard extends Function {
 
 const noopTG = _ => true,
       throwUnknownError = v => {
-	if (!v) {
+	if (!v && throwErrors) {
 		throw new Error("unknown type error");
 	}
 
