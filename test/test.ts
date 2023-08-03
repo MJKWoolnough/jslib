@@ -6337,6 +6337,26 @@ type Tests = {
 
 				return t(true) && !t(false) && !f(true) && f(false);
 			}
+		},
+		"Str": {
+			"valid": async () => {
+				const {Str} = await import("./lib/typeguard.js"),
+				      s = Str();
+
+				return s("") && s("abc") && s("123");
+			},
+			"invalid": async () => {
+				const {Str} = await import("./lib/typeguard.js"),
+				      s = Str();
+
+				return !s(1) && !s(false) && !s(null);
+			},
+			"with regex": async () => {
+				const {Str} = await import("./lib/typeguard.js"),
+				      s = Str(/^a/);
+
+				return !s("") && s("abc") && !s("123");
+			}
 		}
 	}
 });
