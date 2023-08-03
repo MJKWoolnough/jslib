@@ -6339,23 +6339,70 @@ type Tests = {
 			}
 		},
 		"Str": {
-			"valid": async () => {
-				const {Str} = await import("./lib/typeguard.js"),
-				      s = Str();
+			"returns": {
+				"valid": async () => {
+					const {Str} = await import("./lib/typeguard.js"),
+					      s = Str();
 
-				return s("") && s("abc") && s("123");
+					return s("") && s("abc") && s("123");
+				},
+				"invalid": async () => {
+					const {Str} = await import("./lib/typeguard.js"),
+					      s = Str();
+
+					return !s(1) && !s(false) && !s(null);
+				},
+				"with regex": async () => {
+					const {Str} = await import("./lib/typeguard.js"),
+					      s = Str(/^a/);
+
+					return !s("") && s("abc") && !s("123");
+				}
 			},
-			"invalid": async () => {
-				const {Str} = await import("./lib/typeguard.js"),
-				      s = Str();
+			"throws": {
+				"valid": async () => {
+					const {Str} = await import("./lib/typeguard.js"),
+					      s = Str();
 
-				return !s(1) && !s(false) && !s(null);
-			},
-			"with regex": async () => {
-				const {Str} = await import("./lib/typeguard.js"),
-				      s = Str(/^a/);
+					try {
+						return s.throw("") && s.throw("abc") && s.throw("123");
+					} catch (e) {
+						console.log(e);
 
-				return !s("") && s("abc") && !s("123");
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Str} = await import("./lib/typeguard.js"),
+					      s = Str();
+
+					try {
+						s.throw(false)
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+				"with regex": async () => {
+					const {Str} = await import("./lib/typeguard.js"),
+					      s = Str(/^a/);
+
+					try {
+						s.throw("abc");
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+					try {
+						return !s.throw("123");
+					} catch(e) {
+						console.log(e);
+
+						return true;
+					}
+				}
 			}
 		},
 		"Undefined": {
