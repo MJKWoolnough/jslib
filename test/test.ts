@@ -6318,24 +6318,52 @@ type Tests = {
 	},
 	"typeguard.js": {
 		"Bool": {
-			"valid": async () => {
-				const {Bool} = await import("./lib/typeguard.js"),
-				      b = Bool();
+			"returns": {
+				"valid": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool();
 
-				return b(true) && b(false);
+					return b(true) && b(false);
+				},
+				"invalid": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool();
+
+					return !b(1) && !b("");
+				},
+				"true or false": async() => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      t = Bool(true),
+					      f = Bool(false);
+
+					return t(true) && !t(false) && !f(true) && f(false);
+				}
 			},
-			"invalid": async () => {
-				const {Bool} = await import("./lib/typeguard.js"),
-				      b = Bool();
+			"throws": {
+				"valid": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool();
 
-				return !b(1) && !b("");
-			},
-			"true or false": async() => {
-				const {Bool} = await import("./lib/typeguard.js"),
-				      t = Bool(true),
-				      f = Bool(false);
+					try {
+						return b.throw(true) && b.throw(false);
+					} catch(e) {
+						console.log(e);
 
-				return t(true) && !t(false) && !f(true) && f(false);
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool();
+
+					try {
+						b.throw(1);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
 			}
 		},
 		"Str": {
