@@ -53,7 +53,7 @@ Str = r => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "string" && 
 Undefined = () => SpreadableTypeGuard.from(v => throwOrReturn(v === undefined, "undefined")),
 Null = () => SpreadableTypeGuard.from(v => throwOrReturn(v === null, "null")),
 Num = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
-Int = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "number" && (v|0) === v &&  v >= min && v <= max, "integer")),
+Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) &&  v >= min && v <= max, "integer")),
 BigInt = (min, max) => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
 Sym = () => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "symbol", "symbol")),
 Val = val => SpreadableTypeGuard.from(v => throwOrReturn(v === val, "value")),
