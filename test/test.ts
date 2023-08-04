@@ -6612,6 +6612,54 @@ type Tests = {
 					}
 				},
 			}
+		},
+		"BigInt": {
+			"returns": {
+				"valid": async() => {
+					const {BigInt} = await import("./lib/typeguard.js"),
+					      b = BigInt();
+
+					return b(0n) && b(-1n) && b(1000n) && b(-100000n);
+				},
+				"invalid": async() => {
+					const {BigInt} = await import("./lib/typeguard.js"),
+					      b = BigInt();
+
+					return !b(3.14) && !b(-1.618) && !b(Infinity) && !b(-Infinity) && !b("") && !b(false) && !b(null);
+				},
+				"limits": async() => {
+					const {BigInt} = await import("./lib/typeguard.js"),
+					      b = BigInt(-100n, 100n);
+
+					return b(0n) && b(100n) && b(-100n) && !b(101n) && !b(-101);
+				}
+			},
+			"throws": {
+				"valid": async() => {
+					const {BigInt} = await import("./lib/typeguard.js"),
+					      b = BigInt();
+
+					try {
+						return b.throw(0n);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async() => {
+					const {BigInt} = await import("./lib/typeguard.js"),
+					      b = BigInt();
+
+					try {
+						b.throw(0.5);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+			}
 		}
 	}
 });
