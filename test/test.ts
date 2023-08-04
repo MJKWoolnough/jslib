@@ -3911,12 +3911,12 @@ type Tests = {
 					}
 				}) + "" === "@media screen and (min-width: 900px) {\n  article { padding: 1rem 3rem; }\n}";
 			},
-			"@namespace": async() => {
+			"@namespace": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
 				return css.at(`@namespace svg url(http://www.w3.org/2000/svg)`) + "" === `@namespace svg url("http://www.w3.org/2000/svg");`;
 			},
-			"@keyframes": async() => {
+			"@keyframes": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
 				return (css.at("@keyframes identifier", {
@@ -4034,25 +4034,25 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js");
 				return e({"name": "custom-name"}, () => []).name === "custom-name";
 			},
-			"classOnly": async() => {
+			"classOnly": async () => {
 				const {default: e} = await import("./lib/elements.js");
 				return new (e({"classOnly": true}, () => [])) instanceof HTMLElement;
 			},
-			"classOnly (pseudo)": async() => {
+			"classOnly (pseudo)": async () => {
 				const {default: e} = await import("./lib/elements.js");
 				return new (e({"classOnly": true, "pseudo": true}, () => [])) instanceof DocumentFragment;
 			},
-			"extend": async() => {
+			"extend": async () => {
 				const {default: e} = await import("./lib/elements.js"),
 				      t = e({"extend": v => class extends v{a = 1}}, () => [])();
 				return t.a === 1;
 			},
-			"extend (pseudo)": async() => {
+			"extend (pseudo)": async () => {
 				const {default: e} = await import("./lib/elements.js"),
 				      t = e({"extend": v => class extends v{a = 1}, "pseudo": true}, () => [])();
 				return t.a === 1;
 			},
-			"extend Nodes": async() => {
+			"extend Nodes": async () => {
 				const {default: e} = await import("./lib/elements.js"),
 				      {addNodeRef, node} = await import("./lib/nodes.js"),
 				      t = e({"extend": addNodeRef}, () => [])();
@@ -4060,7 +4060,7 @@ type Tests = {
 				// Works when using non-dynamic import.
 				return t[node] === t;
 			},
-			"args": async() => {
+			"args": async () => {
 				const {default: e} = await import("./lib/elements.js"),
 				      t = e({"args": ["a", "b"]}, (e, a, b) => {
 					if (a === 1) {
@@ -4078,7 +4078,7 @@ type Tests = {
 				t({"a": 1, "b": 2});
 				return res === 9;
 			},
-			"args (classOnly)": async() => {
+			"args (classOnly)": async () => {
 				const {default: e} = await import("./lib/elements.js"),
 				      t = e({"classOnly": true, "args": ["a", "b"]}, (e, a, b) => {
 					if (a === 1) {
@@ -6331,7 +6331,7 @@ type Tests = {
 
 					return !b(1) && !b("");
 				},
-				"true or false": async() => {
+				"true or false": async () => {
 					const {Bool} = await import("./lib/typeguard.js"),
 					      t = Bool(true),
 					      f = Bool(false);
@@ -6519,19 +6519,19 @@ type Tests = {
 		},
 		"Num": {
 			"returns": {
-				"valid": async() => {
+				"valid": async () => {
 					const {Num} = await import("./lib/typeguard.js"),
 					      n = Num();
 
 					return n(0) && n(-1) && n(3.14) && n(-1.618) && n(-Infinity) && n(Infinity);
 				},
-				"invalid": async() => {
+				"invalid": async () => {
 					const {Num} = await import("./lib/typeguard.js"),
 					      n = Num();
 
 					return !n("") && !n(false) && !n(null);
 				},
-				"limits": async() => {
+				"limits": async () => {
 					const {Num} = await import("./lib/typeguard.js"),
 					      n = Num(0, 1000);
 
@@ -6539,7 +6539,7 @@ type Tests = {
 				}
 			},
 			"throws": {
-				"valid": async() => {
+				"valid": async () => {
 					const {Num} = await import("./lib/typeguard.js"),
 					      n = Num();
 
@@ -6551,7 +6551,7 @@ type Tests = {
 						return false;
 					}
 				},
-				"invalid": async() => {
+				"invalid": async () => {
 					const {Num} = await import("./lib/typeguard.js"),
 					      n = Num();
 
@@ -6567,19 +6567,19 @@ type Tests = {
 		},
 		"Int": {
 			"returns": {
-				"valid": async() => {
+				"valid": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int();
 
 					return i(0) && i(-1) && i(Number.MIN_SAFE_INTEGER) && i(Number.MAX_SAFE_INTEGER);
 				},
-				"invalid": async() => {
+				"invalid": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int();
 
 					return !i(3.14) && !i(-1.618) && !i(Infinity) && !i(-Infinity) && !i("") && !i(false) && !i(null);
 				},
-				"limits": async() => {
+				"limits": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(0, 1000);
 
@@ -6587,7 +6587,7 @@ type Tests = {
 				}
 			},
 			"throws": {
-				"valid": async() => {
+				"valid": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int();
 
@@ -6599,7 +6599,7 @@ type Tests = {
 						return false;
 					}
 				},
-				"invalid": async() => {
+				"invalid": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int();
 
@@ -6615,19 +6615,19 @@ type Tests = {
 		},
 		"BigInt": {
 			"returns": {
-				"valid": async() => {
+				"valid": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt();
 
 					return b(0n) && b(-1n) && b(1000n) && b(-100000n);
 				},
-				"invalid": async() => {
+				"invalid": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt();
 
 					return !b(3.14) && !b(-1.618) && !b(Infinity) && !b(-Infinity) && !b("") && !b(false) && !b(null);
 				},
-				"limits": async() => {
+				"limits": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt(-100n, 100n);
 
@@ -6635,7 +6635,7 @@ type Tests = {
 				}
 			},
 			"throws": {
-				"valid": async() => {
+				"valid": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt();
 
@@ -6647,7 +6647,7 @@ type Tests = {
 						return false;
 					}
 				},
-				"invalid": async() => {
+				"invalid": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt();
 
