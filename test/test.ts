@@ -6660,6 +6660,48 @@ type Tests = {
 					}
 				},
 			}
+		},
+		"Symbol": {
+			"returns": {
+				"valid": async () => {
+					const {Sym} = await import("./lib/typeguard.js"),
+					      s = Sym();
+
+					return s(Symbol(""));
+				},
+				"invalid": async () => {
+					const {Sym} = await import("./lib/typeguard.js"),
+					      s = Sym();
+
+					return !s("");
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Sym} = await import("./lib/typeguard.js"),
+					      s = Sym();
+
+					try {
+						return s.throw(Symbol(""));
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Sym} = await import("./lib/typeguard.js"),
+					      s = Sym();
+
+					try {
+						s.throw("");
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
