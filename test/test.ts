@@ -6476,17 +6476,45 @@ type Tests = {
 			}
 		},
 		"Null": {
-			"valid": async () => {
-				const {Null} = await import("./lib/typeguard.js"),
-				      n = Null();
+			"returns": {
+				"valid": async () => {
+					const {Null} = await import("./lib/typeguard.js"),
+					      n = Null();
 
-				return n(null);
+					return n(null);
+				},
+				"invalid": async () => {
+					const {Null} = await import("./lib/typeguard.js"),
+					      n = Null();
+
+					return !n(undefined) && !n("") && !n(123);
+				}
 			},
-			"invalid": async () => {
-				const {Null} = await import("./lib/typeguard.js"),
-				      n = Null();
+			"throws": {
+				"valid": async () => {
+					const {Null} = await import("./lib/typeguard.js"),
+					      n = Null();
 
-				return !n(undefined) && !n("") && !n(123);
+					try {
+						return n.throw(null);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Null} = await import("./lib/typeguard.js"),
+					      n = Null();
+
+					try {
+						n.throw(undefined);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
 			}
 		}
 	}
