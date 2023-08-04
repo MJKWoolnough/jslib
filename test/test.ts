@@ -6564,6 +6564,54 @@ type Tests = {
 					}
 				},
 			}
+		},
+		"Int": {
+			"returns": {
+				"valid": async() => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int();
+
+					return i(0) && i(-1) && i(Number.MIN_SAFE_INTEGER) && i(Number.MAX_SAFE_INTEGER);
+				},
+				"invalid": async() => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int();
+
+					return !i(3.14) && !i(-1.618) && !i(Infinity) && !i(-Infinity) && !i("") && !i(false) && !i(null);
+				},
+				"limits": async() => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int(0, 1000);
+
+					return i(0) && i(1000) && !i(1001) && !i(Number.MIN_SAFE_INTEGER) && !i(-1) && !i(Number.MAX_SAFE_INTEGER);
+				}
+			},
+			"throws": {
+				"valid": async() => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int();
+
+					try {
+						return i.throw(0);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async() => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int();
+
+					try {
+						i.throw(0.5);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+			}
 		}
 	}
 });
