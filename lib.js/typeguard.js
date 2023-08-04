@@ -18,7 +18,6 @@ class SpreadableTypeGuard extends Function {
 			throwErrors = false;
 		}
 
-
 		return ret;
 	}
 
