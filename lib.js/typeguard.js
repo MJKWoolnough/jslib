@@ -8,17 +8,13 @@ class SpreadableTypeGuard extends Function {
 	}
 
 	throw(v) {
-		throwErrors = true;
-
-		let ret;
-
 		try {
-			ret = this(v);
+			throwErrors = true;
+
+			return this(v);
 		} finally {
 			throwErrors = false;
 		}
-
-		return ret;
 	}
 
 	*[Symbol.iterator]() {

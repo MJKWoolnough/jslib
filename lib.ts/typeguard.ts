@@ -16,17 +16,13 @@ class SpreadableTypeGuard<T> extends Function {
 	}
 
 	throw(v: unknown): v is T {
-		throwErrors = true;
-
-		let ret: boolean;
-
 		try {
-			ret = this(v);
+			throwErrors = true;
+
+			return this(v);
 		} finally {
 			throwErrors = false;
 		}
-
-		return ret;
 	}
 
 	*[Symbol.iterator]() {
