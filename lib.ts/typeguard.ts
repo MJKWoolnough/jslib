@@ -48,11 +48,7 @@ const noopTG = (_: unknown): _ is any => true,
       },
       throwOrReturn = (v: boolean, name: string, key?: any, err?: string | Error) => {
 	if (!v && throwErrors) {
-		if (key !== undefined && err) {
-			throw new TypeError(`invalid value: ${name}[${key}]: ${err instanceof Error ? err.message : err}`);
-		}
-
-		throw new TypeError(`invalid value: ${name}`);
+		throw new TypeError(`invalid value: ${name}` + (key !== undefined && err ? `[${key}]: ${err instanceof Error ? err.message : err}` : ""));
 	}
 
 	return v;
