@@ -108,11 +108,9 @@ Tuple = (...t) => {
 				pos++;
 			}
 
-			if (pos < t.length) {
-				for (; pos < v.length; pos++) {
-					if (!throwUnknownError(spread(v[pos]))) {
-						return false;
-					}
+			for (; pos < v.length; pos++) {
+				if (!throwUnknownError(spread(v[pos]))) {
+					return false;
 				}
 			}
 		} catch (err) {
