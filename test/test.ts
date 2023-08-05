@@ -6916,6 +6916,120 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Tuple": {
+			"returns": {
+				"valid - empty": async () => {
+					const {Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple();
+
+					return t([]);
+				},
+				"invalid - empty": async () => {
+					const {Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple();
+
+					return !t([1]);
+				},
+				"valid - single string value": async () => {
+					const {Str, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Str());
+
+					return t(["abc"]) && t(["def"]);
+				},
+				"invalid - single string value": async () => {
+					const {Str, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Str());
+
+					return !t([]) && !t([1]) && !t(["abc", "def"]);
+				},
+				"valid - with spread": async () => {
+					const {Bool, Int, Null, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Bool(), Null(), ...Int());
+
+					return t([true, null]) && t([true, null, 1]) && t([false, null, 1, 2, 3]);
+				},
+				"invalid - with spread": async () => {
+					const {Bool, Int, Null, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Bool(), Null(), ...Int());
+
+					return !t([true, 1]) && !t([true, null, 1, "2"]) && !t([false, null, "1"]);
+				}
+			},
+			"throws": {
+				"valid - empty": async () => {
+					const {Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple();
+
+					try {
+						return t.throw([]);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - empty": async () => {
+					const {Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple();
+
+					try {
+						t.throw([1]);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+				"valid - single string value": async () => {
+					const {Str, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Str());
+
+					try {
+						return t.throw(["abc"]);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - single string value": async () => {
+					const {Str, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Str());
+
+					try {
+						t.throw([]);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+				"valid - with spread": async () => {
+					const {Bool, Int, Null, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Bool(), Null(), ...Int());
+
+					try {
+						return t.throw([true, null]);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - with spread": async () => {
+					const {Bool, Int, Null, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Bool(), Null(), ...Int());
+
+					try {
+						t.throw([true, 1]);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
