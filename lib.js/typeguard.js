@@ -121,7 +121,7 @@ Tuple = (...t) => {
 			return throwOrReturn(false, "tuple", pos, err);
 		}
 
-		return throwOrReturn(pos === v.length, "tuple");
+		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	});
 },
 Obj = t => SpreadableTypeGuard.from(v => {

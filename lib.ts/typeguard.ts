@@ -129,7 +129,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 			return throwOrReturn(false, "tuple", pos, err as Error);
 		}
 
-		return throwOrReturn(pos === v.length, "tuple");
+		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	});
 },
 Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => SpreadableTypeGuard.from((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
