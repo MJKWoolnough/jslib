@@ -6423,11 +6423,12 @@ type Tests = {
 
 						return false;
 					}
-					try {
-						return !s.throw("123");
-					} catch(e) {
-						console.log(e);
 
+					try {
+						s.throw("123");
+
+						return false;
+					} catch(e) {
 						return true;
 					}
 				}
