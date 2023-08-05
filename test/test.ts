@@ -6702,6 +6702,120 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Val": {
+			"returns": {
+				"valid - 1": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(1);
+
+					return v(1);
+				},
+				"invalid - 1": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(1);
+
+					return !v(2);
+				},
+				"valid - 2": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(2);
+
+					return v(2);
+				},
+				"invalid - 2": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(2);
+
+					return !v(1);
+				},
+				"valid - \"abc\"": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val("abc");
+
+					return v("abc");
+				},
+				"invalid - \"abc\"": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val("abc");
+
+					return !v("def");
+				}
+			},
+			"throws": {
+				"valid - 1": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(1);
+
+					try {
+						return v.throw(1);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - 1": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(1);
+
+					try {
+						v.throw(2);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+				"valid - 2": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(2);
+
+					try {
+						return v.throw(2);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - 2": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(2);
+
+					try {
+						v.throw(1);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+				"valid - \"abc\"": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val("abc");
+
+					try {
+						return v.throw("abc");
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - \"abc\"": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val("abc");
+
+					try {
+						v.throw("def");
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
