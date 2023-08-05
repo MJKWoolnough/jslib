@@ -6816,6 +6816,28 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Any": {
+			"returns": {
+				"valid": async () => {
+					const {Any} = await import("./lib/typeguard.js"),
+					      a = Any();
+
+					return a(1) && a("abc") && a([1, 2,3]);
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Any} = await import("./lib/typeguard.js"),
+					      a = Any();
+
+					try {
+						return a.throw(1) && a.throw("abc") && a.throw([1, 2,3]);
+					} catch(e) {
+						return false;
+					}
+				}
+			}
 		}
 	}
 });
