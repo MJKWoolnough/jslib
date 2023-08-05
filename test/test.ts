@@ -6838,6 +6838,84 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Arr": {
+			"returns": {
+				"valid - Num": async () => {
+					const {Arr, Num} = await import("./lib/typeguard.js"),
+					      a = Arr(Num());
+
+					return a([0, 1, 2]) && a([3, 4, 5, 6]);
+				},
+				"invalid - Num": async () => {
+					const {Arr, Num} = await import("./lib/typeguard.js"),
+					      a = Arr(Num());
+
+					return !a(null) && !a(["1", "2", "3"]);
+				},
+				"valid - Bool": async () => {
+					const {Arr, Bool} = await import("./lib/typeguard.js"),
+					      a = Arr(Bool());
+
+					return a([true]) && a([false, true]);
+				},
+				"invalid - Bool": async () => {
+					const {Arr, Bool} = await import("./lib/typeguard.js"),
+					      a = Arr(Bool());
+
+					return !a(null) && !a(["true", "false", ""]);
+				}
+			},
+			"throws": {
+				"valid - Num": async () => {
+					const {Arr, Num} = await import("./lib/typeguard.js"),
+					      a = Arr(Num());
+
+					try {
+						return a.throw([0, 1, 2]);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - Num": async () => {
+					const {Arr, Num} = await import("./lib/typeguard.js"),
+					      a = Arr(Num());
+
+					try {
+						a.throw(null);
+						
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+				"valid - Bool": async () => {
+					const {Arr, Bool} = await import("./lib/typeguard.js"),
+					      a = Arr(Bool());
+
+					try {
+						return a.throw([true]);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - Bool": async () => {
+					const {Arr, Bool} = await import("./lib/typeguard.js"),
+					      a = Arr(Bool());
+
+					try {
+						a.throw(null);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
