@@ -98,7 +98,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 		tgs.push(tg);
 	}
 
-	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : noopTG;
+	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : undefined;
 
 	return SpreadableTypeGuard.from((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
 		if (!(v instanceof Array)) {
@@ -116,8 +116,18 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 				pos++;
 			}
 
-			for (; pos < v.length; pos++) {
-				if (!throwUnknownError(spread(v[pos]))) {
+			if (pos < v.length) {
+				if (spread) {
+					for (; pos < v.length; pos++) {
+						if (!throwUnknownError(spread(v[pos]))) {
+							return false;
+						}
+					}
+				} else {
+					if (throwErrors) {
+						throw new Error("extra values");
+					}
+
 					return false;
 				}
 			}
