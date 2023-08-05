@@ -9,8 +9,6 @@ type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGua
 let throwErrors = false;
 
 class SpreadableTypeGuard<T> extends Function {
-	#spread?: TypeGuard<T>;
-
 	static from<T>(tg: TypeGuard<T>) {
 		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype) as TypeGuard<T> & SpreadableTypeGuard<T>;
 	}
@@ -26,13 +24,17 @@ class SpreadableTypeGuard<T> extends Function {
 	}
 
 	*[Symbol.iterator]() {
-		yield this.#spread ??= SpreadTypeGuard.from<T>(this);
+		yield SpreadTypeGuard.from<T>(this);
 	}
 }
 
 class SpreadTypeGuard extends Function {
 	static from<T>(tg: SpreadableTypeGuard<T>) {
-		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype) as TypeGuard<T>;
+		return Object.setPrototypeOf(tg, SpreadTypeGuard.prototype) as TypeGuard<T>;
+	}
+
+	static [Symbol.hasInstance](instance: any) {
+		return instance.__proto__ === SpreadTypeGuard.prototype;
 	}
 }
 
@@ -116,26 +118,18 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 				pos++;
 			}
 
-			if (pos < v.length) {
-				if (spread) {
-					for (; pos < v.length; pos++) {
-						if (!throwUnknownError(spread(v[pos]))) {
-							return false;
-						}
+			if (spread) {
+				for (; pos < v.length; pos++) {
+					if (!throwUnknownError(spread(v[pos]))) {
+						return false;
 					}
-				} else {
-					if (throwErrors) {
-						throw new Error("extra values");
-					}
-
-					return false;
 				}
 			}
 		} catch (err) {
 			return throwOrReturn(false, "tuple", pos, err as Error);
 		}
 
-		return throwOrReturn(pos === t.length, "tuple");
+		return throwOrReturn(pos === v.length, "tuple");
 	});
 },
 Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => SpreadableTypeGuard.from((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {

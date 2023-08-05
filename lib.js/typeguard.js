@@ -1,8 +1,6 @@
 let throwErrors = false;
 
 class SpreadableTypeGuard extends Function {
-	#spread;
-
 	static from(tg) {
 		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype);
 	}
@@ -18,13 +16,17 @@ class SpreadableTypeGuard extends Function {
 	}
 
 	*[Symbol.iterator]() {
-		yield this.#spread ??= SpreadTypeGuard.from<T>(this);
+		yield SpreadTypeGuard.from<T>(this);
 	}
 }
 
 class SpreadTypeGuard extends Function {
 	static from(tg) {
-		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype);
+		return Object.setPrototypeOf(tg, SpreadTypeGuard.prototype);
+	}
+
+	static [Symbol.hasInstance](instance) {
+		return instance.__proto__ === SpreadTypeGuard.prototype;
 	}
 }
 
@@ -108,26 +110,18 @@ Tuple = (...t) => {
 				pos++;
 			}
 
-			if (pos < v.length) {
-				if (spread) {
-					for (; pos < v.length; pos++) {
-						if (!throwUnknownError(spread(v[pos]))) {
-							return false;
-						}
+			if (spread) {
+				for (; pos < v.length; pos++) {
+					if (!throwUnknownError(spread(v[pos]))) {
+						return false;
 					}
-				} else {
-					if (throwErrors) {
-						throw new Error("extra values");
-					}
-
-					return false;
 				}
 			}
 		} catch (err) {
 			return throwOrReturn(false, "tuple", pos, err);
 		}
 
-		return throwOrReturn(pos === t.length, "tuple");
+		return throwOrReturn(pos === v.length, "tuple");
 	});
 },
 Obj = t => SpreadableTypeGuard.from(v => {
