@@ -7031,6 +7031,48 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Class": {
+			"return": {
+				"valid": async () => {
+					const {Class} = await import("./lib/typeguard.js"),
+					      c = Class(HTMLElement);
+
+					return c(document.createElement("div")) && c(document.createElementNS("http://www.w3.org/1999/xhtml", "img"));
+				},
+				"invalid": async () => {
+					const {Class} = await import("./lib/typeguard.js"),
+					      c = Class(HTMLElement);
+
+					return !c(document.createElementNS("http://www.w3.org/2000/svg", "svg")) && !c(null);
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Class} = await import("./lib/typeguard.js"),
+					      c = Class(HTMLElement);
+
+					try {
+						return c.throw(document.createElementNS("http://www.w3.org/1999/xhtml", "div"));
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Class} = await import("./lib/typeguard.js"),
+					      c = Class(HTMLElement);
+
+					try {
+						c.throw(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			},
 		}
 	}
 });
