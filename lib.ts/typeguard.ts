@@ -57,7 +57,8 @@ const throwUnknownError = (v: boolean) => {
 	return v;
       };
 
-export const Bool = <T extends boolean>(d?: T) => STypeGuard.from((v: unknown): v is T => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
+export const asTypeGuard = <T>(tg: (v: unknown) => v is T) => STypeGuard.from(tg),
+Bool = <T extends boolean>(d?: T) => STypeGuard.from((v: unknown): v is T => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
 Str = (r?: RegExp) => STypeGuard.from((v: unknown): v is string => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
 Undefined = () => STypeGuard.from((v: unknown): v is undefined => throwOrReturn(v === undefined, "undefined")),
 Null = () => STypeGuard.from((v: unknown): v is null => throwOrReturn(v === null, "null")),
