@@ -32,8 +32,7 @@ class SpreadTypeGuard extends Function {
 	}
 }
 
-const noopTG = _ => true,
-      throwUnknownError = v => {
+const throwUnknownError = v => {
 	if (!v && throwErrors) {
 		throw new Error("unknown type error");
 	}
@@ -57,7 +56,7 @@ Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => STypeGua
 BigInt = (min, max) => STypeGuard.from(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
 Sym = () => STypeGuard.from(v => throwOrReturn(typeof v === "symbol", "symbol")),
 Val = val => STypeGuard.from(v => throwOrReturn(v === val, "value")),
-Any = () => STypeGuard.from(noopTG),
+Any = () => STypeGuard.from(_ => true),
 Arr = t => STypeGuard.from(v => {
 	if (!(v instanceof Array)) {
 		return throwOrReturn(false, "array");
