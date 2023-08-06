@@ -34,7 +34,7 @@ class SpreadTypeGuard extends Function {
 
 const throwUnknownError = v => {
 	if (!v && throwErrors) {
-		throw new Error("unknown type error");
+		throw new TypeError("unknown type error");
 	}
 
 	return v;
