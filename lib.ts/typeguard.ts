@@ -23,6 +23,10 @@ class SpreadableTypeGuard<T> extends Function {
 		}
 	}
 
+	throws() {
+		return ((v: unknown) => this.throw(v)) as TypeGuard<T>;
+	}
+
 	*[Symbol.iterator]() {
 		yield SpreadTypeGuard.from<T>(this);
 	}
