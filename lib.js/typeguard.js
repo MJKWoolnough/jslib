@@ -28,10 +28,6 @@ class SpreadTypeGuard extends Function {
 	static from(tg) {
 		return Object.setPrototypeOf(tg, SpreadTypeGuard.prototype);
 	}
-
-	static [Symbol.hasInstance](instance) {
-		return instance.__proto__ === SpreadTypeGuard.prototype;
-	}
 }
 
 const noopTG = _ => true,
