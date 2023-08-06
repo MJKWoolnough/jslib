@@ -58,17 +58,17 @@ const throwUnknownError = (v: boolean) => {
       };
 
 export const asTypeGuard = <T>(tg: (v: unknown) => v is T) => STypeGuard.from(tg),
-Bool = <T extends boolean>(d?: T) => STypeGuard.from((v: unknown): v is T => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
-Str = (r?: RegExp) => STypeGuard.from((v: unknown): v is string => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
-Undefined = () => STypeGuard.from((v: unknown): v is undefined => throwOrReturn(v === undefined, "undefined")),
-Null = () => STypeGuard.from((v: unknown): v is null => throwOrReturn(v === null, "null")),
-Num = (min = -Infinity, max = Infinity) => STypeGuard.from((v: unknown): v is number => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
-Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => STypeGuard.from((v: unknown): v is number => throwOrReturn(typeof v === "number" && Number.isInteger(v) &&  v >= min && v <= max, "integer")),
-BigInt = (min?: bigint, max?: bigint) => STypeGuard.from((v: unknown): v is bigint => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
-Sym = () => STypeGuard.from((v: unknown): v is Symbol => throwOrReturn(typeof v === "symbol", "symbol")),
-Val = <const T>(val: T) => STypeGuard.from((v: unknown): v is T => throwOrReturn(v === val, "value")),
-Any = () => STypeGuard.from((_: unknown): _ is any => true),
-Arr = <T>(t: TypeGuard<T>) => STypeGuard.from((v: unknown): v is Array<T> => {
+Bool = <T extends boolean>(d?: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
+Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
+Undefined = () => asTypeGuard((v: unknown): v is undefined => throwOrReturn(v === undefined, "undefined")),
+Null = () => asTypeGuard((v: unknown): v is null => throwOrReturn(v === null, "null")),
+Num = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
+Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && Number.isInteger(v) &&  v >= min && v <= max, "integer")),
+BigInt = (min?: bigint, max?: bigint) => asTypeGuard((v: unknown): v is bigint => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
+Sym = () => asTypeGuard((v: unknown): v is Symbol => throwOrReturn(typeof v === "symbol", "symbol")),
+Val = <const T>(val: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(v === val, "value")),
+Any = () => asTypeGuard((_: unknown): _ is any => true),
+Arr = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Array<T> => {
 	if (!(v instanceof Array)) {
 		return throwOrReturn(false, "array");
 	}
@@ -102,7 +102,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 
 	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : undefined;
 
-	return STypeGuard.from((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
+	return asTypeGuard((v: unknown): v is {-readonly [K in keyof U]: TypeGuardOf<U[K]>;} => {
 		if (!(v instanceof Array)) {
 			return throwOrReturn(false, "tuple");
 		}
@@ -132,7 +132,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	});
 },
-Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => STypeGuard.from((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
+Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => asTypeGuard((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
 	}
@@ -158,7 +158,7 @@ Recur = <T>(tg: () => TypeGuard<T>) => {
 
 	return (v: unknown): v is T => (ttg ??= tg())(v);
 },
-Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: V) => STypeGuard.from((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
+Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: V) => asTypeGuard((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "record");
 	}
@@ -183,7 +183,7 @@ Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: 
 
 	return true;
 }),
-Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => STypeGuard.from((v: unknown): v is OR<T> => {
+Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is OR<T> => {
 	const errs: string[] = [];
 
 	for (const tg of tgs) {
@@ -200,7 +200,7 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => STypeGuard.from((v: unk
 
 	return throwOrReturn(false, "OR", "", errs.join(" | "));
 }),
-And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => STypeGuard.from((v: unknown): v is AND<T> => {
+And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is AND<T> => {
 	let pos = 0;
 
 	for (const tg of tgs) {
@@ -217,7 +217,7 @@ And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => STypeGuard.from((v: un
 
 	return true;
 }),
-MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V) => STypeGuard.from((v: unknown): v is Map<TypeGuardOf<K>, TypeGuardOf<V>> => {
+MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V) => asTypeGuard((v: unknown): v is Map<TypeGuardOf<K>, TypeGuardOf<V>> => {
 	if (!(v instanceof Map)) {
 		return throwOrReturn(false, "map");
 	}
@@ -242,7 +242,7 @@ MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V)
 
 	return true;
 }),
-SetType = <T>(t: TypeGuard<T>) => STypeGuard.from((v: unknown): v is Set<T> => {
+SetType = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Set<T> => {
 	if (!(v instanceof Set)) {
 		return throwOrReturn(false, "set");
 	}
@@ -263,4 +263,4 @@ SetType = <T>(t: TypeGuard<T>) => STypeGuard.from((v: unknown): v is Set<T> => {
 
 	return true;
 }),
-Class = <T extends {new (...args: any): any}>(t: T) => STypeGuard.from((v: unknown): v is InstanceType<T> => throwOrReturn(v instanceof t, "class"));
+Class = <T extends {new (...args: any): any}>(t: T) => asTypeGuard((v: unknown): v is InstanceType<T> => throwOrReturn(v instanceof t, "class"));

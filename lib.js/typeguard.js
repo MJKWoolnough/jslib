@@ -48,17 +48,17 @@ const throwUnknownError = v => {
       };
 
 export const asTypeGuard = tg => STypeGuard.from(tg),
-Bool = d => STypeGuard.from(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
-Str = r => STypeGuard.from(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
-Undefined = () => STypeGuard.from(v => throwOrReturn(v === undefined, "undefined")),
-Null = () => STypeGuard.from(v => throwOrReturn(v === null, "null")),
-Num = (min = -Infinity, max = Infinity) => STypeGuard.from(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
-Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => STypeGuard.from(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) &&  v >= min && v <= max, "integer")),
-BigInt = (min, max) => STypeGuard.from(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
-Sym = () => STypeGuard.from(v => throwOrReturn(typeof v === "symbol", "symbol")),
-Val = val => STypeGuard.from(v => throwOrReturn(v === val, "value")),
-Any = () => STypeGuard.from(_ => true),
-Arr = t => STypeGuard.from(v => {
+Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
+Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
+Undefined = () => asTypeGuard(v => throwOrReturn(v === undefined, "undefined")),
+Null = () => asTypeGuard(v => throwOrReturn(v === null, "null")),
+Num = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
+Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) &&  v >= min && v <= max, "integer")),
+BigInt = (min, max) => asTypeGuard(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
+Sym = () => asTypeGuard(v => throwOrReturn(typeof v === "symbol", "symbol")),
+Val = val => asTypeGuard(v => throwOrReturn(v === val, "value")),
+Any = () => asTypeGuard(_ => true),
+Arr = t => asTypeGuard(v => {
 	if (!(v instanceof Array)) {
 		return throwOrReturn(false, "array");
 	}
@@ -92,7 +92,7 @@ Tuple = (...t) => {
 
 	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : undefined;
 
-	return STypeGuard.from(v => {
+	return asTypeGuard(v => {
 		if (!(v instanceof Array)) {
 			return throwOrReturn(false, "tuple");
 		}
@@ -122,7 +122,7 @@ Tuple = (...t) => {
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	});
 },
-Obj = t => STypeGuard.from(v => {
+Obj = t => asTypeGuard(v => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
 	}
@@ -148,7 +148,7 @@ Recur = tg => {
 
 	return v => (ttg ??= tg())(v);
 },
-Rec = (key, value) => STypeGuard.from(v => {
+Rec = (key, value) => asTypeGuard(v => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "record");
 	}
@@ -173,7 +173,7 @@ Rec = (key, value) => STypeGuard.from(v => {
 
 	return true;
 }),
-Or = (...tgs) => STypeGuard.from(v => {
+Or = (...tgs) => asTypeGuard(v => {
 	const errs = [];
 
 	for (const tg of tgs) {
@@ -190,7 +190,7 @@ Or = (...tgs) => STypeGuard.from(v => {
 
 	return throwOrReturn(false, "OR", "", errs.join(" | "));
 }),
-And = (...tgs) => STypeGuard.from(v => {
+And = (...tgs) => asTypeGuard(v => {
 	let pos = 0;
 
 	for (const tg of tgs) {
@@ -207,7 +207,7 @@ And = (...tgs) => STypeGuard.from(v => {
 
 	return true;
 }),
-MapType = (key, value) => STypeGuard.from(v => {
+MapType = (key, value) => asTypeGuard(v => {
 	if (!(v instanceof Map)) {
 		return throwOrReturn(false, "map");
 	}
@@ -232,7 +232,7 @@ MapType = (key, value) => STypeGuard.from(v => {
 
 	return true;
 }),
-SetType = t => STypeGuard.from(v => {
+SetType = t => asTypeGuard(v => {
 	if (!(v instanceof Set)) {
 		return throwOrReturn(false, "set");
 	}
@@ -253,4 +253,4 @@ SetType = t => STypeGuard.from(v => {
 
 	return true;
 }),
-Class = t => STypeGuard.from(v => throwOrReturn(v instanceof t, "class"));
+Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class"));
