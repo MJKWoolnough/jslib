@@ -1,8 +1,8 @@
 let throwErrors = false;
 
-class SpreadableTypeGuard extends Function {
+class STypeGuard extends Function {
 	static from(tg) {
-		return Object.setPrototypeOf(tg, SpreadableTypeGuard.prototype);
+		return Object.setPrototypeOf(tg, STypeGuard.prototype);
 	}
 
 	throw(v) {
@@ -20,7 +20,7 @@ class SpreadableTypeGuard extends Function {
 	}
 
 	*[Symbol.iterator]() {
-		yield SpreadTypeGuard.from<T>(this);
+		yield SpreadTypeGuard.from(this);
 	}
 }
 
@@ -50,17 +50,17 @@ const noopTG = _ => true,
 	return v;
       };
 
-export const Bool = d => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
-Str = r => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
-Undefined = () => SpreadableTypeGuard.from(v => throwOrReturn(v === undefined, "undefined")),
-Null = () => SpreadableTypeGuard.from(v => throwOrReturn(v === null, "null")),
-Num = (min = -Infinity, max = Infinity) => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
-Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) &&  v >= min && v <= max, "integer")),
-BigInt = (min, max) => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
-Sym = () => SpreadableTypeGuard.from(v => throwOrReturn(typeof v === "symbol", "symbol")),
-Val = val => SpreadableTypeGuard.from(v => throwOrReturn(v === val, "value")),
-Any = () => SpreadableTypeGuard.from(noopTG),
-Arr = t => SpreadableTypeGuard.from(v => {
+export const Bool = d => STypeGuard.from(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
+Str = r => STypeGuard.from(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
+Undefined = () => STypeGuard.from(v => throwOrReturn(v === undefined, "undefined")),
+Null = () => STypeGuard.from(v => throwOrReturn(v === null, "null")),
+Num = (min = -Infinity, max = Infinity) => STypeGuard.from(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
+Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => STypeGuard.from(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) &&  v >= min && v <= max, "integer")),
+BigInt = (min, max) => STypeGuard.from(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
+Sym = () => STypeGuard.from(v => throwOrReturn(typeof v === "symbol", "symbol")),
+Val = val => STypeGuard.from(v => throwOrReturn(v === val, "value")),
+Any = () => STypeGuard.from(noopTG),
+Arr = t => STypeGuard.from(v => {
 	if (!(v instanceof Array)) {
 		return throwOrReturn(false, "array");
 	}
@@ -94,7 +94,7 @@ Tuple = (...t) => {
 
 	const spread = tgs.length < t.length ? t.length - tgs.length === 1 ? t[t.length - 1] : Or(...t.slice(tgs.length)) : undefined;
 
-	return SpreadableTypeGuard.from(v => {
+	return STypeGuard.from(v => {
 		if (!(v instanceof Array)) {
 			return throwOrReturn(false, "tuple");
 		}
@@ -124,7 +124,7 @@ Tuple = (...t) => {
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	});
 },
-Obj = t => SpreadableTypeGuard.from(v => {
+Obj = t => STypeGuard.from(v => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
 	}
@@ -150,7 +150,7 @@ Recur = tg => {
 
 	return v => (ttg ??= tg())(v);
 },
-Rec = (key, value) => SpreadableTypeGuard.from(v => {
+Rec = (key, value) => STypeGuard.from(v => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "record");
 	}
@@ -175,7 +175,7 @@ Rec = (key, value) => SpreadableTypeGuard.from(v => {
 
 	return true;
 }),
-Or = (...tgs) => SpreadableTypeGuard.from(v => {
+Or = (...tgs) => STypeGuard.from(v => {
 	const errs = [];
 
 	for (const tg of tgs) {
@@ -192,7 +192,7 @@ Or = (...tgs) => SpreadableTypeGuard.from(v => {
 
 	return throwOrReturn(false, "OR", "", errs.join(" | "));
 }),
-And = (...tgs) => SpreadableTypeGuard.from(v => {
+And = (...tgs) => STypeGuard.from(v => {
 	let pos = 0;
 
 	for (const tg of tgs) {
@@ -209,7 +209,7 @@ And = (...tgs) => SpreadableTypeGuard.from(v => {
 
 	return true;
 }),
-MapType = (key, value) => SpreadableTypeGuard.from(v => {
+MapType = (key, value) => STypeGuard.from(v => {
 	if (!(v instanceof Map)) {
 		return throwOrReturn(false, "map");
 	}
@@ -234,7 +234,7 @@ MapType = (key, value) => SpreadableTypeGuard.from(v => {
 
 	return true;
 }),
-SetType = t => SpreadableTypeGuard.from(v => {
+SetType = t => STypeGuard.from(v => {
 	if (!(v instanceof Set)) {
 		return throwOrReturn(false, "set");
 	}
@@ -255,4 +255,4 @@ SetType = t => SpreadableTypeGuard.from(v => {
 
 	return true;
 }),
-Class = t => SpreadableTypeGuard.from(v => throwOrReturn(v instanceof t, "class"));
+Class = t => STypeGuard.from(v => throwOrReturn(v instanceof t, "class"));
