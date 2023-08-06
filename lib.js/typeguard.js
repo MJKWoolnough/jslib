@@ -254,4 +254,5 @@ SetType = t => SpreadableTypeGuard.from(v => {
 	}
 
 	return true;
-});
+}),
+Class = t => SpreadableTypeGuard.from(v => throwOrReturn(v instanceof t, "class"));

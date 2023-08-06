@@ -262,4 +262,5 @@ SetType = <T>(t: TypeGuard<T>) => SpreadableTypeGuard.from((v: unknown): v is Se
 	}
 
 	return true;
-});
+}),
+Class = <T extends {new (...args: any): any}>(t: T) => SpreadableTypeGuard.from((v: unknown): v is InstanceType<T> => throwOrReturn(v instanceof t, "class"));
