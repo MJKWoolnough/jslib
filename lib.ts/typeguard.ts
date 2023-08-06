@@ -16,12 +16,14 @@ class STypeGuard<T> extends Function {
 	}
 
 	throw(v: unknown): v is T {
+		const oldThrows = throwErrors;
+
 		try {
 			throwErrors = true;
 
 			return this(v);
 		} finally {
-			throwErrors = false;
+			throwErrors = oldThrows;
 		}
 	}
 
