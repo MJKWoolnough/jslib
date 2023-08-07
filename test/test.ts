@@ -7073,6 +7073,78 @@ type Tests = {
 					}
 				}
 			},
+		},
+		"Obj": {
+			"return": {
+				"valid": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Str()
+					      });
+
+					return o({"a": 0, "b": ""}) && o({"a": 123, "b": "abc", "c": true});
+				},
+				"invalid": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Str()
+					      });
+
+					return !o({"a": "", "b": 0}) && o({"a": 123, "b": "abc"}) && !o({});
+				},
+				"valid - optional": async () => {
+					const {Num, Obj, Or, Str, Undefined} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Or(Str(), Undefined())
+					      });
+
+					return o({"a": 0, "b": ""}) && o({"a": 123});
+				},
+				"invalid - optional": async () => {
+					const {Num, Obj, Or, Str, Undefined} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Or(Str(), Undefined())
+					      });
+
+					return !o({"a": "abc", "b": 123}) && !o({"b": ""});
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Str()
+					      });
+
+					try {
+						return o.throw({"a": 0, "b": ""})
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Str()
+					      });
+
+					try {
+						o.throw({});
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
