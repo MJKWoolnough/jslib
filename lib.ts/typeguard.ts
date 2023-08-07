@@ -1,5 +1,3 @@
-export type TypeGuard<T> = (v: unknown) => v is T;
-
 export type TypeGuardOf<T> = T extends TypeGuard<infer U> ? U : never;
 
 type OR<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> | OR<Rest> : never;
@@ -8,11 +6,11 @@ type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGua
 
 let throwErrors = false;
 
-type SpreadableTypeGuard<T> = STypeGuard<T> & TypeGuard<T>;
+export type TypeGuard<T> = STypeGuard<T> & ((v: unknown) => v is T);
 
 class STypeGuard<T> extends Function {
-	static from<T>(tg: TypeGuard<T>) {
-		return Object.setPrototypeOf(tg, STypeGuard.prototype) as SpreadableTypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T) {
+		return Object.setPrototypeOf(tg, STypeGuard.prototype) as TypeGuard<T>;
 	}
 
 	throw(v: unknown): v is T {
