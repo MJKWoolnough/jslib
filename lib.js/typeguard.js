@@ -146,7 +146,7 @@ Obj = t => asTypeGuard(v => {
 Recur = tg => {
 	let ttg;
 
-	return v => (ttg ??= tg())(v);
+	return asTypeGuard(v => (ttg ??= tg())(v));
 },
 Rec = (key, value) => asTypeGuard(v => {
 	if (!(v instanceof Object)) {
