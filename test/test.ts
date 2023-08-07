@@ -7145,6 +7145,72 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Recur": {
+			"returns": {
+				"valid": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o))
+					      });
+
+					return o({"a": []}) && o({"a": [{"a": []}, {"a": []}]}) && o({"a": [{"a": [{"a": []}]}]});
+				},
+				"invalid": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o))
+					      });
+
+					return !o({"b": []}) && !o({"a": [{"b": []}, {"a": []}]}) && !o({"a": [{"a": [{"b": []}]}]});
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o))
+					      });
+
+					try {
+						return o.throw({"a": [{"a": [{"a": []}]}]});
+					} catch(e) {
+						console.log(e)
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o))
+					      });
+
+					try {
+						o.throw({"a": [{"a": [{"b": []}]}]});
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
