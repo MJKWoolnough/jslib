@@ -9,6 +9,6 @@ require (
 )
 
 require (
-	vimagination.zapto.org/javascript v1.4.10 // indirect
+	vimagination.zapto.org/javascript v1.4.11 // indirect
 	vimagination.zapto.org/parser v1.0.2 // indirect
 )
