@@ -138,11 +138,11 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 	}
 
 	if (t) {
-		for (const [k, e] of Object.entries(v)) {
-			const tg = t[k as keyof typeof t];
+		for (const [k, tg] of Object.entries(t) as [keyof typeof v, TypeGuard<any>][]) {
+			const e = v[k];
 
 			try {
-				if (tg && !throwUnknownError(tg(e))) {
+				if (!throwUnknownError(tg(e))) {
 					return false;
 				}
 			} catch (err) {

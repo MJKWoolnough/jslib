@@ -128,11 +128,11 @@ Obj = t => asTypeGuard(v => {
 	}
 
 	if (t) {
-		for (const [k, e] of Object.entries(v)) {
-			const tg = t[k];
+		for (const [k, tg] of Object.entries(t)) {
+			const e = v[k];
 
 			try {
-				if (tg && !throwUnknownError(tg(e))) {
+				if (!throwUnknownError(tg(e))) {
 					return false;
 				}
 			} catch (err) {
