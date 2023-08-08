@@ -53,7 +53,7 @@ Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefi
 Undefined = () => asTypeGuard(v => throwOrReturn(v === undefined, "undefined")),
 Null = () => asTypeGuard(v => throwOrReturn(v === null, "null")),
 Num = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
-Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) &&  v >= min && v <= max, "integer")),
+Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer")),
 BigInt = (min, max) => asTypeGuard(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
 Sym = () => asTypeGuard(v => throwOrReturn(typeof v === "symbol", "symbol")),
 Val = val => asTypeGuard(v => throwOrReturn(v === val, "value")),
