@@ -7331,6 +7331,48 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"And": {
+			"returns": {
+				"valid": async () => {
+					const {And, Arr, Num, Obj} = await import("./lib/typeguard.js"),
+					      a = And(Arr(Num()), Obj({"length": Num(2, 4)}));
+
+					return a([1, 2]) && a([1, 2, 3]) && a([1, 2, 3, 4]);
+				},
+				"invalid": async () => {
+					const {And, Arr, Num, Obj} = await import("./lib/typeguard.js"),
+					      a = And(Arr(Num()), Obj({"length": Num(2, 4)}));
+
+					return !a([1]) && !a(["", ""]) && !a([1, 2, 3, 4, 5]);
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {And, Arr, Num, Obj} = await import("./lib/typeguard.js"),
+					      a = And(Arr(Num()), Obj({"length": Num(2, 4)}));
+
+					try {
+						return a.throw([1, 2]);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {And, Arr, Num, Obj} = await import("./lib/typeguard.js"),
+					      a = And(Arr(Num()), Obj({"length": Num(2, 4)}));
+
+					try {
+						a.throw([1]);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
