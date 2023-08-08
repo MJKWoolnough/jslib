@@ -7373,6 +7373,48 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"MapType": {
+			"returns": {
+				"valid": async () => {
+					const {MapType, Num, Str} = await import("./lib/typeguard.js"),
+					      m = MapType(Num(), Str());
+
+					return m(new Map()) && m(new Map([[1, "a"]])) && m(new Map([[1, "a"], [2, "b"]]));
+				},
+				"invalid": async () => {
+					const {MapType, Num, Str} = await import("./lib/typeguard.js"),
+					      m = MapType(Num(), Str());
+
+					return !m(new Map([["a", 1]])) && !m(new Map<number | string, number | string>([[1, "a"], ["b", 2]]));
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {MapType, Num, Str} = await import("./lib/typeguard.js"),
+					      m = MapType(Num(), Str());
+
+					try {
+						return m.throw(new Map([[1, "a"]]));
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {MapType, Num, Str} = await import("./lib/typeguard.js"),
+					      m = MapType(Num(), Str());
+
+					try {
+						m.throw(new Map([["a", 1]]));
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
