@@ -7211,6 +7211,84 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Rec": {
+			"returns": {
+				"valid - Str key": async () => {
+					const {Num, Rec, Str} = await import("./lib/typeguard.js"),
+					      r = Rec(Str(), Num());
+
+					return r({}) && r({"a": 1}) && r({"a": 2, "b": 4, "c": 8});
+				},
+				"invalid - Str key": async () => {
+					const {Num, Rec, Str} = await import("./lib/typeguard.js"),
+					      r = Rec(Str(), Num());
+
+					return !r({[Symbol("a")]: 1}) && !r({"a": 2, "b": 4, [Symbol("c")]: 8});
+				},
+				"valid - Sym key": async () => {
+					const {Num, Rec, Sym} = await import("./lib/typeguard.js"),
+					      r = Rec(Sym(), Num());
+
+					return r({}) && r({[Symbol("a")]: 1}) && r({[Symbol("a")]: 2, [Symbol("b")]: 3});
+				},
+				"invalid - Sym key": async () => {
+					const {Num, Rec, Sym} = await import("./lib/typeguard.js"),
+					      r = Rec(Sym(), Num());
+
+					return !r({"": 1}) && !r({"a": 2, [Symbol("b")]: 3});
+				}
+			},
+			"thows": {
+				"valid - Str key": async () => {
+					const {Num, Rec, Str} = await import("./lib/typeguard.js"),
+					      r = Rec(Str(), Num());
+
+					try {
+						return r.throw({"a": 1});
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - Str key": async () => {
+					const {Num, Rec, Str} = await import("./lib/typeguard.js"),
+					      r = Rec(Str(), Num());
+
+					try {
+						r.throw({[Symbol("a")]: 1});
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+				"valid - Sym key": async () => {
+					const {Num, Rec, Sym} = await import("./lib/typeguard.js"),
+					      r = Rec(Sym(), Num());
+
+					try {
+						return r.throw({[Symbol("a")]: 1});
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - Sym key": async () => {
+					const {Num, Rec, Sym} = await import("./lib/typeguard.js"),
+					      r = Rec(Sym(), Num());
+
+					try {
+						r.throw({"": 1});
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
