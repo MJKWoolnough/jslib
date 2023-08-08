@@ -148,6 +148,7 @@ Recur = tg => {
 
 	return asTypeGuard(v => (ttg ??= tg())(v));
 },
+IntKey = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntKey")),
 Rec = (key, value) => asTypeGuard(v => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "record");
