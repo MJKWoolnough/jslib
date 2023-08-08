@@ -63,7 +63,7 @@ Null = () => asTypeGuard((v: unknown): v is null => throwOrReturn(v === null, "n
 Num = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
 Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && Number.isInteger(v) &&  v >= min && v <= max, "integer")),
 BigInt = (min?: bigint, max?: bigint) => asTypeGuard((v: unknown): v is bigint => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
-Sym = () => asTypeGuard((v: unknown): v is Symbol => throwOrReturn(typeof v === "symbol", "symbol")),
+Sym = () => asTypeGuard((v: unknown): v is symbol => throwOrReturn(typeof v === "symbol", "symbol")),
 Val = <const T>(val: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(v === val, "value")),
 Any = () => asTypeGuard((_: unknown): _ is any => true),
 Arr = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Array<T> => {
