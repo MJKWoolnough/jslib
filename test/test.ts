@@ -7415,6 +7415,48 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"SetType": {
+			"returns": {
+				"valid": async () => {
+					const {Num, SetType} = await import("./lib/typeguard.js"),
+					      s = SetType(Num());
+
+					return s(new Set()) && s(new Set([1])) && s(new Set([1, 2, 3]));
+				},
+				"invalid": async () => {
+					const {Num, SetType} = await import("./lib/typeguard.js"),
+					      s = SetType(Num());
+
+					return !s(new Set([""])) && !s(new Set([1, false, 3]));
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Num, SetType} = await import("./lib/typeguard.js"),
+					      s = SetType(Num());
+
+					try {
+						return s.throw(new Set([1, 2, 3]));
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Num, SetType} = await import("./lib/typeguard.js"),
+					      s = SetType(Num());
+
+					try {
+						s.throw(new Set([""]));
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
