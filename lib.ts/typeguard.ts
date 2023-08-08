@@ -2,7 +2,7 @@ export type TypeGuardOf<T> = T extends TypeGuard<infer U> ? U : never;
 
 type OR<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> | OR<Rest> : never;
 
-type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> & AND<Rest> : never;
+type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> & AND<Rest> : unknown;
 
 let throwErrors = false;
 
