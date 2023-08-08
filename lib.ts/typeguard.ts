@@ -156,7 +156,7 @@ Recur = <T>(tg: () => TypeGuard<T>) => {
 
 	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v));
 },
-Rec = <K extends TypeGuard<keyof any>, V extends TypeGuard<any>>(key: K, value: V) => asTypeGuard((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
+Rec = <K extends TypeGuard<Exclude<keyof any, number>>, V extends TypeGuard<any>>(key: K, value: V) => asTypeGuard((v: unknown): v is Record<TypeGuardOf<K>, TypeGuardOf<V>> => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "record");
 	}
