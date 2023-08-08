@@ -7289,6 +7289,48 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Or": {
+			"returns": {
+				"valid": async () => {
+					const {Bool, Num, Or, Sym} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num(), Sym());
+
+					return o(true) && o(false) && o(1) && o(-1234) && o(Symbol("hello"));
+				},
+				"invalid": async () => {
+					const {Bool, Num, Or, Sym} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num(), Sym());
+
+					return !o("") && !o({}) && !o([]);
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Bool, Num, Or, Sym} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num(), Sym());
+
+					try {
+						return o.throw(true);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Bool, Num, Or, Sym} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num(), Sym());
+
+					try {
+						o.throw("");
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
