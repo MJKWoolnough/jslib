@@ -254,4 +254,5 @@ SetType = t => asTypeGuard(v => {
 
 	return true;
 }),
-Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class"));
+Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class")),
+Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"));
