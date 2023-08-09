@@ -7457,6 +7457,48 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"IntKey": {
+			"returns": {
+				"valid": async () => {
+					const {IntKey} = await import("./lib/typeguard.js"),
+					      i = IntKey();
+
+					return i("0") && i("1") && i("99999999");
+				},
+				"invalid": async () => {
+					const {IntKey} = await import("./lib/typeguard.js"),
+					      i = IntKey();
+
+					return !i(0) && !i(1) && !i(true);
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {IntKey} = await import("./lib/typeguard.js"),
+					      i = IntKey();
+
+					try {
+						return i.throw("1");
+					} catch (e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {IntKey} = await import("./lib/typeguard.js"),
+					      i = IntKey();
+
+					try {
+						i.throw(0);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
