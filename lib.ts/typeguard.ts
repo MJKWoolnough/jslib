@@ -26,7 +26,7 @@ class STypeGuard<T> extends Function {
 	}
 
 	throws() {
-		return ((v: unknown) => this.throw(v)) as TypeGuard<T>;
+		return asTypeGuard((v: unknown): v is T => this.throw(v));
 	}
 
 	*[Symbol.iterator]() {
