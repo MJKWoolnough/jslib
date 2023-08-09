@@ -7511,6 +7511,84 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Function": {
+			"return": {
+				"valid - no specified args": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func();
+
+					return f(() => {}) && f((_: any) => {}) && f(function(_a: any, _b: any, ..._c: any[]) {});
+				},
+				"invalid - no specified args": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func();
+
+					return !f(0) && !f(true) && !f("() => {}") && !f("function(a, b, c) {}");
+				},
+				"valid - 2 args": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func(2);
+
+					return f((_a: any, _b: any) => {}) && f(function(_a: any, _b: any) {}) && f(function(_a: any, _b: any, ..._c: any[]) {});
+				},
+				"invalid - 2 args": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func(2);
+
+					return !f(() => {}) && !f((_a: any) => {}) && !f((_a: any, ..._b: any[]) => {}) && !f(function(_a: any) {}) && !f(function(_a: any, _b: any, _c: any, ..._d: any[]) {});
+				}
+			},
+			"throws": {
+				"valid - no specified args": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func();
+
+					try {
+						return f.throw(() => {});
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - no specified args": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func();
+
+					try {
+						f.throw(0);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+				"valid - 2 args": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func(2);
+
+					try {
+						return f.throw((_a: any, _b: any) => {});
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid - 2 args": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func(2);
+
+					try {
+						f.throw(() => {});
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
