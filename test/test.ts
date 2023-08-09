@@ -7237,6 +7237,18 @@ type Tests = {
 					      r = Rec(Sym(), Num());
 
 					return !r({"": 1}) && !r({"a": 2, [Symbol("b")]: 3});
+				},
+				"valid - Int key": async () => {
+					const {IntKey, Rec, Str} = await import("./lib/typeguard.js"),
+					      r = Rec(IntKey(), Str());
+
+					return r({}) && r({"1": "abc"}) && r({"2": "def", "3": "ghi"});
+				},
+				"invalid - Int key": async () => {
+					const {IntKey, Rec, Str} = await import("./lib/typeguard.js"),
+					      r = Rec(IntKey(), Str());
+
+					return !r({"": 1}) && !r({"1.1": 2, "1": 3}) && !r({"a": 4, "1": 5});
 				}
 			},
 			"thows": {
