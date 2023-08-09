@@ -263,4 +263,4 @@ SetType = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Set<T> => {
 	return true;
 }),
 Class = <T extends {new (...args: any): any}>(t: T) => asTypeGuard((v: unknown): v is InstanceType<T> => throwOrReturn(v instanceof t, "class")),
-Func = (args?: number) => asTypeGuard((v: unknown): v is Function => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"));
+Func = <T extends Function>(args?: number) => asTypeGuard((v: unknown): v is T => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"));
