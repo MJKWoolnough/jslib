@@ -29,6 +29,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [rpc](#rpc)                                 | JSONRPC implementation. |
 | [settings](#settings)                       | Type-safe wrappers around localStorage. |
 | [svg](#svg)                                 | Functions to create SVG elements. |
+| [typeguard](#typeguard)                     | Functions to create TypeGuards. |
 | [urlstate](#urlstate)                       | Store and retrieve state from the URL. |
 | [windows](#windows)                         | Custom Elements that act as application Windows. |
 | [windows_taskbar](#windows_taskbar)         | Custom Element that lists Windows on a TaskBar. |
@@ -2278,6 +2279,41 @@ This example creates an SVG image of a flame, printing the source of it to the c
 ```svg
 <svg viewBox="0 0 100 100"><defs><radialGradient id="burning" cy="0.55" fy="1"><stop offset="0%" stop-color="#fff"></stop><stop offset="20%" stop-color="#ff0"></stop><stop offset="100%" stop-color="#f00"></stop></radialGradient></defs><path d="M43,99 c-20,0 -60,-30 -30,-70 q0,20 10,30 c0,-20 25,-40 20,-58 q20,30 20,58 q10,-10 5,-30 q10,15 15,35 q5,-10 0,-25 c40,50 -10,62 -40,60 z M25,20 c-15,30 5,30 0,0 z M60,20 c0,20 10,20 0,0 z" stroke="#000" fill="url(#burning)" stroke-linejoin="round"></path></svg>
 ```
+
+## <a name="typeguard">TypeGuard</a>
+
+The typeguard module provides the building blocks for creating type-safe typeguards.
+
+The intent is to be able to create your types from the typeguards, instead of creating typeguards for a type.
+
+The module exports the following functions:
+
+|  Export     |  Description  |
+|-------------|---------------|
+| And         | The And function returns a TypeGuard that checks a value matches against all of the given TypeGuards. |
+| Any         | The Any function returns a TypeGuard that allows any value.
+| asTypeGuard | This function gives a custom typeguard additional functionality, such as being able to optionally throw errors, and be spreadable. |
+| BigInt      | The BigInt function returns a TypeGuard that checks for bigints, and takes optionsl min and max (inclusive) values to range check. |
+| Bool        | The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against. |
+| Class       | The Class function returns a TypeGuard that checks a value is of the class specified. |
+| Func        | The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check. |
+| Int         | The Int function returns a TypeGuard that checks for integers, and takes optionsl min and max (inclusive) values to range check. |
+| IntKey      | The IntKey function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types. |
+| MapType     | The MapType function returns a TypeGuard that checks for an Map type where the keys and values are of the types specified. |
+| Null        | The Null function returns a TypeGuard that checks for `null`. |
+| Num         | The Num function returns a TypeGuard that checks for numbers, and takes optionsl min and max (inclusive) values to range check. |
+| Obj         | The Obj function returns a TypeGuard that checks for an object type defined by the passed object of TypeGuards. |
+| Or          | The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards. |
+| Rec         | The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified. |
+| Recur       | The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way. |
+| SetType     | The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified. |
+| Str         | The Str function returns a TypeGuard that checks for string values, and takes an optional regex to confirm string format against. |
+| Sym         | The Sym function returns a TypeGuard that checks for symbols. |
+| Tuple       | The Tuple function returns a TypeGuard that checks for the given types in an array. TypeGuards can be spread to allow for and unknown number of that type (follow the typescript rules for spreads). |
+| Undefined   | The Undefined function returns a TypeGuard that checks for `undefined`. |
+| Val         | The Val function returns a TypeGuard that checks for a specific value. |
+
+To determine the type that a TypeGuard guards, you can use the `TypeGuardOf<TypeGuard<any>>` type.
 
 ## <a name="urlstate">urlstate</a>
 
