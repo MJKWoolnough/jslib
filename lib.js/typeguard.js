@@ -1,4 +1,26 @@
+/**
+ * The typeguard module provides the building blocks for creating type-safe typeguards.
+ *
+ * The intent is to be able to create your types from the typeguards, instead of creating typeguards for a type.
+ *
+ * @module typeguard
+ */
+/** */
+
 let throwErrors = false;
+
+/**
+ * This type represents a typeguard of the given type.
+ *
+ * In addition to being a callable typeguard function, has the following methods:
+ *
+ * @method throw  Runs the underlying typeguard and will throw errors on type mismatch.
+ * @method throws Returns a TypeGuard that will throw errors on failures.
+ *
+ * Lastly, TypeGuards can be spread in Tuple calls.
+ *
+ * @typedef {(v: unknown) => v is T} TypeGuard
+ * */
 
 class STypeGuard extends Function {
 	static from(tg) {
@@ -47,16 +69,93 @@ const throwUnknownError = v => {
 	return v;
       };
 
-export const asTypeGuard = tg => STypeGuard.from(tg),
+export const
+/**
+ * This function gives a custom typeguard additional functionality, such as being able to optionally throw errors, and be spreadable.
+ *
+ * NB: All TypeGuards created by this package already have this functionality.
+ *
+ * @typeParam T
+ *
+ * @param {<T>(v: unknown) => v is T} tg The TypeGuard the functionality will be added to.
+ *
+ * @return {TypeGuard<T>} The passed in typeguard, with additional functionality.
+ */
+asTypeGuard = tg => STypeGuard.from(tg),
+/**
+ * The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against.
+ *
+ * @param {boolean} [d] Exact boolean to match against.
+ *
+ * @return {TypeGuard<boolean>}
+ */
 Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
+/**
+ * The Str function returns a TypeGuard that checks for string values, and takes an optional regex to confirm string format against.
+ *
+ * @param {regex} [r] Regexp to compare any strings against.
+ *
+ * @return {TypeGuard<string>}
+ */
 Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
+/**
+ * The Undefined function returns a TypeGuard that checks for `undefined`.
+ *
+ * @return {TypeGuard<undefined>}
+ */
 Undefined = () => asTypeGuard(v => throwOrReturn(v === undefined, "undefined")),
+/**
+ * The Null function returns a TypeGuard that checks for `null`.
+ *
+ * @return {TypeGuard<null>}
+ */
 Null = () => asTypeGuard(v => throwOrReturn(v === null, "null")),
+/**
+ * The Num function returns a TypeGuard that checks for numbers, and takes optionsl min and max (inclusive) values to range check.
+ *
+ * @param {number} min Minimum values for the number.
+ * @param {number} max Maximum values for the number.
+ *
+ * @return {TypeGuard<number>}
+ */
 Num = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
+/**
+ * The Int function returns a TypeGuard that checks for integers, and takes optionsl min and max (inclusive) values to range check.
+ *
+ * @param {number} min Minimum values for the integer.
+ * @param {number} max Maximum values for the integer.
+ *
+ * @return {TypeGuard<number>}
+ */
 Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer")),
+/**
+ * The BigInt function returns a TypeGuard that checks for bigints, and takes optionsl min and max (inclusive) values to range check.
+ *
+ * @param {number} min Minimum values for the bigint.
+ * @param {number} max Maximum values for the bigint.
+ *
+ * @return {TypeGuard<bigint>}
+ */
 BigInt = (min, max) => asTypeGuard(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
+/**
+ * The Sym function returns a TypeGuard that checks for symbols.
+ *
+ * @return {TypeGuard<symbol>}
+ */
 Sym = () => asTypeGuard(v => throwOrReturn(typeof v === "symbol", "symbol")),
+/**
+ * The Val function returns a TypeGuard that checks for a specific value.
+ *
+ * @param {any} v The value to check against.
+ *
+ * @return {TypeGuard<any>}
+ */
 Val = val => asTypeGuard(v => throwOrReturn(v === val, "value")),
+/**
+ * The Any function returns a TypeGuard that allows any value.
+ *
+ * @return {TypeGuard<any>}
+ */
 Any = () => asTypeGuard(_ => true),
 Arr = t => asTypeGuard(v => {
 	if (!(v instanceof Array)) {
@@ -79,6 +178,13 @@ Arr = t => asTypeGuard(v => {
 
 	return true;
 }),
+/**
+ * The Tuple function returns a TypeGuard that checks for the given types in an array.
+ *
+ * @param {...TypeGuard<any>} The elements of the tuple. TypeGuards can be spread to allow for and unknown number of that type (follow the typescript rules for spreads).
+ *
+ * @return {TypeGuard<[]>}
+ */
 Tuple = (...t) => {
 	const tgs = [];
 
@@ -122,6 +228,13 @@ Tuple = (...t) => {
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	});
 },
+/**
+ * The Obj function returns a TypeGuard that checks for an object type defined by the passed object of TypeGuards.
+ *
+ * @param {Record<keyof any, TypeGuard<any>} t The Object definition build from TypeGuards.
+ *
+ * @return {TypeGuard<Object>}
+ */
 Obj = t => asTypeGuard(v => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
@@ -143,12 +256,32 @@ Obj = t => asTypeGuard(v => {
 
 	return true;
 }),
+/**
+ * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
+ *
+ * @param {TypeGuard<any>}
+ *
+ * @return {TypeGuard<any>}
+ */
 Recur = tg => {
 	let ttg;
 
 	return asTypeGuard(v => (ttg ??= tg())(v));
 },
+/**
+ * The IntKey function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
+ *
+ * @return {TypeGuard<string>}
+ */
 IntKey = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntKey")),
+/**
+ * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
+ *
+ * @param {TypeGuard<Exclude<keyof any, number>>} key The Key type.
+ * @param {TypeGuard<any>} value                      The Value type.
+ *
+ * @return {Record<keyof any, any>}
+ */
 Rec = (key, value) => asTypeGuard(v => {
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "record");
@@ -174,6 +307,13 @@ Rec = (key, value) => asTypeGuard(v => {
 
 	return true;
 }),
+/**
+ * The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards.
+ *
+ * @param {...TypeGuard<any>} ths A list of TypeGuards to match against.
+ *
+ * @return {TypeGuard<any>}
+ */
 Or = (...tgs) => asTypeGuard(v => {
 	const errs = [];
 
@@ -191,7 +331,14 @@ Or = (...tgs) => asTypeGuard(v => {
 
 	return throwOrReturn(false, "OR", "", errs.join(" | "));
 }),
-And = (...tgs) => asTypeGuard(v => {
+/**
+ * The And function returns a TypeGuard that checks a value matches against all of the given TypeGuards.
+ *
+ * @param {...TypeGuard<any>} ths A list of TypeGuards to match against.
+ *
+ * @return {TypeGuard<any>}
+ */
+And = (...tgs) => asTypeGuard(vi => {
 	let pos = 0;
 
 	for (const tg of tgs) {
@@ -208,6 +355,14 @@ And = (...tgs) => asTypeGuard(v => {
 
 	return true;
 }),
+/**
+ * The MapType function returns a TypeGuard that checks for an Map type where the keys and values are of the types specified.
+ *
+ * @param {TypeGuard<any>} key   The Key type.
+ * @param {TypeGuard<any>} value The Value type.
+ *
+ * @return {Map<keyof any, any>}
+ */
 MapType = (key, value) => asTypeGuard(v => {
 	if (!(v instanceof Map)) {
 		return throwOrReturn(false, "map");
@@ -233,6 +388,13 @@ MapType = (key, value) => asTypeGuard(v => {
 
 	return true;
 }),
+/**
+ * The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified.
+ *
+ * @param {TypeGuard<any>} value The Value type.
+ *
+ * @return {Set<any>}
+ */
 SetType = t => asTypeGuard(v => {
 	if (!(v instanceof Set)) {
 		return throwOrReturn(false, "set");
@@ -254,5 +416,19 @@ SetType = t => asTypeGuard(v => {
 
 	return true;
 }),
+/**
+ * The Class function returns a TypeGuard that checks a value is of the class specified.
+ *
+ * @param {Class} c The class to check against.
+ *
+ * @return {TypeGuard<class>}
+ */
 Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class")),
+/**
+ * The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check.
+ *
+ * @param {number} [args] Number of arguments that the function must have.
+ *
+ * @returns {TypeGuard<Function>}
+ */
 Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"));
