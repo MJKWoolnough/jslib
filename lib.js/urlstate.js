@@ -1,3 +1,11 @@
+/**
+ * The urlstate module provides classes to create {@link module:bind | Binding}s that store and retrieve data from the URL query string.
+ *
+ * @module urlstate
+ * @requires module:bind
+ */
+/** */
+
 import {Binding} from './bind.js';
 
 /**
