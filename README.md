@@ -1759,7 +1759,7 @@ class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 }
 ```
 
-This function will create a NodeArray from the given parent [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), iterating over every child and running the itemFn to generate an [Item](#nodes_item)  to be append to the NodeArray.
+This function will create a NodeArray from the given parent [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), iterating over every child and running the itemFn to generate an [Item](#nodes_item) to be append to the NodeArray.
 
 #### <a name="nodes_nodearray_reverse">reverse</a>
 ```typescript
