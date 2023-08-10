@@ -2343,6 +2343,8 @@ This default export creates a new StateBound object, bound to the given name, th
 
 It takes a name for the URL param, and a default value, which will not be encoded to the URL. Lastly, it takes an optional checker function to confirm that the value decoded is a valid value.
 
+It is recommended to use a checker function, and the [TypeGuard](#typeguard) module can aid with that.
+
 Returns a special binding that encoded and decodes its values to and from the URL.
 
 To encode and decode, this function uses the built-in JSON object, extended to support the `undefined` value.
