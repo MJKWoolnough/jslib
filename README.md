@@ -2130,6 +2130,8 @@ The await method will wait for a message with a matching ID, which must be negat
 
 The typeCheck function can be specified to check that the data returned matches the format expected.
 
+It is recommended to use a checker function, and the [TypeGuard](#typeguard) module can aid with that.
+
 #### <a name="rpc_rpc_request">request</a>
 ```typescript
 class RPC {
@@ -2141,6 +2143,8 @@ class RPC {
 The request method calls the remote procedure named by the `method` param, and sends any `params` data, JSON encoded, to it.
 
 The typeCheck function can be specified to check that the data returned matches the format expected.
+
+It is recommended to use a checker function, and the [TypeGuard](#typeguard) module can aid with that.
 
 The Promise will resolve with the returned data from the remote procedure call.
 
@@ -2154,6 +2158,8 @@ class RPC {
 The subscribe method will wait for a message with a matching ID, which must be negative, and resolve the [Subscription](#inter_subscription) with the data that message contains for each message with that ID.
 
 The typeCheck function can be specified to check that the data returned matches the format expected.
+
+It is recommended to use a checker function, and the [TypeGuard](#typeguard) module can aid with that.
 
 ## <a name="settings">settings</a>
 
