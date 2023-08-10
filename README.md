@@ -1411,7 +1411,7 @@ This method returns an Array of functions bound to the when, error, and cancel m
 | 4                | [cancel](#inter_subscription_cancel) |
 
 The return will return the following:
-[*when bound function*,  *error bound function*, *cancel bound function*]
+[*when bound function*, *error bound function*, *cancel bound function*]
 
 #### <a name="inter_subscription_cancel">cancel</a>
 ```typescript
