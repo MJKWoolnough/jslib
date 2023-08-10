@@ -2556,7 +2556,7 @@ class WindowElement extends BaseElement {
 
 The close method will attempt to close the `Window`. If the `Window` has a child, that will be focussed instead.
 
-When attempting to close, a cancellable `close` event is dispatched to the WindowElement.  If the event is cancelled, the `Window` will remain open.
+When attempting to close, a cancellable `close` event is dispatched to the WindowElement. If the event is cancelled, the `Window` will remain open.
 
 Returns true if the `Window` was closed, false otherwise.
 
