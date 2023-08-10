@@ -111,6 +111,8 @@ export class RPC {
 	 *
 	 * The typeCheck function can be specified to check that the data returned matches the format expected.
 	 *
+	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
+	 *
 	 * @typeParam {any} T
 	 * @param {string} method                                                     The method name to be called.
 	 * @param {Exclude<any, Function> | ((a: any) => a is T)} [paramsOrTypeCheck] Either the params to be sent to the specified method, or a typecheck function.
@@ -136,6 +138,8 @@ export class RPC {
 	 *
 	 * The typeCheck function can be specified to check that the data returned matches the format expected.
 	 *
+	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
+	 *
 	 * @param {number} id                      The ID to wait for.
 	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
 	 *
@@ -157,6 +161,8 @@ export class RPC {
 	 * The subscribe method will wait for a message with a matching ID, which must be negative, and resolve the {@link inter:Subscription} with the data that message contains for each message with that ID.
 	 *
 	 * The typeCheck function can be specified to check that the data returned matches the format expected.
+	 *
+	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
 	 *
 	 * @param {number} id                      The ID to wait for.
 	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
