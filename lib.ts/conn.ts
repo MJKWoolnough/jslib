@@ -25,7 +25,11 @@ export type Properties = {
 	 * This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest | XMLHttpRequest} object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object.
 	 */
 	response?: "" | "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
-	/** This function is used to check whether parsed JSON matches the expected data structure. */
+	/**
+	 * This function is used to check whether parsed JSON matches the expected data structure.
+	 *
+	 * It is recommended to use a checker function when receiving data, and the {@link module:typeguard | TypeGuard} module can aid with that.
+	 * */
 	checker?: (data: unknown) => boolean;
 	/** This sets an event handler to monitor any upload progress. */
 	onuploadprogress?: (event: ProgressEvent) => void;
