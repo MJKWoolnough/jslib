@@ -2310,6 +2310,7 @@ The module exports the following functions:
 | Num         | The Num function returns a TypeGuard that checks for numbers, and takes optionsl min and max (inclusive) values to range check. |
 | Obj         | The Obj function returns a TypeGuard that checks for an object type defined by the passed object of TypeGuards. |
 | Or          | The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards. |
+| Part        | The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined'). |
 | Rec         | The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified. |
 | Recur       | The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way. |
 | SetType     | The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified. |
