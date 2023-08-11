@@ -285,7 +285,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
  *
  * @return {TypeGuard<{}>}
  */
-Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is Partial<T> => Object.assign(tg, asPartial)(v)),
+Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in keyof T]?: T[K]} => Object.assign(tg, asPartial)(v)),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
