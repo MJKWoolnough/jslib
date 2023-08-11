@@ -7200,6 +7200,60 @@ type Tests = {
 				}
 			}
 		},
+		"Req": {
+			"returns": {
+				"valid": async () => {
+					const {Num, Obj, Or, Req, Str, Undefined} = await import("./lib/typeguard.js"),
+					      r = Req(Obj({
+						      "a": Or(Num(), Undefined()),
+						      "b": Or(Str(), Undefined())
+					      }));
+
+					return r({"a": 0, "b": "1"}) && r({"a": 2, "b": "3", "c": true});
+				},
+				"invalid": async () => {
+					const {Num, Obj, Or, Req, Str, Undefined} = await import("./lib/typeguard.js"),
+					      r = Req(Obj({
+						      "a": Or(Num(), Undefined()),
+						      "b": Or(Str(), Undefined())
+					      }));
+
+					return !r({"a": 0}) && !r({"b": "3"});
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Num, Obj, Or, Req, Str, Undefined} = await import("./lib/typeguard.js"),
+					      r = Req(Obj({
+						      "a": Or(Num(), Undefined()),
+						      "b": Or(Str(), Undefined())
+					      }));
+
+					try {
+						return r.throw({"a": 0, "b": "1"});
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Num, Obj, Or, Req, Str, Undefined} = await import("./lib/typeguard.js"),
+					      r = Req(Obj({
+						      "a": Or(Num(), Undefined()),
+						      "b": Or(Str(), Undefined())
+					      }));
+
+					try {
+						r.throw({"a": 0});
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
+		},
 		"Recur": {
 			"returns": {
 				"valid": async () => {
