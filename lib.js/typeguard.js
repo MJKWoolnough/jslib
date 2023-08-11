@@ -67,7 +67,9 @@ const throwUnknownError = v => {
 	}
 
 	return v;
-      };
+      },
+      partial = Symbol("partial"),
+      asPartial = {[partial]: true};
 
 export const
 /**
@@ -235,27 +237,42 @@ Tuple = (...t) => {
  *
  * @return {TypeGuard<Object>}
  */
-Obj = t => asTypeGuard(v => {
-	if (!(v instanceof Object)) {
-		return throwOrReturn(false, "object");
-	}
+Obj = t => {
+	const tg =  asTypeGuard(v => {
+		const isPartial = partial in tg;
 
-	if (t) {
-		for (const [k, tg] of Object.entries(t)) {
-			const e = v[k];
+		if (isPartial) {
+			delete tg[partial];
+		}
 
-			try {
-				if (!throwUnknownError(tg(e))) {
-					return false;
+		if (!(v instanceof Object)) {
+			return throwOrReturn(false, "object");
+		}
+
+		if (t) {
+			for (const [k, tg] of Object.entries(t)) {
+				const e = v[k];
+
+				if (isPartial && e === undefined) {
+					continue;
 				}
-			} catch (err) {
-				return throwOrReturn(false, "object", k, err);
+
+				try {
+					if (!throwUnknownError(tg(e))) {
+						return false;
+					}
+				} catch (err) {
+					return throwOrReturn(false, "object", k, err);
+				}
 			}
 		}
-	}
 
-	return true;
-}),
+		return true;
+	});
+
+	return tg;
+},
+Part = tg => asTypeGuard(v => Object.assign(tg, asPartial)(v)),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *

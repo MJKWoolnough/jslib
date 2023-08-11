@@ -73,7 +73,9 @@ const throwUnknownError = (v: boolean) => {
 	}
 
 	return v;
-      };
+      },
+      partial = Symbol("partial"),
+      asPartial = {[partial]: true};
 
 export const
 /**
@@ -241,27 +243,42 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
  *
  * @return {TypeGuard<Object>}
  */
-Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => asTypeGuard((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
-	if (!(v instanceof Object)) {
-		return throwOrReturn(false, "object");
-	}
+Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => {
+	const tg =  asTypeGuard((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
+		const isPartial = partial in tg;
 
-	if (t) {
-		for (const [k, tg] of Object.entries(t) as [keyof typeof v, TypeGuard<any>][]) {
-			const e = v[k];
+		if (isPartial) {
+			delete tg[partial];
+		}
 
-			try {
-				if (!throwUnknownError(tg(e))) {
-					return false;
+		if (!(v instanceof Object)) {
+			return throwOrReturn(false, "object");
+		}
+
+		if (t) {
+			for (const [k, tg] of Object.entries(t) as [keyof typeof v, TypeGuard<any>][]) {
+				const e = v[k];
+
+				if (isPartial && e === undefined) {
+					continue;
 				}
-			} catch (err) {
-				return throwOrReturn(false, "object", k, err as Error);
+
+				try {
+					if (!throwUnknownError(tg(e))) {
+						return false;
+					}
+				} catch (err) {
+					return throwOrReturn(false, "object", k, err as Error);
+				}
 			}
 		}
-	}
 
-	return true;
-}),
+		return true;
+	});
+
+	return tg;
+},
+Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is Partial<T> => Object.assign(tg, asPartial)(v)),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
