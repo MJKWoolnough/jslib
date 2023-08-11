@@ -272,6 +272,13 @@ Obj = t => {
 
 	return tg;
 },
+/**
+ * The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined').
+ *
+ * @param {TypeGuard<{}>} tg The TypeGuard created by a call to Obj.
+ *
+ * @return {TypeGuard<{}>}
+ */
 Part = tg => asTypeGuard(v => Object.assign(tg, asPartial)(v)),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
