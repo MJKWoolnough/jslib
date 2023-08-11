@@ -239,10 +239,15 @@ Tuple = (...t) => {
  */
 Obj = t => {
 	const tg =  asTypeGuard(v => {
-		const isPartial = partial in tg;
+		const isPartial = partial in tg,
+		      isRequired = required in tg;
 
 		if (isPartial) {
 			delete tg[partial];
+		}
+
+		if (isRequired) {
+			delete tg[required];
 		}
 
 		if (!(v instanceof Object)) {
@@ -253,8 +258,12 @@ Obj = t => {
 			for (const [k, tg] of Object.entries(t)) {
 				const e = v[k];
 
-				if (isPartial && e === undefined) {
-					continue;
+				if (e === undefined) {
+					if (isPartial) {
+						continue;
+					} else if (isRequired) {
+						return throwOrReturn(false, "object", k, "required is undefined");
+					}
 				}
 
 				try {
@@ -280,6 +289,7 @@ Obj = t => {
  * @return {TypeGuard<{}>}
  */
 Part = tg => asTypeGuard(v => Object.assign(tg, asPartial)(v)),
+Req = tg => asTypeGuard(v => Object.assign(tg, asRequired)(v)),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
