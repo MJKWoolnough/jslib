@@ -297,6 +297,13 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
  * @return {TypeGuard<{}>}
  */
 Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in keyof T]?: T[K]} => Object.assign(tg, asPartial)(v)),
+/**
+ * The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined.
+ *
+ * @param {TypeGuard<{}>} tg The TypeGuard created by a call to Obj.
+ *
+ * @return {TypeGuard<{}>}
+ */
 Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in keyof T]-?: Exclude<T[K], undefined>} => Object.assign(tg, asRequired)(v)),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
