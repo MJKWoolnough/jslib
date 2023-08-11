@@ -368,7 +368,7 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown
  *
  * @return {TypeGuard<any>}
  */
-And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is AND<T> => {
+And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is {[K in keyof AND<T>]: AND<T>[K]} => {
 	let pos = 0;
 
 	for (const tg of tgs) {
