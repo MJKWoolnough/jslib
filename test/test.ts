@@ -7146,6 +7146,60 @@ type Tests = {
 				}
 			}
 		},
+		"Part": {
+			"returns": {
+				"valid": async () => {
+					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Obj({
+						      "a": Num(),
+						      "b": Str()
+					      }));
+
+					return p({}) && p({"a": 1}) && p({"b": "2"}) && p({"a": 1, "b": "2", "c": false});
+				},
+				"invalid": async () => {
+					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Obj({
+						      "a": Num(),
+						      "b": Str()
+					      }));
+
+					return !p({"a": "1"}) && !p({"b": 2});
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Obj({
+						      "a": Num(),
+						      "b": Str()
+					      }));
+
+					try {
+						return p.throw({});
+					} catch (e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Obj({
+						      "a": Num(),
+						      "b": Str()
+					      }));
+
+					try {
+						p.throw({"a": "1"});
+
+						return false;
+					} catch (e) {
+						return true;
+					}
+				}
+			}
+		},
 		"Recur": {
 			"returns": {
 				"valid": async () => {
