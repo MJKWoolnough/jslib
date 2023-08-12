@@ -176,6 +176,13 @@ Val = <const T>(val: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(v =
  * @return {TypeGuard<any>}
  */
 Any = () => asTypeGuard((_: unknown): _ is any => true),
+/**
+ * The Arr function returns a TypeGuard that checks for an Array, running the given TypeGuard on each element.
+ *
+ * @param {TypeGuard<any>} t The TypeGuard to run on each element.
+ *
+ * @return {TypeGuard<any[]}
+ */
 Arr = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Array<T> => {
 	if (!(v instanceof Array)) {
 		return throwOrReturn(false, "array");
