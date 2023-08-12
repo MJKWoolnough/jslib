@@ -334,6 +334,14 @@ Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in 
 		allowUndefined = null;
 	}
 }),
+/**
+ * The Take function takes an existing TypeGuard create by the Obj function and transforms it to only check the keys passed into this function.
+ *
+ * @param {TypeGuard<{}>} tg tg   The TypeGuard created by a call to Obj.
+ * @param {...(keyof any}[]} keys The list of keys to limit Object checking to.
+ *
+ * @return {TypeGuard<{}>}
+ */
 Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys) => asTypeGuard((v: unknown): v is {[K in keyof T as K extends ORVals<Keys> ? K : never]: T[K]} => {
 	take = keys;
 

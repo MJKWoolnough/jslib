@@ -325,6 +325,14 @@ Req = tg => asTypeGuard(v => {
 		allowUndefined = null;
 	}
 }),
+/**
+ * The Take function takes an existing TypeGuard create by the Obj function and transforms it to only check the keys passed into this function.
+ *
+ * @param {TypeGuard<{}>} tg tg   The TypeGuard created by a call to Obj.
+ * @param {...(keyof any}[]} keys The list of keys to limit Object checking to.
+ *
+ * @return {TypeGuard<{}>}
+ */
 Take = (tg, ...keys) => asTypeGuard(v => {
 	take = keys;
 
