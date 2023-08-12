@@ -2297,7 +2297,8 @@ The module exports the following functions:
 |  Export     |  Description  |
 |-------------|---------------|
 | And         | The And function returns a TypeGuard that checks a value matches against all of the given TypeGuards. |
-| Any         | The Any function returns a TypeGuard that allows any value.
+| Any         | The Any function returns a TypeGuard that allows any value. |
+| Arr         | The Arr function returns a TypeGuard that checks for an Array, running the given TypeGuard on each element. |
 | asTypeGuard | This function gives a custom typeguard additional functionality, such as being able to optionally throw errors, and be spreadable. |
 | BigInt      | The BigInt function returns a TypeGuard that checks for bigints, and takes optionsl min and max (inclusive) values to range check. |
 | Bool        | The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against. |
