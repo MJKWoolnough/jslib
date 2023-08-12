@@ -8,7 +8,8 @@
 /** */
 
 let throwErrors = false,
-    allowUndefined = null;
+    allowUndefined = null,
+    take = null;
 
 /**
  * This type represents a typeguard of the given type.
@@ -22,7 +23,6 @@ let throwErrors = false,
  *
  * @typedef {(v: unknown) => v is T} TypeGuard
  * */
-
 class STypeGuard extends Function {
 	static from(tg) {
 		return Object.setPrototypeOf(tg, STypeGuard.prototype);
@@ -237,9 +237,11 @@ Tuple = (...t) => {
  * @return {TypeGuard<Object>}
  */
 Obj = t => asTypeGuard(v => {
-	const au = allowUndefined;
+	const au = allowUndefined,
+	      tk = take;
 
 	allowUndefined = null;
+	take = null;
 
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
@@ -247,6 +249,12 @@ Obj = t => asTypeGuard(v => {
 
 	if (t) {
 		for (const [k, tg] of Object.entries(t)) {
+			if (tk) {
+				if (!tk.includes(k)) {
+					continue;
+				}
+			}
+
 			const e = v[k];
 
 			if (e === undefined) {
@@ -299,6 +307,15 @@ Req = tg => asTypeGuard(v => {
 		return tg(v);
 	} finally {
 		allowUndefined = null;
+	}
+}),
+Take = (tg, ...keys) => asTypeGuard(v => {
+	take = keys;
+
+	try{
+		return tg(v);
+	} finally {
+		take = null;
 	}
 }),
 /**
@@ -361,12 +378,14 @@ Rec = (key, value) => asTypeGuard(v => {
  */
 Or = (...tgs) => asTypeGuard(v => {
 	const errs = [],
-	      au = allowUndefined;
+	      au = allowUndefined,
+	      tk = take;
 
 	for (const tg of tgs) {
-		try {
-			allowUndefined = au;
+		allowUndefined = au;
+		take = tk;
 
+		try {
 			if (tg(v)) {
 				return true;
 			}
@@ -388,12 +407,14 @@ Or = (...tgs) => asTypeGuard(v => {
  */
 And = (...tgs) => asTypeGuard(v => {
 	let pos = 0,
-	    au = allowUndefined;
+	    au = allowUndefined,
+	    tk = take;
 
 	for (const tg of tgs) {
-		try {
-			allowUndefined = au;
+		allowUndefined = au;
+		take = tk;
 
+		try {
 			if (!throwUnknownError(tg(v))) {
 				return false;
 			}

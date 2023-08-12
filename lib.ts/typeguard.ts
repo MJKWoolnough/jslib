@@ -14,8 +14,11 @@ type OR<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuar
 
 type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> & AND<Rest> : unknown;
 
+type ORVals<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? U | ORVals<Rest> : never;
+
 let throwErrors = false,
-    allowUndefined: boolean | null = null;
+    allowUndefined: boolean | null = null,
+    take: (keyof any)[] | null = null;
 
 /**
  * This type represents a typeguard of the given type.
@@ -243,9 +246,11 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
  * @return {TypeGuard<Object>}
  */
 Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => asTypeGuard((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
-	const au = allowUndefined;
+	const au = allowUndefined,
+	      tk = take;
 
 	allowUndefined = null;
+	take = null;
 
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
@@ -253,6 +258,12 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 
 	if (t) {
 		for (const [k, tg] of Object.entries(t) as [keyof typeof v, TypeGuard<any>][]) {
+			if (tk) {
+				if (!tk.includes(k)) {
+					continue;
+				}
+			}
+
 			const e = v[k];
 
 			if (e === undefined) {
@@ -305,6 +316,15 @@ Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in 
 		return tg(v);
 	} finally {
 		allowUndefined = null;
+	}
+}),
+Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys) => asTypeGuard((v: unknown): v is {[K in keyof T as K extends ORVals<Keys> ? K : never]: T[K]} => {
+	take = keys;
+
+	try{
+		return tg(v);
+	} finally {
+		take = null;
 	}
 }),
 /**
@@ -367,12 +387,14 @@ Rec = <K extends TypeGuard<Exclude<keyof any, number>>, V extends TypeGuard<any>
  */
 Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is OR<T> => {
 	const errs: string[] = [],
-	      au = allowUndefined;
+	      au = allowUndefined,
+	      tk = take;
 
 	for (const tg of tgs) {
-		try {
-			allowUndefined = au;
+		allowUndefined = au;
+		take = tk;
 
+		try {
 			if (tg(v)) {
 				return true;
 			}
@@ -394,12 +416,14 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown
  */
 And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is {[K in keyof AND<T>]: AND<T>[K]} => {
 	let pos = 0,
-	    au = allowUndefined;
+	    au = allowUndefined,
+	    tk = take;
 
 	for (const tg of tgs) {
-		try {
-			allowUndefined = au;
+		allowUndefined = au;
+		take = tk;
 
+		try {
 			if (!throwUnknownError(tg(v))) {
 				return false;
 			}
