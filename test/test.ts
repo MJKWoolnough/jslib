@@ -7290,6 +7290,38 @@ type Tests = {
 				}
 			}
 		},
+		"Take": {
+			"returns": {
+				"valid": async () => {
+					const {Bool, Int, Obj, Str, Take} = await import("./lib/typeguard.js"),
+					      t = Take(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Bool()
+					      }), "a", "b")
+
+					return t({"a": 0, "b": "1", "c": 2});
+				}
+			},
+			"throws": {
+				"invalid": async () => {
+					const {Bool, Int, Obj, Str, Take} = await import("./lib/typeguard.js"),
+					      t = Take(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Bool()
+					      }), "a", "b")
+
+					try{
+						t.throw({});
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			},
+		},
 		"Recur": {
 			"returns": {
 				"valid": async () => {
