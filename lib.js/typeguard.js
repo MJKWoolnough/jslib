@@ -11,6 +11,30 @@ let throwErrors = false,
     allowUndefined = null,
     take = null;
 
+
+const throwUnknownError = v => {
+	if (!v && throwErrors) {
+		throw new TypeError("unknown type error");
+	}
+
+	return v;
+      },
+      throwOrReturn = (v, name, key, err) => {
+	if (!v && throwErrors) {
+		throw new TypeError(`invalid value: ${name}` + (key !== undefined && err ? `[${key}]: ${err instanceof Error ? err.message : err}` : ""));
+	}
+
+	return v;
+      },
+      mods = () => {
+	      const mods = [allowUndefined, take];
+
+	      allowUndefined = null;
+	      take = null;
+
+	      return mods;
+      };
+
 /**
  * This type represents a typeguard of the given type.
  *
@@ -54,21 +78,6 @@ class SpreadTypeGuard extends Function {
 		return Object.setPrototypeOf(tg, SpreadTypeGuard.prototype);
 	}
 }
-
-const throwUnknownError = v => {
-	if (!v && throwErrors) {
-		throw new TypeError("unknown type error");
-	}
-
-	return v;
-      },
-      throwOrReturn = (v, name, key, err) => {
-	if (!v && throwErrors) {
-		throw new TypeError(`invalid value: ${name}` + (key !== undefined && err ? `[${key}]: ${err instanceof Error ? err.message : err}` : ""));
-	}
-
-	return v;
-      };
 
 export const
 /**
@@ -163,6 +172,8 @@ Arr = t => asTypeGuard(v => {
 		return throwOrReturn(false, "array");
 	}
 
+	mods();
+
 	let pos = 0;
 
 	for (const e of v) {
@@ -204,6 +215,8 @@ Tuple = (...t) => {
 			return throwOrReturn(false, "tuple");
 		}
 
+		mods();
+
 		let pos = 0;
 
 		try {
@@ -237,11 +250,7 @@ Tuple = (...t) => {
  * @return {TypeGuard<Object>}
  */
 Obj = t => asTypeGuard(v => {
-	const au = allowUndefined,
-	      tk = take;
-
-	allowUndefined = null;
-	take = null;
+	const [au, tk] = mods();
 
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
@@ -349,6 +358,8 @@ Rec = (key, value) => asTypeGuard(v => {
 		return throwOrReturn(false, "record");
 	}
 
+	mods();
+
 	for (const k of Reflect.ownKeys(v)) {
 		try {
 			if (!throwUnknownError(key(k))) {
@@ -378,8 +389,7 @@ Rec = (key, value) => asTypeGuard(v => {
  */
 Or = (...tgs) => asTypeGuard(v => {
 	const errs = [],
-	      au = allowUndefined,
-	      tk = take;
+	      [au, tk] = mods();
 
 	for (const tg of tgs) {
 		allowUndefined = au;
@@ -406,9 +416,9 @@ Or = (...tgs) => asTypeGuard(v => {
  * @return {TypeGuard<any>}
  */
 And = (...tgs) => asTypeGuard(v => {
-	let pos = 0,
-	    au = allowUndefined,
-	    tk = take;
+	let pos = 0;
+
+	const [au, tk] = mods();
 
 	for (const tg of tgs) {
 		allowUndefined = au;
@@ -439,6 +449,8 @@ MapType = (key, value) => asTypeGuard(v => {
 	if (!(v instanceof Map)) {
 		return throwOrReturn(false, "map");
 	}
+
+	mods();
 
 	for (const [k, val] of v) {
 		try {
@@ -471,6 +483,8 @@ SetType = t => asTypeGuard(v => {
 	if (!(v instanceof Set)) {
 		return throwOrReturn(false, "set");
 	}
+
+	mods();
 
 	let pos = 0;
 

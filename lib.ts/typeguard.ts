@@ -20,6 +20,30 @@ let throwErrors = false,
     allowUndefined: boolean | null = null,
     take: (keyof any)[] | null = null;
 
+
+const throwUnknownError = (v: boolean) => {
+	if (!v && throwErrors) {
+		throw new TypeError("unknown type error");
+	}
+
+	return v;
+      },
+      throwOrReturn = (v: boolean, name: string, key?: any, err?: string | Error) => {
+	if (!v && throwErrors) {
+		throw new TypeError(`invalid value: ${name}` + (key !== undefined && err ? `[${key}]: ${err instanceof Error ? err.message : err}` : ""));
+	}
+
+	return v;
+      },
+      mods = () => {
+	      const mods = [allowUndefined, take] as const;
+
+	      allowUndefined = null;
+	      take = null;
+
+	      return mods;
+      };
+
 /**
  * This type represents a typeguard of the given type.
  *
@@ -63,21 +87,6 @@ class SpreadTypeGuard extends Function {
 		return Object.setPrototypeOf(tg, SpreadTypeGuard.prototype) as TypeGuard<T>;
 	}
 }
-
-const throwUnknownError = (v: boolean) => {
-	if (!v && throwErrors) {
-		throw new TypeError("unknown type error");
-	}
-
-	return v;
-      },
-      throwOrReturn = (v: boolean, name: string, key?: any, err?: string | Error) => {
-	if (!v && throwErrors) {
-		throw new TypeError(`invalid value: ${name}` + (key !== undefined && err ? `[${key}]: ${err instanceof Error ? err.message : err}` : ""));
-	}
-
-	return v;
-      };
 
 export const
 /**
@@ -172,6 +181,8 @@ Arr = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Array<T> => {
 		return throwOrReturn(false, "array");
 	}
 
+	mods();
+
 	let pos = 0;
 
 	for (const e of v) {
@@ -213,6 +224,8 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 			return throwOrReturn(false, "tuple");
 		}
 
+		mods();
+
 		let pos = 0;
 
 		try {
@@ -246,11 +259,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
  * @return {TypeGuard<Object>}
  */
 Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => asTypeGuard((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
-	const au = allowUndefined,
-	      tk = take;
-
-	allowUndefined = null;
-	take = null;
+	const [au, tk] = mods();
 
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
@@ -358,6 +367,8 @@ Rec = <K extends TypeGuard<Exclude<keyof any, number>>, V extends TypeGuard<any>
 		return throwOrReturn(false, "record");
 	}
 
+	mods();
+
 	for (const k of Reflect.ownKeys(v)) {
 		try {
 			if (!throwUnknownError(key(k))) {
@@ -387,8 +398,7 @@ Rec = <K extends TypeGuard<Exclude<keyof any, number>>, V extends TypeGuard<any>
  */
 Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is OR<T> => {
 	const errs: string[] = [],
-	      au = allowUndefined,
-	      tk = take;
+	      [au, tk] = mods();
 
 	for (const tg of tgs) {
 		allowUndefined = au;
@@ -415,9 +425,9 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown
  * @return {TypeGuard<any>}
  */
 And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is {[K in keyof AND<T>]: AND<T>[K]} => {
-	let pos = 0,
-	    au = allowUndefined,
-	    tk = take;
+	let pos = 0;
+
+	const [au, tk] = mods();
 
 	for (const tg of tgs) {
 		allowUndefined = au;
@@ -448,6 +458,8 @@ MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V)
 	if (!(v instanceof Map)) {
 		return throwOrReturn(false, "map");
 	}
+
+	mods();
 
 	for (const [k, val] of v) {
 		try {
@@ -480,6 +492,8 @@ SetType = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Set<T> => {
 	if (!(v instanceof Set)) {
 		return throwOrReturn(false, "set");
 	}
+
+	mods();
 
 	let pos = 0;
 
