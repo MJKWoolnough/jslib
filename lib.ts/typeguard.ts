@@ -14,7 +14,8 @@ type OR<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuar
 
 type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGuardOf<U> & AND<Rest> : unknown;
 
-let throwErrors = false;
+let throwErrors = false,
+    allowUndefined: boolean | null = null;
 
 /**
  * This type represents a typeguard of the given type.
@@ -73,11 +74,7 @@ const throwUnknownError = (v: boolean) => {
 	}
 
 	return v;
-      },
-      partial = Symbol("partial"),
-      asPartial = {[partial]: true},
-      required = Symbol("required"),
-      asRequired = {[required]: true};
+      };
 
 export const
 /**
@@ -245,50 +242,39 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
  *
  * @return {TypeGuard<Object>}
  */
-Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => {
-	const tg =  asTypeGuard((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
-		const isPartial = partial in tg,
-		      isRequired = required in tg;
+Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => asTypeGuard((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
+	const au = allowUndefined;
 
-		if (isPartial) {
-			delete tg[partial];
-		}
+	allowUndefined = null;
 
-		if (isRequired) {
-			delete tg[required];
-		}
+	if (!(v instanceof Object)) {
+		return throwOrReturn(false, "object");
+	}
 
-		if (!(v instanceof Object)) {
-			return throwOrReturn(false, "object");
-		}
+	if (t) {
+		for (const [k, tg] of Object.entries(t) as [keyof typeof v, TypeGuard<any>][]) {
+			const e = v[k];
 
-		if (t) {
-			for (const [k, tg] of Object.entries(t) as [keyof typeof v, TypeGuard<any>][]) {
-				const e = v[k];
-
-				if (e === undefined) {
-					if (isPartial) {
-						continue;
-					} else if (isRequired) {
-						return throwOrReturn(false, "object", k, "required is undefined");
-					}
-				}
-
-				try {
-					if (!throwUnknownError(tg(e))) {
-						return false;
-					}
-				} catch (err) {
-					return throwOrReturn(false, "object", k, err as Error);
+			if (e === undefined) {
+				if (au === true) {
+					continue;
+				} else if (au === false) {
+					return throwOrReturn(false, "object", k, "required is undefined");
 				}
 			}
+
+			try {
+				if (!throwUnknownError(tg(e))) {
+					return false;
+				}
+			} catch (err) {
+				return throwOrReturn(false, "object", k, err as Error);
+			}
 		}
+	}
 
-		return true;
-	});
-
-	return tg;
-},
+	return true;
+}),
 /**
  * The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined').
  *
@@ -296,7 +282,15 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
  *
  * @return {TypeGuard<{}>}
  */
-Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in keyof T]?: T[K]} => Object.assign(tg, asPartial)(v)),
+Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in keyof T]?: T[K]} => {
+	allowUndefined ??= true;
+
+	try {
+		return tg(v);
+	} finally {
+		allowUndefined = null;
+	}
+}),
 /**
  * The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined.
  *
@@ -304,7 +298,15 @@ Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in
  *
  * @return {TypeGuard<{}>}
  */
-Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in keyof T]-?: Exclude<T[K], undefined>} => Object.assign(tg, asRequired)(v)),
+Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in keyof T]-?: Exclude<T[K], undefined>} => {
+	allowUndefined ??= false;
+
+	try {
+		return tg(v);
+	} finally {
+		allowUndefined = null;
+	}
+}),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
@@ -364,10 +366,13 @@ Rec = <K extends TypeGuard<Exclude<keyof any, number>>, V extends TypeGuard<any>
  * @return {TypeGuard<any>}
  */
 Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is OR<T> => {
-	const errs: string[] = [];
+	const errs: string[] = [],
+	      au = allowUndefined;
 
 	for (const tg of tgs) {
 		try {
+			allowUndefined = au;
+
 			if (tg(v)) {
 				return true;
 			}
@@ -388,10 +393,13 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown
  * @return {TypeGuard<any>}
  */
 And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is {[K in keyof AND<T>]: AND<T>[K]} => {
-	let pos = 0;
+	let pos = 0,
+	    au = allowUndefined;
 
 	for (const tg of tgs) {
 		try {
+			allowUndefined = au;
+
 			if (!throwUnknownError(tg(v))) {
 				return false;
 			}

@@ -7,7 +7,8 @@
  */
 /** */
 
-let throwErrors = false;
+let throwErrors = false,
+    allowUndefined = null;
 
 /**
  * This type represents a typeguard of the given type.
@@ -67,9 +68,7 @@ const throwUnknownError = v => {
 	}
 
 	return v;
-      },
-      partial = Symbol("partial"),
-      asPartial = {[partial]: true};
+      };
 
 export const
 /**
@@ -237,50 +236,39 @@ Tuple = (...t) => {
  *
  * @return {TypeGuard<Object>}
  */
-Obj = t => {
-	const tg =  asTypeGuard(v => {
-		const isPartial = partial in tg,
-		      isRequired = required in tg;
+Obj = t => asTypeGuard(v => {
+	const au = allowUndefined;
 
-		if (isPartial) {
-			delete tg[partial];
-		}
+	allowUndefined = null;
 
-		if (isRequired) {
-			delete tg[required];
-		}
+	if (!(v instanceof Object)) {
+		return throwOrReturn(false, "object");
+	}
 
-		if (!(v instanceof Object)) {
-			return throwOrReturn(false, "object");
-		}
+	if (t) {
+		for (const [k, tg] of Object.entries(t)) {
+			const e = v[k];
 
-		if (t) {
-			for (const [k, tg] of Object.entries(t)) {
-				const e = v[k];
-
-				if (e === undefined) {
-					if (isPartial) {
-						continue;
-					} else if (isRequired) {
-						return throwOrReturn(false, "object", k, "required is undefined");
-					}
-				}
-
-				try {
-					if (!throwUnknownError(tg(e))) {
-						return false;
-					}
-				} catch (err) {
-					return throwOrReturn(false, "object", k, err);
+			if (e === undefined) {
+				if (au === true) {
+					continue;
+				} else if (au === false) {
+					return throwOrReturn(false, "object", k, "required is undefined");
 				}
 			}
+
+			try {
+				if (!throwUnknownError(tg(e))) {
+					return false;
+				}
+			} catch (err) {
+				return throwOrReturn(false, "object", k, err);
+			}
 		}
+	}
 
-		return true;
-	});
-
-	return tg;
-},
+	return true;
+}),
 /**
  * The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined').
  *
@@ -288,7 +276,15 @@ Obj = t => {
  *
  * @return {TypeGuard<{}>}
  */
-Part = tg => asTypeGuard(v => Object.assign(tg, asPartial)(v)),
+Part = tg => asTypeGuard(v => {
+	allowUndefined ??= true;
+
+	try {
+		return tg(v);
+	} finally {
+		allowUndefined = null;
+	}
+}),
 /**
  * The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined.
  *
@@ -296,7 +292,15 @@ Part = tg => asTypeGuard(v => Object.assign(tg, asPartial)(v)),
  *
  * @return {TypeGuard<{}>}
  */
-Req = tg => asTypeGuard(v => Object.assign(tg, asRequired)(v)),
+Req = tg => asTypeGuard(v => {
+	allowUndefined ??= false;
+
+	try {
+		return tg(v);
+	} finally {
+		allowUndefined = null;
+	}
+}),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
@@ -356,10 +360,13 @@ Rec = (key, value) => asTypeGuard(v => {
  * @return {TypeGuard<any>}
  */
 Or = (...tgs) => asTypeGuard(v => {
-	const errs = [];
+	const errs = [],
+	      au = allowUndefined;
 
 	for (const tg of tgs) {
 		try {
+			allowUndefined = au;
+
 			if (tg(v)) {
 				return true;
 			}
@@ -379,11 +386,14 @@ Or = (...tgs) => asTypeGuard(v => {
  *
  * @return {TypeGuard<any>}
  */
-And = (...tgs) => asTypeGuard(vi => {
-	let pos = 0;
+And = (...tgs) => asTypeGuard(v => {
+	let pos = 0,
+	    au = allowUndefined;
 
 	for (const tg of tgs) {
 		try {
+			allowUndefined = au;
+
 			if (!throwUnknownError(tg(v))) {
 				return false;
 			}
