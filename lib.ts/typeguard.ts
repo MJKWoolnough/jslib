@@ -42,6 +42,12 @@ const throwUnknownError = (v: boolean) => {
 	      take = null;
 
 	      return mods;
+      },
+      resetMods = ([au, tk]: readonly [typeof allowUndefined, typeof take]) => {
+	return () => {
+		allowUndefined = au;
+		take = tk;
+	};
       };
 
 /**
@@ -413,11 +419,10 @@ Rec = <K extends TypeGuard<Exclude<keyof any, number>>, V extends TypeGuard<any>
  */
 Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is OR<T> => {
 	const errs: string[] = [],
-	      [au, tk] = mods();
+	      rm = resetMods(mods());
 
 	for (const tg of tgs) {
-		allowUndefined = au;
-		take = tk;
+		rm();
 
 		try {
 			if (tg(v)) {
@@ -442,11 +447,10 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown
 And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown): v is {[K in keyof AND<T>]: AND<T>[K]} => {
 	let pos = 0;
 
-	const [au, tk] = mods();
+	const rm = resetMods(mods());
 
 	for (const tg of tgs) {
-		allowUndefined = au;
-		take = tk;
+		rm();
 
 		try {
 			if (!throwUnknownError(tg(v))) {

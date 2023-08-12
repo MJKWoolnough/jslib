@@ -33,6 +33,12 @@ const throwUnknownError = v => {
 	      take = null;
 
 	      return mods;
+      },
+      resetMods = ([au, tk]) => {
+	return () => {
+		allowUndefined = au;
+		take = tk;
+	};
       };
 
 /**
@@ -404,11 +410,10 @@ Rec = (key, value) => asTypeGuard(v => {
  */
 Or = (...tgs) => asTypeGuard(v => {
 	const errs = [],
-	      [au, tk] = mods();
+	      rm = resetMods(mods());
 
 	for (const tg of tgs) {
-		allowUndefined = au;
-		take = tk;
+		rm();
 
 		try {
 			if (tg(v)) {
@@ -433,11 +438,10 @@ Or = (...tgs) => asTypeGuard(v => {
 And = (...tgs) => asTypeGuard(v => {
 	let pos = 0;
 
-	const [au, tk] = mods();
+	const rm = resetMods(mods());
 
 	for (const tg of tgs) {
-		allowUndefined = au;
-		take = tk;
+		rm();
 
 		try {
 			if (!throwUnknownError(tg(v))) {
