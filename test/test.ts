@@ -7165,7 +7165,25 @@ type Tests = {
 					      }));
 
 					return !p({"a": "1"}) && !p({"b": 2});
-				}
+				},
+				"valid - before Req": async () => {
+					const {Num, Obj, Part, Req, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Req(Obj({
+						      "a": Num(),
+						      "b": Str()
+					      })));
+
+					return p({}) && p({"a": 1}) && p({"b": "2"}) && p({"a": 1, "b": "2", "c": false});
+				},
+				"invalid - before Req": async () => {
+					const {Num, Obj, Part, Req, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Req(Obj({
+						      "a": Num(),
+						      "b": Str()
+					      })));
+
+					return !p({"a": "1"}) && !p({"b": 2});
+				},
 			},
 			"throws": {
 				"valid": async () => {
@@ -7217,6 +7235,24 @@ type Tests = {
 						      "a": Or(Num(), Undefined()),
 						      "b": Or(Str(), Undefined())
 					      }));
+
+					return !r({"a": 0}) && !r({"b": "3"});
+				},
+				"valid - before Part": async () => {
+					const {Num, Obj, Or, Part, Req, Str, Undefined} = await import("./lib/typeguard.js"),
+					      r = Req(Part(Obj({
+						      "a": Or(Num(), Undefined()),
+						      "b": Or(Str(), Undefined())
+					      })));
+
+					return r({"a": 0, "b": "1"}) && r({"a": 2, "b": "3", "c": true});
+				},
+				"invalid - before Part": async () => {
+					const {Num, Obj, Or, Part, Req, Str, Undefined} = await import("./lib/typeguard.js"),
+					      r = Req(Part(Obj({
+						      "a": Or(Num(), Undefined()),
+						      "b": Or(Str(), Undefined())
+					      })));
 
 					return !r({"a": 0}) && !r({"b": "3"});
 				}
