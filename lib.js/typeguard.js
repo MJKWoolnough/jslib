@@ -343,6 +343,14 @@ Take = (tg, ...keys) => asTypeGuard(v => {
 		take = null;
 	}
 }),
+/**
+ * The Skip function takes an existing TypeGuard create by the Obj function and transforms it to not check the keys passed into this function.
+ *
+ * @param {TypeGuard<{}>} tg tg   The TypeGuard created by a call to Obj.
+ * @param {...(keyof any}[]} keys The list of keys to be skipped within Obj checking.
+ *
+ * @return {TypeGuard<{}>}
+ */
 Skip = (tg, ...keys) => asTypeGuard(v => {
 	skip = keys;
 
