@@ -7,11 +7,6 @@
  */
 /** */
 
-let throwErrors = false,
-    allowUndefined = null,
-    take = null;
-
-
 const throwUnknownError = v => {
 	if (!v && throwErrors) {
 		throw new TypeError("unknown type error");
@@ -27,17 +22,19 @@ const throwUnknownError = v => {
 	return v;
       },
       mods = () => {
-	      const mods = [allowUndefined, take];
+	      const mods = [allowUndefined, take, skip];
 
 	      allowUndefined = null;
 	      take = null;
+	      skip = null;
 
 	      return mods;
       },
-      resetMods = ([au, tk]) => {
+      resetMods = ([au, tk, s]) => {
 	return () => {
 		allowUndefined = au;
 		take = tk;
+		skip = s
 	};
       };
 
@@ -263,7 +260,7 @@ Tuple = (...t) => {
  * @return {TypeGuard<Object>}
  */
 Obj = t => asTypeGuard(v => {
-	const [au, tk] = mods();
+	const [au, tk, s] = mods();
 
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
@@ -271,10 +268,8 @@ Obj = t => asTypeGuard(v => {
 
 	if (t) {
 		for (const [k, tg] of Object.entries(t)) {
-			if (tk) {
-				if (!tk.includes(k)) {
-					continue;
-				}
+			if (tk && !tk.includes(k) || s && s.includes(k)) {
+				continue;
 			}
 
 			const e = v[k];
@@ -346,6 +341,15 @@ Take = (tg, ...keys) => asTypeGuard(v => {
 		return tg(v);
 	} finally {
 		take = null;
+	}
+}),
+Skip = (tg, ...keys) => asTypeGuard(v => {
+	skip = keys;
+
+	try{
+		return tg(v);
+	} finally {
+		skip = null;
 	}
 }),
 /**

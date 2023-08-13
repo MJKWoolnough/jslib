@@ -18,7 +18,8 @@ type ORVals<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? U | 
 
 let throwErrors = false,
     allowUndefined: boolean | null = null,
-    take: (keyof any)[] | null = null;
+    take: (keyof any)[] | null = null,
+    skip: (keyof any)[] | null = null;
 
 
 const throwUnknownError = (v: boolean) => {
@@ -36,17 +37,19 @@ const throwUnknownError = (v: boolean) => {
 	return v;
       },
       mods = () => {
-	      const mods = [allowUndefined, take] as const;
+	      const mods = [allowUndefined, take, skip] as const;
 
 	      allowUndefined = null;
 	      take = null;
+	      skip = null;
 
 	      return mods;
       },
-      resetMods = ([au, tk]: readonly [typeof allowUndefined, typeof take]) => {
+      resetMods = ([au, tk, s]: readonly [typeof allowUndefined, typeof take, typeof skip]) => {
 	return () => {
 		allowUndefined = au;
 		take = tk;
+		skip = s
 	};
       };
 
@@ -272,7 +275,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
  * @return {TypeGuard<Object>}
  */
 Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => asTypeGuard((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
-	const [au, tk] = mods();
+	const [au, tk, s] = mods();
 
 	if (!(v instanceof Object)) {
 		return throwOrReturn(false, "object");
@@ -280,10 +283,8 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 
 	if (t) {
 		for (const [k, tg] of Object.entries(t) as [keyof typeof v, TypeGuard<any>][]) {
-			if (tk) {
-				if (!tk.includes(k)) {
-					continue;
-				}
+			if (tk && !tk.includes(k) || s && s.includes(k)) {
+				continue;
 			}
 
 			const e = v[k];
@@ -355,6 +356,15 @@ Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 		return tg(v);
 	} finally {
 		take = null;
+	}
+}),
+Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys) => asTypeGuard((v: unknown): v is {[K in keyof T as K extends ORVals<Keys> ? never : K]: T[K]} => {
+	skip = keys;
+
+	try{
+		return tg(v);
+	} finally {
+		skip = null;
 	}
 }),
 /**
