@@ -7,6 +7,7 @@
 /** */
 
 import {Binding} from './bind.js';
+import {Subscription} from './inter.js';
 
 type CheckerFn<T> = (v: unknown) => v is T;
 
@@ -43,7 +44,7 @@ export class Codec {
 	/**
 	 * This method creates a new StateBound object, bound to the given name.
 	 *
- 	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
+	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
 	 *
 	 * @param {string} name              Name to be used for the URL param.
 	 * @param {T}      value             Default value for the state.
@@ -100,7 +101,8 @@ const state = new Map<string, string>(),
 		}
 
 		return JSON.parse(v);
-      });
+      }),
+      [urlChanged, setURLChanged] = Subscription.bind<number>(3);
 
 /**
  * StateBound extends a {@link bind:Binding} to get and set state from and to the URL.
@@ -173,6 +175,8 @@ class StateBound<T> extends Binding<T> {
 		for (const [key, sb] of subscribed) {
 			sb.#restore(state.get(key) ?? "");
 		}
+
+		setTimeout(setURLChanged, 0, history.state ?? 0);
 	}
 
 	static goto(href: string) {
@@ -216,6 +220,8 @@ window.addEventListener("click", (e: Event) => {
 });
 
 getStateFromURL();
+
+setTimeout(setURLChanged, 0, history.state ?? 0);
 
 export const
 /**
@@ -262,6 +268,8 @@ toURL = (withVals?: Record<string, string>, without?: string[]) => {
 
 	return "?" + url.join("&");
 };
+
+export {urlChanged};
 
 /**
  * This default export creates a new StateBound object, bound to the given name, that uses JSON for encoding an decoding.

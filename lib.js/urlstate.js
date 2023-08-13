@@ -7,6 +7,7 @@
 /** */
 
 import {Binding} from './bind.js';
+import {Subscription} from './inter.js';
 
 /**
  * This class allows for custom encoding and decoding to state in the URL query.
@@ -94,7 +95,8 @@ const state = new Map(),
 		}
 
 		return JSON.parse(v);
-      });
+      }),
+      [urlChanged, setURLChanged] = Subscription.bind<number>(3);
 
 /**
  * StateBound extends a {@link bind:Binding} to get and set state from and to the URL.
@@ -113,7 +115,7 @@ class StateBound extends Binding {
 	#last;
 	#checker;
 	#codec;
-	constructor(name, v, codec, checker = () => true) {
+	constructor(name, v, codec, checker = _ => true) {
 		super(v);
 
 		this.#def = v;
@@ -167,6 +169,8 @@ class StateBound extends Binding {
 		for (const [key, sb] of subscribed) {
 			sb.#restore(state.get(key) ?? "");
 		}
+
+		setTimeout(setURLChanged, 0, history.state ?? 0);
 	}
 
 	static goto(href) {
@@ -210,6 +214,8 @@ window.addEventListener("click", e => {
 });
 
 getStateFromURL();
+
+setTimeout(setURLChanged, 0, history.state ?? 0);
 
 export const
 /**
@@ -256,6 +262,8 @@ toURL = (withVals, without) => {
 
 	return "?" + url.join("&");
 };
+
+export {urlChanged};
 
 /**
  * This default export creates a new StateBound object, bound to the given name, that uses JSON for encoding an decoding.
