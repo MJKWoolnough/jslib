@@ -232,7 +232,28 @@ goto = (href: string) => StateBound.goto(href),
  * @param {string} name  The name to be set.
  * @param {string} value The string version of the value to be set.
  */
-setParam = (name: string, value: string) => StateBound.setParam(name, value);
+setParam = (name: string, value: string) => StateBound.setParam(name, value),
+toURL = (withVals?: Record<string, string>, without?: string[]) => {
+	const params: Record<string, string> = {};
+
+	for (const [key, val] of state) {
+		if (val && !without?.includes(key)) {
+			params[key] = val;
+		}
+	}
+
+	if (withVals) {
+		Object.assign(params, withVals);
+	}
+
+	let url: string[] = [];
+
+	for (const [key, value] of Object.entries(params)) {
+		url.push(`${key}=${value}`);
+	}
+
+	return "?" + url.join("&");
+};
 
 /**
  * This default export creates a new StateBound object, bound to the given name, that uses JSON for encoding an decoding.
