@@ -3,6 +3,7 @@
  *
  * @module urlstate
  * @requires module:bind
+ * @requires module:inter
  */
 /** */
 
