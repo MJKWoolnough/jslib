@@ -7322,6 +7322,38 @@ type Tests = {
 				}
 			},
 		},
+		"Skip": {
+			"returns": {
+				"valid": async () => {
+					const {Bool, Int, Obj, Skip, Str} = await import("./lib/typeguard.js"),
+					      s = Skip(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Bool()
+					      }), "a", "b")
+
+					return s({"a": "0", "b": "1", "c": true});
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Bool, Int, Obj, Skip, Str} = await import("./lib/typeguard.js"),
+					      s = Skip(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Bool()
+					      }), "a", "b")
+
+					try {
+						s.throw({"a": "0", "b": "1", "c": 2});
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
+		},
 		"Recur": {
 			"returns": {
 				"valid": async () => {
