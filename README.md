@@ -2338,6 +2338,7 @@ This module directly imports the [bind](#bind) module.
 | [Codec](#urlstate_codec) | Allows for custom encoding/decoding of values to/from the URL. |
 | [goto](#urlstate_goto) | Process the parsed URL for state to be set and read. |
 | [setParam](#urlstate_setparam) | Set a single param value. |
+| [toURL](#urlstate_tourl) | Generate a URL from the current state. |
 
 ### <a name="urlstate_default">(default)</a>
 ```typescript
@@ -2381,6 +2382,18 @@ Returns true if href matches current path, false otherwise
 ```
 
 This function sets the named state to the given value, which will be decoded by the codec associated with that state, if one exists.
+
+### <a name="urlstate_tourl">toURL</a>
+```typescript
+(withVals?: Record<String, string>, without?: string[]) => string;
+```
+
+This function is used to generate a search query from the current state, with the ability to add to or filter the state.
+
+The `withVals` object, if supplied, will add to and replace the state for the generation of the query string.
+
+The `without` array, if supplied, will filter the keys pulled out of the state and not add them to the query string.
+
 
 ## <a name="windows">windows</a>
 
