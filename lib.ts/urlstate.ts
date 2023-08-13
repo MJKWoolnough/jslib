@@ -233,6 +233,14 @@ goto = (href: string) => StateBound.goto(href),
  * @param {string} value The string version of the value to be set.
  */
 setParam = (name: string, value: string) => StateBound.setParam(name, value),
+/**
+ * This functions transforms the current state to a search query.
+ *
+ * @param {Record<string, string>} [withVals] Additional key/value pairs to add to the URL. Will overwrite existing values.
+ * @param {string[]} [without]                State keys to filter from the URL.
+ *
+ * @return {string} The generated query string.
+ */
 toURL = (withVals?: Record<string, string>, without?: string[]) => {
 	const params: Record<string, string> = {};
 
