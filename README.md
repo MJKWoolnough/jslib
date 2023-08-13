@@ -2316,6 +2316,7 @@ The module exports the following functions:
 | Recur       | The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way. |
 | Req         | The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined. |
 | SetType     | The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified. |
+| Skip        | The Skip function takes an existing TypeGuard create by the Obj function and transforms it to not check the keys passed into this function. |
 | Str         | The Str function returns a TypeGuard that checks for string values, and takes an optional regex to confirm string format against. |
 | Sym         | The Sym function returns a TypeGuard that checks for symbols. |
 | Take        | The Take function takes an existing TypeGuard create by the Obj function and transforms it to only check the keys passed into this function. |
