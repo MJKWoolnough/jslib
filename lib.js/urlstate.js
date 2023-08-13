@@ -264,6 +264,11 @@ toURL = (withVals, without) => {
 	return "?" + url.join("&");
 };
 
+/**
+ * This value is a {@link inter:Subscription | Subscription} that fires whenever the URL changes.
+ *
+ * The Subscription is fired with the current `history.state` value, which should be the timestamp of when that URL was generated.
+ */
 export {urlChanged};
 
 /**
