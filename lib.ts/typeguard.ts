@@ -563,4 +563,18 @@ Class = <T extends {new (...args: any): any}>(t: T) => asTypeGuard((v: unknown):
  *
  * @returns {TypeGuard<Function>}
  */
-Func = <T extends Function>(args?: number) => asTypeGuard((v: unknown): v is T => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"));
+Func = <T extends Function>(args?: number) => asTypeGuard((v: unknown): v is T => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function")),
+Forbid = <T, U>(t: TypeGuard<T>, u: TypeGuard<U>) => asTypeGuard((v: unknown): v is Exclude<T, U> => {
+	let forbid = false;
+	try {
+		if (u(v)) {
+			forbid = true;
+		}
+	} catch(e) {}
+
+	if (forbid) {
+		return throwOrReturn(false, "forbid")
+	}
+
+	return t(v);
+});

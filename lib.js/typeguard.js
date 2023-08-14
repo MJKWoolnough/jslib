@@ -548,4 +548,18 @@ Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class")),
  *
  * @returns {TypeGuard<Function>}
  */
-Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"));
+Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function")),
+Forbid = (t, u) => asTypeGuard(v => {
+	let forbid = false;
+	try {
+		if (u(v)) {
+			forbid = true;
+		}
+	} catch(e) {}
+
+	if (forbid) {
+		return throwOrReturn(false, "forbid")
+	}
+
+	return t(v);
+});
