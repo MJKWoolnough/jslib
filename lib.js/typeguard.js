@@ -7,6 +7,11 @@
  */
 /** */
 
+let throwErrors = false,
+    allowUndefined = null,
+    take = null,
+    skip = null;
+
 const throwUnknownError = v => {
 	if (!v && throwErrors) {
 		throw new TypeError("unknown type error");
