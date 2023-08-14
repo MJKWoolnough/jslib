@@ -7797,6 +7797,48 @@ type Tests = {
 					}
 				}
 			}
+		},
+		"Fobid": {
+			"returns": {
+				"valid": async () => {
+					const {Bool, Forbid, Null, Num, Or, Str} = await import("./lib/typeguard.js"),
+					      f = Forbid(Or(Bool(), Null(), Num(), Str()), Or(Null(), Str()));
+
+					return f(true) && f(false) && f(0);
+				},
+				"invalid": async () => {
+					const {Bool, Forbid, Null, Num, Or, Str} = await import("./lib/typeguard.js"),
+					      f = Forbid(Or(Bool(), Null(), Num(), Str()), Or(Null(), Str()));
+
+					return !f(null) && !f("");
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Bool, Forbid, Null, Num, Or, Str} = await import("./lib/typeguard.js"),
+					      f = Forbid(Or(Bool(), Null(), Num(), Str()), Or(Null(), Str()));
+
+					try {
+						return f.throw(true);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Bool, Forbid, Null, Num, Or, Str} = await import("./lib/typeguard.js"),
+					      f = Forbid(Or(Bool(), Null(), Num(), Str()), Or(Null(), Str()));
+
+					try {
+						f.throw(null);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
 		}
 	}
 });
