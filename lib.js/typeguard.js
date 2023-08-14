@@ -552,7 +552,7 @@ Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args ===
 /**
  * The Forbid function returns a TypeGuard that disallows certain types from an existing type.
  *
- * @param {TypeGuard<T>} t A TypeGuard to allow.
+ * @param {TypeGuard<T>} t A TypeGuard to require.
  * @param {TypeGuard<U>} u A TypeGuard to forbid.
  *
  * @returns {TypeGuard<Exclude<T, U>>}
