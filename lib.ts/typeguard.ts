@@ -21,7 +21,6 @@ let throwErrors = false,
     take: (keyof any)[] | null = null,
     skip: (keyof any)[] | null = null;
 
-
 const throwUnknownError = (v: boolean) => {
 	if (!v && throwErrors) {
 		throw new TypeError("unknown type error");
@@ -586,3 +585,5 @@ Forbid = <T, U>(t: TypeGuard<T>, u: TypeGuard<U>) => asTypeGuard((v: unknown): v
 
 	return t(v);
 });
+
+export const a = Or(Int(), Bool())
