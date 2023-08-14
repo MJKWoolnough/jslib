@@ -585,5 +585,3 @@ Forbid = <T, U>(t: TypeGuard<T>, u: TypeGuard<U>) => asTypeGuard((v: unknown): v
 
 	return t(v);
 });
-
-export const a = Or(Int(), Bool())
