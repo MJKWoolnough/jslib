@@ -2339,6 +2339,7 @@ This module directly imports the [bind](#bind) module.
 | [goto](#urlstate_goto) | Process the parsed URL for state to be set and read. |
 | [setParam](#urlstate_setparam) | Set a single param value. |
 | [toURL](#urlstate_tourl) | Generate a URL from the current state. |
+| urlChanged | A [Subscription](#inter_subscription) that fires whenever the URL changes. Produces the current `history.state` value, which should be the timestamp of when that URL was generated. |
 
 ### <a name="urlstate_default">(default)</a>
 ```typescript
