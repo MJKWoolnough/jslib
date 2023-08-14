@@ -2303,6 +2303,7 @@ The module exports the following functions:
 | BigInt      | The BigInt function returns a TypeGuard that checks for bigints, and takes optionsl min and max (inclusive) values to range check. |
 | Bool        | The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against. |
 | Class       | The Class function returns a TypeGuard that checks a value is of the class specified. |
+| Forbid      | The Forbid function returns a TypeGuard that disallows certain types from an existing type. |
 | Func        | The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check. |
 | Int         | The Int function returns a TypeGuard that checks for integers, and takes optionsl min and max (inclusive) values to range check. |
 | IntKey      | The IntKey function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types. |
