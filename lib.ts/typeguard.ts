@@ -564,6 +564,14 @@ Class = <T extends {new (...args: any): any}>(t: T) => asTypeGuard((v: unknown):
  * @returns {TypeGuard<Function>}
  */
 Func = <T extends Function>(args?: number) => asTypeGuard((v: unknown): v is T => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function")),
+/**
+ * The Forbid function returns a TypeGuard that disallows certain types from an existing type.
+ *
+ * @param {TypeGuard<T>} t A TypeGuard to allow.
+ * @param {TypeGuard<U>} u A TypeGuard to forbid.
+ *
+ * @returns {TypeGuard<Exclude<T, U>>}
+ */
 Forbid = <T, U>(t: TypeGuard<T>, u: TypeGuard<U>) => asTypeGuard((v: unknown): v is Exclude<T, U> => {
 	let forbid = false;
 	try {
