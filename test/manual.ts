@@ -300,7 +300,20 @@ const sb = URLState("some-name", "default");
 document.body.prepend(button({"data-value": sb, "onclick": function() {
 	result(this.dataset.value === "default");
 }}, "Click Here"));
-`]
-		}
+`],
+			"value updates with URL": [`import URLState, {goto} from './lib/urlstate.js';
+import {button} from './lib/html.js';
+
+const sb = URLState("some-name", "default");
+
+document.body.prepend(button({"data-value": sb, "onclick": function() {
+	if (this.dataset.value === "default") {
+		goto('?some-name="123"');
+	} else {
+		result(this.dataset.value === "123");
+	}
+}}, "Click Here"));
+`],
+		},
 	}
 });
