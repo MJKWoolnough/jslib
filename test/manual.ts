@@ -111,7 +111,7 @@ type ManualTests = {
 		}
 	});
 })({
-	"router": {
+	"router.js": {
 		"html": {
 			"x-router": {
 				"simple non-match": [`import './lib/router.js';`, `<x-router><button route-match="" onclick="result(true)">Success</button></x-router>`],
