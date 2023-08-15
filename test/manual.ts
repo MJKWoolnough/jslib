@@ -311,7 +311,7 @@ document.body.prepend(button({"data-value": sb, "onclick": function() {
 		goto('?some-name="123"');
 		this.innerText = "Click Here Again";
 	} else {
-		result(this.dataset.value === "123");
+		result(window.location.search === "?some-name=%22123%22" && this.dataset.value === "123");
 	}
 }}, "Click Here"));
 `],
