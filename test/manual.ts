@@ -289,5 +289,18 @@ document.body.insertBefore(router().add("/other-page/:id/:data", data => {
 	return button;
 }), document.body.firstChild);`],
 		}
+	},
+	"urlstate.js": {
+		"StateBound": {
+			"hasDefault": [`import URLState from './lib/urlstate.js';
+import {button} from './lib/html.js';
+
+const sb = URLState("some-name", "default");
+
+document.body.prepend(button({"data-value": sb, "onclick": function() {
+	result(this.dataset.value === "default");
+}}, "Click Here"));
+`]
+		}
 	}
 });
