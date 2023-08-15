@@ -314,6 +314,20 @@ document.body.prepend(button({"data-value": sb, "onclick": function() {
 	}
 }}, "Click Here"));
 `],
+			"value updates with setter": [`import URLState, {goto} from './lib/urlstate.js';
+import {button} from './lib/html.js';
+
+const sb = URLState("some-name", "default");
+
+document.body.prepend(button({"data-value": sb, "onclick": function() {
+	if (this.dataset.value === "default") {
+		sb.value = "123";
+		this.innerText = "Click Here Again";
+	} else {
+		result(window.location.search === "?some-name=%22123%22" && this.dataset.value === "123");
+	}
+}}, "Click Here"));
+`],
 		},
 	}
 });
