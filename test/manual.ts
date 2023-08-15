@@ -309,6 +309,7 @@ const sb = URLState("some-name", "default");
 document.body.prepend(button({"data-value": sb, "onclick": function() {
 	if (this.dataset.value === "default") {
 		goto('?some-name="123"');
+		this.innerText = "Click Here Again";
 	} else {
 		result(this.dataset.value === "123");
 	}
