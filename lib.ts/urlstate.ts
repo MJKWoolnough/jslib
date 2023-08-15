@@ -88,7 +88,7 @@ const state = new Map<string, string>(),
 		window.history.pushState(Date.now(), "", "?" + queryStr);
 	}
 
-	debounceSet  = -1;
+	debounceSet = -1;
       },
       jsonCodec = new Codec(v => {
 		if (v === undefined) {
