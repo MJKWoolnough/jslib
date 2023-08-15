@@ -329,6 +329,10 @@ document.body.prepend(button({"data-value": sb, "onclick": function() {
 	}
 }}, "Click Here"));
 `],
-		},
+			"url and value updates when link clicked": [`import URLState, {goto} from './lib/urlstate.js';
+
+URLState("some-name", "default").onChange(v => result(v === "123"));
+`, `<a href='?some-name="123"'>Click Here</a>`]
+		}
 	}
 });
