@@ -146,6 +146,8 @@ class StateBound<T> extends Binding<T> {
 		return super.value;
 	}
 	set value(v: T) {
+		super.value = v;
+
 		state.set(this.#name, v === this.#def ? "" : this.#codec.encode(v));
 
 		if (debounceSet === -1) {
