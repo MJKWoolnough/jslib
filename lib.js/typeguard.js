@@ -129,7 +129,7 @@ Undefined = () => asTypeGuard(v => throwOrReturn(v === undefined, "undefined")),
  */
 Null = () => asTypeGuard(v => throwOrReturn(v === null, "null")),
 /**
- * The Num function returns a TypeGuard that checks for numbers, and takes optionsl min and max (inclusive) values to range check.
+ * The Num function returns a TypeGuard that checks for numbers, and takes optional min and max (inclusive) values to range check.
  *
  * @param {number} min Minimum values for the number.
  * @param {number} max Maximum values for the number.
@@ -138,7 +138,7 @@ Null = () => asTypeGuard(v => throwOrReturn(v === null, "null")),
  */
 Num = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number")),
 /**
- * The Int function returns a TypeGuard that checks for integers, and takes optionsl min and max (inclusive) values to range check.
+ * The Int function returns a TypeGuard that checks for integers, and takes optional min and max (inclusive) values to range check.
  *
  * @param {number} min Minimum values for the integer.
  * @param {number} max Maximum values for the integer.
@@ -147,7 +147,7 @@ Num = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof
  */
 Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer")),
 /**
- * The BigInt function returns a TypeGuard that checks for bigints, and takes optionsl min and max (inclusive) values to range check.
+ * The BigInt function returns a TypeGuard that checks for bigints, and takes optional min and max (inclusive) values to range check.
  *
  * @param {number} min Minimum values for the bigint.
  * @param {number} max Maximum values for the bigint.
