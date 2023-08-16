@@ -421,6 +421,27 @@ document.body.prepend(button({"onclick": function() {
 	}
 }}, "Click Here"));
 `]
-		}
+		},
+		"toURL": [`import {goto, toURL} from './lib/urlstate.js';
+
+const check = (a, b) => {
+	if (a !== b) {
+		result(false);
+	}
+      };
+
+check(toURL(), "?");
+check(toURL({"a": "1"}), "?a=1");
+check(toURL({"a": "1", "b": 2}), "?a=1&b=2");
+
+goto("?a=3");
+
+check(toURL(), "?a=3");
+check(toURL({"a": "4"}), "?a=4");
+check(toURL({"b": "5"}), "?a=3&b=5");
+check(toURL({"b": "5"}, ["a"]), "?b=5");
+
+result(true);
+`]
 	}
 });
