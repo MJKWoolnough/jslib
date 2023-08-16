@@ -442,6 +442,12 @@ check(toURL({"b": "5"}), "?a=3&b=5");
 check(toURL({"b": "5"}, ["a"]), "?b=5");
 
 result(true);
+`],
+		"urlChanged": [`import {goto, urlChanged} from './lib/urlstate.js';
+
+urlChanged.when(() => result(true));
+
+goto("?changed");
 `]
 	}
 });
