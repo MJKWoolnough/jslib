@@ -377,6 +377,29 @@ document.body.prepend(button({"onclick": function() {
 	}
 }}, "Click Here"));
 `]
+		},
+		"setParam": {
+			"correct value": [`import URLState, {goto, setParam} from './lib/urlstate.js';
+import {button} from './lib/html.js';
+
+const sb = URLState("some-name", "default", v => typeof v === "string");
+
+sb.value = "other";
+
+let wasOther = false;
+
+document.body.prepend(button({"onclick": function() {
+	if (sb.value === "other") {
+		wasOther = true;
+
+		setParam("some-name", '"123"');
+	} else if (sb.value === "123") {
+		result(wasOther);
+	} else {
+		result(false);
+	}
+}}, "Click Here"));
+`]
 		}
 	}
 });
