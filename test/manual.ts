@@ -138,21 +138,21 @@ type ManualTests = {
 		},
 		"js": {
 			"simple non-match": [`import {router} from './lib/router.js';
-document.body.insertBefore(router().add("", () => {
+document.body.prepend(router().add("", () => {
 	const button = document.createElement("button");
 	button.textContent = "Success";
 	button.addEventListener("click", () => result(true));
 	return button;
-}), document.body.firstChild);`],
+}));`],
 			"simple match": [`import {router} from './lib/router.js';
-document.body.insertBefore(router().add("/test", () => {
+document.body.prepend(router().add("/test", () => {
 	const button = document.createElement("button");
 	button.textContent = "Success";
 	button.addEventListener("click", () => result(true));
 	return button;
-}), document.body.firstChild);`],
+}));`],
 			"match after link": [`import {router} from './lib/router.js';
-document.body.insertBefore(router().add("/other-page", () => {
+document.body.prepend(router().add("/other-page", () => {
 	const button = document.createElement("button");
 	button.textContent = "Success";
 	button.addEventListener("click", () => result(true));
@@ -162,9 +162,9 @@ document.body.insertBefore(router().add("/other-page", () => {
 	a.textContent = "Click Here";
 	a.setAttribute("href", "/other-page");
 	return a;
-}), document.body.firstChild);`],
+}));`],
 			"match after button (goto)": [`import {goto, router} from './lib/router.js';
-document.body.insertBefore(router().add("/other-page", () => {
+document.body.prepend(router().add("/other-page", () => {
 	const button = document.createElement("button");
 	button.textContent = "Success";
 	button.addEventListener("click", () => result(true));
@@ -174,9 +174,9 @@ document.body.insertBefore(router().add("/other-page", () => {
 	a.textContent = "Click Here";
 	a.addEventListener("click", () => goto("/other-page"));
 	return a;
-}), document.body.firstChild);`],
+}));`],
 			"history check": [`import {goto, router} from './lib/router.js';
-document.body.insertBefore(router().add("/other-page", () => {
+document.body.prepend(router().add("/other-page", () => {
 	const div = document.createElement("div");
 	div.textContent = "Use the back button";
 	return div;
@@ -194,9 +194,9 @@ document.body.insertBefore(router().add("/other-page", () => {
 		}
 	});
 	return button;
-}), document.body.firstChild);`],
+}));`],
 			"path param": [`import {goto, router} from './lib/router.js';
-document.body.insertBefore(router().add("/page-:page", ({page}) => {
+document.body.prepend(router().add("/page-:page", ({page}) => {
 	result(page === "15");
 	return new Text("");
 }).add("", () => {
@@ -204,9 +204,9 @@ document.body.insertBefore(router().add("/page-:page", ({page}) => {
 	a.textContent = "Click Here";
 	a.setAttribute("href", "/page-15");
 	return a;
-}), document.body.firstChild);`],
+}));`],
 			"match query": [`import {router} from './lib/router.js';
-document.body.insertBefore(router().add("?page=other", () => {
+document.body.prepend(router().add("?page=other", () => {
 	result(true);
 	return new Text("Success");
 }).add("", () => {
@@ -214,9 +214,9 @@ document.body.insertBefore(router().add("?page=other", () => {
 	a.textContent = "Click Here";
 	a.setAttribute("href", "?page=other");
 	return a;
-}), document.body.firstChild);`],
+}));`],
 			"query param": [`import {goto, router} from './lib/router.js';
-document.body.insertBefore(router().add("/?page=:page", ({page}) => {
+document.body.prepend(router().add("/?page=:page", ({page}) => {
 	if (page === "15") {
 		result(true);
 	}
@@ -224,9 +224,9 @@ document.body.insertBefore(router().add("/?page=:page", ({page}) => {
 	a.textContent = "Click Here";
 	a.setAttribute("href", "?page=15");
 	return a;
-}), document.body.firstChild);`],
+}));`],
 			"match hash": [`import {router} from './lib/router.js';
-document.body.insertBefore(router().add("#match", () => {
+document.body.prepend(router().add("#match", () => {
 	result(true);
 	return new Text("Success");
 }).add("", () => {
@@ -234,9 +234,9 @@ document.body.insertBefore(router().add("#match", () => {
 	a.textContent = "Click Here";
 	a.setAttribute("href", "#match");
 	return a;
-}), document.body.firstChild);`],
+}));`],
 			"prefix match": [`import {router} from './lib/router.js';
-document.body.insertBefore(router().add("/other-page/", () => {
+document.body.prepend(router().add("/other-page/", () => {
 	result(true);
 	return new Text("Success");
 }).add("", () => {
@@ -244,9 +244,9 @@ document.body.insertBefore(router().add("/other-page/", () => {
 	a.textContent = "Click Here";
 	a.setAttribute("href", "/other-page/name");
 	return a;
-}), document.body.firstChild);`],
+}));`],
 			"suffix match": [`import {router} from './lib/router.js';
-document.body.insertBefore(router().add("other-page/", () => {
+document.body.prepend(router().add("other-page/", () => {
 	result(true);
 	return new Text("Success");
 }).add("", () => {
@@ -254,9 +254,9 @@ document.body.insertBefore(router().add("other-page/", () => {
 	a.textContent = "Click Here";
 	a.setAttribute("href", "/something/other-page/name");
 	return a;
-}), document.body.firstChild);`],
+}));`],
 			"no-suffix match": [`import {router} from './lib/router.js';
-document.body.insertBefore(router().add("other-page/",  () => {
+document.body.prepend(router().add("other-page/",  () => {
 	result(false);
 	return new Text("Failed");
 }).add("/other-page", () => {
@@ -267,9 +267,9 @@ document.body.insertBefore(router().add("other-page/",  () => {
 	a.textContent = "Click Here";
 	a.setAttribute("href", "/other-page");
 	return a;
-}), document.body.firstChild);`],
+}));`],
 			"goto params": [`import {goto, router} from './lib/router.js';
-document.body.insertBefore(router().add("/other-page", data => {
+document.body.prepend(router().add("/other-page", data => {
 	result(data.test === 1 && data.data === "abc");
 	return new Text("Success");
 }).add("", () => {
@@ -277,9 +277,9 @@ document.body.insertBefore(router().add("/other-page", data => {
 	button.textContent = "Click Here";
 	button.addEventListener("click", () => goto("/other-page", {'test': 1, 'data': 'abc'}));
 	return button;
-}), document.body.firstChild);`],
+}));`],
 			"goto overwrite params": [`import {goto, router} from './lib/router.js';
-document.body.insertBefore(router().add("/other-page/:id/:data", data => {
+document.body.prepend(router().add("/other-page/:id/:data", data => {
 	result(data.id === "123" && data.test === 1 && data.data === "abc");
 	return new Text("Success");
 }).add("", () => {
@@ -287,7 +287,7 @@ document.body.insertBefore(router().add("/other-page/:id/:data", data => {
 	button.textContent = "Click Here";
 	button.addEventListener("click", () => goto("/other-page/123/def", {"test": 1, "data": "abc"}));
 	return button;
-}), document.body.firstChild);`],
+}));`],
 		}
 	},
 	"urlstate.js": {
