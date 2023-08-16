@@ -2300,16 +2300,16 @@ The module exports the following functions:
 | Any         | The Any function returns a TypeGuard that allows any value. |
 | Arr         | The Arr function returns a TypeGuard that checks for an Array, running the given TypeGuard on each element. |
 | asTypeGuard | This function gives a custom typeguard additional functionality, such as being able to optionally throw errors, and be spreadable. |
-| BigInt      | The BigInt function returns a TypeGuard that checks for bigints, and takes optionsl min and max (inclusive) values to range check. |
+| BigInt      | The BigInt function returns a TypeGuard that checks for bigints, and takes optional min and max (inclusive) values to range check. |
 | Bool        | The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against. |
 | Class       | The Class function returns a TypeGuard that checks a value is of the class specified. |
 | Forbid      | The Forbid function returns a TypeGuard that disallows certain types from an existing type. |
 | Func        | The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check. |
-| Int         | The Int function returns a TypeGuard that checks for integers, and takes optionsl min and max (inclusive) values to range check. |
+| Int         | The Int function returns a TypeGuard that checks for integers, and takes optional min and max (inclusive) values to range check. |
 | IntKey      | The IntKey function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types. |
 | MapType     | The MapType function returns a TypeGuard that checks for an Map type where the keys and values are of the types specified. |
 | Null        | The Null function returns a TypeGuard that checks for `null`. |
-| Num         | The Num function returns a TypeGuard that checks for numbers, and takes optionsl min and max (inclusive) values to range check. |
+| Num         | The Num function returns a TypeGuard that checks for numbers, and takes optional min and max (inclusive) values to range check. |
 | Obj         | The Obj function returns a TypeGuard that checks for an object type defined by the passed object of TypeGuards. |
 | Or          | The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards. |
 | Part        | The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined'). |
