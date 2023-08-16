@@ -333,6 +333,29 @@ document.body.prepend(button({"data-value": sb, "onclick": function() {
 
 URLState("some-name", "default").onChange(v => result(v === "123"));
 `, `<a href='?some-name="123"'>Click Here</a>`]
+		},
+		"type checker": {
+			"correct value": [`import URLState, {goto, setParam} from './lib/urlstate.js';
+import {button} from './lib/html.js';
+
+const sb = URLState("some-name", "default", v => typeof v === "string");
+
+sb.value = "other";
+
+let wasOther = false;
+
+document.body.prepend(button({"onclick": function() {
+	if (sb.value === "other") {
+		wasOther = true;
+
+		goto("?some-name=%22123%22");
+	} else if (sb.value === "123") {
+		result(wasOther);
+	} else {
+		result(false);
+	}
+}}, "Click Here"));
+`]
 		}
 	}
 });
