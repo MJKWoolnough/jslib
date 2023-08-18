@@ -131,6 +131,7 @@ Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typ
  * @return {TypeGuard<undefined>}
  */
 Undefined = () => asTypeGuard((v: unknown): v is undefined => throwOrReturn(v === undefined, "undefined")),
+Opt = <T>(v: TypeGuard<T>) => Or(v, Undefined()),
 /**
  * The Null function returns a TypeGuard that checks for `null`.
  *
