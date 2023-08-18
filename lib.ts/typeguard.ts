@@ -273,7 +273,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
  *
  * @return {TypeGuard<Object>}
  */
-Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}>(t?: U) => asTypeGuard((v: unknown): v is {[K in keyof U]: TypeGuardOf<U[K]>;} => {
+Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof T]: TypeGuard<T[K]>}, R = {[K in keyof U as undefined extends TypeGuardOf<U[K]> ? never : K]: TypeGuardOf<U[K]>;} & {[K in keyof U as undefined extends TypeGuardOf<U[K]> ? K : never]?: TypeGuardOf<U[K]>;}>(t?: U) => asTypeGuard((v: unknown): v is {[K in keyof R]: R[K]} => {
 	const [au, tk, s] = mods();
 
 	if (!(v instanceof Object)) {
