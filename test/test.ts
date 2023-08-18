@@ -6476,6 +6476,48 @@ type Tests = {
 				}
 			}
 		},
+		"Opt": {
+			"returns": {
+				"valid": async () => {
+					const {Int, Opt} = await import("./lib/typeguard.js"),
+					      o = Opt(Int());
+
+					return o(1) && o(2) && o(undefined);
+				},
+				"invalid": async () => {
+					const {Int, Opt} = await import("./lib/typeguard.js"),
+					      o = Opt(Int());
+
+					return !o("") && !o(null);
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Int, Opt} = await import("./lib/typeguard.js"),
+					      o = Opt(Int());
+
+					try {
+						return o.throw(undefined);
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Int, Opt} = await import("./lib/typeguard.js"),
+					      o = Opt(Int());
+
+					try {
+						o.throw("");
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
+		},
 		"Null": {
 			"returns": {
 				"valid": async () => {
