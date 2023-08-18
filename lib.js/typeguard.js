@@ -122,6 +122,13 @@ Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefi
  * @return {TypeGuard<undefined>}
  */
 Undefined = () => asTypeGuard(v => throwOrReturn(v === undefined, "undefined")),
+/**
+ * The Opt function returns a TypeGuard that checks for both the passed TypeGuard while allowing for it to be undefined.
+ *
+ * @typedef T
+ *
+ * @return {TypeGuard<T | undefined>}
+ */
 Opt = v => Or(v, Undefined()),
 /**
  * The Null function returns a TypeGuard that checks for `null`.
