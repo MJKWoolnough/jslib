@@ -2311,6 +2311,7 @@ The module exports the following functions:
 | Null        | The Null function returns a TypeGuard that checks for `null`. |
 | Num         | The Num function returns a TypeGuard that checks for numbers, and takes optional min and max (inclusive) values to range check. |
 | Obj         | The Obj function returns a TypeGuard that checks for an object type defined by the passed object of TypeGuards. |
+| Opt         | The Opt function returns a TypeGuard that checks for both the passed TypeGuard while allowing for it to be undefined. Equivalent to Or(T, Undefined()). |
 | Or          | The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards. |
 | Part        | The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined'). |
 | Rec         | The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified. |
