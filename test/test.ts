@@ -1374,6 +1374,15 @@ type Tests = {
 				rpc.await(-2).catch(() => res++);
 				return rpc.request("close").then(() => false).catch(() => new Promise<boolean>(sFn => window.setTimeout(() => sFn(res === 2), 0)));
 			});
+		},
+		"queue": async () => {
+			const {WS} = await import("./lib/conn.js"),
+			      {RPC} = await import("./lib/rpc.js"),
+			      rpc = new RPC();
+
+			setTimeout(() => WS("/rpc").then(ws => rpc.reconnect(ws)), 10);
+
+			return rpc.request("echo", "456").then(d => d === "456");
 		}
 	},
 	"bbcode.js": {
