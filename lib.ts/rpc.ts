@@ -83,7 +83,7 @@ export class RPC {
 	/**
 	 * Creates an RPC object with a [Conn](#rpc_conn)
 	 *
-	 * @param {Conn} conn An interface that is used to do the network communication.
+	 * @param {Conn} [conn] An interface that is used to do the network communication. If conn is not provided the requests will be queued until one is provided via reconnect.
 	 */
 	constructor(conn?: Conn) {
 		this.#connInit(conn);
