@@ -43,6 +43,27 @@ export class RPCError {
 	}
 }
 
+class Queue extends Array {
+	#send;
+	constructor(send) {
+		super();
+
+		this.#send = send;
+	}
+
+	close() {
+		for (const msg of this) {
+			this.#send(msg);
+		}
+	}
+
+	send(data) {
+		this.push(data);
+	}
+
+	when() {}
+}
+
 export class RPC {
 	#c;
 	#id = 0;
@@ -57,7 +78,7 @@ export class RPC {
 		this.#connInit(conn);
 	}
 	#connInit(conn) {
-		(this.#c = conn).when(({data}) => {
+		(this.#c = conn ?? new Queue(msg => this.#c?.send(msg))).when(({data}) => {
 			const message = JSON.parse(data),
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
 			      e = message.error,
@@ -89,8 +110,11 @@ export class RPC {
 	 * @param {Conn} conn An interface that is used to do the network communication.
 	 */
 	reconnect(conn) {
-		this.#c?.close();
+		const c = this.#c;
+
 		this.#connInit(conn);
+
+		c?.close();
 	}
 	/**
 	 * The request method calls the remote procedure named by the `method` param, and sends any `params` data, JSON encoded, to it.
@@ -166,7 +190,10 @@ export class RPC {
 	}
 	/** Closes the RPC connection. */
 	close() {
-		this.#c?.close();
+		const c = this.#c;
+
 		this.#c = null;
+
+		c?.close();
 	}
 }

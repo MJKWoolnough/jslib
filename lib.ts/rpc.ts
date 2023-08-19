@@ -54,6 +54,27 @@ export class RPCError implements Error {
 	}
 }
 
+class Queue extends Array<string> {
+	#send: (msg: string) => void;
+	constructor(send: (msg: string) => void) {
+		super();
+
+		this.#send = send;
+	}
+
+	close() {
+		for (const msg of this) {
+			this.#send(msg);
+		}
+	}
+
+	send(data: string) {
+		this.push(data);
+	}
+
+	when() {}
+}
+
 export class RPC {
 	#c?: Conn | null;
 	#id: number = 0;
@@ -64,11 +85,11 @@ export class RPC {
 	 *
 	 * @param {Conn} conn An interface that is used to do the network communication.
 	 */
-	constructor(conn: Conn) {
+	constructor(conn?: Conn) {
 		this.#connInit(conn);
 	}
-	#connInit(conn: Conn) {
-		(this.#c = conn).when(({data}) => {
+	#connInit(conn?: Conn) {
+		(this.#c = conn ?? new Queue((msg: string) => this.#c?.send(msg))).when(({data}) => {
 			const message = JSON.parse(data) as MessageData,
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
 			      e = message.error,
@@ -99,9 +120,12 @@ export class RPC {
 	 *
 	 * @param {Conn} conn An interface that is used to do the network communication.
 	 */
-	reconnect(conn: Conn) {
-		this.#c?.close();
+	reconnect(conn?: Conn) {
+		const c = this.#c;
+
 		this.#connInit(conn);
+
+		c?.close();
 	}
 	request<T = any>(method: string, typeCheck?: (a: any) => a is T): Promise<T>;
 	request<T = any>(method: string, params: any, typeCheck?: (a: any) => a is T): Promise<T>;
@@ -179,7 +203,10 @@ export class RPC {
 	}
 	/** Closes the RPC connection. */
 	close() {
-		this.#c?.close();
+		const c = this.#c;
+
 		this.#c = null;
+
+		c?.close();
 	}
 }
