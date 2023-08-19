@@ -54,7 +54,6 @@ export class RPCError implements Error {
 	}
 }
 
-
 export class RPC {
 	#c?: Conn | null;
 	#id: number = 0;

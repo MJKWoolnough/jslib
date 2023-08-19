@@ -43,7 +43,6 @@ export class RPCError {
 	}
 }
 
-
 export class RPC {
 	#c;
 	#id = 0;
