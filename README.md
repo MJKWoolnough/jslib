@@ -2114,7 +2114,7 @@ This unexported type is the interface used by [RPC](#rpc_rpc) to send and receiv
 |----------|---------------|
 | [await](#rpc_rpc_await) | Used to wait for a specific message. |
 | close | Closes the RPC connection. |
-| constructor | Creates an RPC object with a [Conn](#rpc_conn). |
+| constructor | Creates an RPC object with a [Conn](#rpc_conn). If a Conn is not provided the requests will be queued until one is provided via reconnect.  |
 | reconnect | Reuses the RPC object with a new [Conn](#rpc_conn). |
 | [request](#rpc_rpc_request) | Calls a remote procedure and waits for a response. |
 | [subscribe](#rpc_rpc_subscribe) | Returns data each time a message with a specific ID is received. |
