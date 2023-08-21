@@ -80,6 +80,8 @@ export class RPC {
 	#id: number = 0;
 	#r = new Map<number, handler>();
 	#a = new Map<number, Set<handler>>();
+	#sFn?: (data: {data: any}) => void;
+	#eFn?: (error: Error) => void;
 	/**
 	 * Creates an RPC object with a [Conn](#rpc_conn)
 	 *
@@ -89,7 +91,7 @@ export class RPC {
 		this.#connInit(conn);
 	}
 	#connInit(conn?: Conn) {
-		(this.#c = conn ?? new Queue((msg: string) => this.#c?.send(msg))).when(({data}) => {
+		(this.#c = conn ?? new Queue((msg: string) => this.#c?.send(msg))).when(this.#sFn ??= ({data}) => {
 			const message = JSON.parse(data) as MessageData,
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
 			      e = message.error,
@@ -103,7 +105,7 @@ export class RPC {
 					r[i](m);
 				}
 			}
-		}, err => {
+		}, this.#eFn ??= err => {
 			this.close();
 			for (const [, r] of this.#r) {
 				r[1](err);

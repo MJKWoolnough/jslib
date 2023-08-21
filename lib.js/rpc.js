@@ -69,6 +69,8 @@ export class RPC {
 	#id = 0;
 	#r = new Map();
 	#a = new Map();
+	#sFn;
+	#eFn;
 	/**
 	 * Creates an RPC object with a [Conn](#rpc_conn)
 	 *
@@ -78,7 +80,7 @@ export class RPC {
 		this.#connInit(conn);
 	}
 	#connInit(conn) {
-		(this.#c = conn ?? new Queue(msg => this.#c?.send(msg))).when(({data}) => {
+		(this.#c = conn ?? new Queue(msg => this.#c?.send(msg))).when(this.#sFn ??= ({data}) => {
 			const message = JSON.parse(data),
 			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
 			      e = message.error,
@@ -92,7 +94,7 @@ export class RPC {
 					r[i](m);
 				}
 			}
-		}, err => {
+		}, this.#eFn ??= err => {
 			this.close();
 			for (const [, r] of this.#r) {
 				r[1](err);
