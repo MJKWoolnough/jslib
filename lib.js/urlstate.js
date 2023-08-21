@@ -109,6 +109,22 @@ class StateBound extends Binding {
 
 			StateBound.#processState();
 		});
+
+		window.addEventListener("click", e => {
+			let target = e.target;
+			while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
+				target = target.parentNode;
+			}
+
+			const href = target?.getAttribute("href");
+			if (href && goto(href)) {
+				e.preventDefault();
+			}
+		});
+
+		getStateFromURL();
+
+		setTimeout(setURLChanged, 0, history.state ?? 0);
 	}
 
 	#name;
@@ -203,22 +219,6 @@ class StateBound extends Binding {
 		}
 	}
 }
-
-window.addEventListener("click", e => {
-	let target = e.target;
-	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
-		target = target.parentNode;
-	}
-
-	const href = target?.getAttribute("href");
-	if (href && goto(href)) {
-		e.preventDefault();
-	}
-});
-
-getStateFromURL();
-
-setTimeout(setURLChanged, 0, history.state ?? 0);
 
 export const
 /**
