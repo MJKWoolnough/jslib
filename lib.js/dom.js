@@ -175,7 +175,7 @@ amendNode = (node, properties, children) => {
  *
  * @return {(props? Props | Children, children?: Children) => T} Function used to create a `T` element with the specified properties and/or children.
  * */
-bindElement = (ns, value) => Object.defineProperty((props, children) => amendNode(document.createElementNS(ns, value), props, children), "name", {value}),
+bindElement = (ns, value) => Object.defineProperties((props, children) => amendNode(document.createElementNS(ns, value), props, children), {"name": {value}, [child]: {"get": () => document.createElementNS(ns, value)}}),
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.
  */
