@@ -924,6 +924,21 @@ type Tests = {
 				clearNode(n, {"property": "value"}, s);
 				return n.getAttribute("property") === "value" && n.firstChild === s;
 			}
+		},
+		"bindElement": {
+			"div": async () => {
+				const {bindElement} = await import("./lib/dom.js"),
+				      div = bindElement("http://www.w3.org/1999/xhtml", "div");
+
+				return div() instanceof HTMLDivElement;
+			},
+			"raw": async () => {
+				const {bindElement} = await import("./lib/dom.js"),
+				      div = bindElement("http://www.w3.org/1999/xhtml", "div"),
+				      span = bindElement("http://www.w3.org/1999/xhtml", "span");
+
+				return div(span).firstChild instanceof HTMLSpanElement;
+			}
 		}
 	},
 	"bind.js": {
