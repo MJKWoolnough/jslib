@@ -191,7 +191,7 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
  * @param {string} ns    Namespace of the bound element.
  * @param {string} value Name of the element.
  *
- * @return {(props? Props | Children, children?: Children) => T} Function used to create a `T` element with the specified properties and/or children.
+ * @return {(props? Props | Children, children?: Children) => DOMBind<T>} Function used to create a `T` element with the specified properties and/or children.
  * */
 bindElement = <T extends Element>(ns: string, value: string) => Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(document.createElementNS(ns, value) as T, props, children), {"name": {value}, [child]: {"get": () => document.createElementNS(ns, value) as T}}) as DOMBind<T>,
 /**
