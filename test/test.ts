@@ -6906,6 +6906,28 @@ type Tests = {
 				}
 			}
 		},
+		"Void": {
+			"returns": {
+				"valid": async () => {
+					const {Void} = await import("./lib/typeguard.js"),
+					      v = Void();
+
+					return v(1) && v("abc") && v([1, 2,3]);
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Void} = await import("./lib/typeguard.js"),
+					      v = Void();
+
+					try {
+						return v.throw(1) && v.throw("abc") && v.throw([1, 2,3]);
+					} catch(e) {
+						return false;
+					}
+				}
+			}
+		},
 		"Arr": {
 			"returns": {
 				"valid - Num": async () => {
