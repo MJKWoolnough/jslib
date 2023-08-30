@@ -183,6 +183,7 @@ Val = val => asTypeGuard(v => throwOrReturn(v === val, "value")),
  * @return {TypeGuard<any>}
  */
 Any = () => asTypeGuard(_ => true),
+Void = () => asTypeGuard(_ => true),
 /**
  * The Arr function returns a TypeGuard that checks for an Array, running the given TypeGuard on each element.
  *
