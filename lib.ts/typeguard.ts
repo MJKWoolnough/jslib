@@ -192,6 +192,11 @@ Val = <const T>(val: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(v =
  * @return {TypeGuard<any>}
  */
 Any = () => asTypeGuard((_: unknown): _ is any => true),
+/**
+ * The Void function returns a TypeGuard that performs no check as the value is not intended to be used.
+ *
+ * @return {TypeGuard<void>}
+ */
 Void = () => asTypeGuard((_: unknown): _ is void => true),
 /**
  * The Arr function returns a TypeGuard that checks for an Array, running the given TypeGuard on each element.
