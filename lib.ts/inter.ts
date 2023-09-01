@@ -57,7 +57,9 @@ export class Pipe<T> {
 	 */
 	send(data: T) {
 		for (const fn of this.#out) {
-			fn(data);
+			try {
+				fn(data);
+			} finally {}
 		}
 	}
 	/**
