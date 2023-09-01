@@ -53,6 +53,8 @@ export class Pipe<T> {
 	/**
 	 * This function sends the data passed to any functions registered on the Pipe.
 	 *
+	 * Exceptions thrown be any receivers are ignored.
+	 *
 	 * @param {T} data The data to be sent.
 	 */
 	send(data: T) {
