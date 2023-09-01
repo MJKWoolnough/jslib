@@ -1277,7 +1277,7 @@ class Pipe<T> {
 }
 ```
 
-The passed function will be registered on the Pipe and will receive any future values sent along it.
+The passed function will be registered on the Pipe and will receive any future values sent along it. Exceptions thrown be any receivers are ignored.
 
 NB: The same function can be set multiple times, and will be for each time it is set.
 
