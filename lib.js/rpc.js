@@ -25,7 +25,18 @@ const noop = () => {},
 	const s = new Set();
 	m.set(id, s);
 	return s;
-      };
+      },
+      makeHandler = (sFn, eFn, typeCheck) => [a => {
+	try {
+		if (!typeCheck || typeCheck(a)) {
+			sFn(a);
+		} else {
+			eFn(new TypeError("invalid type"));
+		}
+	} catch(e) {
+		eFn(e);
+	}
+      }, eFn];
 
 /** This class is the error type for RPC, and contains a `code` number, `message` string, and a data field for any addition information of the error. */
 export class RPCError {
@@ -137,17 +148,7 @@ export class RPC {
 		return c ? new Promise((sFn, eFn) => {
 			typeCheck ??= paramsOrTypeCheck instanceof Function ? paramsOrTypeCheck : undefined;
 			const id = this.#id++;
-			this.#r.set(id, [a => {
-				try {
-					if (!typeCheck || typeCheck(a)) {
-						sFn(a);
-					} else {
-						eFn(new TypeError("invalid type"));
-					}
-				} catch(e) {
-					eFn(e);
-				}
-			}, eFn]);
+			this.#r.set(id, makeHandler(sFn, eFn, typeCheck));
 			c.send(JSON.stringify({
 				id,
 				method,
@@ -172,18 +173,7 @@ export class RPC {
 		      a = this.#a,
 		      s = a.get(id) ?? newSet(a, id),
 		      p = new Promise((sFn, eFn) => {
-			h[0] = a => {
-				try {
-					if (!typeCheck || typeCheck(a)) {
-						sFn(a);
-					} else {
-						eFn(new TypeError("invalid type"));
-					}
-				} catch(e) {
-					eFn(e);
-				}
-			};
-			h[1] = eFn;
+			[h[0], h[1]] = makeHandler(sFn, eFn, typeCheck);
 			s.add(h);
 		      });
 		p.finally(() => s.delete(h)).catch(() => {});
@@ -203,17 +193,7 @@ export class RPC {
 	 */
 	subscribe(id, typeCheck) {
 		return new Subscription((sFn, eFn, cFn) => {
-			const h = [a => {
-				try {
-					if (!typeCheck || typeCheck(a)) {
-						sFn(a);
-					} else {
-						eFn(new TypeError("invalid type"));
-					}
-				} catch (e) {
-					eFn(e);
-				}
-			      }, eFn],
+			const h = makeHandler(sFn, eFn, typeCheck),
 			      a = this.#a,
 			      s = a.get(id) ?? newSet(a, id);
 			s.add(h);

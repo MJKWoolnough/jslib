@@ -33,7 +33,18 @@ const noop = () => {},
 	const s = new Set<handler>();
 	m.set(id, s);
 	return s;
-      };
+      },
+      makeHandler = <T>(sFn: (data: T) => void, eFn: (data: any) => void, typeCheck?: (data: any) => data is T): handler => [(a: any) => {
+	try {
+		if (!typeCheck || typeCheck(a)) {
+			sFn(a);
+		} else {
+			eFn(new TypeError("invalid type"));
+		}
+	} catch(e) {
+		eFn(e);
+	}
+      }, eFn];
 
 /** This class is the error type for RPC, and contains a `code` number, `message` string, and a data field for any addition information of the error. */
 export class RPCError implements Error {
@@ -150,17 +161,7 @@ export class RPC {
 		return c ? new Promise<T>((sFn, eFn) => {
 			typeCheck ??= paramsOrTypeCheck instanceof Function ? paramsOrTypeCheck : undefined;
 			const id = this.#id++;
-			this.#r.set(id, [a => {
-				try {
-					if (!typeCheck || typeCheck(a)) {
-						sFn(a);
-					} else {
-						eFn(new TypeError("invalid type"));
-					}
-				} catch(e) {
-					eFn(e);
-				}
-			}, eFn]);
+			this.#r.set(id, makeHandler(sFn, eFn, typeCheck));
 			c.send(JSON.stringify({
 				id,
 				method,
@@ -185,18 +186,7 @@ export class RPC {
 		      a = this.#a,
 		      s = a.get(id) ?? newSet(a, id),
 		      p = new Promise<T>((sFn, eFn) => {
-			h[0] = a => {
-				try {
-					if (!typeCheck || typeCheck(a)) {
-						sFn(a);
-					} else {
-						eFn(new TypeError("invalid type"));
-					}
-				} catch(e) {
-					eFn(e);
-				}
-			};
-			h[1] = eFn;
+			[h[0], h[1]] = makeHandler(sFn, eFn, typeCheck);
 			s.add(h);
 		      });
 		p.finally(() => s.delete(h)).catch(() => {});
@@ -216,17 +206,7 @@ export class RPC {
 	 */
 	subscribe<T = any>(id: number, typeCheck?: (a: any) => a is T): Subscription<T> {
 		return new Subscription<T>((sFn, eFn, cFn) => {
-			const h: handler = [a => {
-				try {
-					if (!typeCheck || typeCheck(a)) {
-						sFn(a);
-					} else {
-						eFn(new TypeError("invalid type"));
-					}
-				} catch(e) {
-					eFn(e);
-				}
-			      }, eFn],
+			const h = makeHandler(sFn, eFn, typeCheck),
 			      a = this.#a,
 			      s = a.get(id) ?? newSet(a, id);
 			s.add(h);
