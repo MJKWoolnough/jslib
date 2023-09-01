@@ -183,7 +183,17 @@ export class RPC {
 	 */
 	subscribe(id, typeCheck) {
 		return new Subscription((sFn, eFn, cFn) => {
-			const h = [a => (!typeCheck || typeCheck(a)) ? sFn(a) : eFn(new TypeError("invalid type")), eFn],
+			const h = [a => {
+				try {
+					if (!typeCheck || typeCheck(a)) {
+						sFn(a);
+					} else {
+						eFn(new TypeError("invalid type"));
+					}
+				} catch (e) {
+					eFn(e);
+				}
+			      }, eFn],
 			      a = this.#a,
 			      s = a.get(id) ?? newSet(a, id);
 			s.add(h);
