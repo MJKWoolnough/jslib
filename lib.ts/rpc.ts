@@ -150,7 +150,17 @@ export class RPC {
 		return c ? new Promise<T>((sFn, eFn) => {
 			typeCheck ??= paramsOrTypeCheck instanceof Function ? paramsOrTypeCheck : undefined;
 			const id = this.#id++;
-			this.#r.set(id, [a => (!typeCheck || typeCheck(a)) ? sFn(a) : eFn(new TypeError("invalid type")), eFn]);
+			this.#r.set(id, [a => {
+				try {
+					if (!typeCheck || typeCheck(a)) {
+						sFn(a);
+					} else {
+						eFn(new TypeError("invalid type"));
+					}
+				} catch(e) {
+					eFn(e);
+				}
+			}, eFn]);
 			c.send(JSON.stringify({
 				id,
 				method,
@@ -175,7 +185,17 @@ export class RPC {
 		      a = this.#a,
 		      s = a.get(id) ?? newSet(a, id),
 		      p = new Promise<T>((sFn, eFn) => {
-			h[0] = a => (!typeCheck || typeCheck(a)) ? sFn(a) : eFn(new TypeError("invalid type"));
+			h[0] = a => {
+				try {
+					if (!typeCheck || typeCheck(a)) {
+						sFn(a);
+					} else {
+						eFn(new TypeError("invalid type"));
+					}
+				} catch(e) {
+					eFn(e);
+				}
+			};
 			h[1] = eFn;
 			s.add(h);
 		      });
@@ -203,7 +223,7 @@ export class RPC {
 					} else {
 						eFn(new TypeError("invalid type"));
 					}
-				} catch (e) {
+				} catch(e) {
 					eFn(e);
 				}
 			      }, eFn],
