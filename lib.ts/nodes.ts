@@ -540,7 +540,8 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 	}
 	with(target: number, value: T) {
-		const root = this[realTarget].#root;
+		const root = this[realTarget].#root,
+		      toRet: T[] = [];
 
 		if (target < 0) {
 			target += root.l;
@@ -549,8 +550,6 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		if (target < 0 || target >= root.l) {
 			throw RangeError("invalid or out-of-range index");
 		}
-
-		const toRet: T[] = [];
 
 		for (const [index, item] of entries(root)) {
 			toRet.push(index === target ? value : item);

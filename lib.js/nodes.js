@@ -497,7 +497,8 @@ export class NodeArray {
 		}
 	}
 	with(target, value) {
-		const root = this[realTarget].#root;
+		const root = this[realTarget].#root,
+		      toRet = [];
 
 		if (target < 0) {
 			target += root.l;
@@ -506,8 +507,6 @@ export class NodeArray {
 		if (target < 0 || target >= root.l) {
 			throw RangeError("invalid or out-of-range index");
 		}
-
-		const toRet = [];
 
 		for (const [index, item] of entries(root)) {
 			toRet.push(index === target ? value : item);
