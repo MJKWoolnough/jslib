@@ -444,6 +444,15 @@ export class NodeArray {
 		}
 		return removed;
 	}
+	toReversed() {
+		const toRet = [];
+
+		for (const [, item] of entries(this[realTarget].#root, -1, -1)) {
+			toRet.push(item);
+		}
+
+		return toRet;
+	}
 	toSorted(compareFunction) {
 		return Array.from(this.values()).sort(compareFunction);
 	}

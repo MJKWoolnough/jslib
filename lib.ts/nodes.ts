@@ -487,6 +487,15 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return removed;
 	}
+	toReversed() {
+		const toRet: T[] = [];
+
+		for (const [, item] of entries(this[realTarget].#root, -1, -1)) {
+			toRet.push(item);
+		}
+
+		return toRet;
+	}
 	toSorted(compareFunction?: sortFunc<T>) {
 		return Array.from(this.values()).sort(compareFunction);
 	}
