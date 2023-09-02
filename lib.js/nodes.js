@@ -444,6 +444,33 @@ export class NodeArray {
 		}
 		return removed;
 	}
+	toSpliced(start, deleteCount = 0, ...items) {
+		const root = this[realTarget].#root,
+		      toRet = [];
+
+		if (start < 0) {
+			start += root.l;
+		}
+
+		for (let curr = root.n; curr.i; curr = curr.n) {
+			if (toRet.length === start) {
+				if (deleteCount > 0) {
+					deleteCount--;
+
+					continue;
+				}
+
+				toRet.push(...items);
+				items = [];
+			}
+
+			toRet.push(curr.i);
+		}
+
+		toRet.push(...items);
+
+		return toRet;
+	}
 	unshift(element, ...elements) {
 		const root = this[realTarget].#root;
 		let adder = addItemAfter(root, root, element);

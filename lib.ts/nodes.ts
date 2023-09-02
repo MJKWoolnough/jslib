@@ -487,6 +487,33 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return removed;
 	}
+	toSpliced(start: number, deleteCount = 0, ...items: T[]) {
+		const root = this[realTarget].#root,
+		      toRet: T[] = [];
+
+		if (start < 0) {
+			start += root.l;
+		}
+
+		for (let curr = root.n; curr.i; curr = curr.n) {
+			if (toRet.length === start) {
+				if (deleteCount > 0) {
+					deleteCount--;
+
+					continue;
+				}
+
+				toRet.push(...items);
+				items = [];
+			}
+
+			toRet.push(curr.i);
+		}
+
+		toRet.push(...items);
+
+		return toRet;
+	}
 	unshift(element: T, ...elements: T[]) {
 		const root = this[realTarget].#root;
 		let adder = addItemAfter(root, root, element);
