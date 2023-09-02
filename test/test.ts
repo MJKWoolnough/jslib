@@ -5595,6 +5595,29 @@ type Tests = {
 					return removed.length === 2 && removed[0] === items[1] && removed[1] === items[2] && n.length === 3 && n.at(0) === items[0] && n.at(2) === items[4];
 				}
 			},
+			"toSorted": {
+				"no nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div")).toSorted((a, b) => b.num - a.num);
+
+					return n.length === 0;
+				},
+				"many nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items).toSorted((a, b) => b.num - a.num);
+
+					return n.at(0) === items[4] && n.at(1) === items[3] && n.at(2) === items[2] && n.at(3) === items[1] && n.at(4) === items[0];;
+				}
+			},
 			"toSplice": {
 				"no nodes, remove": async () => {
 					type MyNode = {
