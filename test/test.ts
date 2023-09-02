@@ -6543,7 +6543,7 @@ type Tests = {
 				const {text2DOM} = await import("./lib/misc.js"),
 				      d = text2DOM("<div><svg></svg></div>");
 				return d instanceof DocumentFragment && d.firstChild instanceof HTMLDivElement && d.firstChild?.firstChild instanceof SVGSVGElement;
-			},
+			}
 		}
 	},
 	"typeguard.js": {
@@ -6835,7 +6835,7 @@ type Tests = {
 					} catch(e) {
 						return true;
 					}
-				},
+				}
 			}
 		},
 		"Int": {
@@ -6883,7 +6883,7 @@ type Tests = {
 					} catch(e) {
 						return true;
 					}
-				},
+				}
 			}
 		},
 		"BigInt": {
@@ -6931,7 +6931,7 @@ type Tests = {
 					} catch(e) {
 						return true;
 					}
-				},
+				}
 			}
 		},
 		"Symbol": {
@@ -7366,7 +7366,7 @@ type Tests = {
 						return true;
 					}
 				}
-			},
+			}
 		},
 		"Obj": {
 			"return": {
@@ -7477,7 +7477,7 @@ type Tests = {
 					      })));
 
 					return !p({"a": "1"}) && !p({"b": 2});
-				},
+				}
 			},
 			"throws": {
 				"valid": async () => {
@@ -7614,7 +7614,7 @@ type Tests = {
 						return true;
 					}
 				}
-			},
+			}
 		},
 		"Skip": {
 			"returns": {
