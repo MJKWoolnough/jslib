@@ -500,6 +500,25 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 			yield curr.i;
 		}
 	}
+	with(target: number, value: T) {
+		const root = this[realTarget].#root;
+
+		if (target < 0) {
+			target += root.l;
+		}
+
+		if (target < 0 || target >= root.l) {
+			throw RangeError("invalid or out-of-range index");
+		}
+
+		const toRet: T[] = [];
+
+		for (const [index, item] of entries(root)) {
+			toRet.push(index === target ? value : item);
+		}
+
+		return toRet;
+	}
 	*[Symbol.iterator]() {
 		yield* this.values();
 	}

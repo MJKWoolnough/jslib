@@ -457,6 +457,25 @@ export class NodeArray {
 			yield curr.i;
 		}
 	}
+	with(target, value) {
+		const root = this[realTarget].#root;
+
+		if (target < 0) {
+			target += root.l;
+		}
+
+		if (target < 0 || target >= root.l) {
+			throw RangeError("invalid or out-of-range index");
+		}
+
+		const toRet = [];
+
+		for (const [index, item] of entries(root)) {
+			toRet.push(index === target ? value : item);
+		}
+
+		return toRet;
+	}
 	*[Symbol.iterator]() {
 		yield* this.values();
 	}
