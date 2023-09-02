@@ -5660,6 +5660,49 @@ type Tests = {
 					return good === 5;
 				}
 			},
+			"with": {
+				"no nodes": async () => {
+					const {NodeArray, node} = await import("./lib/nodes.js"),
+					      n = new NodeArray(document.createElement("div"));
+					try {
+						// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+						n.with(0, {[node]: document.createElement("div")});
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				},
+				"two nodes": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]),
+					      wa = n.with(0, {num: 3, [node]: document.createElement("span")}),
+					      wb = n.with(1, {num: 4, [node]: document.createElement("span")}),
+					      wc = n.with(-1, {num: 5, [node]: document.createElement("span")});
+
+					try {
+					      n.with(-2, {num: 6, [node]: document.createElement("span")});
+					} catch (e) {
+						if (!(e instanceof RangeError)) {
+							return false;
+						}
+					}
+
+					try {
+					      n.with(2, {num: 6, [node]: document.createElement("span")});
+					} catch (e) {
+						if (!(e instanceof RangeError)) {
+							return false;
+						}
+					}
+
+					return wa[0].num === 3 && wa[1].num === 2 && wb[0].num === 1 && wb[1].num === 4 && wc[0].num === 1 && wc[1].num === 5;
+				}
+			},
 			"index": {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
