@@ -487,6 +487,9 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return removed;
 	}
+	toSorted(compareFunction?: sortFunc<T>) {
+		return Array.from(this.values()).sort(compareFunction);
+	}
 	toSpliced(start: number, deleteCount = 0, ...items: T[]) {
 		const root = this[realTarget].#root,
 		      toRet: T[] = [];

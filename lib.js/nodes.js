@@ -444,6 +444,9 @@ export class NodeArray {
 		}
 		return removed;
 	}
+	toSorted(compareFunction) {
+		return Array.from(this.values()).sort(compareFunction);
+	}
 	toSpliced(start, deleteCount = 0, ...items) {
 		const root = this[realTarget].#root,
 		      toRet = [];
