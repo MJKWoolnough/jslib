@@ -183,6 +183,11 @@ Val = val => asTypeGuard(v => throwOrReturn(v === val, "value")),
  * @return {TypeGuard<any>}
  */
 Any = () => asTypeGuard(_ => true),
+/**
+ * The Unknown function returns a TypeGuard that allows any value, but types to `unknown`.
+ *
+ * @return {TypeGuard<unknown>}
+ */
 Unknown = () => asTypeGuard(_ => true),
 /**
  * The Void function returns a TypeGuard that performs no check as the value is not intended to be used.
