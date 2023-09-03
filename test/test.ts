@@ -5674,7 +5674,7 @@ type Tests = {
 					}
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
-					      n = new NodeArray<MyNode>(document.createElement("div")).toSpliced(0, 0, {[node]: document.createElement("span"), num: 1})
+					      n = new NodeArray<MyNode>(document.createElement("div")).toSpliced(0, 0, {[node]: document.createElement("span"), num: 1});
 
 					return n.length === 1;
 				},
@@ -5704,7 +5704,7 @@ type Tests = {
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 2}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
-					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]).toSpliced(1, 0, items[1])
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]).toSpliced(1, 0, items[1]);
 					return n.length === 2 && n.at(0) === items[0] && n.at(1) === items[1];
 				},
 				"one node, add one before": async () => {
@@ -6635,7 +6635,7 @@ type Tests = {
 					      s = Str();
 
 					try {
-						s.throw(false)
+						s.throw(false);
 
 						return false;
 					} catch(e) {
@@ -7592,7 +7592,7 @@ type Tests = {
 						      "a": Int(),
 						      "b": Str(),
 						      "c": Bool()
-					      }), "a", "b")
+					      }), "a", "b");
 
 					return t({"a": 0, "b": "1", "c": 2});
 				}
@@ -7604,7 +7604,7 @@ type Tests = {
 						      "a": Int(),
 						      "b": Str(),
 						      "c": Bool()
-					      }), "a", "b")
+					      }), "a", "b");
 
 					try{
 						t.throw({});
@@ -7624,7 +7624,7 @@ type Tests = {
 						      "a": Int(),
 						      "b": Str(),
 						      "c": Bool()
-					      }), "a", "b")
+					      }), "a", "b");
 
 					return s({"a": "0", "b": "1", "c": true});
 				}
@@ -7636,7 +7636,7 @@ type Tests = {
 						      "a": Int(),
 						      "b": Str(),
 						      "c": Bool()
-					      }), "a", "b")
+					      }), "a", "b");
 
 					try {
 						s.throw({"a": "0", "b": "1", "c": 2});
@@ -7689,7 +7689,7 @@ type Tests = {
 					try {
 						return o.throw({"a": [{"a": [{"a": []}]}]});
 					} catch(e) {
-						console.log(e)
+						console.log(e);
 
 						return false;
 					}
