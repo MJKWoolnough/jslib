@@ -2324,6 +2324,7 @@ The module exports the following functions:
 | Take        | The Take function takes an existing TypeGuard create by the Obj function and transforms it to only check the keys passed into this function. |
 | Tuple       | The Tuple function returns a TypeGuard that checks for the given types in an array. TypeGuards can be spread to allow for and unknown number of that type (follow the typescript rules for spreads). |
 | Undefined   | The Undefined function returns a TypeGuard that checks for `undefined`. |
+| Unknown     | The Unknown function returns a TypeGuard that allows any value, but types to `unknown`. |
 | Val         | The Val function returns a TypeGuard that checks for a specific value. |
 | Void        | The Void function returns a TypeGuard that performs no check as the value is not intended to be used. |
 
