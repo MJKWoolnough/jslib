@@ -124,7 +124,7 @@ Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === unde
  *
  * @return {TypeGuard<string>}
  */
-Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string")),
+Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), "string", r?.toString()),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *
