@@ -41,7 +41,8 @@ const throwUnknownError = v => {
 		take = tk;
 		skip = s
 	};
-      };
+      },
+      typeStrs = new WeakMap();
 
 /**
  * This type represents a typeguard of the given type.
@@ -56,8 +57,12 @@ const throwUnknownError = v => {
  * @typedef {(v: unknown) => v is T} TypeGuard
  * */
 class STypeGuard extends Function {
-	static from(tg) {
-		return Object.setPrototypeOf(tg, STypeGuard.prototype);
+	static from(tg, typeStr, comment) {
+		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype);
+
+		typeStrs.set(tgFn, typeStr + (comment ? `/* ${comment} */` : ""));
+
+		return tgFn;
 	}
 
 	throw(v) {
@@ -77,7 +82,11 @@ class STypeGuard extends Function {
 	}
 
 	*[Symbol.iterator]() {
-		yield SpreadTypeGuard.from(this);
+		yield SpreadTypeGuard.from<T>(this);
+	}
+
+	toString() {
+		return typeStrs.get(this) ?? "unknown";
 	}
 }
 
@@ -99,7 +108,7 @@ export const
  *
  * @return {TypeGuard<T>} The passed in typeguard, with additional functionality.
  */
-asTypeGuard = tg => STypeGuard.from(tg),
+asTypeGuard = (tg, typeStr = "unknown", comment) => STypeGuard.from(tg, typeStr, comment),
 /**
  * The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against.
  *
