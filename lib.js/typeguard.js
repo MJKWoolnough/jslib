@@ -116,7 +116,7 @@ asTypeGuard = (tg, typeStr = "unknown", comment) => STypeGuard.from(tg, typeStr,
  *
  * @return {TypeGuard<boolean>}
  */
-Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean")),
+Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean"), "boolean", d?.toString()),
 /**
  * The Str function returns a TypeGuard that checks for string values, and takes an optional regex to confirm string format against.
  *
