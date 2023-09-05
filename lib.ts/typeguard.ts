@@ -153,7 +153,7 @@ Opt = <T>(v: TypeGuard<T>) => Or(v, Undefined()),
  *
  * @return {TypeGuard<null>}
  */
-Null = () => asTypeGuard((v: unknown): v is null => throwOrReturn(v === null, "null")),
+Null = () => asTypeGuard((v: unknown): v is null => throwOrReturn(v === null, "null"), "null"),
 /**
  * The Num function returns a TypeGuard that checks for numbers, and takes optional min and max (inclusive) values to range check.
  *
