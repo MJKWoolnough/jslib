@@ -130,7 +130,7 @@ Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefi
  *
  * @return {TypeGuard<undefined>}
  */
-Undefined = () => asTypeGuard(v => throwOrReturn(v === undefined, "undefined")),
+Undefined = () => asTypeGuard(v => throwOrReturn(v === undefined, "undefined"), "undefined"),
 /**
  * The Opt function returns a TypeGuard that checks for both the passed TypeGuard while allowing for it to be undefined.
  *

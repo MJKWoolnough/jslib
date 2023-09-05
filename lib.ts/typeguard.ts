@@ -139,7 +139,7 @@ Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typ
  *
  * @return {TypeGuard<undefined>}
  */
-Undefined = () => asTypeGuard((v: unknown): v is undefined => throwOrReturn(v === undefined, "undefined")),
+Undefined = () => asTypeGuard((v: unknown): v is undefined => throwOrReturn(v === undefined, "undefined"), "undefined"),
 /**
  * The Opt function returns a TypeGuard that checks for both the passed TypeGuard while allowing for it to be undefined.
  *
