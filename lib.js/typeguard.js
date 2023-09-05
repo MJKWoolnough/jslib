@@ -171,7 +171,7 @@ Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGu
  *
  * @return {TypeGuard<bigint>}
  */
-BigInt = (min, max) => asTypeGuard(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint")),
+BigInt = (min, max) => asTypeGuard(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint"), "bigint", min || max ? `${min ? min + " <= " : ""}b${max ? " <= " + max : ""}` : undefined),
 /**
  * The Sym function returns a TypeGuard that checks for symbols.
  *
