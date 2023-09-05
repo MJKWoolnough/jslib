@@ -186,7 +186,7 @@ BigInt = (min?: bigint, max?: bigint) => asTypeGuard((v: unknown): v is bigint =
  *
  * @return {TypeGuard<symbol>}
  */
-Sym = () => asTypeGuard((v: unknown): v is symbol => throwOrReturn(typeof v === "symbol", "symbol")),
+Sym = () => asTypeGuard((v: unknown): v is symbol => throwOrReturn(typeof v === "symbol", "symbol"), "symbol"),
 /**
  * The Val function returns a TypeGuard that checks for a specific value.
  *
