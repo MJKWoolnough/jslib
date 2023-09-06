@@ -60,6 +60,8 @@ class STypeGuard extends Function {
 	static from(tg, typeStr, comment) {
 		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype);
 
+		tgFn[group] = typeStr instanceof Array ? comment : undefined;
+
 		typeStrs.set(tgFn, [typeStr, comment]);
 
 		return tgFn;
@@ -88,7 +90,7 @@ class STypeGuard extends Function {
 	toString() {
 		const [typ, comment] = typeStrs.get(this) ?? ["unknown", undefined];
 
-		return (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : `/* ${comment} */`);
+		return typ instanceof Array ? typ.map(t => this[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : `/* ${comment} */`);
 	}
 }
 

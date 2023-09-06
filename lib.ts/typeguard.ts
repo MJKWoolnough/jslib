@@ -51,7 +51,8 @@ const throwUnknownError = (v: boolean) => {
 		skip = s
 	};
       },
-      typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string), string | undefined]>();
+      typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | TypeGuard<any>[], string | undefined]>(),
+      group = Symbol("group");
 
 /**
  * This type represents a typeguard of the given type.
@@ -66,8 +67,14 @@ const throwUnknownError = (v: boolean) => {
 export type TypeGuard<T> = STypeGuard<T> & ((v: unknown) => v is T);
 
 class STypeGuard<T> extends Function {
-	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string), comment?: string) {
+	[group]?: string;
+
+	static from<T>(tg: (v: unknown) => v is T, typeArr: TypeGuard<any>[], group: string): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string), comment?: string): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string) | TypeGuard<any>[], comment?: string) {
 		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype) as TypeGuard<T>;
+
+		tgFn[group] = typeStr instanceof Array ? comment : undefined;
 
 		typeStrs.set(tgFn, [typeStr, comment]);
 
@@ -94,10 +101,10 @@ class STypeGuard<T> extends Function {
 		yield SpreadTypeGuard.from<T>(this);
 	}
 
-	toString() {
+	toString(): string {
 		const [typ, comment] = typeStrs.get(this) ?? ["unknown", undefined];
 
-		return (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : `/* ${comment} */`);
+		return typ instanceof Array ? typ.map(t => this[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : `/* ${comment} */`);
 	}
 }
 
