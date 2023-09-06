@@ -187,7 +187,7 @@ Sym = () => asTypeGuard(v => throwOrReturn(typeof v === "symbol", "symbol"), "sy
  *
  * @return {TypeGuard<T>}
  */
-Val = val => asTypeGuard(v => throwOrReturn(v === val, "value")),
+Val = val => asTypeGuard(v => throwOrReturn(v === val, "value"), val === "bigint" ? val + "n" : val === undefined ? "undefined" : JSON.stringify(val)),
 /**
  * The Any function returns a TypeGuard that allows any value.
  *

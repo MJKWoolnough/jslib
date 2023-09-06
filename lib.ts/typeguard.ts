@@ -196,7 +196,7 @@ Sym = () => asTypeGuard((v: unknown): v is symbol => throwOrReturn(typeof v === 
  *
  * @return {TypeGuard<T>}
  */
-Val = <const T extends boolean | number | bigint | string | null | undefined>(val: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(v === val, "value")),
+Val = <const T extends boolean | number | bigint | string | null | undefined>(val: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(v === val, "value"), val === "bigint" ? val + "n" : val === undefined ? "undefined" : JSON.stringify(val)),
 /**
  * The Any function returns a TypeGuard that allows any value.
  *
