@@ -208,7 +208,7 @@ Any = () => asTypeGuard((_: unknown): _ is any => true, "any"),
  *
  * @return {TypeGuard<unknown>}
  */
-Unknown = () => asTypeGuard((_: unknown): _ is unknown => true),
+Unknown = () => asTypeGuard((_: unknown): _ is unknown => true, "unknown"),
 /**
  * The Void function returns a TypeGuard that performs no check as the value is not intended to be used.
  *

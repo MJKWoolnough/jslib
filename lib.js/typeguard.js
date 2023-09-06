@@ -199,7 +199,7 @@ Any = () => asTypeGuard(_ => true, "any"),
  *
  * @return {TypeGuard<unknown>}
  */
-Unknown = () => asTypeGuard(_ => true),
+Unknown = () => asTypeGuard(_ => true, "unknown"),
 /**
  * The Void function returns a TypeGuard that performs no check as the value is not intended to be used.
  *
