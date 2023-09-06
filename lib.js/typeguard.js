@@ -60,7 +60,7 @@ class STypeGuard extends Function {
 	static from(tg, typeStr, comment) {
 		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype);
 
-		typeStrs.set(tgFn, typeStr + (comment ? `/* ${comment} */` : ""));
+		typeStrs.set(tgFn, [typeStr, comment]);
 
 		return tgFn;
 	}
@@ -86,7 +86,9 @@ class STypeGuard extends Function {
 	}
 
 	toString() {
-		return typeStrs.get(this) ?? "unknown";
+		const [typ, comment] = typeStrs.get(this) ?? ["unknown", undefined];
+
+		return (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : `/* ${comment} */`);
 	}
 }
 

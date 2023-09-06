@@ -51,7 +51,7 @@ const throwUnknownError = (v: boolean) => {
 		skip = s
 	};
       },
-      typeStrs = new WeakMap<STypeGuard<any>, string>();
+      typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string), string | undefined]>();
 
 /**
  * This type represents a typeguard of the given type.
@@ -66,10 +66,10 @@ const throwUnknownError = (v: boolean) => {
 export type TypeGuard<T> = STypeGuard<T> & ((v: unknown) => v is T);
 
 class STypeGuard<T> extends Function {
-	static from<T>(tg: (v: unknown) => v is T, typeStr: string, comment?: string) {
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string), comment?: string) {
 		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype) as TypeGuard<T>;
 
-		typeStrs.set(tgFn, typeStr + (comment ? `/* ${comment} */` : ""));
+		typeStrs.set(tgFn, [typeStr, comment]);
 
 		return tgFn;
 	}
@@ -95,7 +95,9 @@ class STypeGuard<T> extends Function {
 	}
 
 	toString() {
-		return typeStrs.get(this) ?? "unknown";
+		const [typ, comment] = typeStrs.get(this) ?? ["unknown", undefined];
+
+		return (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : `/* ${comment} */`);
 	}
 }
 
