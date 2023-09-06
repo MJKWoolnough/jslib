@@ -205,7 +205,7 @@ Unknown = () => asTypeGuard(_ => true, "unknown"),
  *
  * @return {TypeGuard<void>}
  */
-Void = () => asTypeGuard(_ => true),
+Void = () => asTypeGuard(_ => true, "void"),
 /**
  * The Arr function returns a TypeGuard that checks for an Array, running the given TypeGuard on each element.
  *
