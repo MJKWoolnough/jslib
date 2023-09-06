@@ -181,9 +181,11 @@ Sym = () => asTypeGuard(v => throwOrReturn(typeof v === "symbol", "symbol"), "sy
 /**
  * The Val function returns a TypeGuard that checks for a specific, primitive value.
  *
- * @param {any} v The value to check against.
+ * @typedef {boolean | number | bigint | string | null | undefined} T
  *
- * @return {TypeGuard<any>}
+ * @param {T} v The value to check against.
+ *
+ * @return {TypeGuard<T>}
  */
 Val = val => asTypeGuard(v => throwOrReturn(v === val, "value")),
 /**
