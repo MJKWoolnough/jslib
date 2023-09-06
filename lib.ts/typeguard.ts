@@ -202,7 +202,7 @@ Val = <const T extends boolean | number | bigint | string | null | undefined>(va
  *
  * @return {TypeGuard<any>}
  */
-Any = () => asTypeGuard((_: unknown): _ is any => true),
+Any = () => asTypeGuard((_: unknown): _ is any => true, "any"),
 /**
  * The Unknown function returns a TypeGuard that allows any value, but types to `unknown`.
  *

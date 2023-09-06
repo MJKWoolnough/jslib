@@ -193,7 +193,7 @@ Val = val => asTypeGuard(v => throwOrReturn(v === val, "value"), val === "bigint
  *
  * @return {TypeGuard<any>}
  */
-Any = () => asTypeGuard(_ => true),
+Any = () => asTypeGuard(_ => true, "any"),
 /**
  * The Unknown function returns a TypeGuard that allows any value, but types to `unknown`.
  *
