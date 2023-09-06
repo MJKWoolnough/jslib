@@ -69,8 +69,6 @@ export type TypeGuard<T> = STypeGuard<T> & ((v: unknown) => v is T);
 class STypeGuard<T> extends Function {
 	[group]?: string;
 
-	static from<T>(tg: (v: unknown) => v is T, typeArr: TypeGuard<any>[], group: string): TypeGuard<T>;
-	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string), comment?: string): TypeGuard<T>;
 	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string) | TypeGuard<any>[], comment?: string) {
 		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype) as TypeGuard<T>;
 
@@ -126,7 +124,7 @@ export const
  *
  * @return {TypeGuard<T>} The passed in typeguard, with additional functionality.
  */
-asTypeGuard = <T>(tg: (v: unknown) => v is T, typeStr = "unknown", comment?: string) => STypeGuard.from(tg, typeStr, comment),
+asTypeGuard = <T>(tg: (v: unknown) => v is T, typeStr: string | (() => string) | TypeGuard<any>[] = "unknown", comment?: string) => STypeGuard.from(tg, typeStr, comment),
 /**
  * The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against.
  *
