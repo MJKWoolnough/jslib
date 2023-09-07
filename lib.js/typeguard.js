@@ -290,6 +290,26 @@ Tuple = (...t) => {
 		}
 
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
+	}, () => {
+		let toRet = "[";
+
+		for (const tg of tgs) {
+			if (toRet.length > 1) {
+				toRet += ", ";
+			}
+
+			toRet += tg + "";
+		}
+
+		if (spread) {
+			if (toRet.length > 1) {
+				toRet += ", ";
+			}
+
+			toRet += spread[group] ? `...(${t})[]` : `...${t}[]`
+		}
+
+		return toRet + "]";
 	});
 },
 /**
