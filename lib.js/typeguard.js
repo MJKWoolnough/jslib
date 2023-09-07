@@ -608,7 +608,7 @@ Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class"), t.name || 
  *
  * @returns {TypeGuard<Function>}
  */
-Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function")),
+Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"), "Function", args?.toString()),
 /**
  * The Forbid function returns a TypeGuard that disallows certain types from an existing type.
  *
