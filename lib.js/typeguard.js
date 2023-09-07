@@ -592,7 +592,7 @@ SetType = t => asTypeGuard(v => {
 	}
 
 	return true;
-}),
+}, () => `Set<${t}>`),
 /**
  * The Class function returns a TypeGuard that checks a value is of the class specified.
  *
