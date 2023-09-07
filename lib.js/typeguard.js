@@ -239,7 +239,7 @@ Arr = t => asTypeGuard(v => {
 	}
 
 	return true;
-}),
+}, () => t[group] ? `(${t})[]` : `${t}[]`),
 /**
  * The Tuple function returns a TypeGuard that checks for the given types in an array.
  *

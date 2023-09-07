@@ -251,7 +251,7 @@ Arr = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Array<T> => {
 	}
 
 	return true;
-}),
+}, () => t[group] ? `(${t})[]` : `${t}[]`),
 /**
  * The Tuple function returns a TypeGuard that checks for the given types in an array.
  *
