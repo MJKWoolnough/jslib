@@ -527,7 +527,7 @@ And = (...tgs) => asTypeGuard(v => {
 	}
 
 	return true;
-}),
+}, tgs, "&"),
 /**
  * The MapType function returns a TypeGuard that checks for an Map type where the keys and values are of the types specified.
  *
