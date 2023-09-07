@@ -499,7 +499,7 @@ Or = (...tgs) => asTypeGuard(v => {
 	}
 
 	return throwOrReturn(false, "OR", "", errs.join(" | "));
-}),
+}, tgs, "|"),
 /**
  * The And function returns a TypeGuard that checks a value matches against all of the given TypeGuards.
  *
