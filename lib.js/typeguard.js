@@ -600,7 +600,7 @@ SetType = t => asTypeGuard(v => {
  *
  * @return {TypeGuard<class>}
  */
-Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class")),
+Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class"), t.name || "unknown"),
 /**
  * The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check.
  *

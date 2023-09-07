@@ -612,7 +612,7 @@ SetType = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Set<T> => {
  *
  * @return {TypeGuard<class>}
  */
-Class = <T extends {new (...args: any): any}>(t: T) => asTypeGuard((v: unknown): v is InstanceType<T> => throwOrReturn(v instanceof t, "class")),
+Class = <T extends {new (...args: any): any}>(t: T) => asTypeGuard((v: unknown): v is InstanceType<T> => throwOrReturn(v instanceof t, "class"), t.name || "unknown"),
 /**
  * The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check.
  *
