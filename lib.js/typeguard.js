@@ -562,7 +562,7 @@ MapType = (key, value) => asTypeGuard(v => {
 	}
 
 	return true;
-}),
+}, () => `Map<${key}, ${value}>`),
 /**
  * The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified.
  *

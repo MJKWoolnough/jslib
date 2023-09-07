@@ -574,7 +574,7 @@ MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V)
 	}
 
 	return true;
-}),
+}, () => `Map<${key}, ${value}>`),
 /**
  * The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified.
  *
