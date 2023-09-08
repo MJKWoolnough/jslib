@@ -132,7 +132,7 @@ asTypeGuard = <T>(tg: (v: unknown) => v is T, typeStr: string | (() => string) |
  *
  * @return {TypeGuard<boolean>}
  */
-Bool = <T extends boolean>(d?: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean"), "boolean", d?.toString()),
+Bool = <T extends boolean>(d?: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean"), d?.toString() ?? "boolean"),
 /**
  * The Str function returns a TypeGuard that checks for string values, and takes an optional regex to confirm string format against.
  *
