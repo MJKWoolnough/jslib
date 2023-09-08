@@ -414,6 +414,14 @@ Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 	} finally {
 		take = null;
 	}
+}, () => {
+	take = keys;
+
+	const str = tg.toString();
+
+	take = null;
+
+	return str;
 }),
 /**
  * The Skip function takes an existing TypeGuard create by the Obj function and transforms it to not check the keys passed into this function.
