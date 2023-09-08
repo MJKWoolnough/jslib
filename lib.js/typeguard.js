@@ -385,6 +385,14 @@ Req = tg => asTypeGuard(v => {
 	} finally {
 		allowUndefined = null;
 	}
+}, () => {
+	allowUndefined ??= false;
+
+	const str = tg.toString();
+
+	allowUndefined = null;
+
+	return str;
 }),
 /**
  * The Take function takes an existing TypeGuard create by the Obj function and transforms it to only check the keys passed into this function.
