@@ -381,6 +381,14 @@ Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in
 	} finally {
 		allowUndefined = null;
 	}
+}, () => {
+	allowUndefined ??= true;
+
+	const str = tg.toString();
+
+	allowUndefined = null;
+
+	return str;
 }),
 /**
  * The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined.
