@@ -451,11 +451,7 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
 	let ttg: TypeGuard<T>;
 	const name = str ?? ""; // need to generate type name here
 
-	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => {
-		typeStrs.set(ttg ??= tg(), [name, undefined]);
-
-		return name;
-	});
+	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => typeStrs.get(ttg ??= tg())![1] = name);
 },
 /**
  * The IntKey function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
