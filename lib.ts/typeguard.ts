@@ -431,6 +431,14 @@ Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 	} finally {
 		skip = null;
 	}
+}, () => {
+	skip = keys;
+
+	const str = tg.toString();
+
+	skip = null;
+
+	return str;
 }),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
