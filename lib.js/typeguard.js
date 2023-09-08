@@ -663,4 +663,4 @@ Forbid = (t, u) => asTypeGuard(v => {
 	}
 
 	return t(v);
-});
+}, () => `Exclude<${t}, ${u}>`);
