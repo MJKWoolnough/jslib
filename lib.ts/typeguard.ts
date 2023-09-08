@@ -439,10 +439,15 @@ Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
  *
  * @return {TypeGuard<any>}
  */
-Recur = <T>(tg: () => TypeGuard<T>) => {
+Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
 	let ttg: TypeGuard<T>;
+	const name = str ?? ""; // need to generate type name here
 
-	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v));
+	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => {
+		typeStrs.set(ttg ??= tg(), [name, undefined]);
+
+		return name;
+	});
 },
 /**
  * The IntKey function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
