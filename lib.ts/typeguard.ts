@@ -140,7 +140,7 @@ Bool = <T extends boolean>(d?: T) => asTypeGuard((v: unknown): v is T => throwOr
  *
  * @return {TypeGuard<string>}
  */
-Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), "string", r?.toString().replace("*/", "*$/")),
+Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), "string"),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *
