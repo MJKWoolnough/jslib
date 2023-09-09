@@ -6822,6 +6822,12 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": async () => {
+				const {Null} = await import("./lib/typeguard.js"),
+				      n = Null();
+
+				return n.toString() === "null";
 			}
 		},
 		"Num": {
