@@ -6732,6 +6732,12 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": async () => {
+				const {Undefined} = await import("./lib/typeguard.js"),
+				      u = Undefined();
+
+				return u.toString() === "undefined";
 			}
 		},
 		"Opt": {
