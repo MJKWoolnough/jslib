@@ -6594,6 +6594,26 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"any": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool();
+
+					return b.toString() === "boolean";
+				},
+				"true": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool(true);
+
+					return b.toString() === "true";
+				},
+				"false": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool(false);
+
+					return b.toString() === "false";
+				}
 			}
 		},
 		"Str": {
