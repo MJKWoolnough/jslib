@@ -102,7 +102,7 @@ class STypeGuard<T> extends Function {
 	toString(): string {
 		const [typ, comment] = typeStrs.get(this) ?? ["unknown", undefined];
 
-		return typ instanceof Array ? typ.map(t => this[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : `/* ${comment} */`);
+		return typ instanceof Array ? typ.map(t => this[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
 	}
 }
 
