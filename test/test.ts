@@ -6876,6 +6876,32 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"any": async () => {
+					const {Num} = await import("./lib/typeguard.js"),
+					      n = Num();
+
+					return n.toString() === "number";
+				},
+				"with min": async () => {
+					const {Num} = await import("./lib/typeguard.js"),
+					      n = Num(0);
+
+					return n.toString() === "number /* 0 <= n */";
+				},
+				"with max": async () => {
+					const {Num} = await import("./lib/typeguard.js"),
+					      n = Num(-Infinity, 0);
+
+					return n.toString() === "number /* n <= 0 */";
+				},
+				"with min and max": async () => {
+					const {Num} = await import("./lib/typeguard.js"),
+					      n = Num(5, 10);
+
+					return n.toString() === "number /* 5 <= n <= 10 */";
+				}
 			}
 		},
 		"Int": {
