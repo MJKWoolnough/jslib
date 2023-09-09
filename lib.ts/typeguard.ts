@@ -365,6 +365,20 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 	}
 
 	return true;
+}, () => {
+	let toRet = "{";
+
+	if (t) {
+		toRet += "\n	";
+
+		for (const [k, tg] of Object.entries(t) as [keyof typeof t, TypeGuard<any>][]) {
+			if (typeof k === "string") {
+				toRet += `\n	${k}: ${tg.toString().replaceAll("\n", "\n	")};`;
+			}
+		}
+	}
+
+	return toRet + "}";
 }),
 /**
  * The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined').

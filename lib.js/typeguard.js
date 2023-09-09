@@ -353,6 +353,20 @@ Obj = t => asTypeGuard(v => {
 	}
 
 	return true;
+}, () => {
+	let toRet = "{";
+
+	if (t) {
+		toRet += "\n	";
+
+		for (const [k, tg] of Object.entries(t)) {
+			if (typeof k === "string") {
+				toRet += `\n	${k}: ${tg.toString().replaceAll("\n", "\n	")};`;
+			}
+		}
+	}
+
+	return toRet + "}";
 }),
 /**
  * The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined').
