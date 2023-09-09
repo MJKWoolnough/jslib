@@ -6682,6 +6682,14 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"any": async () => {
+					const {Str} = await import("./lib/typeguard.js"),
+					      s = Str();
+
+					return s.toString() === "string";
+				}
 			}
 		},
 		"Undefined": {
