@@ -7564,6 +7564,43 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"empty": async () => {
+					const {Obj} = await import("./lib/typeguard.js"),
+					      o = Obj();
+
+					return o.toString() === "{}";
+				},
+				"with fields": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Str()
+					      });
+
+					return o.toString() === "{\n	a: number;\n	b: string;\n}";
+				},
+				"with odd fields": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a b c": Num(),
+						      "b()": Str()
+					      });
+
+					return o.toString() === "{\n	\"a b c\": number;\n	\"b()\": string;\n}";
+				},
+				"with object field": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "child": Obj({
+							      "a b c": Num(),
+							      "b()": Str()
+						      })
+					      });
+
+					return o.toString() === "{\n	child: {\n		\"a b c\": number;\n		\"b()\": string;\n	};\n}";
+				}
 			}
 		},
 		"Part": {
