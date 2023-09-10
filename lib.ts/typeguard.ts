@@ -369,13 +369,13 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 	let toRet = "{";
 
 	if (t) {
-		toRet += "\n	";
-
 		for (const [k, tg] of Object.entries(t) as [keyof typeof t, TypeGuard<any>][]) {
 			if (typeof k === "string") {
 				toRet += `\n	${k}: ${tg.toString().replaceAll("\n", "\n	")};`;
 			}
 		}
+
+		toRet += "\n";
 	}
 
 	return toRet + "}";
