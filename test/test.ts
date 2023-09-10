@@ -8255,7 +8255,7 @@ type Tests = {
 				}
 			}
 		},
-		"Fobid": {
+		"Forbid": {
 			"returns": {
 				"valid": async () => {
 					const {Bool, Forbid, Null, Num, Or, Str} = await import("./lib/typeguard.js"),
