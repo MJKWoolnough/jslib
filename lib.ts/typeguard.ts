@@ -52,7 +52,8 @@ const throwUnknownError = (v: boolean) => {
 	};
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly TypeGuard<any>[], string | undefined]>(),
-      group = Symbol("group");
+      group = Symbol("group"),
+      identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v;
 
 /**
  * This type represents a typeguard of the given type.
@@ -371,7 +372,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 	if (t) {
 		for (const [k, tg] of Object.entries(t) as [keyof typeof t, TypeGuard<any>][]) {
 			if (typeof k === "string") {
-				toRet += `\n	${k}: ${tg.toString().replaceAll("\n", "\n	")};`;
+				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}: ${tg.toString().replaceAll("\n", "\n	")};`;
 			}
 		}
 

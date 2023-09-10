@@ -42,7 +42,8 @@ const throwUnknownError = v => {
 		skip = s
 	};
       },
-      typeStrs = new WeakMap();
+      typeStrs = new WeakMap(),
+      identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v;
 
 /**
  * This type represents a typeguard of the given type.
@@ -359,7 +360,7 @@ Obj = t => asTypeGuard(v => {
 	if (t) {
 		for (const [k, tg] of Object.entries(t)) {
 			if (typeof k === "string") {
-				toRet += `\n	${k}: ${tg.toString().replaceAll("\n", "\n	")};`;
+				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}: ${tg.toString().replaceAll("\n", "\n	")};`;
 			}
 		}
 
