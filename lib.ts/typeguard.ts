@@ -498,6 +498,7 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
  * @return {TypeGuard<`${number}`>}
  */
 IntKey = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntKey"), "`${number}`", "number"),
+BoolKey = () => asTypeGuard((v: unknown): v is `${boolean}` => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolKey"), "string", "boolean"),
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *
