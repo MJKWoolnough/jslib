@@ -485,7 +485,7 @@ Recur = (tg, str) => {
  *
  * @return {TypeGuard<string>}
  */
-IntKey = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntKey"), "string", "number"),
+IntKey = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntKey"), "`${number}`", "number"),
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *

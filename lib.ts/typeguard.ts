@@ -495,9 +495,9 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
 /**
  * The IntKey function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
- * @return {TypeGuard<string>}
+ * @return {TypeGuard<`${number}`>}
  */
-IntKey = () => asTypeGuard((v: unknown): v is string => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntKey"), "string", "number"),
+IntKey = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntKey"), "`${number}`", "number"),
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *
