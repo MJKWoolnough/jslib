@@ -8203,6 +8203,48 @@ type Tests = {
 				}
 			}
 		},
+		"BoolKey": {
+			"returns": {
+				"valid": async () => {
+					const {BoolKey} = await import("./lib/typeguard.js"),
+					      b = BoolKey();
+
+					return b("true") && b("false");
+				},
+				"invalid": async () => {
+					const {BoolKey} = await import("./lib/typeguard.js"),
+					      b = BoolKey();
+
+					return !b(true) && !b(false) && !b("other");
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {BoolKey} = await import("./lib/typeguard.js"),
+					      b = BoolKey();
+
+					try {
+						return b.throw("true");
+					} catch (e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {BoolKey} = await import("./lib/typeguard.js"),
+					      b = BoolKey();
+
+					try {
+						b.throw(true);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
+		},
 		"Function": {
 			"return": {
 				"valid - no specified args": async () => {
