@@ -154,6 +154,14 @@ Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === unde
  * @return {TypeGuard<string>}
  */
 Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), "string"),
+/**
+ * The Tmpl function returns a TypeGuard that checks for template values.
+ *
+ * @param {string} first The Initial string part to match.
+ * @param {(TypeGuard<string> | string)[]} ...s Remaining parts to match, must be an alternating list of TypeGuard<string> and string
+ *
+ * @return {TypeGuard<string>}
+ */
 Tmpl = (first, ...s) => asTypeGuard(v => {
 	if (typeof v !== "string") {
 		return throwOrReturn(false, "Template");
