@@ -2302,6 +2302,7 @@ The module exports the following functions:
 | asTypeGuard | This function gives a custom typeguard additional functionality, such as being able to optionally throw errors, and be spreadable. |
 | BigInt      | The BigInt function returns a TypeGuard that checks for bigints, and takes optional min and max (inclusive) values to range check. |
 | Bool        | The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against. |
+| BoolKey     | The BoolKey function returns a TypeGuard that checks for a string value that represents an boolean. |
 | Class       | The Class function returns a TypeGuard that checks a value is of the class specified. |
 | Forbid      | The Forbid function returns a TypeGuard that disallows certain types from an existing type. |
 | Func        | The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check. |
