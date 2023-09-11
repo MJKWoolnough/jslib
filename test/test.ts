@@ -6692,6 +6692,48 @@ type Tests = {
 				}
 			}
 		},
+		"Tmpl": {
+			"returns": {
+				"valid": async () => {
+					const {Tmpl, IntKey, Str} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntKey(), "def", Str(), "ghi");
+
+					return t("abc0defghi") && t("abc123defsome-stringghi") && t("abc123defghighi");
+				},
+				"invalid": async () => {
+					const {Tmpl, IntKey, Str} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntKey(), "def", Str(), "ghi");
+
+					return !t("") && !t(0) && !t("aabc123defghighi") && !t("abc123defghi1") && !t("abconedefghi");
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {Tmpl, IntKey, Str} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntKey(), "def", Str(), "ghi");
+
+					try {
+						return t.throw("abc0defghi");
+					} catch(e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {Tmpl, IntKey, Str} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntKey(), "def", Str(), "ghi");
+
+					try {
+						t.throw("");
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
+		},
 		"Undefined": {
 			"returns": {
 				"valid": async () => {
