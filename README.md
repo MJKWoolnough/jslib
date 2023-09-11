@@ -2311,6 +2311,7 @@ The module exports the following functions:
 | MapType     | The MapType function returns a TypeGuard that checks for an Map type where the keys and values are of the types specified. |
 | Null        | The Null function returns a TypeGuard that checks for `null`. |
 | Num         | The Num function returns a TypeGuard that checks for numbers, and takes optional min and max (inclusive) values to range check. |
+| NumStr      | The NumStr function returns a TypeGuard that checks for a string value that represents an number. |
 | Obj         | The Obj function returns a TypeGuard that checks for an object type defined by the passed object of TypeGuards. |
 | Opt         | The Opt function returns a TypeGuard that checks for both the passed TypeGuard while allowing for it to be undefined. Equivalent to Or(T, Undefined()). |
 | Or          | The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards. |
