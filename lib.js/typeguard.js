@@ -43,7 +43,31 @@ const throwUnknownError = v => {
 	};
       },
       typeStrs = new WeakMap(),
-      identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v;
+      identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
+      matchTemplate = (v, p) => {
+	const [tg, s, ...rest] = p;
+
+	if (rest.length === 0) {
+		if (v.endsWith(s) && tg(v.slice(0, v.length - s.length))) {
+			return true;
+		}
+
+		return false;
+	}
+
+	for (let pos = 0; pos < v.length - s.length; pos++) {
+		pos = v.indexOf(s, pos);
+		if (pos < 0) {
+			break;
+		}
+
+		if (tg(v.slice(0, pos)) && matchTemplate(v.slice(pos + s.length), rest)) {
+			return true;
+		}
+	}
+
+	return false;
+      };
 
 /**
  * This type represents a typeguard of the given type.
@@ -130,6 +154,17 @@ Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === unde
  * @return {TypeGuard<string>}
  */
 Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), "string"),
+Tmpl = (first, ...s) => asTypeGuard(v => {
+	if (typeof v !== "string") {
+		return throwOrReturn(false, "Template");
+	}
+
+	if (v.startsWith(first) && matchTemplate(v.slice(first.length), s)) {
+		return true;
+	}
+
+	return throwOrReturn(false, "template");
+}),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *

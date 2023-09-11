@@ -16,6 +16,10 @@ type AND<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? TypeGua
 
 type ORVals<T> = T extends readonly [first: infer U, ...rest: infer Rest] ? U | ORVals<Rest> : never;
 
+type Template<S extends string, T> = T extends readonly [first: TypeGuard<string>, second: string, ...rest: infer U] ? Template<`${S}${TypeGuardOf<T[0]>}${T[1]}`, U> : S;
+
+type AltTuple<T> = T extends readonly [tg: infer G, s: infer S, ...rest: infer Rest] ? [G, S] extends [TypeGuard<string>, string] ? readonly [G, S, ...AltTuple<Rest>] : never : readonly [];
+
 let throwErrors = false,
     allowUndefined: boolean | null = null,
     take: (keyof any)[] | null = null,
@@ -53,7 +57,31 @@ const throwUnknownError = (v: boolean) => {
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly TypeGuard<any>[], string | undefined]>(),
       group = Symbol("group"),
-      identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v;
+      identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
+      matchTemplate = (v: string, p: readonly (string | TypeGuard<string>)[]) => {
+	const [tg, s, ...rest] = p as readonly [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]];
+
+	if (rest.length === 0) {
+		if (v.endsWith(s) && tg(v.slice(0, v.length - s.length))) {
+			return true;
+		}
+
+		return false;
+	}
+
+	for (let pos = 0; pos < v.length - s.length; pos++) {
+		pos = v.indexOf(s, pos);
+		if (pos < 0) {
+			break;
+		}
+
+		if (tg(v.slice(0, pos)) && matchTemplate(v.slice(pos + s.length), rest)) {
+			return true;
+		}
+	}
+
+	return false;
+      };
 
 /**
  * This type represents a typeguard of the given type.
@@ -142,6 +170,17 @@ Bool = <T extends boolean>(d?: T) => asTypeGuard((v: unknown): v is T => throwOr
  * @return {TypeGuard<string>}
  */
 Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), "string"),
+Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<string>)[]>(first: S, ...s: T extends AltTuple<T> ? T : never) => asTypeGuard((v: unknown): v is Template<S, T> => {
+	if (typeof v !== "string") {
+		return throwOrReturn(false, "Template");
+	}
+
+	if (v.startsWith(first) && matchTemplate(v.slice(first.length), s)) {
+		return true;
+	}
+
+	return throwOrReturn(false, "template");
+}),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *
@@ -697,3 +736,5 @@ Forbid = <T, U>(t: TypeGuard<T>, u: TypeGuard<U>) => asTypeGuard((v: unknown): v
 
 	return t(v);
 }, () => `Exclude<${t}, ${u}>`);
+
+export const a = Tmpl("abc", IntKey(), "c", Str(), "def");
