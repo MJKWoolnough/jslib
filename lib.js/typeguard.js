@@ -524,17 +524,17 @@ Recur = (tg, str) => {
 	return asTypeGuard(v => (ttg ??= tg())(v), () => typeStrs.get(ttg ??= tg())[1] = name);
 },
 /**
- * The IntKey function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
+ * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
  * @return {TypeGuard<string>}
  */
-IntKey = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntKey"), "`${number}`", "number"),
+IntStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), "`${number}`", "number"),
 /**
- * The BoolKey function returns a TypeGuard that checks for a string value that represents an boolean.
+ * The BoolStr function returns a TypeGuard that checks for a string value that represents an boolean.
  *
  * @return {TypeGuard<`${boolean}`>}
  */
-BoolKey = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolKey"), "string", "boolean"),
+BoolStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), "string", "boolean"),
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *

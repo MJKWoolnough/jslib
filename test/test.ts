@@ -6695,22 +6695,22 @@ type Tests = {
 		"Tmpl": {
 			"returns": {
 				"valid": async () => {
-					const {Tmpl, IntKey, Str} = await import("./lib/typeguard.js"),
-					      t = Tmpl("abc", IntKey(), "def", Str(), "ghi");
+					const {Tmpl, IntStr, Str} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntStr(), "def", Str(), "ghi");
 
 					return t("abc0defghi") && t("abc123defsome-stringghi") && t("abc123defghighi");
 				},
 				"invalid": async () => {
-					const {Tmpl, IntKey, Str} = await import("./lib/typeguard.js"),
-					      t = Tmpl("abc", IntKey(), "def", Str(), "ghi");
+					const {Tmpl, IntStr, Str} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntStr(), "def", Str(), "ghi");
 
 					return !t("") && !t(0) && !t("aabc123defghighi") && !t("abc123defghi1") && !t("abconedefghi");
 				}
 			},
 			"throws": {
 				"valid": async () => {
-					const {Tmpl, IntKey, Str} = await import("./lib/typeguard.js"),
-					      t = Tmpl("abc", IntKey(), "def", Str(), "ghi");
+					const {Tmpl, IntStr, Str} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntStr(), "def", Str(), "ghi");
 
 					try {
 						return t.throw("abc0defghi");
@@ -6721,8 +6721,8 @@ type Tests = {
 					}
 				},
 				"invalid": async () => {
-					const {Tmpl, IntKey, Str} = await import("./lib/typeguard.js"),
-					      t = Tmpl("abc", IntKey(), "def", Str(), "ghi");
+					const {Tmpl, IntStr, Str} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntStr(), "def", Str(), "ghi");
 
 					try {
 						t.throw("");
@@ -7972,14 +7972,14 @@ type Tests = {
 					return !r({"": 1}) && !r({"a": 2, [Symbol("b")]: 3});
 				},
 				"valid - Int key": async () => {
-					const {IntKey, Rec, Str} = await import("./lib/typeguard.js"),
-					      r = Rec(IntKey(), Str());
+					const {IntStr, Rec, Str} = await import("./lib/typeguard.js"),
+					      r = Rec(IntStr(), Str());
 
 					return r({}) && r({"1": "abc"}) && r({"2": "def", "3": "ghi"});
 				},
 				"invalid - Int key": async () => {
-					const {IntKey, Rec, Str} = await import("./lib/typeguard.js"),
-					      r = Rec(IntKey(), Str());
+					const {IntStr, Rec, Str} = await import("./lib/typeguard.js"),
+					      r = Rec(IntStr(), Str());
 
 					return !r({"": 1}) && !r({"1.1": 2, "1": 3}) && !r({"a": 4, "1": 5});
 				}
@@ -8203,25 +8203,25 @@ type Tests = {
 				}
 			}
 		},
-		"IntKey": {
+		"IntStr": {
 			"returns": {
 				"valid": async () => {
-					const {IntKey} = await import("./lib/typeguard.js"),
-					      i = IntKey();
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr();
 
 					return i("0") && i("1") && i("99999999");
 				},
 				"invalid": async () => {
-					const {IntKey} = await import("./lib/typeguard.js"),
-					      i = IntKey();
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr();
 
 					return !i(0) && !i(1) && !i(true);
 				}
 			},
 			"throws": {
 				"valid": async () => {
-					const {IntKey} = await import("./lib/typeguard.js"),
-					      i = IntKey();
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr();
 
 					try {
 						return i.throw("1");
@@ -8232,8 +8232,8 @@ type Tests = {
 					}
 				},
 				"invalid": async () => {
-					const {IntKey} = await import("./lib/typeguard.js"),
-					      i = IntKey();
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr();
 
 					try {
 						i.throw(0);
@@ -8245,25 +8245,25 @@ type Tests = {
 				}
 			}
 		},
-		"BoolKey": {
+		"BoolStr": {
 			"returns": {
 				"valid": async () => {
-					const {BoolKey} = await import("./lib/typeguard.js"),
-					      b = BoolKey();
+					const {BoolStr} = await import("./lib/typeguard.js"),
+					      b = BoolStr();
 
 					return b("true") && b("false");
 				},
 				"invalid": async () => {
-					const {BoolKey} = await import("./lib/typeguard.js"),
-					      b = BoolKey();
+					const {BoolStr} = await import("./lib/typeguard.js"),
+					      b = BoolStr();
 
 					return !b(true) && !b(false) && !b("other");
 				}
 			},
 			"throws": {
 				"valid": async () => {
-					const {BoolKey} = await import("./lib/typeguard.js"),
-					      b = BoolKey();
+					const {BoolStr} = await import("./lib/typeguard.js"),
+					      b = BoolStr();
 
 					try {
 						return b.throw("true");
@@ -8274,8 +8274,8 @@ type Tests = {
 					}
 				},
 				"invalid": async () => {
-					const {BoolKey} = await import("./lib/typeguard.js"),
-					      b = BoolKey();
+					const {BoolStr} = await import("./lib/typeguard.js"),
+					      b = BoolStr();
 
 					try {
 						b.throw(true);
