@@ -523,6 +523,7 @@ Recur = (tg, str) => {
 
 	return asTypeGuard(v => (ttg ??= tg())(v), () => typeStrs.get(ttg ??= tg())[1] = name);
 },
+NumStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), "`${number}`", "number"),
 /**
  * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
