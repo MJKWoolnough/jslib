@@ -8203,6 +8203,48 @@ type Tests = {
 				}
 			}
 		},
+		"NumStr": {
+			"returns": {
+				"valid": async () => {
+					const {NumStr} = await import("./lib/typeguard.js"),
+					      n = NumStr();
+
+					return n("0") && n("1.1") && n("-1.23") && n("Infinity") && n("-Infinity");
+				},
+				"invalid": async () => {
+					const {NumStr} = await import("./lib/typeguard.js"),
+					      n = NumStr();
+
+					return !n(0) && !n(1) && !n(true);
+				}
+			},
+			"throws": {
+				"valid": async () => {
+					const {NumStr} = await import("./lib/typeguard.js"),
+					      n = NumStr();
+
+					try {
+						return n.throw("1.111");
+					} catch (e) {
+						console.log(e);
+
+						return false;
+					}
+				},
+				"invalid": async () => {
+					const {NumStr} = await import("./lib/typeguard.js"),
+					      n = NumStr();
+
+					try {
+						n.throw(0);
+
+						return false;
+					} catch(e) {
+						return true;
+					}
+				}
+			}
+		},
 		"IntStr": {
 			"returns": {
 				"valid": async () => {
