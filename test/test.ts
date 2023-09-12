@@ -7642,6 +7642,12 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": async () => {
+				const {Class} = await import("./lib/typeguard.js"),
+				      c = Class(HTMLElement);
+
+				return c.toString() === "HTMLElement";
 			}
 		},
 		"Obj": {
