@@ -6732,6 +6732,32 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"empty": async () => {
+					const {Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("");
+
+					return t.toString() === "``";
+				},
+				"simple": async () => {
+					const {Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc");
+
+					return t.toString() === "`abc`";
+				},
+				"with params": async () => {
+					const {IntStr, Str, Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntStr(), "def", Str(), "g$hi");
+
+					return t.toString() === "`abc${number}def${string}g\\$hi`";
+				},
+				"with templates": async () => {
+					const {IntStr, Str, Tmpl, Val} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntStr(), "def", Tmpl("123", Str(), "456", Val("!!"), "---"), "g$hi");
+
+					return t.toString() === "`abc${number}def123${string}456!!---g\\$hi`";
+				}
 			}
 		},
 		"Undefined": {
