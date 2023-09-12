@@ -528,19 +528,19 @@ Recur = (tg, str) => {
  *
  * @return {TypeGuard<`${number}`>}
  */
-NumStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), "`${number}`", "number"),
+NumStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), "`${number}`"),
 /**
  * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
  * @return {TypeGuard<string>}
  */
-IntStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), "`${number}`", "number"),
+IntStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), "`${number}`"),
 /**
  * The BoolStr function returns a TypeGuard that checks for a string value that represents an boolean.
  *
  * @return {TypeGuard<`${boolean}`>}
  */
-BoolStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), "string", "boolean"),
+BoolStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), "`${boolean}`"),
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *
