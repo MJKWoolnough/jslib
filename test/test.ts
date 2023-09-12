@@ -7286,6 +7286,44 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"string": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val("abc");
+
+					return v.toString() === `"abc"`;
+				},
+				"number": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(123);
+
+					return v.toString() === `123`;
+				},
+				"boolean": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(true);
+
+					return v.toString() === `true`;
+				},
+				"bigint": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(1024n);
+
+					return v.toString() === `1024n`;
+				},
+				"null": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(null);
+
+					return v.toString() === `null`;
+				},
+				"undefined": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(undefined);
+
+					return v.toString() === `undefined`;
+				}
 			}
 		},
 		"Any": {
