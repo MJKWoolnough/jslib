@@ -7402,6 +7402,12 @@ type Tests = {
 						return false;
 					}
 				}
+			},
+			"toString": async () => {
+				const {Void} = await import("./lib/typeguard.js"),
+				      v = Void();
+
+				return v.toString() === "void";
 			}
 		},
 		"Arr": {
