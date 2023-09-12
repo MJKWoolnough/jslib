@@ -188,7 +188,30 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 	}
 
 	return throwOrReturn(false, "template");
-}),
+}
+	, (() => {
+	let toRet = "`" + first,
+	    rest = s as unknown as (string | TypeGuard<string>)[];
+
+	while (rest.length) {
+		const [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]],
+		      tgs = tg.toString();
+
+		rest = r;
+
+		if (tgs.startsWith("`")) {
+			toRet += tgs.slice(1, -1);
+		} else if (tgs.startsWith(`"`)) {
+			toRet += JSON.parse(tgs).replaceAll("$", "\\$");
+		} else {
+			toRet += "${" + tgs.replaceAll("$", "\\$") + "}";
+		}
+
+		toRet += s.replaceAll("$", "\\$");
+	}
+
+	return toRet + "`";
+})()),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *

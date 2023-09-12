@@ -172,7 +172,29 @@ Tmpl = (first, ...s) => asTypeGuard(v => {
 	}
 
 	return throwOrReturn(false, "template");
-}),
+}, (() => {
+	let toRet = "`" + first,
+	    rest = s;
+
+	while (rest.length) {
+		const [tg, s, ...r] = rest,
+		      tgs = tg.toString();
+
+		rest = r;
+
+		if (tgs.startsWith("`")) {
+			toRet += tgs.slice(1, -1);
+		} else if (tgs.startsWith(`"`)) {
+			toRet += JSON.parse(tgs).replaceAll("$", "\\$");
+		} else {
+			toRet += "${" + tgs.replaceAll("$", "\\$") + "}";
+		}
+
+		toRet += s.replaceAll("$", "\\$");
+	}
+
+	return toRet + "`";
+})()),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *
