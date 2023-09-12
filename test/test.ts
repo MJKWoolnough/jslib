@@ -7374,6 +7374,12 @@ type Tests = {
 						return false;
 					}
 				}
+			},
+			"toString": async () => {
+				const {Unknown} = await import("./lib/typeguard.js"),
+				      u = Unknown();
+
+				return u.toString() === "unknown";
 			}
 		},
 		"Void": {
