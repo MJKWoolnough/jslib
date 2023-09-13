@@ -8121,6 +8121,22 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"simple": async () => {
+					const {Bool, IntStr, Rec} = await import("./lib/typeguard.js"),
+					      r = Rec(IntStr(), Bool());
+
+					return r.toString() === "Record<`${number}`, boolean>";
+				},
+				"complex": async () => {
+					const {BoolStr, Int, Obj, Rec, Val} = await import("./lib/typeguard.js"),
+					      r = Rec(BoolStr(), Rec(Val("abc"), Obj({
+						      a: Int(0, 255)
+					      })));
+
+					return r.toString() === "Record<`${boolean}`, Record<\"abc\", {\n	a: number /* 0 <= n <= 255 */;\n}>>";
+				}
 			}
 		},
 		"Or": {
