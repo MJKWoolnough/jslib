@@ -8235,6 +8235,20 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"simple": async () => {
+					const {And, Bool, Num} = await import("./lib/typeguard.js"),
+					      a = And(Bool(), Num());
+
+					return a.toString() === "boolean & number";
+				},
+				"complex": async () => {
+					const {And, Bool, BoolStr, IntStr, Num, Or} = await import("./lib/typeguard.js"),
+					      a = And(Bool(), Num(), Or(BoolStr(), IntStr()));
+
+					return a.toString() === "boolean & number & (`${boolean}` | `${number}`)";
+				}
 			}
 		},
 		"MapType": {
