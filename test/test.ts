@@ -7486,6 +7486,26 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"simple": async () => {
+					const {Arr, Bool} = await import("./lib/typeguard.js"),
+					      a = Arr(Bool());
+
+					return a.toString() === "boolean[]";
+				},
+				"with comment": async () => {
+					const {Arr, Int} = await import("./lib/typeguard.js"),
+					      a = Arr(Int(0));
+
+					return a.toString() === "number /* 0 <= n */[]";
+				},
+				"complex": async () => {
+					const {Arr, Bool, Int, Or} = await import("./lib/typeguard.js"),
+					      a = Arr(Or(Int(0, 255), Arr(Bool())));
+
+					return a.toString() === "(number /* 0 <= n <= 255 */ | boolean[])[]";
+				}
 			}
 		},
 		"Tuple": {
