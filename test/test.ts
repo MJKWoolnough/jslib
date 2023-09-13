@@ -8291,6 +8291,22 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"simple": async () => {
+					const {Bool, Int, MapType} = await import("./lib/typeguard.js"),
+					      m = MapType(Int(), Bool());
+
+					return m.toString() === "Map<number, boolean>";
+				},
+				"complex": async () => {
+					const {Bool, Int, Obj, MapType, Val} = await import("./lib/typeguard.js"),
+					      m = MapType(Bool(), MapType(Val("abc"), Obj({
+						      a: Int(0, 255)
+					      })));
+
+					return m.toString() === "Map<boolean, Map<\"abc\", {\n	a: number /* 0 <= n <= 255 */;\n}>>";
+				}
 			}
 		},
 		"SetType": {
