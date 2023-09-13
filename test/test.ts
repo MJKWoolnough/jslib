@@ -8349,6 +8349,22 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"simple": async () => {
+					const {Bool, SetType} = await import("./lib/typeguard.js"),
+					      s = SetType(Bool());
+
+					return s.toString() === "Set<boolean>";
+				},
+				"complex": async () => {
+					const {Int, Obj, SetType} = await import("./lib/typeguard.js"),
+					      s = SetType(SetType(Obj({
+						      a: Int(0, 255)
+					      })));
+
+					return s.toString() === "Set<Set<{\n	a: number /* 0 <= n <= 255 */;\n}>>";
+				}
 			}
 		},
 		"NumStr": {
