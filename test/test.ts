@@ -8587,6 +8587,20 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"simple": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func();
+
+					return f.toString() === "Function";
+				},
+				"complex": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func(2);
+
+					return f.toString() === "Function /* 2 */";
+				}
 			}
 		},
 		"Forbid": {
