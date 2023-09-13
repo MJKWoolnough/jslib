@@ -8503,6 +8503,12 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": async () => {
+				const {BoolStr} = await import("./lib/typeguard.js"),
+				      b = BoolStr();
+
+				return b.toString() === "`${boolean}`";
 			}
 		},
 		"Function": {
