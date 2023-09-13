@@ -8179,6 +8179,20 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"simple": async () => {
+					const {Bool, Num, Or} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num());
+
+					return o.toString() === "boolean | number";
+				},
+				"complex": async () => {
+					const {Bool, BoolStr, IntStr, Num, Or} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num(), Or(BoolStr(), IntStr()));
+
+					return o.toString() === "boolean | number | `${boolean}` | `${number}`";
+				}
 			}
 		},
 		"And": {
