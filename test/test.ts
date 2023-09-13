@@ -8455,6 +8455,12 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": async () => {
+				const {IntStr} = await import("./lib/typeguard.js"),
+				      i = IntStr();
+
+				return i.toString() === "`${number}`";
 			}
 		},
 		"BoolStr": {
