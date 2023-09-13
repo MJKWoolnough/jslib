@@ -8407,6 +8407,12 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": async () => {
+				const {NumStr} = await import("./lib/typeguard.js"),
+				      n = NumStr();
+
+				return n.toString() === "`${number}`";
 			}
 		},
 		"IntStr": {
