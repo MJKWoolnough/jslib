@@ -7653,6 +7653,33 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"empty": async () => {
+					const {Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple();
+
+					return t.toString() === "[]";
+				},
+				"single element": async () => {
+					const {Int, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Int());
+
+					return t.toString() === "[number]";
+				},
+				"multiple elements": async () => {
+					const {Int, Tuple, Str} = await import("./lib/typeguard.js"),
+					      t = Tuple(Int(), Str());
+
+					return t.toString() === "[number, string]";
+				},
+				"tuples within tuples": async () => {
+					const {Int, Tuple, Str} = await import("./lib/typeguard.js"),
+					      t = Tuple(Int(), Str()),
+					      u = Tuple(t, t);
+
+					return u.toString() === "[[number, string], [number, string]]";
+				}
 			}
 		},
 		"Class": {
