@@ -6757,6 +6757,18 @@ type Tests = {
 					      t = Tmpl("abc", IntStr(), "def", Tmpl("123", Str(), "456", Val("!!"), "---"), "g$hi");
 
 					return t.toString() === "`abc${number}def123${string}456!!---g\\$hi`";
+				},
+				"collapse adjacent strings": async () => {
+					const {Str, Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("beginning", Str(), "", Str(), "end");
+
+					return t.toString() === "`beginning${string}end`";
+				},
+				"collapse multiple adjacent strings": async () => {
+					const {Str, Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("beginning", Str(), "", Str(), "", Str(), "middle", Str(), "", Str(), "", Str(), "", Str(), "end");
+
+					return t.toString() === "`beginning${string}middle${string}end`";
 				}
 			}
 		},
