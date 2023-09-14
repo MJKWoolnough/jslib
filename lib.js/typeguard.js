@@ -173,6 +173,10 @@ Tmpl = (first, ...s) => asTypeGuard(v => {
 
 	return throwOrReturn(false, "template");
 }, (() => {
+	if (s.length === 0) {
+		return JSON.stringify(first);
+	}
+
 	let toRet = "`" + first,
 	    rest = s;
 
