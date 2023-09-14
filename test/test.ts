@@ -6769,6 +6769,16 @@ type Tests = {
 					      t = Tmpl("beginning", Str(), "", Str(), "", Str(), "middle", Str(), "", Str(), "", Str(), "", Str(), "end");
 
 					return t.toString() === "`beginning${string}middle${string}end`";
+				},
+				"reduce to simple `string` if possible": async () => {
+					const {Str, Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("", Str(), ""),
+					      t2 = Tmpl("", Str(), "", Str(), ""),
+					      t3 = Tmpl("", Str(), "", Str(), "", Str(), "");
+
+					console.log(t.toString(), t2.toString(), t3.toString());
+
+					return t.toString() === "string" && t2.toString() === "string" && t3.toString() === "string";
 				}
 			}
 		},
