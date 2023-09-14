@@ -6870,6 +6870,13 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": async () => {
+				const {Int, Opt, Str} = await import("./lib/typeguard.js"),
+				      o = Opt(Int()),
+				      o2 = Opt(Str());
+
+				return o.toString() === "number | undefined" && o2.toString() === "string | undefined";
 			}
 		},
 		"Null": {
