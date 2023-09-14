@@ -217,6 +217,10 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 		toRet = toRet.replaceAll("${string}${string}", "${string}");
 	}
 
+	if (toRet === "`${string}") {
+		return "string";
+	}
+
 	return toRet + "`";
 })()),
 /**

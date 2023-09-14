@@ -200,6 +200,10 @@ Tmpl = (first, ...s) => asTypeGuard(v => {
 		toRet = toRet.replaceAll("${string}${string}", "${string}");
 	}
 
+	if (toRet === "`${string}") {
+		return "string";
+	}
+
 	return toRet + "`";
 })()),
 /**
