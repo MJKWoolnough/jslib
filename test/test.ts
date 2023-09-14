@@ -7199,6 +7199,12 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": async () => {
+				const {Sym} = await import("./lib/typeguard.js"),
+				      s = Sym();
+
+				return s.toString() === "symbol";
 			}
 		},
 		"Val": {
