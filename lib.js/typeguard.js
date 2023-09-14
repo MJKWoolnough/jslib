@@ -193,6 +193,13 @@ Tmpl = (first, ...s) => asTypeGuard(v => {
 		toRet += s.replaceAll("$", "\\$");
 	}
 
+	let last = "";
+
+	while (last !== toRet) {
+		last = toRet;
+		toRet = toRet.replaceAll("${string}${string}", "${string}");
+	}
+
 	return toRet + "`";
 })()),
 /**
