@@ -7159,7 +7159,7 @@ type Tests = {
 				}
 			}
 		},
-		"Symbol": {
+		"Sym": {
 			"returns": {
 				"valid": async () => {
 					const {Sym} = await import("./lib/typeguard.js"),
