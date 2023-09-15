@@ -6750,13 +6750,13 @@ type Tests = {
 					const {IntStr, Str, Tmpl} = await import("./lib/typeguard.js"),
 					      t = Tmpl("abc", IntStr(), "def", Str(), "g$hi");
 
-					return t.toString() === "`abc${number}def${string}g\\$hi`";
+					return t.toString() === "`abc${number}def${string}g$hi`";
 				},
 				"with templates": async () => {
 					const {IntStr, Str, Tmpl, Val} = await import("./lib/typeguard.js"),
 					      t = Tmpl("abc", IntStr(), "def", Tmpl("123", Str(), "456", Val("!!"), "---"), "g$hi");
 
-					return t.toString() === "`abc${number}def123${string}456!!---g\\$hi`";
+					return t.toString() === "`abc${number}def123${string}456!!---g$hi`";
 				},
 				"collapse adjacent strings": async () => {
 					const {Str, Tmpl} = await import("./lib/typeguard.js"),
