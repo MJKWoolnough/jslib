@@ -67,7 +67,8 @@ const throwUnknownError = v => {
 	}
 
 	return false;
-      };
+      },
+      stringCollapse = /([^\\])\$\{string\}\$\{string\}/g;
 
 /**
  * This type represents a typeguard of the given type.
@@ -228,7 +229,7 @@ Tmpl = (first, ...s) => asTypeGuard(v => {
 		toRet += s.replaceAll("${", "\\${");
 	}
 
-	for (let last = ""; last !== toRet; toRet = toRet.replaceAll(/([^\\])\$\{string\}\$\{string\}/g, "$1${string}")) {
+	for (let last = ""; last !== toRet; toRet = toRet.replaceAll(stringCollapse, "$1${string}")) {
 		last = toRet;
 	}
 
