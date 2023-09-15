@@ -245,7 +245,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 		toRet += s.replaceAll("${", "\\${");
 	}
 
-	for (let last = ""; last !== toRet; toRet = toRet.replaceAll("${string}${string}", "${string}")) {
+	for (let last = ""; last !== toRet; toRet = toRet.replaceAll(/([^\\])\$\{string\}\$\{string\}/g, "$1${string}")) {
 		last = toRet;
 	}
 

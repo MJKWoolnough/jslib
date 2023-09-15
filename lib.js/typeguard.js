@@ -228,7 +228,7 @@ Tmpl = (first, ...s) => asTypeGuard(v => {
 		toRet += s.replaceAll("${", "\\${");
 	}
 
-	for (let last = ""; last !== toRet; toRet = toRet.replaceAll("${string}${string}", "${string}")) {
+	for (let last = ""; last !== toRet; toRet = toRet.replaceAll(/([^\\])\$\{string\}\$\{string\}/g, "$1${string}")) {
 		last = toRet;
 	}
 
