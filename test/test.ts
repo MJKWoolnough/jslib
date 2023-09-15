@@ -6783,6 +6783,12 @@ type Tests = {
 					      t = Tmpl("abc", Val("${not a type}"), "def", IntStr(), "ghi");
 
 					return t.toString() === "`abc\\${not a type}def${number}ghi`";
+				},
+				"with ${ in a Val, but now a string": async () => {
+					const {Tmpl, Val} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", Val("${not a type}"), "def");
+
+					return t.toString() === "\"abc${not a type}def\"";
 				}
 			}
 		},
