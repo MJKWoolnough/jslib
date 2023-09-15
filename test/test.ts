@@ -6738,13 +6738,13 @@ type Tests = {
 					const {Tmpl} = await import("./lib/typeguard.js"),
 					      t = Tmpl("");
 
-					return t.toString() === "``";
+					return t.toString() === `""`;
 				},
 				"simple": async () => {
 					const {Tmpl} = await import("./lib/typeguard.js"),
 					      t = Tmpl("abc");
 
-					return t.toString() === "`abc`";
+					return t.toString() === `"abc"`;
 				},
 				"with params": async () => {
 					const {IntStr, Str, Tmpl} = await import("./lib/typeguard.js"),
