@@ -6777,6 +6777,12 @@ type Tests = {
 					      t3 = Tmpl("", Str(), "", Str(), "", Str(), "");
 
 					return t.toString() === "string" && t2.toString() === "string" && t3.toString() === "string";
+				},
+				"with ${ in a Val, but still a template": async () => {
+					const {IntStr, Tmpl, Val} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", Val("${not a type}"), "def", IntStr(), "ghi");
+
+					return t.toString() === "`abc\\${not a type}def${number}ghi`";
 				}
 			}
 		},
