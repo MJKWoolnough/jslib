@@ -195,11 +195,42 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 	}
 
 	let toRet = "`" + first,
-	    rest = s as unknown as (string | TypeGuard<string>)[];
+	    rest = s as unknown as (string | TypeGuard<string>)[],
+	    allStrings = true;
+
+	const vals: string[] = [];
 
 	while (rest.length) {
 		const [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]],
-		      tgs = tg.toString();
+		      tgStr = tg.toString();
+
+		rest = r;
+
+		if (!tgStr.startsWith(`"`)) {
+			allStrings = false;
+		}
+
+		vals.push(tgStr, s);
+	}
+
+	rest = vals;
+
+	if (allStrings) {
+		toRet = first;
+
+		while (rest.length) {
+			const [tgs, s, ...r] = rest as string[];
+
+			rest = r;
+
+			toRet += JSON.parse(tgs) + s;
+		}
+
+		return JSON.stringify(toRet);
+	}
+
+	while (rest.length) {
+		const [tgs, s, ...r] = rest as string[];
 
 		rest = r;
 

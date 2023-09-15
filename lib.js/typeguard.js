@@ -178,11 +178,42 @@ Tmpl = (first, ...s) => asTypeGuard(v => {
 	}
 
 	let toRet = "`" + first,
-	    rest = s;
+	    rest = s,
+	    allStrings = true;
+
+	const vals = [];
 
 	while (rest.length) {
 		const [tg, s, ...r] = rest,
-		      tgs = tg.toString();
+		      tgStr = tg.toString();
+
+		rest = r;
+
+		if (!tgStr.startsWith(`"`)) {
+			allStrings = false;
+		}
+
+		vals.push(tgStr, s);
+	}
+
+	rest = vals;
+
+	if (allStrings) {
+		toRet = first;
+
+		while (rest.length) {
+			const [tgs, s, ...r] = rest;
+
+			rest = r;
+
+			toRet += JSON.parse(tgs) + s;
+		}
+
+		return JSON.stringify(toRet);
+	}
+
+	while (rest.length) {
+		const [tgs, s, ...r] = rest;
 
 		rest = r;
 
