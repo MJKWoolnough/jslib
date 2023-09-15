@@ -189,12 +189,12 @@ Tmpl = (first, ...s) => asTypeGuard(v => {
 		if (tgs.startsWith("`")) {
 			toRet += tgs.slice(1, -1);
 		} else if (tgs.startsWith(`"`)) {
-			toRet += JSON.parse(tgs).replaceAll("$", "\\$");
+			toRet += JSON.parse(tgs).replaceAll("${", "\\${");
 		} else {
 			toRet += "${" + tgs.replaceAll("$", "\\$") + "}";
 		}
 
-		toRet += s.replaceAll("$", "\\$");
+		toRet += s.replaceAll("${", "\\${");
 	}
 
 	for (let last = ""; last !== toRet; toRet = toRet.replaceAll("${string}${string}", "${string}")) {
