@@ -214,11 +214,8 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 		toRet += s.replaceAll("$", "\\$");
 	}
 
-	let last = "";
-
-	while (last !== toRet) {
+	for (let last = ""; last !== toRet; toRet = toRet.replaceAll("${string}${string}", "${string}")) {
 		last = toRet;
-		toRet = toRet.replaceAll("${string}${string}", "${string}");
 	}
 
 	if (toRet === "`${string}") {
