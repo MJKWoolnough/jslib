@@ -7862,6 +7862,24 @@ type Tests = {
 					      });
 
 					return o.toString() === "{\n	child: {\n		\"a b c\": number;\n		\"b()\": string;\n	};\n}";
+				},
+				"with undefined field": async () => {
+					const {Num, Obj, Undefined} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Undefined()
+					      });
+
+					return o.toString() === "{\n	a: number;\n	b?: undefined;\n}";
+				},
+				"with optional field": async () => {
+					const {Num, Obj, Opt, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Opt(Str())
+					      });
+
+					return o.toString() === "{\n	a: number;\n	b?: string | undefined;\n}";
 				}
 			}
 		},
