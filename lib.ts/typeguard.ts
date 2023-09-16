@@ -82,7 +82,30 @@ const throwUnknownError = (v: boolean) => {
 
 	return false;
       },
-      stringCollapse = /([^\\])\$\{string\}\$\{string\}/g;
+      stringCollapse = /([^\\])\$\{string\}\$\{string\}/g,
+      getType = (tg: STypeGuard<any>) => {
+	const t = typeStrs.get(tg) ?? ["unknown", undefined];
+
+	if (t[0] instanceof Array) {
+		const arr: TypeGuard<any>[] = [];
+
+		for (const g of t[0]) {
+			if (g[group] === tg[group]) {
+				const [h] = getType(g) as [TypeGuard<any>[], string | undefined];
+
+				for (const i of h) {
+					arr.push(i);
+				}
+			} else {
+				arr.push(g);
+			}
+		}
+
+		t[0] = arr;
+	}
+
+	return t;
+      };
 
 /**
  * This type represents a typeguard of the given type.
@@ -130,9 +153,9 @@ class STypeGuard<T> extends Function {
 	}
 
 	toString(): string {
-		const [typ, comment] = typeStrs.get(this) ?? ["unknown", undefined];
+		const [typ, comment] = getType(this);
 
-		return typ instanceof Array ? typ.map(t => this[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
+		return typ instanceof Array ? typ.map(t => this[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
 	}
 }
 
