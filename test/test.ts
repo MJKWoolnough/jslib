@@ -7953,7 +7953,16 @@ type Tests = {
 						return true;
 					}
 				}
-			}
+			},
+			"toString": async () => {
+				const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
+				      p = Part(Obj({
+					      "a": Num(),
+					      "b": Str()
+				      }));
+
+				return p.toString() === "{\n	a?: number;\n	b?: string;\n}";
+			},
 		},
 		"Req": {
 			"returns": {
