@@ -494,7 +494,7 @@ Obj = t => asTypeGuard(v => {
 		for (const [k, tg] of Object.entries(t)) {
 			if (typeof k === "string") {
 				const s = getType(tg),
-				      hasUndefined = tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined";
+				      hasUndefined = allowUndefined || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined");
 
 				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${toString(s[0], s[1]).replaceAll("\n", "\n	")};`;
 			}
