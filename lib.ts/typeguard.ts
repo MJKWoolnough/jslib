@@ -105,7 +105,8 @@ const throwUnknownError = (v: boolean) => {
 	}
 
 	return t;
-      };
+      },
+      toString = (tg: STypeGuard<any>, typ: string | (() => string) | readonly TypeGuard<any>[], comment?: string) => typ instanceof Array ? typ.map(t => tg[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
 
 /**
  * This type represents a typeguard of the given type.
@@ -155,7 +156,7 @@ class STypeGuard<T> extends Function {
 	toString(): string {
 		const [typ, comment] = getType(this);
 
-		return typ instanceof Array ? typ.map(t => this[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
+		return toString(this, typ, comment);
 	}
 }
 
