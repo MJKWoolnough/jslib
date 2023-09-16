@@ -55,7 +55,7 @@ const throwUnknownError = (v: boolean) => {
 		skip = s
 	};
       },
-      typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly TypeGuard<any>[], string | undefined]>(),
+      typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
       group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v: string, p: readonly (string | TypeGuard<string>)[]) => {
@@ -87,11 +87,11 @@ const throwUnknownError = (v: boolean) => {
 	const t = typeStrs.get(tg) ?? ["unknown", undefined];
 
 	if (t[0] instanceof Array) {
-		const arr: TypeGuard<any>[] = [];
+		const arr: STypeGuard<any>[] = [];
 
 		for (const g of t[0]) {
 			if (g[group] === tg[group]) {
-				const [h] = getType(g) as [TypeGuard<any>[], string | undefined];
+				const [h] = getType(g) as [STypeGuard<any>[], string | undefined];
 
 				for (const i of h) {
 					arr.push(i);
@@ -106,7 +106,7 @@ const throwUnknownError = (v: boolean) => {
 
 	return t;
       },
-      toString = (tg: STypeGuard<any>, typ: string | (() => string) | readonly TypeGuard<any>[], comment?: string) => typ instanceof Array ? typ.map(t => tg[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
+      toString = (tg: STypeGuard<any>, typ: string | (() => string) | readonly STypeGuard<any>[], comment?: string) => typ instanceof Array ? typ.map(t => tg[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
 
 /**
  * This type represents a typeguard of the given type.
@@ -509,7 +509,10 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 	if (t) {
 		for (const [k, tg] of Object.entries(t) as [keyof typeof t, TypeGuard<any>][]) {
 			if (typeof k === "string") {
-				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}: ${tg.toString().replaceAll("\n", "\n	")};`;
+				const s = getType(tg),
+				      hasUndefined = tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined";
+
+				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${tg.toString().replaceAll("\n", "\n	")};`;
 			}
 		}
 
