@@ -8298,6 +8298,18 @@ type Tests = {
 					      o = Or(Bool(), Num(), Or(BoolStr(), IntStr()));
 
 					return o.toString() === "boolean | number | `${boolean}` | `${number}`";
+				},
+				"duplicates": async () => {
+					const {Bool, Num, Or} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num(), Bool(), Bool(), Num());
+
+					return o.toString() === "boolean | number";
+				},
+				"multi-level duplicates": async () => {
+					const {Bool, Num, Or} = await import("./lib/typeguard.js"),
+					      o = Or(Or(Or(Bool(), Num()), Bool()), Or(Bool(), Or(Num())));
+
+					return o.toString() === "boolean | number";
 				}
 			}
 		},
