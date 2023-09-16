@@ -92,7 +92,7 @@ const throwUnknownError = v => {
 
 	return t;
       },
-      toString = (tg, typ, comment) => typ instanceof Array ? typ.map(t => tg[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
+      toString = (typ, comment, g) => typ instanceof Array ? typ.map(t => g === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
 
 /**
  * This type represents a typeguard of the given type.
@@ -140,7 +140,7 @@ class STypeGuard extends Function {
 	toString() {
 		const [typ, comment] = getType(this);
 
-		return toString(this, typ, comment);
+		return toString(typ, comment, this[group]);
 	}
 }
 
@@ -496,7 +496,7 @@ Obj = t => asTypeGuard(v => {
 				const s = getType(tg),
 				      hasUndefined = tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined";
 
-				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${tg.toString().replaceAll("\n", "\n	")};`;
+				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${toString(s[0], s[1]).replaceAll("\n", "\n	")};`;
 			}
 		}
 
