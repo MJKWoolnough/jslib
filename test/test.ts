@@ -6887,12 +6887,20 @@ type Tests = {
 					}
 				}
 			},
-			"toString": async () => {
-				const {Int, Opt, Str} = await import("./lib/typeguard.js"),
-				      o = Opt(Int()),
-				      o2 = Opt(Str());
+			"toString": {
+				"simple": async () => {
+					const {Int, Opt, Str} = await import("./lib/typeguard.js"),
+					      o = Opt(Int()),
+					      o2 = Opt(Str());
 
-				return o.toString() === "number | undefined" && o2.toString() === "string | undefined";
+					return o.toString() === "number | undefined" && o2.toString() === "string | undefined";
+				},
+				"with undefined": async () => {
+					const {Opt, Undefined} = await import("./lib/typeguard.js"),
+					      o = Opt(Undefined());
+
+					return o.toString() === "undefined";
+				}
 			}
 		},
 		"Null": {
