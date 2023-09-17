@@ -8075,6 +8075,16 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": async () => {
+				const {Bool, Int, Obj, Str, Take} = await import("./lib/typeguard.js"),
+				      t = Take(Obj({
+					      "a": Int(),
+					      "b": Str(),
+					      "c": Bool()
+				      }), "a", "b");
+
+				return t.toString() === "{\n	a: number;\n	b: string;\n}";
 			}
 		},
 		"Skip": {
