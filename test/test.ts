@@ -8132,16 +8132,30 @@ type Tests = {
 					}
 				}
 			},
-			"toString": async () => {
-				const {Bool, Int, Obj, Skip, Str} = await import("./lib/typeguard.js"),
-				      s = Skip(Obj({
-					      "a": Int(),
-					      "b": Str(),
-					      "c": Bool()
-				      }), "a", "b");
+			"toString": {
+				"simple": async () => {
+					const {Bool, Int, Obj, Skip, Str} = await import("./lib/typeguard.js"),
+					      s = Skip(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Bool()
+					      }), "a", "b");
 
-				return s.toString() === "{\n	c: boolean;\n}";
-			}
+					return s.toString() === "{\n	c: boolean;\n}";
+				},
+				"inner obj": async () => {
+					const {Bool, Int, Obj, Skip, Str} = await import("./lib/typeguard.js"),
+					      s = Skip(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Obj({
+							      "a": Bool(),
+						      })
+					      }), "a", "b");
+
+					return s.toString() === "{\n	c: {\n		a: boolean;\n	};\n}";
+				}
+		}
 		},
 		"Recur": {
 			"returns": {
