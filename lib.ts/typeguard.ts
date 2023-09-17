@@ -504,13 +504,15 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 
 	return true;
 }, () => {
+	const [au, tk, s] = mods();
+
 	let toRet = "{";
 
 	if (t) {
 		for (const [k, tg] of Object.entries(t) as [keyof typeof t, TypeGuard<any>][]) {
-			if (typeof k === "string" && (take?.includes(k) ?? true) && !skip?.includes(k)) {
+			if (typeof k === "string" && (tk?.includes(k) ?? true) && !s?.includes(k)) {
 				const s = getType(tg),
-				      hasUndefined = allowUndefined || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined");
+				      hasUndefined = au || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined");
 
 				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${toString(s[0], s[1]).replaceAll("\n", "\n	")};`;
 			}
