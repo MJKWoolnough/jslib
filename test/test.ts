@@ -7962,7 +7962,7 @@ type Tests = {
 				      }));
 
 				return p.toString() === "{\n	a?: number;\n	b?: string;\n}";
-			},
+			}
 		},
 		"Req": {
 			"returns": {
