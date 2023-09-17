@@ -7954,14 +7954,28 @@ type Tests = {
 					}
 				}
 			},
-			"toString": async () => {
-				const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
-				      p = Part(Obj({
-					      "a": Num(),
-					      "b": Str()
-				      }));
+			"toString": {
+				"simple": async () => {
+					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Obj({
+						      "a": Num(),
+						      "b": Str()
+					      }));
 
-				return p.toString() === "{\n	a?: number;\n	b?: string;\n}";
+					return p.toString() === "{\n	a?: number;\n	b?: string;\n}";
+				},
+				"inner object": async () => {
+					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Obj({
+						      "a": Num(),
+						      "b": Str(),
+						      "c": Obj({
+							      "a": Num()
+						      })
+					      }));
+
+					return p.toString() === "{\n	a?: number;\n	b?: string;\n	c?: {\n		a: number;\n	};\n}";
+				}
 			}
 		},
 		"Req": {
