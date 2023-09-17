@@ -492,7 +492,7 @@ Obj = t => asTypeGuard(v => {
 
 	if (t) {
 		for (const [k, tg] of Object.entries(t)) {
-			if (typeof k === "string" && !skip?.includes(k)) {
+			if (typeof k === "string" && (take?.includes(k) ?? true) && !skip?.includes(k)) {
 				const s = getType(tg),
 				      hasUndefined = allowUndefined || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined");
 
