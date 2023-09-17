@@ -478,7 +478,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 
 	if (t) {
 		for (const [k, tg] of Object.entries(t) as [keyof typeof v, TypeGuard<any>][]) {
-			if (tk && !tk.includes(k) || s && s.includes(k)) {
+			if (tk && !tk.includes(k) || s?.includes(k)) {
 				continue;
 			}
 

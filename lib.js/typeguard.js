@@ -462,7 +462,7 @@ Obj = t => asTypeGuard(v => {
 
 	if (t) {
 		for (const [k, tg] of Object.entries(t)) {
-			if (tk && !tk.includes(k) || s && s.includes(k)) {
+			if (tk && !tk.includes(k) || s?.includes(k)) {
 				continue;
 			}
 
