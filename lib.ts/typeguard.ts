@@ -108,7 +108,7 @@ const throwUnknownError = (v: boolean) => {
 
 	return t;
       },
-      toString = (tg: STypeGuard<any>, typ: string | (() => string) | readonly STypeGuard<any>[], comment?: string) => {
+      toString = (tg: STypeGuard<any>, typ: string | (() => string) | readonly STypeGuard<any>[], comment?: string): string & {deps?: string[]} => {
 	      const alias = aliases.get(tg);
 	      if (alias) {
 		      return alias;
@@ -118,7 +118,7 @@ const throwUnknownError = (v: boolean) => {
 	            lateAlias = aliases.get(tg);
 
 	      if (lateAlias) {
-		      return lateAlias;
+		      return Object.assign(lateAlias, {"deps": [`type ${lateAlias} = ${str}`]});
 	      }
 
 	      aliases.set(tg, str);
@@ -171,7 +171,7 @@ class STypeGuard<T> extends Function {
 		yield SpreadTypeGuard.from<T>(this);
 	}
 
-	toString(): string {
+	toString() {
 		const [typ, comment] = getType(this);
 
 		return toString(this, typ, comment);

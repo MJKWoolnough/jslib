@@ -105,7 +105,7 @@ const throwUnknownError = v => {
 	            lateAlias = aliases.get(tg);
 
 	      if (lateAlias) {
-		      return lateAlias;
+		      return Object.assign(lateAlias, {"deps": [`type ${lateAlias} = ${str}`]});
 	      }
 
 	      aliases.set(tg, str);
