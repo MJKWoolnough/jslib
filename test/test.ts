@@ -8247,7 +8247,7 @@ type Tests = {
 						      "a": Arr(Recur(() => o))
 					      });
 
-					return o.toString() === "type_4";
+					return o.toString() + "" === "type_4";
 				},
 				"simple - with name": async () => {
 					type O = {
@@ -8257,9 +8257,11 @@ type Tests = {
 					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
 					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
 						      "a": Arr(Recur(() => o, "MyType"))
-					      });
+					      }),
+					      str = o.toString(),
+					      deps = str.deps;
 
-					return o.toString() === "MyType";
+					return str + "" === "MyType" && deps !== undefined && deps.length === 1 && deps[0] === "type MyType = {\n	a: MyType[];\n}";
 				},
 				"in deep": async () => {
 					type O = {
