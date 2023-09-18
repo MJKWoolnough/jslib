@@ -23,7 +23,8 @@ type AltTuple<T> = T extends readonly [tg: infer G, s: infer S, ...rest: infer R
 let throwErrors = false,
     allowUndefined: boolean | null = null,
     take: (keyof any)[] | null = null,
-    skip: (keyof any)[] | null = null;
+    skip: (keyof any)[] | null = null,
+    unknownTypes = 0;
 
 const throwUnknownError = (v: boolean) => {
 	if (!v && throwErrors) {
@@ -56,6 +57,7 @@ const throwUnknownError = (v: boolean) => {
 	};
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
+      aliases = new Map<STypeGuard<any>, string>(),
       group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v: string, p: readonly (string | TypeGuard<string>)[]) => {
@@ -106,7 +108,23 @@ const throwUnknownError = (v: boolean) => {
 
 	return t;
       },
-      toString = (typ: string | (() => string) | readonly STypeGuard<any>[], comment?: string, g?: string) => typ instanceof Array ? typ.map(t => g === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `) : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
+      toString = (tg: STypeGuard<any>, typ: string | (() => string) | readonly STypeGuard<any>[], comment?: string) => {
+	      const alias = aliases.get(tg);
+	      if (alias) {
+		      return alias;
+	      }
+
+	      const str = typ instanceof Array ? typ.map(t => tg[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `) : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`),
+	            lateAlias = aliases.get(tg);
+
+	      if (lateAlias) {
+		      return lateAlias;
+	      }
+
+	      aliases.set(tg, str);
+
+	      return str;
+      };
 
 /**
  * This type represents a typeguard of the given type.
@@ -156,7 +174,7 @@ class STypeGuard<T> extends Function {
 	toString(): string {
 		const [typ, comment] = getType(this);
 
-		return toString(typ, comment, this[group]);
+		return toString(this, typ, comment);
 	}
 }
 
@@ -514,7 +532,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 				const s = getType(tg),
 				      hasUndefined = au || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined");
 
-				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${toString(s[0], s[1]).replaceAll("\n", "\n	")};`;
+				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${toString(tg, s[0], s[1]).replaceAll("\n", "\n	")};`;
 			}
 		}
 
@@ -630,9 +648,13 @@ Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
  */
 Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
 	let ttg: TypeGuard<T>;
-	const name = str ?? ""; // need to generate type name here
+	const name = str ?? "type_"+unknownTypes++; // need to generate type name here
 
-	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => typeStrs.get(ttg ??= tg())![1] = name);
+	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => {
+		aliases.set(ttg ??= tg(), name);
+
+		return name;
+	});
 },
 /**
  * The NumStr function returns a TypeGuard that checks for a string value that represents an number.

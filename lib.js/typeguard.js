@@ -10,7 +10,8 @@
 let throwErrors = false,
     allowUndefined = null,
     take = null,
-    skip = null;
+    skip = null,
+    unknownTypes = 0;
 
 const throwUnknownError = v => {
 	if (!v && throwErrors) {
@@ -43,6 +44,7 @@ const throwUnknownError = v => {
 	};
       },
       typeStrs = new WeakMap(),
+      aliases = new Map(),
       group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v, p) => {
@@ -93,7 +95,23 @@ const throwUnknownError = v => {
 
 	return t;
       },
-      toString = (typ, comment, g) => typ instanceof Array ? typ.map(t => g === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `) : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
+      toString = (tg, typ, comment) => {
+	      const alias = aliases.get(tg);
+	      if (alias) {
+		      return alias;
+	      }
+
+	      const str = typ instanceof Array ? typ.map(t => tg[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `) : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`),
+	            lateAlias = aliases.get(tg);
+
+	      if (lateAlias) {
+		      return lateAlias;
+	      }
+
+	      aliases.set(tg, str);
+
+	      return str;
+      };
 
 /**
  * This type represents a typeguard of the given type.
@@ -141,7 +159,7 @@ class STypeGuard extends Function {
 	toString() {
 		const [typ, comment] = getType(this);
 
-		return toString(typ, comment, this[group]);
+		return toString(this, typ, comment);
 	}
 }
 
@@ -499,7 +517,7 @@ Obj = t => asTypeGuard(v => {
 				const s = getType(tg),
 				      hasUndefined = au || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined");
 
-				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${toString(s[0], s[1]).replaceAll("\n", "\n	")};`;
+				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${toString(tg, s[0], s[1]).replaceAll("\n", "\n	")};`;
 			}
 		}
 
@@ -615,9 +633,13 @@ Skip = (tg, ...keys) => asTypeGuard(v => {
  */
 Recur = (tg, str) => {
 	let ttg;
-	const name = str ?? ""; // need to generate type name here
+	const name = str ?? "type_"+unknownTypes++; // need to generate type name here
 
-	return asTypeGuard(v => (ttg ??= tg())(v), () => typeStrs.get(ttg ??= tg())[1] = name);
+	return asTypeGuard(v => (ttg ??= tg())(v), () => {
+		aliases.set(ttg ??= tg(), name);
+
+		return name;
+	});
 },
 /**
  * The NumStr function returns a TypeGuard that checks for a string value that represents an number.
