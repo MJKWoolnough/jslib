@@ -650,7 +650,7 @@ NumStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseFloa
 /**
  * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
- * @return {TypeGuard<string>}
+ * @return {TypeGuard<`${number}`>}
  */
 IntStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), "`${number}`"),
 /**
