@@ -96,22 +96,54 @@ const throwUnknownError = v => {
 	return t;
       },
       toString = (tg, typ, comment) => {
-	      const alias = aliases.get(tg);
-	      if (alias) {
-		      return alias;
-	      }
+	const alias = aliases.get(tg);
+	if (alias) {
+		return alias;
+	}
 
-	      const str = typ instanceof Array ? typ.map(t => tg[group] === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `) : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`),
-	            lateAlias = aliases.get(tg);
+	let str = "";
 
-	      if (lateAlias) {
-		      return Object.assign(lateAlias, {"deps": [`type ${lateAlias} = ${str}`]});
-	      }
+	if (typ instanceof Array) {
+	        const arr = [],
+		      deps = [];
 
-	      aliases.set(tg, str);
+		for (const t of typ) {
+			const str = t.toString(),
+			      gStr = tg[group] === '&' && t[group] === '|' ? `(${str})` : str;
 
-	      return str;
-      };
+			if (!arr.includes(gStr)) {
+				if (str.deps) {
+					deps.push(...str.deps);
+				}
+
+				arr.push(gStr);
+			}
+		}
+
+		str = assignDeps(arr.join(` ${comment} `), deps);
+	} else {
+		str = (typ instanceof Function ? typ() : typ);
+
+		if (comment) {
+			str += ` /* ${comment} */`;
+		}
+	}
+
+	const lateAlias = aliases.get(tg);
+
+	if (lateAlias) {
+		const deps = (str.deps ?? []);
+
+		deps.push(`type ${lateAlias} = ${str}`)
+
+		str = assignDeps(lateAlias, deps);
+	}
+
+	aliases.set(tg, str);
+
+	return str;
+      },
+      assignDeps = (str, deps) => deps?.length ? Object.assign(str, {deps}) : str;
 
 /**
  * This type represents a typeguard of the given type.
@@ -392,7 +424,11 @@ Arr = t => asTypeGuard(v => {
 	}
 
 	return true;
-}, () => t[group] ? `(${t})[]` : `${t}[]`),
+}, () => {
+	const str = t.toString();
+
+	return assignDeps(t[group] ? `(${str})[]` : `${str}[]`, str.deps);
+}),
 /**
  * The Tuple function returns a TypeGuard that checks for the given types in an array.
  *
@@ -444,6 +480,8 @@ Tuple = (...t) => {
 
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	}, () => {
+		const deps = [];
+
 		let toRet = "[";
 
 		for (const tg of tgs) {
@@ -451,7 +489,13 @@ Tuple = (...t) => {
 				toRet += ", ";
 			}
 
-			toRet += tg + "";
+			const str = tg.toString();
+
+			if (str.deps) {
+				deps.push(...str.deps)
+			}
+
+			toRet += str;
 		}
 
 		if (spread) {
@@ -459,10 +503,16 @@ Tuple = (...t) => {
 				toRet += ", ";
 			}
 
-			toRet += spread[group] ? `...(${t})[]` : `...${t}[]`
+			const str = spread.toString();
+
+			if (str.deps) {
+				deps.push(...str.deps)
+			}
+
+			toRet += spread[group] ? `...(${str})[]` : `...${str}[]`
 		}
 
-		return toRet + "]";
+		return assignDeps(toRet + "]", deps);
 	});
 },
 /**
@@ -507,7 +557,8 @@ Obj = t => asTypeGuard(v => {
 
 	return true;
 }, () => {
-	const [au, tk, s] = mods();
+	const [au, tk, s] = mods(),
+	      deps = [];
 
 	let toRet = "{";
 
@@ -515,16 +566,21 @@ Obj = t => asTypeGuard(v => {
 		for (const [k, tg] of Object.entries(t)) {
 			if (typeof k === "string" && (tk?.includes(k) ?? true) && !s?.includes(k)) {
 				const s = getType(tg),
-				      hasUndefined = au || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined");
+				      hasUndefined = au || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined"),
+				      str = toString(tg, s[0], s[1]);
 
-				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${toString(tg, s[0], s[1]).replaceAll("\n", "\n	")};`;
+				if (str.deps) {
+					deps.push(...str.deps);
+				}
+
+				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${str.replaceAll("\n", "\n	")};`;
 			}
 		}
 
 		toRet += "\n";
 	}
 
-	return toRet + "}";
+	return assignDeps(toRet + "}", deps);
 }),
 /**
  * The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined').
@@ -693,7 +749,12 @@ Rec = (key, value) => asTypeGuard(v => {
 	}
 
 	return true;
-}, () => `Record<${key}, ${value}>`),
+}, () => {
+	const keyStr = key.toString(),
+	      valStr = value.toString();
+
+	return assignDeps(`Record<${keyStr}, ${valStr}>`, (keyStr.deps ?? []).concat(valStr.deps ?? []));
+}),
 /**
  * The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards.
  *
@@ -783,7 +844,12 @@ MapType = (key, value) => asTypeGuard(v => {
 	}
 
 	return true;
-}, () => `Map<${key}, ${value}>`),
+}, () => {
+	const keyStr = key.toString(),
+	      valStr = value.toString();
+
+	return assignDeps(`Map<${keyStr}, ${valStr}>`, (keyStr.deps ?? []).concat(valStr.deps ?? []));
+}),
 /**
  * The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified.
  *
@@ -813,7 +879,11 @@ SetType = t => asTypeGuard(v => {
 	}
 
 	return true;
-}, () => `Set<${t}>`),
+}, () => {
+	const str = t.toString();
+
+	return assignDeps(`Set<${str}>`, str.deps);
+}),
 /**
  * The Class function returns a TypeGuard that checks a value is of the class specified.
  *
@@ -851,4 +921,9 @@ Forbid = (t, u) => asTypeGuard(v => {
 	}
 
 	return t(v);
-}, () => `Exclude<${t}, ${u}>`);
+}, () => {
+	const tStr = t.toString(),
+	      uStr = u.toString();
+
+	return assignDeps(`Exclude<${tStr}, ${uStr}>`, (tStr.deps ?? []).concat(uStr.deps ?? []));
+});
