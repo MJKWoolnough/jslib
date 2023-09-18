@@ -8235,6 +8235,45 @@ type Tests = {
 						return true;
 					}
 				}
+			},
+			"toString": {
+				"simple - no name": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o))
+					      });
+
+					return o.toString() === "type_4";
+				},
+				"simple - with name": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o, "MyType"))
+					      });
+
+					return o.toString() === "MyType";
+				},
+				"in deep": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o, "MyType"))
+					      }),
+					      p = Obj({"a": o});
+
+					return p.toString() === "{\n	a: MyType;\n}"
+				}
 			}
 		},
 		"Rec": {
