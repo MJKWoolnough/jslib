@@ -92,7 +92,7 @@ const throwUnknownError = v => {
 
 	return t;
       },
-      toString = (typ, comment, g) => typ instanceof Array ? typ.map(t => g === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `)  : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
+      toString = (typ, comment, g) => typ instanceof Array ? typ.map(t => g === '&' && t[group] === '|' ? `(${t})` : t.toString()).filter((v, i, a) => a.indexOf(v) === i).join(` ${comment} `) : (typ instanceof Function ? typ() : typ) + (comment === undefined ? "" : ` /* ${comment} */`);
 
 /**
  * This type represents a typeguard of the given type.
