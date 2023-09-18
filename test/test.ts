@@ -8090,15 +8090,29 @@ type Tests = {
 					}
 				}
 			},
-			"toString": async () => {
-				const {Bool, Int, Obj, Str, Take} = await import("./lib/typeguard.js"),
-				      t = Take(Obj({
-					      "a": Int(),
-					      "b": Str(),
-					      "c": Bool()
-				      }), "a", "b");
+			"toString": {
+				"simple": async () => {
+					const {Bool, Int, Obj, Str, Take} = await import("./lib/typeguard.js"),
+					      t = Take(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Bool()
+					      }), "a", "b");
 
-				return t.toString() === "{\n	a: number;\n	b: string;\n}";
+					return t.toString() === "{\n	a: number;\n	b: string;\n}";
+				},
+				"inner obj": async () => {
+					const {Bool, Int, Obj, Str, Take} = await import("./lib/typeguard.js"),
+					      t = Take(Obj({
+						      "a": Int(),
+						      "b": Obj({
+							      "c": Str(),
+						      }),
+						      "c": Bool()
+					      }), "a", "b");
+
+					return t.toString() === "{\n	a: number;\n	b: {\n		c: string;\n	};\n}";
+				}
 			}
 		},
 		"Skip": {
