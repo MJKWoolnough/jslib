@@ -43,6 +43,7 @@ const throwUnknownError = v => {
 	};
       },
       typeStrs = new WeakMap(),
+      group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v, p) => {
 	const [tg, s, ...rest] = p;
