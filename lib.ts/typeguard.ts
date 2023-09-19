@@ -149,11 +149,7 @@ const throwUnknownError = (v: boolean) => {
 	const lateAlias = aliases.get(tg);
 
 	if (lateAlias) {
-		const deps = (str.deps ?? {});
-
-		deps[lateAlias] = str;
-
-		str = assignDeps(lateAlias, deps);
+		str = assignDeps(lateAlias, Object.assign(Object.assign({}, str.deps ?? {}), {[lateAlias]: str}));
 	}
 
 	aliases.set(tg, str);
