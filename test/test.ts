@@ -8301,6 +8301,29 @@ type Tests = {
 					      deps = Obj({"a": o}).toString().deps;
 
 					return deps?.["MyType4"] === "{\n	a: MyType4[];\n}";
+				},
+				"multiple deps": async () => {
+					type O = {
+						a: number;
+						o?: O;
+					}
+					type P = {
+						b: string;
+						p: P[];
+					}
+					const {Arr, Num, Obj, Opt, Or, Recur, Str} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Num(),
+						      "o": Opt(Recur(() => o, "O"))
+					      }),
+					      p: import("./lib/typeguard.js").TypeGuard<P> = Obj({
+						      "b": Str(),
+						      "p": Arr(Recur(() => p, "P"))
+					      }),
+					      q = Or(o, p),
+					      deps = q.toString().deps;
+
+					return deps?.["O"] === "{\n	a: number;\n	o?: O | undefined;\n}" && deps?.["P"] === "{\n	b: string;\n	p: P[];\n}";
 				}
 			}
 		},
