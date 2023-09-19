@@ -110,7 +110,7 @@ const throwUnknownError = v => {
 
 		for (const t of typ) {
 			const str = t.toString(),
-			      gStr = tg[group] === '&' && t[group] === '|' ? `(${str})` : str;
+			      gStr = tg[group] === '&' && t[group] === '|' ? `(${str})` : str + "";
 
 			if (!arr.includes(gStr)) {
 				if (str.deps) {
