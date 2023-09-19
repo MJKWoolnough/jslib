@@ -8274,7 +8274,7 @@ type Tests = {
 					      }),
 					      p = Obj({"a": o});
 
-					return p.toString() + "" === "{\n	a: MyType;\n}"
+					return p + "" === "{\n	a: MyType;\n}"
 				}
 			}
 		},
