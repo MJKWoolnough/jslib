@@ -706,9 +706,12 @@ Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
- * @param {TypeGuard<any>}
+ * @typedef T
  *
- * @return {TypeGuard<any>}
+ * @param {() => TypeGuard<T>} tg    A closure that returns the recurring TypeGuard.
+ * @param {string}             [str] Optional type name. If unspecified will be generated automatically from template: `type_${number}`
+ *
+ * @return {TypeGuard<T>}
  */
 Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
 	let ttg: TypeGuard<T>;
