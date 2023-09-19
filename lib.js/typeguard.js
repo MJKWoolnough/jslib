@@ -7,6 +7,7 @@
  */
 /** */
 
+
 let throwErrors = false,
     allowUndefined = null,
     take = null,
@@ -105,7 +106,7 @@ const throwUnknownError = v => {
 
 	if (typ instanceof Array) {
 	        const arr = [],
-		      deps = [];
+		      deps = {};
 
 		for (const t of typ) {
 			const str = t.toString(),
@@ -113,7 +114,7 @@ const throwUnknownError = v => {
 
 			if (!arr.includes(gStr)) {
 				if (str.deps) {
-					deps.push(...str.deps);
+					Object.assign(deps, str.deps);
 				}
 
 				arr.push(gStr);
@@ -132,9 +133,9 @@ const throwUnknownError = v => {
 	const lateAlias = aliases.get(tg);
 
 	if (lateAlias) {
-		const deps = (str.deps ?? []);
+		const deps = (str.deps ?? {});
 
-		deps.push(`type ${lateAlias} = ${str}`)
+		deps[lateAlias] = str;
 
 		str = assignDeps(lateAlias, deps);
 	}
@@ -143,7 +144,7 @@ const throwUnknownError = v => {
 
 	return str;
       },
-      assignDeps = (str, deps) => deps?.length ? Object.assign(str, {deps}) : str;
+      assignDeps = (str, deps = {}) => Object.keys(deps).length ? Object.assign(str, {deps}) : str;
 
 /**
  * This type represents a typeguard of the given type.
@@ -484,7 +485,7 @@ Tuple = (...t) => {
 
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	}, () => {
-		const deps = [];
+		const deps = {};
 
 		let toRet = "[";
 
@@ -496,7 +497,7 @@ Tuple = (...t) => {
 			const str = tg.toString();
 
 			if (str.deps) {
-				deps.push(...str.deps)
+				Object.assign(deps, str.deps);
 			}
 
 			toRet += str;
@@ -510,7 +511,7 @@ Tuple = (...t) => {
 			const str = spread.toString();
 
 			if (str.deps) {
-				deps.push(...str.deps)
+				Object.assign(deps, str.deps);
 			}
 
 			toRet += spread[group] ? `...(${str})[]` : `...${str}[]`
@@ -562,7 +563,7 @@ Obj = t => asTypeGuard(v => {
 	return true;
 }, () => {
 	const [au, tk, s] = mods(),
-	      deps = [];
+	      deps = {};
 
 	let toRet = "{";
 
@@ -574,7 +575,7 @@ Obj = t => asTypeGuard(v => {
 				      str = toString(tg, s[0], s[1]);
 
 				if (str.deps) {
-					deps.push(...str.deps);
+					Object.assign(deps, str.deps);
 				}
 
 				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${str.replaceAll("\n", "\n	")};`;
@@ -757,7 +758,7 @@ Rec = (key, value) => asTypeGuard(v => {
 	const keyStr = key.toString(),
 	      valStr = value.toString();
 
-	return assignDeps(`Record<${keyStr}, ${valStr}>`, (keyStr.deps ?? []).concat(valStr.deps ?? []));
+	return assignDeps(`Record<${keyStr}, ${valStr}>`, Object.assign(Object.assign({}, keyStr.deps ?? {}), valStr.deps ?? {}));
 }),
 /**
  * The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards.
@@ -852,7 +853,7 @@ MapType = (key, value) => asTypeGuard(v => {
 	const keyStr = key.toString(),
 	      valStr = value.toString();
 
-	return assignDeps(`Map<${keyStr}, ${valStr}>`, (keyStr.deps ?? []).concat(valStr.deps ?? []));
+	return assignDeps(`Map<${keyStr}, ${valStr}>`, Object.assign(Object.assign({}, keyStr.deps ?? {}), valStr.deps ?? {}));
 }),
 /**
  * The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified.
@@ -929,5 +930,5 @@ Forbid = (t, u) => asTypeGuard(v => {
 	const tStr = t.toString(),
 	      uStr = u.toString();
 
-	return assignDeps(`Exclude<${tStr}, ${uStr}>`, (tStr.deps ?? []).concat(uStr.deps ?? []));
+	return assignDeps(`Exclude<${tStr}, ${uStr}>`, Object.assign(Object.assign({}, tStr.deps ?? {}), uStr.deps ?? {}));
 });

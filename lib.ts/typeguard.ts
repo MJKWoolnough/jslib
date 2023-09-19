@@ -21,7 +21,7 @@ type Template<S extends string, T> = T extends readonly [first: TypeGuard<string
 type AltTuple<T> = T extends readonly [tg: infer G, s: infer S, ...rest: infer Rest] ? [G, S] extends [TypeGuard<string>, string] ? readonly [G, S, ...AltTuple<Rest>] : never : readonly [];
 
 type Aliases = {
-	deps?: string[];
+	deps?: Record<string, string>;
 }
 
 let throwErrors = false,
@@ -122,7 +122,7 @@ const throwUnknownError = (v: boolean) => {
 
 	if (typ instanceof Array) {
 	        const arr: string[] = [],
-		      deps: string[] = [];
+		      deps: Record<string, string> = {};
 
 		for (const t of typ) {
 			const str = t.toString(),
@@ -130,7 +130,7 @@ const throwUnknownError = (v: boolean) => {
 
 			if (!arr.includes(gStr)) {
 				if (str.deps) {
-					deps.push(...str.deps);
+					Object.assign(deps, str.deps);
 				}
 
 				arr.push(gStr);
@@ -149,9 +149,9 @@ const throwUnknownError = (v: boolean) => {
 	const lateAlias = aliases.get(tg);
 
 	if (lateAlias) {
-		const deps = (str.deps ?? []);
+		const deps = (str.deps ?? {});
 
-		deps.push(`type ${lateAlias} = ${str}`)
+		deps[lateAlias] = str;
 
 		str = assignDeps(lateAlias, deps);
 	}
@@ -160,7 +160,7 @@ const throwUnknownError = (v: boolean) => {
 
 	return str;
       },
-      assignDeps = (str: string, deps?: string[]) => deps?.length ? Object.assign(str, {deps}) : str;
+      assignDeps = (str: string, deps: Record<string, string> = {}) => Object.keys(deps).length ? Object.assign(str, {deps}) : str;
 
 /**
  * This type represents a typeguard of the given type.
@@ -503,7 +503,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	}, () => {
-		const deps: string[] = [];
+		const deps: Record<string, string> = {};
 
 		let toRet = "[";
 
@@ -515,7 +515,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 			const str = tg.toString();
 
 			if (str.deps) {
-				deps.push(...str.deps)
+				Object.assign(deps, str.deps);
 			}
 
 			toRet += str;
@@ -529,7 +529,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 			const str = spread.toString();
 
 			if (str.deps) {
-				deps.push(...str.deps)
+				Object.assign(deps, str.deps);
 			}
 
 			toRet += spread[group] ? `...(${str})[]` : `...${str}[]`
@@ -581,7 +581,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 	return true;
 }, () => {
 	const [au, tk, s] = mods(),
-	      deps: string[] = [];
+	      deps: Record<string, string> = {};
 
 	let toRet = "{";
 
@@ -593,7 +593,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 				      str = toString(tg, s[0], s[1]);
 
 				if (str.deps) {
-					deps.push(...str.deps);
+					Object.assign(deps, str.deps);
 				}
 
 				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${str.replaceAll("\n", "\n	")};`;
@@ -776,7 +776,7 @@ Rec = <K extends TypeGuard<Exclude<keyof any, number>>, V extends TypeGuard<any>
 	const keyStr = key.toString(),
 	      valStr = value.toString();
 
-	return assignDeps(`Record<${keyStr}, ${valStr}>`, (keyStr.deps ?? []).concat(valStr.deps ?? []));
+	return assignDeps(`Record<${keyStr}, ${valStr}>`, Object.assign(Object.assign({}, keyStr.deps ?? {}), valStr.deps ?? {}));
 }),
 /**
  * The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards.
@@ -871,7 +871,7 @@ MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V)
 	const keyStr = key.toString(),
 	      valStr = value.toString();
 
-	return assignDeps(`Map<${keyStr}, ${valStr}>`, (keyStr.deps ?? []).concat(valStr.deps ?? []));
+	return assignDeps(`Map<${keyStr}, ${valStr}>`, Object.assign(Object.assign({}, keyStr.deps ?? {}), valStr.deps ?? {}));
 }),
 /**
  * The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified.
@@ -948,5 +948,5 @@ Forbid = <T, U>(t: TypeGuard<T>, u: TypeGuard<U>) => asTypeGuard((v: unknown): v
 	const tStr = t.toString(),
 	      uStr = u.toString();
 
-	return assignDeps(`Exclude<${tStr}, ${uStr}>`, (tStr.deps ?? []).concat(uStr.deps ?? []));
+	return assignDeps(`Exclude<${tStr}, ${uStr}>`, Object.assign(Object.assign({}, tStr.deps ?? {}), uStr.deps ?? {}));
 });
