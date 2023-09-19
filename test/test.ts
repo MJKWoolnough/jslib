@@ -8287,7 +8287,7 @@ type Tests = {
 					      }),
 					      deps = o.toString().deps;
 
-					return deps !== undefined && deps.length === 1 && deps[0] === "type MyType3 = {\n	a: MyType3[];\n}";
+					return deps?.["MyType3"] === "{\n	a: MyType3[];\n}";
 				},
 				"in deep": async () => {
 					type O = {
@@ -8300,7 +8300,7 @@ type Tests = {
 					      }),
 					      deps = Obj({"a": o}).toString().deps;
 
-					return deps?.length === 1 && deps[0] === "type MyType4 = {\n	a: MyType4[];\n}";
+					return deps?.["MyType4"] === "{\n	a: MyType4[];\n}";
 				}
 			}
 		},
