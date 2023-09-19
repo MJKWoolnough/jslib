@@ -8257,11 +8257,9 @@ type Tests = {
 					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
 					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
 						      "a": Arr(Recur(() => o, "MyType"))
-					      }),
-					      str = o.toString(),
-					      deps = str.deps;
+					      });
 
-					return str + "" === "MyType" && deps !== undefined && deps.length === 1 && deps[0] === "type MyType = {\n	a: MyType[];\n}";
+					return o + "" === "MyType";
 				},
 				"in deep": async () => {
 					type O = {
@@ -8270,11 +8268,39 @@ type Tests = {
 
 					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
 					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
-						      "a": Arr(Recur(() => o, "MyType"))
+						      "a": Arr(Recur(() => o, "MyType2"))
 					      }),
 					      p = Obj({"a": o});
 
-					return p + "" === "{\n	a: MyType;\n}"
+					return p + "" === "{\n	a: MyType2;\n}"
+				}
+			},
+			"deps": {
+				"simple - with name": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o, "MyType3"))
+					      }),
+					      deps = o.toString().deps;
+
+					return deps !== undefined && deps.length === 1 && deps[0] === "type MyType3 = {\n	a: MyType3[];\n}";
+				},
+				"in deep": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o, "MyType4"))
+					      }),
+					      deps = Obj({"a": o}).toString().deps;
+
+					return deps?.length === 1 && deps[0] === "type MyType4 = {\n	a: MyType4[];\n}";
 				}
 			}
 		},
