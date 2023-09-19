@@ -188,6 +188,10 @@ class STypeGuard extends Function {
 		yield SpreadTypeGuard.from<T>(this);
 	}
 
+	[Symbol.toPrimitive]() {
+		return this.toString() + "";
+	}
+
 	toString() {
 		const [typ, comment] = getType(this);
 
