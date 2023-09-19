@@ -20,6 +20,10 @@ type Template<S extends string, T> = T extends readonly [first: TypeGuard<string
 
 type AltTuple<T> = T extends readonly [tg: infer G, s: infer S, ...rest: infer Rest] ? [G, S] extends [TypeGuard<string>, string] ? readonly [G, S, ...AltTuple<Rest>] : never : readonly [];
 
+type Aliases = {
+	deps?: string[];
+}
+
 let throwErrors = false,
     allowUndefined: boolean | null = null,
     take: (keyof any)[] | null = null,
@@ -57,7 +61,7 @@ const throwUnknownError = (v: boolean) => {
 	};
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
-      aliases = new Map<STypeGuard<any>, string & {deps?: string[]}>(),
+      aliases = new Map<STypeGuard<any>, string & Aliases>(),
       group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v: string, p: readonly (string | TypeGuard<string>)[]) => {
@@ -114,7 +118,7 @@ const throwUnknownError = (v: boolean) => {
 		return alias;
 	}
 
-	let str: string & {deps?: string[]} = "";
+	let str: string & Aliases = "";
 
 	if (typ instanceof Array) {
 	        const arr: string[] = [],
