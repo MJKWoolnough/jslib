@@ -20,8 +20,10 @@ type Template<S extends string, T> = T extends readonly [first: TypeGuard<string
 
 type AltTuple<T> = T extends readonly [tg: infer G, s: infer S, ...rest: infer Rest] ? [G, S] extends [TypeGuard<string>, string] ? readonly [G, S, ...AltTuple<Rest>] : never : readonly [];
 
+type Deps = Record<string, string>;
+
 type Aliases = {
-	deps?: Record<string, string>;
+	deps?: Deps;
 }
 
 let throwErrors = false,
@@ -120,7 +122,7 @@ const throwUnknownError = (v: boolean) => {
 
 	if (typ instanceof Array) {
 	        const arr: string[] = [],
-		      deps: Record<string, string> = {};
+		      deps: Deps = {};
 
 		for (const t of typ) {
 			const str = t.toString(),
@@ -160,8 +162,8 @@ const throwUnknownError = (v: boolean) => {
 
 	return str;
       },
-      assignDeps = (str: string, ...ds: (Record<string, string> | undefined)[]) => {
-	const deps: Record<string, string> = {};
+      assignDeps = (str: string, ...ds: (Deps | undefined)[]) => {
+	const deps: Deps = {};
 
 	for (const d of ds) {
 		Object.assign(deps, d);
@@ -511,7 +513,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
 	}, () => {
-		const deps: Record<string, string> = {};
+		const deps: Deps = {};
 
 		let toRet = "[";
 
@@ -589,7 +591,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 	return true;
 }, () => {
 	const [au, tk, s] = mods(),
-	      deps: Record<string, string> = {};
+	      deps: Deps = {};
 
 	let toRet = "{";
 
