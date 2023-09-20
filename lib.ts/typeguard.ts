@@ -160,7 +160,15 @@ const throwUnknownError = (v: boolean) => {
 
 	return str;
       },
-      assignDeps = (str: string, deps: Record<string, string> = {}) => Object.keys(deps).length ? Object.assign(str, {deps}) : str;
+      assignDeps = (str: string, ...ds: (Record<string, string> | undefined)[]) => {
+	const deps: Record<string, string> = {};
+
+	for (const d of ds) {
+		Object.assign(deps, d);
+	}
+
+	return Object.keys(deps).length ? Object.assign(str, {deps}) : str;
+      };
 
 /**
  * This type represents a typeguard of the given type.

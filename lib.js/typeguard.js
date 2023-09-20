@@ -144,7 +144,15 @@ const throwUnknownError = v => {
 
 	return str;
       },
-      assignDeps = (str, deps = {}) => Object.keys(deps).length ? Object.assign(str, {deps}) : str;
+      assignDeps = (str, ...ds) => {
+	const deps = {};
+
+	for (const d of ds) {
+		Object.assign(deps, d);
+	}
+
+	return Object.keys(deps).length ? Object.assign(str, {deps}) : str;
+      };
 
 /**
  * This type represents a typeguard of the given type.
