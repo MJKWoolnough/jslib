@@ -53,12 +53,10 @@ const throwUnknownError = (v: boolean) => {
 
 	      return mods;
       },
-      resetMods = ([au, tk, s]: readonly [typeof allowUndefined, typeof take, typeof skip]) => {
-	return () => {
-		allowUndefined = au;
-		take = tk;
-		skip = s;
-	};
+      resetMods = ([au, tk, s]: readonly [typeof allowUndefined, typeof take, typeof skip]) => () => {
+	allowUndefined = au;
+	take = tk;
+	skip = s;
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
       aliases = new Map<STypeGuard<any>, string & Aliases>(),

@@ -37,12 +37,10 @@ const throwUnknownError = v => {
 
 	      return mods;
       },
-      resetMods = ([au, tk, s]) => {
-	return () => {
-		allowUndefined = au;
-		take = tk;
-		skip = s;
-	};
+      resetMods = ([au, tk, s]) => () => {
+	allowUndefined = au;
+	take = tk;
+	skip = s;
       },
       typeStrs = new WeakMap(),
       aliases = new Map(),
