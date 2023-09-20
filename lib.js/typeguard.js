@@ -41,7 +41,7 @@ const throwUnknownError = v => {
 	return () => {
 		allowUndefined = au;
 		take = tk;
-		skip = s
+		skip = s;
 	};
       },
       typeStrs = new WeakMap(),

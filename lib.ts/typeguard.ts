@@ -57,7 +57,7 @@ const throwUnknownError = (v: boolean) => {
 	return () => {
 		allowUndefined = au;
 		take = tk;
-		skip = s
+		skip = s;
 	};
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
