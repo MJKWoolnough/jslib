@@ -47,13 +47,13 @@ const throwUnknownError = (v: boolean) => {
 	return v;
       },
       mods = () => {
-	      const mods = [allowUndefined, take, skip] as const;
+	const mods = [allowUndefined, take, skip] as const;
 
-	      allowUndefined = null;
-	      take = null;
-	      skip = null;
+	allowUndefined = null;
+	take = null;
+	skip = null;
 
-	      return mods;
+	return mods;
       },
       resetMods = ([au, tk, s]: readonly [typeof allowUndefined, typeof take, typeof skip]) => () => {
 	allowUndefined = au;
