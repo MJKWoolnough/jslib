@@ -8273,7 +8273,19 @@ type Tests = {
 					      p = Obj({"a": o});
 
 					return p + "" === "{\n	a: MyType2;\n}"
-				}
+				},
+				"multiple calls to toString": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o))
+					      });
+
+					return o + "" === o + "";
+				},
 			},
 			"deps": {
 				"simple - with name": async () => {
