@@ -29,13 +29,13 @@ const throwUnknownError = v => {
 	return v;
       },
       mods = () => {
-	      const mods = [allowUndefined, take, skip];
+	const mods = [allowUndefined, take, skip];
 
-	      allowUndefined = null;
-	      take = null;
-	      skip = null;
+	allowUndefined = null;
+	take = null;
+	skip = null;
 
-	      return mods;
+	return mods;
       },
       resetMods = ([au, tk, s]) => () => {
 	allowUndefined = au;
