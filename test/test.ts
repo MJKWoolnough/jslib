@@ -8324,6 +8324,20 @@ type Tests = {
 					      deps = q.toString().deps;
 
 					return deps?.["O"] === "{\n	a: number;\n	o?: O | undefined;\n}" && deps?.["P"] === "{\n	b: string;\n	p: P[];\n}";
+				},
+				"multiple toString calls": async () => {
+					type O = {
+						a: O[];
+					}
+
+					const {Arr, Obj, Recur} = await import("./lib/typeguard.js"),
+					      o: import("./lib/typeguard.js").TypeGuard<O> = Obj({
+						      "a": Arr(Recur(() => o, "MyType3"))
+					      }),
+					      aDeps = o.toString().deps,
+					      bDeps = o.toString().deps;
+
+					return JSON.stringify(aDeps) === JSON.stringify(bDeps);
 				}
 			}
 		},
