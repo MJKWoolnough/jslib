@@ -137,7 +137,7 @@ const throwUnknownError = v => {
 	const lateAlias = aliases.get(tg);
 
 	if (lateAlias) {
-		str = assignDeps(lateAlias, Object.assign(Object.assign({}, str.deps ?? {}), {[lateAlias]: str}));
+		str = assignDeps(lateAlias, str.deps, {[lateAlias]: str});
 	}
 
 	aliases.set(tg, str);
@@ -769,7 +769,7 @@ Rec = (key, value) => asTypeGuard(v => {
 	const keyStr = key.toString(),
 	      valStr = value.toString();
 
-	return assignDeps(`Record<${keyStr}, ${valStr}>`, Object.assign(Object.assign({}, keyStr.deps ?? {}), valStr.deps ?? {}));
+	return assignDeps(`Record<${keyStr}, ${valStr}>`, keyStr.deps, valStr.deps);
 }),
 /**
  * The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards.
@@ -864,7 +864,7 @@ MapType = (key, value) => asTypeGuard(v => {
 	const keyStr = key.toString(),
 	      valStr = value.toString();
 
-	return assignDeps(`Map<${keyStr}, ${valStr}>`, Object.assign(Object.assign({}, keyStr.deps ?? {}), valStr.deps ?? {}));
+	return assignDeps(`Map<${keyStr}, ${valStr}>`, keyStr.deps, valStr.deps);
 }),
 /**
  * The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified.
@@ -941,5 +941,5 @@ Forbid = (t, u) => asTypeGuard(v => {
 	const tStr = t.toString(),
 	      uStr = u.toString();
 
-	return assignDeps(`Exclude<${tStr}, ${uStr}>`, Object.assign(Object.assign({}, tStr.deps ?? {}), uStr.deps ?? {}));
+	return assignDeps(`Exclude<${tStr}, ${uStr}>`, tStr.deps, uStr.deps);
 });
