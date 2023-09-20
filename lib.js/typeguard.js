@@ -126,7 +126,13 @@ const throwUnknownError = v => {
 		str = (typ instanceof Function ? typ() : typ);
 
 		if (comment) {
+			const deps = str.deps;
+
 			str += ` /* ${comment} */`;
+
+			if (deps) {
+				str = Object.assign(str, {deps});
+			}
 		}
 	}
 
