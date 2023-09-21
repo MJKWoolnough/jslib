@@ -26,7 +26,7 @@ type Aliases = {
 	deps?: Deps;
 }
 
-type Definition = string | ["Array", Definition] | ["Tuple", Definition[], Definition?] | ["Or" | "And", readonly Definition[]] | ["Object", Record<string | number | symbol, Definition>] | [string, Definition, Definition | undefined] // Normal, Array, Tuple, Or/And, Object, Special
+type Definition = string | ["Array", Definition] | ["Tuple", readonly Definition[], Definition?] | ["Or" | "And", readonly Definition[]] | ["Object", Record<string | number | symbol, Definition>] | [string, Definition, Definition | undefined] // Normal, Array, Tuple, Or/And, Object, Special
 
 type DefinitionWithDeps = Definition & Aliases;
 
@@ -201,6 +201,22 @@ class STypeGuard<T> extends Function {
 
 	*[Symbol.iterator]() {
 		yield SpreadTypeGuard.from<T>(this);
+	}
+
+	def(): DefinitionWithDeps {
+		const def = definitions.get(this) ?? ["unknown"],
+		      [typeStr, data, extra] = def;
+
+		if (typeStr instanceof Function) {
+			return def[0] = typeStr();
+		}
+
+		switch (typeStr) {
+		case "Array":
+			return [typeStr, (data as STypeGuard<any>).def()]
+		}
+
+		return "";
 	}
 
 	toString() {
