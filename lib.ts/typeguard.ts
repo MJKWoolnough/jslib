@@ -216,6 +216,21 @@ class STypeGuard<T> extends Function {
 			return [typeStr, (data as STypeGuard<any>).def()]
 		case "Tuple":
 			return [typeStr, (data as STypeGuard<any>[]).map(d => d.def()), (extra as STypeGuard<any>)?.def()];
+		case "Or":
+		case "And":
+			const elements: Definition[] = [];
+
+			for (const e of data as STypeGuard<any>[]) {
+				const d = e.def();
+
+				if (d[0] === typeStr) {
+					elements.push(...(d[1] as Definition[]));
+				} else {
+					elements.push(d);
+				}
+			}
+
+			return [typeStr, elements];
 		}
 
 		return "";
