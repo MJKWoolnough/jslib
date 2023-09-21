@@ -194,12 +194,20 @@ export type TypeGuard<T> = STypeGuard<T> & ((v: unknown) => v is T);
 class STypeGuard<T> extends Function {
 	[group]?: string;
 
-	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string) | readonly TypeGuard<any>[], comment?: string) {
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string, comment?: string): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string)): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Array", arrType: STypeGuard<any>): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Tuple", elements: readonly STypeGuard<any>[], skip?: STypeGuard<any>): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Object", obj?: {[K: string | number | symbol]: STypeGuard<any>}): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Record", key: STypeGuard<string | symbol>, val: STypeGuard<any>): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Partial", elem: STypeGuard<any>): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Required", elem: STypeGuard<any>): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Omit" | "Pick", elem: STypeGuard<any>, keys: readonly (string | number | symbol)[]): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "And" | "Or", elements: readonly STypeGuard<any>[]): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string, element: STypeGuard<any>, additionalElement?: STypeGuard<any>): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string, data?: string | (() => string) | STypeGuard<any> | readonly STypeGuard<any>[] | {[K: string | number | symbol]: STypeGuard<any>}, extra?: string | STypeGuard<any> | readonly (string | number | symbol)[]): TypeGuard<any>;
+	static from<T>(tg: (v: unknown) => v is T, _typeStr: string, _data?: string | (() => string) | STypeGuard<any> | readonly STypeGuard<any>[] | {[K: string | number | symbol]: STypeGuard<any>}, _extra?: string | STypeGuard<any> | readonly (string | number | symbol)[]) {
 		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype) as TypeGuard<T>;
-
-		tgFn[group] = typeStr instanceof Array ? comment : undefined;
-
-		typeStrs.set(tgFn, [typeStr, comment]);
 
 		return tgFn;
 	}
@@ -217,7 +225,7 @@ class STypeGuard<T> extends Function {
 	}
 
 	throws() {
-		return asTypeGuard((v: unknown): v is T => this.throw(v));
+		return asTypeGuard((v: unknown): v is T => this.throw(v), "unknown");
 	}
 
 	*[Symbol.iterator]() {
@@ -253,7 +261,7 @@ export const
  *
  * @return {TypeGuard<T>} The passed in typeguard, with additional functionality.
  */
-asTypeGuard = <T>(tg: (v: unknown) => v is T, typeStr: string | (() => string) | readonly TypeGuard<any>[] = "unknown", comment?: string) => STypeGuard.from(tg, typeStr, comment),
+asTypeGuard: typeof STypeGuard.from = (tg, typeStr, data, extra) => STypeGuard.from(tg, typeStr, data, extra),
 /**
  * The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against.
  *
@@ -464,11 +472,7 @@ Arr = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Array<T> => {
 	}
 
 	return true;
-}, () => {
-	const str = t.toString();
-
-	return assignDeps(t[group] ? `(${str})[]` : `${str}[]`, str.deps);
-}),
+}, "Array", t),
 /**
  * The Tuple function returns a TypeGuard that checks for the given types in an array.
  *
@@ -519,41 +523,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 		}
 
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
-	}, () => {
-		const deps: Deps = {};
-
-		let toRet = "[";
-
-		for (const tg of tgs) {
-			if (toRet.length > 1) {
-				toRet += ", ";
-			}
-
-			const str = tg.toString();
-
-			if (str.deps) {
-				Object.assign(deps, str.deps);
-			}
-
-			toRet += str;
-		}
-
-		if (spread) {
-			if (toRet.length > 1) {
-				toRet += ", ";
-			}
-
-			const str = spread.toString();
-
-			if (str.deps) {
-				Object.assign(deps, str.deps);
-			}
-
-			toRet += spread[group] ? `...(${str})[]` : `...${str}[]`
-		}
-
-		return assignDeps(toRet + "]", deps);
-	});
+	}, "Tuple", tgs, spread);
 },
 /**
  * The Obj function returns a TypeGuard that checks for an object type defined by the passed object of TypeGuards.
@@ -596,32 +566,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 	}
 
 	return true;
-}, () => {
-	const [au, tk, s] = mods(),
-	      deps: Deps = {};
-
-	let toRet = "{";
-
-	if (t) {
-		for (const [k, tg] of Object.entries(t) as [keyof typeof t, TypeGuard<any>][]) {
-			if (typeof k === "string" && (tk?.includes(k) ?? true) && !s?.includes(k)) {
-				const s = getType(tg),
-				      hasUndefined = au || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined"),
-				      str = toString(tg, s[0], s[1]);
-
-				if (str.deps) {
-					Object.assign(deps, str.deps);
-				}
-
-				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${str.replaceAll("\n", "\n	")};`;
-			}
-		}
-
-		toRet += "\n";
-	}
-
-	return assignDeps(toRet + "}", deps);
-}),
+}, "Object", t),
 /**
  * The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined').
  *
@@ -637,15 +582,7 @@ Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in
 	} finally {
 		allowUndefined = null;
 	}
-}, () => {
-	allowUndefined ??= true;
-
-	const str = tg.toString();
-
-	allowUndefined = null;
-
-	return str;
-}),
+}, "Partial", tg),
 /**
  * The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined.
  *
@@ -661,15 +598,7 @@ Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in 
 	} finally {
 		allowUndefined = null;
 	}
-}, () => {
-	allowUndefined ??= false;
-
-	const str = tg.toString();
-
-	allowUndefined = null;
-
-	return str;
-}),
+}, "Required", tg),
 /**
  * The Take function takes an existing TypeGuard create by the Obj function and transforms it to only check the keys passed into this function.
  *
@@ -686,15 +615,7 @@ Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 	} finally {
 		take = null;
 	}
-}, () => {
-	take = keys;
-
-	const str = tg.toString();
-
-	take = null;
-
-	return str;
-}),
+}, "Pick", tg, keys),
 /**
  * The Skip function takes an existing TypeGuard create by the Obj function and transforms it to not check the keys passed into this function.
  *
@@ -711,15 +632,7 @@ Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 	} finally {
 		skip = null;
 	}
-}, () => {
-	skip = keys;
-
-	const str = tg.toString();
-
-	skip = null;
-
-	return str;
-}),
+}, "Omit", tg, keys),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
@@ -792,12 +705,7 @@ Rec = <K extends TypeGuard<Exclude<keyof any, number>>, V extends TypeGuard<any>
 	}
 
 	return true;
-}, () => {
-	const keyStr = key.toString(),
-	      valStr = value.toString();
-
-	return assignDeps(`Record<${keyStr}, ${valStr}>`, keyStr.deps, valStr.deps);
-}),
+}, "Record", key, value),
 /**
  * The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards.
  *
@@ -824,7 +732,7 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown
 	}
 
 	return throwOrReturn(false, "OR", "", errs.join(" | "));
-}, tgs, "|"),
+}, "Or", tgs),
 /**
  * The And function returns a TypeGuard that checks a value matches against all of the given TypeGuards.
  *
@@ -852,7 +760,7 @@ And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknow
 	}
 
 	return true;
-}, tgs, "&"),
+}, "And", tgs),
 /**
  * The MapType function returns a TypeGuard that checks for an Map type where the keys and values are of the types specified.
  *
@@ -887,12 +795,7 @@ MapType = <K extends TypeGuard<any>, V extends TypeGuard<any>>(key: K, value: V)
 	}
 
 	return true;
-}, () => {
-	const keyStr = key.toString(),
-	      valStr = value.toString();
-
-	return assignDeps(`Map<${keyStr}, ${valStr}>`, keyStr.deps, valStr.deps);
-}),
+}, "Map", key, value),
 /**
  * The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified.
  *
@@ -922,11 +825,7 @@ SetType = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Set<T> => {
 	}
 
 	return true;
-}, () => {
-	const str = t.toString();
-
-	return assignDeps(`Set<${str}>`, str.deps);
-}),
+}, "Set", t),
 /**
  * The Class function returns a TypeGuard that checks a value is of the class specified.
  *
@@ -964,9 +863,4 @@ Forbid = <T, U>(t: TypeGuard<T>, u: TypeGuard<U>) => asTypeGuard((v: unknown): v
 	}
 
 	return t(v);
-}, () => {
-	const tStr = t.toString(),
-	      uStr = u.toString();
-
-	return assignDeps(`Exclude<${tStr}, ${uStr}>`, tStr.deps, uStr.deps);
-});
+}, "Exclude", t, u);
