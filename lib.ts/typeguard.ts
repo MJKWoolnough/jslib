@@ -26,6 +26,10 @@ type Aliases = {
 	deps?: Deps;
 }
 
+type Definition = string | ["Array", Definition] | ["Tuple" | "Or" | "And", ...Definition[]] | ["Object", Record<string | number | symbol, Definition>] | [string, Definition, Definition | undefined] // Normal, Array, Tuple/Or/And, Object, Special
+
+type DefinitionWithDeps = Definition & Aliases;
+
 let throwErrors = false,
     allowUndefined: boolean | null = null,
     take: (keyof any)[] | null = null,
