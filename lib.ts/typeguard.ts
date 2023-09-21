@@ -214,6 +214,8 @@ class STypeGuard<T> extends Function {
 		switch (typeStr) {
 		case "Array":
 			return [typeStr, (data as STypeGuard<any>).def()]
+		case "Tuple":
+			return [typeStr, (data as STypeGuard<any>[]).map(d => d.def()), (extra as STypeGuard<any>)?.def()];
 		}
 
 		return "";
