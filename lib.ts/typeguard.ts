@@ -30,6 +30,8 @@ type Definition = string | ["Array", Definition] | ["Tuple" | "Or" | "And", ...D
 
 type DefinitionWithDeps = Definition & Aliases;
 
+type StoredDefinition = [string, string | undefined] | ["Array", STypeGuard<any>] | ["Tuple" | "Or" | "And", ...STypeGuard<any>[]] | ["Object", STypeGuard<string | symbol>, STypeGuard<any>] | [string, STypeGuard<any>, STypeGuard<any> | undefined];
+
 let throwErrors = false,
     allowUndefined: boolean | null = null,
     take: (keyof any)[] | null = null,
@@ -66,6 +68,7 @@ const throwUnknownError = (v: boolean) => {
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
       aliases = new Map<STypeGuard<any>, string & Aliases>(),
+      definitions = new WeakMap<STypeGuard<any>, StoredDefinition>(),
       group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v: string, p: readonly (string | TypeGuard<string>)[]) => {
