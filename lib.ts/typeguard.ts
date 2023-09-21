@@ -26,11 +26,11 @@ type Aliases = {
 	deps?: Deps;
 }
 
-type Definition = string | ["Array", Definition] | ["Tuple", Definition[], Definition?] | ["Or" | "And", ...Definition[]] | ["Object", Record<string | number | symbol, Definition>] | [string, Definition, Definition | undefined] // Normal, Array, Tuple, Or/And, Object, Special
+type Definition = string | ["Array", Definition] | ["Tuple", Definition[], Definition?] | ["Or" | "And", readonly Definition[]] | ["Object", Record<string | number | symbol, Definition>] | [string, Definition, Definition | undefined] // Normal, Array, Tuple, Or/And, Object, Special
 
 type DefinitionWithDeps = Definition & Aliases;
 
-type StoredDefinition = [string, string | undefined] | ["Array", STypeGuard<any>] | ["Tuple", STypeGuard<any>[], STypeGuard<any>?] | ["Or" | "And", ...STypeGuard<any>[]] | ["Object", STypeGuard<string | symbol>, STypeGuard<any>] | [string, STypeGuard<any>, STypeGuard<any> | undefined];
+type StoredDefinition = [string | (() => string), string?] | ["Array", STypeGuard<any>] | ["Tuple", readonly STypeGuard<any>[], STypeGuard<any>?] | ["Or" | "And", readonly STypeGuard<any>[]] | ["Object", {[K: string | number | symbol]: STypeGuard<any>}] | [string, STypeGuard<any>, STypeGuard<any>?];
 
 let throwErrors = false,
     allowUndefined: boolean | null = null,
@@ -206,8 +206,38 @@ class STypeGuard<T> extends Function {
 	static from<T>(tg: (v: unknown) => v is T, typeStr: "Omit" | "Pick", elem: STypeGuard<any>, keys: readonly (string | number | symbol)[]): TypeGuard<T>;
 	static from<T>(tg: (v: unknown) => v is T, typeStr: "And" | "Or", elements: readonly STypeGuard<any>[], _?: undefined): TypeGuard<T>;
 	static from<T>(tg: (v: unknown) => v is T, typeStr: string, element: STypeGuard<any>, additionalElement?: STypeGuard<any>): TypeGuard<T>;
-	static from<T>(tg: (v: unknown) => v is T, _typeStr: string | (() => string), _data?: string | STypeGuard<any> | readonly STypeGuard<any>[] | {[K: string | number | symbol]: STypeGuard<any>}, _extra?: STypeGuard<any> | readonly (string | number | symbol)[]) {
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string) = "unknown", data?: string | STypeGuard<any> | readonly STypeGuard<any>[] | {[K: string | number | symbol]: STypeGuard<any>}, extra?: STypeGuard<any> | readonly (string | number | symbol)[]) {
 		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype) as TypeGuard<T>;
+
+		let def: StoredDefinition;
+
+		switch (typeStr) {
+		case "Array":
+			def = ["Array", data as STypeGuard<any>]
+			break;
+		case "Tuple":
+			def = ["Tuple", data as STypeGuard<any>, extra as STypeGuard<any>]
+			break;
+		case "Object":
+			def = ["Object", data as {[K: string | number | symbol]: STypeGuard<any>}];
+			break
+		case "Record":
+		case "Omit":
+			def = [typeStr, data as STypeGuard<any>, extra as STypeGuard<any>];
+			break;
+		case "And":
+		case "Or":
+			def = [typeStr, data as readonly STypeGuard<any>[]];
+			break;
+		default:
+			if (typeStr instanceof Function) {
+				def = [typeStr];
+			} else {
+				def = [typeStr, data as TypeGuard<any>, extra as undefined];
+			}
+		}
+
+		definitions.set(tgFn, def);
 
 		return tgFn;
 	}
