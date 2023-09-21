@@ -118,65 +118,6 @@ const throwUnknownError = (v: boolean) => {
 	}
 
 	return t;
-      },
-      toString = (tg: STypeGuard<any>, typ: string | (() => string) | readonly STypeGuard<any>[], comment?: string) => {
-	const alias = aliases.get(tg);
-	if (alias) {
-		return alias;
-	}
-
-	let str: string & Aliases = "";
-
-	if (typ instanceof Array) {
-	        const arr: string[] = [],
-		      deps: Deps = {};
-
-		for (const t of typ) {
-			const str = t.toString(),
-			      gStr = tg[group] === '&' && t[group] === '|' ? `(${str})` : str + "";
-
-			if (!arr.includes(gStr)) {
-				if (str.deps) {
-					Object.assign(deps, str.deps);
-				}
-
-				arr.push(gStr);
-			}
-		}
-
-		str = assignDeps(arr.join(` ${comment} `), deps);
-	} else {
-		str = (typ instanceof Function ? typ() : typ);
-
-		if (comment) {
-			const deps = str.deps;
-
-			str += ` /* ${comment} */`;
-
-			if (deps) {
-				str = Object.assign(str, {deps});
-			}
-		}
-	}
-
-	const lateAlias = aliases.get(tg);
-
-	if (lateAlias) {
-		str = assignDeps(lateAlias, str.deps, {[lateAlias]: str});
-	}
-
-	aliases.set(tg, str);
-
-	return str;
-      },
-      assignDeps = (str: string, ...ds: (Deps | undefined)[]) => {
-	const deps: Deps = {};
-
-	for (const d of ds) {
-		Object.assign(deps, d);
-	}
-
-	return Object.keys(deps).length ? Object.assign(str, {deps}) : str;
       };
 
 /**
@@ -262,14 +203,8 @@ class STypeGuard<T> extends Function {
 		yield SpreadTypeGuard.from<T>(this);
 	}
 
-	[Symbol.toPrimitive]() {
-		return this.toString() + "";
-	}
-
 	toString() {
-		const [typ, comment] = getType(this);
-
-		return toString(this, typ, comment);
+		return "";
 	}
 }
 
