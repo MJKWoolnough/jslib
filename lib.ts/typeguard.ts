@@ -194,19 +194,19 @@ export type TypeGuard<T> = STypeGuard<T> & ((v: unknown) => v is T);
 class STypeGuard<T> extends Function {
 	[group]?: string;
 
-	static from<T>(tg: (v: unknown) => v is T, typeStr: string, comment?: string): TypeGuard<T>;
-	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string)): TypeGuard<T>;
-	static from<T>(tg: (v: unknown) => v is T, typeStr: "Array", arrType: STypeGuard<any>): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string), data?: string | STypeGuard<any> | readonly STypeGuard<any>[] | {[K: string | number | symbol]: STypeGuard<any>}, extra?: STypeGuard<any> | readonly (string | number | symbol)[]): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string, comment?: string, _?: undefined): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: string | (() => string), _a?: undefined, _b?: undefined): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Array", arrType: STypeGuard<any>, _?: undefined): TypeGuard<T>;
 	static from<T>(tg: (v: unknown) => v is T, typeStr: "Tuple", elements: readonly STypeGuard<any>[], skip?: STypeGuard<any>): TypeGuard<T>;
-	static from<T>(tg: (v: unknown) => v is T, typeStr: "Object", obj?: {[K: string | number | symbol]: STypeGuard<any>}): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Object", obj?: {[K: string | number | symbol]: STypeGuard<any>}, _?: undefined): TypeGuard<T>;
 	static from<T>(tg: (v: unknown) => v is T, typeStr: "Record", key: STypeGuard<string | symbol>, val: STypeGuard<any>): TypeGuard<T>;
-	static from<T>(tg: (v: unknown) => v is T, typeStr: "Partial", elem: STypeGuard<any>): TypeGuard<T>;
-	static from<T>(tg: (v: unknown) => v is T, typeStr: "Required", elem: STypeGuard<any>): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Partial", elem: STypeGuard<any>, _?: undefined): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "Required", elem: STypeGuard<any>, _?: undefined): TypeGuard<T>;
 	static from<T>(tg: (v: unknown) => v is T, typeStr: "Omit" | "Pick", elem: STypeGuard<any>, keys: readonly (string | number | symbol)[]): TypeGuard<T>;
-	static from<T>(tg: (v: unknown) => v is T, typeStr: "And" | "Or", elements: readonly STypeGuard<any>[]): TypeGuard<T>;
+	static from<T>(tg: (v: unknown) => v is T, typeStr: "And" | "Or", elements: readonly STypeGuard<any>[], _?: undefined): TypeGuard<T>;
 	static from<T>(tg: (v: unknown) => v is T, typeStr: string, element: STypeGuard<any>, additionalElement?: STypeGuard<any>): TypeGuard<T>;
-	static from<T>(tg: (v: unknown) => v is T, typeStr: string, data?: string | (() => string) | STypeGuard<any> | readonly STypeGuard<any>[] | {[K: string | number | symbol]: STypeGuard<any>}, extra?: string | STypeGuard<any> | readonly (string | number | symbol)[]): TypeGuard<any>;
-	static from<T>(tg: (v: unknown) => v is T, _typeStr: string, _data?: string | (() => string) | STypeGuard<any> | readonly STypeGuard<any>[] | {[K: string | number | symbol]: STypeGuard<any>}, _extra?: string | STypeGuard<any> | readonly (string | number | symbol)[]) {
+	static from<T>(tg: (v: unknown) => v is T, _typeStr: string | (() => string), _data?: string | STypeGuard<any> | readonly STypeGuard<any>[] | {[K: string | number | symbol]: STypeGuard<any>}, _extra?: STypeGuard<any> | readonly (string | number | symbol)[]) {
 		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype) as TypeGuard<T>;
 
 		return tgFn;
