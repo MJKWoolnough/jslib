@@ -279,11 +279,12 @@ class STypeGuard<T> extends Function {
 
 			return req;
 		case "Omit":
-			skip = extra as (string | symbol)[];
+			const oldSkip = skip;
+			skip = (skip ?? []).concat(extra as (string | symbol)[]);
 
 			const omit = (data as STypeGuard<any>).def();
 
-			skip = null;
+			skip = oldSkip;
 
 			return omit;
 		case "Pick":
