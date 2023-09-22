@@ -288,11 +288,12 @@ class STypeGuard<T> extends Function {
 
 			return omit;
 		case "Pick":
-			take = extra as (string | symbol)[];
+			const oldTake = take;
+			take = (extra as (string | symbol)[]).filter(take ? a => take!.includes(a) : a => a);
 
 			const pick = (data as STypeGuard<any>).def();
 
-			take = null;
+			take = oldTake;
 
 			return pick;
 		default:
