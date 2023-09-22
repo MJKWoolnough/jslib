@@ -298,9 +298,9 @@ class STypeGuard<T> extends Function {
 			if (typeof data === "string" || data === undefined) {
 				return typeStr + (data ? ` /* ${data} */` : "");
 			}
-		}
 
-		return "";
+			return [typeStr, (data as STypeGuard<any>).def(), (extra as STypeGuard<any>)?.def()]; 
+		}
 	}
 
 	toString() {
