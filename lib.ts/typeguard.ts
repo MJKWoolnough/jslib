@@ -30,7 +30,7 @@ type Definition = string | ["Array", Definition] | ["Tuple", readonly Definition
 
 type DefinitionWithDeps = Definition & Aliases;
 
-type StoredDefinition = [string | (() => string), string?] | ["Array", STypeGuard<any>] | ["Tuple", readonly STypeGuard<any>[], STypeGuard<any>?] | ["Or" | "And", readonly STypeGuard<any>[]] | ["Object", {[K: string | number | symbol]: STypeGuard<any>}] | [string, STypeGuard<any>, STypeGuard<any>?];
+type StoredDefinition = [string | (() => string), string?] | ["Array", STypeGuard<any>] | ["Tuple", readonly STypeGuard<any>[], STypeGuard<any>?] | ["Or" | "And", readonly STypeGuard<any>[]] | ["Object", {[K: string | number | symbol]: STypeGuard<any>}] | ["Omit" | "Pick", STypeGuard<any>, (string | symbol)[]] | [string, STypeGuard<any>, STypeGuard<any>?];
 
 let throwErrors = false,
     allowUndefined: boolean | null = null,
@@ -278,6 +278,14 @@ class STypeGuard<T> extends Function {
 			allowUndefined = null;
 
 			return req;
+		case "Omit":
+			skip = extra as (string | symbol)[];
+
+			const omit = (data as STypeGuard<any>).def();
+
+			skip = null;
+
+			return omit;
 		}
 
 		return "";
