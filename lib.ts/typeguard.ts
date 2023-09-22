@@ -294,6 +294,10 @@ class STypeGuard<T> extends Function {
 			take = null;
 
 			return pick;
+		default:
+			if (typeof data === "string" || data === undefined) {
+				return typeStr + (data ? ` /* ${data} */` : "");
+			}
 		}
 
 		return "";
