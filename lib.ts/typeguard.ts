@@ -261,7 +261,7 @@ class STypeGuard<T> extends Function {
 				}
 			}
 
-			return ["Object", fields];
+			return [typeStr, fields];
 		case "Partial":
 			allowUndefined ??= true;
 
