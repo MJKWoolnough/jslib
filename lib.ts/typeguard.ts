@@ -262,6 +262,14 @@ class STypeGuard<T> extends Function {
 			}
 
 			return ["Object", fields];
+		case "Partial":
+			allowUndefined ??= true;
+
+			const part = (data as STypeGuard<any>).def();
+
+			allowUndefined = null;
+
+			return part;
 		}
 
 		return "";
