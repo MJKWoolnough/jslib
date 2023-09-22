@@ -270,6 +270,14 @@ class STypeGuard<T> extends Function {
 			allowUndefined = null;
 
 			return part;
+		case "Required":
+			allowUndefined ??= false;
+
+			const req = (data as STypeGuard<any>).def();
+
+			allowUndefined = null;
+
+			return req;
 		}
 
 		return "";
