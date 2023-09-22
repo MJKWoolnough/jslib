@@ -286,6 +286,14 @@ class STypeGuard<T> extends Function {
 			skip = null;
 
 			return omit;
+		case "Pick":
+			take = extra as (string | symbol)[];
+
+			const pick = (data as STypeGuard<any>).def();
+
+			take = null;
+
+			return pick;
 		}
 
 		return "";
