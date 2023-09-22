@@ -231,6 +231,37 @@ class STypeGuard<T> extends Function {
 			}
 
 			return [typeStr, elements];
+		case "Object":
+			const [au, tk, s] = mods(),
+			      fields: Record<string | number | symbol, DefinitionWithDeps> = {};
+
+			if (data) {
+				for (const [k, tg] of Object.entries(data) as [keyof {}, TypeGuard<any>][]) {
+					if (typeof k === "string" && (tk?.includes(k) ?? true) && !s?.includes(k)) {
+						let t = tg.def();
+
+						if (au) {
+							if (t[0] === "Or") {
+								if (!(t[1] as Definition[]).some(e => e === "undefined")) {
+									t = ["Or", [...(t[1] as Definition[]), "undefined"]];
+								}
+							} else {
+								t = ["Or", [t, "undefined"]];
+							}
+						} else if (au === false) {
+							if (t === "undefined") {
+								continue;
+							} else if (t[0] === "Or") {
+								t = ["Or", (t[1] as Definition[]).filter(e => e === "undefined")];
+							}
+						}
+
+						fields[k] = t;
+					}
+				}
+			}
+
+			return ["Object", fields];
 		}
 
 		return "";
