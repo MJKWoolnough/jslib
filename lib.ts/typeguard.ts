@@ -323,7 +323,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 	}
 
 	return throwOrReturn(false, "template");
-}, (() => {
+}, () => {
 	if (s.length === 0) {
 		return JSON.stringify(first);
 	}
@@ -388,7 +388,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 	}
 
 	return toRet + "`";
-})()),
+}),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *
