@@ -550,7 +550,7 @@ Tuple = <const T extends readonly any[], const U extends {[K in keyof T]: TypeGu
 		}
 
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
-	}, "Tuple", tgs, spread);
+	}, ["Tuple", tgs, spread]);
 },
 /**
  * The Obj function returns a TypeGuard that checks for an object type defined by the passed object of TypeGuards.
