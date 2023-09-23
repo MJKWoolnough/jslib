@@ -417,7 +417,7 @@ Null = () => asTypeGuard((v: unknown): v is null => throwOrReturn(v === null, "n
  *
  * @return {TypeGuard<number>}
  */
-Num = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number"), "number", min !== -Infinity ? `${min} <= n` + (max !== Infinity ? ` <= ${max}` : "") : max !== Infinity ? `n <= ${max}` : undefined),
+Num = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number"), min !== -Infinity ? ["number", `${min} <= n` + (max !== Infinity ? ` <= ${max}` : "")] : max !== Infinity ? ["number", `n <= ${max}`] : "number"),
 /**
  * The Int function returns a TypeGuard that checks for integers, and takes optional min and max (inclusive) values to range check.
  *
