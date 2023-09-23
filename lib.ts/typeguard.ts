@@ -609,7 +609,7 @@ Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in
 	} finally {
 		allowUndefined = null;
 	}
-}, "Partial", tg),
+}, ["Partial", tg]),
 /**
  * The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined.
  *
