@@ -288,7 +288,7 @@ export const
  *
  * @return {TypeGuard<T>} The passed in typeguard, with additional functionality.
  */
-asTypeGuard: typeof STypeGuard.from = (tg, typeStr, data, extra) => STypeGuard.from(tg, typeStr, data, extra),
+asTypeGuard = <T>(tg: (v: unknown) => v is T, def: StoredDefinition = "unknown") => STypeGuard.from(tg, def),
 /**
  * The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against.
  *
