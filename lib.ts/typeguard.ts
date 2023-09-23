@@ -426,7 +426,7 @@ Num = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is number
  *
  * @return {TypeGuard<number>}
  */
-Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer"), "number", min > Number.MIN_SAFE_INTEGER ? `${min} <= n` + (max < Number.MAX_SAFE_INTEGER ? ` <= ${max}` : "") : max < Number.MAX_SAFE_INTEGER ? `n <= ${max}` : undefined),
+Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer"), min > Number.MIN_SAFE_INTEGER ? ["number", `${min} <= n` + (max < Number.MAX_SAFE_INTEGER ? ` <= ${max}` : "")] : max < Number.MAX_SAFE_INTEGER ? ["number", `n <= ${max}`] : "number"),
 /**
  * The BigInt function returns a TypeGuard that checks for bigints, and takes optional min and max (inclusive) values to range check.
  *
