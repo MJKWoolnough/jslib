@@ -26,7 +26,11 @@ type Aliases = {
 	deps?: Deps;
 }
 
-type Definition = string | ["Array", Definition] | ["Tuple", readonly Definition[], Definition?] | ["Or" | "And", readonly Definition[]] | ["Object", Record<string | number | symbol, Definition>] | [string, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
+type ObjectDefinition = readonly ["Object", Record<string | number | symbol, Definition>];
+
+type AndOrDefinition = readonly ["Or" | "And", readonly Definition[]];
+
+type Definition = string | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly [Exclude<string, "Array" | "Tuple" | "Or" | "And" | "Object">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
 
 type DefinitionWithDeps = Definition & Aliases;
 
@@ -118,6 +122,38 @@ const throwUnknownError = (v: boolean) => {
 	}
 
 	return t;
+      },
+      filterObj = (def: Definition, fn: (key: string | number | symbol, val: Definition) => null | [typeof key, Definition]): Definition => {
+	if (def[0] === "Object") {
+		const obj: Record<string | number | symbol, Definition> = {};
+
+		for (const [key, value] of Object.entries(def[1])) {
+			const d = fn(key, value);
+
+			if (d) {
+				obj[d[0]] = d[1];
+			}
+		}
+
+		return [def[0], obj] as ObjectDefinition;
+	} else if (def[0] === "Or" || def[1] === "And") {
+		const list: Definition[] = [];
+
+		for (const d of def[1] as Definition[]) {
+			if (d instanceof Array) {
+				if (d[0] === "Object" || (d[0] === "Or" || d[1] === "And")) {
+					list.push(filterObj(d, fn));
+
+					continue;
+				}
+			}
+			list.push(d);
+		}
+
+		return [def[0], list] as AndOrDefinition;
+	}
+
+	return def;
       };
 
 /**
