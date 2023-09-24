@@ -661,7 +661,21 @@ Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in 
 	} finally {
 		allowUndefined = null;
 	}
-}, "Required", tg),
+}, () => ["Required", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => {
+	if (v[0] === "Or") {
+		const left = (v[1] as Definition[]).filter(d => d !== "undefined");
+
+		if (!left) {
+			return null;
+		}
+
+		return [k, ["Or", left]];
+	} else if (v === "undefined") {
+		return null;
+	}
+
+	return [k, v];
+})]),
 /**
  * The Take function takes an existing TypeGuard create by the Obj function and transforms it to only check the keys passed into this function.
  *
