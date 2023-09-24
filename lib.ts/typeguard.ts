@@ -782,7 +782,7 @@ Rec = <K extends TypeGuard<Exclude<keyof any, number>>, V extends TypeGuard<any>
 	}
 
 	return true;
-}, "Record", key, value),
+}, () => ["Record", key.def(), value.def()]),
 /**
  * The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards.
  *
