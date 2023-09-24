@@ -499,7 +499,7 @@ Arr = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Array<T> => {
 	}
 
 	return true;
-}, ["Array", t]),
+}, () => ["Array", t.def()]),
 /**
  * The Tuple function returns a TypeGuard that checks for the given types in an array.
  *
