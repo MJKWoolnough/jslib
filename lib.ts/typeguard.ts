@@ -26,11 +26,11 @@ type Aliases = {
 	deps?: Deps;
 }
 
-type Definition = string | ["Array", Definition] | ["Tuple", readonly Definition[], Definition?] | ["Or" | "And", readonly Definition[]] | ["Object", Record<string | number | symbol, Definition>] | [string, Definition, Definition | undefined] // Normal, Array, Tuple, Or/And, Object, Special
+type Definition = string | ["Array", Definition] | ["Tuple", readonly Definition[], Definition?] | ["Or" | "And", readonly Definition[]] | ["Object", Record<string | number | symbol, Definition>] | [string, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
 
 type DefinitionWithDeps = Definition & Aliases;
 
-type StoredDefinition = string | (() => string) | [string, string] | ["Array", STypeGuard<any>] | ["Tuple", readonly STypeGuard<any>[], STypeGuard<any>?] | ["Or" | "And", readonly STypeGuard<any>[]] | ["Object", {[K: string | number | symbol]: STypeGuard<any>}] | ["Omit" | "Pick", STypeGuard<any>, (string | symbol)[]] | [string, STypeGuard<any>, STypeGuard<any>?];
+type StoredDefinition = Definition | (() => Definition);
 
 let throwErrors = false,
     allowUndefined: boolean | null = null,
