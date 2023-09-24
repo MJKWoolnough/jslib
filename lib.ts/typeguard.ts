@@ -709,7 +709,7 @@ Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 	} finally {
 		skip = null;
 	}
-}, "Omit", tg, keys),
+}, () => ["Pick", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => keys.includes(k as keyof T) ? null : [k, v])]),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
