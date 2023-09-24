@@ -692,7 +692,7 @@ Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 	} finally {
 		take = null;
 	}
-}, "Pick", tg, keys),
+}, () => ["Pick", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => keys.includes(k as keyof T) ? [k, v] : null)]),
 /**
  * The Skip function takes an existing TypeGuard create by the Obj function and transforms it to not check the keys passed into this function.
  *
