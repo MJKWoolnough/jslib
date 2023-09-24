@@ -593,7 +593,7 @@ Obj = <T extends {}, U extends {[K in keyof T]: TypeGuard<T[K]>} = {[K in keyof 
 	}
 
 	return true;
-}, t ? ["Object", t] : "Object"),
+}, t ? () => ["Object", Object.fromEntries((Object.entries(t) as [keyof U, TypeGuard<any>][]).map(([k, v]) => [k, v.def()]))] : "Object"),
 /**
  * The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined').
  *
