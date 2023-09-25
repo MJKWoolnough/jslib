@@ -175,6 +175,18 @@ const throwUnknownError = (v: boolean) => {
 	}
 
 	return "never";
+      },
+      toString = (def: Definition) => {
+	switch (def[0]) {
+	case "Array":
+		const isGroup = def[1][0] === "And" || def[1][0] === "Or";
+
+		return `${isGroup ? "(" : ""}${toString(def[1])}${isGroup ? ")" : ""}[]`;
+	case "Tuple":
+	case "Object":
+	case "And":
+	case "Or":
+	}
       };
 
 /**
@@ -227,7 +239,7 @@ class STypeGuard<T> extends Function {
 	}
 
 	toString() {
-		return "";
+		return toString(this.def());
 	}
 }
 
