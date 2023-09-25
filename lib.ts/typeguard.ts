@@ -154,6 +154,27 @@ const throwUnknownError = (v: boolean) => {
 	}
 
 	return def;
+      },
+      reduceAndOr = (andOr: "And" | "Or", tgs: readonly TypeGuard<any>[]): Definition => {
+	const list: Definition[] = [];
+
+	for (const tg of tgs) {
+		const def = tg.def();
+
+		if (def[0] === andOr) {
+			list.push(...(def[1] as Definition[]))
+		} else if (def !== "never") {
+			list.push(def);
+		}
+	}
+
+	if (list.length === 1) {
+		return list[0];
+	} else if (list.length) {
+		return [andOr, list];
+	}
+
+	return "never";
       };
 
 /**
