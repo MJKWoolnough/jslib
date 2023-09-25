@@ -858,7 +858,7 @@ And = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknow
 	}
 
 	return true;
-}, "And", tgs),
+}, () => reduceAndOr("And", tgs)),
 /**
  * The MapType function returns a TypeGuard that checks for an Map type where the keys and values are of the types specified.
  *
