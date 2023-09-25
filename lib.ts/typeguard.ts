@@ -182,10 +182,11 @@ const throwUnknownError = (v: boolean) => {
 		const isGroup = def[1][0] === "And" || def[1][0] === "Or";
 
 		return `${isGroup ? "(" : ""}${toString(def[1])}${isGroup ? ")" : ""}[]`;
-	case "Tuple":
-	case "Object":
 	case "And":
 	case "Or":
+		return (def[1] as Definition[]).map(d => toString(d)).join(def[0] === "And" ? " & " : " | ");
+	case "Tuple":
+	case "Object":
 	}
       };
 
