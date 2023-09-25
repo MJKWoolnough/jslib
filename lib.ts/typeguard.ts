@@ -830,7 +830,7 @@ Or = <T extends readonly TypeGuard<any>[]>(...tgs: T) => asTypeGuard((v: unknown
 	}
 
 	return throwOrReturn(false, "OR", "", errs.join(" | "));
-}, "Or", tgs),
+}, () => reduceAndOr("Or", tgs)),
 /**
  * The And function returns a TypeGuard that checks a value matches against all of the given TypeGuards.
  *
