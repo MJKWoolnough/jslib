@@ -177,6 +177,10 @@ const throwUnknownError = (v: boolean) => {
 	return "never";
       },
       toString = (def: Definition) => {
+	if (typeof def === "string") {
+		return def;
+	}
+
 	switch (def[0]) {
 	case "Array":
 		const isGroup = def[1][0] === "And" || def[1][0] === "Or";
