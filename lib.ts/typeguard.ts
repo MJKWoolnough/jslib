@@ -185,8 +185,24 @@ const throwUnknownError = (v: boolean) => {
 	case "And":
 	case "Or":
 		return (def[1] as Definition[]).map(d => toString(d)).join(def[0] === "And" ? " & " : " | ");
-	case "Tuple":
 	case "Object":
+		let arr = "{";
+
+		for (const [k, d] of Object.entries(def[1]) as [string, Definition][]) {
+			if (typeof k === "string") {
+				const hasUndefined = d === "undefined" || d[0] === "Or" && (d[1] as Definition[]).includes("undefined");
+
+				arr += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${toString(d).replaceAll("\n", "\n	")};`;
+			}
+		}
+
+		if (arr.length > 1) {
+			arr += "\n";
+		}
+
+		return arr + "}";
+	case "Tuple":
+		
 	}
       };
 
