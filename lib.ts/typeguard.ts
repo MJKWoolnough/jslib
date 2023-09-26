@@ -184,7 +184,11 @@ const throwUnknownError = (v: boolean) => {
 		return `${isGroup ? "(" : ""}${toString(def[1])}${isGroup ? ")" : ""}[]`;
 	case "And":
 	case "Or":
-		return (def[1] as Definition[]).map(d => toString(d)).join(def[0] === "And" ? " & " : " | ");
+		return (def[1] as Definition[]).map(d => {
+			const group = def[0] === "And" && d[0] === "Or";
+
+			return `${group ? "(" : ""}${toString(d)}${group ? ")" : ""}`;
+		}).join(def[0] === "And" ? " & " : " | ");
 	case "Object":
 		let arr = "{";
 
