@@ -235,6 +235,8 @@ const throwUnknownError = (v: boolean) => {
 	case "Map":
 	case "Exclude":
 		return `${def[0]}<${toString(def[1])}, ${toString(def[2]!)}>`;
+	case "Set":
+		return `Set<${toString(def[1])}>`;
 	}
       };
 
