@@ -231,6 +231,8 @@ const throwUnknownError = (v: boolean) => {
 		}
 
 		return tuple + "]";
+	case "Record":
+		return `Record<${toString(def[1])}, ${toString(def[2]!)}>`;
 	}
       };
 
