@@ -631,7 +631,7 @@ Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in
 	} finally {
 		allowUndefined = null;
 	}
-}, () => ["Partial", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => v[0] === "Or" ? [k, v] : [k, ["Or", [v, "undefined"]]])]),
+}, () => ["Object", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => v[0] === "Or" ? [k, v] : [k, ["Or", [v, "undefined"]]])]),
 /**
  * The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined.
  *
@@ -647,7 +647,7 @@ Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in 
 	} finally {
 		allowUndefined = null;
 	}
-}, () => ["Required", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => {
+}, () => ["Object", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => {
 	if (v[0] === "Or") {
 		const left = (v[1] as Definition[]).filter(d => d !== "undefined");
 
@@ -678,7 +678,7 @@ Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 	} finally {
 		take = null;
 	}
-}, () => ["Pick", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => keys.includes(k as keyof T) ? [k, v] : null)]),
+}, () => ["Object", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => keys.includes(k as keyof T) ? [k, v] : null)]),
 /**
  * The Skip function takes an existing TypeGuard create by the Obj function and transforms it to not check the keys passed into this function.
  *
@@ -695,7 +695,7 @@ Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 	} finally {
 		skip = null;
 	}
-}, () => ["Pick", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => keys.includes(k as keyof T) ? null : [k, v])]),
+}, () => ["Object", filterObj(tg.def(), (k: string | number | symbol, v: Definition) => keys.includes(k as keyof T) ? null : [k, v])]),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
