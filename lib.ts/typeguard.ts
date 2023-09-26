@@ -223,7 +223,7 @@ const throwUnknownError = (v: boolean) => {
 				tuple += ", ";
 			}
 
-			tuple += `...${group ? "(" : ""}${toString(def[2])}${group ? ")" : ""}`;
+			tuple += `...${group ? "(" : ""}${toString(def[2])}${group ? ")" : ""}[]`;
 		}
 
 		return tuple + "]";
