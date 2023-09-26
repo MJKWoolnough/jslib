@@ -237,6 +237,8 @@ const throwUnknownError = (v: boolean) => {
 		return `${def[0]}<${toString(def[1])}, ${toString(def[2]!)}>`;
 	case "Set":
 		return `Set<${toString(def[1])}>`;
+	default:
+		return `${def[0]} /* ${def[1]} */`
 	}
       };
 
