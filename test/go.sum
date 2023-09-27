@@ -27,8 +27,8 @@ golang.org/x/tools v0.0.0-20191119224855-298f0cb1881e/go.mod h1:b+2E5dAYhXwXZwtn
 golang.org/x/tools v0.1.12/go.mod h1:hNGJHUnrk76NpqgfD5Aqm5Crs+Hm0VOH/i9J2+nxYbc=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 vimagination.zapto.org/javascript v1.4.10/go.mod h1:zGQvh50K8o8zaa/b3XH83gsjwSYz5ubq6EgpJw3smxg=
-vimagination.zapto.org/javascript v1.4.11 h1:ygPrlsld8QZUCpUY1PqbIx5XTP+99hWAEBN5o5Yv2Xc=
-vimagination.zapto.org/javascript v1.4.11/go.mod h1:zGQvh50K8o8zaa/b3XH83gsjwSYz5ubq6EgpJw3smxg=
+vimagination.zapto.org/javascript v1.4.12 h1:agIjSueENXwSW4FwoMmy/cPCJrrx+UKXY2n8zVI+79o=
+vimagination.zapto.org/javascript v1.4.12/go.mod h1:zGQvh50K8o8zaa/b3XH83gsjwSYz5ubq6EgpJw3smxg=
 vimagination.zapto.org/jsonrpc v1.2.1 h1:zsm7ndUizhxUi116DBJ4akKF2OnwBopzBGR1to7iaK4=
 vimagination.zapto.org/jsonrpc v1.2.1/go.mod h1:g41PBlAn31blw/VOQ2Vme2WUj0TI7OjPELvqn6luED4=
 vimagination.zapto.org/parser v1.0.2 h1:EVp5w4HmERKntuXFhJVVdmLanqXUBW/VyDUzUDY/rY0=
