@@ -217,7 +217,7 @@ const throwUnknownError = (v: boolean) => {
 		let tuple = "[";
 
 		for (const d of def[1] as Definition[]) {
-			if (d.length === 1) {
+			if (tuple.length > 1) {
 				tuple += ", ";
 			}
 
@@ -227,7 +227,7 @@ const throwUnknownError = (v: boolean) => {
 		if (def[2]) {
 			const group = def[2][0] === "Or" || def[2][0] === "And";
 
-			if (tuple.length === 1) {
+			if (tuple.length > 1) {
 				tuple += ", ";
 			}
 
