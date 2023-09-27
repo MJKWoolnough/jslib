@@ -176,7 +176,7 @@ const throwUnknownError = (v: boolean) => {
 
 	return "never";
       },
-      toString = (def: Definition) => {
+      toString = (def: Definition): string => {
 	if (typeof def === "string") {
 		return def;
 	}
@@ -291,7 +291,7 @@ class STypeGuard<T> extends Function {
 		return def instanceof Function ? def() : def;
 	}
 
-	toString() {
+	toString(): string {
 		return toString(this.def());
 	}
 }
