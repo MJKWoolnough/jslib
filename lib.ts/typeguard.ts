@@ -162,8 +162,12 @@ const throwUnknownError = (v: boolean) => {
 		const def = tg.def();
 
 		if (def[0] === andOr) {
-			list.push(...(def[1] as Definition[]))
-		} else if (def !== "never") {
+			for (const d of def[1] as Definition[]) {
+				if (list.indexOf(d) === -1) {
+					list.push(d);
+				}
+			}
+		} else if (def !== "never" && list.indexOf(def) === -1) {
 			list.push(def);
 		}
 	}
