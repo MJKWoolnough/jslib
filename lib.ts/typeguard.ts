@@ -305,17 +305,11 @@ const throwUnknownError = (v: boolean) => {
 		}
 
 		return tuple + "]";
-	case "Record":
-	case "Map":
-	case "Exclude":
-		return `${def[0]}<${toString(def[1])}, ${toString(def[2]!)}>`;
-	case "Set":
-		return `Set<${toString(def[1])}>`;
 	case "Recur":
 		return def[1] as string;
+	default:
+		return `${def[0]}<${(def.slice(1) as Definition[]).map(toString).join(", ")}>`;
 	}
-
-	return "unknown";
       };
 
 /**
