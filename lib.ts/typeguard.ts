@@ -192,7 +192,8 @@ const throwUnknownError = (v: boolean) => {
       toString = (def: Definition): string => {
 	switch (def[0]) {
 	case "":
-		return def[2] ? `${def[1]} /* ${def[2]} */` : def[1] as string;
+	case "Recur":
+		return typeof def[2] === "string" ? `${def[1]} /* ${def[2]} */` : def[1] as string;
 	case "Template":
 		const [, first, s] = def as ["Template", string, (string | TypeGuard<string>)[]];
 
@@ -305,8 +306,6 @@ const throwUnknownError = (v: boolean) => {
 		}
 
 		return tuple + "]";
-	case "Recur":
-		return def[1] as string;
 	default:
 		return `${def[0]}<${(def.slice(1) as Definition[]).map(toString).join(", ")}>`;
 	}
