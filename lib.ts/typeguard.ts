@@ -186,22 +186,12 @@ const throwUnknownError = (v: boolean) => {
 		}
 	}
 
-	if (list.length === 1) {
-		return list[0];
-	} else if (list.length) {
-		return [andOr, list];
-	}
-
-	return ["", "never"];
+	return list.length === 1 ? list[0] : list.length ? [andOr, list] : ["", "never"];
       },
       toString = (def: Definition): string => {
 	switch (def[0]) {
 	case "":
-		if (def[2]) {
-			return `${def[1]} /* ${def[2]} */`
-		}
-
-		return def[1] as string;
+		return def[2] ? `${def[1]} /* ${def[2]} */` : def[1] as string;
 	case "Template":
 		const [, first, s] = def as ["Template", string, (string | TypeGuard<string>)[]];
 
@@ -264,11 +254,7 @@ const throwUnknownError = (v: boolean) => {
 			last = toRet;
 		}
 
-		if (toRet === "`${string}") {
-			return "string";
-		}
-
-		return toRet + "`";
+		return toRet === "`${string}" ? "string" : toRet + "`";
 	case "Array":
 		const isGroup = def[1][0] === "And" || def[1][0] === "Or";
 
