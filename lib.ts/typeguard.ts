@@ -72,6 +72,7 @@ const throwUnknownError = (v: boolean) => {
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
       definitions = new WeakMap<STypeGuard<any>, StoredDefinition>(),
+      strings = new WeakMap<STypeGuard<any>, string>(),
       group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v: string, p: readonly (string | TypeGuard<string>)[]) => {
@@ -377,7 +378,17 @@ class STypeGuard<T> extends Function {
 	}
 
 	toString(): string {
-		return toString(this.def());
+		const str = strings.get(this);
+
+		if (str) {
+			return str;
+		}
+
+		const ts =  toString(this.def());
+
+		strings.set(this, ts);
+
+		return ts;
 	}
 }
 
