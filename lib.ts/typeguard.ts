@@ -750,19 +750,19 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
  *
  * @return {TypeGuard<`${number}`>}
  */
-NumStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), ["", "`${number}`"]),
+NumStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), ["Template", "", ["number", ""]]),
 /**
  * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
  * @return {TypeGuard<`${number}`>}
  */
-IntStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), ["", "`${number}`"]),
+IntStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), ["Template", "", ["number", ""]]),
 /**
  * The BoolStr function returns a TypeGuard that checks for a string value that represents an boolean.
  *
  * @return {TypeGuard<`${boolean}`>}
  */
-BoolStr = () => asTypeGuard((v: unknown): v is `${boolean}` => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), ["", "`${boolean}`"]),
+BoolStr = () => asTypeGuard((v: unknown): v is `${boolean}` => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), ["Template", "", ["boolean", ""]]),
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *
