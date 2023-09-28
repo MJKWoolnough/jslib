@@ -30,7 +30,7 @@ type ObjectDefinition = readonly ["Object", Record<string | number | symbol, Def
 
 type AndOrDefinition = readonly ["Or" | "And", readonly Definition[]];
 
-type Definition = string | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly [Exclude<string, "Array" | "Tuple" | "Or" | "And" | "Object">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
+type Definition = string | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly ["Recur", string, Definition?] | readonly [Exclude<string, "Array" | "Tuple" | "Or" | "And" | "Object" | "Recur">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
 
 type DefinitionWithDeps = Definition & Aliases;
 
@@ -71,7 +71,6 @@ const throwUnknownError = (v: boolean) => {
 	skip = s;
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
-      aliases = new Map<STypeGuard<any>, string & Aliases>(),
       definitions = new WeakMap<STypeGuard<any>, StoredDefinition>(),
       group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
@@ -241,6 +240,8 @@ const throwUnknownError = (v: boolean) => {
 		return `${def[0]}<${toString(def[1])}, ${toString(def[2]!)}>`;
 	case "Set":
 		return `Set<${toString(def[1])}>`;
+	case "Recur":
+		return toString(def[1]);
 	default:
 		return `${def[0]} /* ${def[1]} */`
 	}
@@ -290,9 +291,19 @@ class STypeGuard<T> extends Function {
 	}
 
 	def(): DefinitionWithDeps {
-		const def = definitions.get(this) ?? "unknown";
+		const def = definitions.get(this) ?? "unknown",
+		      processed = def instanceof Function ? def() : def,
+		      late = definitions.get(this);
 
-		return def instanceof Function ? def() : def;
+		if (late !== def && late instanceof Array && late[0] === "Recur") {
+			const recur = ["Recur", late[1], processed] as const;
+
+			definitions.set(this, recur);
+
+			return recur;
+		}
+
+		return processed;
 	}
 
 	toString(): string {
@@ -719,9 +730,9 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
 	const name = str ?? "type_"+unknownTypes++; // need to generate type name here
 
 	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => {
-		aliases.set(ttg ??= tg(), name);
+		definitions.set(ttg ??= tg(), ["Recur", name]);
 
-		return name;
+		return ["Recur", name];
 	});
 },
 /**
