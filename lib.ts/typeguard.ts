@@ -30,7 +30,7 @@ type ObjectDefinition = readonly ["Object", Record<string | number | symbol, Def
 
 type AndOrDefinition = readonly ["Or" | "And", readonly Definition[]];
 
-type Definition = string | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly ["Recur", string, Definition?] | readonly [Exclude<string, "Array" | "Tuple" | "Or" | "And" | "Object" | "Recur">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
+type Definition = string | readonly ["Template", string, readonly (string | TypeGuard<string>)[]] | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly ["Recur", string, Definition?] | readonly [Exclude<string, "Array" | "Tuple" | "Or" | "And" | "Object" | "Recur">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
 
 type DefinitionWithDeps = Definition & Aliases;
 
@@ -185,6 +185,73 @@ const throwUnknownError = (v: boolean) => {
 	}
 
 	switch (def[0]) {
+	case "Template":
+		const [, first, s] = def as ["Template", string, (string | TypeGuard<string>)[]];
+
+		if (s.length === 0) {
+			return JSON.stringify(first);
+		}
+
+		let toRet = "`" + first,
+		    rest = s,
+		    allStrings = true;
+
+		const vals: string[] = [];
+
+		while (rest.length) {
+			const [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]],
+			      tgStr = tg.toString();
+
+			rest = r;
+
+			if (!tgStr.startsWith(`"`)) {
+				allStrings = false;
+			}
+
+			vals.push(tgStr, s);
+		}
+
+		rest = vals;
+
+		if (allStrings) {
+			toRet = first;
+
+			while (rest.length) {
+				const [tgs, s, ...r] = rest as string[];
+
+				rest = r;
+
+				toRet += JSON.parse(tgs) + s;
+			}
+
+			return JSON.stringify(toRet);
+		}
+
+		while (rest.length) {
+			const [tgs, s, ...r] = rest as string[];
+
+			rest = r;
+
+			if (tgs.startsWith("`")) {
+				toRet += tgs.slice(1, -1);
+			} else if (tgs.startsWith(`"`)) {
+				toRet += JSON.parse(tgs).replaceAll("${", "\\${");
+			} else {
+				toRet += "${" + tgs.replaceAll("$", "\\$") + "}";
+			}
+
+			toRet += s.replaceAll("${", "\\${");
+		}
+
+		for (let last = ""; last !== toRet; toRet = toRet.replaceAll(stringCollapse, "$1${string}")) {
+			last = toRet;
+		}
+
+		if (toRet === "`${string}") {
+			return "string";
+		}
+
+		return toRet + "`";
 	case "Array":
 		const isGroup = def[1][0] === "And" || def[1][0] === "Or";
 
@@ -364,72 +431,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 	}
 
 	return throwOrReturn(false, "template");
-}, () => {
-	if (s.length === 0) {
-		return JSON.stringify(first);
-	}
-
-	let toRet = "`" + first,
-	    rest = s as unknown as (string | TypeGuard<string>)[],
-	    allStrings = true;
-
-	const vals: string[] = [];
-
-	while (rest.length) {
-		const [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]],
-		      tgStr = tg.toString();
-
-		rest = r;
-
-		if (!tgStr.startsWith(`"`)) {
-			allStrings = false;
-		}
-
-		vals.push(tgStr, s);
-	}
-
-	rest = vals;
-
-	if (allStrings) {
-		toRet = first;
-
-		while (rest.length) {
-			const [tgs, s, ...r] = rest as string[];
-
-			rest = r;
-
-			toRet += JSON.parse(tgs) + s;
-		}
-
-		return JSON.stringify(toRet);
-	}
-
-	while (rest.length) {
-		const [tgs, s, ...r] = rest as string[];
-
-		rest = r;
-
-		if (tgs.startsWith("`")) {
-			toRet += tgs.slice(1, -1);
-		} else if (tgs.startsWith(`"`)) {
-			toRet += JSON.parse(tgs).replaceAll("${", "\\${");
-		} else {
-			toRet += "${" + tgs.replaceAll("$", "\\$") + "}";
-		}
-
-		toRet += s.replaceAll("${", "\\${");
-	}
-
-	for (let last = ""; last !== toRet; toRet = toRet.replaceAll(stringCollapse, "$1${string}")) {
-		last = toRet;
-	}
-
-	if (toRet === "`${string}") {
-		return "string";
-	}
-
-	return toRet + "`";
-}),
+}, () => ["Template", first, s]),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *
