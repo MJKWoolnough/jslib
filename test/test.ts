@@ -7962,7 +7962,7 @@ type Tests = {
 						      "b": Str()
 					      }));
 
-					return p.toString() === "{\n	a?: number;\n	b?: string;\n}";
+					return p.toString() === "{\n	a?: number | undefined;\n	b?: string | undefined;\n}";
 				},
 				"inner object": async () => {
 					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
@@ -7974,7 +7974,7 @@ type Tests = {
 						      })
 					      }));
 
-					return p.toString() === "{\n	a?: number;\n	b?: string;\n	c?: {\n		a: number;\n	};\n}";
+					return p.toString() === "{\n	a?: number | undefined;\n	b?: string | undefined;\n	c?: {\n		a: number;\n	} | undefined;\n}";
 				}
 			}
 		},
