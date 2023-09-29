@@ -7274,6 +7274,32 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"any": async () => {
+					const {BigInt} = await import("./lib/typeguard.js"),
+					      b = BigInt();
+
+					return JSON.stringify(b.def()) === `["","bigint"]`;
+				},
+				"with min (default for max)": async () => {
+					const {BigInt} = await import("./lib/typeguard.js"),
+					      b = BigInt(0n);
+
+					return JSON.stringify(b.def()) === `["","bigint","0n <= n"]`;
+				},
+				"with max (Number.MIN_SAFE_INTEGER for min)": async () => {
+					const {BigInt} = await import("./lib/typeguard.js"),
+					      b = BigInt(undefined, 0n);
+
+					return JSON.stringify(b.def()) === `["","bigint","n <= 0n"]`;
+				},
+				"with min and max": async () => {
+					const {BigInt} = await import("./lib/typeguard.js"),
+					      b = BigInt(5n, 10n);
+
+					return JSON.stringify(b.def()) === `["","bigint","5n <= n <= 10n"]`;
+				}
+			},
 			"toString": {
 				"any": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
