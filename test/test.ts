@@ -7161,31 +7161,31 @@ type Tests = {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(0, Infinity);
 
-					return JSON.stringify(i.def()) === `["","number","0 <= n"]`;
+					return JSON.stringify(i.def()) === `["","number","0 <= i"]`;
 				},
 				"with min (default for max)": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(0);
 
-					return JSON.stringify(i.def()) === `["","number","0 <= n"]`;
+					return JSON.stringify(i.def()) === `["","number","0 <= i"]`;
 				},
 				"with max (-Infinity for min)": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(-Infinity, 0);
 
-					return JSON.stringify(i.def()) === `["","number","n <= 0"]`;
+					return JSON.stringify(i.def()) === `["","number","i <= 0"]`;
 				},
 				"with max (Number.MIN_SAFE_INTEGER for min)": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(Number.MIN_SAFE_INTEGER, 0);
 
-					return JSON.stringify(i.def()) === `["","number","n <= 0"]`;
+					return JSON.stringify(i.def()) === `["","number","i <= 0"]`;
 				},
 				"with min and max": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(5, 10);
 
-					return JSON.stringify(i.def()) === `["","number","5 <= n <= 10"]`;
+					return JSON.stringify(i.def()) === `["","number","5 <= i <= 10"]`;
 				}
 			},
 			"toString": {
@@ -7199,31 +7199,31 @@ type Tests = {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(0, Infinity);
 
-					return i.toString() === "number /* 0 <= n */";
+					return i.toString() === "number /* 0 <= i */";
 				},
 				"with min (default for max)": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(0);
 
-					return i.toString() === "number /* 0 <= n */";
+					return i.toString() === "number /* 0 <= i */";
 				},
 				"with max (-Infinity for min)": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(-Infinity, 0);
 
-					return i.toString() === "number /* n <= 0 */";
+					return i.toString() === "number /* i <= 0 */";
 				},
 				"with max (Number.MIN_SAFE_INTEGER for min)": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(Number.MIN_SAFE_INTEGER, 0);
 
-					return i.toString() === "number /* n <= 0 */";
+					return i.toString() === "number /* i <= 0 */";
 				},
 				"with min and max": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
 					      i = Int(5, 10);
 
-					return i.toString() === "number /* 5 <= n <= 10 */";
+					return i.toString() === "number /* 5 <= i <= 10 */";
 				}
 			}
 		},
@@ -7699,13 +7699,13 @@ type Tests = {
 					const {Arr, Int} = await import("./lib/typeguard.js"),
 					      a = Arr(Int(0));
 
-					return a.toString() === "number /* 0 <= n */[]";
+					return a.toString() === "number /* 0 <= i */[]";
 				},
 				"complex": async () => {
 					const {Arr, Bool, Int, Or} = await import("./lib/typeguard.js"),
 					      a = Arr(Or(Int(0, 255), Arr(Bool())));
 
-					return a.toString() === "(number /* 0 <= n <= 255 */ | boolean[])[]";
+					return a.toString() === "(number /* 0 <= i <= 255 */ | boolean[])[]";
 				}
 			}
 		},
@@ -8532,7 +8532,7 @@ type Tests = {
 						      a: Int(0, 255)
 					      })));
 
-					return r.toString() === "Record<`${boolean}`, Record<\"abc\", {\n	a: number /* 0 <= n <= 255 */;\n}>>";
+					return r.toString() === "Record<`${boolean}`, Record<\"abc\", {\n	a: number /* 0 <= i <= 255 */;\n}>>";
 				}
 			}
 		},
@@ -8714,7 +8714,7 @@ type Tests = {
 						      a: Int(0, 255)
 					      })));
 
-					return m.toString() === "Map<boolean, Map<\"abc\", {\n	a: number /* 0 <= n <= 255 */;\n}>>";
+					return m.toString() === "Map<boolean, Map<\"abc\", {\n	a: number /* 0 <= i <= 255 */;\n}>>";
 				}
 			}
 		},
@@ -8772,7 +8772,7 @@ type Tests = {
 						      a: Int(0, 255)
 					      })));
 
-					return s.toString() === "Set<Set<{\n	a: number /* 0 <= n <= 255 */;\n}>>";
+					return s.toString() === "Set<Set<{\n	a: number /* 0 <= i <= 255 */;\n}>>";
 				}
 			}
 		},
