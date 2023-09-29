@@ -6703,6 +6703,12 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {Str} = await import("./lib/typeguard.js"),
+				      s = Str();
+
+				return JSON.stringify(s.def()) === `["","string"]`;
+			},
 			"toString": {
 				"any": async () => {
 					const {Str} = await import("./lib/typeguard.js"),
