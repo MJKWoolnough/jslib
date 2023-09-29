@@ -6990,6 +6990,12 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {Null} = await import("./lib/typeguard.js"),
+				      n = Null();
+
+				return JSON.stringify(n.def()) === `["","null"]`;
+			},
 			"toString": async () => {
 				const {Null} = await import("./lib/typeguard.js"),
 				      n = Null();
