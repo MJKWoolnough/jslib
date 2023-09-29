@@ -6595,6 +6595,26 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"bool": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool();
+
+					return JSON.stringify(b.def()) === `["","boolean"]`;
+				},
+				"true": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool(true);
+
+					return JSON.stringify(b.def()) === `["","true"]`;
+				},
+				"false": async () => {
+					const {Bool} = await import("./lib/typeguard.js"),
+					      b = Bool(false);
+
+					return JSON.stringify(b.def()) === `["","false"]`;
+				}
+			},
 			"toString": {
 				"any": async () => {
 					const {Bool} = await import("./lib/typeguard.js"),
