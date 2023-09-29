@@ -7285,19 +7285,19 @@ type Tests = {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt(0n);
 
-					return JSON.stringify(b.def()) === `["","bigint","0n <= n"]`;
+					return JSON.stringify(b.def()) === `["","bigint","0n <= b"]`;
 				},
 				"with max (Number.MIN_SAFE_INTEGER for min)": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt(undefined, 0n);
 
-					return JSON.stringify(b.def()) === `["","bigint","n <= 0n"]`;
+					return JSON.stringify(b.def()) === `["","bigint","b <= 0n"]`;
 				},
 				"with min and max": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt(5n, 10n);
 
-					return JSON.stringify(b.def()) === `["","bigint","5n <= n <= 10n"]`;
+					return JSON.stringify(b.def()) === `["","bigint","5n <= b <= 10n"]`;
 				}
 			},
 			"toString": {
@@ -7311,19 +7311,19 @@ type Tests = {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt(0n);
 
-					return b.toString() === "bigint /* 0n <= n */";
+					return b.toString() === "bigint /* 0n <= b */";
 				},
 				"with max (Number.MIN_SAFE_INTEGER for min)": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt(undefined, 0n);
 
-					return b.toString() === "bigint /* n <= 0n */";
+					return b.toString() === "bigint /* b <= 0n */";
 				},
 				"with min and max": async () => {
 					const {BigInt} = await import("./lib/typeguard.js"),
 					      b = BigInt(5n, 10n);
 
-					return b.toString() === "bigint /* 5n <= n <= 10n */";
+					return b.toString() === "bigint /* 5n <= b <= 10n */";
 				}
 			}
 		},
