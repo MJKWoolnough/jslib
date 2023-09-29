@@ -6865,6 +6865,12 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {Undefined} = await import("./lib/typeguard.js"),
+				      u = Undefined();
+
+				return JSON.stringify(u.def()) === `["","undefined"]`;
+			},
 			"toString": async () => {
 				const {Undefined} = await import("./lib/typeguard.js"),
 				      u = Undefined();
