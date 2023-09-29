@@ -6919,6 +6919,20 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Int, Opt} = await import("./lib/typeguard.js"),
+					      o = Opt(Int());
+
+					return JSON.stringify(o.def()) === `["Or",[["","number"],["","undefined"]]]`;
+				},
+				"with undefined": async () => {
+					const {Opt, Undefined} = await import("./lib/typeguard.js"),
+					      o = Opt(Undefined());
+
+					return JSON.stringify(o.def()) === `["","undefined"]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Int, Opt, Str} = await import("./lib/typeguard.js"),
