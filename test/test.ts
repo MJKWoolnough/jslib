@@ -7050,6 +7050,32 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"any": async () => {
+					const {Num} = await import("./lib/typeguard.js"),
+					      n = Num();
+
+					return JSON.stringify(n.def()) === `["","number"]`;
+				},
+				"with min": async () => {
+					const {Num} = await import("./lib/typeguard.js"),
+					      n = Num(0);
+
+					return JSON.stringify(n.def()) === `["","number","0 <= n"]`;
+				},
+				"with max": async () => {
+					const {Num} = await import("./lib/typeguard.js"),
+					      n = Num(-Infinity, 0);
+
+					return JSON.stringify(n.def()) === `["","number","n <= 0"]`;
+				},
+				"with min and max": async () => {
+					const {Num} = await import("./lib/typeguard.js"),
+					      n = Num(5, 10);
+
+					return JSON.stringify(n.def()) === `["","number","5 <= n <= 10"]`;
+				}
+			},
 			"toString": {
 				"any": async () => {
 					const {Num} = await import("./lib/typeguard.js"),
