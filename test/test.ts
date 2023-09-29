@@ -7150,6 +7150,44 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"any": async () => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int();
+
+					return JSON.stringify(i.def()) === `["","number"]`;
+				},
+				"with min (Infinity for max)": async () => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int(0, Infinity);
+
+					return JSON.stringify(i.def()) === `["","number","0 <= n"]`;
+				},
+				"with min (default for max)": async () => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int(0);
+
+					return JSON.stringify(i.def()) === `["","number","0 <= n"]`;
+				},
+				"with max (-Infinity for min)": async () => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int(-Infinity, 0);
+
+					return JSON.stringify(i.def()) === `["","number","n <= 0"]`;
+				},
+				"with max (Number.MIN_SAFE_INTEGER for min)": async () => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int(Number.MIN_SAFE_INTEGER, 0);
+
+					return JSON.stringify(i.def()) === `["","number","n <= 0"]`;
+				},
+				"with min and max": async () => {
+					const {Int} = await import("./lib/typeguard.js"),
+					      i = Int(5, 10);
+
+					return JSON.stringify(i.def()) === `["","number","5 <= n <= 10"]`;
+				}
+			},
 			"toString": {
 				"any": async () => {
 					const {Int} = await import("./lib/typeguard.js"),
