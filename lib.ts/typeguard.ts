@@ -192,21 +192,21 @@ const throwUnknownError = (v: boolean) => {
 
 	return list.length === 1 ? list[0] : list.length ? [andOr, list] : ["", "never"];
       },
+      templateSafe = (s: string) => s.replaceAll("${", "\\${").replaceAll("`", "\\`"),
       toString = (def: Definition): string => {
 	switch (def[0]) {
 	case "":
 	case "Recur":
 		return typeof def[2] === "string" ? `${def[1]} /* ${def[2]} */` : def[1] as string;
 	case "Template":
-		let template = "`" + def[1][0].replaceAll("${", "\\${"),
+		let template = "`" + templateSafe(def[1][0]),
 		    r = def[1].slice(1);
 
 		while (r.length) {
 			const [d, s, ...rest] = r as [string, string, ...string[]];
 
-			template += "${" + d + "}" + s.replaceAll("${", "\\${");
-
 			r = rest;
+			template += "${" + d + "}" + templateSafe(s);
 		}
 
 		return template + "`";
