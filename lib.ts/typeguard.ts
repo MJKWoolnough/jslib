@@ -199,17 +199,7 @@ const throwUnknownError = (v: boolean) => {
 	case "Recur":
 		return typeof def[2] === "string" ? `${def[1]} /* ${def[2]} */` : def[1] as string;
 	case "Template":
-		let template = "`" + templateSafe(def[1][0]),
-		    r = def[1].slice(1);
-
-		while (r.length) {
-			const [d, s, ...rest] = r as [string, string, ...string[]];
-
-			r = rest;
-			template += "${" + d + "}" + templateSafe(s);
-		}
-
-		return template + "`";
+		return (def[1] as string[]).reduce((s, d, n) => s + (n % 2 ? "${" + d + "}" : templateSafe(d)), "`") + "`";
 	case "Array":
 		const isGroup = def[1][0] === "And" || def[1][0] === "Or";
 
