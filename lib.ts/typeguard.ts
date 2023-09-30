@@ -30,9 +30,11 @@ type ObjectDefinition = readonly ["Object", Record<string | number | symbol, Def
 
 type AndOrDefinition = readonly ["Or" | "And", readonly Definition[]];
 
-type PrimitiveOrValueDefinition = ["", string, string?];
+type PrimitiveOrValueDefinition = readonly ["", string, string?];
 
-type Definition = PrimitiveOrValueDefinition | readonly ["Template", (string | PrimitiveOrValueDefinition)[]] | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly ["Recur", string, Definition?] | readonly [Exclude<string, "Array" | "Tuple" | "Or" | "And" | "Object" | "Recur">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
+type TemplateDefinition = readonly ["Template", readonly (string | PrimitiveOrValueDefinition)[]]
+
+type Definition = PrimitiveOrValueDefinition | TemplateDefinition | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly ["Recur", string, Definition?] | readonly [Exclude<string, "Tuple" | "Array" | "Tuple" | "Or" | "And" | "Object" | "Recur">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
 
 type DefinitionWithDeps = Definition & Aliases;
 
@@ -440,7 +442,54 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 	}
 
 	return throwOrReturn(false, "template");
-}, () => ["Template", first, s]),
+}, () => {
+	if (s.length === 0) {
+		return ["", JSON.stringify(first)];
+	}
+
+	let rest: (string | TypeGuard<string>)[] = s.slice(),
+	    justString = first === "";
+
+	const vals: (string | PrimitiveOrValueDefinition)[] = [first];
+
+	for (let [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]]; r.length; [tg, s, ...r] = r as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]]) {
+		const def = tg.def() as TemplateDefinition | PrimitiveOrValueDefinition;
+
+		if (def[0] === "Template") {
+			vals[vals.length - 1] += def[1][0] as string;
+
+			for (let [d, ds, ...dr] = def[1].slice(1) as [PrimitiveOrValueDefinition, string, ...(PrimitiveOrValueDefinition | string)[]]; dr.length; [d, ds, ...dr] = dr as [PrimitiveOrValueDefinition, string, ...(PrimitiveOrValueDefinition | string)[]]) {
+				justString &&= d[1] === "string" && ds === "";
+
+				vals.push(d, ds);
+			}
+		} else {
+			if (def[1].startsWith(`"`)) {
+				vals[vals.length - 1] += JSON.parse(def[1]) + s;
+
+				justString = false;
+			} else {
+				justString &&= def[1] === "string";
+
+				vals.push(def as PrimitiveOrValueDefinition);
+			}
+		}
+
+		justString &&= s === "";
+
+		vals.push(s);
+	}
+
+	if (justString) {
+		return ["", "string"];
+	}
+
+	if (vals.length === 1) {
+		return ["", JSON.stringify(vals[0])];
+	}
+
+	return ["Template", vals];
+}),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *
