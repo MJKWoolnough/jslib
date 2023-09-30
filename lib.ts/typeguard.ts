@@ -401,32 +401,52 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 
 	const vals: string[] = [first];
 
-	for (let [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]]; r.length; [tg, s, ...r] = r as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]]) {
-		const def = tg.def() as TemplateDefinition | PrimitiveOrValueDefinition;
+	while (rest.length) {
+		const [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]],
+		      [typ, val] = tg.def() as TemplateDefinition | PrimitiveOrValueDefinition;
 
-		if (def[0] === "Template") {
-			vals[vals.length - 1] += def[1][0] as string;
+		rest = r;
 
-			for (let [d, ds, ...dr] = def[1].slice(1) as [string, string, ...string[]]; dr.length; [d, ds, ...dr] = dr as [string, string, ...string[]]) {
-				justString &&= d === "string" && ds === "";
+		if (typ === "Template") {
+			vals[vals.length - 1] += val[0];
+
+			let dr = val.slice(1);
+
+			while (dr.length) {
+				const [d, ds, ...rest] = dr as [string, string, ...string[]];
+
+				dr = rest;
+
+				if (d === "string" && !vals[vals.length - 1]) {
+					vals.pop();
+
+					continue;
+				}
 
 				vals.push(d, ds);
+
+				justString &&= d === "string" && ds === "";
 			}
+
+			vals[vals.length - 1] += s;
 		} else {
-			if (def[1].startsWith(`"`)) {
-				vals[vals.length - 1] += JSON.parse(def[1]) + s;
+			if (val.startsWith(`"`)) {
+				vals[vals.length - 1] += JSON.parse(val) + s;
 
 				justString = false;
-			} else {
-				justString &&= def[1] === "string";
 
-				vals.push(def[1] as string);
+				continue;
+			} else if (val === "string" && !vals[vals.length - 1]) {
+				vals.pop();
+			} else {
+				justString &&= val === "string";
+				vals.push(val);
 			}
+
+			vals.push(s);
 		}
 
 		justString &&= s === "";
-
-		vals.push(s);
 	}
 
 	if (justString) {
