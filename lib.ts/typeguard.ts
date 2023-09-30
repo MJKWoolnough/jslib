@@ -382,10 +382,6 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 
 	return throwOrReturn(false, "template");
 }, () => {
-	if (s.length === 0) {
-		return ["", JSON.stringify(first)];
-	}
-
 	let rest: (string | TypeGuard<string>)[] = s.slice(),
 	    justString = first === "";
 
@@ -407,7 +403,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 
 				dr = rest;
 
-				if (d === "string" && !vals[vals.length - 1]) {
+				if (d === "string" && vals.length > 1 && !vals[vals.length - 1]) {
 					vals[vals.length - 1] = ds;
 				} else {
 					vals.push(d, ds);
@@ -422,7 +418,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 				vals[vals.length - 1] += JSON.parse(val) + s;
 
 				justString = false;
-			} else if (val === "string" && !vals[vals.length - 1]) {
+			} else if (val === "string" && vals.length > 1 && !vals[vals.length - 1]) {
 				vals[vals.length - 1] = s;
 			} else {
 				justString &&= val === "string";
@@ -433,12 +429,12 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 		justString &&= s === "";
 	}
 
-	if (justString) {
-		return ["", "string"];
-	}
-
 	if (vals.length === 1) {
 		return ["", JSON.stringify(vals[0])];
+	}
+
+	if (justString) {
+		return ["", "string"];
 	}
 
 	return ["Template", vals];
