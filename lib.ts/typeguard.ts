@@ -30,7 +30,9 @@ type ObjectDefinition = readonly ["Object", Record<string | number | symbol, Def
 
 type AndOrDefinition = readonly ["Or" | "And", readonly Definition[]];
 
-type Definition = ["", string, string?] | readonly ["Template", string, readonly (string | TypeGuard<string>)[]] | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly ["Recur", string, Definition?] | readonly [Exclude<string, "Array" | "Tuple" | "Or" | "And" | "Object" | "Recur">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
+type PrimitiveOrValueDefinition = ["", string, string?];
+
+type Definition = PrimitiveOrValueDefinition | readonly ["Template", (string | PrimitiveOrValueDefinition)[]] | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly ["Recur", string, Definition?] | readonly [Exclude<string, "Array" | "Tuple" | "Or" | "And" | "Object" | "Recur">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
 
 type DefinitionWithDeps = Definition & Aliases;
 
