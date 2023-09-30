@@ -32,7 +32,7 @@ type AndOrDefinition = readonly ["Or" | "And", readonly Definition[]];
 
 type PrimitiveOrValueDefinition = readonly ["", string, string?];
 
-type TemplateDefinition = readonly ["Template", readonly (string | PrimitiveOrValueDefinition)[]]
+type TemplateDefinition = readonly ["Template", readonly string[]]
 
 type Definition = PrimitiveOrValueDefinition | TemplateDefinition | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly ["Recur", string, Definition?] | readonly [Exclude<string, "Tuple" | "Array" | "Tuple" | "Or" | "And" | "Object" | "Recur">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
 
@@ -198,10 +198,15 @@ const throwUnknownError = (v: boolean) => {
 	case "Recur":
 		return typeof def[2] === "string" ? `${def[1]} /* ${def[2]} */` : def[1] as string;
 	case "Template":
-		let template = "`" + def[1][0];
+		let template = "`" + def[1][0].replaceAll("${", "\\${"),
+		    r = def[1].slice(1);
 
-		for (let [d, s, ...r] = def[1].slice(1) as [PrimitiveOrValueDefinition, string, ...(PrimitiveOrValueDefinition | string)[]]; r.length; [d, s, ...r] = r as [PrimitiveOrValueDefinition, string, ...(PrimitiveOrValueDefinition | string)[]]) {
-			template += "${" + d[1] + "}" + s.replaceAll("${", "\\${");
+		while (r.length) {
+			const [d, s, ...rest] = r as [string, string, ...string[]];
+
+			template += "${" + d + "}" + s.replaceAll("${", "\\${");
+
+			r = rest;
 		}
 
 		return template + "`";
@@ -394,7 +399,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 	let rest: (string | TypeGuard<string>)[] = s.slice(),
 	    justString = first === "";
 
-	const vals: (string | PrimitiveOrValueDefinition)[] = [first];
+	const vals: string[] = [first];
 
 	for (let [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]]; r.length; [tg, s, ...r] = r as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]]) {
 		const def = tg.def() as TemplateDefinition | PrimitiveOrValueDefinition;
@@ -402,8 +407,8 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 		if (def[0] === "Template") {
 			vals[vals.length - 1] += def[1][0] as string;
 
-			for (let [d, ds, ...dr] = def[1].slice(1) as [PrimitiveOrValueDefinition, string, ...(PrimitiveOrValueDefinition | string)[]]; dr.length; [d, ds, ...dr] = dr as [PrimitiveOrValueDefinition, string, ...(PrimitiveOrValueDefinition | string)[]]) {
-				justString &&= d[1] === "string" && ds === "";
+			for (let [d, ds, ...dr] = def[1].slice(1) as [string, string, ...string[]]; dr.length; [d, ds, ...dr] = dr as [string, string, ...string[]]) {
+				justString &&= d === "string" && ds === "";
 
 				vals.push(d, ds);
 			}
@@ -415,7 +420,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 			} else {
 				justString &&= def[1] === "string";
 
-				vals.push(def as PrimitiveOrValueDefinition);
+				vals.push(def[1] as string);
 			}
 		}
 
