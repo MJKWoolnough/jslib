@@ -418,14 +418,12 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 				dr = rest;
 
 				if (d === "string" && !vals[vals.length - 1]) {
-					vals.pop();
+					vals[vals.length - 1] = ds;
+				} else {
+					vals.push(d, ds);
 
-					continue;
+					justString &&= d === "string" && ds === "";
 				}
-
-				vals.push(d, ds);
-
-				justString &&= d === "string" && ds === "";
 			}
 
 			vals[vals.length - 1] += s;
@@ -434,16 +432,12 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 				vals[vals.length - 1] += JSON.parse(val) + s;
 
 				justString = false;
-
-				continue;
 			} else if (val === "string" && !vals[vals.length - 1]) {
-				vals.pop();
+				vals[vals.length - 1] = s;
 			} else {
 				justString &&= val === "string";
-				vals.push(val);
+				vals.push(val, s);
 			}
-
-			vals.push(s);
 		}
 
 		justString &&= s === "";
