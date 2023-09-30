@@ -103,7 +103,6 @@ const throwUnknownError = (v: boolean) => {
 
 	return false;
       },
-      stringCollapse = /([^\\])\$\{string\}\$\{string\}/g,
       getType = (tg: STypeGuard<any>) => {
 	const t = typeStrs.get(tg) ?? ["unknown", undefined];
 
@@ -199,68 +198,13 @@ const throwUnknownError = (v: boolean) => {
 	case "Recur":
 		return typeof def[2] === "string" ? `${def[1]} /* ${def[2]} */` : def[1] as string;
 	case "Template":
-		const [, first, s] = def as ["Template", string, (string | TypeGuard<string>)[]];
+		let template = "`" + def[1][0];
 
-		if (s.length === 0) {
-			return JSON.stringify(first);
+		for (let [d, s, ...r] = def[1].slice(1) as [PrimitiveOrValueDefinition, string, ...(PrimitiveOrValueDefinition | string)[]]; r.length; [d, s, ...r] = r as [PrimitiveOrValueDefinition, string, ...(PrimitiveOrValueDefinition | string)[]]) {
+			template += "${" + d[1] + "}" + s.replaceAll("${", "\\${");
 		}
 
-		let toRet = "`" + first,
-		    rest = s,
-		    allStrings = true;
-
-		const vals: string[] = [];
-
-		while (rest.length) {
-			const [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]],
-			      tgStr = tg.toString();
-
-			rest = r;
-
-			if (!tgStr.startsWith(`"`)) {
-				allStrings = false;
-			}
-
-			vals.push(tgStr, s);
-		}
-
-		rest = vals;
-
-		if (allStrings) {
-			toRet = first;
-
-			while (rest.length) {
-				const [tgs, s, ...r] = rest as string[];
-
-				rest = r;
-
-				toRet += JSON.parse(tgs) + s;
-			}
-
-			return JSON.stringify(toRet);
-		}
-
-		while (rest.length) {
-			const [tgs, s, ...r] = rest as string[];
-
-			rest = r;
-
-			if (tgs.startsWith("`")) {
-				toRet += tgs.slice(1, -1);
-			} else if (tgs.startsWith(`"`)) {
-				toRet += JSON.parse(tgs).replaceAll("${", "\\${");
-			} else {
-				toRet += "${" + tgs.replaceAll("$", "\\$") + "}";
-			}
-
-			toRet += s.replaceAll("${", "\\${");
-		}
-
-		for (let last = ""; last !== toRet; toRet = toRet.replaceAll(stringCollapse, "$1${string}")) {
-			last = toRet;
-		}
-
-		return toRet === "`${string}" ? "string" : toRet + "`";
+		return template + "`";
 	case "Array":
 		const isGroup = def[1][0] === "And" || def[1][0] === "Or";
 
