@@ -6891,6 +6891,12 @@ type Tests = {
 					      t = Tmpl("abc", Val("${string}"), "", Str(), "def");
 
 					return t.toString() === "`abc\\${string}${string}def`";
+				},
+				"with Or in template": async () => {
+					const {Or, Tmpl, Val} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", Or(Val("123"), Val("456")), "def");
+
+					return t.toString() === '`abc${"123" | "456"}def`';
 				}
 			}
 		},
