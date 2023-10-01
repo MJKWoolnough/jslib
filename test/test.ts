@@ -7432,6 +7432,12 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {Sym} = await import("./lib/typeguard.js"),
+				      s = Sym();
+
+				return JSON.stringify(s.def()) === `["","symbol"]`;
+			},
 			"toString": async () => {
 				const {Sym} = await import("./lib/typeguard.js"),
 				      s = Sym();
