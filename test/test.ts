@@ -6759,6 +6759,70 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"empty": async () => {
+					const {Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("");
+
+					return JSON.stringify(t.def()) === `["","\\"\\""]`;
+				},
+				"simple": async () => {
+					const {Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc");
+
+					return JSON.stringify(t.def()) === `["","\\"abc\\""]`;
+				},
+				"with params": async () => {
+					const {IntStr, Str, Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntStr(), "def", Str(), "g$hi");
+
+					return JSON.stringify(t.def()) === `["Template",["abc","number","def","string","g$hi"]]`;
+				},
+				"with templates": async () => {
+					const {IntStr, Str, Tmpl, Val} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", IntStr(), "def", Tmpl("123", Str(), "456", Val("!!"), "---"), "g$hi");
+
+					return JSON.stringify(t.def()) === `["Template",["abc","number","def123","string","456!!---g$hi"]]`;
+				},
+				"collapse adjacent strings": async () => {
+					const {Str, Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("beginning", Str(), "", Str(), "end");
+
+					return JSON.stringify(t.def()) === `["Template",["beginning","string","end"]]`;
+				},
+				"collapse multiple adjacent strings": async () => {
+					const {Str, Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("beginning", Str(), "", Str(), "", Str(), "middle", Str(), "", Str(), "", Str(), "", Str(), "end");
+
+					return JSON.stringify(t.def()) === `["Template",["beginning","string","middle","string","end"]]`;
+				},
+				"reduce to simple `string` if possible": async () => {
+					const {Str, Tmpl} = await import("./lib/typeguard.js"),
+					      t = Tmpl("", Str(), ""),
+					      t2 = Tmpl("", Str(), "", Str(), ""),
+					      t3 = Tmpl("", Str(), "", Str(), "", Str(), "");
+
+					return JSON.stringify(t.def()) === `["","string"]` && JSON.stringify(t2.def()) === `["","string"]` && JSON.stringify(t3.def()) === `["","string"]`
+				},
+				"with ${ in a Val, but still a template": async () => {
+					const {IntStr, Tmpl, Val} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", Val("${not a type}"), "def", IntStr(), "ghi");
+
+					return JSON.stringify(t.def()) === '["Template",["abc${not a type}def","number","ghi"]]';
+				},
+				"with ${ in a Val, but now a string": async () => {
+					const {Tmpl, Val} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", Val("${not a type}"), "def");
+
+					return JSON.stringify(t.def()) === '["","\\"abc${not a type}def\\""]';
+				},
+				"with ${string} in a string value, followed by a Str()": async () => {
+					const {Str, Tmpl, Val} = await import("./lib/typeguard.js"),
+					      t = Tmpl("abc", Val("${string}"), "", Str(), "def");
+
+					return JSON.stringify(t.def()) === '["Template",["abc${string}","string","def"]]';
+				}
+			},
 			"toString": {
 				"empty": async () => {
 					const {Tmpl} = await import("./lib/typeguard.js"),
