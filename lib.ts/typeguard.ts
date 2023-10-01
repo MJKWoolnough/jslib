@@ -420,7 +420,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 		} else if (def[0] === "Or") {
 			justString = false;
 
-			vals.push(def);
+			vals.push(def, s);
 		} else {
 			if (def[1].startsWith(`"`)) {
 				vals[vals.length - 1] += JSON.parse(def[1]) + s;
