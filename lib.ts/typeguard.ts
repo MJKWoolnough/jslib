@@ -443,15 +443,7 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 		justString &&= s === "";
 	}
 
-	if (vals.length === 1) {
-		return ["", JSON.stringify(vals[0])];
-	}
-
-	if (justString) {
-		return ["", "string"];
-	}
-
-	return ["Template", vals];
+	return vals.length === 1 ? ["", JSON.stringify(vals[0])] : justString ? ["", "string"] : ["Template", vals];
 }),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
