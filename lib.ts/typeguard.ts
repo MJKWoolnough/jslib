@@ -32,7 +32,9 @@ type AndOrDefinition = readonly ["Or" | "And", readonly Definition[]];
 
 type PrimitiveOrValueDefinition = readonly ["", string, string?];
 
-type TemplateData = [string, readonly (string | PrimitiveOrValueDefinition | ["Or", readonly PrimitiveOrValueDefinition[]])[]];
+type TemplateOr = ["Or", readonly PrimitiveOrValueDefinition[]];
+
+type TemplateData = [string, ...(string | PrimitiveOrValueDefinition | TemplateOr)[]];
 
 type TemplateDefinition = readonly ["Template", TemplateData]
 
@@ -201,7 +203,7 @@ const throwUnknownError = (v: boolean) => {
 	case "Recur":
 		return typeof def[2] === "string" ? `${def[1]} /* ${def[2]} */` : def[1] as string;
 	case "Template":
-		return (def[1] as string[]).reduce((s, d, n) => s + (n % 2 ? "${" + d + "}" : templateSafe(d)), "`") + "`";
+		return (def[1] as (string | PrimitiveOrValueDefinition)[]).reduce((s, d, n) => s + (n % 2 ? "${" + toString(d as PrimitiveOrValueDefinition) + "}" : templateSafe(d as string)), "`") + "`";
 	case "Array":
 		const isGroup = def[1][0] === "And" || def[1][0] === "Or";
 
@@ -387,44 +389,49 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 	let rest: (string | TypeGuard<string>)[] = s.slice(),
 	    justString = first === "";
 
-	const vals: string[] = [first];
+	const vals: TemplateData = [first];
 
 	while (rest.length) {
 		const [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]],
-		      [typ, val] = tg.def() as TemplateDefinition | PrimitiveOrValueDefinition;
+		      def = tg.def() as TemplateDefinition | PrimitiveOrValueDefinition | TemplateOr;
 
 		rest = r;
 
-		if (typ === "Template") {
-			vals[vals.length - 1] += val[0];
+		if (def[0] === "Template") {
+			vals[vals.length - 1] += def[1][0];
 
-			let dr = val.slice(1);
+			let dr = def[1].slice(1);
 
 			while (dr.length) {
-				const [d, ds, ...rest] = dr as [string, string, ...string[]];
+				const [d, ds, ...rest] = dr as [PrimitiveOrValueDefinition | TemplateOr, string, ...string[]];
 
 				dr = rest;
 
-				if (d === "string" && vals.length > 1 && !vals[vals.length - 1]) {
+				if (d[0] === "" && d[1] === "string" && vals.length > 1 && !vals[vals.length - 1]) {
 					vals[vals.length - 1] = ds;
 				} else {
 					vals.push(d, ds);
 
-					justString &&= d === "string" && ds === "";
+					justString &&= d[0] === "" && d[1] === "string" && ds === "";
 				}
 			}
 
 			vals[vals.length - 1] += s;
+		} else if (def[0] === "Or") {
+			justString = false;
+
+			vals.push(def);
 		} else {
-			if (val.startsWith(`"`)) {
-				vals[vals.length - 1] += JSON.parse(val) + s;
+			if (def[1].startsWith(`"`)) {
+				vals[vals.length - 1] += JSON.parse(def[1]) + s;
 
 				justString = false;
-			} else if (val === "string" && vals.length > 1 && !vals[vals.length - 1]) {
+			} else if (def[1] === "string" && vals.length > 1 && !vals[vals.length - 1]) {
 				vals[vals.length - 1] = s;
 			} else {
-				justString &&= val === "string";
-				vals.push(val, s);
+				justString &&= def[1] === "string";
+
+				vals.push(def, s);
 			}
 		}
 
@@ -751,19 +758,19 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
  *
  * @return {TypeGuard<`${number}`>}
  */
-NumStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), ["Template", ["", "number", ""]]),
+NumStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), ["Template", ["", ["", "number"], ""]]),
 /**
  * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
  * @return {TypeGuard<`${number}`>}
  */
-IntStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), ["Template", ["", "number", ""]]),
+IntStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), ["Template", ["", ["", "number"], ""]]),
 /**
  * The BoolStr function returns a TypeGuard that checks for a string value that represents an boolean.
  *
  * @return {TypeGuard<`${boolean}`>}
  */
-BoolStr = () => asTypeGuard((v: unknown): v is `${boolean}` => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), ["Template", ["", "boolean", ""]]),
+BoolStr = () => asTypeGuard((v: unknown): v is `${boolean}` => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), ["Template", ["", ["", "boolean"], ""]]),
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *
