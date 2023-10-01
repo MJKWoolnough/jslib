@@ -393,14 +393,16 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 
 	while (rest.length) {
 		const [tg, s, ...r] = rest as [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]],
-		      def = tg.def() as TemplateDefinition | PrimitiveOrValueDefinition | TemplateOr;
+		      def = tg.def() as TemplateDefinition | PrimitiveOrValueDefinition | TemplateOr,
+		      [typ, val] = def;
 
 		rest = r;
 
-		if (def[0] === "Template") {
-			vals[vals.length - 1] += def[1][0];
+		switch (typ) {
+		case "Template":
+			vals[vals.length - 1] += val[0];
 
-			let dr = def[1].slice(1);
+			let dr = val.slice(1);
 
 			while (dr.length) {
 				const [d, ds, ...rest] = dr as [PrimitiveOrValueDefinition | TemplateOr, string, ...string[]];
@@ -417,19 +419,22 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 			}
 
 			vals[vals.length - 1] += s;
-		} else if (def[0] === "Or") {
+			break;
+		case "Or":
 			justString = false;
 
 			vals.push(def, s);
-		} else {
-			if (def[1].startsWith(`"`)) {
-				vals[vals.length - 1] += JSON.parse(def[1]) + s;
+
+			break;
+		default:
+			if (val.startsWith(`"`)) {
+				vals[vals.length - 1] += JSON.parse(val) + s;
 
 				justString = false;
-			} else if (def[1] === "string" && vals.length > 1 && !vals[vals.length - 1]) {
+			} else if (val === "string" && vals.length > 1 && !vals[vals.length - 1]) {
 				vals[vals.length - 1] = s;
 			} else {
-				justString &&= def[1] === "string";
+				justString &&= val === "string";
 
 				vals.push(def, s);
 			}
