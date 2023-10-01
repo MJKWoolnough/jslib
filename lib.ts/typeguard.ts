@@ -32,7 +32,9 @@ type AndOrDefinition = readonly ["Or" | "And", readonly Definition[]];
 
 type PrimitiveOrValueDefinition = readonly ["", string, string?];
 
-type TemplateDefinition = readonly ["Template", readonly string[]]
+type TemplateData = [string, readonly (string | PrimitiveOrValueDefinition | ["Or", readonly PrimitiveOrValueDefinition[]])[]];
+
+type TemplateDefinition = readonly ["Template", TemplateData]
 
 type Definition = PrimitiveOrValueDefinition | TemplateDefinition | readonly ["Array", Definition] | readonly ["Tuple", readonly Definition[], Definition?] | AndOrDefinition | ObjectDefinition | readonly ["Recur", string, Definition?] | readonly [Exclude<string, "Tuple" | "Array" | "Tuple" | "Or" | "And" | "Object" | "Recur">, Definition, Definition?] // Normal, Array, Tuple, Or/And, Object, Special
 
