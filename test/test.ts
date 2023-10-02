@@ -8077,6 +8077,12 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {Class} = await import("./lib/typeguard.js"),
+				      c = Class(HTMLElement);
+
+				return JSON.stringify(c.def()) === `["","HTMLElement"]`;
+			},
 			"toString": async () => {
 				const {Class} = await import("./lib/typeguard.js"),
 				      c = Class(HTMLElement);
