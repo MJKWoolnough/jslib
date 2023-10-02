@@ -7702,6 +7702,12 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {Unknown} = await import("./lib/typeguard.js"),
+				      u = Unknown();
+
+				return JSON.stringify(u.def()) === `["","unknown"]`;
+			},
 			"toString": async () => {
 				const {Unknown} = await import("./lib/typeguard.js"),
 				      u = Unknown();
