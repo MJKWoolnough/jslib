@@ -7980,6 +7980,34 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"empty": async () => {
+					const {Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple();
+
+					console.log(JSON.stringify(t.def()));
+					return JSON.stringify(t.def()) === `["Tuple",[]]`;
+				},
+				"single element": async () => {
+					const {Int, Tuple} = await import("./lib/typeguard.js"),
+					      t = Tuple(Int());
+
+					return JSON.stringify(t.def()) === `["Tuple",[["","number"]]]`;
+				},
+				"multiple elements": async () => {
+					const {Int, Tuple, Str} = await import("./lib/typeguard.js"),
+					      t = Tuple(Int(), Str());
+
+					return JSON.stringify(t.def()) === `["Tuple",[["","number"],["","string"]]]`;
+				},
+				"tuples within tuples": async () => {
+					const {Int, Tuple, Str} = await import("./lib/typeguard.js"),
+					      t = Tuple(Int(), Str()),
+					      u = Tuple(t, t);
+
+					return JSON.stringify(u.def()) === `["Tuple",[["Tuple",[["","number"],["","string"]]],["Tuple",[["","number"],["","string"]]]]]`;
+				}
+			},
 			"toString": {
 				"empty": async () => {
 					const {Tuple} = await import("./lib/typeguard.js"),
