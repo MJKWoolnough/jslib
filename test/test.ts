@@ -7570,6 +7570,44 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"string": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val("abc");
+
+					return JSON.stringify(v.def()) === `["","\\"abc\\""]`;
+				},
+				"number": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(123);
+
+					return JSON.stringify(v.def()) === `["","123"]`;
+				},
+				"boolean": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(true);
+
+					return JSON.stringify(v.def()) === `["","true"]`;
+				},
+				"bigint": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(1024n);
+
+					return JSON.stringify(v.def()) === `["","1024n"]`;
+				},
+				"null": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(null);
+
+					return JSON.stringify(v.def()) === `["","null"]`;
+				},
+				"undefined": async () => {
+					const {Val} = await import("./lib/typeguard.js"),
+					      v = Val(undefined);
+
+					return JSON.stringify(v.def()) === `["","undefined"]`;
+				}
+			},
 			"toString": {
 				"string": async () => {
 					const {Val} = await import("./lib/typeguard.js"),
