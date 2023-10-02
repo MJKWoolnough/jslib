@@ -7736,6 +7736,12 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {Void} = await import("./lib/typeguard.js"),
+				      v = Void();
+
+				return JSON.stringify(v.def()) === `["","void"]`;
+			},
 			"toString": async () => {
 				const {Void} = await import("./lib/typeguard.js"),
 				      v = Void();
