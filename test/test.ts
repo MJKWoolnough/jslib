@@ -7826,6 +7826,26 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Arr, Bool} = await import("./lib/typeguard.js"),
+					      a = Arr(Bool());
+
+					return JSON.stringify(a.def()) === `["Array",["","boolean"]]`;
+				},
+				"with comment": async () => {
+					const {Arr, Int} = await import("./lib/typeguard.js"),
+					      a = Arr(Int(0));
+
+					return JSON.stringify(a.def()) === `["Array",["","number","0 <= i"]]`;
+				},
+				"complex": async () => {
+					const {Arr, Bool, Int, Or} = await import("./lib/typeguard.js"),
+					      a = Arr(Or(Int(0, 255), Arr(Bool())));
+
+					return JSON.stringify(a.def()) === `["Array",["Or",[["","number","0 <= i <= 255"],["Array",["","boolean"]]]]]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Arr, Bool} = await import("./lib/typeguard.js"),
