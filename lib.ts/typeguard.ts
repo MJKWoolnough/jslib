@@ -81,6 +81,7 @@ const throwUnknownError = (v: boolean) => {
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
       definitions = new WeakMap<STypeGuard<any>, StoredDefinition>(),
       strings = new WeakMap<STypeGuard<any>, string>(),
+      spreads = new WeakMap<SpreadTypeGuard, STypeGuard<any>>(),
       group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v: string, p: readonly (string | TypeGuard<string>)[]) => {
@@ -334,7 +335,19 @@ class STypeGuard<T> extends Function {
 
 class SpreadTypeGuard extends Function {
 	static from<T>(tg: STypeGuard<T>) {
-		return Object.setPrototypeOf(tg, SpreadTypeGuard.prototype) as TypeGuard<T>;
+		const stg =  Object.setPrototypeOf((v: unknown): v is T => tg(v), SpreadTypeGuard.prototype) as TypeGuard<T>;
+
+		spreads.set(stg, tg);
+
+		return stg;
+	}
+
+	def() {
+		return spreads.get(this)!.def();
+	}
+
+	toString() {
+		return spreads.get(this)!.toString();
 	}
 }
 
