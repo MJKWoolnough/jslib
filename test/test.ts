@@ -7985,7 +7985,6 @@ type Tests = {
 					const {Tuple} = await import("./lib/typeguard.js"),
 					      t = Tuple();
 
-					console.log(JSON.stringify(t.def()));
 					return JSON.stringify(t.def()) === `["Tuple",[]]`;
 				},
 				"single element": async () => {
