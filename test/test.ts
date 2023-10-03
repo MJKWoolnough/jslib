@@ -8038,6 +8038,12 @@ type Tests = {
 					      u = Tuple(t, t);
 
 					return u.toString() === "[[number, string], [number, string]]";
+				},
+				"with spread": async () => {
+					const {Int, Tuple, Str} = await import("./lib/typeguard.js"),
+					      t = Tuple(Int(), ...Str());
+
+					return t.toString() === `[number, ...string[]]`;
 				}
 			}
 		},
