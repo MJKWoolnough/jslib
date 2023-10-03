@@ -8472,6 +8472,17 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {Num, Obj, Part, Req, Str} = await import("./lib/typeguard.js"),
+				      r = Req(Part(Obj({
+					      "a": Num(),
+					      "b": Str()
+				      })));
+
+				console.log(JSON.stringify(r.def()))
+					console.log(`["Object",{"a":["","number"],"b":["","string"]}]`);
+				return JSON.stringify(r.def()) === `["Object",{"a":["","number"],"b":["","string"]}]`;
+			},
 			"toString": async () => {
 				const {Num, Obj, Part, Req, Str} = await import("./lib/typeguard.js"),
 				      p = Req(Part(Obj({
