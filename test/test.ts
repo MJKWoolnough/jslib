@@ -8479,8 +8479,6 @@ type Tests = {
 					      "b": Str()
 				      })));
 
-				console.log(JSON.stringify(r.def()))
-					console.log(`["Object",{"a":["","number"],"b":["","string"]}]`);
 				return JSON.stringify(r.def()) === `["Object",{"a":["","number"],"b":["","string"]}]`;
 			},
 			"toString": async () => {
