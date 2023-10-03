@@ -8602,6 +8602,30 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Bool, Int, Obj, Skip, Str} = await import("./lib/typeguard.js"),
+					      s = Skip(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Bool()
+					      }), "a", "b");
+
+					return JSON.stringify(s.def()) === `["Object",{"c":["","boolean"]}]`;
+				},
+				"inner obj": async () => {
+					const {Bool, Int, Obj, Skip, Str} = await import("./lib/typeguard.js"),
+					      s = Skip(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Obj({
+							      "a": Bool(),
+						      })
+					      }), "a", "b");
+
+					return JSON.stringify(s.def()) === `["Object",{"c":["Object",{"a":["","boolean"]}]}]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Bool, Int, Obj, Skip, Str} = await import("./lib/typeguard.js"),
@@ -8625,7 +8649,7 @@ type Tests = {
 
 					return s.toString() === "{\n	c: {\n		a: boolean;\n	};\n}";
 				}
-		}
+			}
 		},
 		"Recur": {
 			"returns": {
