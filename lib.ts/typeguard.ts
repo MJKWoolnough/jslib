@@ -698,8 +698,12 @@ Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in 
 	if (v[0] === "Or") {
 		const left = (v[1] as Definition[]).filter(d => d[0] !== "" || d[1] !== "undefined");
 
-		if (!left) {
+		if (!left.length) {
 			return null;
+		}
+
+		if (left.length === 1) {
+			return [k, left[0]];
 		}
 
 		return [k, ["Or", left]];
