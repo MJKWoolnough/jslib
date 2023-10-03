@@ -8354,6 +8354,29 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Obj({
+						      "a": Num(),
+						      "b": Str()
+					      }));
+
+					return JSON.stringify(p.def()) === `["Object",{"a":["Or",[["","number"],["","undefined"]]],"b":["Or",[["","string"],["","undefined"]]]}]`;
+				},
+				"inner object": async () => {
+					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
+					      p = Part(Obj({
+						      "a": Num(),
+						      "b": Str(),
+						      "c": Obj({
+							      "a": Num()
+						      })
+					      }));
+
+					return JSON.stringify(p.def()) === `["Object",{"a":["Or",[["","number"],["","undefined"]]],"b":["Or",[["","string"],["","undefined"]]],"c":["Or",[["Object",{"a":["","number"]}],["","undefined"]]]}]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Num, Obj, Part, Str} = await import("./lib/typeguard.js"),
