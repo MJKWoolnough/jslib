@@ -8485,12 +8485,12 @@ type Tests = {
 			},
 			"toString": async () => {
 				const {Num, Obj, Part, Req, Str} = await import("./lib/typeguard.js"),
-				      p = Req(Part(Obj({
+				      r = Req(Part(Obj({
 					      "a": Num(),
 					      "b": Str()
 				      })));
 
-				return p.toString() === "{\n	a: number;\n	b: string;\n}";
+				return r.toString() === "{\n	a: number;\n	b: string;\n}";
 			}
 		},
 		"Take": {
