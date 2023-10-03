@@ -8005,6 +8005,12 @@ type Tests = {
 					      u = Tuple(t, t);
 
 					return JSON.stringify(u.def()) === `["Tuple",[["Tuple",[["","number"],["","string"]]],["Tuple",[["","number"],["","string"]]]]]`;
+				},
+				"with spread": async () => {
+					const {Int, Tuple, Str} = await import("./lib/typeguard.js"),
+					      t = Tuple(Int(), ...Str());
+
+					return JSON.stringify(t.def()) === `["Tuple",[["","number"]],["","string"]]`;
 				}
 			},
 			"toString": {
