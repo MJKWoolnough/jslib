@@ -8172,6 +8172,61 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"empty": async () => {
+					const {Obj} = await import("./lib/typeguard.js"),
+					      o = Obj();
+
+					return JSON.stringify(o.def()) === `["Object",{}]`;
+				},
+				"with fields": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Str()
+					      });
+
+					return JSON.stringify(o.def()) === `["Object",{"a":["","number"],"b":["","string"]}]`;
+				},
+				"with odd fields": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a b c": Num(),
+						      "b()": Str()
+					      });
+
+					return JSON.stringify(o.def()) === `["Object",{"a b c":["","number"],"b()":["","string"]}]`;
+				},
+				"with object field": async () => {
+					const {Num, Obj, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "child": Obj({
+							      "a b c": Num(),
+							      "b()": Str()
+						      })
+					      });
+
+					return JSON.stringify(o.def()) === `["Object",{"child":["Object",{"a b c":["","number"],"b()":["","string"]}]}]`;
+				},
+				"with undefined field": async () => {
+					const {Num, Obj, Undefined} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Undefined()
+					      });
+
+					return JSON.stringify(o.def()) === `["Object",{"a":["","number"],"b":["","undefined"]}]`;
+				},
+				"with optional field": async () => {
+					const {Num, Obj, Opt, Str} = await import("./lib/typeguard.js"),
+					      o = Obj({
+						      "a": Num(),
+						      "b": Opt(Str())
+					      });
+
+					return JSON.stringify(o.def()) === `["Object",{"a":["","number"],"b":["Or",[["","string"],["","undefined"]]]}]`;
+				}
+			},
 			"toString": {
 				"empty": async () => {
 					const {Obj} = await import("./lib/typeguard.js"),
