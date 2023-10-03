@@ -8524,6 +8524,30 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Bool, Int, Obj, Str, Take} = await import("./lib/typeguard.js"),
+					      t = Take(Obj({
+						      "a": Int(),
+						      "b": Str(),
+						      "c": Bool()
+					      }), "a", "b");
+
+					return JSON.stringify(t.def()) === `["Object",{"a":["","number"],"b":["","string"]}]`;
+				},
+				"inner obj": async () => {
+					const {Bool, Int, Obj, Str, Take} = await import("./lib/typeguard.js"),
+					      t = Take(Obj({
+						      "a": Int(),
+						      "b": Obj({
+							      "c": Str(),
+						      }),
+						      "c": Bool()
+					      }), "a", "b");
+
+					return JSON.stringify(t.def()) === `["Object",{"a":["","number"],"b":["Object",{"c":["","string"]}]}]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Bool, Int, Obj, Str, Take} = await import("./lib/typeguard.js"),
