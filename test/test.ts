@@ -9324,6 +9324,12 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {IntStr} = await import("./lib/typeguard.js"),
+				      i = IntStr();
+
+				return JSON.stringify(i.def()) === `["Template",["",["","number"],""]]`;
+			},
 			"toString": async () => {
 				const {IntStr} = await import("./lib/typeguard.js"),
 				      i = IntStr();
