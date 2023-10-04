@@ -8958,6 +8958,32 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Bool, Num, Or} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num());
+
+					return JSON.stringify(o.def()) === `["Or",[["","boolean"],["","number"]]]`;
+				},
+				"complex": async () => {
+					const {Bool, BoolStr, IntStr, Num, Or} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num(), Or(BoolStr(), IntStr()));
+
+					return JSON.stringify(o.def()) === `["Or",[["","boolean"],["","number"],["Template",["",["","boolean"],""]],["Template",["",["","number"],""]]]]`;
+				},
+				"duplicates": async () => {
+					const {Bool, Num, Or} = await import("./lib/typeguard.js"),
+					      o = Or(Bool(), Num(), Bool(), Bool(), Num());
+
+					return JSON.stringify(o.def()) === `["Or",[["","boolean"],["","number"]]]`;
+				},
+				"multi-level duplicates": async () => {
+					const {Bool, Num, Or} = await import("./lib/typeguard.js"),
+					      o = Or(Or(Or(Bool(), Num()), Bool()), Or(Bool(), Or(Num())));
+
+					return JSON.stringify(o.def()) === `["Or",[["","boolean"],["","number"]]]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Bool, Num, Or} = await import("./lib/typeguard.js"),
