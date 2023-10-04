@@ -9196,6 +9196,22 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Bool, SetType} = await import("./lib/typeguard.js"),
+					      s = SetType(Bool());
+
+					return JSON.stringify(s.def()) === `["Set",["","boolean"]]`;
+				},
+				"complex": async () => {
+					const {Int, Obj, SetType} = await import("./lib/typeguard.js"),
+					      s = SetType(SetType(Obj({
+						      a: Int(0, 255)
+					      })));
+
+					return JSON.stringify(s.def()) === `["Set",["Set",["Object",{"a":["","number","0 <= i <= 255"]}]]]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Bool, SetType} = await import("./lib/typeguard.js"),
