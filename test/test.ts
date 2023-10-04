@@ -8884,6 +8884,22 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Bool, IntStr, Rec} = await import("./lib/typeguard.js"),
+					      r = Rec(IntStr(), Bool());
+
+					return JSON.stringify(r.def()) === `["Record",["Template",["",["","number"],""]],["","boolean"]]`;
+				},
+				"complex": async () => {
+					const {BoolStr, Int, Obj, Rec, Val} = await import("./lib/typeguard.js"),
+					      r = Rec(BoolStr(), Rec(Val("abc"), Obj({
+						      a: Int(0, 255)
+					      })));
+
+					return JSON.stringify(r.def()) === `["Record",["Template",["",["","boolean"],""]],["Record",["","\\"abc\\""],["Object",{"a":["","number","0 <= i <= 255"]}]]]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Bool, IntStr, Rec} = await import("./lib/typeguard.js"),
