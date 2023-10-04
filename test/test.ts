@@ -9378,6 +9378,12 @@ type Tests = {
 					}
 				}
 			},
+			"def": async () => {
+				const {BoolStr} = await import("./lib/typeguard.js"),
+				      b = BoolStr();
+
+				return JSON.stringify(b.def()) === `["Template",["",["","boolean"],""]]`;
+			},
 			"toString": async () => {
 				const {BoolStr} = await import("./lib/typeguard.js"),
 				      b = BoolStr();
