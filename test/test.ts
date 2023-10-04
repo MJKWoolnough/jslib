@@ -9122,6 +9122,22 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Bool, Int, MapType} = await import("./lib/typeguard.js"),
+					      m = MapType(Int(), Bool());
+
+					return JSON.stringify(m.def()) === `["Map",["","number"],["","boolean"]]`;
+				},
+				"complex": async () => {
+					const {Bool, Int, Obj, MapType, Val} = await import("./lib/typeguard.js"),
+					      m = MapType(Bool(), MapType(Val("abc"), Obj({
+						      a: Int(0, 255)
+					      })));
+
+					return JSON.stringify(m.def()) === `["Map",["","boolean"],["Map",["","\\"abc\\""],["Object",{"a":["","number","0 <= i <= 255"]}]]]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Bool, Int, MapType} = await import("./lib/typeguard.js"),
