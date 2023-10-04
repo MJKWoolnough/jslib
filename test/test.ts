@@ -9054,16 +9054,16 @@ type Tests = {
 			},
 			"toString": {
 				"simple": async () => {
-					const {And, Bool, Num} = await import("./lib/typeguard.js"),
-					      a = And(Bool(), Num());
+					const {And, Bool, Num, Obj} = await import("./lib/typeguard.js"),
+					      a = And(Obj({"a": Bool(), "b": Num()}), Obj({"a": Bool(), "b": Bool()}));
 
-					return a.toString() === "boolean & number";
+					return a.toString() === "{\n	a: boolean;\n	b: number;\n} & {\n	a: boolean;\n	b: boolean;\n}";
 				},
 				"complex": async () => {
-					const {And, Bool, BoolStr, IntStr, Num, Or} = await import("./lib/typeguard.js"),
-					      a = And(Bool(), Num(), Or(BoolStr(), IntStr()));
+					const {And,BoolStr, IntStr, Or, Str} = await import("./lib/typeguard.js"),
+					      a = And(Str(), Or(BoolStr(), IntStr()));
 
-					return a.toString() === "boolean & number & (`${boolean}` | `${number}`)";
+					return a.toString() === "string & (`${boolean}` | `${number}`)";
 				}
 			}
 		},
