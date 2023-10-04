@@ -9052,6 +9052,20 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {And, Bool, Num, Obj} = await import("./lib/typeguard.js"),
+					      a = And(Obj({"a": Bool(), "b": Num()}), Obj({"a": Bool(), "b": Bool()}));
+
+					return JSON.stringify(a.def()) === `["And",[["Object",{"a":["","boolean"],"b":["","number"]}],["Object",{"a":["","boolean"],"b":["","boolean"]}]]]`;
+				},
+				"complex": async () => {
+					const {And,BoolStr, IntStr, Or, Str} = await import("./lib/typeguard.js"),
+					      a = And(Str(), Or(BoolStr(), IntStr()));
+
+					return JSON.stringify(a.def()) === `["And",[["","string"],["Or",[["Template",["",["","boolean"],""]],["Template",["",["","number"],""]]]]]]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {And, Bool, Num, Obj} = await import("./lib/typeguard.js"),
