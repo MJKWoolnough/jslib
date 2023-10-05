@@ -722,7 +722,7 @@ Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in 
  * @return {TypeGuard<{}>}
  */
 Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys) => asTypeGuard((v: unknown): v is {[K in keyof T as K extends ORVals<Keys> ? K : never]: T[K]} => {
-	take = keys;
+	take = take ? take.filter(k => keys.includes(k as keyof T)) : keys;
 
 	try{
 		return tg(v);
