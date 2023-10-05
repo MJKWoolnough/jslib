@@ -327,7 +327,7 @@ class STypeGuard<T> extends Function {
 			return str;
 		}
 
-		const ts =  toString(this.def());
+		const ts = toString(this.def());
 
 		strings.set(this, ts);
 
