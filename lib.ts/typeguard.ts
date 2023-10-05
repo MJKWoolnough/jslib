@@ -222,27 +222,7 @@ const throwUnknownError = (v: boolean) => {
 
 		return arr + "}";
 	case "Tuple":
-		let tuple = "[";
-
-		for (const d of def[1] as Definition[]) {
-			if (tuple.length > 1) {
-				tuple += ", ";
-			}
-
-			tuple += toString(d);
-		}
-
-		if (def[2]) {
-			const group = def[2][0] === "Or" || def[2][0] === "And";
-
-			if (tuple.length > 1) {
-				tuple += ", ";
-			}
-
-			tuple += `...${group ? "(" : ""}${toString(def[2])}${group ? ")" : ""}[]`;
-		}
-
-		return tuple + "]";
+		return "[" + (def[1] as Definition[]).map(toString).concat(def[2] ? [`...${["Or", "And"].includes(def[2][0]) ? "(" : ""}${toString(def[2])}${["Or", "And"].includes(def[2][0]) ? ")" : ""}[]`]  : []).join(", ") + "]";
 	default:
 		return `${def[0]}<${(def.slice(1) as Definition[]).map(toString).join(", ")}>`;
 	}
