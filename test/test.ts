@@ -9543,6 +9543,12 @@ type Tests = {
 				      f = Forbid(Or(Bool(), Null(), Num(), Str()), Or(Null(), Str()));
 
 				return JSON.stringify(f.def()) === `["Exclude",["Or",[["","boolean"],["","null"],["","number"],["","string"]]],["Or",[["","null"],["","string"]]]]`;
+			},
+			"toString": async () => {
+				const {Bool, Forbid, Null, Num, Or, Str} = await import("./lib/typeguard.js"),
+				      f = Forbid(Or(Bool(), Null(), Num(), Str()), Or(Null(), Str()));
+
+				return f.toString() === `Exclude<boolean | null | number | string, null | string>`;
 			}
 		}
 	}
