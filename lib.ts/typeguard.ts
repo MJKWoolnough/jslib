@@ -739,7 +739,7 @@ Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
  * @return {TypeGuard<{}>}
  */
 Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys) => asTypeGuard((v: unknown): v is {[K in keyof T as K extends ORVals<Keys> ? never : K]: T[K]} => {
-	skip = keys;
+	skip = skip ? [...skip, ...keys] : keys;
 
 	try{
 		return tg(v);
