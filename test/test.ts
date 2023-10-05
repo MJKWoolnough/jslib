@@ -9468,6 +9468,20 @@ type Tests = {
 					}
 				}
 			},
+			"def": {
+				"simple": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func();
+
+					return JSON.stringify(f.def()) === `["","Function"]`;
+				},
+				"complex": async () => {
+					const {Func} = await import("./lib/typeguard.js"),
+					      f = Func(2);
+
+					return JSON.stringify(f.def()) === `["","Function","2"]`;
+				}
+			},
 			"toString": {
 				"simple": async () => {
 					const {Func} = await import("./lib/typeguard.js"),
