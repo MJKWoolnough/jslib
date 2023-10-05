@@ -80,7 +80,7 @@ const throwUnknownError = (v: boolean) => {
       },
       typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
       definitions = new WeakMap<STypeGuard<any>, StoredDefinition>(),
-      strings = new WeakMap<STypeGuard<any>, string>(),
+      strings = new WeakMap<Definition, string>(),
       spreads = new WeakMap<SpreadTypeGuard, STypeGuard<any>>(),
       group = Symbol("group"),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
@@ -199,6 +199,19 @@ const throwUnknownError = (v: boolean) => {
       },
       templateSafe = (s: string) => s.replaceAll("${", "\\${").replaceAll("`", "\\`"),
       toString = (def: Definition): string => {
+	const str = strings.get(def);
+
+	if (str) {
+		return str;
+	}
+
+	const t = defToString(def);
+
+	strings.set(def, t);
+
+	return t;
+      },
+      defToString = (def: Definition): string => {
 	switch (def[0]) {
 	case "":
 	case "Recur":
@@ -321,17 +334,7 @@ class STypeGuard<T> extends Function {
 	}
 
 	toString(): string {
-		const str = strings.get(this);
-
-		if (str) {
-			return str;
-		}
-
-		const ts = toString(this.def());
-
-		strings.set(this, ts);
-
-		return ts;
+		return toString(this.def());
 	}
 }
 
