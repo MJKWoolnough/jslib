@@ -310,9 +310,11 @@ class STypeGuard<T> extends Function {
 		if (late !== def && late instanceof Array && late[0] === "Recur") {
 			const recur = ["Recur", late[1] as string, processed] as const;
 
-			definitions.set(this, recur);
+			definitions.set(this, Object.freeze(recur));
 
 			return recur;
+		} else if (processed !== def) {
+			definitions.set(this, Object.freeze(def) as StoredDefinition);
 		}
 
 		return processed;
