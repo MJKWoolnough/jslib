@@ -78,7 +78,6 @@ const throwUnknownError = (v: boolean) => {
 	take = tk;
 	skip = s;
       },
-      typeStrs = new WeakMap<STypeGuard<any>, [string | (() => string) | readonly STypeGuard<any>[], string | undefined]>(),
       definitions = new WeakMap<STypeGuard<any>, StoredDefinition>(),
       strings = new WeakMap<Definition, string>(),
       spreads = new WeakMap<SpreadTypeGuard, STypeGuard<any>>(),
@@ -107,29 +106,6 @@ const throwUnknownError = (v: boolean) => {
 	}
 
 	return false;
-      },
-      getType = (tg: STypeGuard<any>) => {
-	const t = typeStrs.get(tg) ?? ["unknown", undefined];
-
-	if (t[0] instanceof Array) {
-		const arr: STypeGuard<any>[] = [];
-
-		for (const g of t[0]) {
-			if (g[group] === tg[group]) {
-				const [h] = getType(g) as [STypeGuard<any>[], string | undefined];
-
-				for (const i of h) {
-					arr.push(i);
-				}
-			} else {
-				arr.push(g);
-			}
-		}
-
-		t[0] = arr;
-	}
-
-	return t;
       },
       filterObj = (def: Definition, fn: (key: string | number | symbol, val: Definition) => null | [typeof key, Definition]): Definition => {
 	if (def[0] === "Object") {
