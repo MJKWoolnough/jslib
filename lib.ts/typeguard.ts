@@ -7,6 +7,8 @@
  */
 /** */
 
+import {setAndReturn} from './misc.js';
+
 /** This Type retrieves the guarded type from a TypeGuard. */
 export type TypeGuardOf<T> = T extends TypeGuard<infer U> ? U : never;
 
@@ -174,19 +176,7 @@ const throwUnknownError = (v: boolean) => {
 	return list.length === 1 ? list[0] : list.length ? [andOr, list] : ["", "never"];
       },
       templateSafe = (s: string) => s.replaceAll("${", "\\${").replaceAll("`", "\\`"),
-      toString = (def: Definition): string => {
-	const str = strings.get(def);
-
-	if (str) {
-		return str;
-	}
-
-	const t = defToString(def);
-
-	strings.set(def, t);
-
-	return t;
-      },
+      toString = (def: Definition): string => strings.get(def) ?? setAndReturn(strings, def, defToString(def)),
       defToString = (def: Definition): string => {
 	switch (def[0]) {
 	case "":
