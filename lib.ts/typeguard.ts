@@ -195,9 +195,7 @@ const throwUnknownError = (v: boolean) => {
 	case "Template":
 		return (def[1] as (string | PrimitiveOrValueDefinition)[]).reduce((s, d, n) => s + (n % 2 ? "${" + toString(d as PrimitiveOrValueDefinition) + "}" : templateSafe(d as string)), "`") + "`";
 	case "Array":
-		const isGroup = def[1][0] === "And" || def[1][0] === "Or";
-
-		return `${isGroup ? "(" : ""}${toString(def[1])}${isGroup ? ")" : ""}[]`;
+		return (def[1][0] === "And" || def[1][0] === "Or" ? `(${toString(def[1])})` : toString(def[1])) + "[]";
 	case "And":
 	case "Or":
 		return (def[1] as Definition[]).map(d => def[0] === "And" && d[0] === "Or" ? `(${toString(d)})` : toString(d)).join(def[0] === "And" ? " & " : " | ");
