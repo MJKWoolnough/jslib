@@ -222,7 +222,7 @@ const throwUnknownError = (v: boolean) => {
 
 		return arr + "}";
 	case "Tuple":
-		return "[" + (def[1] as Definition[]).map(toString).concat(def[2] ? [`...${["Or", "And"].includes(def[2][0]) ? "(" : ""}${toString(def[2])}${["Or", "And"].includes(def[2][0]) ? ")" : ""}[]`]  : []).join(", ") + "]";
+		return "[" + (def[1] as Definition[]).map(toString).concat(def[2] ? "..." + (["Or", "And"].includes(def[2][0]) ? `(${toString(def[2])})` : toString(def[2])) + "[]" : []).join(", ") + "]";
 	default:
 		return `${def[0]}<${(def.slice(1) as Definition[]).map(toString).join(", ")}>`;
 	}
