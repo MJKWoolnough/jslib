@@ -4,6 +4,7 @@
  * The intent is to be able to create your types from the typeguards, instead of creating typeguards for a type.
  *
  * @module typeguard
+ * @requires module:misc
  */
 /** */
 
