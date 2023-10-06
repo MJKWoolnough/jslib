@@ -263,7 +263,7 @@ class STypeGuard<T> extends Function {
 
 			return recur;
 		} else if (processed !== def) {
-			definitions.set(this, Object.freeze(def) as StoredDefinition);
+			definitions.set(this, Object.freeze(processed) as StoredDefinition);
 		}
 
 		return processed;
