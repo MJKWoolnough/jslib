@@ -682,11 +682,7 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
 	let ttg: TypeGuard<T>;
 	const name = str ?? "type_"+unknownTypes++; // need to generate type name here
 
-	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => {
-		definitions.set(ttg ??= tg(), ["Recur", name]);
-
-		return ["Recur", name];
-	});
+	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => setAndReturn(definitions, ttg ??= tg(), ["Recur", name]));
 },
 /**
  * The NumStr function returns a TypeGuard that checks for a string value that represents an number.
