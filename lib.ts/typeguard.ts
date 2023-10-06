@@ -246,17 +246,7 @@ class STypeGuard<T> extends Function {
 		      processed = def instanceof Function ? def() : def,
 		      late = definitions.get(this);
 
-		if (late !== def && late instanceof Array && late[0] === "Recur") {
-			const recur = ["Recur", late[1] as string, processed] as const;
-
-			definitions.set(this, Object.freeze(recur));
-
-			return recur;
-		} else if (processed !== def) {
-			definitions.set(this, Object.freeze(processed) as StoredDefinition);
-		}
-
-		return processed;
+		return late !== def && late instanceof Array && late[0] === "Recur" ? setAndReturn(definitions, this, Object.freeze(["Recur", late[1] as string, processed])) : processed !== def ? setAndReturn(definitions, this, Object.freeze(processed) as Definition) : processed;
 	}
 
 	toString(): string {
