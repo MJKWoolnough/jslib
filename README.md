@@ -2292,6 +2292,8 @@ The typeguard module provides the building blocks for creating type-safe typegua
 
 The intent is to be able to create your types from the typeguards, instead of creating typeguards for a type.
 
+This module directly imports the [misc](#misc) module.
+
 The module exports the following functions:
 
 |  Export     |  Description  |
