@@ -113,17 +113,7 @@ const throwUnknownError = (v: boolean) => {
       },
       filterObj = (def: Definition, fn: (key: string | number | symbol, val: Definition) => null | [typeof key, Definition]): Definition => {
 	if (def[0] === "Object") {
-		const obj: Record<string | number | symbol, Definition> = {};
-
-		for (const [key, value] of Object.entries(def[1])) {
-			const d = fn(key, value);
-
-			if (d) {
-				obj[d[0]] = d[1];
-			}
-		}
-
-		return [def[0], obj] as ObjectDefinition;
+		return [def[0], (Object.entries(def[1]).map(([k, v]) => fn(k, v)).filter(v => v) as [string, Definition][]).reduce((o, [k, v]) => (o[k] = v, o), {} as Record<string, Definition>)] as ObjectDefinition;
 	} else if (def[0] === "Or" || def[0] === "And") {
 		return [def[0], (def[1] as Definition[]).map(d => d[0] === "Object" || d[0] === "Or" || d[0] == "And" ? filterObj(d, fn) : d)];
 	}
