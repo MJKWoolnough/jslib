@@ -307,17 +307,7 @@ Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typ
  *
  * @return {TypeGuard<string>}
  */
-Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<string>)[]>(first: S, ...s: T extends AltTuple<T> ? T : never) => asTypeGuard((v: unknown): v is Template<S, T> => {
-	if (typeof v !== "string") {
-		return throwOrReturn(false, "Template");
-	}
-
-	if (v.startsWith(first) && matchTemplate(v.slice(first.length), s)) {
-		return true;
-	}
-
-	return throwOrReturn(false, "template");
-}, () => {
+Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<string>)[]>(first: S, ...s: T extends AltTuple<T> ? T : never) => asTypeGuard((v: unknown): v is Template<S, T> => throwOrReturn(typeof v === "string" && v.startsWith(first) && matchTemplate(v.slice(first.length), s), "template"), () => {
 	let rest: (string | TypeGuard<string>)[] = s.slice(),
 	    justString = first === "";
 
