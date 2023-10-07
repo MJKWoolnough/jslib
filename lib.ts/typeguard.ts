@@ -81,6 +81,8 @@ const throwUnknownError = (v: boolean) => {
 	take = tk;
 	skip = s;
       },
+      unknownStr = "unknown",
+      unknownDef = Object.freeze(["", unknownStr] as const),
       definitions = new WeakMap<STypeGuard<any>, StoredDefinition>(),
       strings = new WeakMap<Definition, string>(),
       spreads = new WeakMap<SpreadTypeGuard, STypeGuard<any>>(),
@@ -232,7 +234,7 @@ class STypeGuard<T> extends Function {
 	}
 
 	throws() {
-		return asTypeGuard((v: unknown): v is T => this.throw(v), ["", "unknown"]);
+		return asTypeGuard((v: unknown): v is T => this.throw(v), unknownDef);
 	}
 
 	*[Symbol.iterator]() {
@@ -240,7 +242,7 @@ class STypeGuard<T> extends Function {
 	}
 
 	def(): DefinitionWithDeps {
-		const def = definitions.get(this) ?? ["", "unknown"],
+		const def = definitions.get(this) ?? unknownDef,
 		      processed = def instanceof Function ? def() : def,
 		      late = definitions.get(this);
 
@@ -262,11 +264,11 @@ class SpreadTypeGuard extends Function {
 	}
 
 	def() {
-		return spreads.get(this)?.def() ?? ["", "unknown"];
+		return spreads.get(this)?.def() ?? unknownDef;
 	}
 
 	toString() {
-		return spreads.get(this)?.toString() ?? "unknown";
+		return spreads.get(this)?.toString() ?? unknownStr;
 	}
 }
 
@@ -282,7 +284,7 @@ export const
  *
  * @return {TypeGuard<T>} The passed in typeguard, with additional functionality.
  */
-asTypeGuard = <T>(tg: (v: unknown) => v is T, def: StoredDefinition = ["", "unknown"]) => STypeGuard.from(tg, def),
+asTypeGuard = <T>(tg: (v: unknown) => v is T, def: StoredDefinition = unknownDef) => STypeGuard.from(tg, def),
 /**
  * The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against.
  *
@@ -441,7 +443,7 @@ Any = () => asTypeGuard((_: unknown): _ is any => true, ["", "any"]),
  *
  * @return {TypeGuard<unknown>}
  */
-Unknown = () => asTypeGuard((_: unknown): _ is unknown => true, ["", "unknown"]),
+Unknown = () => asTypeGuard((_: unknown): _ is unknown => true, unknownDef),
 /**
  * The Void function returns a TypeGuard that performs no check as the value is not intended to be used.
  *
@@ -852,7 +854,7 @@ SetType = <T>(t: TypeGuard<T>) => asTypeGuard((v: unknown): v is Set<T> => {
  *
  * @return {TypeGuard<class>}
  */
-Class = <T extends {new (...args: any): any}>(t: T) => asTypeGuard((v: unknown): v is InstanceType<T> => throwOrReturn(v instanceof t, "class"), ["", t.name || "unknown"]),
+Class = <T extends {new (...args: any): any}>(t: T) => asTypeGuard((v: unknown): v is InstanceType<T> => throwOrReturn(v instanceof t, "class"), ["", t.name || unknownStr]),
 /**
  * The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check.
  *
