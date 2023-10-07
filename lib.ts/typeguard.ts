@@ -128,12 +128,10 @@ const throwUnknownError = (v: boolean) => {
 		const list: Definition[] = [];
 
 		for (const d of def[1] as Definition[]) {
-			if (d instanceof Array) {
-				if (d[0] === "Object" || (d[0] === "Or" || d[1] === "And")) {
-					list.push(filterObj(d, fn));
+			if (d[0] === "Object" || (d[0] === "Or" || d[1] === "And")) {
+				list.push(filterObj(d, fn));
 
-					continue;
-				}
+				continue;
 			}
 			list.push(d);
 		}
