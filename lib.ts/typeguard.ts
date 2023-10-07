@@ -82,7 +82,7 @@ const throwUnknownError = (v: boolean) => {
 	skip = s;
       },
       unknownStr = "unknown",
-      unknownDef = Object.freeze(["", unknownStr] as const),
+      [unknownDef, anyDef, numberDef, bigIntDef, stringDef, booleanDef, functionDef, symbolDef, neverDef, undefinedDef, nullDef, voidDef] = [unknownStr, "any", "number", "bigint", "string", "boolean", "Function", "symbol", "never", "undefined", "null", "void"].map(v => Object.freeze(["", v] as const)),
       definitions = new WeakMap<STypeGuard<any>, StoredDefinition>(),
       strings = new WeakMap<Definition, string>(),
       spreads = new WeakMap<SpreadTypeGuard, STypeGuard<any>>(),
@@ -175,7 +175,7 @@ const throwUnknownError = (v: boolean) => {
 		}
 	}
 
-	return list.length === 1 ? list[0] : list.length ? [andOr, list] : ["", "never"];
+	return list.length === 1 ? list[0] : list.length ? [andOr, list] : neverDef;
       },
       templateSafe = (s: string) => s.replaceAll("${", "\\${").replaceAll("`", "\\`"),
       toString = (def: Definition): string => strings.get(def) ?? setAndReturn(strings, def, defToString(def)),
@@ -292,7 +292,7 @@ asTypeGuard = <T>(tg: (v: unknown) => v is T, def: StoredDefinition = unknownDef
  *
  * @return {TypeGuard<boolean>}
  */
-Bool = <T extends boolean>(d?: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean"), ["", d?.toString() ?? "boolean"]),
+Bool = <T extends boolean>(d?: T) => asTypeGuard((v: unknown): v is T => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean"), d !== undefined ? ["", d.toString()] : booleanDef),
 /**
  * The Str function returns a TypeGuard that checks for string values, and takes an optional regex to confirm string format against.
  *
@@ -300,7 +300,7 @@ Bool = <T extends boolean>(d?: T) => asTypeGuard((v: unknown): v is T => throwOr
  *
  * @return {TypeGuard<string>}
  */
-Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), ["", "string"]),
+Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), stringDef),
 /**
  * The Tmpl function returns a TypeGuard that checks for template values.
  *
@@ -367,14 +367,14 @@ Tmpl = <const S extends string, const T extends readonly (string | TypeGuard<str
 		justString &&= s === "";
 	}
 
-	return vals.length === 1 ? ["", JSON.stringify(vals[0])] : justString ? ["", "string"] : ["Template", vals];
+	return vals.length === 1 ? ["", JSON.stringify(vals[0])] : justString ? stringDef : ["Template", vals];
 }),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *
  * @return {TypeGuard<undefined>}
  */
-Undefined = () => asTypeGuard((v: unknown): v is undefined => throwOrReturn(v === undefined, "undefined"), ["", "undefined"]),
+Undefined = () => asTypeGuard((v: unknown): v is undefined => throwOrReturn(v === undefined, "undefined"), undefinedDef),
 /**
  * The Opt function returns a TypeGuard that checks for both the passed TypeGuard while allowing for it to be undefined.
  *
@@ -388,7 +388,7 @@ Opt = <T>(v: TypeGuard<T>) => Or(v, Undefined()),
  *
  * @return {TypeGuard<null>}
  */
-Null = () => asTypeGuard((v: unknown): v is null => throwOrReturn(v === null, "null"), ["", "null"]),
+Null = () => asTypeGuard((v: unknown): v is null => throwOrReturn(v === null, "null"), nullDef),
 /**
  * The Num function returns a TypeGuard that checks for numbers, and takes optional min and max (inclusive) values to range check.
  *
@@ -397,7 +397,7 @@ Null = () => asTypeGuard((v: unknown): v is null => throwOrReturn(v === null, "n
  *
  * @return {TypeGuard<number>}
  */
-Num = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number"), min !== -Infinity ? ["", "number", `${min} <= n` + (max !== Infinity ? ` <= ${max}` : "")] : max !== Infinity ? ["", "number", `n <= ${max}`] : ["", "number"]),
+Num = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number"), min !== -Infinity ? ["", "number", `${min} <= n` + (max !== Infinity ? ` <= ${max}` : "")] : max !== Infinity ? ["", "number", `n <= ${max}`] : numberDef),
 /**
  * The Int function returns a TypeGuard that checks for integers, and takes optional min and max (inclusive) values to range check.
  *
@@ -406,7 +406,7 @@ Num = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is number
  *
  * @return {TypeGuard<number>}
  */
-Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer"), min > Number.MIN_SAFE_INTEGER ? ["", "number", `${min} <= i` + (max < Number.MAX_SAFE_INTEGER ? ` <= ${max}` : "")] : max < Number.MAX_SAFE_INTEGER ? ["", "number", `i <= ${max}`] : ["", "number"]),
+Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer"), min > Number.MIN_SAFE_INTEGER ? ["", "number", `${min} <= i` + (max < Number.MAX_SAFE_INTEGER ? ` <= ${max}` : "")] : max < Number.MAX_SAFE_INTEGER ? ["", "number", `i <= ${max}`] : numberDef),
 /**
  * The BigInt function returns a TypeGuard that checks for bigints, and takes optional min and max (inclusive) values to range check.
  *
@@ -415,13 +415,13 @@ Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGu
  *
  * @return {TypeGuard<bigint>}
  */
-BigInt = (min?: bigint, max?: bigint) => asTypeGuard((v: unknown): v is bigint => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint"), min !== undefined ? ["", "bigint", `${min}n <= b` + (max != undefined ? ` <= ${max}n` : "")] : max != undefined ? ["", "bigint", `b <= ${max}n`] : ["", "bigint"]),
+BigInt = (min?: bigint, max?: bigint) => asTypeGuard((v: unknown): v is bigint => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint"), min !== undefined ? ["", "bigint", `${min}n <= b` + (max != undefined ? ` <= ${max}n` : "")] : max != undefined ? ["", "bigint", `b <= ${max}n`] : bigIntDef),
 /**
  * The Sym function returns a TypeGuard that checks for symbols.
  *
  * @return {TypeGuard<symbol>}
  */
-Sym = () => asTypeGuard((v: unknown): v is symbol => throwOrReturn(typeof v === "symbol", "symbol"), ["", "symbol"]),
+Sym = () => asTypeGuard((v: unknown): v is symbol => throwOrReturn(typeof v === "symbol", "symbol"), symbolDef),
 /**
  * The Val function returns a TypeGuard that checks for a specific, primitive value.
  *
@@ -437,7 +437,7 @@ Val = <const T extends boolean | number | bigint | string | null | undefined>(va
  *
  * @return {TypeGuard<any>}
  */
-Any = () => asTypeGuard((_: unknown): _ is any => true, ["", "any"]),
+Any = () => asTypeGuard((_: unknown): _ is any => true, anyDef),
 /**
  * The Unknown function returns a TypeGuard that allows any value, but types to `unknown`.
  *
@@ -449,7 +449,7 @@ Unknown = () => asTypeGuard((_: unknown): _ is unknown => true, unknownDef),
  *
  * @return {TypeGuard<void>}
  */
-Void = () => asTypeGuard((_: unknown): _ is void => true, ["", "void"]),
+Void = () => asTypeGuard((_: unknown): _ is void => true, voidDef),
 /**
  * The Arr function returns a TypeGuard that checks for an Array, running the given TypeGuard on each element.
  *
@@ -589,7 +589,7 @@ Part = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in
 	} finally {
 		allowUndefined = null;
 	}
-}, () => filterObj(tg.def(), (k: string | number | symbol, v: Definition) => v[0] === "Or" ? [k, v] : [k, ["Or", [v, ["", "undefined"]]]])),
+}, () => filterObj(tg.def(), (k: string | number | symbol, v: Definition) => v[0] === "Or" ? [k, v] : [k, ["Or", [v, undefinedDef]]])),
 /**
  * The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined.
  *
@@ -679,19 +679,19 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
  *
  * @return {TypeGuard<`${number}`>}
  */
-NumStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), ["Template", ["", ["", "number"], ""]]),
+NumStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), ["Template", ["", numberDef, ""]]),
 /**
  * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
  * @return {TypeGuard<`${number}`>}
  */
-IntStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), ["Template", ["", ["", "number"], ""]]),
+IntStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), ["Template", ["", numberDef, ""]]),
 /**
  * The BoolStr function returns a TypeGuard that checks for a string value that represents an boolean.
  *
  * @return {TypeGuard<`${boolean}`>}
  */
-BoolStr = () => asTypeGuard((v: unknown): v is `${boolean}` => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), ["Template", ["", ["", "boolean"], ""]]),
+BoolStr = () => asTypeGuard((v: unknown): v is `${boolean}` => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), ["Template", ["", booleanDef, ""]]),
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *
@@ -862,7 +862,7 @@ Class = <T extends {new (...args: any): any}>(t: T) => asTypeGuard((v: unknown):
  *
  * @returns {TypeGuard<Function>}
  */
-Func = <T extends Function>(args?: number) => asTypeGuard((v: unknown): v is T => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"), args ? ["", "Function", args?.toString()] : ["", "Function"]),
+Func = <T extends Function>(args?: number) => asTypeGuard((v: unknown): v is T => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"), args ? ["", "Function", args?.toString()] : functionDef),
 /**
  * The Forbid function returns a TypeGuard that disallows certain types from an existing type.
  *
