@@ -143,7 +143,7 @@ const throwUnknownError = (v: boolean) => {
       },
       reduceAndOr = (andOr: "And" | "Or", tgs: readonly TypeGuard<any>[]): Definition => {
 	const list: Definition[] = [],
-	      simple = new Set<string>();
+	      simple = new Set();
 
 	for (const tg of tgs) {
 		const def = tg.def();
@@ -151,22 +151,22 @@ const throwUnknownError = (v: boolean) => {
 		if (def[0] === andOr) {
 			for (const d of def[1] as Definition[]) {
 				if (d[0] === "") {
-					if (simple.has(d[1] as string)) {
+					if (simple.has(d[1])) {
 						continue
 					}
 
-					simple.add(d[1] as string);
+					simple.add(d[1]);
 				}
 
 				list.push(d);
 			}
 		} else if ((def[0] !== "" || def[1] !== "never")) {
 			if (def[0] === "") {
-				if (simple.has(def[1] as string)) {
+				if (simple.has(def[1])) {
 					continue
 				}
 
-				simple.add(def[1] as string);
+				simple.add(def[1]);
 			}
 
 			list.push(def);
