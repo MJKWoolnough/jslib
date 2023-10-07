@@ -124,11 +124,11 @@ const throwUnknownError = (v: boolean) => {
 		}
 
 		return [def[0], obj] as ObjectDefinition;
-	} else if (def[0] === "Or" || def[1] === "And") {
+	} else if (def[0] === "Or" || def[0] === "And") {
 		const list: Definition[] = [];
 
 		for (const d of def[1] as Definition[]) {
-			if (d[0] === "Object" || (d[0] === "Or" || d[1] === "And")) {
+			if (d[0] === "Object" || (d[0] === "Or" || d[0] === "And")) {
 				list.push(filterObj(d, fn));
 
 				continue;
