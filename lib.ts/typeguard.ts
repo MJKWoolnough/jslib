@@ -125,18 +125,7 @@ const throwUnknownError = (v: boolean) => {
 
 		return [def[0], obj] as ObjectDefinition;
 	} else if (def[0] === "Or" || def[0] === "And") {
-		const list: Definition[] = [];
-
-		for (const d of def[1] as Definition[]) {
-			if (d[0] === "Object" || (d[0] === "Or" || d[0] === "And")) {
-				list.push(filterObj(d, fn));
-
-				continue;
-			}
-			list.push(d);
-		}
-
-		return [def[0], list] as AndOrDefinition;
+		return [def[0], (def[1] as Definition[]).map(d => d[0] === "Object" || d[0] === "Or" || d[0] == "And" ? filterObj(d, fn) : d)];
 	}
 
 	return def;
