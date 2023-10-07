@@ -262,11 +262,11 @@ class SpreadTypeGuard extends Function {
 	}
 
 	def() {
-		return spreads.get(this)!.def();
+		return spreads.get(this)?.def() ?? ["", "unknown"];
 	}
 
 	toString() {
-		return spreads.get(this)!.toString();
+		return spreads.get(this)?.toString() ?? "unknown";
 	}
 }
 
