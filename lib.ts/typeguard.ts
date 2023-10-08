@@ -111,15 +111,7 @@ const throwUnknownError = (v: boolean) => {
 
 	return false;
       },
-      filterObj = (def: Definition, fn: (key: string | number | symbol, val: Definition) => null | [typeof key, Definition]): Definition => {
-	if (def[0] === "Object") {
-		return [def[0], (Object.entries(def[1]).map(([k, v]) => fn(k, v)).filter(v => v) as [string, Definition][]).reduce((o, [k, v]) => (o[k] = v, o), {} as Record<string, Definition>)] as ObjectDefinition;
-	} else if (def[0] === "Or" || def[0] === "And") {
-		return [def[0], (def[1] as Definition[]).map(d => d[0] === "Object" || d[0] === "Or" || d[0] == "And" ? filterObj(d, fn) : d)];
-	}
-
-	return def;
-      },
+      filterObj = (def: Definition, fn: (key: string | number | symbol, val: Definition) => null | [typeof key, Definition]): Definition => def[0] === "Object" ? [def[0], (Object.entries(def[1]).map(([k, v]) => fn(k, v)).filter(v => v) as [string, Definition][]).reduce((o, [k, v]) => (o[k] = v, o), {} as Record<string, Definition>)] as ObjectDefinition : def[0] === "Or" || def[0] === "And" ? [def[0], (def[1] as Definition[]).map(d => d[0] === "Object" || d[0] === "Or" || d[0] == "And" ? filterObj(d, fn) : d)] : def,
       reduceAndOr = (andOr: "And" | "Or", tgs: readonly TypeGuard<any>[]): Definition => {
 	const list: Definition[] = [],
 	      simple = new Set();
