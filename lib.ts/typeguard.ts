@@ -225,7 +225,7 @@ class STypeGuard<T> extends Function {
 
 class SpreadTypeGuard extends Function {
 	static from<T>(tg: STypeGuard<T>) {
-		const stg =  Object.setPrototypeOf((v: unknown): v is T => tg(v), SpreadTypeGuard.prototype) as TypeGuard<T>;
+		const stg = Object.setPrototypeOf((v: unknown): v is T => tg(v), SpreadTypeGuard.prototype) as TypeGuard<T>;
 
 		spreads.set(stg, tg);
 
