@@ -4,9 +4,11 @@
  * The intent is to be able to create your types from the typeguards, instead of creating typeguards for a type.
  *
  * @module typeguard
+ * @requires module:misc
  */
 /** */
 
+import {setAndReturn} from './misc.js';
 
 let throwErrors = false,
     allowUndefined = null,
@@ -42,9 +44,11 @@ const throwUnknownError = v => {
 	take = tk;
 	skip = s;
       },
-      typeStrs = new WeakMap(),
-      aliases = new Map(),
-      group = Symbol("group"),
+      unknownStr = "unknown",
+      [unknownDef, anyDef, numberDef, bigIntDef, stringDef, booleanDef, functionDef, symbolDef, neverDef, undefinedDef, nullDef, voidDef] = [unknownStr, "any", "number", "bigint", "string", "boolean", "Function", "symbol", "never", "undefined", "null", "void"].map(v => Object.freeze(["", v])),
+      definitions = new WeakMap(),
+      strings = new WeakMap(),
+      spreads = new WeakMap(),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v, p) => {
 	const [tg, s, ...rest] = p;
@@ -70,88 +74,62 @@ const throwUnknownError = v => {
 
 	return false;
       },
-      stringCollapse = /([^\\])\$\{string\}\$\{string\}/g,
-      getType = tg => {
-	const t = typeStrs.get(tg) ?? ["unknown", undefined];
+      filterObj = (def, fn) => def[0] === "Object" ? [def[0], Object.entries(def[1]).map(([k, v]) => fn(k, v)).filter(v => v).reduce((o, [k, v]) => (o[k] = v, o), {})] : def[0] === "Or" || def[0] === "And" ? [def[0], def[1].map(d => d[0] === "Object" || d[0] === "Or" || d[0] == "And" ? filterObj(d, fn) : d)] : def,
+      reduceAndOr = (andOr, tgs) => {
+	const list = [],
+	      simple = new Set();
 
-	if (t[0] instanceof Array) {
-		const arr = [];
+	for (const tg of tgs) {
+		const def = tg.def();
 
-		for (const g of t[0]) {
-			if (g[group] === tg[group]) {
-				const [h] = getType(g);
+		if (def[0] === andOr) {
+			for (const d of def[1]) {
+				if (d[0] === "") {
+					if (simple.has(d[1])) {
+						continue
+					}
 
-				for (const i of h) {
-					arr.push(i);
-				}
-			} else {
-				arr.push(g);
-			}
-		}
-
-		t[0] = arr;
-	}
-
-	return t;
-      },
-      toString = (tg, typ, comment) => {
-	const alias = aliases.get(tg);
-	if (alias) {
-		return alias;
-	}
-
-	let str = "";
-
-	if (typ instanceof Array) {
-	        const arr = [],
-		      deps = {};
-
-		for (const t of typ) {
-			const str = t.toString(),
-			      gStr = tg[group] === '&' && t[group] === '|' ? `(${str})` : str + "";
-
-			if (!arr.includes(gStr)) {
-				if (str.deps) {
-					Object.assign(deps, str.deps);
+					simple.add(d[1]);
 				}
 
-				arr.push(gStr);
+				list.push(d);
 			}
-		}
+		} else if ((def[0] !== "" || def[1] !== "never")) {
+			if (def[0] === "") {
+				if (simple.has(def[1])) {
+					continue
+				}
 
-		str = assignDeps(arr.join(` ${comment} `), deps);
-	} else {
-		str = (typ instanceof Function ? typ() : typ);
-
-		if (comment) {
-			const deps = str.deps;
-
-			str += ` /* ${comment} */`;
-
-			if (deps) {
-				str = Object.assign(str, {deps});
+				simple.add(def[1]);
 			}
+
+			list.push(def);
 		}
 	}
 
-	const lateAlias = aliases.get(tg);
-
-	if (lateAlias) {
-		str = assignDeps(lateAlias, str.deps, {[lateAlias]: str});
-	}
-
-	aliases.set(tg, str);
-
-	return str;
+	return list.length === 1 ? list[0] : list.length ? [andOr, list] : neverDef;
       },
-      assignDeps = (str, ...ds) => {
-	const deps = {};
-
-	for (const d of ds) {
-		Object.assign(deps, d);
+      templateSafe = s => s.replaceAll("${", "\\${").replaceAll("`", "\\`"),
+      toString = def => strings.get(def) ?? setAndReturn(strings, def, defToString(def)),
+      defToString = def => {
+	switch (def[0]) {
+	case "":
+	case "Recur":
+		return typeof def[2] === "string" ? `${def[1]} /* ${def[2]} */` : def[1];
+	case "Template":
+		return def[1].reduce((s, d, n) => s + (n % 2 ? "${" + toString(d) + "}" : templateSafe(d)), "`") + "`";
+	case "Array":
+		return (def[1][0] === "And" || def[1][0] === "Or" ? `(${toString(def[1])})` : toString(def[1])) + "[]";
+	case "And":
+	case "Or":
+		return def[1].map(d => def[0] === "And" && d[0] === "Or" ? `(${toString(d)})` : toString(d)).join(def[0] === "And" ? " & " : " | ");
+	case "Object":
+		return Object.entries(def[1]).filter(([k]) => typeof k === "string").map(([k, d]) => `	${k.match(identifer) ? k : JSON.stringify(k)}${(d[0] === "" && d[1] === "undefined") || d[0] === "Or" && d[1].some(e => e[0] === "" && e[1] === "undefined") ? "?" : ""}: ${toString(d).replaceAll("\n", "\n	")};\n`).reduce((t, e, n) => t + (!n ? "\n" : "") + e, "{")  + "}";
+	case "Tuple":
+		return "[" + def[1].map(toString).concat(def[2] ? "..." + (["Or", "And"].includes(def[2][0]) ? `(${toString(def[2])})` : toString(def[2])) + "[]" : []).join(", ") + "]";
+	default:
+		return `${def[0]}<${def.slice(1).map(toString).join(", ")}>`;
 	}
-
-	return Object.keys(deps).length ? Object.assign(str, {deps}) : str;
       };
 
 /**
@@ -167,12 +145,10 @@ const throwUnknownError = v => {
  * @typedef {(v: unknown) => v is T} TypeGuard
  * */
 class STypeGuard extends Function {
-	static from(tg, typeStr, comment) {
+	static from(tg, def) {
 		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype);
 
-		tgFn[group] = typeStr instanceof Array ? comment : undefined;
-
-		typeStrs.set(tgFn, [typeStr, comment]);
+		definitions.set(tgFn, def);
 
 		return tgFn;
 	}
@@ -190,27 +166,41 @@ class STypeGuard extends Function {
 	}
 
 	throws() {
-		return asTypeGuard(v => this.throw(v));
+		return asTypeGuard((v => this.throw(v), this.def()));
 	}
 
 	*[Symbol.iterator]() {
 		yield SpreadTypeGuard.from<T>(this);
 	}
 
-	[Symbol.toPrimitive]() {
-		return this.toString() + "";
+	def() {
+		const def = definitions.get(this) ?? unknownDef,
+		      processed = def instanceof Function ? def() : def,
+		      late = definitions.get(this);
+
+		return late !== def && late instanceof Array && late[0] === "Recur" ? setAndReturn(definitions, this, Object.freeze(["Recur", late[1], processed])) : processed !== def ? setAndReturn(definitions, this, Object.freeze(processed)) : processed;
 	}
 
 	toString() {
-		const [typ, comment] = getType(this);
-
-		return toString(this, typ, comment);
+		return toString(this.def());
 	}
 }
 
 class SpreadTypeGuard extends Function {
 	static from(tg) {
-		return Object.setPrototypeOf(tg, SpreadTypeGuard.prototype);
+		const stg = Object.setPrototypeOf(v => tg(v), SpreadTypeGuard.prototype);
+
+		spreads.set(stg, tg);
+
+		return stg;
+	}
+
+	def() {
+		return spreads.get(this)?.def() ?? unknownDef;
+	}
+
+	toString() {
+		return spreads.get(this)?.toString() ?? unknownStr;
 	}
 }
 
@@ -226,7 +216,7 @@ export const
  *
  * @return {TypeGuard<T>} The passed in typeguard, with additional functionality.
  */
-asTypeGuard = (tg, typeStr = "unknown", comment) => STypeGuard.from(tg, typeStr, comment),
+asTypeGuard = (tg, def = unknownDef) => STypeGuard.from(tg, def),
 /**
  * The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against.
  *
@@ -234,7 +224,7 @@ asTypeGuard = (tg, typeStr = "unknown", comment) => STypeGuard.from(tg, typeStr,
  *
  * @return {TypeGuard<boolean>}
  */
-Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean"), d?.toString() ?? "boolean"),
+Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === undefined || v === d), "boolean"), d !== undefined ? ["", d.toString()] : booleanDef),
 /**
  * The Str function returns a TypeGuard that checks for string values, and takes an optional regex to confirm string format against.
  *
@@ -242,7 +232,7 @@ Bool = d => asTypeGuard(v => throwOrReturn(typeof v === "boolean" && (d === unde
  *
  * @return {TypeGuard<string>}
  */
-Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), "string"),
+Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefined || r.test(v)), "string"), stringDef),
 /**
  * The Tmpl function returns a TypeGuard that checks for template values.
  *
@@ -251,88 +241,72 @@ Str = r => asTypeGuard(v => throwOrReturn(typeof v === "string" && (r === undefi
  *
  * @return {TypeGuard<string>}
  */
-Tmpl = (first, ...s) => asTypeGuard(v => {
-	if (typeof v !== "string") {
-		return throwOrReturn(false, "Template");
-	}
+Tmpl = (first, ...s) => asTypeGuard(v => throwOrReturn(typeof v === "string" && v.startsWith(first) && matchTemplate(v.slice(first.length), s), "template"), () => {
+	let rest = s.slice(),
+	    justString = first === "";
 
-	if (v.startsWith(first) && matchTemplate(v.slice(first.length), s)) {
-		return true;
-	}
-
-	return throwOrReturn(false, "template");
-}, (() => {
-	if (s.length === 0) {
-		return JSON.stringify(first);
-	}
-
-	let toRet = "`" + first,
-	    rest = s,
-	    allStrings = true;
-
-	const vals = [];
+	const vals = [first];
 
 	while (rest.length) {
 		const [tg, s, ...r] = rest,
-		      tgStr = tg.toString();
+		      def = tg.def(),
+		      [typ, val] = def;
 
 		rest = r;
 
-		if (!tgStr.startsWith(`"`)) {
-			allStrings = false;
+		switch (typ) {
+		case "Template":
+			vals[vals.length - 1] += val[0];
+
+			let dr = val.slice(1);
+
+			while (dr.length) {
+				const [d, ds, ...rest] = dr;
+
+				dr = rest;
+
+				if (d[0] === "" && d[1] === "string" && vals.length > 1 && !vals[vals.length - 1]) {
+					vals[vals.length - 1] = ds;
+				} else {
+					vals.push(d, ds);
+
+					justString &&= d[0] === "" && d[1] === "string" && ds === "";
+				}
+			}
+
+			vals[vals.length - 1] += s;
+			break;
+		case "Or":
+			justString = false;
+
+			vals.push(def, s);
+
+			break;
+		default:
+			if (val.startsWith(`"`)) {
+				vals[vals.length - 1] += JSON.parse(val) + s;
+
+				justString = false;
+			} else if (val === "string" && vals.length > 1 && !vals[vals.length - 1]) {
+				vals[vals.length - 1] = s;
+			} else {
+				justString &&= val === "string";
+
+				vals.push(def, s);
+			}
 		}
 
-		vals.push(tgStr, s);
+		justString &&= s === "";
 	}
 
-	rest = vals;
-
-	if (allStrings) {
-		toRet = first;
-
-		while (rest.length) {
-			const [tgs, s, ...r] = rest;
-
-			rest = r;
-
-			toRet += JSON.parse(tgs) + s;
-		}
-
-		return JSON.stringify(toRet);
-	}
-
-	while (rest.length) {
-		const [tgs, s, ...r] = rest;
-
-		rest = r;
-
-		if (tgs.startsWith("`")) {
-			toRet += tgs.slice(1, -1);
-		} else if (tgs.startsWith(`"`)) {
-			toRet += JSON.parse(tgs).replaceAll("${", "\\${");
-		} else {
-			toRet += "${" + tgs.replaceAll("$", "\\$") + "}";
-		}
-
-		toRet += s.replaceAll("${", "\\${");
-	}
-
-	for (let last = ""; last !== toRet; toRet = toRet.replaceAll(stringCollapse, "$1${string}")) {
-		last = toRet;
-	}
-
-	if (toRet === "`${string}") {
-		return "string";
-	}
-
-	return toRet + "`";
-})()),
+	return vals.length === 1 ? ["", JSON.stringify(vals[0])] : justString ? stringDef : ["Template", vals];
+}),
 /**
  * The Undefined function returns a TypeGuard that checks for `undefined`.
  *
  * @return {TypeGuard<undefined>}
  */
-Undefined = () => asTypeGuard(v => throwOrReturn(v === undefined, "undefined"), "undefined"),
+Undefined = () => asTypeGuard(v => throwOrReturn(v === undefined, "undefined"), undefinedDef),
 /**
  * The Opt function returns a TypeGuard that checks for both the passed TypeGuard while allowing for it to be undefined.
  *
@@ -346,7 +320,7 @@ Opt = v => Or(v, Undefined()),
  *
  * @return {TypeGuard<null>}
  */
-Null = () => asTypeGuard(v => throwOrReturn(v === null, "null"), "null"),
+Null = () => asTypeGuard(v => throwOrReturn(v === null, "null"), nullDef),
 /**
  * The Num function returns a TypeGuard that checks for numbers, and takes optional min and max (inclusive) values to range check.
  *
@@ -355,7 +329,7 @@ Null = () => asTypeGuard(v => throwOrReturn(v === null, "null"), "null"),
  *
  * @return {TypeGuard<number>}
  */
-Num = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number"), "number", min !== -Infinity ? `${min} <= n` + (max !== Infinity ? ` <= ${max}` : "") : max !== Infinity ? `n <= ${max}` : undefined),
+Num = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof v === "number" && v >= min && v <= max, "number"), min !== -Infinity ? ["", "number", `${min} <= n` + (max !== Infinity ? ` <= ${max}` : "")] : max !== Infinity ? ["", "number", `n <= ${max}`] : numberDef),
 /**
  * The Int function returns a TypeGuard that checks for integers, and takes optional min and max (inclusive) values to range check.
  *
@@ -364,7 +338,7 @@ Num = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof
  *
  * @return {TypeGuard<number>}
  */
-Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer"), "number", min > Number.MIN_SAFE_INTEGER ? `${min} <= n` + (max < Number.MAX_SAFE_INTEGER ? ` <= ${max}` : "") : max < Number.MAX_SAFE_INTEGER ? `n <= ${max}` : undefined),
+Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard(v => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer"), min > Number.MIN_SAFE_INTEGER ? ["", "number", `${min} <= i` + (max < Number.MAX_SAFE_INTEGER ? ` <= ${max}` : "")] : max < Number.MAX_SAFE_INTEGER ? ["", "number", `i <= ${max}`] : numberDef),
 /**
  * The BigInt function returns a TypeGuard that checks for bigints, and takes optional min and max (inclusive) values to range check.
  *
@@ -373,13 +347,13 @@ Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGu
  *
  * @return {TypeGuard<bigint>}
  */
-BigInt = (min, max) => asTypeGuard(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint"), "bigint", min !== undefined ? `${min}n <= n` + (max != undefined ? ` <= ${max}n` : "") : max != undefined ? `n <= ${max}n` : undefined),
+BigInt = (min, max) => asTypeGuard(v => throwOrReturn(typeof v === "bigint" && (min === undefined || v >= min) && (max === undefined || v <= max), "bigint"), min !== undefined ? ["", "bigint", `${min}n <= b` + (max != undefined ? ` <= ${max}n` : "")] : max != undefined ? ["", "bigint", `b <= ${max}n`] : bigIntDef),
 /**
  * The Sym function returns a TypeGuard that checks for symbols.
  *
  * @return {TypeGuard<symbol>}
  */
-Sym = () => asTypeGuard(v => throwOrReturn(typeof v === "symbol", "symbol"), "symbol"),
+Sym = () => asTypeGuard(v => throwOrReturn(typeof v === "symbol", "symbol"), symbolDef),
 /**
  * The Val function returns a TypeGuard that checks for a specific, primitive value.
  *
@@ -389,25 +363,25 @@ Sym = () => asTypeGuard(v => throwOrReturn(typeof v === "symbol", "symbol"), "sy
  *
  * @return {TypeGuard<T>}
  */
-Val = val => asTypeGuard(v => throwOrReturn(v === val, "value"), typeof val === "bigint" ? val + "n" : val === undefined ? "undefined" : JSON.stringify(val)),
+Val = val => asTypeGuard(v => throwOrReturn(v === val, "value"), ["", typeof val === "bigint" ? val + "n" : val === undefined ? "undefined" : JSON.stringify(val)]),
 /**
  * The Any function returns a TypeGuard that allows any value.
  *
  * @return {TypeGuard<any>}
  */
-Any = () => asTypeGuard(_ => true, "any"),
+Any = () => asTypeGuard(_ => true, anyDef),
 /**
  * The Unknown function returns a TypeGuard that allows any value, but types to `unknown`.
  *
  * @return {TypeGuard<unknown>}
  */
-Unknown = () => asTypeGuard(_ => true, "unknown"),
+Unknown = () => asTypeGuard(_ => true, unknownDef),
 /**
  * The Void function returns a TypeGuard that performs no check as the value is not intended to be used.
  *
  * @return {TypeGuard<void>}
  */
-Void = () => asTypeGuard(_ => true, "void"),
+Void = () => asTypeGuard(_ => true, voidDef),
 /**
  * The Arr function returns a TypeGuard that checks for an Array, running the given TypeGuard on each element.
  *
@@ -437,11 +411,7 @@ Arr = t => asTypeGuard(v => {
 	}
 
 	return true;
-}, () => {
-	const str = t.toString();
-
-	return assignDeps(t[group] ? `(${str})[]` : `${str}[]`, str.deps);
-}),
+}, () => ["Array", t.def()]),
 /**
  * The Tuple function returns a TypeGuard that checks for the given types in an array.
  *
@@ -492,41 +462,7 @@ Tuple = (...t) => {
 		}
 
 		return throwOrReturn(pos === v.length, "tuple", "", "extra values");
-	}, () => {
-		const deps = {};
-
-		let toRet = "[";
-
-		for (const tg of tgs) {
-			if (toRet.length > 1) {
-				toRet += ", ";
-			}
-
-			const str = tg.toString();
-
-			if (str.deps) {
-				Object.assign(deps, str.deps);
-			}
-
-			toRet += str;
-		}
-
-		if (spread) {
-			if (toRet.length > 1) {
-				toRet += ", ";
-			}
-
-			const str = spread.toString();
-
-			if (str.deps) {
-				Object.assign(deps, str.deps);
-			}
-
-			toRet += spread[group] ? `...(${str})[]` : `...${str}[]`
-		}
-
-		return assignDeps(toRet + "]", deps);
-	});
+	}, () => spread ? ["Tuple", tgs.map(tg => tg.def()), spread.def()] : ["Tuple", tgs.map(tg => tg.def())]);
 },
 /**
  * The Obj function returns a TypeGuard that checks for an object type defined by the passed object of TypeGuards.
@@ -569,32 +505,7 @@ Obj = t => asTypeGuard(v => {
 	}
 
 	return true;
-}, () => {
-	const [au, tk, s] = mods(),
-	      deps = {};
-
-	let toRet = "{";
-
-	if (t) {
-		for (const [k, tg] of Object.entries(t)) {
-			if (typeof k === "string" && (tk?.includes(k) ?? true) && !s?.includes(k)) {
-				const s = getType(tg),
-				      hasUndefined = au || (tg[group] === "|" ? s[0] instanceof Array && s[0].some(e => typeStrs.get(e)?.[0] === "undefined") : typeStrs.get(tg)?.[0] === "undefined"),
-				      str = toString(tg, s[0], s[1]);
-
-				if (str.deps) {
-					Object.assign(deps, str.deps);
-				}
-
-				toRet += `\n	${k.match(identifer) ? k : JSON.stringify(k)}${hasUndefined ? "?" : ""}: ${str.replaceAll("\n", "\n	")};`;
-			}
-		}
-
-		toRet += "\n";
-	}
-
-	return assignDeps(toRet + "}", deps);
-}),
+}, () => ["Object", Object.fromEntries(Object.entries(t ?? {}).map(([k, v]) => [k, v.def()]))]),
 /**
  * The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined').
  *
@@ -610,15 +521,7 @@ Part = tg => asTypeGuard(v => {
 	} finally {
 		allowUndefined = null;
 	}
-}, () => {
-	allowUndefined ??= true;
-
-	const str = tg.toString();
-
-	allowUndefined = null;
-
-	return str;
-}),
+}, () => filterObj(tg.def(), (k, v) => v[0] === "Or" ? [k, v] : [k, ["Or", [v, undefinedDef]]])),
 /**
  * The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined.
  *
@@ -634,15 +537,25 @@ Req = tg => asTypeGuard(v => {
 	} finally {
 		allowUndefined = null;
 	}
-}, () => {
-	allowUndefined ??= false;
+}, () => filterObj(tg.def(), (k, v) => {
+	if (v[0] === "Or") {
+		const left = v[1].filter(d => d[0] !== "" || d[1] !== "undefined");
 
-	const str = tg.toString();
+		if (!left.length) {
+			return null;
+		}
 
-	allowUndefined = null;
+		if (left.length === 1) {
+			return [k, left[0]];
+		}
 
-	return str;
-}),
+		return [k, ["Or", left]];
+	} else if (v[0] === "" && v[1] === "undefined") {
+		return null;
+	}
+
+	return [k, v];
+})),
 /**
  * The Take function takes an existing TypeGuard create by the Obj function and transforms it to only check the keys passed into this function.
  *
@@ -652,22 +565,14 @@ Req = tg => asTypeGuard(v => {
  * @return {TypeGuard<{}>}
  */
 Take = (tg, ...keys) => asTypeGuard(v => {
-	take = keys;
+	take = take ? take.filter(k => keys.includes(k)) : keys;
 
 	try{
 		return tg(v);
 	} finally {
 		take = null;
 	}
-}, () => {
-	take = keys;
-
-	const str = tg.toString();
-
-	take = null;
-
-	return str;
-}),
+}, () => filterObj(tg.def(), (k, v) => keys.includes(k) ? [k, v] : null)),
 /**
  * The Skip function takes an existing TypeGuard create by the Obj function and transforms it to not check the keys passed into this function.
  *
@@ -677,22 +582,14 @@ Take = (tg, ...keys) => asTypeGuard(v => {
  * @return {TypeGuard<{}>}
  */
 Skip = (tg, ...keys) => asTypeGuard(v => {
-	skip = keys;
+	skip = skip ? [...skip, ...keys] : keys;
 
 	try{
 		return tg(v);
 	} finally {
 		skip = null;
 	}
-}, () => {
-	skip = keys;
-
-	const str = tg.toString();
-
-	skip = null;
-
-	return str;
-}),
+}, () => filterObj(tg.def(), (k, v) => keys.includes(k) ? null : [k, v])),
 /**
  * The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way.
  *
@@ -707,30 +604,26 @@ Recur = (tg, str) => {
 	let ttg;
 	const name = str ?? "type_"+unknownTypes++; // need to generate type name here
 
-	return asTypeGuard(v => (ttg ??= tg())(v), () => {
-		aliases.set(ttg ??= tg(), name);
-
-		return name;
-	});
+	return asTypeGuard(v => (ttg ??= tg())(v), () => setAndReturn(definitions, ttg ??= tg(), ["Recur", name]));
 },
 /**
  * The NumStr function returns a TypeGuard that checks for a string value that represents an number.
  *
  * @return {TypeGuard<`${number}`>}
  */
-NumStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), "`${number}`"),
+NumStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), ["Template", ["", numberDef, ""]]),
 /**
  * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
  * @return {TypeGuard<`${number}`>}
  */
-IntStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), "`${number}`"),
+IntStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), ["Template", ["", numberDef, ""]]),
 /**
  * The BoolStr function returns a TypeGuard that checks for a string value that represents an boolean.
  *
  * @return {TypeGuard<`${boolean}`>}
  */
-BoolStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), "`${boolean}`"),
+BoolStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && (v === "true" || v === "false"), "BoolStr"), ["Template", ["", booleanDef, ""]]),
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *
@@ -765,12 +658,7 @@ Rec = (key, value) => asTypeGuard(v => {
 	}
 
 	return true;
-}, () => {
-	const keyStr = key.toString(),
-	      valStr = value.toString();
-
-	return assignDeps(`Record<${keyStr}, ${valStr}>`, keyStr.deps, valStr.deps);
-}),
+}, () => ["Record", key.def(), value.def()]),
 /**
  * The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards.
  *
@@ -797,7 +685,7 @@ Or = (...tgs) => asTypeGuard(v => {
 	}
 
 	return throwOrReturn(false, "OR", "", errs.join(" | "));
-}, tgs, "|"),
+}, () => reduceAndOr("Or", tgs)),
 /**
  * The And function returns a TypeGuard that checks a value matches against all of the given TypeGuards.
  *
@@ -825,7 +713,7 @@ And = (...tgs) => asTypeGuard(v => {
 	}
 
 	return true;
-}, tgs, "&"),
+}, () => reduceAndOr("And", tgs)),
 /**
  * The MapType function returns a TypeGuard that checks for an Map type where the keys and values are of the types specified.
  *
@@ -860,12 +748,7 @@ MapType = (key, value) => asTypeGuard(v => {
 	}
 
 	return true;
-}, () => {
-	const keyStr = key.toString(),
-	      valStr = value.toString();
-
-	return assignDeps(`Map<${keyStr}, ${valStr}>`, keyStr.deps, valStr.deps);
-}),
+}, () => ["Map", key.def(), value.def()]),
 /**
  * The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified.
  *
@@ -895,11 +778,7 @@ SetType = t => asTypeGuard(v => {
 	}
 
 	return true;
-}, () => {
-	const str = t.toString();
-
-	return assignDeps(`Set<${str}>`, str.deps);
-}),
+}, () => ["Set", t.def()]),
 /**
  * The Class function returns a TypeGuard that checks a value is of the class specified.
  *
@@ -907,7 +786,7 @@ SetType = t => asTypeGuard(v => {
  *
  * @return {TypeGuard<class>}
  */
-Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class"), t.name || "unknown"),
+Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class"), ["", t.name || unknownStr]),
 /**
  * The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check.
  *
@@ -915,7 +794,7 @@ Class = t => asTypeGuard(v => throwOrReturn(v instanceof t, "class"), t.name || 
  *
  * @returns {TypeGuard<Function>}
  */
-Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"), "Function", args?.toString()),
+Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args === undefined || v.length === args), "Function"), args ? ["", "Function", args?.toString()] : functionDef),
 /**
  * The Forbid function returns a TypeGuard that disallows certain types from an existing type.
  *
@@ -937,9 +816,4 @@ Forbid = (t, u) => asTypeGuard(v => {
 	}
 
 	return t(v);
-}, () => {
-	const tStr = t.toString(),
-	      uStr = u.toString();
-
-	return assignDeps(`Exclude<${tStr}, ${uStr}>`, tStr.deps, uStr.deps);
-});
+}, () => ["Exclude", t.def(), u.def()]);
