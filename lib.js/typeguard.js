@@ -166,7 +166,7 @@ class STypeGuard extends Function {
 	}
 
 	throws() {
-		return asTypeGuard((v => this.throw(v), this.def()));
+		return asTypeGuard((v => this.throw(v), () => this.def()));
 	}
 
 	*[Symbol.iterator]() {
