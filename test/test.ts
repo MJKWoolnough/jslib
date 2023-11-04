@@ -9626,6 +9626,30 @@ type Tests = {
 
 				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
 			},
+			"wrong characters": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["+++", "==="].map(parseMarkdown);
+
+				return parsed.every(p => !(p.firstChild instanceof HTMLHRElement));
+			},
+			"not enough characters": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["--", "**", "__"].map(parseMarkdown);
+
+				return parsed.every(p => !(p.firstChild instanceof HTMLHRElement));
+			},
+			"too much indentation": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["    ---", "    ***", "    ___"].map(parseMarkdown);
+
+				return parsed.every(p => !(p.firstChild instanceof HTMLHRElement));
+			},
+			"non-whitespace at end": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["---a", "*** b", "___	c "].map(parseMarkdown);
+
+				return parsed.every(p => !(p.firstChild instanceof HTMLHRElement));
+			}
 		}
 	}
 });
