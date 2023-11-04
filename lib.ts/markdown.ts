@@ -20,6 +20,8 @@ class Markdown {
 		      pushBlock = (block?: HTMLElement) => {
 			if (text) {
 				blocks.push(tags.paragraphs(this.parseInline(text)));
+
+				text = "";
 			}
 
 			if (block) {
