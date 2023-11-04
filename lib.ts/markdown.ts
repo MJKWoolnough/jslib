@@ -14,6 +14,8 @@ class Markdown {
 	refs = new Map<string, [string, string]>();
 
 	parseBlocks(markdown: string) {
+		let text = "";
+
 		const blocks: HTMLElement[] = [],
 		      pushBlock = (block?: HTMLElement) => {
 			if (text) {
@@ -25,8 +27,6 @@ class Markdown {
 			}
 		      };
 
-		let text = "";
-
 		Loop:
 		for (const line of markdown.split("\n")) {
 			for (const tb of isThematicBreak) {
@@ -36,6 +36,8 @@ class Markdown {
 					continue Loop;
 				}
 			}
+
+			text += (text && " ") + line;
 		}
 
 		pushBlock();
