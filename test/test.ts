@@ -9578,27 +9578,27 @@ type Tests = {
 
 				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
 			},
-			"pluses": async () => {
+			"stars": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["+++", "+++++", "+++++++++++++++"].map(parseMarkdown);
+				      parsed = ["***", "*****", "***************"].map(parseMarkdown);
 
 				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
 			},
-			"pluses with leading spaces": async () => {
+			"stars with leading spaces": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = [" +++", "  +++", "   +++"].map(parseMarkdown);
+				      parsed = [" ***", "  ***", "   ***"].map(parseMarkdown);
 
 				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
 			},
-			"pluses with whitespace in between": async () => {
+			"stars with whitespace in between": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["+ + +", "+	+	+", "+ 	 + 	 +"].map(parseMarkdown);
+				      parsed = ["* * *", "*	*	*", "* 	 * 	 *"].map(parseMarkdown);
 
 				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
 			},
-			"pluses with whitespace at end": async () => {
+			"stars with whitespace at end": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["+++ ", "+++	", "+++ 	 	   		"].map(parseMarkdown);
+				      parsed = ["*** ", "***	", "*** 	 	   		"].map(parseMarkdown);
 
 				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
 			},
