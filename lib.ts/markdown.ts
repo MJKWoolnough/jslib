@@ -40,9 +40,9 @@ class Markdown {
 		for (const line of markdown.split("\n")) {
 			if (line.match(isHeading)) {
 				const t = line.trimStart(),
-				      start = t.indexOf(" ") as 1 | 2 | 3 | 4 | 5 | 6;
+				      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
 
-				pushBlock(tags[`heading${start}`](this.parseInline(t.slice(start).trim())));
+				pushBlock(tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline(start === -1 ? "" : t.slice(start).trim())));
 
 				continue Loop;
 			}
