@@ -14,15 +14,31 @@ class Markdown {
 	refs = new Map<string, [string, string]>();
 
 	parseBlocks(markdown: string) {
-		const blocks: HTMLElement[] = [];
+		const blocks: HTMLElement[] = [],
+		      pushBlock = (block?: HTMLElement) => {
+			if (text) {
+				blocks.push(tags.paragraphs(this.parseInline(text)));
+			}
 
+			if (block) {
+				blocks.push(block);
+			}
+		      };
+
+		let text = "";
+
+		Loop:
 		for (const line of markdown.split("\n")) {
 			for (const tb of isThematicBreak) {
 				if (line.match(tb)) {
-					blocks.push(tags.thematicBreaks());
+					pushBlock(tags.thematicBreaks());
+
+					continue Loop;
 				}
 			}
 		}
+
+		pushBlock();
 
 		return blocks;
 	}
