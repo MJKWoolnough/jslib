@@ -9551,5 +9551,81 @@ type Tests = {
 				return f.toString() === `Exclude<boolean | null | number | string, null | string>`;
 			}
 		}
+	},
+	"markdown": {
+		"thematic breaks": {
+			"dashes": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["---", "-----", "---------------"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"dashes with leading spaces": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = [" ---", "  ---", "   ---"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"dashes with whitespace in between": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["- - -", "-	-	-", "- 	 - 	 -"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"dashes with whitespace at end": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["--- ", "---	", "--- 	 	   		"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"pluses": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["+++", "+++++", "+++++++++++++++"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"pluses with leading spaces": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = [" +++", "  +++", "   +++"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"pluses with whitespace in between": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["+ + +", "+	+	+", "+ 	 + 	 +"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"pluses with whitespace at end": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["+++ ", "+++	", "+++ 	 	   		"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"underscores": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["___", "_____", "_______________"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"underscores with leading spaces": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = [" ___", "  ___", "   ___"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"underscores with whitespace in between": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["_ _ _", "_	_	_", "_ 	 _ 	 _"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+			"underscores with whitespace at end": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      parsed = ["___ ", "___	", "___ 	 	   		"].map(parseMarkdown);
+
+				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+			},
+		}
 	}
 });
