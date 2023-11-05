@@ -9681,45 +9681,88 @@ type Tests = {
 		"headings": {
 			"empty headings": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["#", "##", "###", "####", "#####", "######"].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => p.firstChild instanceof HTMLHeadingElement && p.firstChild?.textContent === "");
+				return [
+					["#", "<h1></h1>"],
+					["##", "<h2></h2>"],
+					["###", "<h3></h3>"],
+					["####", "<h4></h4>"],
+					["#####", "<h5></h5>"],
+					["######", "<h6></h6>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading1": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["# Some Text", "#   Some Text	", " # Some Text", "  # Some Text", "   # Some Text"].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild?.nodeName === "h1" && p.firstChild?.textContent === "Some Text"));
+				return [
+					["# Some Text", "<h1>Some Text</h1>"],
+					["#   Some Text	", "<h1>Some Text</h1>"],
+					[" # Some Text", "<h1>Some Text</h1>"],
+					["  # Some Text", "<h1>Some Text</h1>"],
+					["   # Some Text", "<h1>Some Text</h1>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading2": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["## Some Text", "##   Some Text	", " ## Some Text", "  ## Some Text", "   ## Some Text"].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild?.nodeName === "h2" && p.firstChild?.textContent === "Some Text"));
+				return [
+					["## Some Text", "<h2>Some Text</h2>"],
+					["##   Some Text	", "<h2>Some Text</h2>"],
+					[" ## Some Text", "<h2>Some Text</h2>"],
+					["  ## Some Text", "<h2>Some Text</h2>"],
+					["   ## Some Text", "<h2>Some Text</h2>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading3": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["### Some Text", "###   Some Text	", " ### Some Text", "  ### Some Text", "   ### Some Text"].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild?.nodeName === "h3" && p.firstChild?.textContent === "Some Text"));
+				return [
+					["### Some Text", "<h3>Some Text</h3>"],
+					["###   Some Text	", "<h3>Some Text</h3>"],
+					[" ### Some Text", "<h3>Some Text</h3>"],
+					["  ### Some Text", "<h3>Some Text</h3>"],
+					["   ### Some Text", "<h3>Some Text</h3>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading4": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["#### Some Text", "####   Some Text	", " #### Some Text", "  #### Some Text", "   #### Some Text"].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild?.nodeName === "h4" && p.firstChild?.textContent === "Some Text"));
+				return [
+					["#### Some Text", "<h4>Some Text</h4>"],
+					["####   Some Text	", "<h4>Some Text</h4>"],
+					[" #### Some Text", "<h4>Some Text</h4>"],
+					["  #### Some Text", "<h4>Some Text</h4>"],
+					["   #### Some Text", "<h4>Some Text</h4>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading5": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["##### Some Text", "#####   Some Text	", " ##### Some Text", "  ##### Some Text", "   ##### Some Text"].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild?.nodeName === "h5" && p.firstChild?.textContent === "Some Text"));
+				return [
+					["##### Some Text", "<h5>Some Text</h5>"],
+					["#####   Some Text	", "<h5>Some Text</h5>"],
+					[" ##### Some Text", "<h5>Some Text</h5>"],
+					["  ##### Some Text", "<h5>Some Text</h5>"],
+					["   ##### Some Text", "<h5>Some Text</h5>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading6": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["###### Some Text", "######   Some Text	", " ###### Some Text", "  ###### Some Text", "   ###### Some Text"].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild?.nodeName === "h6" && p.firstChild?.textContent === "Some Text"));
+				return [
+					["###### Some Text", "<h6>Some Text</h6>"],
+					["######   Some Text	", "<h6>Some Text</h6>"],
+					[" ###### Some Text", "<h6>Some Text</h6>"],
+					["  ###### Some Text", "<h6>Some Text</h6>"],
+					["   ###### Some Text", "<h6>Some Text</h6>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		}
 	}
