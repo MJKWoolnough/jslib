@@ -63,7 +63,7 @@ class Markdown {
 	}
 
 	parseInline(markdown: string) {
-		return markdown;
+		return markdown.replace("\\#", "#");
 	}
 }
 
