@@ -9704,7 +9704,8 @@ type Tests = {
 					["   # Some Text", "<h1>Some Text</h1>"],
 					["# Some Text #", "<h1>Some Text</h1>"],
 					["# Some Text ##", "<h1>Some Text</h1>"],
-					["# Some Text #########", "<h1>Some Text</h1>"]
+					["# Some Text #########", "<h1>Some Text</h1>"],
+					["# Some Text ###\\######", "<h1>Some Text ####</h1>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading2": async () => {
@@ -9719,7 +9720,8 @@ type Tests = {
 					["   ## Some Text", "<h2>Some Text</h2>"],
 					["## Some Text #", "<h2>Some Text</h2>"],
 					["## Some Text ##", "<h2>Some Text</h2>"],
-					["## Some Text #########", "<h2>Some Text</h2>"]
+					["## Some Text #########", "<h2>Some Text</h2>"],
+					["## Some Text ###\\######", "<h2>Some Text ####</h2>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading3": async () => {
@@ -9734,7 +9736,8 @@ type Tests = {
 					["   ### Some Text", "<h3>Some Text</h3>"],
 					["### Some Text #", "<h3>Some Text</h3>"],
 					["### Some Text ##", "<h3>Some Text</h3>"],
-					["### Some Text #########", "<h3>Some Text</h3>"]
+					["### Some Text #########", "<h3>Some Text</h3>"],
+					["### Some Text ###\\######", "<h3>Some Text ####</h3>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading4": async () => {
@@ -9749,7 +9752,8 @@ type Tests = {
 					["   #### Some Text", "<h4>Some Text</h4>"],
 					["#### Some Text #", "<h4>Some Text</h4>"],
 					["#### Some Text ##", "<h4>Some Text</h4>"],
-					["#### Some Text #########", "<h4>Some Text</h4>"]
+					["#### Some Text #########", "<h4>Some Text</h4>"],
+					["#### Some Text ###\\######", "<h4>Some Text ####</h4>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading5": async () => {
@@ -9764,7 +9768,8 @@ type Tests = {
 					["   ##### Some Text", "<h5>Some Text</h5>"],
 					["##### Some Text #", "<h5>Some Text</h5>"],
 					["##### Some Text ##", "<h5>Some Text</h5>"],
-					["##### Some Text #########", "<h5>Some Text</h5>"]
+					["##### Some Text #########", "<h5>Some Text</h5>"],
+					["##### Some Text ###\\######", "<h5>Some Text ####</h5>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"heading6": async () => {
@@ -9779,7 +9784,8 @@ type Tests = {
 					["   ###### Some Text", "<h6>Some Text</h6>"],
 					["###### Some Text #", "<h6>Some Text</h6>"],
 					["###### Some Text ##", "<h6>Some Text</h6>"],
-					["###### Some Text #########", "<h6>Some Text</h6>"]
+					["###### Some Text #########", "<h6>Some Text</h6>"],
+					["###### Some Text ###\\######", "<h6>Some Text ####</h6>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		}
