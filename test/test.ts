@@ -9556,99 +9556,126 @@ type Tests = {
 		"thematic breaks": {
 			"dashes": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = ["---", "-----", "---------------"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"dashes with leading spaces": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = [" ---", "  ---", "   ---"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"dashes with whitespace in between": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = ["- - -", "-	-	-", "- 	 - 	 -"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"dashes with whitespace at end": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = ["--- ", "---	", "--- 	 	   		"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"stars": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = ["***", "*****", "***************"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"stars with leading spaces": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = [" ***", "  ***", "   ***"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"stars with whitespace in between": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = ["* * *", "*	*	*", "* 	 * 	 *"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"stars with whitespace at end": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = ["*** ", "***	", "*** 	 	   		"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"underscores": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = ["___", "_____", "_______________"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"underscores with leading spaces": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = [" ___", "  ___", "   ___"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"underscores with whitespace in between": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = ["_ _ _", "_	_	_", "_ 	 _ 	 _"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"underscores with whitespace at end": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js"),
 				      parsed = ["___ ", "___	", "___ 	 	   		"].map(parseMarkdown);
 
-				return parsed.every(p => p.firstChild instanceof HTMLHRElement);
+				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"wrong characters": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["+++", "==="].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild instanceof HTMLHRElement));
+				return [
+					["+++", "<p>+++</p>"],
+					["===", "<p>===</p>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"not enough characters": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["--", "**", "__"].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild instanceof HTMLHRElement));
+				return [
+					["--", "<p>--</p>"],
+					["**", "<p>**</p>"],
+					["__", "<p>__</p>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"too much indentation": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["    ---", "    ***", "    ___"].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild instanceof HTMLHRElement));
+				return [ // TODO: will need updating once code blocks are implemented
+					["    ---", "<p>    ---</p>"],
+					["    ***", "<p>    ***</p>"],
+					["    ___", "<p>    ___</p>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"non-whitespace at end": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      parsed = ["---a", "*** b", "___	c "].map(parseMarkdown);
+				      {div}  = await import ("./lib/html.js");
 
-				return parsed.every(p => !(p.firstChild instanceof HTMLHRElement));
+				return [
+					["---a", "<p>---a</p>"],
+					["*** b", "<p>*** b</p>"],
+					["___	c", "<p>___	c</p>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		},
 		"headings": {
