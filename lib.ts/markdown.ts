@@ -21,14 +21,13 @@ class Markdown {
 	refs = new Map<string, [string, string]>();
 
 	parseBlocks(markdown: string) {
-		let text = "";
-
-		const blocks: HTMLElement[] = [],
+		const text: string[] = [],
+		      blocks: HTMLElement[] = [],
 		      pushBlock = (block?: HTMLElement) => {
-			if (text) {
+			if (text.length) {
 				blocks.push(tags.paragraphs(this.parseInline(text)));
 
-				text = "";
+				text.splice(0, text.length);
 			}
 
 			if (block) {
@@ -42,7 +41,7 @@ class Markdown {
 				const t = line.trimStart(),
 				      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
 
-				pushBlock(tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline(start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim())));
+				pushBlock(tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
 
 				continue Loop;
 			}
@@ -54,7 +53,7 @@ class Markdown {
 				}
 			}
 
-			text += (text && " ") + line;
+			text.push(line);
 		}
 
 		pushBlock();
@@ -62,8 +61,8 @@ class Markdown {
 		return blocks;
 	}
 
-	parseInline(markdown: string) {
-		return markdown.replace("\\#", "#");
+	parseInline(markdown: string[]) {
+		return markdown.join(" ").replace("\\#", "#");
 	}
 }
 
