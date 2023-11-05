@@ -9787,6 +9787,17 @@ type Tests = {
 					["###### Some Text #########", "<h6>Some Text</h6>"],
 					["###### Some Text ###\\######", "<h6>Some Text ####</h6>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+			},
+			"not a heading": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js");
+
+				return [
+					["####### heading", "<p>####### heading</p>"],
+					["#hashtag", "<p>#hashtag</p>"],
+					["#5 bolt", "<p>#5 bolt</p>"],
+					["\\# not a title", "<p># not a title</p>"]
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		}
 	}
