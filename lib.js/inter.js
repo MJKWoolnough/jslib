@@ -92,7 +92,7 @@ export class Pipe {
 	 * @return {Function} Cancel function to stop the pipes being merged.
 	 */
 	static any(cb, ...pipes) {
-		let debounce = -1;
+		let debounce = false;
 
 		const defs = pipes.map(p => p instanceof Pipe ? undefined : isPipeWithDefault(p) ? p[1] : p),
 		      cancels = [];
@@ -103,10 +103,11 @@ export class Pipe {
 				      fn = v => {
 					defs[n] = v;
 
-					if (debounce === -1) {
-						debounce = setTimeout(() => {
+					if (!debounce) {
+						debounce = true;
+						queueMicrotask(() => {
 							cb(defs);
-							debounce = -1;
+							debounce = false;
 						});
 					}
 				      };
@@ -302,7 +303,7 @@ export class Subscription {
 	 * @return {Subscription} The combined Subscription that will fire when any of the passed subscriptions fire.
 	 */
 	static any(...subs) {
-		let debounce = -1;
+		let debounce = false;
 
 		const [s, sFn, eFn, cFn] = Subscription.bind(),
 		      defs = subs.map(s => s instanceof Subscription ? undefined : isSubscriptionWithDefault(s) ? s[1] : s);
@@ -312,10 +313,11 @@ export class Subscription {
 				(s instanceof Array ? s[0] : s).when(v => {
 					defs[n] = v;
 
-					if (debounce === -1) {
-						debounce = setTimeout(() => {
+					if (!debounce) {
+						debounce = true;
+						queueMicrotask(() => {
 							sFn(defs);
-							debounce = -1;
+							debounce = false;
 						});
 					}
 				}, eFn);
