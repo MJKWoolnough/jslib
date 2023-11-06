@@ -9818,6 +9818,23 @@ type Tests = {
 					["heading\n==	 	  ", "<h1>heading</h1>"],
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
+			"dashes": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js");
+
+				return [
+					["heading\n-", "<h2>heading</h2>"],
+					["heading\n--", "<h2>heading</h2>"],
+					["heading\n---", "<h2>heading</h2>"],
+					["heading\n----", "<h2>heading</h2>"],
+					["heading\n ----", "<h2>heading</h2>"],
+					["heading\n  ----", "<h2>heading</h2>"],
+					["heading\n   ----", "<h2>heading</h2>"],
+					["heading\n-- ", "<h2>heading</h2>"],
+					["heading\n--	", "<h2>heading</h2>"],
+					["heading\n--	 	  ", "<h2>heading</h2>"],
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+			},
 		}
 	}
 });
