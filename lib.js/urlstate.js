@@ -56,7 +56,7 @@ export class Codec {
 	}
 }
 
-let debounceSet = -1;
+let debounceSet = false;
 
 const state = new Map(),
       subscribed = new Map(),
@@ -82,7 +82,7 @@ const state = new Map(),
 		window.history.pushState(Date.now(), "", "?" + queryStr);
 	}
 
-	debounceSet = -1;
+	debounceSet = false;
       },
       jsonCodec = new Codec(v => {
 		if (v === undefined) {
@@ -124,7 +124,7 @@ class StateBound extends Binding {
 
 		getStateFromURL();
 
-		setTimeout(setURLChanged, 0, history.state ?? 0);
+		queueMicrotask(() => setURLChanged(history.state ?? 0));
 	}
 
 	#name;
@@ -160,8 +160,9 @@ class StateBound extends Binding {
 
 		state.set(this.#name, v === this.#def ? "" : this.#codec.encode(v));
 
-		if (debounceSet === -1) {
-			debounceSet = setTimeout(addStateToURL);
+		if (!debounceSet) {
+			debounceSet = true;
+			queueMicrotask(addStateToURL);
 		}
 	}
 	#restore(newState) {
@@ -189,7 +190,7 @@ class StateBound extends Binding {
 			sb.#restore(state.get(key) ?? "");
 		}
 
-		setTimeout(setURLChanged, 0, history.state ?? 0);
+		queueMicrotask(() => setURLChanged(history.state ?? 0));
 	}
 
 	static goto(href) {
@@ -214,8 +215,9 @@ class StateBound extends Binding {
 
 		state.set(name, val);
 
-		if (debounceSet === -1) {
-			debounceSet = setTimeout(addStateToURL);
+		if (!debounceSet) {
+			debounceSet = true;
+			queueMicrotask(addStateToURL);
 		}
 	}
 }
