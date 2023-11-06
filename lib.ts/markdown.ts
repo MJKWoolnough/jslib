@@ -1,4 +1,4 @@
-import {p, h1, h2, h3, h4, h5, h6, hr} from './html.js';
+import {h1, h2, h3, h4, h5, h6, hr, p} from './html.js';
 
 const tags = {
 	"paragraphs": p,
