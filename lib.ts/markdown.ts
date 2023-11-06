@@ -8,7 +8,7 @@ const tags = {
 	"heading3": h3,
 	"heading4": h4,
 	"heading5": h5,
-	"heading6": h6,
+	"heading6": h6
       } as const,
       isHeading = /^ {0,3}#{1,6}( .*)?$/,
       isSeText1 = /^ {0,3}=+[ 	]*$/,
