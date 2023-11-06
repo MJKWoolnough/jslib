@@ -9835,6 +9835,19 @@ type Tests = {
 					["heading\n--	 	  ", "<h2>heading</h2>"],
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
+			"not a heading": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js");
+
+				return [
+					["heading\n    ====", "<p>heading     ====</p>"],
+					["heading\n    ----", "<p>heading     ----</p>"],
+					["heading\n==== a", "<p>heading ==== a</p>"],
+					["heading\n---- a", "<p>heading ---- a</p>"],
+					["heading\n== ==", "<p>heading == ==</p>"],
+					["heading\n-- --", "<p>heading</p><hr>"],
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+			}
 		}
 	}
 });
