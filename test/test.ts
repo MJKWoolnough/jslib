@@ -9799,6 +9799,25 @@ type Tests = {
 					["\\# not a title", "<p># not a title</p>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
+		},
+		"setext": {
+			"equals": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div}  = await import ("./lib/html.js");
+
+				return [
+					["heading\n=", "<h1>heading</h1>"],
+					["heading\n==", "<h1>heading</h1>"],
+					["heading\n===", "<h1>heading</h1>"],
+					["heading\n=====", "<h1>heading</h1>"],
+					["heading\n ====", "<h1>heading</h1>"],
+					["heading\n  ====", "<h1>heading</h1>"],
+					["heading\n   ====", "<h1>heading</h1>"],
+					["heading\n== ", "<h1>heading</h1>"],
+					["heading\n==	", "<h1>heading</h1>"],
+					["heading\n==	 	  ", "<h1>heading</h1>"],
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+			},
 		}
 	}
 });
