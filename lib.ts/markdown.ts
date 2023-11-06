@@ -11,7 +11,8 @@ const tags = {
 	"heading6": h6,
       } as const,
       isHeading = /^ {0,3}#{1,6}( .*)?$/,
-      isSeText = /^ {0,3}=+[ 	]*$/,
+      isSeText1 = /^ {0,3}=+[ 	]*$/,
+      isSeText2 = /^ {0,3}\-+[ 	]*$/,
       isThematicBreak = [
 	/^ {0,3}(\-[ 	]*){3,}[ 	]*$/,
 	/^ {0,3}(\*[ 	]*){3,}[ 	]*$/,
@@ -47,14 +48,26 @@ class Markdown {
 				continue Loop;
 			}
 
-			if (text.length && line.match(isSeText)) {
-				const header = this.parseInline(text);
+			if (text.length) {
+				if (line.match(isSeText1)) {
+					const header = this.parseInline(text);
 
-				text.splice(0, text.length);
+					text.splice(0, text.length);
 
-				pushBlock(tags["heading1"](header));
+					pushBlock(tags["heading1"](header));
 
-				continue;
+					continue;
+				}
+
+				if (line.match(isSeText2)) {
+					const header = this.parseInline(text);
+
+					text.splice(0, text.length);
+
+					pushBlock(tags["heading2"](header));
+
+					continue;
+				}
 			}
 
 			for (const tb of isThematicBreak) {
