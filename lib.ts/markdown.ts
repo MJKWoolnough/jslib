@@ -94,7 +94,7 @@ class Markdown {
 	}
 
 	parseInline(markdown: string[]) {
-		let text = markdown.join(" ");
+		let text = markdown.join("\n");
 
 		for (let i = 0; i < punctuation.length; i++) {
 			const char = punctuation.charAt(i);
