@@ -8538,7 +8538,7 @@ type Tests = {
 					      t = Take(Obj({
 						      "a": Int(),
 						      "b": Obj({
-							      "c": Str(),
+							      "c": Str()
 						      }),
 						      "c": Bool()
 					      }), "a", "b");
@@ -8562,7 +8562,7 @@ type Tests = {
 					      t = Take(Obj({
 						      "a": Int(),
 						      "b": Obj({
-							      "c": Str(),
+							      "c": Str()
 						      }),
 						      "c": Bool()
 					      }), "a", "b");
@@ -8619,7 +8619,7 @@ type Tests = {
 						      "a": Int(),
 						      "b": Str(),
 						      "c": Obj({
-							      "a": Bool(),
+							      "a": Bool()
 						      })
 					      }), "a", "b");
 
@@ -8643,7 +8643,7 @@ type Tests = {
 						      "a": Int(),
 						      "b": Str(),
 						      "c": Obj({
-							      "a": Bool(),
+							      "a": Bool()
 						      })
 					      }), "a", "b");
 
@@ -9815,7 +9815,7 @@ type Tests = {
 					["heading\n   ====", "<h1>heading</h1>"],
 					["heading\n== ", "<h1>heading</h1>"],
 					["heading\n==\t", "<h1>heading</h1>"],
-					["heading\n==\t \t  ", "<h1>heading</h1>"],
+					["heading\n==\t \t  ", "<h1>heading</h1>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"dashes": async () => {
@@ -9832,7 +9832,7 @@ type Tests = {
 					["heading\n   ----", "<h2>heading</h2>"],
 					["heading\n-- ", "<h2>heading</h2>"],
 					["heading\n--\t", "<h2>heading</h2>"],
-					["heading\n--\t \t  ", "<h2>heading</h2>"],
+					["heading\n--\t \t  ", "<h2>heading</h2>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"not a heading": async () => {
@@ -9845,7 +9845,7 @@ type Tests = {
 					["heading\n==== a", "<p>heading ==== a</p>"],
 					["heading\n---- a", "<p>heading ---- a</p>"],
 					["heading\n== ==", "<p>heading == ==</p>"],
-					["heading\n-- --", "<p>heading</p><hr>"],
+					["heading\n-- --", "<p>heading</p><hr>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		}
