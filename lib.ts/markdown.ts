@@ -17,7 +17,8 @@ const tags = {
 	/^ {0,3}(\-[ \t]*){3,}[ \t]*$/,
 	/^ {0,3}(\*[ \t]*){3,}[ \t]*$/,
 	/^ {0,3}(_[ \t]*){3,}[ \t]*$/
-      ];
+      ],
+      punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 class Markdown {
 	refs = new Map<string, [string, string]>();
@@ -93,7 +94,15 @@ class Markdown {
 	}
 
 	parseInline(markdown: string[]) {
-		return markdown.join(" ").replace("\\#", "#");
+		let text = markdown.join(" ");
+
+		for (let i = 0; i < punctuation.length; i++) {
+			const char = punctuation.charAt(i);
+
+			text = text.replaceAll("\\" + char, char);
+		}
+
+		return text;
 	}
 }
 
