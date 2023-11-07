@@ -39,6 +39,12 @@ class Markdown {
 
 		Loop:
 		for (const line of markdown.split("\n")) {
+			if (!line.trim()) {
+				pushBlock();
+
+				continue;
+			}
+
 			if (line.match(isHeading)) {
 				const t = line.trimStart(),
 				      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
