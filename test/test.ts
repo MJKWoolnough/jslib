@@ -9840,11 +9840,11 @@ type Tests = {
 				      {div} = await import ("./lib/html.js");
 
 				return [
-					["heading\n    ====", "<p>heading     ====</p>"],
-					["heading\n    ----", "<p>heading     ----</p>"],
-					["heading\n==== a", "<p>heading ==== a</p>"],
-					["heading\n---- a", "<p>heading ---- a</p>"],
-					["heading\n== ==", "<p>heading == ==</p>"],
+					["heading\n    ====", "<p>heading\n    ====</p>"],
+					["heading\n    ----", "<p>heading\n    ----</p>"],
+					["heading\n==== a", "<p>heading\n==== a</p>"],
+					["heading\n---- a", "<p>heading\n---- a</p>"],
+					["heading\n== ==", "<p>heading\n== ==</p>"],
 					["heading\n-- --", "<p>heading</p><hr>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
@@ -9853,10 +9853,10 @@ type Tests = {
 				      {div} = await import ("./lib/html.js");
 
 				return [
-					["Foo\nbar\n---\nbaz", "<h2>Foo bar</h2><p>baz</p>"],
+					["Foo\nbar\n---\nbaz", "<h2>Foo\nbar</h2><p>baz</p>"],
 					["Foo\n\nbar\n---\nbaz", "<p>Foo</p><h2>bar</h2><p>baz</p>"],
-					["Foo\nbar\n\n---\nbaz", "<p>Foo bar</p><hr><p>baz</p>"],
-					["Foo\nbar\n\\---\nbaz", "<p>Foo bar --- baz</p>"],
+					["Foo\nbar\n\n---\nbaz", "<p>Foo\nbar</p><hr><p>baz</p>"],
+					["Foo\nbar\n\\---\nbaz", "<p>Foo\nbar\n---\nbaz</p>"],
 				].every(([input, output]) => {
 					const t = div(parseMarkdown(input)).innerHTML;
 
