@@ -9847,6 +9847,14 @@ type Tests = {
 					["heading\n== ==", "<p>heading == ==</p>"],
 					["heading\n-- --", "<p>heading</p><hr>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+			},
+			"complex setext header": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
+
+				return [
+					["Foo\nbar\n---\nbaz", "<h2>Foo bar</h2><p>baz</p>"],
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		}
 	}
