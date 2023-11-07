@@ -9571,14 +9571,14 @@ type Tests = {
 			"dashes with whitespace in between": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js"),
-				      parsed = ["- - -", "-	-	-", "- 	 - 	 -"].map(parseMarkdown);
+				      parsed = ["- - -", "-\t-\t-", "- \t - \t -"].map(parseMarkdown);
 
 				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"dashes with whitespace at end": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js"),
-				      parsed = ["--- ", "---	", "--- 	 	   		"].map(parseMarkdown);
+				      parsed = ["--- ", "---\t", "--- \t \t   \t\t"].map(parseMarkdown);
 
 				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
@@ -9599,14 +9599,14 @@ type Tests = {
 			"stars with whitespace in between": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js"),
-				      parsed = ["* * *", "*	*	*", "* 	 * 	 *"].map(parseMarkdown);
+				      parsed = ["* * *", "*\t*\t*", "* \t * \t *"].map(parseMarkdown);
 
 				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"stars with whitespace at end": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js"),
-				      parsed = ["*** ", "***	", "*** 	 	   		"].map(parseMarkdown);
+				      parsed = ["*** ", "***\t", "*** \t \t   \t\t"].map(parseMarkdown);
 
 				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
@@ -9627,14 +9627,14 @@ type Tests = {
 			"underscores with whitespace in between": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js"),
-				      parsed = ["_ _ _", "_	_	_", "_ 	 _ 	 _"].map(parseMarkdown);
+				      parsed = ["_ _ _", "_\t_\t_", "_ \t _ \t _"].map(parseMarkdown);
 
 				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
 			"underscores with whitespace at end": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js"),
-				      parsed = ["___ ", "___	", "___ 	 	   		"].map(parseMarkdown);
+				      parsed = ["___ ", "___\t", "___ \t \t   \t\t"].map(parseMarkdown);
 
 				return parsed.every(p => div(p).innerHTML === "<hr>");
 			},
@@ -9674,7 +9674,7 @@ type Tests = {
 				return [
 					["---a", "<p>---a</p>"],
 					["*** b", "<p>*** b</p>"],
-					["___	c", "<p>___	c</p>"]
+					["___\tc", "<p>___\tc</p>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		},
@@ -9698,7 +9698,7 @@ type Tests = {
 
 				return [
 					["# Some Text", "<h1>Some Text</h1>"],
-					["#   Some Text	", "<h1>Some Text</h1>"],
+					["#   Some Text\t", "<h1>Some Text</h1>"],
 					[" # Some Text", "<h1>Some Text</h1>"],
 					["  # Some Text", "<h1>Some Text</h1>"],
 					["   # Some Text", "<h1>Some Text</h1>"],
@@ -9714,7 +9714,7 @@ type Tests = {
 
 				return [
 					["## Some Text", "<h2>Some Text</h2>"],
-					["##   Some Text	", "<h2>Some Text</h2>"],
+					["##   Some Text\t", "<h2>Some Text</h2>"],
 					[" ## Some Text", "<h2>Some Text</h2>"],
 					["  ## Some Text", "<h2>Some Text</h2>"],
 					["   ## Some Text", "<h2>Some Text</h2>"],
@@ -9730,7 +9730,7 @@ type Tests = {
 
 				return [
 					["### Some Text", "<h3>Some Text</h3>"],
-					["###   Some Text	", "<h3>Some Text</h3>"],
+					["###   Some Text\t", "<h3>Some Text</h3>"],
 					[" ### Some Text", "<h3>Some Text</h3>"],
 					["  ### Some Text", "<h3>Some Text</h3>"],
 					["   ### Some Text", "<h3>Some Text</h3>"],
@@ -9746,7 +9746,7 @@ type Tests = {
 
 				return [
 					["#### Some Text", "<h4>Some Text</h4>"],
-					["####   Some Text	", "<h4>Some Text</h4>"],
+					["####   Some Text\t", "<h4>Some Text</h4>"],
 					[" #### Some Text", "<h4>Some Text</h4>"],
 					["  #### Some Text", "<h4>Some Text</h4>"],
 					["   #### Some Text", "<h4>Some Text</h4>"],
@@ -9762,7 +9762,7 @@ type Tests = {
 
 				return [
 					["##### Some Text", "<h5>Some Text</h5>"],
-					["#####   Some Text	", "<h5>Some Text</h5>"],
+					["#####   Some Text\t", "<h5>Some Text</h5>"],
 					[" ##### Some Text", "<h5>Some Text</h5>"],
 					["  ##### Some Text", "<h5>Some Text</h5>"],
 					["   ##### Some Text", "<h5>Some Text</h5>"],
@@ -9778,7 +9778,7 @@ type Tests = {
 
 				return [
 					["###### Some Text", "<h6>Some Text</h6>"],
-					["######   Some Text	", "<h6>Some Text</h6>"],
+					["######   Some Text\t", "<h6>Some Text</h6>"],
 					[" ###### Some Text", "<h6>Some Text</h6>"],
 					["  ###### Some Text", "<h6>Some Text</h6>"],
 					["   ###### Some Text", "<h6>Some Text</h6>"],
@@ -9814,8 +9814,8 @@ type Tests = {
 					["heading\n  ====", "<h1>heading</h1>"],
 					["heading\n   ====", "<h1>heading</h1>"],
 					["heading\n== ", "<h1>heading</h1>"],
-					["heading\n==	", "<h1>heading</h1>"],
-					["heading\n==	 	  ", "<h1>heading</h1>"],
+					["heading\n==\t", "<h1>heading</h1>"],
+					["heading\n==\t \t  ", "<h1>heading</h1>"],
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"dashes": async () => {
@@ -9831,8 +9831,8 @@ type Tests = {
 					["heading\n  ----", "<h2>heading</h2>"],
 					["heading\n   ----", "<h2>heading</h2>"],
 					["heading\n-- ", "<h2>heading</h2>"],
-					["heading\n--	", "<h2>heading</h2>"],
-					["heading\n--	 	  ", "<h2>heading</h2>"],
+					["heading\n--\t", "<h2>heading</h2>"],
+					["heading\n--\t \t  ", "<h2>heading</h2>"],
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"not a heading": async () => {
