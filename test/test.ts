@@ -9661,10 +9661,10 @@ type Tests = {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
-				return [ // TODO: will need updating once code blocks are implemented
-					["    ---", "<p>    ---</p>"],
-					["    ***", "<p>    ***</p>"],
-					["    ___", "<p>    ___</p>"]
+				return [
+					["    ---", "<code>---</code>"],
+					["    ***", "<code>***</code>"],
+					["    ___", "<code>___</code>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"non-whitespace at end": async () => {
