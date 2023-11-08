@@ -9662,9 +9662,9 @@ type Tests = {
 				      {div} = await import ("./lib/html.js");
 
 				return [
-					["    ---", "<code>---</code>"],
-					["    ***", "<code>***</code>"],
-					["    ___", "<code>___</code>"]
+					["    ---", "<pre><code>---</code></pre>"],
+					["    ***", "<pre><code>***</code></pre>"],
+					["    ___", "<pre><code>___</code></pre>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"non-whitespace at end": async () => {
