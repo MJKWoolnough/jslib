@@ -1,4 +1,4 @@
-import {code, h1, h2, h3, h4, h5, h6, hr, p} from './html.js';
+import {code, h1, h2, h3, h4, h5, h6, hr, p, pre} from './html.js';
 
 const tags = {
 	"paragraphs": p,
@@ -9,7 +9,7 @@ const tags = {
 	"heading4": h4,
 	"heading5": h5,
 	"heading6": h6,
-	"code": code
+	"code": (text: string) => pre(code(text))
       } as const,
       isHeading = /^ {0,3}#{1,6}( .*)?$/,
       isSeText1 = /^ {0,3}=+[ \t]*$/,
