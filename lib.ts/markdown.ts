@@ -20,6 +20,7 @@ const tags = {
 	/^ {0,3}(_[ \t]*){3,}[ \t]*$/
       ],
       isIndent = /^(\t|    )/,
+      isIndentBlankContinue = /^ {0,3}$/,
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 class Markdown {
@@ -55,6 +56,8 @@ class Markdown {
 			if (indent) {
 				if (line.match(isIndent)) {
 					text.push(line.replace(isIndent, ""));
+				} else if (line.match(isIndentBlankContinue)) {
+					text.push("");
 				} else {
 					pushBlock();
 
