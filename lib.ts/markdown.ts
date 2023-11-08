@@ -1,4 +1,4 @@
-import {h1, h2, h3, h4, h5, h6, hr, p} from './html.js';
+import {code, h1, h2, h3, h4, h5, h6, hr, p} from './html.js';
 
 const tags = {
 	"paragraphs": p,
@@ -8,7 +8,8 @@ const tags = {
 	"heading3": h3,
 	"heading4": h4,
 	"heading5": h5,
-	"heading6": h6
+	"heading6": h6,
+	"code": code
       } as const,
       isHeading = /^ {0,3}#{1,6}( .*)?$/,
       isSeText1 = /^ {0,3}=+[ \t]*$/,
@@ -18,17 +19,24 @@ const tags = {
 	/^ {0,3}(\*[ \t]*){3,}[ \t]*$/,
 	/^ {0,3}(_[ \t]*){3,}[ \t]*$/
       ],
+      isIndent = /^(\t|    )/,
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 class Markdown {
 	refs = new Map<string, [string, string]>();
 
 	parseBlocks(markdown: string) {
+		let indent = false;
+
 		const text: string[] = [],
 		      blocks: HTMLElement[] = [],
 		      pushBlock = (block?: HTMLElement) => {
 			if (text.length) {
-				blocks.push(tags.paragraphs(this.parseInline(text)));
+				if (indent) {
+					blocks.push(tags.code(text.join("\n")));
+				} else {
+					blocks.push(tags.paragraphs(this.parseInline(text)));
+				}
 
 				text.splice(0, text.length);
 			}
@@ -40,6 +48,22 @@ class Markdown {
 
 		Loop:
 		for (const line of markdown.split("\n")) {
+			if (!text.length && line.match(isIndent)) {
+				indent = true;
+			}
+
+			if (indent) {
+				if (line.match(isIndent)) {
+					text.push(line.replace(isIndent, ""));
+				} else {
+					pushBlock();
+
+					indent = false;
+				}
+
+				continue;
+			}
+
 			if (!line.trim()) {
 				pushBlock();
 
