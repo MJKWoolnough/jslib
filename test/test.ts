@@ -9857,15 +9857,7 @@ type Tests = {
 					["Foo\n\nbar\n---\nbaz", "<p>Foo</p><h2>bar</h2><p>baz</p>"],
 					["Foo\nbar\n\n---\nbaz", "<p>Foo\nbar</p><hr><p>baz</p>"],
 					["Foo\nbar\n\\---\nbaz", "<p>Foo\nbar\n---\nbaz</p>"],
-				].every(([input, output]) => {
-					const t = div(parseMarkdown(input)).innerHTML;
-
-					if (t !== output) {
-						console.log(input, t);
-					}
-
-					return t === output
-				});
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		},
 		"code blocks": {
