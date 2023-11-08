@@ -9867,6 +9867,18 @@ type Tests = {
 					return t === output
 				});
 			}
+		},
+		"code blocks": {
+			"simple code blocks": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
+
+				return [
+					["    a simple\n      indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
+					["\ta simple\n\t  indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
+					["    <a/>\n    *hi*\n", "<pre><code>&lt;a/&gt;\n*hi*</code></pre>"],
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+			}
 		}
 	}
 });
