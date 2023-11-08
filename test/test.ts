@@ -9868,7 +9868,7 @@ type Tests = {
 				return [
 					["    a simple\n      indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
 					["\ta simple\n\t  indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
-					["    <a/>\n    *hi*\n", "<pre><code>&lt;a/&gt;\n*hi*</code></pre>"],
+					["    <a/>\n    *hi*\n", "<pre><code>&lt;a/&gt;\n*hi*\n</code></pre>"],
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		}
