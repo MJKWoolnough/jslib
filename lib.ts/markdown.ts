@@ -56,15 +56,17 @@ class Markdown {
 			if (indent) {
 				if (line.match(isIndent)) {
 					text.push(line.replace(isIndent, ""));
+
+					continue;
 				} else if (line.match(isIndentBlankContinue)) {
 					text.push("");
+
+					continue;
 				} else {
 					pushBlock();
 
 					indent = false;
 				}
-
-				continue;
 			}
 
 			if (!line.trim()) {
