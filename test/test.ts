@@ -9869,7 +9869,9 @@ type Tests = {
 					["    a simple\n      indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
 					["\ta simple\n\t  indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
 					["    <a/>\n    *hi*\n", "<pre><code>&lt;a/&gt;\n*hi*\n</code></pre>"],
-					["    an indented code block\n\n    with a blank line", "<pre><code>an indented code block\n\nwith a blank line</code></pre>"]
+					["    an indented code block\n\n    with a blank line", "<pre><code>an indented code block\n\nwith a blank line</code></pre>"],
+					["    foo  \t", "<pre><code>foo  \t</code></pre>"],
+					["    foo  \t\n    \t \t", "<pre><code>foo  \t\n\t \t</code></pre>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"code blocks with surrounding": async () => {
