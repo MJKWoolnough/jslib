@@ -1,6 +1,19 @@
+import type {Children} from './dom.js';
 import {code, h1, h2, h3, h4, h5, h6, hr, p, pre} from './html.js';
 
-const tags = {
+type Tags = {
+	paragraphs: (c: Children) => Element;
+	thematicBreaks: () => Element;
+	heading1: (c: Children) => Element;
+	heading2: (c: Children) => Element;
+	heading3: (c: Children) => Element;
+	heading4: (c: Children) => Element;
+	heading5: (c: Children) => Element;
+	heading6: (c: Children) => Element;
+	code: (info: string, text: string) => Element;
+}
+
+const tags: Tags = {
 	"paragraphs": p,
 	"thematicBreaks": hr,
 	"heading1": h1,
@@ -10,7 +23,7 @@ const tags = {
 	"heading5": h5,
 	"heading6": h6,
 	"code": (_info: string, text: string) => pre(code(text))
-      } as const,
+      },
       isHeading = /^ {0,3}#{1,6}( .*)?$/,
       isSeText1 = /^ {0,3}=+[ \t]*$/,
       isSeText2 = /^ {0,3}\-+[ \t]*$/,
@@ -30,8 +43,8 @@ class Markdown {
 		let indent = false;
 
 		const text: string[] = [],
-		      blocks: HTMLElement[] = [],
-		      pushBlock = (block?: HTMLElement) => {
+		      blocks: Element[] = [],
+		      pushBlock = (block?: Element) => {
 			if (text.length) {
 				if (indent) {
 					blocks.push(tags.code("", text.join("\n")));
