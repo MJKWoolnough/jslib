@@ -9874,16 +9874,8 @@ type Tests = {
 					["    a simple\n      indented code block\na paragraph", "<pre><code>a simple\n  indented code block\n</code></pre><p>a paragraph</p>"],
 					["    an indented code block\n\n    with a blank line", "<pre><code>an indented code block\n\nwith a blank line</code></pre>"],
 					["# Heading\n    foo\nHeading\n------\n    foo\n----", "<h1>Heading</h1><pre><code>foo\n</code></pre><h2>Heading</h2><pre><code>foo\n</code></pre><hr>"],
-				].every(([input, output]) => {
-					const t = div(parseMarkdown(input)).innerHTML;
-
-					if (t !== output) {
-						console.log(t, output);
-					}
-
-					return t === output;
-				});
-			}
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+			},
 		}
 	}
 });
