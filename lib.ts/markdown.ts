@@ -63,6 +63,8 @@ class Markdown {
 
 					continue;
 				} else {
+					text.push("");
+
 					pushBlock();
 
 					indent = false;
