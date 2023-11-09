@@ -9,7 +9,7 @@ const tags = {
 	"heading4": h4,
 	"heading5": h5,
 	"heading6": h6,
-	"code": (text: string) => pre(code(text))
+	"code": (_info: string, text: string) => pre(code(text))
       } as const,
       isHeading = /^ {0,3}#{1,6}( .*)?$/,
       isSeText1 = /^ {0,3}=+[ \t]*$/,
@@ -34,7 +34,7 @@ class Markdown {
 		      pushBlock = (block?: HTMLElement) => {
 			if (text.length) {
 				if (indent) {
-					blocks.push(tags.code(text.join("\n")));
+					blocks.push(tags.code("", text.join("\n")));
 				} else {
 					blocks.push(tags.paragraphs(this.parseInline(text)));
 				}
