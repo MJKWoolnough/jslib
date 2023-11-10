@@ -9885,6 +9885,16 @@ type Tests = {
 					["# Heading\n    foo\nHeading\n------\n    foo\n----", "<h1>Heading</h1><pre><code>foo\n</code></pre><h2>Heading</h2><pre><code>foo\n</code></pre><hr>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
+		},
+		"fenced code blocks": {
+			"simple fenced": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
+
+				return [
+					["```\nCode Here\n```", "<pre><code>Code Here</code></pre>"],
+				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+			}
 		}
 	}
 });
