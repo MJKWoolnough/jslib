@@ -38,6 +38,11 @@ const tags: Tags = {
 
 class Markdown {
 	refs = new Map<string, [string, string]>();
+	tags: Tags;
+
+	constructor(tgs: Tags) {
+		this.tags = tgs;
+	}
 
 	parseBlocks(markdown: string) {
 		let indent = false;
@@ -47,9 +52,9 @@ class Markdown {
 		      pushBlock = (block?: Element) => {
 			if (text.length) {
 				if (indent) {
-					blocks.push(tags.code("", text.join("\n")));
+					blocks.push(this.tags.code("", text.join("\n")));
 				} else {
-					blocks.push(tags.paragraphs(this.parseInline(text)));
+					blocks.push(this.tags.paragraphs(this.parseInline(text)));
 				}
 
 				text.splice(0, text.length);
@@ -94,7 +99,7 @@ class Markdown {
 				const t = line.trimStart(),
 				      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
 
-				pushBlock(tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
+				pushBlock(this.tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
 
 				continue Loop;
 			}
@@ -105,7 +110,7 @@ class Markdown {
 
 					text.splice(0, text.length);
 
-					pushBlock(tags["heading1"](header));
+					pushBlock(this.tags["heading1"](header));
 
 					continue;
 				}
@@ -115,7 +120,7 @@ class Markdown {
 
 					text.splice(0, text.length);
 
-					pushBlock(tags["heading2"](header));
+					pushBlock(this.tags["heading2"](header));
 
 					continue;
 				}
@@ -123,7 +128,7 @@ class Markdown {
 
 			for (const tb of isThematicBreak) {
 				if (line.match(tb)) {
-					pushBlock(tags.thematicBreaks());
+					pushBlock(this.tags.thematicBreaks());
 
 					continue Loop;
 				}
@@ -150,10 +155,10 @@ class Markdown {
 	}
 }
 
-export default (markdown: string) => {
+export default (markdown: string, tgs: Partial<Tags> = {}) => {
 	const df = document.createDocumentFragment();
 	
-	df.append(...(new Markdown()).parseBlocks(markdown));
+	df.append(...(new Markdown(Object.assign(Object.assign({}, tags), tgs))).parseBlocks(markdown));
 
 	return df;
 };
