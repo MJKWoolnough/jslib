@@ -34,6 +34,7 @@ const tags: Tags = {
       ],
       isIndent = /^(\t|    )/,
       isIndentBlankContinue = /^ {0,3}$/,
+      isFenced = /^ {0,3}(````*|~~~~*)([^`][^`]*)?[ \t]*$/,
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 class Markdown {
@@ -41,6 +42,7 @@ class Markdown {
 	text: string[] = [];
 	blocks: Element[] = [];
 	indent = false;
+	fenced: [string, string, string] | null = null;
 	tags: Tags;
 
 	constructor(tgs: Tags) {
@@ -61,6 +63,47 @@ class Markdown {
 		if (block) {
 			this.blocks.push(block);
 		}
+	}
+
+	parseFencedCodeBlock(line: string) {
+		if (this.fenced) {
+			if (line.match(isFenced) && line.trim().startsWith(this.fenced[0])) {
+				const fencedCode = this.text.join("\n");
+
+				this.text.splice(0, this.text.length);
+
+				this.pushBlock(this.tags.code(this.fenced[2], fencedCode));
+
+				this.fenced = null;
+
+				return true;
+			}
+
+			for (let toRemove = this.fenced[1]; toRemove.length; toRemove = toRemove.slice(1)) {
+				if (line.startsWith(toRemove)) {
+					line = line.slice(toRemove.length);
+
+					break;
+				}
+			}
+
+			this.text.push(line);
+
+			return true;
+		}
+
+		if (line.match(isFenced)) {
+			const spaces = line.search(/\S/),
+			      trimmed = line.trim(),
+			      markers = trimmed.search(/[^`~]|$/),
+			      info = trimmed.replace(/^[`~]*/, "");
+
+			this.fenced = [trimmed.slice(0, markers), line.slice(0, spaces), info];
+
+			return true;
+		}
+
+		return false;
 	}
 
 	parseIndentedCodeBlock(line: string) {
@@ -152,6 +195,7 @@ class Markdown {
 
 	parseBlocks(markdown: string) {
 		const parsers = [
+			this.parseFencedCodeBlock,
 			this.parseIndentedCodeBlock,
 			this.parseEmptyLine,
 			this.parseHeading,
