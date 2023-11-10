@@ -62,72 +62,107 @@ class Markdown {
 			this.blocks.push(block);
 		}
 	}
-	parseBlocks(markdown: string) {
-		Loop:
-		for (const line of markdown.split("\n")) {
-			if (!this.text.length && line.match(isIndent)) {
-				this.indent = true;
-			}
 
-			if (this.indent) {
-				if (line.match(isIndent)) {
-					this.text.push(line.replace(isIndent, ""));
+	parseIndentedCodeBlock(line: string) {
+		if (!this.text.length && line.match(isIndent)) {
+			this.indent = true;
+		}
 
-					continue;
-				} else if (line.match(isIndentBlankContinue)) {
-					this.text.push("");
+		if (this.indent) {
+			if (line.match(isIndent)) {
+				this.text.push(line.replace(isIndent, ""));
 
-					continue;
-				} else {
-					this.text.push("");
+				return true;;
+			} else if (line.match(isIndentBlankContinue)) {
+				this.text.push("");
 
-					this.pushBlock();
+				return true;
+			} else {
+				this.text.push("");
 
-					this.indent = false;
-				}
-			}
-
-			if (!line.trim()) {
 				this.pushBlock();
 
-				continue;
+				this.indent = false;
+			}
+		}
+
+		return false;
+	}
+
+	parseEmptyLine(line: string) {
+		if (!line.trim()) {
+			this.pushBlock();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	parseHeading(line: string) {
+		if (line.match(isHeading)) {
+			const t = line.trimStart(),
+			      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
+
+			this.pushBlock(this.tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
+
+			return true;
+		}
+
+		return false;
+	}
+
+	parseSetextHeading(line: string) {
+		if (this.text.length) {
+			if (line.match(isSeText1)) {
+				const header = this.parseInline(this.text);
+
+				this.text.splice(0, this.text.length);
+
+				this.pushBlock(this.tags["heading1"](header));
+
+				return true;
 			}
 
-			if (line.match(isHeading)) {
-				const t = line.trimStart(),
-				      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
+			if (line.match(isSeText2)) {
+				const header = this.parseInline(this.text);
 
-				this.pushBlock(this.tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
+				this.text.splice(0, this.text.length);
 
-				continue Loop;
+				this.pushBlock(this.tags["heading2"](header));
+
+				return true;
 			}
+		}
 
-			if (this.text.length) {
-				if (line.match(isSeText1)) {
-					const header = this.parseInline(this.text);
+		return false;
+	}
 
-					this.text.splice(0, this.text.length);
+	parseThematicBreak(line: string) {
+		for (const tb of isThematicBreak) {
+			if (line.match(tb)) {
+				this.pushBlock(this.tags.thematicBreaks());
 
-					this.pushBlock(this.tags["heading1"](header));
-
-					continue;
-				}
-
-				if (line.match(isSeText2)) {
-					const header = this.parseInline(this.text);
-
-					this.text.splice(0, this.text.length);
-
-					this.pushBlock(this.tags["heading2"](header));
-
-					continue;
-				}
+				return true;
 			}
+		}
 
-			for (const tb of isThematicBreak) {
-				if (line.match(tb)) {
-					this.pushBlock(this.tags.thematicBreaks());
+		return false;
+	}
 
+	parseBlocks(markdown: string) {
+		const parsers = [
+			this.parseIndentedCodeBlock,
+			this.parseEmptyLine,
+			this.parseHeading,
+			this.parseSetextHeading,
+			this.parseThematicBreak
+		] as const;
+
+		Loop:
+		for (const line of markdown.split("\n")) {
+			for (const parser of parsers) {
+				if (parser.call(this, line)) {
 					continue Loop;
 				}
 			}
