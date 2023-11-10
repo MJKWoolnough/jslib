@@ -38,59 +38,57 @@ const tags: Tags = {
 
 class Markdown {
 	refs = new Map<string, [string, string]>();
+	text: string[] = [];
+	blocks: Element[] = [];
+	indent = false;
 	tags: Tags;
 
 	constructor(tgs: Tags) {
 		this.tags = tgs;
 	}
 
+	pushBlock(block?: Element) {
+		if (this.text.length) {
+			if (this.indent) {
+				this.blocks.push(this.tags.code("", this.text.join("\n")));
+			} else {
+				this.blocks.push(this.tags.paragraphs(this.parseInline(this.text)));
+			}
+
+			this.text.splice(0, this.text.length);
+		}
+
+		if (block) {
+			this.blocks.push(block);
+		}
+	}
 	parseBlocks(markdown: string) {
-		let indent = false;
-
-		const text: string[] = [],
-		      blocks: Element[] = [],
-		      pushBlock = (block?: Element) => {
-			if (text.length) {
-				if (indent) {
-					blocks.push(this.tags.code("", text.join("\n")));
-				} else {
-					blocks.push(this.tags.paragraphs(this.parseInline(text)));
-				}
-
-				text.splice(0, text.length);
-			}
-
-			if (block) {
-				blocks.push(block);
-			}
-		      };
-
 		Loop:
 		for (const line of markdown.split("\n")) {
-			if (!text.length && line.match(isIndent)) {
-				indent = true;
+			if (!this.text.length && line.match(isIndent)) {
+				this.indent = true;
 			}
 
-			if (indent) {
+			if (this.indent) {
 				if (line.match(isIndent)) {
-					text.push(line.replace(isIndent, ""));
+					this.text.push(line.replace(isIndent, ""));
 
 					continue;
 				} else if (line.match(isIndentBlankContinue)) {
-					text.push("");
+					this.text.push("");
 
 					continue;
 				} else {
-					text.push("");
+					this.text.push("");
 
-					pushBlock();
+					this.pushBlock();
 
-					indent = false;
+					this.indent = false;
 				}
 			}
 
 			if (!line.trim()) {
-				pushBlock();
+				this.pushBlock();
 
 				continue;
 			}
@@ -99,28 +97,28 @@ class Markdown {
 				const t = line.trimStart(),
 				      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
 
-				pushBlock(this.tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
+				this.pushBlock(this.tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
 
 				continue Loop;
 			}
 
-			if (text.length) {
+			if (this.text.length) {
 				if (line.match(isSeText1)) {
-					const header = this.parseInline(text);
+					const header = this.parseInline(this.text);
 
-					text.splice(0, text.length);
+					this.text.splice(0, this.text.length);
 
-					pushBlock(this.tags["heading1"](header));
+					this.pushBlock(this.tags["heading1"](header));
 
 					continue;
 				}
 
 				if (line.match(isSeText2)) {
-					const header = this.parseInline(text);
+					const header = this.parseInline(this.text);
 
-					text.splice(0, text.length);
+					this.text.splice(0, this.text.length);
 
-					pushBlock(this.tags["heading2"](header));
+					this.pushBlock(this.tags["heading2"](header));
 
 					continue;
 				}
@@ -128,18 +126,18 @@ class Markdown {
 
 			for (const tb of isThematicBreak) {
 				if (line.match(tb)) {
-					pushBlock(this.tags.thematicBreaks());
+					this.pushBlock(this.tags.thematicBreaks());
 
 					continue Loop;
 				}
 			}
 
-			text.push(line);
+			this.text.push(line);
 		}
 
-		pushBlock();
+		this.pushBlock();
 
-		return blocks;
+		return this.blocks;
 	}
 
 	parseInline(markdown: string[]) {
