@@ -96,7 +96,7 @@ class Markdown {
 			const spaces = line.search(/\S/),
 			      trimmed = line.trim(),
 			      markers = trimmed.search(/[^`~]|$/),
-			      info = trimmed.replace(/^[`~]*/, "");
+			      info = trimmed.replace(/^[`~]*/, "").trim();
 
 			this.fenced = [trimmed.slice(0, markers), line.slice(0, spaces), info];
 
