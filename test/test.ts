@@ -9897,6 +9897,20 @@ type Tests = {
 					[" ````\n Code Here\n```\nabc\n ````", "<pre><code>Code Here\n```\nabc</code></pre>"],
 					["   ~~~~\n Code Here\n```\nabc\n   ~~~~", "<pre><code>Code Here\n```\nabc</code></pre>"],
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+			},
+			"fenced with info string": async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {code, div, pre} = await import ("./lib/html.js"),
+				      tags = {
+					"code": (info: string, text: string) => pre({"class": info || null}, code(text))
+				      };
+
+				return [
+					["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here</code></pre>"],
+					["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here</code></pre>"],
+					[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc</code></pre>"],
+					["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc</code></pre>"],
+				].every(([input, output]) => div(parseMarkdown(input, tags)).innerHTML === output);
 			}
 		}
 	}
