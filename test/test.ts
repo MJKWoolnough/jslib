@@ -9893,6 +9893,9 @@ type Tests = {
 
 				return [
 					["```\nCode Here\n```", "<pre><code>Code Here</code></pre>"],
+					["~~~\nCode Here\n~~~", "<pre><code>Code Here</code></pre>"],
+					[" ````\n Code Here\n```\nabc\n ````", "<pre><code>Code Here\n```\nabc</code></pre>"],
+					["   ~~~~\n Code Here\n```\nabc\n   ~~~~", "<pre><code>Code Here\n```\nabc</code></pre>"],
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		}
