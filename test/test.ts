@@ -9892,13 +9892,13 @@ type Tests = {
 				      {div} = await import ("./lib/html.js");
 
 				return [
-					["```\nCode Here\n```", "<pre><code>Code Here</code></pre>"],
-					["~~~\nCode Here\n~~~", "<pre><code>Code Here</code></pre>"],
-					[" ````\n Code Here\n```\nabc\n ````", "<pre><code>Code Here\n```\nabc</code></pre>"],
-					["   ~~~~\n Code Here\n```\nabc\n   ~~~~", "<pre><code>Code Here\n```\nabc</code></pre>"],
-					["   ```\n   Code Here\n  ~~~\n abc\n  ~~~\n   ```", "<pre><code>Code Here\n~~~\nabc\n~~~</code></pre>"],
-					["   ~~~\n   Code Here\n  ```\n abc\n  ```\n   ~~~", "<pre><code>Code Here\n```\nabc\n```</code></pre>"],
-					["```\n``` a\n```", "<pre><code>``` a</code></pre>"],
+					["```\nCode Here\n```", "<pre><code>Code Here\n</code></pre>"],
+					["~~~\nCode Here\n~~~", "<pre><code>Code Here\n</code></pre>"],
+					[" ````\n Code Here\n```\nabc\n ````", "<pre><code>Code Here\n```\nabc\n</code></pre>"],
+					["   ~~~~\n Code Here\n```\nabc\n   ~~~~", "<pre><code>Code Here\n```\nabc\n</code></pre>"],
+					["   ```\n   Code Here\n  ~~~\n abc\n  ~~~\n   ```", "<pre><code>Code Here\n~~~\nabc\n~~~\n</code></pre>"],
+					["   ~~~\n   Code Here\n  ```\n abc\n  ```\n   ~~~", "<pre><code>Code Here\n```\nabc\n```\n</code></pre>"],
+					["```\n``` a\n```", "<pre><code>``` a\n</code></pre>"],
 				].every(([input, output]) => {
 					const t = div(parseMarkdown(input)).innerHTML;
 
@@ -9917,10 +9917,10 @@ type Tests = {
 				      };
 
 				return [
-					["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here</code></pre>"],
-					["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here</code></pre>"],
-					[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc</code></pre>"],
-					["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc</code></pre>"],
+					["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
+					["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
+					[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
+					["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"],
 				].every(([input, output]) => div(parseMarkdown(input, tags)).innerHTML === output);
 			}
 		}

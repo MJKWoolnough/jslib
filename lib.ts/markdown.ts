@@ -69,7 +69,7 @@ class Markdown {
 	parseFencedCodeBlock(line: string) {
 		if (this.fenced) {
 			if (line.match(isEndFenced) && line.trim().startsWith(this.fenced[0])) {
-				const fencedCode = this.text.join("\n");
+				const fencedCode = this.text.join("\n") + "\n";
 
 				this.text.splice(0, this.text.length);
 
