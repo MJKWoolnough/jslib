@@ -52,13 +52,7 @@ class Markdown {
 
 	pushBlock(block?: Element) {
 		if (this.text.length) {
-			if (this.indent) {
-				this.blocks.push(this.tags.code("", this.text.join("\n")));
-			} else if (this.fenced) {
-				this.blocks.push(this.tags.code(this.fenced[2], this.text.join("\n")));
-			} else {
-				this.blocks.push(this.tags.paragraphs(this.parseInline(this.text)));
-			}
+			this.blocks.push(this.indent || this.fenced ? this.tags.code(this.fenced?.[2] ?? "", this.text.join("\n")) : this.tags.paragraphs(this.parseInline(this.text)));
 
 			this.text.splice(0, this.text.length);
 		}
