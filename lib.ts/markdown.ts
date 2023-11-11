@@ -35,6 +35,7 @@ const tags: Tags = {
       isIndent = /^(\t|    )/,
       isIndentBlankContinue = /^ {0,3}$/,
       isFenced = /^ {0,3}(````*|~~~~*)([^`][^`]*)?[ \t]*$/,
+      isEndFenced = /^ {0,3}(````*|~~~~*)[ \t]*$/,
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 class Markdown {
@@ -67,7 +68,7 @@ class Markdown {
 
 	parseFencedCodeBlock(line: string) {
 		if (this.fenced) {
-			if (line.match(isFenced) && line.trim().startsWith(this.fenced[0])) {
+			if (line.match(isEndFenced) && line.trim().startsWith(this.fenced[0])) {
 				const fencedCode = this.text.join("\n");
 
 				this.text.splice(0, this.text.length);
