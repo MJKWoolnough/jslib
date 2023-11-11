@@ -9898,7 +9898,16 @@ type Tests = {
 					["   ~~~~\n Code Here\n```\nabc\n   ~~~~", "<pre><code>Code Here\n```\nabc</code></pre>"],
 					["   ```\n   Code Here\n  ~~~\n abc\n  ~~~\n   ```", "<pre><code>Code Here\n~~~\nabc\n~~~</code></pre>"],
 					["   ~~~\n   Code Here\n  ```\n abc\n  ```\n   ~~~", "<pre><code>Code Here\n```\nabc\n```</code></pre>"],
-				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
+					["```\n``` a\n```", "<pre><code>``` a</code></pre>"],
+				].every(([input, output]) => {
+					const t = div(parseMarkdown(input)).innerHTML;
+
+					if (t !== output) {
+						console.log(input, t);
+					}
+
+					return t === output;
+				});
 			},
 			"fenced with info string": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
