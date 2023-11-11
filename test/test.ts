@@ -9856,7 +9856,7 @@ type Tests = {
 					["Foo\nbar\n---\nbaz", "<h2>Foo\nbar</h2><p>baz</p>"],
 					["Foo\n\nbar\n---\nbaz", "<p>Foo</p><h2>bar</h2><p>baz</p>"],
 					["Foo\nbar\n\n---\nbaz", "<p>Foo\nbar</p><hr><p>baz</p>"],
-					["Foo\nbar\n\\---\nbaz", "<p>Foo\nbar\n---\nbaz</p>"],
+					["Foo\nbar\n\\---\nbaz", "<p>Foo\nbar\n---\nbaz</p>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			}
 		},
@@ -9899,7 +9899,7 @@ type Tests = {
 					["   ```\n   Code Here\n  ~~~\n abc\n  ~~~\n   ```", "<pre><code>Code Here\n~~~\nabc\n~~~\n</code></pre>"],
 					["   ~~~\n   Code Here\n  ```\n abc\n  ```\n   ~~~", "<pre><code>Code Here\n```\nabc\n```\n</code></pre>"],
 					["```\n``` a\n```", "<pre><code>``` a\n</code></pre>"],
-					["```\nCode Here", "<pre><code>Code Here</code></pre>"],
+					["```\nCode Here", "<pre><code>Code Here</code></pre>"]
 				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
 			},
 			"fenced with info string": async () => {
@@ -9913,7 +9913,7 @@ type Tests = {
 					["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
 					["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
 					[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
-					["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"],
+					["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
 				].every(([input, output]) => div(parseMarkdown(input, tags)).innerHTML === output);
 			}
 		}
