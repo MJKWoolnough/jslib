@@ -116,7 +116,7 @@ class Markdown {
 			if (line.match(isIndent)) {
 				this.text.push(line.replace(isIndent, ""));
 
-				return true;;
+				return true;
 			} else if (line.match(isIndentBlankContinue)) {
 				this.text.push("");
 
