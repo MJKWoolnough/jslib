@@ -9643,7 +9643,7 @@ type Tests = {
 			"wrong characters": [
 				["+++", "<p>+++</p>"],
 				["===", "<p>===</p>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9653,7 +9653,7 @@ type Tests = {
 				["--", "<p>--</p>"],
 				["**", "<p>**</p>"],
 				["__", "<p>__</p>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9663,7 +9663,7 @@ type Tests = {
 				["    ---", "<pre><code>---</code></pre>"],
 				["    ***", "<pre><code>***</code></pre>"],
 				["    ___", "<pre><code>___</code></pre>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9673,7 +9673,7 @@ type Tests = {
 				["---a", "<p>---a</p>"],
 				["*** b", "<p>*** b</p>"],
 				["___\tc", "<p>___\tc</p>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9688,7 +9688,7 @@ type Tests = {
 				["####", "<h4></h4>"],
 				["#####", "<h5></h5>"],
 				["######", "<h6></h6>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9704,7 +9704,7 @@ type Tests = {
 					["# Some Text ##", "<h1>Some Text</h1>"],
 					["# Some Text #########", "<h1>Some Text</h1>"],
 					["# Some Text ###\\######", "<h1>Some Text ####</h1>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9720,7 +9720,7 @@ type Tests = {
 				["## Some Text ##", "<h2>Some Text</h2>"],
 				["## Some Text #########", "<h2>Some Text</h2>"],
 				["## Some Text ###\\######", "<h2>Some Text ####</h2>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9736,7 +9736,7 @@ type Tests = {
 				["### Some Text ##", "<h3>Some Text</h3>"],
 				["### Some Text #########", "<h3>Some Text</h3>"],
 				["### Some Text ###\\######", "<h3>Some Text ####</h3>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9752,7 +9752,7 @@ type Tests = {
 				["#### Some Text ##", "<h4>Some Text</h4>"],
 				["#### Some Text #########", "<h4>Some Text</h4>"],
 				["#### Some Text ###\\######", "<h4>Some Text ####</h4>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9768,7 +9768,7 @@ type Tests = {
 				["##### Some Text ##", "<h5>Some Text</h5>"],
 				["##### Some Text #########", "<h5>Some Text</h5>"],
 				["##### Some Text ###\\######", "<h5>Some Text ####</h5>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9784,7 +9784,7 @@ type Tests = {
 				["###### Some Text ##", "<h6>Some Text</h6>"],
 				["###### Some Text #########", "<h6>Some Text</h6>"],
 				["###### Some Text ###\\######", "<h6>Some Text ####</h6>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9795,7 +9795,7 @@ type Tests = {
 				["#hashtag", "<p>#hashtag</p>"],
 				["#5 bolt", "<p>#5 bolt</p>"],
 				["\\# not a title", "<p># not a title</p>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9814,7 +9814,7 @@ type Tests = {
 				["heading\n== ", "<h1>heading</h1>"],
 				["heading\n==\t", "<h1>heading</h1>"],
 				["heading\n==\t \t  ", "<h1>heading</h1>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9831,7 +9831,7 @@ type Tests = {
 				["heading\n-- ", "<h2>heading</h2>"],
 				["heading\n--\t", "<h2>heading</h2>"],
 				["heading\n--\t \t  ", "<h2>heading</h2>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9844,7 +9844,7 @@ type Tests = {
 				["heading\n---- a", "<p>heading\n---- a</p>"],
 				["heading\n== ==", "<p>heading\n== ==</p>"],
 				["heading\n-- --", "<p>heading</p><hr>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9855,7 +9855,7 @@ type Tests = {
 				["Foo\n\nbar\n---\nbaz", "<p>Foo</p><h2>bar</h2><p>baz</p>"],
 				["Foo\nbar\n\n---\nbaz", "<p>Foo\nbar</p><hr><p>baz</p>"],
 				["Foo\nbar\n\\---\nbaz", "<p>Foo\nbar\n---\nbaz</p>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9870,7 +9870,7 @@ type Tests = {
 				["    an indented code block\n\n    with a blank line", "<pre><code>an indented code block\n\nwith a blank line</code></pre>"],
 				["    foo  \t", "<pre><code>foo  \t</code></pre>"],
 				["    foo  \t\n    \t \t", "<pre><code>foo  \t\n\t \t</code></pre>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9881,7 +9881,7 @@ type Tests = {
 				["a paragraph\n\n    a simple\n      indented code block", "<p>a paragraph</p><pre><code>a simple\n  indented code block</code></pre>"],
 				["    a simple\n      indented code block\na paragraph", "<pre><code>a simple\n  indented code block\n</code></pre><p>a paragraph</p>"],
 				["# Heading\n    foo\nHeading\n------\n    foo\n----", "<h1>Heading</h1><pre><code>foo\n</code></pre><h2>Heading</h2><pre><code>foo\n</code></pre><hr>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9898,7 +9898,7 @@ type Tests = {
 				["   ~~~\n   Code Here\n  ```\n abc\n  ```\n   ~~~", "<pre><code>Code Here\n```\nabc\n```\n</code></pre>"],
 				["```\n``` a\n```", "<pre><code>``` a\n</code></pre>"],
 				["```\nCode Here", "<pre><code>Code Here</code></pre>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
@@ -9909,7 +9909,7 @@ type Tests = {
 				["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
 				[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
 				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
-			].reduce((o, [input, output], n) => (o[n+""] = async () => {
+			].reduce((o, [input, output], n) => (o[n] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {code, div, pre} = await import ("./lib/html.js"),
 				      tags = {
