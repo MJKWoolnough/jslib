@@ -41,24 +41,25 @@ const tags: Tags = {
 class Markdown {
 	refs = new Map<string, [string, string]>();
 	text: string[] = [];
-	blocks: Element[] = [];
+	base: Element | DocumentFragment;
 	indent = false;
 	fenced: [string, string, string] | null = null;
 	tags: Tags;
 
-	constructor(tgs: Tags) {
+	constructor(base: Element | DocumentFragment, tgs: Tags) {
+		this.base = base;
 		this.tags = tgs;
 	}
 
 	pushBlock(block?: Element) {
 		if (this.text.length) {
-			this.blocks.push(this.indent || this.fenced ? this.tags.code(this.fenced?.[2] ?? "", this.text.join("\n")) : this.tags.paragraphs(this.parseInline(this.text)));
+			this.base.append(this.indent || this.fenced ? this.tags.code(this.fenced?.[2] ?? "", this.text.join("\n")) : this.tags.paragraphs(this.parseInline(this.text)));
 
 			this.text.splice(0, this.text.length);
 		}
 
 		if (block) {
-			this.blocks.push(block);
+			this.base.append(block);
 		}
 	}
 
@@ -210,8 +211,6 @@ class Markdown {
 		}
 
 		this.pushBlock();
-
-		return this.blocks;
 	}
 
 	parseInline(markdown: string[]) {
@@ -230,7 +229,7 @@ class Markdown {
 export default (markdown: string, tgs: Partial<Tags> = {}) => {
 	const df = document.createDocumentFragment();
 	
-	df.append(...(new Markdown(Object.assign(Object.assign({}, tags), tgs))).parseBlocks(markdown));
+	new Markdown(df, Object.assign(Object.assign({}, tags), tgs)).parseBlocks(markdown);
 
 	return df;
 };
