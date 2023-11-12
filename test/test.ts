@@ -9889,35 +9889,35 @@ type Tests = {
 			}, o), {} as Record<string, () => Promise<boolean>>)
 		},
 		"fenced code blocks": {
-			"simple fenced": async () => {
+			"simple fenced": [
+				["```\nCode Here\n```", "<pre><code>Code Here\n</code></pre>"],
+				["~~~\nCode Here\n~~~", "<pre><code>Code Here\n</code></pre>"],
+				[" ````\n Code Here\n```\nabc\n ````", "<pre><code>Code Here\n```\nabc\n</code></pre>"],
+				["   ~~~~\n Code Here\n```\nabc\n   ~~~~", "<pre><code>Code Here\n```\nabc\n</code></pre>"],
+				["   ```\n   Code Here\n  ~~~\n abc\n  ~~~\n   ```", "<pre><code>Code Here\n~~~\nabc\n~~~\n</code></pre>"],
+				["   ~~~\n   Code Here\n  ```\n abc\n  ```\n   ~~~", "<pre><code>Code Here\n```\nabc\n```\n</code></pre>"],
+				["```\n``` a\n```", "<pre><code>``` a\n</code></pre>"],
+				["```\nCode Here", "<pre><code>Code Here</code></pre>"]
+			].reduce((o, [input, output], n) => (o[n+""] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
-				return [
-					["```\nCode Here\n```", "<pre><code>Code Here\n</code></pre>"],
-					["~~~\nCode Here\n~~~", "<pre><code>Code Here\n</code></pre>"],
-					[" ````\n Code Here\n```\nabc\n ````", "<pre><code>Code Here\n```\nabc\n</code></pre>"],
-					["   ~~~~\n Code Here\n```\nabc\n   ~~~~", "<pre><code>Code Here\n```\nabc\n</code></pre>"],
-					["   ```\n   Code Here\n  ~~~\n abc\n  ~~~\n   ```", "<pre><code>Code Here\n~~~\nabc\n~~~\n</code></pre>"],
-					["   ~~~\n   Code Here\n  ```\n abc\n  ```\n   ~~~", "<pre><code>Code Here\n```\nabc\n```\n</code></pre>"],
-					["```\n``` a\n```", "<pre><code>``` a\n</code></pre>"],
-					["```\nCode Here", "<pre><code>Code Here</code></pre>"]
-				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
-			},
-			"fenced with info string": async () => {
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"fenced with info string": [
+				["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
+				["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
+				[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
+				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
+			].reduce((o, [input, output], n) => (o[n+""] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {code, div, pre} = await import ("./lib/html.js"),
 				      tags = {
 					"code": (info: string, text: string) => pre({"class": info || null}, code(text))
 				      };
 
-				return [
-					["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
-					["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
-					[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
-					["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
-				].every(([input, output]) => div(parseMarkdown(input, tags)).innerHTML === output);
-			}
+				return div(parseMarkdown(input, tags)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>)
 		}
 	}
 });
