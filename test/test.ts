@@ -9803,64 +9803,64 @@ type Tests = {
 			}, o), {} as Record<string, () => Promise<boolean>>)
 		},
 		"setext": {
-			"equals": async () => {
+			"equals": [
+				["heading\n=", "<h1>heading</h1>"],
+				["heading\n==", "<h1>heading</h1>"],
+				["heading\n===", "<h1>heading</h1>"],
+				["heading\n=====", "<h1>heading</h1>"],
+				["heading\n ====", "<h1>heading</h1>"],
+				["heading\n  ====", "<h1>heading</h1>"],
+				["heading\n   ====", "<h1>heading</h1>"],
+				["heading\n== ", "<h1>heading</h1>"],
+				["heading\n==\t", "<h1>heading</h1>"],
+				["heading\n==\t \t  ", "<h1>heading</h1>"]
+			].reduce((o, [input, output], n) => (o[n+""] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
-				return [
-					["heading\n=", "<h1>heading</h1>"],
-					["heading\n==", "<h1>heading</h1>"],
-					["heading\n===", "<h1>heading</h1>"],
-					["heading\n=====", "<h1>heading</h1>"],
-					["heading\n ====", "<h1>heading</h1>"],
-					["heading\n  ====", "<h1>heading</h1>"],
-					["heading\n   ====", "<h1>heading</h1>"],
-					["heading\n== ", "<h1>heading</h1>"],
-					["heading\n==\t", "<h1>heading</h1>"],
-					["heading\n==\t \t  ", "<h1>heading</h1>"]
-				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
-			},
-			"dashes": async () => {
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"dashes": [
+				["heading\n-", "<h2>heading</h2>"],
+				["heading\n--", "<h2>heading</h2>"],
+				["heading\n---", "<h2>heading</h2>"],
+				["heading\n----", "<h2>heading</h2>"],
+				["heading\n ----", "<h2>heading</h2>"],
+				["heading\n  ----", "<h2>heading</h2>"],
+				["heading\n   ----", "<h2>heading</h2>"],
+				["heading\n-- ", "<h2>heading</h2>"],
+				["heading\n--\t", "<h2>heading</h2>"],
+				["heading\n--\t \t  ", "<h2>heading</h2>"]
+			].reduce((o, [input, output], n) => (o[n+""] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
-				return [
-					["heading\n-", "<h2>heading</h2>"],
-					["heading\n--", "<h2>heading</h2>"],
-					["heading\n---", "<h2>heading</h2>"],
-					["heading\n----", "<h2>heading</h2>"],
-					["heading\n ----", "<h2>heading</h2>"],
-					["heading\n  ----", "<h2>heading</h2>"],
-					["heading\n   ----", "<h2>heading</h2>"],
-					["heading\n-- ", "<h2>heading</h2>"],
-					["heading\n--\t", "<h2>heading</h2>"],
-					["heading\n--\t \t  ", "<h2>heading</h2>"]
-				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
-			},
-			"not a heading": async () => {
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"not a heading": [
+				["heading\n    ====", "<p>heading\n    ====</p>"],
+				["heading\n    ----", "<p>heading\n    ----</p>"],
+				["heading\n==== a", "<p>heading\n==== a</p>"],
+				["heading\n---- a", "<p>heading\n---- a</p>"],
+				["heading\n== ==", "<p>heading\n== ==</p>"],
+				["heading\n-- --", "<p>heading</p><hr>"]
+			].reduce((o, [input, output], n) => (o[n+""] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
-				return [
-					["heading\n    ====", "<p>heading\n    ====</p>"],
-					["heading\n    ----", "<p>heading\n    ----</p>"],
-					["heading\n==== a", "<p>heading\n==== a</p>"],
-					["heading\n---- a", "<p>heading\n---- a</p>"],
-					["heading\n== ==", "<p>heading\n== ==</p>"],
-					["heading\n-- --", "<p>heading</p><hr>"]
-				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
-			},
-			"complex setext header": async () => {
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"complex setext header": [
+				["Foo\nbar\n---\nbaz", "<h2>Foo\nbar</h2><p>baz</p>"],
+				["Foo\n\nbar\n---\nbaz", "<p>Foo</p><h2>bar</h2><p>baz</p>"],
+				["Foo\nbar\n\n---\nbaz", "<p>Foo\nbar</p><hr><p>baz</p>"],
+				["Foo\nbar\n\\---\nbaz", "<p>Foo\nbar\n---\nbaz</p>"]
+			].reduce((o, [input, output], n) => (o[n+""] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
-				return [
-					["Foo\nbar\n---\nbaz", "<h2>Foo\nbar</h2><p>baz</p>"],
-					["Foo\n\nbar\n---\nbaz", "<p>Foo</p><h2>bar</h2><p>baz</p>"],
-					["Foo\nbar\n\n---\nbaz", "<p>Foo\nbar</p><hr><p>baz</p>"],
-					["Foo\nbar\n\\---\nbaz", "<p>Foo\nbar\n---\nbaz</p>"]
-				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
-			}
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>)
 		},
 		"code blocks": {
 			"simple code blocks": async () => {
