@@ -9790,7 +9790,7 @@ type Tests = {
 			},
 			"not a heading": async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js")
+				      {div} = await import ("./lib/html.js");
 
 				return [
 					["####### heading", "<p>####### heading</p>"],
