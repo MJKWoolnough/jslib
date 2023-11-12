@@ -9863,30 +9863,30 @@ type Tests = {
 			}, o), {} as Record<string, () => Promise<boolean>>)
 		},
 		"code blocks": {
-			"simple code blocks": async () => {
+			"simple code blocks": [
+				["    a simple\n      indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
+				["\ta simple\n\t  indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
+				["    <a/>\n    *hi*\n", "<pre><code>&lt;a/&gt;\n*hi*\n</code></pre>"],
+				["    an indented code block\n\n    with a blank line", "<pre><code>an indented code block\n\nwith a blank line</code></pre>"],
+				["    foo  \t", "<pre><code>foo  \t</code></pre>"],
+				["    foo  \t\n    \t \t", "<pre><code>foo  \t\n\t \t</code></pre>"]
+			].reduce((o, [input, output], n) => (o[n+""] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
-				return [
-					["    a simple\n      indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
-					["\ta simple\n\t  indented code block", "<pre><code>a simple\n  indented code block</code></pre>"],
-					["    <a/>\n    *hi*\n", "<pre><code>&lt;a/&gt;\n*hi*\n</code></pre>"],
-					["    an indented code block\n\n    with a blank line", "<pre><code>an indented code block\n\nwith a blank line</code></pre>"],
-					["    foo  \t", "<pre><code>foo  \t</code></pre>"],
-					["    foo  \t\n    \t \t", "<pre><code>foo  \t\n\t \t</code></pre>"]
-				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
-			},
-			"code blocks with surrounding": async () => {
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"code blocks with surrounding": [
+				["a simple\n      paragraph", "<p>a simple\n      paragraph</p>"],
+				["a paragraph\n\n    a simple\n      indented code block", "<p>a paragraph</p><pre><code>a simple\n  indented code block</code></pre>"],
+				["    a simple\n      indented code block\na paragraph", "<pre><code>a simple\n  indented code block\n</code></pre><p>a paragraph</p>"],
+				["# Heading\n    foo\nHeading\n------\n    foo\n----", "<h1>Heading</h1><pre><code>foo\n</code></pre><h2>Heading</h2><pre><code>foo\n</code></pre><hr>"]
+			].reduce((o, [input, output], n) => (o[n+""] = async () => {
 				const {default: parseMarkdown} = await import("./lib/markdown.js"),
 				      {div} = await import ("./lib/html.js");
 
-				return [
-					["a simple\n      paragraph", "<p>a simple\n      paragraph</p>"],
-					["a paragraph\n\n    a simple\n      indented code block", "<p>a paragraph</p><pre><code>a simple\n  indented code block</code></pre>"],
-					["    a simple\n      indented code block\na paragraph", "<pre><code>a simple\n  indented code block\n</code></pre><p>a paragraph</p>"],
-					["# Heading\n    foo\nHeading\n------\n    foo\n----", "<h1>Heading</h1><pre><code>foo\n</code></pre><h2>Heading</h2><pre><code>foo\n</code></pre><hr>"]
-				].every(([input, output]) => div(parseMarkdown(input)).innerHTML === output);
-			}
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>)
 		},
 		"fenced code blocks": {
 			"simple fenced": async () => {
