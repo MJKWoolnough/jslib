@@ -9638,7 +9638,7 @@ type Tests = {
 					      parsed = ["___ ", "___\t", "___ \t \t   \t\t"].map(s => parseMarkdown(s));
 
 					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
+				}
 			},
 			"wrong characters": [
 				["+++", "<p>+++</p>"],
