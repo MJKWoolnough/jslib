@@ -9790,7 +9790,7 @@ type Tests = {
 				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
 			]
 		}
-	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n] = Object.defineProperty(async () => {
+	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
 		      {code, div, pre} = await import ("./lib/html.js"),
 		      tags = {
