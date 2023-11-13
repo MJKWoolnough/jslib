@@ -9793,9 +9793,7 @@ type Tests = {
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
 		      {code, div, pre} = await import ("./lib/html.js"),
-		      tags = {
-			"code": (info: string, text: string) => pre({"class": info || null}, code(text))
-		      };
+		      tags = {"code": (info: string, text: string) => pre({"class": info || null}, code(text))};
 
 		return div(parseMarkdown(input, tags)).innerHTML === output;
 	}, "toString", {"value": () => JSON.stringify(input) + " => " + JSON.stringify(output)}), q), {} as Record<string, () => Promise<boolean>>), p), {} as Record<string, Record<string, () => Promise<boolean>>>), o), {} as Record<string, Record<string, Record<string, () => Promise<boolean>>>>)
