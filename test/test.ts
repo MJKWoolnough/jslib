@@ -9554,92 +9554,126 @@ type Tests = {
 	},
 	"markdown": {
 		"thematic breaks": {
-			"simple tests": {
-				"dashes": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = ["---", "-----", "---------------"].map(s => parseMarkdown(s));
+			"dashes": [
+				["---", "<hr>"],
+				["-----", "<hr>"],
+				["---------------", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"dashes with leading spaces": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = [" ---", "  ---", "   ---"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"dashes with leading spaces": [
+				[" ---", "<hr>"],
+				["  ---", "<hr>"],
+				["   ---", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"dashes with whitespace in between": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = ["- - -", "-\t-\t-", "- \t - \t -"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"dashes with whitespace in between": [
+				["- - -", "<hr>"],
+				["-\t-\t-", "<hr>"],
+				["- \t - \t -", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"dashes with whitespace at end": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = ["--- ", "---\t", "--- \t \t   \t\t"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"dashes with whitespace at end": [
+				["--- ", "<hr>"],
+				["---\t", "<hr>"],
+				["--- \t \t   \t\t", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"stars": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = ["***", "*****", "***************"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"stars": [
+				["***", "<hr>"],
+				["*****", "<hr>"],
+				["***************", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"stars with leading spaces": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = [" ***", "  ***", "   ***"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"stars with leading spaces": [
+				[" ***", "<hr>"],
+				["  ***", "<hr>"],
+				["   ***", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"stars with whitespace in between": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = ["* * *", "*\t*\t*", "* \t * \t *"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"stars with whitespace in between": [
+				["* * *", "<hr>"],
+				["*\t*\t*", "<hr>"],
+				["* \t * \t *", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"stars with whitespace at end": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = ["*** ", "***\t", "*** \t \t   \t\t"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"stars with whitespace at end": [
+				["*** ", "<hr>"],
+				["***\t", "<hr>"],
+				["*** \t \t   \t\t", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"underscores": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = ["___", "_____", "_______________"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"underscores": [
+				["___", "<hr>"],
+				["_____", "<hr>"],
+				["_______________", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"underscores with leading spaces": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = [" ___", "  ___", "   ___"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"underscores with leading spaces": [
+				[" ___", "<hr>"],
+				["  ___", "<hr>"],
+				["   ___", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"underscores with whitespace in between": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = ["_ _ _", "_\t_\t_", "_ \t _ \t _"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"underscores with whitespace in between": [
+				["_ _ _", "<hr>"],
+				["_\t_\t_", "<hr>"],
+				["_ \t _ \t _", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				},
-				"underscores with whitespace at end": async () => {
-					const {default: parseMarkdown} = await import("./lib/markdown.js"),
-					      {div} = await import ("./lib/html.js"),
-					      parsed = ["___ ", "___\t", "___ \t \t   \t\t"].map(s => parseMarkdown(s));
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
+			"underscores with whitespace at end": [
+				["___ ", "<hr>"],
+				["___\t", "<hr>"],
+				["___ \t \t   \t\t", "<hr>"]
+			].reduce((o, [input, output], n) => (o[n] = async () => {
+				const {default: parseMarkdown} = await import("./lib/markdown.js"),
+				      {div} = await import ("./lib/html.js");
 
-					return parsed.every(p => div(p).innerHTML === "<hr>");
-				}
-			},
+				return div(parseMarkdown(input)).innerHTML === output;
+			}, o), {} as Record<string, () => Promise<boolean>>),
 			"wrong characters": [
 				["+++", "<p>+++</p>"],
 				["===", "<p>===</p>"]
