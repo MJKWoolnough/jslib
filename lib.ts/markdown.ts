@@ -14,32 +14,6 @@ type Tags = {
 	allowedHTML: null | [string, string[]][];
 }
 
-const tags: Tags = {
-	"paragraphs": p,
-	"thematicBreaks": hr,
-	"heading1": h1,
-	"heading2": h2,
-	"heading3": h3,
-	"heading4": h4,
-	"heading5": h5,
-	"heading6": h6,
-	"code": (_info: string, text: string) => pre(code(text)),
-	"allowedHTML": null
-      },
-      isHeading = /^ {0,3}#{1,6}( .*)?$/,
-      isSeText1 = /^ {0,3}=+[ \t]*$/,
-      isSeText2 = /^ {0,3}\-+[ \t]*$/,
-      isThematicBreak = [
-	/^ {0,3}(\-[ \t]*){3,}[ \t]*$/,
-	/^ {0,3}(\*[ \t]*){3,}[ \t]*$/,
-	/^ {0,3}(_[ \t]*){3,}[ \t]*$/
-      ],
-      isIndent = /^(\t|    )/,
-      isIndentBlankContinue = /^ {0,3}$/,
-      isFenced = /^ {0,3}(````*|~~~~*)([^`][^`]*)?[ \t]*$/,
-      isEndFenced = /^ {0,3}(````*|~~~~*)[ \t]*$/,
-      punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-
 class Markdown {
 	refs = new Map<string, [string, string]>();
 	text: string[] = [];
@@ -192,15 +166,6 @@ class Markdown {
 	}
 
 	parseBlocks(markdown: string) {
-		const parsers = [
-			this.parseFencedCodeBlock,
-			this.parseIndentedCodeBlock,
-			this.parseEmptyLine,
-			this.parseHeading,
-			this.parseSetextHeading,
-			this.parseThematicBreak
-		] as const;
-
 		Loop:
 		for (const line of markdown.split("\n")) {
 			for (const parser of parsers) {
@@ -227,6 +192,40 @@ class Markdown {
 		return text;
 	}
 }
+
+const tags: Tags = {
+	"paragraphs": p,
+	"thematicBreaks": hr,
+	"heading1": h1,
+	"heading2": h2,
+	"heading3": h3,
+	"heading4": h4,
+	"heading5": h5,
+	"heading6": h6,
+	"code": (_info: string, text: string) => pre(code(text)),
+	"allowedHTML": null
+      },
+      isHeading = /^ {0,3}#{1,6}( .*)?$/,
+      isSeText1 = /^ {0,3}=+[ \t]*$/,
+      isSeText2 = /^ {0,3}\-+[ \t]*$/,
+      isThematicBreak = [
+	/^ {0,3}(\-[ \t]*){3,}[ \t]*$/,
+	/^ {0,3}(\*[ \t]*){3,}[ \t]*$/,
+	/^ {0,3}(_[ \t]*){3,}[ \t]*$/
+      ],
+      isIndent = /^(\t|    )/,
+      isIndentBlankContinue = /^ {0,3}$/,
+      isFenced = /^ {0,3}(````*|~~~~*)([^`][^`]*)?[ \t]*$/,
+      isEndFenced = /^ {0,3}(````*|~~~~*)[ \t]*$/,
+      punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
+      parsers = ([
+	"parseFencedCodeBlock",
+	"parseIndentedCodeBlock",
+	"parseEmptyLine",
+	"parseHeading",
+	"parseSetextHeading",
+	"parseThematicBreak"
+      ] as const).map(k => Markdown.prototype[k]);
 
 export default (markdown: string, tgs: Partial<Tags> = {}) => {
 	const df = document.createDocumentFragment();
