@@ -9552,167 +9552,87 @@ type Tests = {
 			}
 		}
 	},
-	"markdown": {
+	"markdown": Object.entries({
 		"thematic breaks": {
 			"dashes": [
 				["---", "<hr>"],
 				["-----", "<hr>"],
 				["---------------", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"dashes with leading spaces": [
 				[" ---", "<hr>"],
 				["  ---", "<hr>"],
 				["   ---", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"dashes with whitespace in between": [
 				["- - -", "<hr>"],
 				["-\t-\t-", "<hr>"],
 				["- \t - \t -", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"dashes with whitespace at end": [
 				["--- ", "<hr>"],
 				["---\t", "<hr>"],
 				["--- \t \t   \t\t", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"stars": [
 				["***", "<hr>"],
 				["*****", "<hr>"],
 				["***************", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"stars with leading spaces": [
 				[" ***", "<hr>"],
 				["  ***", "<hr>"],
 				["   ***", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"stars with whitespace in between": [
 				["* * *", "<hr>"],
 				["*\t*\t*", "<hr>"],
 				["* \t * \t *", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"stars with whitespace at end": [
 				["*** ", "<hr>"],
 				["***\t", "<hr>"],
 				["*** \t \t   \t\t", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"underscores": [
 				["___", "<hr>"],
 				["_____", "<hr>"],
 				["_______________", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"underscores with leading spaces": [
 				[" ___", "<hr>"],
 				["  ___", "<hr>"],
 				["   ___", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"underscores with whitespace in between": [
 				["_ _ _", "<hr>"],
 				["_\t_\t_", "<hr>"],
 				["_ \t _ \t _", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"underscores with whitespace at end": [
 				["___ ", "<hr>"],
 				["___\t", "<hr>"],
 				["___ \t \t   \t\t", "<hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"wrong characters": [
 				["+++", "<p>+++</p>"],
 				["===", "<p>===</p>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"not enough characters": [
 				["--", "<p>--</p>"],
 				["**", "<p>**</p>"],
 				["__", "<p>__</p>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"too much indentation": [
 				["    ---", "<pre><code>---</code></pre>"],
 				["    ***", "<pre><code>***</code></pre>"],
 				["    ___", "<pre><code>___</code></pre>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"non-whitespace at end": [
 				["---a", "<p>---a</p>"],
 				["*** b", "<p>*** b</p>"],
 				["___\tc", "<p>___\tc</p>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>)
+			]
 		},
 		"headings": {
 			"empty headings": [
@@ -9722,28 +9642,18 @@ type Tests = {
 				["####", "<h4></h4>"],
 				["#####", "<h5></h5>"],
 				["######", "<h6></h6>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"heading1": [
-					["# Some Text", "<h1>Some Text</h1>"],
-					["#   Some Text\t", "<h1>Some Text</h1>"],
-					[" # Some Text", "<h1>Some Text</h1>"],
-					["  # Some Text", "<h1>Some Text</h1>"],
-					["   # Some Text", "<h1>Some Text</h1>"],
-					["# Some Text #", "<h1>Some Text</h1>"],
-					["# Some Text ##", "<h1>Some Text</h1>"],
-					["# Some Text #########", "<h1>Some Text</h1>"],
-					["# Some Text ###\\######", "<h1>Some Text ####</h1>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+				["# Some Text", "<h1>Some Text</h1>"],
+				["#   Some Text\t", "<h1>Some Text</h1>"],
+				[" # Some Text", "<h1>Some Text</h1>"],
+				["  # Some Text", "<h1>Some Text</h1>"],
+				["   # Some Text", "<h1>Some Text</h1>"],
+				["# Some Text #", "<h1>Some Text</h1>"],
+				["# Some Text ##", "<h1>Some Text</h1>"],
+				["# Some Text #########", "<h1>Some Text</h1>"],
+				["# Some Text ###\\######", "<h1>Some Text ####</h1>"]
+			],
 			"heading2": [
 				["## Some Text", "<h2>Some Text</h2>"],
 				["##   Some Text\t", "<h2>Some Text</h2>"],
@@ -9754,12 +9664,7 @@ type Tests = {
 				["## Some Text ##", "<h2>Some Text</h2>"],
 				["## Some Text #########", "<h2>Some Text</h2>"],
 				["## Some Text ###\\######", "<h2>Some Text ####</h2>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"heading3": [
 				["### Some Text", "<h3>Some Text</h3>"],
 				["###   Some Text\t", "<h3>Some Text</h3>"],
@@ -9770,12 +9675,7 @@ type Tests = {
 				["### Some Text ##", "<h3>Some Text</h3>"],
 				["### Some Text #########", "<h3>Some Text</h3>"],
 				["### Some Text ###\\######", "<h3>Some Text ####</h3>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"heading4": [
 				["#### Some Text", "<h4>Some Text</h4>"],
 				["####   Some Text\t", "<h4>Some Text</h4>"],
@@ -9786,12 +9686,7 @@ type Tests = {
 				["#### Some Text ##", "<h4>Some Text</h4>"],
 				["#### Some Text #########", "<h4>Some Text</h4>"],
 				["#### Some Text ###\\######", "<h4>Some Text ####</h4>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"heading5": [
 				["##### Some Text", "<h5>Some Text</h5>"],
 				["#####   Some Text\t", "<h5>Some Text</h5>"],
@@ -9802,12 +9697,7 @@ type Tests = {
 				["##### Some Text ##", "<h5>Some Text</h5>"],
 				["##### Some Text #########", "<h5>Some Text</h5>"],
 				["##### Some Text ###\\######", "<h5>Some Text ####</h5>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"heading6": [
 				["###### Some Text", "<h6>Some Text</h6>"],
 				["######   Some Text\t", "<h6>Some Text</h6>"],
@@ -9818,23 +9708,13 @@ type Tests = {
 				["###### Some Text ##", "<h6>Some Text</h6>"],
 				["###### Some Text #########", "<h6>Some Text</h6>"],
 				["###### Some Text ###\\######", "<h6>Some Text ####</h6>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"not a heading": [
 				["####### heading", "<p>####### heading</p>"],
 				["#hashtag", "<p>#hashtag</p>"],
 				["#5 bolt", "<p>#5 bolt</p>"],
 				["\\# not a title", "<p># not a title</p>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>)
+			]
 		},
 		"setext": {
 			"equals": [
@@ -9848,12 +9728,7 @@ type Tests = {
 				["heading\n== ", "<h1>heading</h1>"],
 				["heading\n==\t", "<h1>heading</h1>"],
 				["heading\n==\t \t  ", "<h1>heading</h1>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"dashes": [
 				["heading\n-", "<h2>heading</h2>"],
 				["heading\n--", "<h2>heading</h2>"],
@@ -9865,12 +9740,7 @@ type Tests = {
 				["heading\n-- ", "<h2>heading</h2>"],
 				["heading\n--\t", "<h2>heading</h2>"],
 				["heading\n--\t \t  ", "<h2>heading</h2>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"not a heading": [
 				["heading\n    ====", "<p>heading\n    ====</p>"],
 				["heading\n    ----", "<p>heading\n    ----</p>"],
@@ -9878,23 +9748,13 @@ type Tests = {
 				["heading\n---- a", "<p>heading\n---- a</p>"],
 				["heading\n== ==", "<p>heading\n== ==</p>"],
 				["heading\n-- --", "<p>heading</p><hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"complex setext header": [
 				["Foo\nbar\n---\nbaz", "<h2>Foo\nbar</h2><p>baz</p>"],
 				["Foo\n\nbar\n---\nbaz", "<p>Foo</p><h2>bar</h2><p>baz</p>"],
 				["Foo\nbar\n\n---\nbaz", "<p>Foo\nbar</p><hr><p>baz</p>"],
 				["Foo\nbar\n\\---\nbaz", "<p>Foo\nbar\n---\nbaz</p>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>)
+			]
 		},
 		"code blocks": {
 			"simple code blocks": [
@@ -9904,23 +9764,13 @@ type Tests = {
 				["    an indented code block\n\n    with a blank line", "<pre><code>an indented code block\n\nwith a blank line</code></pre>"],
 				["    foo  \t", "<pre><code>foo  \t</code></pre>"],
 				["    foo  \t\n    \t \t", "<pre><code>foo  \t\n\t \t</code></pre>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"code blocks with surrounding": [
 				["a simple\n      paragraph", "<p>a simple\n      paragraph</p>"],
 				["a paragraph\n\n    a simple\n      indented code block", "<p>a paragraph</p><pre><code>a simple\n  indented code block</code></pre>"],
 				["    a simple\n      indented code block\na paragraph", "<pre><code>a simple\n  indented code block\n</code></pre><p>a paragraph</p>"],
 				["# Heading\n    foo\nHeading\n------\n    foo\n----", "<h1>Heading</h1><pre><code>foo\n</code></pre><h2>Heading</h2><pre><code>foo\n</code></pre><hr>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>)
+			]
 		},
 		"fenced code blocks": {
 			"simple fenced": [
@@ -9932,26 +9782,21 @@ type Tests = {
 				["   ~~~\n   Code Here\n  ```\n abc\n  ```\n   ~~~", "<pre><code>Code Here\n```\nabc\n```\n</code></pre>"],
 				["```\n``` a\n```", "<pre><code>``` a\n</code></pre>"],
 				["```\nCode Here", "<pre><code>Code Here</code></pre>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {div} = await import ("./lib/html.js");
-
-				return div(parseMarkdown(input)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>),
+			],
 			"fenced with info string": [
 				["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
 				["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
 				[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
 				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
-			].reduce((o, [input, output], n) => (o[n] = async () => {
-				const {default: parseMarkdown} = await import("./lib/markdown.js"),
-				      {code, div, pre} = await import ("./lib/html.js"),
-				      tags = {
-					"code": (info: string, text: string) => pre({"class": info || null}, code(text))
-				      };
-
-				return div(parseMarkdown(input, tags)).innerHTML === output;
-			}, o), {} as Record<string, () => Promise<boolean>>)
+			]
 		}
-	}
+	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n] = async () => {
+		const {default: parseMarkdown} = await import("./lib/markdown.js"),
+		      {code, div, pre} = await import ("./lib/html.js"),
+		      tags = {
+			"code": (info: string, text: string) => pre({"class": info || null}, code(text))
+		      };
+
+		return div(parseMarkdown(input, tags)).innerHTML === output;
+	}, q), {} as Record<string, () => Promise<boolean>>), p), {} as Record<string, Record<string, () => Promise<boolean>>>), o), {} as Record<string, Record<string, Record<string, () => Promise<boolean>>>>)
 });
