@@ -129,22 +129,14 @@ class Markdown {
 
 	parseSetextHeading(line: string) {
 		if (this.text.length) {
-			if (line.match(isSeText1)) {
+			const heading: 0 | 1 | 2 = line.match(isSeText1) ? 1 : line.match(isSeText2) ? 2 : 0;
+
+			if (heading !== 0) {
 				const header = this.parseInline(this.text);
 
 				this.text.splice(0, this.text.length);
 
-				this.pushBlock(this.tags["heading1"](header));
-
-				return true;
-			}
-
-			if (line.match(isSeText2)) {
-				const header = this.parseInline(this.text);
-
-				this.text.splice(0, this.text.length);
-
-				this.pushBlock(this.tags["heading2"](header));
+				this.pushBlock(this.tags[`heading${heading}`](header));
 
 				return true;
 			}
