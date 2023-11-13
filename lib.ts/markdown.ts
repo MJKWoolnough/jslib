@@ -11,6 +11,7 @@ type Tags = {
 	heading5: (c: Children) => Element;
 	heading6: (c: Children) => Element;
 	code: (info: string, text: string) => Element;
+	allowedHTML: null | [string, string[]][];
 }
 
 const tags: Tags = {
@@ -22,7 +23,8 @@ const tags: Tags = {
 	"heading4": h4,
 	"heading5": h5,
 	"heading6": h6,
-	"code": (_info: string, text: string) => pre(code(text))
+	"code": (_info: string, text: string) => pre(code(text)),
+	"allowedHTML": null
       },
       isHeading = /^ {0,3}#{1,6}( .*)?$/,
       isSeText1 = /^ {0,3}=+[ \t]*$/,
