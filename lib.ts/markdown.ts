@@ -176,9 +176,7 @@ class Markdown {
 		let text = markdown.join("\n");
 
 		for (let i = 0; i < punctuation.length; i++) {
-			const char = punctuation.charAt(i);
-
-			text = text.replaceAll("\\" + char, char);
+			text = text.replaceAll("\\" + punctuation.charAt(i), a => a.slice(1));
 		}
 
 		return text;
