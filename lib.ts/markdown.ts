@@ -173,13 +173,7 @@ class Markdown {
 	}
 
 	parseInline(markdown: string[]) {
-		let text = markdown.join("\n");
-
-		for (let i = 0; i < punctuation.length; i++) {
-			text = text.replaceAll("\\" + punctuation.charAt(i), a => a.slice(1));
-		}
-
-		return text;
+		return punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), markdown.join("\n"))
 	}
 }
 
