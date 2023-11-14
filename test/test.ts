@@ -9789,6 +9789,11 @@ type Tests = {
 				[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
 				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
 			]
+		},
+		"raw html": {
+			"type 1": [
+				['<pre language="haskell"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\nokay', '<pre language="haskell"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre><p>okay</p>'],
+			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
