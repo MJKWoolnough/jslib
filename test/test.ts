@@ -9796,6 +9796,9 @@ type Tests = {
 				['<script type="text/javascript">\n// JavaScript example\n\ndocument.getElementById("demo").innerHTML = "Hello JavaScript!";\n</script>\nokay', '<script type="text/javascript">\n// JavaScript example\n\ndocument.getElementById("demo").innerHTML = "Hello JavaScript!";\n</script><p>okay</p>'],
 				['<textarea>\n\n*foo*\n\n_bar_\n\n</textarea>', '<textarea>\n*foo*\n\n_bar_\n\n</textarea>'],
 				['<style\n  type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style>\nokay', '<style type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style><p>okay</p>']
+			],
+			"type 2": [
+				['<!-- foo -->*bar*\nbaz', '<!-- foo -->*bar*<p>baz</p>']
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
