@@ -18,16 +18,18 @@ class Markdown {
 	refs = new Map<string, [string, string]>();
 	text: string[] = [];
 	base: Element | DocumentFragment;
+	inHTML = -1;
 	indent = false;
 	fenced: [string, string, string] | null = null;
 	tags: Tags;
+	parser = new DOMParser();
 
 	constructor(base: Element | DocumentFragment, tgs: Tags) {
 		this.base = base;
 		this.tags = tgs;
 	}
 
-	pushBlock(block?: Element) {
+	pushBlock(block?: Element | HTMLCollection) {
 		if (this.text.length) {
 			this.base.append(this.indent || this.fenced ? this.tags.code(this.fenced?.[2] ?? "", this.text.join("\n")) : this.tags.paragraphs(this.parseInline(this.text)));
 
@@ -35,8 +37,40 @@ class Markdown {
 		}
 
 		if (block) {
-			this.base.append(block);
+			this.base.append(...(block instanceof Element ? [block] : Array.from(block as HTMLCollection)));
 		}
+	}
+
+	parseHTML(line: string) {
+		if (this.inHTML < 0) {
+			for (const [n, open] of isHTMLOpen.entries()) {
+				if (line.match(open)) {
+					this.inHTML = n;
+
+					break;
+				}
+			}
+
+			if (this.inHTML < 0) {
+				return false;
+			}
+		}
+
+		this.text.push(line);
+
+		if (line.match(isHTMLClose[this.inHTML])) {
+			this.inHTML = -1;
+
+			console.log(this.parser.parseFromString(this.text.join("\n"), "text/html"))
+
+			const children = this.parser.parseFromString(this.text.join("\n"), "text/html").body.children;
+
+			this.text.splice(0, this.text.length);
+
+			this.pushBlock(children);
+		}
+
+		return true;
 	}
 
 	parseFencedCodeBlock(line: string) {
@@ -202,7 +236,14 @@ const tags: Tags = {
       isFenced = /^ {0,3}(````*|~~~~*)([^`][^`]*)?[ \t]*$/,
       isEndFenced = /^ {0,3}(````*|~~~~*)[ \t]*$/,
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
+      isHTMLOpen = [
+	      /^ {0,3}<(pre|script|style|textarea)([ \t>]|$)/i
+      ],
+      isHTMLClose = [
+	      /<\/(pre|script|style|textarea)>/i
+      ],
       parsers = ([
+	"parseHTML",
 	"parseFencedCodeBlock",
 	"parseIndentedCodeBlock",
 	"parseEmptyLine",
