@@ -29,7 +29,7 @@ class Markdown {
 		this.tags = tgs;
 	}
 
-	pushBlock(block?: Element | HTMLCollection) {
+	pushBlock(block?: Element | DocumentFragment) {
 		if (this.text.length) {
 			this.base.append(this.indent || this.fenced ? this.tags.code(this.fenced?.[2] ?? "", this.text.join("\n")) : this.tags.paragraphs(this.parseInline(this.text)));
 
@@ -37,7 +37,7 @@ class Markdown {
 		}
 
 		if (block) {
-			this.base.append(...(block instanceof Element ? [block] : Array.from(block as HTMLCollection)));
+			this.base.append(block);
 		}
 	}
 
@@ -61,13 +61,11 @@ class Markdown {
 		if (line.match(isHTMLClose[this.inHTML])) {
 			this.inHTML = -1;
 
-			console.log(this.parser.parseFromString(this.text.join("\n"), "text/html"))
-
-			const children = this.parser.parseFromString(this.text.join("\n"), "text/html").body.children;
+			const parsed = (this.parser.parseFromString("<template>" + this.text.join("\n") + "</template>", "text/html").head.firstChild as HTMLTemplateElement).content;
 
 			this.text.splice(0, this.text.length);
 
-			this.pushBlock(children);
+			this.pushBlock(parsed);
 		}
 
 		return true;
