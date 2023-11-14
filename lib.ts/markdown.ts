@@ -22,7 +22,7 @@ class Markdown {
 	indent = false;
 	fenced: [string, string, string] | null = null;
 	tags: Tags;
-	parser = new DOMParser();
+	parser = document.createElement("template");
 
 	constructor(base: Element | DocumentFragment, tgs: Tags) {
 		this.base = base;
@@ -61,11 +61,11 @@ class Markdown {
 		if (line.match(isHTMLClose[this.inHTML])) {
 			this.inHTML = -1;
 
-			const parsed = (this.parser.parseFromString("<template>" + this.text.join("\n") + "</template>", "text/html").head.firstChild as HTMLTemplateElement).content;
+			this.parser.innerHTML =  this.text.join("\n");
 
 			this.text.splice(0, this.text.length);
 
-			this.pushBlock(parsed);
+			this.pushBlock(this.parser.content);
 		}
 
 		return true;
