@@ -235,10 +235,12 @@ const tags: Tags = {
       isEndFenced = /^ {0,3}(````*|~~~~*)[ \t]*$/,
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
       isHTMLOpen = [
-	      /^ {0,3}<(pre|script|style|textarea)([ \t>]|$)/i
+	      /^ {0,3}<(pre|script|style|textarea)([ \t>]|$)/i,
+	      /^ {0,3}<!--/
       ],
       isHTMLClose = [
-	      /<\/(pre|script|style|textarea)>/i
+	      /<\/(pre|script|style|textarea)>/i,
+	      /-->/
       ],
       parsers = ([
 	"parseHTML",
