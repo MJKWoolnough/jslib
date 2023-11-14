@@ -237,12 +237,14 @@ const tags: Tags = {
       isHTMLOpen = [
 	      /^ {0,3}<(pre|script|style|textarea)([ \t>]|$)/i,
 	      /^ {0,3}<!--/,
-	      /^ {0,3}<\?/
+	      /^ {0,3}<\?/,
+	      /^ {0,3}<![A-Za-z]/
       ],
       isHTMLClose = [
 	      /<\/(pre|script|style|textarea)>/i,
 	      /-->/,
-	      /\?>/
+	      /\?>/,
+	      />/,
       ],
       parsers = ([
 	"parseHTML",
