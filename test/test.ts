@@ -9793,6 +9793,9 @@ type Tests = {
 		"raw html": {
 			"type 1": [
 				['<pre language="haskell"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\nokay', '<pre language="haskell"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre><p>okay</p>'],
+				['<script type="text/javascript">\n// JavaScript example\n\ndocument.getElementById("demo").innerHTML = "Hello JavaScript!";\n</script>\nokay', '<script type="text/javascript">\n// JavaScript example\n\ndocument.getElementById("demo").innerHTML = "Hello JavaScript!";\n</script><p>okay</p>'],
+				['<textarea>\n\n*foo*\n\n_bar_\n\n</textarea>', '<textarea>\n*foo*\n\n_bar_\n\n</textarea>'],
+				['<style\n  type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style>\nokay', '<style type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style><p>okay</p>']
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
