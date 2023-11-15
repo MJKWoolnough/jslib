@@ -1,4 +1,3 @@
-import {clearNode} from './dom.js';
 import {code, h1, h2, h3, h4, h5, h6, hr, p, pre} from './html.js';
 
 type Tags = {
@@ -287,7 +286,9 @@ class Markdown {
 	}
 
 	parseInline(markdown: string[]) {
-		return clearNode(this.encoder, punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), markdown.join("\n"))).innerHTML;
+		this.encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), markdown.join("\n"));
+
+		return this.encoder.innerHTML;
 	}
 
 	tag(name: string, contents?: string, attr?: [string, string]) {
