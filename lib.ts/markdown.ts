@@ -1,4 +1,5 @@
 import type {Children} from './dom.js';
+import {clearNode} from './dom.js';
 import {code, h1, h2, h3, h4, h5, h6, hr, p, pre} from './html.js';
 
 type Tags = {
@@ -16,28 +17,42 @@ type Tags = {
 
 class Markdown {
 	refs = new Map<string, [string, string]>();
+	uid: string;
+	processed = "";
 	text: string[] = [];
-	base: Element | DocumentFragment;
 	inHTML = -1;
 	indent = false;
 	fenced: [string, string, string] | null = null;
 	tags: Tags;
-	parser = document.createElement("template");
+	encoder = document.createElement("div");
 
-	constructor(base: Element | DocumentFragment, tgs: Tags) {
-		this.base = base;
+	constructor(tgs: Tags, source: string) {
 		this.tags = tgs;
+
+		while (true) {
+			this.uid = "";
+
+			while (this.uid.length < 20) {
+				this.uid += String.fromCharCode(65 + Math.random() * 26);
+			}
+
+			if (!source.includes(this.uid)) {
+				break;
+			}
+		}
+
+		this.parseBlocks(source);
 	}
 
-	pushBlock(block?: Element | DocumentFragment) {
+	pushBlock(block?: string) {
 		if (this.text.length) {
-			this.base.append(this.indent || this.fenced ? this.tags.code(this.fenced?.[2] ?? "", this.text.join("\n")) : this.tags.paragraphs(this.parseInline(this.text)));
+			this.processed += this.indent || this.fenced ? this.tag("TEXTAREA", this.text.join("\n"), this.fenced ? ["type", this.fenced[2]] : undefined) : this.tag("P", this.parseInline(this.text));
 
 			this.text.splice(0, this.text.length);
 		}
 
 		if (block) {
-			this.base.append(block);
+			this.processed += block;
 		}
 	}
 
@@ -61,11 +76,11 @@ class Markdown {
 		if (line.match(isHTMLClose[this.inHTML])) {
 			this.inHTML = -1;
 
-			this.parser.innerHTML =  this.text.join("\n");
+			const html = this.text.join("\n");
 
 			this.text.splice(0, this.text.length);
 
-			this.pushBlock(this.parser.content);
+			this.pushBlock(html);
 		}
 
 		return true;
@@ -151,7 +166,7 @@ class Markdown {
 			const t = line.trimStart(),
 			      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
 
-			this.pushBlock(this.tags[`heading${start === -1 ? t.length as 1 | 2 | 3 | 4 | 5 | 6 : start}`](this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
+			this.pushBlock(this.tag(`H${start === -1 ? t.length : start}`, this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
 
 			return true;
 		}
@@ -168,7 +183,7 @@ class Markdown {
 
 				this.text.splice(0, this.text.length);
 
-				this.pushBlock(this.tags[`heading${heading}`](header));
+				this.pushBlock(this.tag(`H${heading}`, header));
 
 				return true;
 			}
@@ -180,7 +195,7 @@ class Markdown {
 	parseThematicBreak(line: string) {
 		for (const tb of isThematicBreak) {
 			if (line.match(tb)) {
-				this.pushBlock(this.tags.thematicBreaks());
+				this.pushBlock(this.tag("HR"));
 
 				return true;
 			}
@@ -204,8 +219,60 @@ class Markdown {
 		this.pushBlock();
 	}
 
+	get content() {
+		const t = document.createElement("template");
+
+		t.innerHTML = this.processed;
+
+		return this.sanitise(t.content.childNodes);
+	}
+
+	sanitise(childNodes: NodeListOf<ChildNode>) {
+		const df = document.createDocumentFragment();
+		for (const node of Array.from(childNodes)) {
+			if (node instanceof Element) {
+				if (node.hasAttribute(this.uid)) {
+					switch (node.nodeName) {
+					case "P":
+						df.append(this.tags.paragraphs(this.sanitise(node.childNodes)));
+
+						break;
+					case "HR":
+						df.append(this.tags.thematicBreaks());
+
+						break;
+					case "TEXTAREA":
+						df.append(this.tags.code(node.getAttribute("type") ?? "", (node as HTMLTextAreaElement).innerText));
+
+						break;
+					default:
+						df.append(this.tags[`heading${node.nodeName.charAt(1) as "1" | "2" | "3" | "4" | "5" | "6"}`](this.sanitise(node.childNodes)));
+
+						break;
+					}
+				} else {
+					df.append(node);
+				}
+			} else {
+				df.append(node);
+			}
+		}
+
+		return df;
+	}
+
 	parseInline(markdown: string[]) {
-		return punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), markdown.join("\n"))
+		return clearNode(this.encoder, punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), markdown.join("\n"))).innerHTML;
+	}
+
+	tag(name: string, contents?: string, attr?: [string, string]) {
+		const open = `<${name} ${this.uid}="" ${attr ? ` ${attr[0]}=${JSON.stringify(attr[1])}` : ""}`;
+
+		if (contents === undefined) {
+			return open + " />";
+		}
+
+		return open + `>${contents}</${name}>`;
 	}
 }
 
@@ -263,9 +330,5 @@ const tags: Tags = {
       ] as const).map(k => Markdown.prototype[k]);
 
 export default (markdown: string, tgs: Partial<Tags> = {}) => {
-	const df = document.createDocumentFragment();
-	
-	new Markdown(df, Object.assign(Object.assign({}, tags), tgs)).parseBlocks(markdown);
-
-	return df;
+	return new Markdown(Object.assign(Object.assign({}, tags), tgs), markdown).content;
 };
