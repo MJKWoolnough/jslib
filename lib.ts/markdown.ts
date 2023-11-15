@@ -12,7 +12,7 @@ type Tags = {
 	heading5: (c: Children) => Element;
 	heading6: (c: Children) => Element;
 	code: (info: string, text: string) => Element;
-	allowedHTML: null | [string, string[]][];
+	allowedHTML: null | [string, ...string[]][];
 }
 
 class Markdown {
@@ -229,6 +229,8 @@ class Markdown {
 
 	sanitise(childNodes: NodeListOf<ChildNode>) {
 		const df = document.createDocumentFragment();
+
+		Loop:
 		for (const node of Array.from(childNodes)) {
 			if (node instanceof Element) {
 				if (node.hasAttribute(this.uid)) {
@@ -251,7 +253,31 @@ class Markdown {
 						break;
 					}
 				} else {
-					df.append(node);
+					if (this.tags.allowedHTML) {
+						for (const [name, ...attrs] of this.tags.allowedHTML) {
+							if (node.nodeName === name) {
+								const tag = document.createElement(node.nodeName);
+
+								for (const attr of attrs) {
+									const a = node.getAttributeNode(attr);
+
+									if (a) {
+										tag.setAttributeNode(a);
+									}
+								}
+
+								tag.append(this.sanitise(node.childNodes));
+
+								df.append(tag);
+
+								continue Loop;
+							}
+						}
+
+						df.append(this.sanitise(node.childNodes));
+					} else {
+						df.append(node);
+					}
 				}
 			} else {
 				df.append(node);
