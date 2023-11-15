@@ -9802,6 +9802,9 @@ type Tests = {
 			],
 			"type 3": [
 				["<?php\n\n\n  echo '>';\n\n?>\nokay", "<!--?php\n\n\n  echo '-->';\n\n?&gt;<p>okay</p>"]
+			],
+			"type 4": [
+				["<!DOCTYPE html>", ""]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
