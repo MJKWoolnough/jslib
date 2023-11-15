@@ -238,13 +238,15 @@ const tags: Tags = {
 	      /^ {0,3}<(pre|script|style|textarea)([ \t>]|$)/i,
 	      /^ {0,3}<!--/,
 	      /^ {0,3}<\?/,
-	      /^ {0,3}<![A-Za-z]/
+	      /^ {0,3}<![A-Za-z]/,
+	      /^ {0,3}<!\[CDATA\[/
       ],
       isHTMLClose = [
 	      /<\/(pre|script|style|textarea)>/i,
 	      /-->/,
 	      /\?>/,
 	      />/,
+	      /]]>/
       ],
       parsers = ([
 	"parseHTML",
