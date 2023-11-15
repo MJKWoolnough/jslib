@@ -2,16 +2,16 @@ import {clearNode} from './dom.js';
 import {code, h1, h2, h3, h4, h5, h6, hr, p, pre} from './html.js';
 
 type Tags = {
-	paragraphs: (c: DocumentFragment) => Element;
-	thematicBreaks: () => Element;
+	allowedHTML: null | [string, ...string[]][];
+	code: (info: string, text: string) => Element;
 	heading1: (c: DocumentFragment) => Element;
 	heading2: (c: DocumentFragment) => Element;
 	heading3: (c: DocumentFragment) => Element;
 	heading4: (c: DocumentFragment) => Element;
 	heading5: (c: DocumentFragment) => Element;
 	heading6: (c: DocumentFragment) => Element;
-	code: (info: string, text: string) => Element;
-	allowedHTML: null | [string, ...string[]][];
+	paragraphs: (c: DocumentFragment) => Element;
+	thematicBreaks: () => Element;
 }
 
 class Markdown {
