@@ -1,5 +1,3 @@
-import {code, h1, h2, h3, h4, h5, h6, hr, p, pre} from './html.js';
-
 type Tags = {
 	allowedHTML: null | [string, ...string[]][];
 	code: (info: string, text: string) => Element;
@@ -302,18 +300,27 @@ class Markdown {
 	}
 }
 
-const tags: Tags = {
-	"paragraphs": p,
-	"thematicBreaks": hr,
-	"heading1": h1,
-	"heading2": h2,
-	"heading3": h3,
-	"heading4": h4,
-	"heading5": h5,
-	"heading6": h6,
-	"code": (_info: string, text: string) => pre(code(text)),
-	"allowedHTML": null
-      },
+const tags: Tags = Object.assign({
+	"code": (_info: string, text: string) => {
+		const pre = document.createElement("pre"),
+		      code = pre.appendChild(document.createElement("code"));
+
+		code.textContent = text;
+
+		return pre;
+	},
+	"allowedHTML": null,
+	"thematicBreaks": () => document.createElement("hr")
+      }, ([
+	["paragraphs", "p"],
+	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, string])
+      ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => {
+	      const t = document.createElement(tag);
+
+	      t.append(c);
+
+	      return t;
+      }, o), {} as Record<`heading${1 | 2 | 3 | 4 | 5 | 6}` | "paragraphs", (c: DocumentFragment) => Element>), {}),
       isHeading = /^ {0,3}#{1,6}( .*)?$/,
       isSeText1 = /^ {0,3}=+[ \t]*$/,
       isSeText2 = /^ {0,3}\-+[ \t]*$/,
