@@ -240,7 +240,7 @@ class Markdown {
 
 						break;
 					case "TEXTAREA":
-						df.append(this.tags.code(node.getAttribute("type") ?? "", (node as HTMLTextAreaElement).innerText));
+						df.append(this.tags.code(node.getAttribute("type") ?? "", node.textContent ?? ""));
 
 						break;
 					default:
