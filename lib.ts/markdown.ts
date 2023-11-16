@@ -42,7 +42,7 @@ class Markdown {
 
 	pushBlock(block?: string) {
 		if (this.text.length) {
-			this.processed += this.indent || this.fenced ? this.tag("TEXTAREA", this.text.join("\n"), this.fenced ? ["type", this.fenced[2]] : undefined) : this.tag("P", this.parseInline(this.text));
+			this.processed += this.inHTML !== -1 ? this.text.join("\n") : this.indent || this.fenced ? this.tag("TEXTAREA", this.text.join("\n"), this.fenced ? ["type", this.fenced[2]] : undefined) : this.tag("P", this.parseInline(this.text));
 
 			this.text.splice(0, this.text.length);
 		}
@@ -72,13 +72,9 @@ class Markdown {
 		this.text.push(line);
 
 		if (line.match(isHTMLClose[this.inHTML])) {
+			this.pushBlock();
+
 			this.inHTML = -1;
-
-			const html = this.text.join("\n");
-
-			this.text.splice(0, this.text.length);
-
-			this.pushBlock(html);
 		}
 
 		return true;
