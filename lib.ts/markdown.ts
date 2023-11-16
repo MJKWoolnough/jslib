@@ -56,6 +56,8 @@ class Markdown {
 		if (this.inHTML < 0) {
 			for (const [n, open] of isHTMLOpen.entries()) {
 				if (line.match(open)) {
+					this.pushBlock();
+
 					this.inHTML = n;
 
 					break;
