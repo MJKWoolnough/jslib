@@ -353,9 +353,9 @@ const tags: Tags = Object.assign({
 	      /^[ \t]*$/
       ],
       parsers = ([
-	"parseHTML",
 	"parseFencedCodeBlock",
 	"parseIndentedCodeBlock",
+	"parseHTML",
 	"parseEmptyLine",
 	"parseHeading",
 	"parseSetextHeading",
