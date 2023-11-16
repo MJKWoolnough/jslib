@@ -9817,6 +9817,12 @@ type Tests = {
 				["Text Before\n<center>\nData\n</center>\n\nText After", "<p>Text Before</p><center>\nData\n</center>\n<p>Text After</p>"],
 				["<center>More\nData\n\nClose?", "<center>More\nData\n<p>Close?</p></center>"],
 				["</center>*bar*\n\nbaz", "*bar*\n<p>baz</p>"]
+			],
+			"type 7": [ // TODO: Update after adding inline parsing
+				["<Warning>\n*bar*\n</Warning>", "<warning>\n*bar*\n</warning>"],
+				['<i class="foo">\n*bar*\n</i>', '<i class="foo">\n*bar*\n</i>'],
+				["<del>\n*foo*\n</del>", "<del>\n*foo*\n</del>"],
+				["<del>\n\n*foo*\n\n</del>", "<del>\n<p>*foo*</p></del>"],
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
