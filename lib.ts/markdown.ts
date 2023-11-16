@@ -270,6 +270,8 @@ class Markdown {
 
 						df.append(this.sanitise(node.childNodes));
 					} else {
+						node.replaceChildren(this.sanitise(node.childNodes));
+
 						df.append(node);
 					}
 				}
