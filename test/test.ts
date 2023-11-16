@@ -9808,6 +9808,15 @@ type Tests = {
 			],
 			"type 5": [
 				["<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\nokay", "<!--[CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]--><p>okay</p>"]
+			],
+			"type 6": [
+				["<center>\nData\n</center>", "<center>\nData\n</center>"],
+				["<center>Data</center>", "<center>Data</center>"],
+				["<center>More\nData", "<center>More\nData</center>"],
+				["Text Before\n<center>\nData\n</center>\nText After", "<p>Text Before</p><center>\nData\n</center>\nText After"],
+				["Text Before\n<center>\nData\n</center>\n\nText After", "<p>Text Before</p><center>\nData\n</center>\n<p>Text After</p>"],
+				["<center>More\nData\n\nClose?", "<center>More\nData\n<p>Close?</p></center>"],
+				["</center>*bar*\n\nbaz", "*bar*\n<p>baz</p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
