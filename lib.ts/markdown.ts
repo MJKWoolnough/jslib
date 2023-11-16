@@ -54,6 +54,10 @@ class Markdown {
 
 	parseHTML(line: string) {
 		if (this.inHTML < 0) {
+			if (this.text.length) {
+				return false;
+			}
+
 			for (const [n, open] of isHTMLOpen.entries()) {
 				if (line.match(open)) {
 					this.pushBlock();

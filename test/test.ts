@@ -9813,8 +9813,8 @@ type Tests = {
 				["<center>\nData\n</center>", "<center>\nData\n</center>"],
 				["<center>Data</center>", "<center>Data</center>"],
 				["<center>More\nData", "<center>More\nData</center>"],
-				["Text Before\n<center>\nData\n</center>\nText After", "<p>Text Before</p><center>\nData\n</center>\nText After"],
-				["Text Before\n<center>\nData\n</center>\n\nText After", "<p>Text Before</p><center>\nData\n</center>\n<p>Text After</p>"],
+				["Text Before\n\n<center>\nData\n</center>\nText After", "<p>Text Before</p><center>\nData\n</center>\nText After"],
+				["Text Before\n\n<center>\nData\n</center>\n\nText After", "<p>Text Before</p><center>\nData\n</center>\n<p>Text After</p>"],
 				["<center>More\nData\n\nClose?", "<center>More\nData\n<p>Close?</p></center>"],
 				["</center>*bar*\n\nbaz", "*bar*\n<p>baz</p>"]
 			],
