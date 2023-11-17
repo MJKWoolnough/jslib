@@ -9842,6 +9842,9 @@ type Tests = {
 				["> # Foo\n> bar\n> baz", "<blockquote><h1>Foo</h1><p>bar\nbaz</p></blockquote>"],
 				["># Foo\n>bar\n> baz", "<blockquote><h1>Foo</h1><p>bar\nbaz</p></blockquote>"],
 				["   > # Foo\n   > bar\n > baz", "<blockquote><h1>Foo</h1><p>bar\nbaz</p></blockquote>"]
+			],
+			"not a block quote": [
+				["    > # Foo\n    > bar\n    > baz", "<pre><code>&gt; # Foo\n&gt; bar\n&gt; baz</code></pre>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
