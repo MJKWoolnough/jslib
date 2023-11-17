@@ -9823,6 +9823,7 @@ type Tests = {
 				['<i class="foo">\n*bar*\n</i>', '<i class="foo">\n*bar*\n</i>'],
 				["<del>\n*foo*\n</del>", "<del>\n*foo*\n</del>"],
 				["<del>\n\n*foo*\n\n</del>", "<del>\n<p>*foo*</p></del>"],
+				['Foo\n<a href="bar">\nbaz', '<p>Foo\n<a href="bar">\nbaz</a></p>'],
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
