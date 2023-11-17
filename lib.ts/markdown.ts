@@ -42,7 +42,7 @@ class Markdown {
 
 	pushBlock(block?: string) {
 		if (this.text.length) {
-			this.processed += this.inHTML !== -1 ? this.text.join("\n") : this.indent || this.fenced ? this.tag("TEXTAREA", this.text.join("\n"), this.fenced ? ["type", this.fenced[2]] : undefined) : this.tag("P", this.parseInline(this.text));
+			this.processed += this.inHTML >= 10 ? this.text.join("\n") : this.indent || this.fenced ? this.tag("TEXTAREA", this.text.join("\n"), this.fenced ? ["type", this.fenced[2]] : undefined) : this.tag("P", this.text.join("\n"));
 
 			this.text.splice(0, this.text.length);
 		}
@@ -54,14 +54,8 @@ class Markdown {
 
 	parseHTML(line: string) {
 		if (this.inHTML < 0) {
-			if (this.text.length) {
-				return false;
-			}
-
 			for (const [n, open] of isHTMLOpen.entries()) {
 				if (line.match(open)) {
-					this.pushBlock();
-
 					this.inHTML = n;
 
 					break;
@@ -71,12 +65,18 @@ class Markdown {
 			if (this.inHTML < 0) {
 				return false;
 			}
+
+			if (!this.text.length) {
+				this.inHTML += 10;
+			}
 		}
 
 		this.text.push(line);
 
-		if (line.match(isHTMLClose[this.inHTML])) {
-			this.pushBlock();
+		if (line.match(isHTMLClose[this.inHTML % 10])) {
+			if (this.inHTML >= 10) {
+				this.pushBlock();
+			}
 
 			this.inHTML = -1;
 		}
@@ -164,7 +164,7 @@ class Markdown {
 			const t = line.trimStart(),
 			      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
 
-			this.pushBlock(this.tag(`H${start === -1 ? t.length : start}`, this.parseInline([start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim()])));
+			this.pushBlock(this.tag(`H${start === -1 ? t.length : start}`, this.parseInline(start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim())));
 
 			return true;
 		}
@@ -177,7 +177,7 @@ class Markdown {
 			const heading: 0 | 1 | 2 = line.match(isSeText1) ? 1 : line.match(isSeText2) ? 2 : 0;
 
 			if (heading !== 0) {
-				const header = this.parseInline(this.text);
+				const header = this.text.join("\n");
 
 				this.text.splice(0, this.text.length);
 
@@ -211,7 +211,7 @@ class Markdown {
 				}
 			}
 
-			this.text.push(line);
+			this.pushText(line);
 		}
 
 		this.pushBlock();
@@ -287,10 +287,14 @@ class Markdown {
 		return df;
 	}
 
-	parseInline(markdown: string[]) {
-		this.encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), markdown.join("\n"));
+	parseInline(text: string) {
+		this.encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text);
 
 		return this.encoder.innerHTML;
+	}
+
+	pushText(text: string) {
+		this.text.push(this.parseInline(text));
 	}
 
 	tag(name: string, contents?: string, attr?: [string, string]) {
