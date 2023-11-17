@@ -9826,6 +9826,16 @@ type Tests = {
 				['Foo\n<a href="bar">\nbaz', '<p>Foo\n<a href="bar">\nbaz</a></p>'],
 				['Foo\n<foo>\nbaz\n</foo>\n\nMore Foo\n\nMore Text', '<p>Foo\n<foo>\nbaz\n</foo>\n\nMore Foo</p><p>More Text</p>'],
 			]
+		},
+		"paragraphs": {
+			"leading whitespace": [
+				["aaa\n\nbbb", "<p>aaa</p><p>bbb</p>"],
+				["aaa\nbbb\n\nccc\nddd", "<p>aaa\nbbb</p><p>ccc\nddd</p>"],
+				["aaa\nbbb\n\n\nccc\nddd", "<p>aaa\nbbb</p><p>ccc\nddd</p>"],
+				["  aaa\nbbb", "<p>aaa\nbbb</p>"],
+				["aaa\n             bbb\n                                       ccc", "<p>aaa\nbbb\nccc</p>"],
+				["    aaa\nbbb", "<pre><code>aaa\n</code></pre><p>bbb</p>"],
+			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
