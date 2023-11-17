@@ -95,6 +95,10 @@ class Markdown {
 			bq++;
 		}
 
+		if (this.blockQuote && !bq && !this.line.match(isNotParagraphContinuation)) {
+			return false;
+		}
+
 		for (; bq > this.blockQuote; this.blockQuote++) {
 			this.processed += "<blockquote>";
 		}
@@ -385,6 +389,7 @@ const tags: Tags = Object.assign({
 	      /^[ \t]*$/
       ],
       isBlockQuote = /^ {0,3}>/,
+      isNotParagraphContinuation = /^ {0,3}[^\-]]/,
       parsers = ([
 	"parseFencedCodeBlock",
 	"parseIndentedCodeBlock",
