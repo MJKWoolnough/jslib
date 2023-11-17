@@ -9742,8 +9742,8 @@ type Tests = {
 				["heading\n--\t \t  ", "<h2>heading</h2>"]
 			],
 			"not a heading": [
-				["heading\n    ====", "<p>heading\n    ====</p>"],
-				["heading\n    ----", "<p>heading\n    ----</p>"],
+				["heading\n    ====", "<p>heading\n====</p>"],
+				["heading\n    ----", "<p>heading\n----</p>"],
 				["heading\n==== a", "<p>heading\n==== a</p>"],
 				["heading\n---- a", "<p>heading\n---- a</p>"],
 				["heading\n== ==", "<p>heading\n== ==</p>"],
@@ -9766,7 +9766,7 @@ type Tests = {
 				["    foo  \t\n    \t \t", "<pre><code>foo  \t\n\t \t</code></pre>"]
 			],
 			"code blocks with surrounding": [
-				["a simple\n      paragraph", "<p>a simple\n      paragraph</p>"],
+				["a simple\n      paragraph", "<p>a simple\nparagraph</p>"],
 				["a paragraph\n\n    a simple\n      indented code block", "<p>a paragraph</p><pre><code>a simple\n  indented code block</code></pre>"],
 				["    a simple\n      indented code block\na paragraph", "<pre><code>a simple\n  indented code block\n</code></pre><p>a paragraph</p>"],
 				["# Heading\n    foo\nHeading\n------\n    foo\n----", "<h1>Heading</h1><pre><code>foo\n</code></pre><h2>Heading</h2><pre><code>foo\n</code></pre><hr>"]

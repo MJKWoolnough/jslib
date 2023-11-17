@@ -211,7 +211,7 @@ class Markdown {
 				}
 			}
 
-			this.pushText(line);
+			this.pushText(line.trimStart());
 		}
 
 		this.pushBlock();
