@@ -399,9 +399,9 @@ const tags: Tags = Object.assign({
       isBlockQuote = /^ {0,3}>/,
       isParagraphContinuation = /^ {0,3}[^ -]/,
       parsers = ([
+	"parseBlockQuote",
 	"parseFencedCodeBlock",
 	"parseIndentedCodeBlock",
-	"parseBlockQuote",
 	"parseHTML",
 	"parseEmptyLine",
 	"parseHeading",
