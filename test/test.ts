@@ -9850,8 +9850,11 @@ type Tests = {
 				["> # Foo\n> bar\nbaz", "<blockquote><h1>Foo</h1><p>bar\nbaz</p></blockquote>"],
 				["> bar\nbaz\n> foo", "<blockquote><p>bar\nbaz\nfoo</p></blockquote>"],
 				["> foo\n> ---", "<blockquote><h2>foo</h2></blockquote>"],
-				["> foo\n---", "<blockquote><p>foo</p></blockquote><hr>"]
-			],
+				["> foo\n---", "<blockquote><p>foo</p></blockquote><hr>"],
+				[">     foo\n    bar", "<blockquote><pre><code>foo\n</code></pre></blockquote><pre><code>bar</code></pre>"],
+				["> ```\nfoo\n```", "<blockquote><pre><code></code></pre></blockquote><p>foo</p><pre><code></code></pre>"],
+				["> foo\n    - bar", "<blockquote><p>foo\n- bar</p></blockquote>"]
+			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
