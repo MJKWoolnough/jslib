@@ -43,7 +43,7 @@ class Markdown {
 	}
 
 	pushBlock(block?: string) {
-		if (this.text.length) {
+		if (this.text.length || this.fenced) {
 			this.processed += this.inHTML >= 10 ? this.text.join("\n") : this.indent || this.fenced ? this.tag("TEXTAREA", this.text.join("\n"), this.fenced ? ["type", this.fenced[2]] : undefined) : this.tag("P", this.text.join("\n"));
 
 			this.text.splice(0, this.text.length);
@@ -95,22 +95,39 @@ class Markdown {
 			bq++;
 		}
 
+		if (bq && this.line.startsWith(" ")) {
+			this.line = this.line.slice(1);
+		}
+
 		if (this.blockQuote && !bq && this.line.match(isParagraphContinuation)) {
-			return false;
+			const line = this.line;
+
+			if (this.indent) {
+				this.line = "-";
+
+				this.parseIndentedCodeBlock();
+			} else if (this.fenced) {
+				this.line = this.fenced[0];
+
+				this.parseFencedCodeBlock();
+				console.log(1, line);
+			} else {
+				return false;
+			}
+
+			this.line = line;
 		}
 
 		if (bq > this.blockQuote) {
 			this.pushBlock();
 
 			for (; bq > this.blockQuote; this.blockQuote++) {
-
 				this.processed += "<blockquote>";
 			}
 		} else if (bq < this.blockQuote) {
 			this.pushBlock();
 
 			for (; bq < this.blockQuote; this.blockQuote--) {
-
 				this.processed += "</blockquote>";
 			}
 		}
@@ -144,6 +161,8 @@ class Markdown {
 		}
 
 		if (this.line.match(isFenced)) {
+			this.pushBlock();
+
 			const spaces = this.line.search(/\S/),
 			      trimmed = this.line.trim(),
 			      markers = trimmed.search(/[^`~]|$/),
@@ -397,7 +416,7 @@ const tags: Tags = Object.assign({
 	      /^[ \t]*$/
       ],
       isBlockQuote = /^ {0,3}>/,
-      isParagraphContinuation = /^ {0,3}[^ -]/,
+      isParagraphContinuation = /^ {0,3}[^-]/,
       parsers = ([
 	"parseBlockQuote",
 	"parseFencedCodeBlock",
