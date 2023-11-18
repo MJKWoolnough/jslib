@@ -110,7 +110,6 @@ class Markdown {
 				this.line = this.fenced[0];
 
 				this.parseFencedCodeBlock();
-				console.log(1, line);
 			} else {
 				return false;
 			}
