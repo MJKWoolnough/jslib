@@ -99,7 +99,7 @@ class Markdown {
 			this.line = this.line.slice(1);
 		}
 
-		if (this.blockQuote && !bq && this.line.match(isParagraphContinuation)) {
+		if (this.blockQuote && bq < this.blockQuote && this.line.match(isParagraphContinuation)) {
 			const line = this.line;
 
 			if (this.indent) {
