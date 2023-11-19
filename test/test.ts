@@ -9861,7 +9861,10 @@ type Tests = {
 				["> foo\n---", "<blockquote><p>foo</p></blockquote><hr>"],
 				[">     foo\n    bar", "<blockquote><pre><code>foo\n</code></pre></blockquote><pre><code>bar</code></pre>"],
 				["> ```\nfoo\n```", "<blockquote><pre><code></code></pre></blockquote><p>foo</p><pre><code></code></pre>"],
-				["> foo\n    - bar", "<blockquote><p>foo\n- bar</p></blockquote>"]
+				["> foo\n    - bar", "<blockquote><p>foo\n- bar</p></blockquote>"],
+				["> bar\nbaz", "<blockquote><p>bar\nbaz</p></blockquote>"],
+				["> bar\n\nbaz", "<blockquote><p>bar</p></blockquote><p>baz</p>"],
+				["> bar\n>\nbaz", "<blockquote><p>bar</p></blockquote><p>baz</p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
