@@ -9865,6 +9865,10 @@ type Tests = {
 				["> bar\nbaz", "<blockquote><p>bar\nbaz</p></blockquote>"],
 				["> bar\n\nbaz", "<blockquote><p>bar</p></blockquote><p>baz</p>"],
 				["> bar\n>\nbaz", "<blockquote><p>bar</p></blockquote><p>baz</p>"]
+			],
+			"multi depth": [
+				["> > > foo\nbar", "<blockquote><blockquote><blockquote><p>foo\nbar</p></blockquote></blockquote></blockquote>"],
+				[">>> foo\n> bar\n>>baz", "<blockquote><blockquote><blockquote><p>foo\nbar\nbaz</p></blockquote></blockquote></blockquote>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
