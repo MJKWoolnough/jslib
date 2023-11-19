@@ -351,14 +351,18 @@ class Markdown {
 		this.text.push(this.parseInline(this.line));
 	}
 
+	openTag(name: string, close = true, attr?: [string, string]) {
+		return `<${name} ${this.uid}="" ${attr ? ` ${attr[0]}=${JSON.stringify(attr[1])}` : ""}` + (close ? " />" : "");
+	}
+
+	closeTag(name: string) {
+		return `</${name}>`;
+	}
+
 	tag(name: string, contents?: string, attr?: [string, string]) {
-		const open = `<${name} ${this.uid}="" ${attr ? ` ${attr[0]}=${JSON.stringify(attr[1])}` : ""}`;
+		const close = contents === undefined;
 
-		if (contents === undefined) {
-			return open + " />";
-		}
-
-		return open + `>${contents}</${name}>`;
+		return this.openTag(name, close, attr) + (close ? "" : ">" + contents + this.closeTag(name));
 	}
 }
 
