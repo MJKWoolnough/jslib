@@ -415,7 +415,7 @@ const tags: Tags = Object.assign({
 	      /^[ \t]*$/
       ],
       isBlockQuote = /^ {0,3}>/,
-      isParagraphContinuation = /^ {0,3}[^-]/,
+      isParagraphContinuation = /^ {0,3}[^-*]/,
       parsers = ([
 	"parseBlockQuote",
 	"parseFencedCodeBlock",
