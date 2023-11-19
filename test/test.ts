@@ -9848,6 +9848,8 @@ type Tests = {
 				["> foo\n\n> bar", "<blockquote><p>foo</p></blockquote><blockquote><p>bar</p></blockquote>"],
 				["> foo\n> bar", "<blockquote><p>foo\nbar</p></blockquote>"],
 				["> foo\n>\n> bar", "<blockquote><p>foo</p><p>bar</p></blockquote>"],
+				["foo\n> bar", "<p>foo</p><blockquote><p>bar</p></blockquote>"],
+				["> aaa\n***\n> bbb", "<blockquote><p>aaa</p></blockquote><hr><blockquote><p>bbb</p></blockquote>"]
 			],
 			"not a block quote": [
 				["    > # Foo\n    > bar\n    > baz", "<pre><code>&gt; # Foo\n&gt; bar\n&gt; baz</code></pre>"]
