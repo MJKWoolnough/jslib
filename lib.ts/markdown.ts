@@ -1,5 +1,6 @@
 type Tags = {
 	allowedHTML: null | [string, ...string[]][];
+	blockquote: (c: DocumentFragment) => Element;
 	code: (info: string, text: string) => Element;
 	heading1: (c: DocumentFragment) => Element;
 	heading2: (c: DocumentFragment) => Element;
@@ -121,13 +122,13 @@ class Markdown {
 			this.pushBlock();
 
 			for (; bq > this.blockQuote; this.blockQuote++) {
-				this.processed += "<blockquote>";
+				this.processed += this.openTag("BLOCKQUOTE");
 			}
 		} else if (bq < this.blockQuote) {
 			this.pushBlock();
 
 			for (; bq < this.blockQuote; this.blockQuote--) {
-				this.processed += "</blockquote>";
+				this.processed += this.closeTag("BLOCKQUOTE");
 			}
 		}
 
@@ -299,6 +300,10 @@ class Markdown {
 						df.append(this.tags.code(node.getAttribute("type") ?? "", node.textContent ?? ""));
 
 						break;
+					case "BLOCKQUOTE":
+						df.append(this.tags.blockquote(this.sanitise(node.childNodes)));
+
+						break;
 					default:
 						df.append(this.tags[`heading${node.nodeName.charAt(1) as "1" | "2" | "3" | "4" | "5" | "6"}`](this.sanitise(node.childNodes)));
 
@@ -351,8 +356,8 @@ class Markdown {
 		this.text.push(this.parseInline(this.line));
 	}
 
-	openTag(name: string, close = true, attr?: [string, string]) {
-		return `<${name} ${this.uid}="" ${attr ? ` ${attr[0]}=${JSON.stringify(attr[1])}` : ""}` + (close ? " />" : "");
+	openTag(name: string, close = false, attr?: [string, string]) {
+		return `<${name} ${this.uid}="" ${attr ? ` ${attr[0]}=${JSON.stringify(attr[1])}` : ""}` + (close ? " />" : ">");
 	}
 
 	closeTag(name: string) {
@@ -362,7 +367,7 @@ class Markdown {
 	tag(name: string, contents?: string, attr?: [string, string]) {
 		const close = contents === undefined;
 
-		return this.openTag(name, close, attr) + (close ? "" : ">" + contents + this.closeTag(name));
+		return this.openTag(name, close, attr) + (close ? "" : contents + this.closeTag(name));
 	}
 }
 
@@ -378,6 +383,7 @@ const tags: Tags = Object.assign({
 	"allowedHTML": null,
 	"thematicBreaks": () => document.createElement("hr")
       }, ([
+	["blockquote", "blockquote"],
 	["paragraphs", "p"],
 	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, string])
       ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => {
@@ -386,7 +392,7 @@ const tags: Tags = Object.assign({
 	      t.append(c);
 
 	      return t;
-      }, o), {} as Record<`heading${1 | 2 | 3 | 4 | 5 | 6}` | "paragraphs", (c: DocumentFragment) => Element>), {}),
+      }, o), {} as Record<keyof Tags, (c: DocumentFragment) => Element>), {}),
       isHeading = /^ {0,3}#{1,6}( .*)?$/,
       isSeText1 = /^ {0,3}=+[ \t]*$/,
       isSeText2 = /^ {0,3}\-+[ \t]*$/,
