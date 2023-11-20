@@ -9739,7 +9739,9 @@ type Tests = {
 				["####### heading", "<p>####### heading</p>"],
 				["#hashtag", "<p>#hashtag</p>"],
 				["#5 bolt", "<p>#5 bolt</p>"],
-				["\\# not a title", "<p># not a title</p>"]
+				["\\# not a title", "<p># not a title</p>"],
+				["    # foo", "<pre><code># foo</code></pre>"],
+				["foo\n    # bar", "<p>foo\n# bar</p>"]
 			]
 		},
 		"setext": {
