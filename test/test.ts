@@ -9673,7 +9673,7 @@ type Tests = {
 				["# Some Text ##", "<h1>Some Text</h1>"],
 				["# Some Text ##  ", "<h1>Some Text</h1>"],
 				["# Some Text #########", "<h1>Some Text</h1>"],
-				["# Some Text ###\\######", "<h1>Some Text ####</h1>"],
+				["# Some Text ###\\######", "<h1>Some Text #########</h1>"],
 				["#           Some Text With Long Spaces              ", "<h1>Some Text With Long Spaces</h1>"]
 			],
 			"heading2": [
@@ -9686,7 +9686,7 @@ type Tests = {
 				["## Some Text ##", "<h2>Some Text</h2>"],
 				["## Some Text ##\t\t", "<h2>Some Text</h2>"],
 				["## Some Text #########", "<h2>Some Text</h2>"],
-				["## Some Text ###\\######", "<h2>Some Text ####</h2>"],
+				["## Some Text ###\\######", "<h2>Some Text #########</h2>"],
 				["##           Some Text With Long Spaces              ", "<h2>Some Text With Long Spaces</h2>"]
 			],
 			"heading3": [
@@ -9699,7 +9699,7 @@ type Tests = {
 				["### Some Text ##", "<h3>Some Text</h3>"],
 				["### Some Text ##\t ", "<h3>Some Text</h3>"],
 				["### Some Text #########", "<h3>Some Text</h3>"],
-				["### Some Text ###\\######", "<h3>Some Text ####</h3>"],
+				["### Some Text ###\\######", "<h3>Some Text #########</h3>"],
 				["###           Some Text With Long Spaces              ", "<h3>Some Text With Long Spaces</h3>"]
 			],
 			"heading4": [
@@ -9712,7 +9712,7 @@ type Tests = {
 				["#### Some Text ##", "<h4>Some Text</h4>"],
 				["#### Some Text ##\t ", "<h4>Some Text</h4>"],
 				["#### Some Text #########", "<h4>Some Text</h4>"],
-				["#### Some Text ###\\######", "<h4>Some Text ####</h4>"],
+				["#### Some Text ###\\######", "<h4>Some Text #########</h4>"],
 				["####           Some Text With Long Spaces              ", "<h4>Some Text With Long Spaces</h4>"]
 			],
 			"heading5": [
@@ -9725,7 +9725,7 @@ type Tests = {
 				["##### Some Text ##", "<h5>Some Text</h5>"],
 				["##### Some Text ## \t", "<h5>Some Text</h5>"],
 				["##### Some Text #########", "<h5>Some Text</h5>"],
-				["##### Some Text ###\\######", "<h5>Some Text ####</h5>"],
+				["##### Some Text ###\\######", "<h5>Some Text #########</h5>"],
 				["#####           Some Text With Long Spaces              ", "<h5>Some Text With Long Spaces</h5>"]
 			],
 			"heading6": [
@@ -9738,7 +9738,7 @@ type Tests = {
 				["###### Some Text ##", "<h6>Some Text</h6>"],
 				["###### Some Text ## \t", "<h6>Some Text</h6>"],
 				["###### Some Text #########", "<h6>Some Text</h6>"],
-				["###### Some Text ###\\######", "<h6>Some Text ####</h6>"],
+				["###### Some Text ###\\######", "<h6>Some Text #########</h6>"],
 				["######           Some Text With Long Spaces              ", "<h6>Some Text With Long Spaces</h6>"]
 			],
 			"not a heading": [
