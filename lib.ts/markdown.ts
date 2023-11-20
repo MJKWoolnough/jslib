@@ -1,15 +1,15 @@
 type Tags = {
 	allowedHTML: null | [string, ...string[]][];
-	blockquote: (c: DocumentFragment) => Element;
-	code: (info: string, text: string) => Element;
-	heading1: (c: DocumentFragment) => Element;
-	heading2: (c: DocumentFragment) => Element;
-	heading3: (c: DocumentFragment) => Element;
-	heading4: (c: DocumentFragment) => Element;
-	heading5: (c: DocumentFragment) => Element;
-	heading6: (c: DocumentFragment) => Element;
-	paragraphs: (c: DocumentFragment) => Element;
-	thematicBreaks: () => Element;
+	blockquote: (c: DocumentFragment) => Element | DocumentFragment;
+	code: (info: string, text: string) => Element | DocumentFragment;
+	heading1: (c: DocumentFragment) => Element | DocumentFragment;
+	heading2: (c: DocumentFragment) => Element | DocumentFragment;
+	heading3: (c: DocumentFragment) => Element | DocumentFragment;
+	heading4: (c: DocumentFragment) => Element | DocumentFragment;
+	heading5: (c: DocumentFragment) => Element | DocumentFragment;
+	heading6: (c: DocumentFragment) => Element | DocumentFragment;
+	paragraphs: (c: DocumentFragment) => Element | DocumentFragment;
+	thematicBreaks: () => Element | DocumentFragment;
 }
 
 class Markdown {
