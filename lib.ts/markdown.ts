@@ -217,7 +217,7 @@ class Markdown {
 			const t = this.line.trimStart(),
 			      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
 
-			this.pushBlock(this.tag(`H${start === -1 ? t.length : start}`, this.parseInline(start === -1 ? "" : t.slice(start).replace(/(\\#)?#*$/, "$1").replace("\\#", "#").trim())));
+			this.pushBlock(this.tag(`H${start === -1 ? t.length : start}`, this.parseInline(start === -1 ? "" : t.slice(start).replace(/(\\#)?#*[ \t]*$/, "$1").replace("\\#", "#").trim())));
 
 			return true;
 		}
