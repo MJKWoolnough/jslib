@@ -9645,7 +9645,13 @@ type Tests = {
 			"surrounding text": [
 				["Foo\n    ***", "<p>Foo\n***</p>"],
 				["Foo\n   ***", "<p>Foo</p><hr>"],
-				["Foo\n   ***\nText After", "<p>Foo</p><hr><p>Text After</p>"]
+				["Foo\n   ***\nText After", "<p>Foo</p><hr><p>Text After</p>"],
+				["Foo\n    ---", "<p>Foo\n---</p>"],
+				["Foo\n   ---", "<h2>Foo</h2>"],
+				["Foo\n   ---\nText After", "<h2>Foo</h2><p>Text After</p>"],
+				["Foo\n    ___", "<p>Foo\n___</p>"],
+				["Foo\n   ___", "<p>Foo</p><hr>"],
+				["Foo\n   ___\nText After", "<p>Foo</p><hr><p>Text After</p>"],
 			]
 		},
 		"headings": {
