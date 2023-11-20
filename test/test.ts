@@ -9632,6 +9632,11 @@ type Tests = {
 				["---a", "<p>---a</p>"],
 				["*** b", "<p>*** b</p>"],
 				["___\tc", "<p>___\tc</p>"]
+			],
+			"surrounding text": [
+				["Foo\n    ***", "<p>Foo\n***</p>"],
+				["Foo\n   ***", "<p>Foo</p><hr>"],
+				["Foo\n   ***\nText After", "<p>Foo</p><hr><p>Text After</p>"]
 			]
 		},
 		"headings": {
