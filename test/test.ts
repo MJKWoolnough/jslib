@@ -9633,6 +9633,11 @@ type Tests = {
 				["*** b", "<p>*** b</p>"],
 				["___\tc", "<p>___\tc</p>"]
 			],
+			"invalid characters in line": [
+				["_ _ _ _ a", "<p>_ _ _ _ a</p>"],
+				["a------", "<p>a------</p>"],
+				["---a---", "<p>---a---</p>"]
+			],
 			"surrounding text": [
 				["Foo\n    ***", "<p>Foo\n***</p>"],
 				["Foo\n   ***", "<p>Foo</p><hr>"],
