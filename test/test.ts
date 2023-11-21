@@ -9783,6 +9783,8 @@ type Tests = {
 				["heading\n== ==", "<p>heading\n== ==</p>"],
 				["heading\n-- --", "<p>heading</p><hr>"],
 				["    Foo\n    ---\n\n    Foo\n---", "<pre><code>Foo\n---\n\nFoo\n</code></pre><hr>"],
+				["> foo\n---", "<blockquote><p>foo</p></blockquote><hr>"],
+				["> foo\nbar\n===", "<blockquote><p>foo\nbar\n===</p></blockquote>"]
 			],
 			"complex setext header": [
 				["Foo\nbar\n---\nbaz", "<h2>Foo\nbar</h2><p>baz</p>"],
