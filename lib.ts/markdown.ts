@@ -112,6 +112,10 @@ class Markdown {
 
 				this.parseFencedCodeBlock();
 			} else if (this.text.length && line) {
+				if (this.line.match(isSeText1) || this.line.match(isSeText2)) {
+					this.line = "\t" + this.line;
+				}
+
 				return false;
 			}
 
