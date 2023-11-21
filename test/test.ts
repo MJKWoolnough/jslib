@@ -9804,7 +9804,9 @@ type Tests = {
 				["    <a/>\n    *hi*\n", "<pre><code>&lt;a/&gt;\n*hi*\n</code></pre>"],
 				["    an indented code block\n\n    with a blank line", "<pre><code>an indented code block\n\nwith a blank line</code></pre>"],
 				["    foo  \t", "<pre><code>foo  \t</code></pre>"],
-				["    foo  \t\n    \t \t", "<pre><code>foo  \t\n\t \t</code></pre>"]
+				["    foo  \t\n    \t \t", "<pre><code>foo  \t\n\t \t</code></pre>"],
+				["    chunk1\n\n    chunk2\n  \n \n \n    chunk3", "<pre><code>chunk1\n\nchunk2\n\n\n\nchunk3</code></pre>"],
+				["    chunk1\n      \n      chunk2", "<pre><code>chunk1\n  \n  chunk2</code></pre>"]
 			],
 			"code blocks with surrounding": [
 				["a simple\n      paragraph", "<p>a simple\nparagraph</p>"],
