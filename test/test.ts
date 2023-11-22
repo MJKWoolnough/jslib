@@ -9826,7 +9826,7 @@ type Tests = {
 				["```\nCode Here\n```", "<pre><code>Code Here\n</code></pre>"],
 				["~~~\nCode Here\n~~~", "<pre><code>Code Here\n</code></pre>"],
 				[" ````\n Code Here\n```\nabc\n ````", "<pre><code>Code Here\n```\nabc\n</code></pre>"],
-				["   ~~~~\n Code Here\n```\nabc\n   ~~~~", "<pre><code>Code Here\n```\nabc\n</code></pre>"],
+				["   ~~~~\n Code Here\n~~~\nabc\n   ~~~~", "<pre><code>Code Here\n~~~\nabc\n</code></pre>"],
 				["   ```\n   Code Here\n  ~~~\n abc\n  ~~~\n   ```", "<pre><code>Code Here\n~~~\nabc\n~~~\n</code></pre>"],
 				["   ~~~\n   Code Here\n  ```\n abc\n  ```\n   ~~~", "<pre><code>Code Here\n```\nabc\n```\n</code></pre>"],
 				["```\n``` a\n```", "<pre><code>``` a\n</code></pre>"],
