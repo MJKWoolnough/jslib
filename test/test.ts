@@ -9832,7 +9832,9 @@ type Tests = {
 				["```\n``` a\n```", "<pre><code>``` a\n</code></pre>"],
 				["```\nCode Here", "<pre><code>Code Here</code></pre>"],
 				["```\n<\n >\n```", "<pre><code>&lt;\n &gt;\n</code></pre>"],
-				["~~~\n<\n >\n~~~", "<pre><code>&lt;\n &gt;\n</code></pre>"]
+				["~~~\n<\n >\n~~~", "<pre><code>&lt;\n &gt;\n</code></pre>"],
+				["```", "<pre><code></code></pre>"],
+				["~~~", "<pre><code></code></pre>"]
 			],
 			"fenced with info string": [
 				["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
