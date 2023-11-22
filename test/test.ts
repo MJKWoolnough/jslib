@@ -9840,7 +9840,11 @@ type Tests = {
 				["```\n\n\n  \n```", "<pre><code>\n  \n</code></pre>"],
 				["~~~\n\n\n  \n~~~", "<pre><code>\n  \n</code></pre>"],
 				["```\n```", "<pre><code></code></pre>"],
-				["~~~\n~~~", "<pre><code></code></pre>"]
+				["~~~\n~~~", "<pre><code></code></pre>"],
+				["  ```\naaa\n  aaa\n  ```", "<pre><code>aaa\naaa\n</code></pre>"],
+				["  ~~~\naaa\n  aaa\n  ~~~", "<pre><code>aaa\naaa\n</code></pre>"],
+				["   ```\n   aaa\n    aaa\n  aaa\n   ```", "<pre><code>aaa\n aaa\naaa\n</code></pre>"],
+				["   ~~~\n   aaa\n    aaa\n  aaa\n   ~~~", "<pre><code>aaa\n aaa\naaa\n</code></pre>"]
 			],
 			"fenced with info string": [
 				["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
