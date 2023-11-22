@@ -88,6 +88,10 @@ class Markdown {
 	}
 
 	parseBlockQuote() {
+		if (!this.blockQuote && this.fenced) {
+			return false;
+		}
+
 		let bq = 0;
 
 		while (this.line.match(isBlockQuote)) {
