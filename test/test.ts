@@ -9856,7 +9856,8 @@ type Tests = {
 			"mixed blocks": [
 				["> ```\n> aaa\n\nbbb", "<blockquote><pre><code>aaa\n</code></pre></blockquote><p>bbb</p>"],
 				["> ~~~\n> aaa\n\nbbb", "<blockquote><pre><code>aaa\n</code></pre></blockquote><p>bbb</p>"],
-				["foo\n```\nbar\n```\nbaz", "<p>foo</p><pre><code>bar\n</code></pre><p>baz</p>"]
+				["foo\n```\nbar\n```\nbaz", "<p>foo</p><pre><code>bar\n</code></pre><p>baz</p>"],
+				["foo\n---\n~~~\nbar\n~~~\n# baz", "<h2>foo</h2><pre><code>bar\n</code></pre><h1>baz</h1>"]
 			],
 			"not a fenced code block": [
 				["    ```\n    aaa\n    ```", "<pre><code>```\naaa\n```</code></pre>"]
