@@ -411,7 +411,7 @@ const tags: Tags = Object.assign({
       ],
       isIndent = /^(\t|    )/,
       isIndentBlankContinue = /^ {0,3}$/,
-      isFenced = /^ {0,3}(````*|~~~~*)([^`][^`]*)?[ \t]*$/,
+      isFenced = /^ {0,3}(````*[^`]*|~~~~*.*)[ \t]*$/,
       isEndFenced = /^ {0,3}(````*|~~~~*)[ \t]*$/,
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
       isHTMLOpen = [
