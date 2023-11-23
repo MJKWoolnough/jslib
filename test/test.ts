@@ -9851,6 +9851,9 @@ type Tests = {
 				["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
 				[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
 				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
+			],
+			"not a fenced code block": [
+				["    ```\n    aaa\n    ```", "<pre><code>```\naaa\n```</code></pre>"]
 			]
 		},
 		"raw html": {
