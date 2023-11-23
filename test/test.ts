@@ -9848,11 +9848,11 @@ type Tests = {
 				["~~~~~~\naaa\n~~~ ~~", "<pre><code>aaa\n~~~ ~~</code></pre>"]
 			],
 			"fenced with info string": [
-				["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
-				["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
-				[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
-				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"],
-				["```ruby\ndef foo(x)\n  return 3\nend\n```", "<pre class=\"ruby\"><code>def foo(x)\n  return 3\nend\n</code></pre>"]
+				["```bash\nCode Here\n```", "<pre class=\"language-bash\"><code>Code Here\n</code></pre>"],
+				["~~~ cpp \nCode Here\n~~~", "<pre class=\"language-cpp\"><code>Code Here\n</code></pre>"],
+				[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"language-python\"><code>Code Here\n```\nabc\n</code></pre>"],
+				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"language-code language-here\"><code>Code Here\n```\nabc\n</code></pre>"],
+				["```ruby\ndef foo(x)\n  return 3\nend\n```", "<pre class=\"language-ruby\"><code>def foo(x)\n  return 3\nend\n</code></pre>"]
 			],
 			"mixed blocks": [
 				["> ```\n> aaa\n\nbbb", "<blockquote><pre><code>aaa\n</code></pre></blockquote><p>bbb</p>"],
@@ -9949,7 +9949,7 @@ type Tests = {
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
 		      {code, div, pre} = await import ("./lib/html.js"),
-		      tags = {"code": (info: string, text: string) => pre({"class": info || null}, code(text))},
+		      tags = {"code": (info: string, text: string) => pre({"class": info.split(/[ \t]+/).filter(l => l.trim()).map(l => `language-${l}`) || null}, code(text))},
 		      generated = div(parseMarkdown(input, tags)).innerHTML;
 
 		if (generated !== output) {
