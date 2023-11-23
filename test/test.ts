@@ -9835,8 +9835,6 @@ type Tests = {
 				["~~~\n<\n >\n~~~", "<pre><code>&lt;\n &gt;\n</code></pre>"],
 				["```", "<pre><code></code></pre>"],
 				["~~~", "<pre><code></code></pre>"],
-				["> ```\n> aaa\n\nbbb", "<blockquote><pre><code>aaa\n</code></pre></blockquote><p>bbb</p>"],
-				["> ~~~\n> aaa\n\nbbb", "<blockquote><pre><code>aaa\n</code></pre></blockquote><p>bbb</p>"],
 				["```\n\n\n  \n```", "<pre><code>\n  \n</code></pre>"],
 				["~~~\n\n\n  \n~~~", "<pre><code>\n  \n</code></pre>"],
 				["```\n```", "<pre><code></code></pre>"],
@@ -9847,14 +9845,18 @@ type Tests = {
 				["   ~~~\n   aaa\n    aaa\n  aaa\n   ~~~", "<pre><code>aaa\n aaa\naaa\n</code></pre>"],
 				["```\naaa\n  ```", "<pre><code>aaa\n</code></pre>"],
 				["~~~\naaa\n  ~~~", "<pre><code>aaa\n</code></pre>"],
-				["~~~~~~\naaa\n~~~ ~~", "<pre><code>aaa\n~~~ ~~</code></pre>"],
-				["foo\n```\nbar\n```\nbaz", "<p>foo</p><pre><code>bar\n</code></pre><p>baz</p>"]
+				["~~~~~~\naaa\n~~~ ~~", "<pre><code>aaa\n~~~ ~~</code></pre>"]
 			],
 			"fenced with info string": [
 				["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
 				["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
 				[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
 				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
+			],
+			"mixed blocks": [
+				["> ```\n> aaa\n\nbbb", "<blockquote><pre><code>aaa\n</code></pre></blockquote><p>bbb</p>"],
+				["> ~~~\n> aaa\n\nbbb", "<blockquote><pre><code>aaa\n</code></pre></blockquote><p>bbb</p>"],
+				["foo\n```\nbar\n```\nbaz", "<p>foo</p><pre><code>bar\n</code></pre><p>baz</p>"]
 			],
 			"not a fenced code block": [
 				["    ```\n    aaa\n    ```", "<pre><code>```\naaa\n```</code></pre>"]
