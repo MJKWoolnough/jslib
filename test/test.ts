@@ -9851,7 +9851,8 @@ type Tests = {
 				["```bash\nCode Here\n```", "<pre class=\"bash\"><code>Code Here\n</code></pre>"],
 				["~~~ cpp \nCode Here\n~~~", "<pre class=\"cpp\"><code>Code Here\n</code></pre>"],
 				[" ````	python	\n Code Here\n```\nabc\n ````", "<pre class=\"python\"><code>Code Here\n```\nabc\n</code></pre>"],
-				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"]
+				["   ~~~~	code here \n Code Here\n```\nabc\n   ~~~~", "<pre class=\"code here\"><code>Code Here\n```\nabc\n</code></pre>"],
+				["```ruby\ndef foo(x)\n  return 3\nend\n```", "<pre class=\"ruby\"><code>def foo(x)\n  return 3\nend\n</code></pre>"]
 			],
 			"mixed blocks": [
 				["> ```\n> aaa\n\nbbb", "<blockquote><pre><code>aaa\n</code></pre></blockquote><p>bbb</p>"],
