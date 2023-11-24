@@ -13,130 +13,130 @@ type Tags = {
 }
 
 class Markdown {
-	refs = new Map<string, [string, string]>();
-	uid: string;
-	processed = "";
-	text: string[] = [];
-	inHTML = -1;
-	indent = false;
-	blockQuote = 0;
-	fenced: [string, string, string] | null = null;
-	tags: Tags;
-	encoder = document.createElement("div");
-	line = "";
+	#refs = new Map<string, [string, string]>();
+	#uid: string;
+	#processed = "";
+	#text: string[] = [];
+	#inHTML = -1;
+	#indent = false;
+	#blockQuote = 0;
+	#fenced: [string, string, string] | null = null;
+	#tags: Tags;
+	#encoder = document.createElement("div");
+	#line = "";
 
 	constructor(tgs: Tags, source: string) {
-		this.tags = tgs;
+		this.#tags = tgs;
 
 		while (true) {
-			this.uid = "";
+			this.#uid = "";
 
-			while (this.uid.length < 20) {
-				this.uid += String.fromCharCode(65 + Math.random() * 26);
+			while (this.#uid.length < 20) {
+				this.#uid += String.fromCharCode(65 + Math.random() * 26);
 			}
 
-			if (!source.includes(this.uid)) {
+			if (!source.includes(this.#uid)) {
 				break;
 			}
 		}
 
-		this.parseBlocks(source);
+		this.#parseBlocks(source);
 	}
 
-	pushBlock(block?: string) {
-		if (this.text.length || this.fenced) {
-			this.processed += this.inHTML >= 10 ? this.text.join("\n") : this.indent || this.fenced ? this.tag("TEXTAREA", this.text.join("\n"), this.fenced ? ["type", this.fenced[2]] : undefined) : this.tag("P", this.text.join("\n"));
+	#pushBlock(block?: string) {
+		if (this.#text.length || this.#fenced) {
+			this.#processed += this.#inHTML >= 10 ? this.#text.join("\n") : this.#indent || this.#fenced ? this.#tag("TEXTAREA", this.#text.join("\n"), this.#fenced ? ["type", this.#fenced[2]] : undefined) : this.#tag("P", this.#text.join("\n"));
 
-			this.text.splice(0, this.text.length);
+			this.#text.splice(0, this.#text.length);
 		}
 
 		if (block) {
-			this.processed += block;
+			this.#processed += block;
 		}
 	}
 
 	parseHTML() {
-		if (this.inHTML < 0) {
+		if (this.#inHTML < 0) {
 			for (const [n, open] of isHTMLOpen.entries()) {
-				if (this.line.match(open)) {
-					this.inHTML = n;
+				if (this.#line.match(open)) {
+					this.#inHTML = n;
 
 					break;
 				}
 			}
 
-			if (this.inHTML < 0) {
+			if (this.#inHTML < 0) {
 				return false;
 			}
 
-			if (!this.text.length) {
-				this.inHTML += 10;
+			if (!this.#text.length) {
+				this.#inHTML += 10;
 			}
 		}
 
-		this.text.push(this.line);
+		this.#text.push(this.#line);
 
-		if (this.line.match(isHTMLClose[this.inHTML % 10])) {
-			if (this.inHTML >= 10) {
-				this.pushBlock();
+		if (this.#line.match(isHTMLClose[this.#inHTML % 10])) {
+			if (this.#inHTML >= 10) {
+				this.#pushBlock();
 			}
 
-			this.inHTML = -1;
+			this.#inHTML = -1;
 		}
 
 		return true;
 	}
 
 	parseBlockQuote() {
-		if (!this.blockQuote && this.fenced) {
+		if (!this.#blockQuote && this.#fenced) {
 			return false;
 		}
 
 		let bq = 0;
 
-		while (this.line.match(isBlockQuote)) {
-			this.line = this.line.trimStart().slice(1);
+		while (this.#line.match(isBlockQuote)) {
+			this.#line = this.#line.trimStart().slice(1);
 
 			bq++;
 		}
 
-		if (bq && this.line.startsWith(" ")) {
-			this.line = this.line.slice(1);
+		if (bq && this.#line.startsWith(" ")) {
+			this.#line = this.#line.slice(1);
 		}
 
-		if (this.blockQuote && bq < this.blockQuote && this.line.match(isParagraphContinuation)) {
-			const line = this.line;
+		if (this.#blockQuote && bq < this.#blockQuote && this.#line.match(isParagraphContinuation)) {
+			const line = this.#line;
 
-			if (this.indent) {
-				this.line = "-";
+			if (this.#indent) {
+				this.#line = "-";
 
 				this.parseIndentedCodeBlock();
-			} else if (this.fenced) {
-				this.line = this.fenced[0];
+			} else if (this.#fenced) {
+				this.#line = this.#fenced[0];
 
 				this.parseFencedCodeBlock();
-			} else if (this.text.length && line) {
-				if (this.line.match(isSeText1) || this.line.match(isSeText2)) {
-					this.line = "\t" + this.line;
+			} else if (this.#text.length && line) {
+				if (this.#line.match(isSeText1) || this.#line.match(isSeText2)) {
+					this.#line = "\t" + this.#line;
 				}
 
 				return false;
 			}
 
-			this.line = line;
+			this.#line = line;
 		}
 
-		if (bq > this.blockQuote) {
-			this.pushBlock();
+		if (bq > this.#blockQuote) {
+			this.#pushBlock();
 
-			for (; bq > this.blockQuote; this.blockQuote++) {
-				this.processed += this.openTag("BLOCKQUOTE");
+			for (; bq > this.#blockQuote; this.#blockQuote++) {
+				this.#processed += this.#openTag("BLOCKQUOTE");
 			}
-		} else if (bq < this.blockQuote) {
-			this.pushBlock();
+		} else if (bq < this.#blockQuote) {
+			this.#pushBlock();
 
-			for (; bq < this.blockQuote; this.blockQuote--) {
-				this.processed += this.closeTag("BLOCKQUOTE");
+			for (; bq < this.#blockQuote; this.#blockQuote--) {
+				this.#processed += this.#closeTag("BLOCKQUOTE");
 			}
 		}
 
@@ -144,39 +144,39 @@ class Markdown {
 	}
 
 	parseFencedCodeBlock() {
-		if (this.fenced) {
-			if (this.line.match(isEndFenced) && this.line.trim().startsWith(this.fenced[0])) {
-				this.text.push("");
+		if (this.#fenced) {
+			if (this.#line.match(isEndFenced) && this.#line.trim().startsWith(this.#fenced[0])) {
+				this.#text.push("");
 
-				this.pushBlock();
+				this.#pushBlock();
 
-				this.fenced = null;
+				this.#fenced = null;
 
 				return true;
 			}
 
-			for (let toRemove = this.fenced[1]; toRemove.length; toRemove = toRemove.slice(1)) {
-				if (this.line.startsWith(toRemove)) {
-					this.line = this.line.slice(toRemove.length);
+			for (let toRemove = this.#fenced[1]; toRemove.length; toRemove = toRemove.slice(1)) {
+				if (this.#line.startsWith(toRemove)) {
+					this.#line = this.#line.slice(toRemove.length);
 
 					break;
 				}
 			}
 
-			this.text.push(this.line);
+			this.#text.push(this.#line);
 
 			return true;
 		}
 
-		if (this.line.match(isFenced)) {
-			this.pushBlock();
+		if (this.#line.match(isFenced)) {
+			this.#pushBlock();
 
-			const spaces = this.line.search(/\S/),
-			      trimmed = this.line.trim(),
+			const spaces = this.#line.search(/\S/),
+			      trimmed = this.#line.trim(),
 			      markers = trimmed.search(/[^`~]|$/),
 			      info = trimmed.replace(/^[`~]*/, "").trim();
 
-			this.fenced = [trimmed.slice(0, markers), this.line.slice(0, spaces), info];
+			this.#fenced = [trimmed.slice(0, markers), this.#line.slice(0, spaces), info];
 
 			return true;
 		}
@@ -185,25 +185,25 @@ class Markdown {
 	}
 
 	parseIndentedCodeBlock() {
-		if (!this.text.length && this.line.match(isIndent)) {
-			this.indent = true;
+		if (!this.#text.length && this.#line.match(isIndent)) {
+			this.#indent = true;
 		}
 
-		if (this.indent) {
-			if (this.line.match(isIndent)) {
-				this.text.push(this.line.replace(isIndent, ""));
+		if (this.#indent) {
+			if (this.#line.match(isIndent)) {
+				this.#text.push(this.#line.replace(isIndent, ""));
 
 				return true;
-			} else if (this.line.match(isIndentBlankContinue)) {
-				this.text.push("");
+			} else if (this.#line.match(isIndentBlankContinue)) {
+				this.#text.push("");
 
 				return true;
 			} else {
-				this.text.push("");
+				this.#text.push("");
 
-				this.pushBlock();
+				this.#pushBlock();
 
-				this.indent = false;
+				this.#indent = false;
 			}
 		}
 
@@ -211,8 +211,8 @@ class Markdown {
 	}
 
 	parseEmptyLine() {
-		if (!this.line.trim()) {
-			this.pushBlock();
+		if (!this.#line.trim()) {
+			this.#pushBlock();
 
 			return true;
 		}
@@ -221,11 +221,11 @@ class Markdown {
 	}
 
 	parseHeading() {
-		if (this.line.match(isHeading)) {
-			const t = this.line.trimStart(),
+		if (this.#line.match(isHeading)) {
+			const t = this.#line.trimStart(),
 			      start = t.indexOf(" ") as -1 | 1 | 2 | 3 | 4 | 5 | 6;
 
-			this.pushBlock(this.tag(`H${start === -1 ? t.length : start}`, this.parseInline(start === -1 ? "" : t.slice(start).replace(/(\\#)?([ \t]#*[ \t]*)?$/, "$1").replace("\\#", "#").trim())));
+			this.#pushBlock(this.#tag(`H${start === -1 ? t.length : start}`, this.#parseInline(start === -1 ? "" : t.slice(start).replace(/(\\#)?([ \t]#*[ \t]*)?$/, "$1").replace("\\#", "#").trim())));
 
 			return true;
 		}
@@ -234,15 +234,15 @@ class Markdown {
 	}
 
 	parseSetextHeading() {
-		if (this.text.length) {
-			const heading: 0 | 1 | 2 = this.line.match(isSeText1) ? 1 : this.line.match(isSeText2) ? 2 : 0;
+		if (this.#text.length) {
+			const heading: 0 | 1 | 2 = this.#line.match(isSeText1) ? 1 : this.#line.match(isSeText2) ? 2 : 0;
 
 			if (heading !== 0) {
-				const header = this.text.join("\n");
+				const header = this.#text.join("\n");
 
-				this.text.splice(0, this.text.length);
+				this.#text.splice(0, this.#text.length);
 
-				this.pushBlock(this.tag(`H${heading}`, header));
+				this.#pushBlock(this.#tag(`H${heading}`, header));
 
 				return true;
 			}
@@ -253,8 +253,8 @@ class Markdown {
 
 	parseThematicBreak() {
 		for (const tb of isThematicBreak) {
-			if (this.line.match(tb)) {
-				this.pushBlock(this.tag("HR"));
+			if (this.#line.match(tb)) {
+				this.#pushBlock(this.#tag("HR"));
 
 				return true;
 			}
@@ -263,63 +263,63 @@ class Markdown {
 		return false;
 	}
 
-	parseBlocks(markdown: string) {
+	#parseBlocks(markdown: string) {
 		Loop:
-		for (this.line of markdown.split("\n")) {
+		for (this.#line of markdown.split("\n")) {
 			for (const parser of parsers) {
 				if (parser.call(this)) {
 					continue Loop;
 				}
 			}
 
-			this.line = this.line.trimStart();
+			this.#line = this.#line.trimStart();
 
-			this.pushText();
+			this.#pushText();
 		}
 
-		this.pushBlock();
+		this.#pushBlock();
 	}
 
 	get content() {
 		const t = document.createElement("template");
 
-		t.innerHTML = this.processed;
+		t.innerHTML = this.#processed;
 
-		return this.sanitise(t.content.childNodes);
+		return this.#sanitise(t.content.childNodes);
 	}
 
-	sanitise(childNodes: NodeListOf<ChildNode>) {
+	#sanitise(childNodes: NodeListOf<ChildNode>) {
 		const df = document.createDocumentFragment();
 
 		Loop:
 		for (const node of Array.from(childNodes)) {
 			if (node instanceof Element) {
-				if (node.hasAttribute(this.uid)) {
+				if (node.hasAttribute(this.#uid)) {
 					switch (node.nodeName) {
 					case "P":
-						df.append(this.tags.paragraphs(this.sanitise(node.childNodes)));
+						df.append(this.#tags.paragraphs(this.#sanitise(node.childNodes)));
 
 						break;
 					case "HR":
-						df.append(this.tags.thematicBreaks());
+						df.append(this.#tags.thematicBreaks());
 
 						break;
 					case "TEXTAREA":
-						df.append(this.tags.code(node.getAttribute("type") ?? "", node.textContent ?? ""));
+						df.append(this.#tags.code(node.getAttribute("type") ?? "", node.textContent ?? ""));
 
 						break;
 					case "BLOCKQUOTE":
-						df.append(this.tags.blockquote(this.sanitise(node.childNodes)));
+						df.append(this.#tags.blockquote(this.#sanitise(node.childNodes)));
 
 						break;
 					default:
-						df.append(this.tags[`heading${node.nodeName.charAt(1) as "1" | "2" | "3" | "4" | "5" | "6"}`](this.sanitise(node.childNodes)));
+						df.append(this.#tags[`heading${node.nodeName.charAt(1) as "1" | "2" | "3" | "4" | "5" | "6"}`](this.#sanitise(node.childNodes)));
 
 						break;
 					}
 				} else {
-					if (this.tags.allowedHTML) {
-						for (const [name, ...attrs] of this.tags.allowedHTML) {
+					if (this.#tags.allowedHTML) {
+						for (const [name, ...attrs] of this.#tags.allowedHTML) {
 							if (node.nodeName === name) {
 								const tag = document.createElement(node.nodeName);
 
@@ -331,7 +331,7 @@ class Markdown {
 									}
 								}
 
-								tag.append(this.sanitise(node.childNodes));
+								tag.append(this.#sanitise(node.childNodes));
 
 								df.append(tag);
 
@@ -339,9 +339,9 @@ class Markdown {
 							}
 						}
 
-						df.append(this.sanitise(node.childNodes));
+						df.append(this.#sanitise(node.childNodes));
 					} else {
-						node.replaceChildren(this.sanitise(node.childNodes));
+						node.replaceChildren(this.#sanitise(node.childNodes));
 
 						df.append(node);
 					}
@@ -354,28 +354,28 @@ class Markdown {
 		return df;
 	}
 
-	parseInline(text: string) {
-		this.encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text);
+	#parseInline(text: string) {
+		this.#encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text);
 
-		return this.encoder.innerHTML;
+		return this.#encoder.innerHTML;
 	}
 
-	pushText() {
-		this.text.push(this.parseInline(this.line));
+	#pushText() {
+		this.#text.push(this.#parseInline(this.#line));
 	}
 
-	openTag(name: string, close = false, attr?: [string, string]) {
-		return `<${name} ${this.uid}="" ${attr ? ` ${attr[0]}=${JSON.stringify(attr[1])}` : ""}` + (close ? " />" : ">");
+	#openTag(name: string, close = false, attr?: [string, string]) {
+		return `<${name} ${this.#uid}="" ${attr ? ` ${attr[0]}=${JSON.stringify(attr[1])}` : ""}` + (close ? " />" : ">");
 	}
 
-	closeTag(name: string) {
+	#closeTag(name: string) {
 		return `</${name}>`;
 	}
 
-	tag(name: string, contents?: string, attr?: [string, string]) {
+	#tag(name: string, contents?: string, attr?: [string, string]) {
 		const close = contents === undefined;
 
-		return this.openTag(name, close, attr) + (close ? "" : contents + this.closeTag(name));
+		return this.#openTag(name, close, attr) + (close ? "" : contents + this.#closeTag(name));
 	}
 }
 
