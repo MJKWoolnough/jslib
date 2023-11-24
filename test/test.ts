@@ -9620,7 +9620,7 @@ type Tests = {
 			],
 			"inconsistant characters": [
 				[" -*-", "<p>-*-</p>"],
-				[" -_-", "<p>-_-</p>"],
+				[" -_-", "<p>-_-</p>"]
 			],
 			"not enough characters": [
 				["--", "<p>--</p>"],
@@ -9651,7 +9651,7 @@ type Tests = {
 				["Foo\n   ---\nText After", "<h2>Foo</h2><p>Text After</p>"],
 				["Foo\n    ___", "<p>Foo\n___</p>"],
 				["Foo\n   ___", "<p>Foo</p><hr>"],
-				["Foo\n   ___\nText After", "<p>Foo</p><hr><p>Text After</p>"],
+				["Foo\n   ___\nText After", "<p>Foo</p><hr><p>Text After</p>"]
 			]
 		},
 		"headings": {
@@ -9903,7 +9903,7 @@ type Tests = {
 				["<del>\n*foo*\n</del>", "<del>\n*foo*\n</del>"],
 				["<del>\n\n*foo*\n\n</del>", "<del>\n<p>*foo*</p></del>"],
 				['Foo\n<a href="bar">\nbaz', '<p>Foo\n<a href="bar">\nbaz</a></p>'],
-				['Foo\n<foo>\nbaz\n</foo>\n\nMore Foo\n\nMore Text', '<p>Foo\n<foo>\nbaz\n</foo>\n\nMore Foo</p><p>More Text</p>'],
+				['Foo\n<foo>\nbaz\n</foo>\n\nMore Foo\n\nMore Text', '<p>Foo\n<foo>\nbaz\n</foo>\n\nMore Foo</p><p>More Text</p>']
 			]
 		},
 		"paragraphs": {
