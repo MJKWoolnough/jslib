@@ -21,7 +21,7 @@ class Parser {
 
 	#next() {
 		if (this.#pos === this.#text.length) {
-			return -1;
+			return "";
 		}
 
 		return this.#text.charAt(this.#pos++);
@@ -39,6 +39,59 @@ class Parser {
 		this.#lastPos = this.#pos;
 
 		return str;
+	}
+
+	peek() {
+		const c = this.#next();
+		this.#backup();
+
+		return c;
+	}
+
+	accept(chars: string) {
+		if (!chars.includes(this.#next())) {
+			this.#backup();
+
+			return false;
+		}
+
+		return true;
+	}
+
+	acceptRun(chars: string) {
+		while (true) {
+			const c = this.#next();
+
+			if (!chars.includes(c)) {
+				this.#backup();
+
+				return c;
+			}
+		}
+	}
+
+	except(chars: string) {
+		const c = this.#next();
+
+		if (!c || chars.includes(c)) {
+			this.#backup();
+
+			return false;
+		}
+
+		return true;
+	}
+
+	exceptRun(chars: string) {
+		while (true) {
+			const c = this.#next();
+
+			if (!c || chars.includes(c)) {
+				this.#backup()
+
+				return c;
+			}
+		}
 	}
 }
 
