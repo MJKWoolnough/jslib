@@ -13,7 +13,6 @@ type Tags = {
 }
 
 class Markdown {
-	#refs = new Map<string, [string, string]>();
 	#uid: string;
 	#processed = "";
 	#text: string[] = [];
