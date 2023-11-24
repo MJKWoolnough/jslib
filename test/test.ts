@@ -9913,7 +9913,7 @@ type Tests = {
 				["aaa\nbbb\n\n\nccc\nddd", "<p>aaa\nbbb</p><p>ccc\nddd</p>"],
 				["  aaa\nbbb", "<p>aaa\nbbb</p>"],
 				["aaa\n             bbb\n                                       ccc", "<p>aaa\nbbb\nccc</p>"],
-				["    aaa\nbbb", "<pre><code>aaa\n</code></pre><p>bbb</p>"],
+				["    aaa\nbbb", "<pre><code>aaa\n</code></pre><p>bbb</p>"]
 			]
 		},
 		"block quotes": {
