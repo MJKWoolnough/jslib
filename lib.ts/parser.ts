@@ -124,9 +124,28 @@ class Parser {
 
 class Phraser {
 	#parser: Parser;
+	#fn: ParserFn;
+	#tokens: Token[] = [];
+	#ignoreLast = false;
 
-	constructor(parser: Parser) {
+	constructor(parser: Parser, parserFn: ParserFn) {
 		this.#parser = parser;
+		this.#fn = parserFn;
+	}
+
+	#next() {
+		if (this.#ignoreLast) {
+			this.#ignoreLast = false;
+
+			return this.#tokens.at(-1);
+		}
+
+		const [tk, nextFn] = this.#fn(this.#parser);
+
+		this.#tokens.push(tk);
+		this.#fn = nextFn;
+
+		return tk;
 	}
 }
 
