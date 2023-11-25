@@ -147,6 +147,12 @@ class Phraser {
 
 		return tk;
 	}
+
+	#backup() {
+		if (this.#tokens.length > 0 && !this.#ignoreLast) {
+			this.#ignoreLast = true;
+		}
+	}
 }
 
 export default function* (text: string, parserFn: ParserFn, phraserFn?: PhraserFn) {
