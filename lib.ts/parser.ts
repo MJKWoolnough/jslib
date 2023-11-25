@@ -161,9 +161,7 @@ class Phraser {
 	get() {
 		const toRet = this.#tokens;
 
-		if (this.#ignoreLast) {
-			this.#tokens = toRet.splice(this.#tokens.length - 1, 1);
-		}
+		this.#tokens = toRet.splice(this.#tokens.length - +this.#ignoreLast, 1);
 
 		return toRet;
 	}
