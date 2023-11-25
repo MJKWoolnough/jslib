@@ -153,6 +153,20 @@ class Phraser {
 			this.#ignoreLast = true;
 		}
 	}
+
+	length() {
+		return this.#tokens.length - +this.#ignoreLast;
+	}
+
+	get() {
+		const toRet = this.#tokens;
+
+		if (this.#ignoreLast) {
+			this.#tokens = toRet.splice(this.#tokens.length - 1, 1);
+		}
+
+		return toRet;
+	}
 }
 
 export default function* (text: string, parserFn: ParserFn, phraserFn?: PhraserFn) {
