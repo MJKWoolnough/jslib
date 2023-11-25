@@ -167,6 +167,14 @@ class Phraser {
 
 		return toRet;
 	}
+
+	peek() {
+		const tk = this.#next();
+
+		this.#backup();
+
+		return tk;
+	}
 }
 
 export default function* (text: string, parserFn: ParserFn, phraserFn?: PhraserFn) {
