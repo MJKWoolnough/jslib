@@ -93,6 +93,18 @@ class Parser {
 			}
 		}
 	}
+
+	done() {
+		const done = () => [{type: TokenDone, data: ""}, done];
+
+		return done();
+	}
+
+	error(err = "unknown error") {
+		const error = () => [{type: TokenError, data: err}, error];
+
+		return error();
+	}
 }
 
 export default (text: string, initialParser: ParserFn) => {
