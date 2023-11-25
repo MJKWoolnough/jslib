@@ -107,5 +107,14 @@ class Parser {
 	}
 }
 
-export default (text: string, initialParser: ParserFn) => {
+export default function* (text: string, parserFn: ParserFn) {
+	const parser = new Parser(text);
+
+	while (true) {
+		let [tk, nextParserFn] = parserFn(parser);
+
+		yield tk;
+
+		parserFn = nextParserFn;
+	}
 }
