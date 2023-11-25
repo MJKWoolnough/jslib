@@ -33,6 +33,10 @@ class Parser {
 		}
 	}
 
+	length() {
+		return this.#pos - this.#lastPos;
+	}
+
 	get() {
 		const str = this.#text.slice(this.#lastPos, this.#pos);
 
