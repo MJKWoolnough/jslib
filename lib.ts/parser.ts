@@ -137,7 +137,7 @@ class Phraser {
 		if (this.#ignoreLast) {
 			this.#ignoreLast = false;
 
-			return this.#tokens.at(-1);
+			return this.#tokens.at(-1)!;
 		}
 
 		const [tk, nextFn] = this.#fn(this.#parser);
@@ -174,6 +174,16 @@ class Phraser {
 		this.#backup();
 
 		return tk;
+	}
+
+	accept(...tokenTypes: TokenType[]) {
+		if (!tokenTypes.includes(this.#next().type)) {
+			this.#backup();
+
+			return false;
+		}
+
+		return true;
 	}
 }
 
