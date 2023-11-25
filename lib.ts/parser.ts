@@ -1,14 +1,25 @@
 type TokenType = number;
 
+type PhraseType = number;
+
 export const TokenDone: TokenType = -1,
-TokenError: TokenType = -2;
+TokenError: TokenType = -2,
+PhraseDone: PhraseType = -1,
+PhraseError: PhraseType = -2;
 
 type Token = {
 	type: TokenType;
 	data: string
 }
 
+type Phrase = {
+	type: PhraseType;
+	data: Token[];
+}
+
 type ParserFn = (p: Parser) => [Token, ParserFn];
+
+type PhraserFn = (p: Phraser) => [Phrase, PhraserFn];
 
 class Parser {
 	#text: string;
@@ -111,7 +122,15 @@ class Parser {
 	}
 }
 
-export default function* (text: string, parserFn: ParserFn) {
+class Phraser {
+	#parser: Parser;
+
+	constructor(parser: Parser) {
+		this.#parser = parser;
+	}
+}
+
+export default function* (text: string, parserFn: ParserFn, phraserFn?: PhraserFn) {
 	const parser = new Parser(text);
 
 	while (true) {
