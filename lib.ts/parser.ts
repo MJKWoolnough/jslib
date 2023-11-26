@@ -183,6 +183,18 @@ class Phraser {
 
 		return true;
 	}
+
+	acceptRun(...tokenTypes: TokenType[]) {
+		while (true) {
+			const t = this.#next().type;
+
+			if (!tokenTypes.includes(t)) {
+				this.#backup();
+
+				return t;
+			}
+		}
+	}
 }
 
 export default function* (text: string, parserFn: ParserFn, phraserFn?: PhraserFn) {
