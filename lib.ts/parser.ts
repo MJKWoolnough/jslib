@@ -186,14 +186,26 @@ class Phraser {
 
 	acceptRun(...tokenTypes: TokenType[]) {
 		while (true) {
-			const t = this.#next().type;
+			const tk = this.#next().type;
 
-			if (!tokenTypes.includes(t)) {
+			if (!tokenTypes.includes(tk)) {
 				this.#backup();
 
-				return t;
+				return tk;
 			}
 		}
+	}
+
+	except(...tokenTypes: TokenType[]) {
+		const tk = this.#next().type;
+
+		if (tk < 0 || tokenTypes.includes(tk)) {
+			this.#backup();
+
+			return false;
+		}
+
+		return true;
 	}
 }
 
