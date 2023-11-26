@@ -253,6 +253,12 @@ class Phraser {
 
 		return done();
 	}
+
+	error(err = "unknown error") {
+		const error = () => [{type: PhraseError, data: [{type: TokenError, data: err}]}, error];
+
+		return error();
+	}
 }
 
 export default (function* (text: string | StringParser, parserFn: ParserFn, phraserFn?: PhraserFn) {
