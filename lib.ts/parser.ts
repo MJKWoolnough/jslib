@@ -21,12 +21,19 @@ type ParserFn = (p: Parser) => [Token, ParserFn];
 
 type PhraserFn = (p: Phraser) => [Phrase, PhraserFn];
 
-interface ParserOrPhraser {
-	(text: string, parserFn: ParserFn): Generator<Token>;
-	(text: string, parserFn: ParserFn, phraserFn?: PhraserFn): Generator<Phrase>;
+interface StringParser {
+	next(): string;
+	backup(): void;
+	length(): number;
+	get(): string;
 }
 
-class Parser {
+interface ParserOrPhraser {
+	(text: string | StringParser, parserFn: ParserFn): Generator<Token>;
+	(text: string | StringParser, parserFn: ParserFn, phraserFn?: PhraserFn): Generator<Phrase>;
+}
+
+class StringParser {
 	#text: string;
 	#pos = 0;
 	#lastPos = 0;
@@ -35,7 +42,7 @@ class Parser {
 		this.#text = text;
 	}
 
-	#next() {
+	next() {
 		if (this.#pos === this.#text.length) {
 			return "";
 		}
@@ -43,7 +50,7 @@ class Parser {
 		return this.#text.charAt(this.#pos++);
 	}
 
-	#backup() {
+	backup() {
 		if (this.#pos > this.#lastPos) {
 			this.#pos--;
 		}
@@ -60,17 +67,33 @@ class Parser {
 
 		return str;
 	}
+}
+
+class Parser {
+	#sp: StringParser;
+
+	constructor(sp: StringParser) {
+		this.#sp = sp;
+	}
+
+	length() {
+		return this.#sp.length();
+	}
+
+	get() {
+		return this.#sp.get();
+	}
 
 	peek() {
-		const c = this.#next();
-		this.#backup();
+		const c = this.#sp.next();
+		this.#sp.backup();
 
 		return c;
 	}
 
 	accept(chars: string) {
-		if (!chars.includes(this.#next())) {
-			this.#backup();
+		if (!chars.includes(this.#sp.next())) {
+			this.#sp.backup();
 
 			return false;
 		}
@@ -80,10 +103,10 @@ class Parser {
 
 	acceptRun(chars: string) {
 		while (true) {
-			const c = this.#next();
+			const c = this.#sp.next();
 
 			if (!chars.includes(c)) {
-				this.#backup();
+				this.#sp.backup();
 
 				return c;
 			}
@@ -91,10 +114,10 @@ class Parser {
 	}
 
 	except(chars: string) {
-		const c = this.#next();
+		const c = this.#sp.next();
 
 		if (!c || chars.includes(c)) {
-			this.#backup();
+			this.#sp.backup();
 
 			return false;
 		}
@@ -104,10 +127,10 @@ class Parser {
 
 	exceptRun(chars: string) {
 		while (true) {
-			const c = this.#next();
+			const c = this.#sp.next();
 
 			if (!c || chars.includes(c)) {
-				this.#backup()
+				this.#sp.backup()
 
 				return c;
 			}
@@ -226,8 +249,8 @@ class Phraser {
 	}
 }
 
-export default (function* (text: string, parserFn: ParserFn, phraserFn?: PhraserFn) {
-	const parser = new Parser(text);
+export default (function* (text: string | StringParser, parserFn: ParserFn, phraserFn?: PhraserFn) {
+	const parser = new Parser(typeof text === "string" ? new StringParser(text) : text);
 
 	if (phraserFn) {
 		const phraser = new Phraser(parser, parserFn);
