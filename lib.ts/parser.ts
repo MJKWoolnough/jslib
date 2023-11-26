@@ -217,7 +217,7 @@ class Phraser {
 		while (true) {
 			const tk = this.#next().type;
 
-			if (!tk || tokenTypes.includes(tk)) {
+			if (tk < 0 || tokenTypes.includes(tk)) {
 				this.#backup()
 
 				return tk;
