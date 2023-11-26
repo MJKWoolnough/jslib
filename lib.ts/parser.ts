@@ -247,6 +247,12 @@ class Phraser {
 			}
 		}
 	}
+
+	done() {
+		const done = () => [{type: PhraseDone, data: []}, done];
+
+		return done();
+	}
 }
 
 export default (function* (text: string | StringParser, parserFn: ParserFn, phraserFn?: PhraserFn) {
