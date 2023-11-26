@@ -21,6 +21,11 @@ type ParserFn = (p: Parser) => [Token, ParserFn];
 
 type PhraserFn = (p: Phraser) => [Phrase, PhraserFn];
 
+interface ParserOrPhraser {
+	(text: string, parserFn: ParserFn): Generator<Token>;
+	(text: string, parserFn: ParserFn, phraserFn?: PhraserFn): Generator<Phrase>;
+}
+
 class Parser {
 	#text: string;
 	#pos = 0;
@@ -221,7 +226,7 @@ class Phraser {
 	}
 }
 
-export default function* (text: string, parserFn: ParserFn, phraserFn?: PhraserFn) {
+export default (function* (text: string, parserFn: ParserFn, phraserFn?: PhraserFn) {
 	const parser = new Parser(text);
 
 	if (phraserFn) {
@@ -235,4 +240,4 @@ export default function* (text: string, parserFn: ParserFn, phraserFn?: PhraserF
 	for (let [token, nextParserFn] = parserFn(parser); ; parserFn = nextParserFn) {
 		yield token;
 	}
-}
+} as ParserOrPhraser);
