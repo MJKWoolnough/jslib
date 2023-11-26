@@ -188,11 +188,15 @@ class Phraser {
 export default function* (text: string, parserFn: ParserFn, phraserFn?: PhraserFn) {
 	const parser = new Parser(text);
 
-	while (true) {
-		let [tk, nextParserFn] = parserFn(parser);
+	if (phraserFn) {
+		const phraser = new Phraser(parser, parserFn);
 
-		yield tk;
+		for (let [phrase, nextPhraserFn] = phraserFn(phraser); ; phraserFn = nextPhraserFn) {
+			yield phrase;
+		}
+	}
 
-		parserFn = nextParserFn;
+	for (let [token, nextParserFn] = parserFn(parser); ; parserFn = nextParserFn) {
+		yield token;
 	}
 }
