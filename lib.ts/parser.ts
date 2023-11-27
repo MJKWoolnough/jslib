@@ -126,7 +126,7 @@ export class Parser {
 			const c = this.#sp.next();
 
 			if (!c || chars.includes(c)) {
-				this.#sp.backup()
+				this.#sp.backup();
 
 				return c;
 			}
@@ -237,7 +237,7 @@ export class Phraser {
 			const tk = this.#next().type;
 
 			if (tk < 0 || tokenTypes.includes(tk)) {
-				this.#backup()
+				this.#backup();
 
 				return tk;
 			}
