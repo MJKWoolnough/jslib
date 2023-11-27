@@ -137,8 +137,8 @@ class Parser {
 		}
 	}
 
-	done() {
-		const done = () => [{type: TokenDone, data: ""}, done];
+	done(msg = "") {
+		const done = () => [{type: TokenDone, data: msg}, done];
 
 		return done();
 	}
