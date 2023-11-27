@@ -1,25 +1,25 @@
-type TokenType = number;
+export type TokenType = number;
 
-type PhraseType = number;
+export type PhraseType = number;
 
 export const TokenDone: TokenType = -1,
 TokenError: TokenType = -2,
 PhraseDone: PhraseType = -1,
 PhraseError: PhraseType = -2;
 
-type Token = {
+export type Token = {
 	type: TokenType;
 	data: string
 }
 
-type Phrase = {
+export type Phrase = {
 	type: PhraseType;
 	data: Token[];
 }
 
-type ParserFn = (p: Parser) => [Token, ParserFn];
+export type ParserFn = (p: Parser) => [Token, ParserFn];
 
-type PhraserFn = (p: Phraser) => [Phrase, PhraserFn];
+export type PhraserFn = (p: Phraser) => [Phrase, PhraserFn];
 
 interface StringParser {
 	next(): string;
@@ -69,7 +69,7 @@ class StringParser {
 	}
 }
 
-class Parser {
+export class Parser {
 	#sp: StringParser;
 
 	constructor(sp: StringParser) {
@@ -150,7 +150,7 @@ class Parser {
 	}
 }
 
-class Phraser {
+export class Phraser {
 	#parser: Parser;
 	#fn: ParserFn;
 	#tokens: Token[] = [];
