@@ -248,7 +248,7 @@ class Phraser {
 		}
 	}
 
-	done(msg: string) {
+	done(msg = "") {
 		const done = () => [{type: PhraseDone, data: msg ? [{type: TokenDone, data: msg}] : []}, done];
 
 		return done();
