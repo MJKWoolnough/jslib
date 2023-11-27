@@ -33,7 +33,7 @@ interface ParserOrPhraser {
 	(text: string | StringParser, parserFn: ParserFn, phraserFn?: PhraserFn): Generator<Phrase>;
 }
 
-class StringParser {
+class StrParser {
 	#text: string;
 	#pos = 0;
 	#lastPos = 0;
@@ -262,7 +262,7 @@ export class Phraser {
 }
 
 export default (function* (text: string | StringParser, parserFn: ParserFn, phraserFn?: PhraserFn) {
-	const parser = new Parser(typeof text === "string" ? new StringParser(text) : text);
+	const parser = new Parser(typeof text === "string" ? new StrParser(text) : text);
 
 	if (phraserFn) {
 		const phraser = new Phraser(parser, parserFn);
