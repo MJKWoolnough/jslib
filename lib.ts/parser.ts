@@ -263,7 +263,11 @@ export default (function* (text: string | StringParser, parserFn: ParserFn, phra
 
 	let fn = phraserFn ?? parserFn;
 
-	for (let [token, nextFn] = fn(p as any); ; fn = nextFn) {
-		yield token;
+	while(true) {
+		const [t, nextFn] = fn(p as any)
+
+		yield t;
+
+		fn = nextFn;
 	}
 } as ParserOrPhraser);
