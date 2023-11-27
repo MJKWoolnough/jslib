@@ -61,11 +61,7 @@ class StrParser {
 	}
 
 	get() {
-		const str = this.#text.slice(this.#lastPos, this.#pos);
-
-		this.#lastPos = this.#pos;
-
-		return str;
+		return this.#text.slice(this.#lastPos, this.#lastPos = this.#pos);
 	}
 }
 
