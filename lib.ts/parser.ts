@@ -138,13 +138,13 @@ export class Parser {
 	}
 
 	done(msg = "") {
-		const done = () => [{type: TokenDone, data: msg}, done];
+		const done = () => [{"type": TokenDone, "data": msg}, done];
 
 		return done();
 	}
 
 	error(err = "unknown error") {
-		const error = () => [{type: TokenError, data: err}, error];
+		const error = () => [{"type": TokenError, "data": err}, error];
 
 		return error();
 	}
@@ -249,13 +249,13 @@ export class Phraser {
 	}
 
 	done(msg = "") {
-		const done = () => [{type: PhraseDone, data: msg ? [{type: TokenDone, data: msg}] : []}, done];
+		const done = () => [{"type": PhraseDone, "data": msg ? [{"type": TokenDone, "data": msg}] : []}, done];
 
 		return done();
 	}
 
 	error(err = "unknown error") {
-		const error = () => [{type: PhraseError, data: [{type: TokenError, data: err}]}, error];
+		const error = () => [{"type": PhraseError, "data": [{"type": TokenError, "data": err}]}, error];
 
 		return error();
 	}
