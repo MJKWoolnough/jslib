@@ -258,17 +258,12 @@ export class Phraser {
 }
 
 export default (function* (text: string | StringParser, parserFn: ParserFn, phraserFn?: PhraserFn) {
-	const parser = new Parser(typeof text === "string" ? new StrParser(text) : text);
+	const parser = new Parser(typeof text === "string" ? new StrParser(text) : text),
+	      p = phraserFn ? new Phraser(parser, parserFn) : parser;
 
-	if (phraserFn) {
-		const phraser = new Phraser(parser, parserFn);
+	let fn = phraserFn ?? parserFn;
 
-		for (let [phrase, nextPhraserFn] = phraserFn(phraser); ; phraserFn = nextPhraserFn) {
-			yield phrase;
-		}
-	}
-
-	for (let [token, nextParserFn] = parserFn(parser); ; parserFn = nextParserFn) {
+	for (let [token, nextFn] = fn(p as any); ; fn = nextFn) {
 		yield token;
 	}
 } as ParserOrPhraser);
