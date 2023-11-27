@@ -30,7 +30,7 @@ interface StringParser {
 
 interface ParserOrPhraser {
 	(text: string | StringParser, parserFn: ParserFn): Generator<Token>;
-	(text: string | StringParser, parserFn: ParserFn, phraserFn?: PhraserFn): Generator<Phrase>;
+	(text: string | StringParser, parserFn: ParserFn, phraserFn: PhraserFn): Generator<Phrase>;
 }
 
 class StrParser {
