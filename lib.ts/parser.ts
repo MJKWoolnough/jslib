@@ -65,7 +65,7 @@ class StrParser {
 	}
 }
 
-export class Tokeniser {
+export class CTokeniser {
 	#sp: StringParser;
 
 	constructor(sp: StringParser) {
@@ -146,13 +146,15 @@ export class Tokeniser {
 	}
 }
 
-export class Phraser {
-	#parser: Tokeniser;
+export type Tokeniser = CTokeniser;
+
+export class CPhraser {
+	#parser: CTokeniser;
 	#fn: TokenFn;
 	#tokens: Token[] = [];
 	#ignoreLast = false;
 
-	constructor(parser: Tokeniser, parserFn: TokenFn) {
+	constructor(parser: CTokeniser, parserFn: TokenFn) {
 		this.#parser = parser;
 		this.#fn = parserFn;
 	}
@@ -257,9 +259,11 @@ export class Phraser {
 	}
 }
 
+export type Phraser = CPhraser;
+
 export default (function* (text: string | StringParser, parserFn: TokenFn, phraserFn?: PhraserFn) {
-	const parser = new Tokeniser(typeof text === "string" ? new StrParser(text) : text),
-	      p = phraserFn ? new Phraser(parser, parserFn) : parser;
+	const parser = new CTokeniser(typeof text === "string" ? new StrParser(text) : text),
+	      p = phraserFn ? new CPhraser(parser, parserFn) : parser;
 
 	let fn = phraserFn ?? parserFn;
 
