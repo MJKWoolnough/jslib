@@ -101,6 +101,10 @@ export class CTokeniser {
 		while (true) {
 			const c = this.#sp.next();
 
+			if (!c) {
+				return "";
+			}
+
 			if (!chars.includes(c)) {
 				this.#sp.backup();
 
