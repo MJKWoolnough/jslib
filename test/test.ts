@@ -9607,7 +9607,24 @@ type Tests = {
 					      }).next().value;
 
 					return tk.type === 2 && tk.data === "c";
-				}
+				},
+				"abc???": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abc", p => {
+						p.accept("a");
+						p.accept("b");
+						p.accept("c");
+						p.accept("a");
+						p.accept("b");
+						p.accept("c");
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "abc";
+				},
 			},
 			"acceptRun": {
 				"aabbbcccc": async () => {
