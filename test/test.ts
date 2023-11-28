@@ -9608,6 +9608,36 @@ type Tests = {
 
 					return tk.type === 2 && tk.data === "c";
 				}
+			},
+			"acceptRun": {
+				"aabbbcccc": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("aabbbcccc", p => {
+						p.acceptRun("a");
+						p.acceptRun("b");
+						p.acceptRun("d");
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "aabbb";
+				},
+				"ccccccaaaabbbbbbb": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("ccccccaaaabbbbbbb", p => {
+						p.acceptRun("a");
+						p.acceptRun("b");
+						p.acceptRun("c");
+						return [{
+							"type": 2,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 2 && tk.data === "cccccc";
+				}
 			}
 		}
 	},
