@@ -29,8 +29,8 @@ interface StringParser {
 }
 
 interface ParserOrPhraser {
-	(text: string | StringParser, parserFn: TokenFn): Generator<Token>;
-	(text: string | StringParser, parserFn: TokenFn, phraserFn: PhraserFn): Generator<Phrase>;
+	(text: string | StringParser, parserFn: TokenFn): Generator<Token, Token>;
+	(text: string | StringParser, parserFn: TokenFn, phraserFn: PhraserFn): Generator<Phrase, Phrase>;
 }
 
 class StrParser {
