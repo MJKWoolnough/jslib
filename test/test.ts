@@ -9578,6 +9578,36 @@ type Tests = {
 
 					return peeked && tk.type === TokenDone && tk.data === "";
 				}
+			},
+			"accept": {
+				"abc": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abc", p => {
+						p.accept("a");
+						p.accept("b");
+						p.accept("d");
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "ab";
+				},
+				"cab": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("cab", p => {
+						p.accept("a");
+						p.accept("b");
+						p.accept("c");
+						return [{
+							"type": 2,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 2 && tk.data === "c";
+				}
 			}
 		}
 	},
