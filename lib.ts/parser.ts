@@ -17,7 +17,7 @@ export type Phrase = {
 	data: Token[];
 }
 
-export type ParserFn = (p: Parser) => [Token, ParserFn];
+export type TokenFn = (p: Tokeniser) => [Token, TokenFn];
 
 export type PhraserFn = (p: Phraser) => [Phrase, PhraserFn];
 
@@ -29,8 +29,8 @@ interface StringParser {
 }
 
 interface ParserOrPhraser {
-	(text: string | StringParser, parserFn: ParserFn): Generator<Token>;
-	(text: string | StringParser, parserFn: ParserFn, phraserFn: PhraserFn): Generator<Phrase>;
+	(text: string | StringParser, parserFn: TokenFn): Generator<Token>;
+	(text: string | StringParser, parserFn: TokenFn, phraserFn: PhraserFn): Generator<Phrase>;
 }
 
 class StrParser {
@@ -65,7 +65,7 @@ class StrParser {
 	}
 }
 
-export class Parser {
+export class Tokeniser {
 	#sp: StringParser;
 
 	constructor(sp: StringParser) {
@@ -147,12 +147,12 @@ export class Parser {
 }
 
 export class Phraser {
-	#parser: Parser;
-	#fn: ParserFn;
+	#parser: Tokeniser;
+	#fn: TokenFn;
 	#tokens: Token[] = [];
 	#ignoreLast = false;
 
-	constructor(parser: Parser, parserFn: ParserFn) {
+	constructor(parser: Tokeniser, parserFn: TokenFn) {
 		this.#parser = parser;
 		this.#fn = parserFn;
 	}
@@ -257,8 +257,8 @@ export class Phraser {
 	}
 }
 
-export default (function* (text: string | StringParser, parserFn: ParserFn, phraserFn?: PhraserFn) {
-	const parser = new Parser(typeof text === "string" ? new StrParser(text) : text),
+export default (function* (text: string | StringParser, parserFn: TokenFn, phraserFn?: PhraserFn) {
+	const parser = new Tokeniser(typeof text === "string" ? new StrParser(text) : text),
 	      p = phraserFn ? new Phraser(parser, parserFn) : parser;
 
 	let fn = phraserFn ?? parserFn;
