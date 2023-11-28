@@ -9566,6 +9566,17 @@ type Tests = {
 					}).next()
 
 					return peeked;
+				},
+				"cab": async () => {
+					let peeked = false;
+
+					const {default: parser, TokenDone} = await import("./lib/parser.js"),
+					      tk = parser("cab", p => {
+						peeked = p.peek() === "c";
+						return p.done();
+					      }).next().value;
+
+					return peeked && tk.type === TokenDone && tk.data === "";
 				}
 			}
 		}
