@@ -134,13 +134,13 @@ export class CTokeniser {
 	}
 
 	done(msg = "") {
-		const done = () => [{"type": TokenDone, "data": msg}, done];
+		const done: () => [Token, TokenFn] = () => [{"type": TokenDone, "data": msg}, done];
 
 		return done();
 	}
 
 	error(err = "unknown error") {
-		const error = () => [{"type": TokenError, "data": err}, error];
+		const error: () => [Token, TokenFn] = () => [{"type": TokenError, "data": err}, error];
 
 		return error();
 	}
