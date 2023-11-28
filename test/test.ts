@@ -9552,6 +9552,24 @@ type Tests = {
 			}
 		}
 	},
+	"parser": {
+		"tokeniser": {
+			"peek": {
+				"abc": async () => {
+					const {default: parser} = await import("./lib/parser.js");
+
+					let peeked = false;
+
+					parser("abc", p => {
+						peeked = p.peek() === "a";
+						return p.done();
+					}).next()
+
+					return peeked;
+				}
+			}
+		}
+	},
 	"markdown": Object.entries({
 		"thematic breaks": {
 			"dashes": [
