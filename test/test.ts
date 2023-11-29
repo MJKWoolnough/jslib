@@ -9716,7 +9716,53 @@ type Tests = {
 					      }).next().value;
 
 					return tk.type === 1 && tk.data === "ab";
+				}
+			},
+			"exceptRun": {
+				"aabbbcccc": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("aabbbcccc", p => {
+						p.exceptRun("a");
+						p.exceptRun("b");
+						p.exceptRun("cd");
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "aabbb";
 				},
+				"ccccccaaaabbbbbbb": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("ccccccaaaabbbbbbb", p => {
+						p.exceptRun("a");
+						p.exceptRun("b");
+						p.exceptRun("c");
+						return [{
+							"type": 2,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 2 && tk.data === "ccccccaaaabbbbbbb";
+				},
+				"aabbbcccc???": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("aabbbcccc", p => {
+						p.exceptRun("a");
+						p.exceptRun("b");
+						p.exceptRun("c");
+						p.exceptRun("d");
+						p.exceptRun("e");
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "aabbbcccc";
+				}
 			}
 		}
 	},
