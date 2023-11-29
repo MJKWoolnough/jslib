@@ -9783,6 +9783,22 @@ type Tests = {
 				      b = JSON.stringify(tk.next().value);
 
 				return a === `{"type":-2,"data":"myErr"}` && a === b;
+			},
+			"multi fn": async () => {
+				const {default: parser} = await import("./lib/parser.js"),
+				      tk = parser("12345abcde", p => {
+					p.exceptRun("abcde");
+					return [{"type": 1, "data": p.get()}, p => {
+						p.acceptRun("abcde");
+
+						return [{"type": 2, "data": p.get()}, () => p.done()];
+					}];
+				      }),
+				      a = JSON.stringify(tk.next().value),
+				      b = JSON.stringify(tk.next().value),
+				      c = JSON.stringify(tk.next().value);
+
+				return a === `{"type":1,"data":"12345"}` && b === `{"type":2,"data":"abcde"}` && c === `{"type":-1,"data":""}`;
 			}
 		}
 	},
