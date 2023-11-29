@@ -9671,6 +9671,39 @@ type Tests = {
 					return tk.type === 1 && tk.data === "aabbbcccc";
 				}
 			},
+			"length": {
+				"simple": async () => {
+					let l = 0;
+
+					const {default: parser} = await import("./lib/parser.js");
+
+					parser("12345abcde", p => {
+						p.accept("123");
+						p.accept("123");
+						p.accept("123");
+						p.accept("123");
+						l = p.length();
+
+						return p.done();
+					}).next();
+
+					return l === 3
+				},
+				"run": async () => {
+					let l = 0;
+
+					const {default: parser} = await import("./lib/parser.js");
+
+					parser("12345abcde", p => {
+						p.exceptRun("abcde");
+						l = p.length();
+
+						return p.done();
+					}).next();
+
+					return l === 5
+				}
+			},
 			"except": {
 				"abc": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
