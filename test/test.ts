@@ -9773,6 +9773,16 @@ type Tests = {
 				      b = JSON.stringify(tk.next().value);
 
 				return a === `{"type":-1,"data":"myMsg"}` && a === b;
+			},
+			"error": async () => {
+				const {default: parser} = await import("./lib/parser.js"),
+				      tk = parser("", p => {
+					return p.error("myErr");
+				      }),
+				      a = JSON.stringify(tk.next().value),
+				      b = JSON.stringify(tk.next().value);
+
+				return a === `{"type":-2,"data":"myErr"}` && a === b;
 			}
 		}
 	},
