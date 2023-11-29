@@ -9670,6 +9670,53 @@ type Tests = {
 
 					return tk.type === 1 && tk.data === "aabbbcccc";
 				}
+			},
+			"except": {
+				"abc": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abc", p => {
+						p.except("a");
+						p.except("b");
+						p.except("d");
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "ab";
+				},
+				"cab": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("cab", p => {
+						p.except("a");
+						p.except("b");
+						p.except("c");
+						return [{
+							"type": 2,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 2 && tk.data === "cab";
+				},
+				"abc???": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abc", p => {
+						p.except("a");
+						p.except("b");
+						p.except("c");
+						p.except("a");
+						p.except("b");
+						p.except("c");
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "ab";
+				},
 			}
 		}
 	},
