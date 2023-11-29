@@ -269,6 +269,34 @@ export class CPhraser {
 
 export type Phraser = CPhraser;
 
+export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, T>): Generator<T, T> {
+	const pos = {
+		"pos": 0,
+		"line": 0,
+		"linePos": 0
+	      };
+
+	for (const t of p) {
+		for (const tk of t.data instanceof Array ? t.data : [t]) {
+			Object.assign(tk, pos);
+
+			for (const c of t.data) {
+				pos.pos++;
+				pos.linePos++;
+
+				if (c === "\n") {
+					pos.line++;
+					pos.linePos = 0;
+				}
+			}
+		}
+
+		yield t;
+	}
+
+	return null as any as T;
+}
+
 export default (function* (text: string | StringParser, parserFn: TokenFn, phraserFn?: PhraserFn) {
 	const parser = new CTokeniser(typeof text === "string" ? new StrParser(text) : text),
 	      p = phraserFn ? new CPhraser(parser, parserFn) : parser;
