@@ -9866,6 +9866,24 @@ type Tests = {
 
 				return a === `{"type":1,"data":"12345"}` && b === `{"type":2,"data":"abcde"}` && c === `{"type":-1,"data":""}`;
 			}
+		},
+		"phraser": {
+			"peek": async () => {
+				const {default: parser} = await import("./lib/parser.js");
+
+				let peeked = false;
+
+				parser("12345abcde", p => {
+					p.accept("12345");
+					return [{"type": 1, "data": p.get()}, () => p.done()];
+				      }, p => {
+					peeked = JSON.stringify(p.peek()) === `{"type":1,"data":"1"}`;
+
+					return p.done();
+				      }).next();
+
+				return peeked;
+			}
 		}
 	},
 	"markdown": Object.entries({
