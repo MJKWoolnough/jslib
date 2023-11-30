@@ -9927,6 +9927,31 @@ type Tests = {
 					      }).next().value;
 
 					return JSON.stringify(p) === `{"type":3,"data":[{"type":1,"data":"12345"},{"type":2,"data":"abcde"}]}`;
+				},
+				"abcde12345": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("abcde12345", p => {
+						p.acceptRun("12345");
+
+						if (p.length()) {
+							return [{"type": 1, "data": p.get()}, p => {
+								p.acceptRun("abcde");
+
+								return [{"type": 2, "data": p.get()}, () => p.done()];
+							}];
+						}
+
+						p.acceptRun("abcde");
+
+						return [{"type": 2, "data": p.get()}, () => p.done()];
+					      }, p => {
+						p.accept(1);
+						p.accept(2);
+
+						return [{"type": 3, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":3,"data":[{"type":2,"data":"abcde"}]}`;
 				}
 			}
 		}
