@@ -9979,7 +9979,7 @@ type Tests = {
 
 					return JSON.stringify(p) === `{"type":3,"data":[{"type":1,"data":"12345"}]}`;
 				},
-				"12345": async () => {
+				"123": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
 					      p = parser("", p => {
 						return [{"type": 1, "data":"1"}, () => {
@@ -9996,6 +9996,24 @@ type Tests = {
 					      }).next().value;
 
 					return JSON.stringify(p) === `{"type":1,"data":[{"type":1,"data":"1"},{"type":1,"data":"2"},{"type":2,"data":"3"}]}`;
+				},
+				"123??": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => {
+						return [{"type": 1, "data":"1"}, () => {
+							return [{"type": 1, "data":"2"}, () => {
+								return [{"type": 2, "data":"3"}, () => {
+									return [{"type": 2, "data":"3"}, () => p.done()];
+								}];
+							}];
+						}];
+					      }, p => {
+						p.acceptRun(1, 2);
+
+						return [{"type": 1, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":1,"data":[{"type":1,"data":"1"},{"type":1,"data":"2"},{"type":2,"data":"3"},{"type":2,"data":"3"}]}`;
 				}
 			}
 		}
