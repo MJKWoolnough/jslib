@@ -9868,21 +9868,39 @@ type Tests = {
 			}
 		},
 		"phraser": {
-			"peek": async () => {
-				const {default: parser} = await import("./lib/parser.js");
+			"peek": {
+				"12345abcde": async () => {
+					const {default: parser} = await import("./lib/parser.js");
 
-				let peeked = false;
+					let peeked = false;
 
-				parser("12345abcde", p => {
-					p.accept("12345");
-					return [{"type": 1, "data": p.get()}, () => p.done()];
-				      }, p => {
-					peeked = JSON.stringify(p.peek()) === `{"type":1,"data":"1"}`;
+					parser("12345abcde", p => {
+						p.accept("12345");
+						return [{"type": 1, "data": p.get()}, () => p.done()];
+					      }, p => {
+						peeked = JSON.stringify(p.peek()) === `{"type":1,"data":"1"}`;
 
-					return p.done();
-				      }).next();
+						return p.done();
+					      }).next();
 
-				return peeked;
+					return peeked;
+				},
+				"abcde12345": async () => {
+					const {default: parser} = await import("./lib/parser.js");
+
+					let peeked = false;
+
+					parser("abcde12345", p => {
+						p.accept("12345");
+						return [{"type": 1, "data": p.get()}, () => p.done()];
+					      }, p => {
+						peeked = JSON.stringify(p.peek()) === `{"type":1,"data":""}`;
+
+						return p.done();
+					      }).next();
+
+					return peeked;
+				}
 			}
 		}
 	},
