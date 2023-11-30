@@ -9901,6 +9901,33 @@ type Tests = {
 
 					return peeked;
 				}
+			},
+			"accept": {
+				"12345abcde": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("12345abcde", p => {
+						p.acceptRun("12345");
+
+						if (p.length()) {
+							return [{"type": 1, "data": p.get()}, p => {
+								p.acceptRun("abcde");
+
+								return [{"type": 2, "data": p.get()}, () => p.done()];
+							}];
+						}
+
+						p.acceptRun("abcde");
+
+						return [{"type": 2, "data": p.get()}, () => p.done()];
+					      }, p => {
+						p.accept(1);
+						p.accept(2);
+
+						return [{"type": 3, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":3,"data":[{"type":1,"data":"12345"},{"type":2,"data":"abcde"}]}`;
+				}
 			}
 		}
 	},
