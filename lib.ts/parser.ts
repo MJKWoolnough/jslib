@@ -255,13 +255,13 @@ export class CPhraser {
 	}
 
 	done(msg = "") {
-		const done = () => [{"type": PhraseDone, "data": msg ? [{"type": TokenDone, "data": msg}] : []}, done];
+		const done: () => [Phrase, PhraserFn] = () => [{"type": PhraseDone, "data": msg ? [{"type": TokenDone, "data": msg}] : []}, done];
 
 		return done();
 	}
 
 	error(err = "unknown error") {
-		const error = () => [{"type": PhraseError, "data": [{"type": TokenError, "data": err}]}, error];
+		const error: () => [Phrase, PhraserFn] = () => [{"type": PhraseError, "data": [{"type": TokenError, "data": err}]}, error];
 
 		return error();
 	}
