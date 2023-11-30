@@ -10015,6 +10015,31 @@ type Tests = {
 
 					return JSON.stringify(p) === `{"type":1,"data":[{"type":1,"data":"1"},{"type":1,"data":"2"},{"type":2,"data":"3"},{"type":2,"data":"3"}]}`;
 				}
+			},
+			"length": {
+				"simple": async () => {
+					let length = 0;
+
+					const {default: parser} = await import("./lib/parser.js");
+
+					parser("", p => {
+						return [{"type": 1, "data":"1"}, () => {
+							return [{"type": 1, "data":"2"}, () => {
+								return [{"type": 2, "data":"3"}, () => {
+									return [{"type": 3, "data":"3"}, () => p.done()];
+								}];
+							}];
+						}];
+					}, p => {
+						p.acceptRun(1, 2);
+
+						length = p.length();
+
+						return p.done();
+					}).next().value;
+
+					return length === 3;
+				}
 			}
 		}
 	},
