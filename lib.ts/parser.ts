@@ -269,7 +269,13 @@ export class CPhraser {
 
 export type Phraser = CPhraser;
 
-export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, T>): Generator<T, T> {
+type Nums = {
+	pos: number;
+	line: number;
+	linePos: number;
+}
+
+export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, T>): Generator<T extends Token ? Token & Nums : Phrase & {data: (Token & Nums)[]}, T> {
 	const pos = {
 		"pos": 0,
 		"line": 0,
@@ -291,7 +297,7 @@ export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, 
 			}
 		}
 
-		yield t;
+		yield t as any;
 	}
 
 	return null as any as T;
