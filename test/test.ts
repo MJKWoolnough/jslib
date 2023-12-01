@@ -9965,6 +9965,26 @@ type Tests = {
 					const {default: parser} = await import("./lib/parser.js");
 
 					parser("", p => [{"type": 1, "data":"1"}, () => [{"type": 1, "data":"2"}, () => [{"type": 2, "data":"3"}, () => [{"type": 3, "data":"3"}, () => p.done()]]]], p => {
+						p.accept(1, 2);
+						p.accept(1, 2);
+						p.accept(1, 2);
+						p.accept(1, 2);
+						p.accept(1, 2);
+						p.accept(1, 2);
+
+						length = p.length();
+
+						return p.done();
+					}).next().value;
+
+					return length === 3;
+				},
+				"run": async () => {
+					let length = 0;
+
+					const {default: parser} = await import("./lib/parser.js");
+
+					parser("", p => [{"type": 1, "data":"1"}, () => [{"type": 1, "data":"2"}, () => [{"type": 2, "data":"3"}, () => [{"type": 3, "data":"3"}, () => p.done()]]]], p => {
 						p.acceptRun(1, 2);
 
 						length = p.length();
