@@ -9905,21 +9905,7 @@ type Tests = {
 			"accept": {
 				"12345abcde": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
-					      p = parser("12345abcde", p => {
-						p.acceptRun("12345");
-
-						if (p.length()) {
-							return [{"type": 1, "data": p.get()}, p => {
-								p.acceptRun("abcde");
-
-								return [{"type": 2, "data": p.get()}, () => p.done()];
-							}];
-						}
-
-						p.acceptRun("abcde");
-
-						return [{"type": 2, "data": p.get()}, () => p.done()];
-					      }, p => {
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => [{"type": 2, "data": "abcde"}, () => p.done()]], p => {
 						p.accept(1);
 						p.accept(2);
 
@@ -9930,21 +9916,7 @@ type Tests = {
 				},
 				"abcde12345": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
-					      p = parser("abcde12345", p => {
-						p.acceptRun("12345");
-
-						if (p.length()) {
-							return [{"type": 1, "data": p.get()}, p => {
-								p.acceptRun("abcde");
-
-								return [{"type": 2, "data": p.get()}, () => p.done()];
-							}];
-						}
-
-						p.acceptRun("abcde");
-
-						return [{"type": 2, "data": p.get()}, () => p.done()];
-					      }, p => {
+					      p = parser("", p => [{"type": 2, "data": "abcde"}, () => p.done()], p => {
 						p.accept(1);
 						p.accept(2);
 
@@ -9957,21 +9929,7 @@ type Tests = {
 			"acceptRun": {
 				"12345abcde": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
-					      p = parser("12345abcde", p => {
-						p.acceptRun("12345");
-
-						if (p.length()) {
-							return [{"type": 1, "data": p.get()}, p => {
-								p.acceptRun("abcde");
-
-								return [{"type": 2, "data": p.get()}, () => p.done()];
-							}];
-						}
-
-						p.acceptRun("abcde");
-
-						return [{"type": 2, "data": p.get()}, () => p.done()];
-					      }, p => {
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => p.done()], p => {
 						p.acceptRun(1);
 
 						return [{"type": 3, "data": p.get()}, () => p.done()];
@@ -9981,15 +9939,7 @@ type Tests = {
 				},
 				"123": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
-					      p = parser("", p => {
-						return [{"type": 1, "data":"1"}, () => {
-							return [{"type": 1, "data":"2"}, () => {
-								return [{"type": 2, "data":"3"}, () => {
-									return [{"type": 3, "data":"3"}, () => p.done()];
-								}];
-							}];
-						}];
-					      }, p => {
+					      p = parser("", p => [{"type": 1, "data":"1"}, () => [{"type": 1, "data":"2"}, () => [{"type": 2, "data":"3"}, () => [{"type": 3, "data":"3"}, () => p.done()]]]], p => {
 						p.acceptRun(1, 2);
 
 						return [{"type": 1, "data": p.get()}, () => p.done()];
@@ -9999,15 +9949,7 @@ type Tests = {
 				},
 				"123??": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
-					      p = parser("", p => {
-						return [{"type": 1, "data":"1"}, () => {
-							return [{"type": 1, "data":"2"}, () => {
-								return [{"type": 2, "data":"3"}, () => {
-									return [{"type": 2, "data":"3"}, () => p.done()];
-								}];
-							}];
-						}];
-					      }, p => {
+					      p = parser("", p => [{"type": 1, "data":"1"}, () => [{"type": 1, "data":"2"}, () => [{"type": 2, "data":"3"}, () => [{"type": 2, "data":"3"}, () => p.done()]]]], p => {
 						p.acceptRun(1, 2);
 
 						return [{"type": 1, "data": p.get()}, () => p.done()];
@@ -10022,15 +9964,7 @@ type Tests = {
 
 					const {default: parser} = await import("./lib/parser.js");
 
-					parser("", p => {
-						return [{"type": 1, "data":"1"}, () => {
-							return [{"type": 1, "data":"2"}, () => {
-								return [{"type": 2, "data":"3"}, () => {
-									return [{"type": 3, "data":"3"}, () => p.done()];
-								}];
-							}];
-						}];
-					}, p => {
+					parser("", p => [{"type": 1, "data":"1"}, () => [{"type": 1, "data":"2"}, () => [{"type": 2, "data":"3"}, () => [{"type": 3, "data":"3"}, () => p.done()]]]], p => {
 						p.acceptRun(1, 2);
 
 						length = p.length();
