@@ -9830,15 +9830,27 @@ type Tests = {
 					return tk.type === 1 && tk.data === "aabbbcccc";
 				}
 			},
-			"done": async () => {
-				const {default: parser} = await import("./lib/parser.js"),
-				      tk = parser("", p => {
-					return p.done("myMsg");
-				      }),
-				      a = JSON.stringify(tk.next().value),
-				      b = JSON.stringify(tk.next().value);
+			"done": {
+				"empty": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("", p => {
+						return p.done();
+					      }),
+					      a = JSON.stringify(tk.next().value),
+					      b = JSON.stringify(tk.next().value);
 
-				return a === `{"type":-1,"data":"myMsg"}` && a === b;
+					return a === `{"type":-1,"data":""}` && a === b;
+				},
+				"msg": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("", p => {
+						return p.done("myMsg");
+					      }),
+					      a = JSON.stringify(tk.next().value),
+					      b = JSON.stringify(tk.next().value);
+
+					return a === `{"type":-1,"data":"myMsg"}` && a === b;
+				},
 			},
 			"error": async () => {
 				const {default: parser} = await import("./lib/parser.js"),
