@@ -9994,7 +9994,53 @@ type Tests = {
 
 					return length === 3;
 				}
-			}
+			},
+			"except": {
+				"12345abcde 1,1": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => [{"type": 2, "data": "abcde"}, () => p.done()]], p => {
+						p.except(1);
+						p.except(1);
+
+						return [{"type": 3, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":3,"data":[]}`;
+				},
+				"12345abcde 1,2": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => [{"type": 2, "data": "abcde"}, () => p.done()]], p => {
+						p.except(1);
+						p.except(2);
+
+						return [{"type": 3, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":3,"data":[{"type":1,"data":"12345"}]}`;
+				},
+				"12345abcde 2,2": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => [{"type": 2, "data": "abcde"}, () => p.done()]], p => {
+						p.except(2);
+						p.except(2);
+
+						return [{"type": 3, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":3,"data":[{"type":1,"data":"12345"}]}`;
+				},
+				"12345abcde 2,1": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => [{"type": 2, "data": "abcde"}, () => p.done()]], p => {
+						p.except(2);
+						p.except(1);
+
+						return [{"type": 3, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":3,"data":[{"type":1,"data":"12345"},{"type":2,"data":"abcde"}]}`;
+				}
+			},
 		}
 	},
 	"markdown": Object.entries({
