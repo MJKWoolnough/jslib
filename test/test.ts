@@ -10041,6 +10041,58 @@ type Tests = {
 					return JSON.stringify(p) === `{"type":3,"data":[{"type":1,"data":"12345"},{"type":2,"data":"abcde"}]}`;
 				}
 			},
+			"exceptRun": {
+				"12345abcde 1": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => p.done()], p => {
+						p.exceptRun(1);
+
+						return [{"type": 3, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":3,"data":[]}`;
+				},
+				"12345abcde 2": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => p.done()], p => {
+						p.exceptRun(2);
+
+						return [{"type": 3, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":3,"data":[{"type":1,"data":"12345"}]}`;
+				},
+				"123 1,2": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data":"1"}, () => [{"type": 1, "data":"2"}, () => [{"type": 2, "data":"3"}, () => [{"type": 3, "data":"3"}, () => p.done()]]]], p => {
+						p.exceptRun(1, 2);
+
+						return [{"type": 1, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":1,"data":[]}`;
+				},
+				"123 3": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data":"1"}, () => [{"type": 1, "data":"2"}, () => [{"type": 2, "data":"3"}, () => [{"type": 3, "data":"3"}, () => p.done()]]]], p => {
+						p.exceptRun(3);
+
+						return [{"type": 1, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":1,"data":[{"type":1,"data":"1"},{"type":1,"data":"2"},{"type":2,"data":"3"}]}`;
+				},
+				"123?? 4": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data":"1"}, () => [{"type": 1, "data":"2"}, () => [{"type": 2, "data":"3"}, () => [{"type": 2, "data":"3"}, () => p.done()]]]], p => {
+						p.exceptRun(4);
+
+						return [{"type": 1, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":1,"data":[{"type":1,"data":"1"},{"type":1,"data":"2"},{"type":2,"data":"3"},{"type":2,"data":"3"}]}`;
+				}
+			}
 		}
 	},
 	"markdown": Object.entries({
