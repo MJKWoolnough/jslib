@@ -10092,6 +10092,20 @@ type Tests = {
 
 					return JSON.stringify(p) === `{"type":1,"data":[{"type":1,"data":"1"},{"type":1,"data":"2"},{"type":2,"data":"3"},{"type":2,"data":"3"}]}`;
 				}
+			},
+			"done": {
+				"empty": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => p.done(), p => p.done());
+
+					return JSON.stringify(p.next().value) === `{"type":-1,"data":[]}` && JSON.stringify(p.next().value) === `{"type":-1,"data":[]}`;
+				},
+				"msg": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => p.done(), p => p.done("msg"));
+
+					return JSON.stringify(p.next().value) === `{"type":-1,"data":[{"type":-1,"data":"msg"}]}` && JSON.stringify(p.next().value) === `{"type":-1,"data":[{"type":-1,"data":"msg"}]}`;
+				}
 			}
 		}
 	},
