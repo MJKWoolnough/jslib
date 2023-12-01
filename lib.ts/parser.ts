@@ -293,6 +293,10 @@ export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, 
 		for (const tk of t.data instanceof Array ? t.data : [t]) {
 			Object.assign(tk, pos);
 
+			if (tk.type === TokenDone || tk.type === TokenError) {
+				continue;
+			}
+
 			for (const c of t.data) {
 				pos.pos++;
 				pos.linePos++;
