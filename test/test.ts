@@ -10106,6 +10106,20 @@ type Tests = {
 
 					return JSON.stringify(p.next().value) === `{"type":-1,"data":[{"type":-1,"data":"msg"}]}` && JSON.stringify(p.next().value) === `{"type":-1,"data":[{"type":-1,"data":"msg"}]}`;
 				}
+			},
+			"error": {
+				"empty": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => p.done(), p => p.error());
+
+					return JSON.stringify(p.next().value) === `{"type":-2,"data":[{"type":-2,"data":"unknown error"}]}` && JSON.stringify(p.next().value) === `{"type":-2,"data":[{"type":-2,"data":"unknown error"}]}`;
+				},
+				"msg": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => p.done(), p => p.error("custom error"));
+
+					return JSON.stringify(p.next().value) === `{"type":-2,"data":[{"type":-2,"data":"custom error"}]}` && JSON.stringify(p.next().value) === `{"type":-2,"data":[{"type":-2,"data":"custom error"}]}`;
+				}
 			}
 		}
 	},
