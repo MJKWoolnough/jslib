@@ -70,7 +70,7 @@ export type TokenFn = (p: Tokeniser) => [Token, TokenFn];
  * */
 export type PhraserFn = (p: Phraser) => [Phrase, PhraserFn];
 
-/** The StringParser interface represents an alternate to a string for  */
+/** The StringParser interface represents an alternate to a string for */
 interface StringParser {
 	/** next() should return the next character in the stream */
 	next(): string;
@@ -119,7 +119,7 @@ class StrParser {
 	}
 }
 
-export class CTokeniser {
+class CTokeniser {
 	#sp: StringParser;
 
 	constructor(sp: StringParser) {
@@ -220,7 +220,7 @@ export class CTokeniser {
 /** A Tokeniser is a collection of methods that allow the easy parsing of a text stream. */
 export type Tokeniser = CTokeniser;
 
-export class CPhraser {
+class CPhraser {
 	#parser: CTokeniser;
 	#fn: TokenFn;
 	#tokens: Token[] = [];
