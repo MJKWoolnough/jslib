@@ -297,7 +297,7 @@ export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, 
 				continue;
 			}
 
-			for (const c of t.data) {
+			for (const c of tk.data) {
 				pos.pos++;
 				pos.linePos++;
 
