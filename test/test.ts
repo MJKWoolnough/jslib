@@ -10145,6 +10145,18 @@ type Tests = {
 					return JSON.stringify(p.next().value) === `{"type":-2,"data":[{"type":-2,"data":"custom error"}]}` && JSON.stringify(p.next().value) === `{"type":-2,"data":[{"type":-2,"data":"custom error"}]}`;
 				}
 			}
+		},
+		"withNumbers": {
+			"tokens": async () => {
+				const {default: parser, withNumbers} = await import("./lib/parser.js"),
+				      tk = withNumbers(parser("", p => [{"type": 1, "data": "123"}, () => [{"type": 2, "data": "  \n  "}, () => [{"type": 3, "data": "\n\nabc"}, () => p.done()]]])),
+				      a = JSON.stringify(tk.next().value),
+				      b = JSON.stringify(tk.next().value),
+				      c = JSON.stringify(tk.next().value),
+				      d = JSON.stringify(tk.next().value);
+
+				return a === `{"type":1,"data":"123","pos":0,"line":0,"linePos":0}` && b === `{"type":2,"data":"  \\n  ","pos":3,"line":0,"linePos":3}` && c === `{"type":3,"data":"\\n\\nabc","pos":8,"line":1,"linePos":2}` && d === `{"type":-1,"data":"","pos":13,"line":3,"linePos":3}`;
+			}
 		}
 	},
 	"markdown": Object.entries({
