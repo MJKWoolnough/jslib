@@ -105,6 +105,7 @@ class StrParser {
 	}
 }
 
+/** A Tokeniser is a collection of methods that allow the easy parsing of a text stream. */
 class CTokeniser {
 	#sp;
 
@@ -203,8 +204,7 @@ class CTokeniser {
 	}
 }
 
-/** A Tokeniser is a collection of methods that allow the easy parsing of a text stream. */
-
+/** A Phraser is a collection of methods that allow the easy parsing of a token stream. */
 class CPhraser {
 	#parser;
 	#fn;
@@ -324,8 +324,6 @@ class CPhraser {
 		return error();
 	}
 }
-
-/** A Phraser is a collection of methods that allow the easy parsing of a token stream. */
 
 /** withNumbers adds positional information to the tokens, either in the token stream or phrase stream. */
 export const withNumbers = function* (p) {
