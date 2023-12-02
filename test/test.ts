@@ -10156,6 +10156,28 @@ type Tests = {
 				      d = JSON.stringify(tk.next().value);
 
 				return a === `{"type":1,"data":"123","pos":0,"line":0,"linePos":0}` && b === `{"type":2,"data":"  \\n  ","pos":3,"line":0,"linePos":3}` && c === `{"type":3,"data":"\\n\\nabc","pos":8,"line":1,"linePos":2}` && d === `{"type":-1,"data":"","pos":13,"line":3,"linePos":3}`;
+			},
+			"phrases": async () => {
+				const {default: parser, withNumbers} = await import("./lib/parser.js"),
+				      tk = withNumbers(parser("", p => p.done(), p => [
+					{"type": 1, "data": [
+						{"type": 1, "data": "abc"}
+					]}, () => [ {"type": 2, "data": [
+						{"type": 2, "data": "123"},
+						{"type": 3, "data": "\n456"}
+					]}, () => [{"type": 3, "data": [
+						{"type": 4, "data": "nl\n"},
+						{"type": 5, "data": "Jackdaws love my big sphinx of quartz"},
+						{"type": 6, "data": "\n\n\n"}
+					]}, () => p.done("msg")]
+				      ]])),
+				      a = JSON.stringify(tk.next().value),
+				      b = JSON.stringify(tk.next().value),
+				      c = JSON.stringify(tk.next().value),
+				      d = JSON.stringify(tk.next().value),
+				      e = JSON.stringify(tk.next().value);
+
+				return a === `{"type":1,"data":[{"type":1,"data":"abc","pos":0,"line":0,"linePos":0}]}` && b === `{"type":2,"data":[{"type":2,"data":"123","pos":3,"line":0,"linePos":3},{"type":3,"data":"\\n456","pos":6,"line":0,"linePos":6}]}` && c === `{"type":3,"data":[{"type":4,"data":"nl\\n","pos":10,"line":1,"linePos":3},{"type":5,"data":"Jackdaws love my big sphinx of quartz","pos":13,"line":2,"linePos":0},{"type":6,"data":"\\n\\n\\n","pos":50,"line":2,"linePos":37}]}` && d === `{"type":-1,"data":[{"type":-1,"data":"msg","pos":53,"line":5,"linePos":0}]}` && d === e;
 			}
 		}
 	},
