@@ -325,7 +325,7 @@ class CPhraser {
 	}
 }
 
-/** A Phrase is a collection of methods that allow the easy parsing of a token stream. */
+/** A Phraser is a collection of methods that allow the easy parsing of a token stream. */
 
 /** withNumbers adds positional information to the tokens, either in the token stream or phrase stream. */
 export const withNumbers = function* (p) {
