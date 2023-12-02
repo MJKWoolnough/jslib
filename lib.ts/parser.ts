@@ -42,8 +42,8 @@ interface StringParser {
 }
 
 interface ParserOrPhraser {
-	(text: string | StringParser, parserFn: TokenFn): Generator<Token, Token>;
-	(text: string | StringParser, parserFn: TokenFn, phraserFn: PhraserFn): Generator<Phrase, Phrase>;
+	(text: string | StringParser, parserFn: TokenFn): Generator<Token, never>;
+	(text: string | StringParser, parserFn: TokenFn, phraserFn: PhraserFn): Generator<Phrase, never>;
 }
 
 class StrParser {
@@ -282,7 +282,7 @@ export class CPhraser {
 
 export type Phraser = CPhraser;
 
-export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, T>): Generator<T extends Token ? TokenWithNumbers : PhraseWithNumbers, T extends Token ? TokenWithNumbers : PhraseWithNumbers> {
+export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, never>): Generator<T extends Token ? TokenWithNumbers : PhraseWithNumbers, void> {
 	const pos = {
 		"pos": 0,
 		"line": 0,
@@ -310,8 +310,6 @@ export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, 
 
 		yield t as any;
 	}
-
-	return null as any;
 }
 
 export default (function* (text: string | StringParser, parserFn: TokenFn, phraserFn?: PhraserFn) {
