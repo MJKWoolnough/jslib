@@ -70,7 +70,7 @@ export type TokenFn = (p: Tokeniser) => [Token, TokenFn];
  * */
 export type PhraserFn = (p: Phraser) => [Phrase, PhraserFn];
 
-/** The StringParser interface represents an alternate to a string for */
+/** The StringParser interface represents an alternate to a string for parsing. */
 interface StringParser {
 	/** next() should return the next character in the stream */
 	next(): string;
