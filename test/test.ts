@@ -9898,10 +9898,7 @@ type Tests = {
 
 					let peeked = false;
 
-					parser("12345abcde", p => {
-						p.accept("12345");
-						return [{"type": 1, "data": p.get()}, () => p.done()];
-					      }, p => {
+					parser("12345abcde", p => [{"type": 1, "data": "12345"}, () => p.done()], p => {
 						peeked = p.peek() === 1;
 
 						return p.done();
@@ -9914,10 +9911,7 @@ type Tests = {
 
 					let peeked = false;
 
-					parser("abcde12345", p => {
-						p.accept("12345");
-						return [{"type": 2, "data": p.get()}, () => p.done()];
-					      }, p => {
+					parser("abcde12345", p => [{"type": 2, "data": ""}, () => p.done()], p => {
 						peeked = p.peek() === 2;
 
 						return p.done();
