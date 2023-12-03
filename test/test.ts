@@ -9563,7 +9563,7 @@ type Tests = {
 					parser("abc", p => {
 						peeked = p.peek() === "a";
 						return p.done();
-					}).next()
+					}).next();
 
 					return peeked;
 				},
