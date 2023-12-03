@@ -9624,7 +9624,7 @@ type Tests = {
 					      }).next().value;
 
 					return tk.type === 1 && tk.data === "abc";
-				},
+				}
 			},
 			"get": {
 				"simple": async () => {
