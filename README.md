@@ -1941,6 +1941,144 @@ setLanguage = (l: Partial<{
 
 This function is used to set the language used for the `Next` and `Previous` page elements.
 
+## <a name="parser">parser</a>
+
+The parse module can be used to parse text into token or phrase streams.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [(default)](#parser_default) | Function | The default function can parse a text stream into either a stream of tokens or a stream of phrases, depending on whether a phrase parsing function is provided. |
+| [Phrase](#parser_phrase) | Type | Phrase represents a parsed phrase, which is a collection of successive tokens. |
+| PhraseDone | Constant | Set to -1, this constant is a PhraseType used by the `Phraser.done()` method to indicate that their are no more Phrases. |
+| PhraseError | Constant | Set to -2, this constant is a PhraseType used by the `Phraser.error()` method to indicate that an error has occurred in the token stream, and that there are no more Phrases. |
+| [PhraseFn](#parser_phrasefn) | Type | PhraseFn is used by the parsing function to parse a Phrase from a token stream. |
+| [Phraser](#parser_phraser) | Type | A Phraser is a collection of methods that allow the easy parsing of a token stream. |
+| PhraseType | Type | PhraseType is used to ID a particular class of Phrases. Negative numbers represent built-in states, so only positive numbers should be used by implementing functions. |
+| PhraseWithNumbers | Type | PhraseWithNumbers represents a Phrase where the tokens are TokenWithNumbers. |
+| [Token](#parser_token) | Type | A Token represents a parsed token. |
+| TokenDone | Constant | Set to -1, this constant is a TokenType used by the `Tokeniser.done()` method to indicate that their are no more Tokens. |
+| TokenError | Constant | Set to -2, this constant is a TokenType used by the `Tokeniser.error()` method to indicate that an error has occurred in the token stream, and that there are no more Tokens. |
+| [TokenFn](#parser_tokenfn) | Type | TokenFn is used by the parsing function to parse a Token from a text stream. |
+| Tokeniser | Type | Tokeniser is a collection of methods that allow the easy parsing of a text stream. |
+| TokenType | Type | TokenType is used to ID a particular class of Tokens. Negative numbers represent built-in states, so only positive numbers should be used by implementing functions. |
+| TokenWithNumbers | Type | TokenWithNumbers represents a token which has it's position within the text stream as an absolute position (pos), a zero-indexed line number (line), and the position on that line (linePos). |
+| withNumbers | Function | withNumbers adds positional information to the tokens, either in the token stream or phrase stream. |
+
+<a name="parser_default">(default)</a>
+```typescript
+(text: string, parserFn: TokenFn): Generator<Token, never>;
+(text: string, parserFn: TokenFn, phraserFn: PhraserFn): Generator<Phrase, never>;
+
+```
+
+The default function can parse a text stream into either a stream of tokens or a stream of phrases, depending on whether a phrase parsing function is provided.
+
+<a name="parser_phrase">Phrase</a>
+```typescript
+type Phrase = {
+	/** The type of Phrase parsed. */
+	type: PhraseType;
+	/** The parsed tokens. */
+	data: Token[];
+}
+```
+
+Phrase represents a parsed phrase, which is a collection of successive tokens.
+
+<a name="parser_phrasefn">PhraseFn</a>
+```typescript
+type PhraserFn = (p: Phraser) => [Phrase, PhraserFn]
+```
+
+PhraseFn is used by the parsing function to parse a Phrase from a token stream. Takes a [Phraser](#parser_phraser), and returns the parsed [Phrase](#parser_phraser) and the next PhraseFn with which to parse the next phrase.
+
+<a name="parser_phraser">Phraser<a/>
+```typescript
+class Phraser {
+	/** length() returns the number of tokens in the buffer. */
+	length(): number;
+
+	/** get() returns all of the tokens processed, clearing the buffer. */
+	get(): Token[];
+
+	/** peek() looks ahead at the next token in the stream without adding it to the buffer, and returns the TokenID. */
+	peek(): TokenID;
+
+	/** accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added. */
+	accept(...tokenTypes: TokenType[]): boolean;
+
+	/** acceptRun() successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added. */
+	acceptRun(...tokenTypes: TokenType[]): TokenType;
+
+	** except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added. */
+	except(...tokenTypes: TokenType[]): boolean;
+
+	/** exceptRun() successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. Returns the TokenID of the last token added. */
+	exceptRun(...tokenTypes: TokenType[]): TokenType;
+
+	/** done() returns a Done phrase, optionally with a Done token with a done message, and a recursive PhraseFn which continually returns the same done Phrase. */
+	done(msg = ""): [Phrase, PhraseFn];
+
+	/** error() returns an Error phrase, optionally with an Error token with an error message, and a recursive PhraseFn which continually returns the same error Phrase. */
+	error(err = "unknown error"): [Phrase, PhraseFn];
+}
+```
+
+A Phraser is a collection of methods that allow the easy parsing of a token stream.
+
+<a name="parser_token">Token</a>
+```typescript
+export type Token = {
+        /** The type of Token parsed. */
+        type: TokenType;
+        /** The text parsed. */
+        data: string;
+}
+```
+
+A Token represents a parsed token.
+
+<a name="parser_tokenfn">TokenFn</a>
+```typescript
+export type TokenFn = (p: Tokeniser) => [Token, TokenFn];
+```
+
+TokenFn is used by the parsing function to parse a Token from the text stream. Takes a [Tokeniser](#parser_tokeniser), and returns the parsed [Token](#parser_token) and the next TokenFn with which to parse the next token.
+
+<a name="parser_tokeniser">Tokeniser</a>
+```typescript
+class Tokeniser {
+	/** length() returns the number of characters in the buffer. */
+	length(): number;
+
+	/** get() returns all of the characters processed, clearing the buffer. */
+	get(): string;
+
+	/** peek() looks ahead at the next character in the stream without adding it to the buffer. */
+	peek(): string;
+
+	/** accept() adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. */
+	accept(chars: string): boolean;
+
+	/** acceptRun() successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run. */
+	acceptRun(chars: string): string;
+
+	/** except() adds the next character in the stream to the buffer as long as they are not in the string provided. Returns true if a character was added. */
+	except(chars: string): boolean;
+
+	/** exceptRun() successively adds characters in the stream to the buffer as long as they are not in the string provided. Returns the character that stopped the run. */
+	exceptRun(chars: string): string;
+
+	/** done() returns a Done token, with optional done message, and a recursive TokenFn which continually returns the same done Token. */
+	done(msg = ""): [Token, TokenFn];
+
+	/** error() returns an Error token, with optional error message, and a recursive TokenFn which continually returns the same error Token. */
+	error(err = "unknown error"): [Token, TokenFn];
+}
+```
+
+A Tokeniser is a collection of methods that allow the easy parsing of a text stream.
+
 ## <a name="router">router</a>
 
 The router module allows for easy use of the [History](https://developer.mozilla.org/en-US/docs/Web/API/History) API, updating the page according to the rules given to the router.
