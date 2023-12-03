@@ -20,7 +20,7 @@ const parseText = function* (text) {
 			TagLoop:
 			for (pos++; pos < text.length; pos++) {
 				let c = text.charCodeAt(pos);
-				if (c >= 65 && c <=90 || c >=97 && c <=122 || c >= 48 && c <= 57) {
+				if (c >= 65 && c <= 90 || c >= 97 && c <=122 || c >= 48 && c <= 57) {
 					continue;
 				} else if (pos > start + +end + 1) {
 					const startAttr = pos;
