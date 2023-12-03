@@ -131,7 +131,7 @@ class CTokeniser {
 		return c;
 	}
 
-	/** accept() adds the next character in the stream to the buffer if it is in the string provided. */
+	/** accept() adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. */
 	accept(chars) {
 		if (!chars.includes(this.#sp.next())) {
 			this.#sp.backup();
@@ -142,7 +142,7 @@ class CTokeniser {
 		return true;
 	}
 
-	/** acceptRun() successively adds characters in the stream to the buffer as long as are in the string provided. */
+	/** acceptRun() successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run. */
 	acceptRun(chars) {
 		while (true) {
 			const c = this.#sp.next();
@@ -159,7 +159,7 @@ class CTokeniser {
 		}
 	}
 	
-	/** except() adds the next character in the stream to the buffer as long as they are not in the string provided. */
+	/** except() adds the next character in the stream to the buffer as long as they are not in the string provided. Returns true if a character was added. */
 	except(chars) {
 		const c = this.#sp.next();
 
@@ -172,7 +172,7 @@ class CTokeniser {
 		return true;
 	}
 
-	/** exceptRun() successively adds characters in the stream to the buffer as long as they are not in the string provided. */
+	/** exceptRun() successively adds characters in the stream to the buffer as long as they are not in the string provided. Returns the character that stopped the run. */
 	exceptRun(chars) {
 		while (true) {
 			const c = this.#sp.next();
@@ -260,7 +260,7 @@ class CPhraser {
 		return tk;
 	}
 
-	/** accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. */
+	/** accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added. */
 	accept(...tokenTypes) {
 		if (!tokenTypes.includes(this.#next())) {
 			this.#backup();
@@ -271,7 +271,7 @@ class CPhraser {
 		return true;
 	}
 
-	/** acceptRun() successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. */
+	/** acceptRun() successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added. */
 	acceptRun(...tokenTypes) {
 		while (true) {
 			const tk = this.#next();
@@ -284,7 +284,7 @@ class CPhraser {
 		}
 	}
 
-	/** except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. */
+	/** except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added. */
 	except(...tokenTypes) {
 		const tk = this.#next();
 
@@ -297,7 +297,7 @@ class CPhraser {
 		return true;
 	}
 
-	/** exceptRun() successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. */
+	/** exceptRun() successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. Returns the TokenID of the last token added. */
 	exceptRun(...tokenTypes) {
 		while (true) {
 			const tk = this.#next();
