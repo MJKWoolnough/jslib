@@ -26,7 +26,7 @@ export type Token = {
 	/** The type of Token parsed. */
 	type: TokenType;
 	/** The text parsed. */
-	data: string
+	data: string;
 }
 
 /** Phrase represents a parsed phrase, which is a collection of successive tokens. */

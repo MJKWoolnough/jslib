@@ -26,7 +26,7 @@ PhraseError = -2;
  *	// The type of Token parsed.
  *	type: TokenType;
  *	// The text parsed.
- *	data: string
+ *	data: string;
  * }
  */
 /**
