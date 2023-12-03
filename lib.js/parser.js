@@ -220,7 +220,7 @@ class CPhraser {
 		if (this.#ignoreLast) {
 			this.#ignoreLast = false;
 
-			return this.#tokens.at(-1);
+			return this.#tokens.at(-1).type;
 		}
 
 		const [tk, nextFn] = this.#fn(this.#parser);
@@ -228,7 +228,7 @@ class CPhraser {
 		this.#tokens.push(tk);
 		this.#fn = nextFn;
 
-		return tk;
+		return tk.type;
 	}
 
 	#backup() {
@@ -251,7 +251,7 @@ class CPhraser {
 		return toRet;
 	}
 
-	/** peek() looks ahead at the next token in the stream without adding it to the buffer. */
+	/** peek() looks ahead at the next token in the stream without adding it to the buffer, and returns the TokenID. */
 	peek() {
 		const tk = this.#next();
 
@@ -262,7 +262,7 @@ class CPhraser {
 
 	/** accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. */
 	accept(...tokenTypes) {
-		if (!tokenTypes.includes(this.#next().type)) {
+		if (!tokenTypes.includes(this.#next())) {
 			this.#backup();
 
 			return false;
@@ -274,7 +274,7 @@ class CPhraser {
 	/** acceptRun() successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. */
 	acceptRun(...tokenTypes) {
 		while (true) {
-			const tk = this.#next().type;
+			const tk = this.#next();
 
 			if (!tokenTypes.includes(tk)) {
 				this.#backup();
@@ -286,7 +286,7 @@ class CPhraser {
 
 	/** except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. */
 	except(...tokenTypes) {
-		const tk = this.#next().type;
+		const tk = this.#next();
 
 		if (tk < 0 || tokenTypes.includes(tk)) {
 			this.#backup();
@@ -300,7 +300,7 @@ class CPhraser {
 	/** exceptRun() successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. */
 	exceptRun(...tokenTypes) {
 		while (true) {
-			const tk = this.#next().type;
+			const tk = this.#next();
 
 			if (tk < 0 || tokenTypes.includes(tk)) {
 				this.#backup();

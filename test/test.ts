@@ -9902,7 +9902,7 @@ type Tests = {
 						p.accept("12345");
 						return [{"type": 1, "data": p.get()}, () => p.done()];
 					      }, p => {
-						peeked = JSON.stringify(p.peek()) === `{"type":1,"data":"1"}`;
+						peeked = p.peek() === 1;
 
 						return p.done();
 					      }).next();
@@ -9916,9 +9916,9 @@ type Tests = {
 
 					parser("abcde12345", p => {
 						p.accept("12345");
-						return [{"type": 1, "data": p.get()}, () => p.done()];
+						return [{"type": 2, "data": p.get()}, () => p.done()];
 					      }, p => {
-						peeked = JSON.stringify(p.peek()) === `{"type":1,"data":""}`;
+						peeked = p.peek() === 2;
 
 						return p.done();
 					      }).next();
