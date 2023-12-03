@@ -5,10 +5,10 @@
  */
 /** */
 
-/** TokenType is used to ID a particular class of Tokens. */
+/** TokenType is used to ID a particular class of Tokens. Negative numbers represent built-in states, so only positive numbers should be used by implementing functions. */
 export type TokenType = number;
 
-/** PhraseType is used to ID a particular class of Phrases. */
+/** PhraseType is used to ID a particular class of Phrases. Negative numbers represent built-in states, so only positive numbers should be used by implementing functions. */
 export type PhraseType = number;
 
 export const
