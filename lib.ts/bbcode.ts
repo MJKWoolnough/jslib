@@ -7,104 +7,145 @@
  */
 /** */
 
-const parseText = function* (text: string): Tokeniser {
-	const tags: string[] = [];
-	let last = 0;
-	for (let pos = 0; pos < text.length; pos++) {
-		if (text.charAt(pos) === '[') {
-			const start = pos,
-			      end = text.charAt(pos+1) === '/';
-			if (end) {
-				pos++;
-			}
-			TagLoop:
-			for (pos++; pos < text.length; pos++) {
-				let c = text.charCodeAt(pos);
-				if (c >= 65 && c <= 90 || c >= 97 && c <=122 || c >= 48 && c <= 57) {
+import type {Phrase, Phraser, PhraserFn, Token, TokenFn, Tokeniser as PTokeniser} from './parser.js';
+import parser from './parser.js';
+
+const textToken = 1,
+      openToken = 2,
+      closeToken = 3,
+      nameChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+      tagStart = "[",
+      tagStop = "]",
+      tagEndStart = "/",
+      tagAttr = "=",
+      parseText = (t: PTokeniser): [Token, TokenFn] => {
+	if (!t.exceptRun(tagStart)) {
+		if (t.length()) {
+			return [{"type": textToken, "data": t.get()}, () => t.done()];
+		}
+
+		return t.done();
+	}
+
+	if (t.length()) {
+		return [{"type": textToken, "data": t.get()}, parseOpen];
+	}
+
+	return parseOpen(t);
+      },
+      parseOpen = (t: PTokeniser): [Token, TokenFn] => {
+	if (!t.accept(tagStart)) {
+		return parseText(t);
+	}
+
+	if (t.accept(tagEndStart)) {
+		return parseClose(t);
+	}
+
+	if (!t.accept(nameChars)) {
+		return parseText(t);
+	}
+
+	t.acceptRun(nameChars);
+
+	if (t.accept(tagAttr)) {
+		if (t.accept("\"")) {
+			Loop:
+			while (true) {
+				switch (t.exceptRun("\\\"")) {
+				case "\\":
+					t.except("");
+					t.except("");
+
 					continue;
-				} else if (pos > start + +end + 1) {
-					const startAttr = pos;
-					let attr: string | null = null;
-					if (c === 61 && !end) { // '='
-						if (text.charAt(pos+1) === '"') {
-							attr = "";
-							pos++;
-							AttrLoop:
-							for (pos++; pos < text.length; pos++) {
-								const c = text.charAt(pos);
-								switch (c) {
-								case '"':
-									if (text.charAt(pos+1) === ']') {
-										pos++;
-										break AttrLoop;
-									}
-									pos = startAttr;
-									break TagLoop;
-								case '\\':
-									pos++;
-									const d = text.charAt(pos);
-									switch (d) {
-									case '"':
-									case "'":
-									case '\\':
-										attr += d;
-									}
-									break;
-								default:
-									attr += c;
-								}
-							}
-						} else {
-							for (pos++; pos < text.length; pos++) {
-								if (text.charAt(pos) === ']') {
-									break;
-								}
-							}
-							attr = text.slice(startAttr+1, pos);
-						}
-						c = text.charCodeAt(pos);
-					}
-					if (c === 93) { // ']'
-						if (last !== start) {
-							const t = text.slice(last, start);
-							while (yield t) {}
-						}
-						last = pos+1;
-						const t = Object.freeze(end ? {
-							"tagName": text.slice(start+2, pos).toLowerCase(),
-							"fullText": text.slice(start, pos+1)
-						} : {
-							"tagName": text.slice(start+1, startAttr).toLowerCase(),
-							attr,
-							"fullText": text.slice(start, pos+1)
-						});
-						if (end) {
-							if (tags[0] === t.tagName) {
-								tags.shift();
-								while ((yield undefined!) !== 1) {}
-							}
-							while (yield t) {}
-						} else {
-							OpenLoop:
-							while (true) {
-								switch (yield t) {
-								default:
-									break OpenLoop;
-								case 1:
-									tags.unshift(t.tagName);
-								case true:
-								}
-							}
-						}
-					}
+				case "\"":
+					t.except("");
+					break Loop;
+				default:
+					return parseText(t);
 				}
-				break;
 			}
+		} else {
+			t.exceptRun(tagStop);
 		}
 	}
-	if (last < text.length) {
-		const t = text.slice(last);
-		while (yield t) {}
+
+	if (!t.accept(tagStop)) {
+		return parseText(t);
+	}
+
+	return [{"type": openToken, "data": t.get()}, parseText];
+      },
+      parseClose = (t: PTokeniser): [Token, TokenFn] => {
+	if (!t.accept(nameChars) || t.acceptRun(nameChars) !== tagStop) {
+		return parseText(t);
+	}
+
+	t.except("");
+
+	return [{"type": closeToken, "data": t.get()}, parseText];
+      },
+      mergeText = (p: Phraser): [Phrase, PhraserFn] => {
+	if (p.accept(textToken)) {
+		p.acceptRun(textToken);
+
+		return [{"type": textToken, "data": p.get()}, mergeText];
+	}
+
+	p.except(0);
+
+	const tks = p.get();
+
+	if (tks.length) {
+		return [{"type": tks[0].type, "data": tks}, mergeText];
+	}
+
+	return p.done();
+      },
+      processText = function* (text: string): Tokeniser {
+	const tags: string[] = [];
+
+	Loop:
+	for (const tks of parser(text, parseText, mergeText)) {
+		switch (tks.type) {
+		case textToken:
+			const text = tks.data.reduce((t, {data}) => t + data, "");
+
+			while (yield text) {}
+
+			break;
+		case openToken: {
+			const fullText = tks.data[0].data,
+			      [tagName, attr] = fullText.slice(1, -1).split(tagAttr),
+			      open = {tagName, "attr": attr?.startsWith("\"") ? JSON.parse(attr) : attr ?? null, fullText};
+
+			OpenLoop:
+			while (true) {
+				switch (yield open) {
+				default:
+					break OpenLoop;
+				case 1:
+					tags.unshift(tagName);
+				case true:
+				}
+			}
+		}; break;
+		case closeToken: {
+			const fullText = tks.data[0].data,
+			      tagName = fullText.slice(2, -1),
+			      close =  {tagName, fullText};
+
+			if (tags[0] === tagName) {
+				tags.shift();
+
+				while ((yield undefined!) !== 1) {}
+			}
+
+			while (yield close) {}
+		}; break;
+		default:
+			break Loop;
+		}
 	}
       };
 
@@ -230,4 +271,4 @@ export type Parsers = {
  *
  * @return {DocumentFragment} DocumentFragment containing the parsed elements.
  */
-export default (parsers: Parsers, text: string): DocumentFragment => process(document.createDocumentFragment(), parseText(text), parsers);
+export default (parsers: Parsers, text: string): DocumentFragment => process(document.createDocumentFragment(), processText(text), parsers);
