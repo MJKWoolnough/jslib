@@ -450,12 +450,13 @@ const tags: Tags = Object.assign({
 const tokenIndentedCodeBlock = 1,
       tokenThematicBreak = 2,
       tokenATXHeading = 3,
-      tokenFencedClodeBlock = 4,
-      tokenHTML = 5,
-      tokenBlockQuote = 6,
-      tokenBulletListMarker = 7,
-      tokenOrderedListMarker = 8,
-      tokenText = 9,
+      tokenSetextHeading = 4,
+      tokenFencedClodeBlock = 5,
+      tokenHTML = 6,
+      tokenBlockQuote = 7,
+      tokenBulletListMarker = 8,
+      tokenOrderedListMarker = 9,
+      tokenText = 10,
       whiteSpace = " \t",
       parseBlock = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.acceptRun(" ");
@@ -469,7 +470,6 @@ const tokenIndentedCodeBlock = 1,
 	case '*':
 	case '_':
 		return parseThematicBreak(t);
-	case '-':
 	case '=':
 		return parseSetextHeading(t);
 	case '#':
@@ -477,6 +477,7 @@ const tokenIndentedCodeBlock = 1,
 	case '`':
 	case '~':
 		return parseFencedCodeBlock(t);
+	case '-':
 	case '+':
 		return parseBulletListMarker(t);
 	case '0':
@@ -526,6 +527,17 @@ const tokenIndentedCodeBlock = 1,
 	return [{"type": tokenThematicBreak, "data": t.get()}, parseBlock];
       },
       parseSetextHeading = (t: Tokeniser): [Token, TokenFn] => {
+	const char = t.peek();
+
+	t.acceptRun(char);
+
+	if (!t.acceptRun(whiteSpace)) {
+		return [{"type": tokenSetextHeading, "data": t.get()}, parseBlock];
+	} else if (!t.accept("\n")) {
+		return parseText(t);
+	}
+	
+	return [{"type": tokenSetextHeading, "data": t.get()}, parseBlock];
       },
       parseATXHeading = (t: Tokeniser): [Token, TokenFn] => {
       },
