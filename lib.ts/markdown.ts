@@ -448,11 +448,68 @@ const tags: Tags = Object.assign({
       ] as const).map(k => Markdown.prototype[k]);
 
 const tokenIndentedCodeBlock = 1,
-      parseBlock = (t: Tokeniser) => {
-	t.acceptRun(" ");
+      tokenThematicBreak = 2,
+      tokenATXHeading = 3,
+      tokenFencedClodeBlock = 4,
+      tokenHTML = 5,
+      tokenBlockQuote = 6,
+      tokenBulletListMarker = 7,
+      tokenOrderedListMarker = 8,
+      tokenText = 9,
+      parseBlock = (t: Tokeniser): [Token, TokenFn] => {
+	const char = t.acceptRun(" ");
 	if (t.length() >= 4) {
 		return [{"type": tokenIndentedCodeBlock, "data": t.get()}, parseBlock];
 	}
+
+	switch (char) {
+	case '>':
+		return parseBlockQuote(t);
+	case '*':
+	case '_':
+	case '-':
+		return parseThematicBreak(t);
+	case '=':
+		return parseSetextHeading(t);
+	case '#':
+		return parseATXHeading(t);
+	case '`':
+	case '~':
+		return parseFencedCodeBlock(t);
+	case '+':
+		return parseBulletListMarker(t);
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+	case '8':
+	case '9':
+		return parseOrderedListMarker(t);
+	case '':
+		return [{"type": tokenText, "data": t.get()}, () => t.done()];
+	default:
+		return parseText(t);
+	}
+      },
+      parseBlockQuote = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseThematicBreak = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseSetextHeading = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseATXHeading = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseFencedCodeBlock = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseBulletListMarker = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseOrderedListMarker = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseText = (t: Tokeniser): [Token, TokenFn] => {
       };
 
 export default (markdown: string, tgs: Partial<Tags> = {}) => {
