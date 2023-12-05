@@ -1,3 +1,6 @@
+import type {Phrase, Phraser, PhraserFn, Token, TokenFn, Tokeniser} from './parser.js';
+import parser from './parser.js';
+
 type Tags = {
 	allowedHTML: null | [string, ...string[]][];
 	blockquote: (c: DocumentFragment) => Element | DocumentFragment;
@@ -443,6 +446,14 @@ const tags: Tags = Object.assign({
 	"parseSetextHeading",
 	"parseThematicBreak"
       ] as const).map(k => Markdown.prototype[k]);
+
+const tokenIndentedCodeBlock = 1,
+      parseBlock = (t: Tokeniser) => {
+	t.acceptRun(" ");
+	if (t.length() >= 4) {
+		return [{"type": tokenIndentedCodeBlock, "data": t.get()}, parseBlock];
+	}
+      };
 
 export default (markdown: string, tgs: Partial<Tags> = {}) => {
 	return new Markdown(Object.assign(Object.assign({}, tags), tgs), markdown).content;
