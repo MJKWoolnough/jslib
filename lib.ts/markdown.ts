@@ -1,4 +1,4 @@
-import type {Phrase, Phraser, PhraserFn, Token, TokenFn, Tokeniser} from './parser.js';
+import type {Token, TokenFn, Tokeniser, TokenType} from './parser.js';
 import parser from './parser.js';
 
 type Tags = {
@@ -458,10 +458,11 @@ const tokenIndentedCodeBlock = 1,
       tokenOrderedListMarker = 9,
       tokenText = 10,
       whiteSpace = " \t",
+      tokenReturn = (type: TokenType, t: Tokeniser | string, fn?: TokenFn): [Token, TokenFn] => [{type, "data": typeof t === "string" ? t : t.get()}, fn ?? (() => t.done())],
       parseBlock = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.acceptRun(" ");
 	if (t.length() >= 4) {
-		return [{"type": tokenIndentedCodeBlock, "data": t.get()}, parseBlock];
+		return tokenReturn(tokenIndentedCodeBlock, t, parseBlock);
 	}
 
 	switch (char) {
@@ -492,7 +493,7 @@ const tokenIndentedCodeBlock = 1,
 	case '9':
 		return parseOrderedListMarker(t);
 	case '':
-		return [{"type": tokenText, "data": t.get()}, () => t.done()];
+		return tokenReturn(tokenText, t);
 	default:
 		return parseText(t);
 	}
@@ -500,7 +501,8 @@ const tokenIndentedCodeBlock = 1,
       parseBlockQuote = (t: Tokeniser): [Token, TokenFn] => {
 	t.accept(">");
 	t.accept(" ");
-	return [{"type": tokenBlockQuote, "data": t.get()}, parseBlock];
+
+	return tokenReturn(tokenBlockQuote, t, parseBlock);
       },
       parseThematicBreak = (t: Tokeniser, firstParsed = false): [Token, TokenFn] => {
 	const char = t.peek();
@@ -524,7 +526,7 @@ const tokenIndentedCodeBlock = 1,
 	t.acceptRun(char + whiteSpace);
 	t.accept("\n");
 
-	return [{"type": tokenThematicBreak, "data": t.get()}, parseBlock];
+	return tokenReturn(tokenThematicBreak, t.get(), parseBlock);
       },
       parseSetextHeading = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.peek();
@@ -532,12 +534,12 @@ const tokenIndentedCodeBlock = 1,
 	t.acceptRun(char);
 
 	if (!t.acceptRun(whiteSpace)) {
-		return [{"type": tokenSetextHeading, "data": t.get()}, parseBlock];
+		return tokenReturn(tokenSetextHeading, t);
 	} else if (!t.accept("\n")) {
 		return parseText(t);
 	}
 	
-	return [{"type": tokenSetextHeading, "data": t.get()}, parseBlock];
+	return tokenReturn(tokenSetextHeading, t, parseBlock);
       },
       parseATXHeading = (t: Tokeniser): [Token, TokenFn] => {
       },
