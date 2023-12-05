@@ -594,6 +594,19 @@ const tokenIndentedCodeBlock = 1,
 	];
       })(),
       parseBulletListMarker = (t: Tokeniser): [Token, TokenFn] => {
+	const char = t.peek();
+
+	t.accept(char);
+
+	if (!t.accept(whiteSpace)) {
+		if (char === "-") {
+			return parseThematicBreak(t, true);
+		}
+
+		return parseText(t);
+	}
+
+	return tokenReturn(tokenBulletListMarker, t, parseBlock);
       },
       parseOrderedListMarker = (t: Tokeniser): [Token, TokenFn] => {
       },
