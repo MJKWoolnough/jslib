@@ -542,6 +542,11 @@ const tokenIndentedCodeBlock = 1,
 	return tokenReturn(tokenSetextHeading, t, parseBlock);
       },
       parseATXHeading = (t: Tokeniser): [Token, TokenFn] => {
+	t.acceptRun("#");
+
+	t.exceptRun("\n");
+
+	return tokenReturn(tokenATXHeading, t, parseBlock);
       },
       parseFencedCodeBlock = (t: Tokeniser): [Token, TokenFn] => {
       },
