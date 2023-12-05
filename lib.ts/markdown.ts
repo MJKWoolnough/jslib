@@ -456,6 +456,7 @@ const tokenIndentedCodeBlock = 1,
       tokenBulletListMarker = 7,
       tokenOrderedListMarker = 8,
       tokenText = 9,
+      whiteSpace = " \t",
       parseBlock = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.acceptRun(" ");
 	if (t.length() >= 4) {
@@ -467,8 +468,8 @@ const tokenIndentedCodeBlock = 1,
 		return parseBlockQuote(t);
 	case '*':
 	case '_':
-	case '-':
 		return parseThematicBreak(t);
+	case '-':
 	case '=':
 		return parseSetextHeading(t);
 	case '#':
@@ -500,7 +501,29 @@ const tokenIndentedCodeBlock = 1,
 	t.accept(" ");
 	return [{"type": tokenBlockQuote, "data": t.get()}, parseBlock];
       },
-      parseThematicBreak = (t: Tokeniser): [Token, TokenFn] => {
+      parseThematicBreak = (t: Tokeniser, firstParsed = false): [Token, TokenFn] => {
+	const char = t.peek();
+
+	if (!firstParsed) {
+		t.accept(char);
+	}
+
+	t.acceptRun(whiteSpace);
+
+	if (!t.accept(char)) {
+		return parseText(t);
+	}
+
+	t.acceptRun(whiteSpace);
+
+	if (!t.accept(char)) {
+		return parseText(t);
+	}
+
+	t.acceptRun(char + whiteSpace);
+	t.accept("\n");
+
+	return [{"type": tokenThematicBreak, "data": t.get()}, parseBlock];
       },
       parseSetextHeading = (t: Tokeniser): [Token, TokenFn] => {
       },
