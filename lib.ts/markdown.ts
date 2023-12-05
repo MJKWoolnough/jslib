@@ -496,6 +496,9 @@ const tokenIndentedCodeBlock = 1,
 	}
       },
       parseBlockQuote = (t: Tokeniser): [Token, TokenFn] => {
+	t.accept(">");
+	t.accept(" ");
+	return [{"type": tokenBlockQuote, "data": t.get()}, parseBlock];
       },
       parseThematicBreak = (t: Tokeniser): [Token, TokenFn] => {
       },
