@@ -609,6 +609,15 @@ const tokenIndentedCodeBlock = 1,
 	return tokenReturn(tokenBulletListMarker, t, parseBlock);
       },
       parseOrderedListMarker = (t: Tokeniser): [Token, TokenFn] => {
+	const l = t.length();
+
+	t.acceptRun("0123456789");
+
+	if (t.length() - l > 9 || !t.accept(".)")) {
+		return parseText(t);
+	}
+
+	return tokenReturn(tokenOrderedListMarker, t, parseBlock);
       },
       parseText = (t: Tokeniser): [Token, TokenFn] => {
       };
