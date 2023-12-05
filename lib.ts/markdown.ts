@@ -451,12 +451,13 @@ const tokenIndentedCodeBlock = 1,
       tokenThematicBreak = 2,
       tokenATXHeading = 3,
       tokenSetextHeading = 4,
-      tokenFencedClodeBlock = 5,
-      tokenHTML = 6,
-      tokenBlockQuote = 7,
-      tokenBulletListMarker = 8,
-      tokenOrderedListMarker = 9,
-      tokenText = 10,
+      tokenFencedClodeBlockOpen = 5,
+      tokenFencedClodeBlockClose = 6,
+      tokenHTML = 7,
+      tokenBlockQuote = 8,
+      tokenBulletListMarker = 9,
+      tokenOrderedListMarker = 10,
+      tokenText = 11,
       whiteSpace = " \t",
       tokenReturn = (type: TokenType, t: Tokeniser | string, fn?: TokenFn): [Token, TokenFn] => [{type, "data": typeof t === "string" ? t : t.get()}, fn ?? (() => t.done())],
       parseBlock = (t: Tokeniser): [Token, TokenFn] => {
@@ -538,7 +539,7 @@ const tokenIndentedCodeBlock = 1,
 	} else if (!t.accept("\n")) {
 		return parseText(t);
 	}
-	
+
 	return tokenReturn(tokenSetextHeading, t, parseBlock);
       },
       parseATXHeading = (t: Tokeniser): [Token, TokenFn] => {
@@ -548,8 +549,50 @@ const tokenIndentedCodeBlock = 1,
 
 	return tokenReturn(tokenATXHeading, t, parseBlock);
       },
-      parseFencedCodeBlock = (t: Tokeniser): [Token, TokenFn] => {
-      },
+      [parseFencedCodeBlock, parseFencedCodeBlockContents] = (() => {
+	let fcbChar = "",
+	    fcbCount = 0;
+
+	return [
+		(t: Tokeniser): [Token, TokenFn] => {
+			fcbChar = t.peek();
+
+			t.accept(fcbChar);
+
+			if (!t.accept(fcbChar) || !t.accept(fcbChar)) {
+				return parseText(t);
+			}
+
+			const l = t.length();
+
+			t.acceptRun(fcbChar);
+
+			fcbCount = 3 + (t.length() - l);
+
+			t.exceptRun("\n");
+			t.accept("\n");
+
+			return tokenReturn(tokenFencedClodeBlockOpen, t, parseFencedCodeBlockContents);
+		},
+		(t: Tokeniser): [Token, TokenFn] => {
+			t.acceptRun(" ");
+
+			const l = t.length();
+
+			t.acceptRun(fcbChar);
+
+			if (t.length() - l === fcbCount) {
+				t.acceptRun(whiteSpace);
+
+				if (!t.peek() || t.accept("\n")) {
+					return tokenReturn(tokenFencedClodeBlockClose, t, parseBlock);
+				}
+			}
+
+			return parseText(t);
+		}
+	];
+      })(),
       parseBulletListMarker = (t: Tokeniser): [Token, TokenFn] => {
       },
       parseOrderedListMarker = (t: Tokeniser): [Token, TokenFn] => {
