@@ -9889,6 +9889,22 @@ type Tests = {
 				      c = JSON.stringify(tk.next().value);
 
 				return a === `{"type":1,"data":"12345"}` && b === `{"type":2,"data":"abcde"}` && c === `{"type":-1,"data":""}`;
+			},
+			"return": async () => {
+				const {default: parser} = await import("./lib/parser.js"),
+				      tk = parser("12345abcde", p => {
+					p.exceptRun("abcde");
+					return p.return(1, p => {
+						p.acceptRun("abcde");
+
+						return p.return(2);
+					});
+				      }),
+				      a = JSON.stringify(tk.next().value),
+				      b = JSON.stringify(tk.next().value),
+				      c = JSON.stringify(tk.next().value);
+
+				return a === `{"type":1,"data":"12345"}` && b === `{"type":2,"data":"abcde"}` && c === `{"type":-1,"data":""}`;
 			}
 		},
 		"phraser": {
