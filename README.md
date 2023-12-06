@@ -65,6 +65,8 @@ This module contains a full [BBCode](https://en.wikipedia.org/wiki/BBCode) parse
 
 The current implementation requires tags be properly nested.
 
+This module directly imports the [parser](#parser) module.
+
 |  Export    |  Type  | Description  |
 |------------|--------|--------------|
 | [(default)](#bbcode_default) | Function | This function is the main BBCode parsing function. |
