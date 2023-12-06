@@ -215,6 +215,10 @@ class CTokeniser {
 
 		return error();
 	}
+
+	return(type: TokenType, fn?: TokenFn): [Token, TokenFn] {
+		return [{type, "data": this.get()}, fn ?? (() => this.done())];
+	}
 }
 
 /** A Tokeniser is a collection of methods that allow the easy parsing of a text stream. */

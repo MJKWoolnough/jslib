@@ -202,6 +202,10 @@ class CTokeniser {
 
 		return error();
 	}
+
+	return(type, fn) {
+		return [{type, "data": this.get()}, fn ?? (() => this.done())];
+	}
 }
 
 /** A Phraser is a collection of methods that allow the easy parsing of a token stream. */
