@@ -10154,6 +10154,23 @@ type Tests = {
 
 					return JSON.stringify(p.next().value) === `{"type":-2,"data":[{"type":-2,"data":"custom error"}]}` && JSON.stringify(p.next().value) === `{"type":-2,"data":[{"type":-2,"data":"custom error"}]}`;
 				}
+			},
+			"return": async () => {
+				const {default: parser} = await import("./lib/parser.js"),
+				      p = parser("", p => [{"type": 1, "data":"1"}, () => [{"type": 1, "data":"2"}, () => [{"type": 2, "data":"3"}, () => [{"type": 3, "data":"3"}, () => p.done()]]]], p => {
+					p.acceptRun(1);
+
+					return p.return(4, () => {
+						p.acceptRun(2, 3)
+
+						return p.return(5);
+					});
+				      }),
+				      a = JSON.stringify(p.next().value),
+				      b = JSON.stringify(p.next().value),
+				      c = JSON.stringify(p.next().value);
+
+				return a === `{"type":4,"data":[{"type":1,"data":"1"},{"type":1,"data":"2"}]}` && b === `{"type":5,"data":[{"type":2,"data":"3"},{"type":3,"data":"3"}]}` && c === `{"type":-1,"data":[]}`;
 			}
 		},
 		"withNumbers": {
