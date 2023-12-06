@@ -9579,6 +9579,30 @@ type Tests = {
 					return peeked && tk.type === TokenDone && tk.data === "";
 				}
 			},
+			"next": {
+				"123": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("123abc", p => {
+						return [{
+							"type": 1 + +(p.next() === "1" && p.next() === "2" && p.next() === "3"),
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 2 && tk.data === "123";
+				},
+				"abc": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abc", p => {
+						return [{
+							"type": +(p.next() === "a" && p.next() === "b" && p.next() === "c" && p.next() === ""),
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "abc";
+				}
+			},
 			"accept": {
 				"abc": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
