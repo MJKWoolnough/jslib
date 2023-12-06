@@ -327,6 +327,10 @@ class CPhraser {
 
 		return error();
 	}
+
+	return(type, fn) {
+		return [{type, "data": this.get()}, fn ?? (() => this.done())];
+	}
 }
 
 /** withNumbers adds positional information to the tokens, either in the token stream or phrase stream. */

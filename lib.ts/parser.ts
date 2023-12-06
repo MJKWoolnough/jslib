@@ -342,6 +342,10 @@ class CPhraser {
 
 		return error();
 	}
+
+	return(type: PhraseType, fn?: PhraserFn): [Phrase, PhraserFn] {
+		return [{type, "data": this.get()}, fn ?? (() => this.done())];
+	}
 }
 
 /** A Phraser is a collection of methods that allow the easy parsing of a token stream. */
