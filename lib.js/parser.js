@@ -113,6 +113,10 @@ class CTokeniser {
 		this.#sp = sp;
 	}
 
+	next() {
+		return this.#sp.next();
+	}
+
 	/** length() returns the number of characters in the buffer. */
 	length() {
 		return this.#sp.length();
