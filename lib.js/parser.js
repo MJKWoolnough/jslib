@@ -245,6 +245,16 @@ class CPhraser {
 		}
 	}
 
+	next() {
+		const type = this.#next();
+
+		if (type === TokenDone || type === TokenError) {
+			this.#backup();
+		}
+
+		return type;
+	}
+
 	/** length() returns the number of tokens in the buffer. */
 	length() {
 		return this.#tokens.length - +this.#ignoreLast;
