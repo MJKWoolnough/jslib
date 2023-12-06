@@ -4,6 +4,7 @@
  * The current implementation requires tags be properly nested.
  *
  * @module bbcode
+ * @requires module:parser
  */
 /** */
 
