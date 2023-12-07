@@ -28,7 +28,7 @@ const textToken = 1,
 	}
 
 	if (t.length()) {
-		return [{"type": textToken, "data": t.get()}, parseOpen];
+		return t.return(textToken, parseOpen);
 	}
 
 	return parseOpen(t);
@@ -74,7 +74,7 @@ const textToken = 1,
 		return parseText(t);
 	}
 
-	return [{"type": openToken, "data": t.get()}, parseText];
+	return t.return(openToken, parseText);
       },
       parseClose = t => {
 	if (!t.accept(nameChars) || t.acceptRun(nameChars) !== tagStop) {
@@ -83,13 +83,13 @@ const textToken = 1,
 
 	t.except("");
 
-	return [{"type": closeToken, "data": t.get()}, parseText];
+	return t.return(closeToken, parseText);
       },
       mergeText = p => {
 	if (p.accept(textToken)) {
 		p.acceptRun(textToken);
 
-		return [{"type": textToken, "data": p.get()}, mergeText];
+		return p.return(textToken, mergeText);
 	}
 
 	p.except(0);
