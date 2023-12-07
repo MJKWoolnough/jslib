@@ -1998,6 +1998,9 @@ PhraseFn is used by the parsing function to parse a Phrase from a token stream. 
 <a name="parser_phraser">Phraser<a/>
 ```typescript
 class Phraser {
+	/** next() adds the next token to the buffer (if it's not a TokenDone or TokenError) and returns the TokenType. */
+	next(): string;
+
 	/** length() returns the number of tokens in the buffer. */
 	length(): number;
 
@@ -2024,6 +2027,9 @@ class Phraser {
 
 	/** error() returns an Error phrase, optionally with an Error token with an error message, and a recursive PhraseFn which continually returns the same error Phrase. */
 	error(err = "unknown error"): [Phrase, PhraseFn];
+
+	/** return() creates the [Phrase, PhraseFn] tuple, using the parsed tokens as the data. If no PhraseFn is supplied, Phraser.done() is used. */
+	return(type: PhraseType, fn?: PhraserFn): [Phrase, PhraserFn];
 }
 ```
 
@@ -2051,6 +2057,9 @@ TokenFn is used by the parsing function to parse a Token from the text stream. T
 <a name="parser_tokeniser">Tokeniser</a>
 ```typescript
 class Tokeniser {
+	/** next() adds the next character to the buffer and returns it. */
+	next(): string;
+
 	/** length() returns the number of characters in the buffer. */
 	length(): number;
 
@@ -2077,6 +2086,9 @@ class Tokeniser {
 
 	/** error() returns an Error token, with optional error message, and a recursive TokenFn which continually returns the same error Token. */
 	error(err = "unknown error"): [Token, TokenFn];
+
+	/** return() creates the [Token, TokenFn] tuple, using the parsed characters as the data. If no TokenFn is supplied, Tokeniser.done() is used. */
+	return(type: TokenType, fn?: TokenFn): [Token, TokenFn];
 }
 ```
 
