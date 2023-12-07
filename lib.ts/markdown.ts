@@ -628,6 +628,10 @@ const tokenIndentedCodeBlock = 1,
 		if (t.accept("-") && t.accept("-")) {
 			return parseHTMLBlock2(t);
 		}
+
+		break;
+	case '?':
+		return parseHTMLBlock3(3);
 	}
       },
       parseHTMLBlock1 = (t: Tokeniser): [Token, TokenFn] => {
@@ -684,6 +688,13 @@ const tokenIndentedCodeBlock = 1,
 	}
       },
       parseHTMLBlock3 = (t: Tokeniser): [Token, TokenFn] => {
+	while (true) {
+		t.exceptRun("?");
+
+		if (t.accept(">")) {
+			return t.return(tokenHTML, parseBlock);
+		}
+	}
       },
       parseHTMLBlock4 = (t: Tokeniser): [Token, TokenFn] => {
       },
