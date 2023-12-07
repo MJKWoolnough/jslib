@@ -1,4 +1,4 @@
-import type {Token, TokenFn, Tokeniser, TokenType} from './parser.js';
+import type {Token, TokenFn, Tokeniser} from './parser.js';
 import parser from './parser.js';
 
 type Tags = {
