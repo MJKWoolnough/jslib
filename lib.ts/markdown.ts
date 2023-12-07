@@ -615,6 +615,13 @@ const tokenIndentedCodeBlock = 1,
 	return t.return(tokenOrderedListMarker, parseBlock);
       },
       parseText = (t: Tokeniser): [Token, TokenFn] => {
+	t.exceptRun("\n");
+
+	if (t.accept("\n")) {
+		return t.return(tokenText, parseBlock);
+	}
+
+	return t.return(tokenText);
       };
 
 export default (markdown: string, tgs: Partial<Tags> = {}) => {
