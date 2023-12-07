@@ -126,6 +126,7 @@ class CTokeniser {
 		this.#sp = sp;
 	}
 
+	/** next() adds the next character to the buffer and returns it. */
 	next() {
 		return this.#sp.next();
 	}
@@ -220,6 +221,7 @@ class CTokeniser {
 		return error();
 	}
 
+	/** return() creates the [Token, TokenFn] tuple, using the parsed characters as the data. If no TokenFn is supplied, Tokeniser.done() is used. */
 	return(type: TokenType, fn?: TokenFn): [Token, TokenFn] {
 		return [{type, "data": this.get()}, fn ?? (() => this.done())];
 	}
@@ -260,6 +262,7 @@ class CPhraser {
 		}
 	}
 
+	/** next() adds the next token to the buffer (if it's not a TokenDone or TokenError) and returns the TokenType. */
 	next() {
 		const type = this.#next();
 
@@ -357,6 +360,7 @@ class CPhraser {
 		return error();
 	}
 
+	/** return() creates the [Phrase, PhraseFn] tuple, using the parsed tokens as the data. If no PhraseFn is supplied, Phraser.done() is used. */
 	return(type: PhraseType, fn?: PhraserFn): [Phrase, PhraserFn] {
 		return [{type, "data": this.get()}, fn ?? (() => this.done())];
 	}
