@@ -459,11 +459,10 @@ const tokenIndentedCodeBlock = 1,
       tokenOrderedListMarker = 10,
       tokenText = 11,
       whiteSpace = " \t",
-      tokenReturn = (type: TokenType, t: Tokeniser | string, fn?: TokenFn): [Token, TokenFn] => [{type, "data": typeof t === "string" ? t : t.get()}, fn ?? (() => t.done())],
       parseBlock = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.acceptRun(" ");
 	if (t.length() >= 4) {
-		return tokenReturn(tokenIndentedCodeBlock, t, parseBlock);
+		return t.return(tokenIndentedCodeBlock, parseBlock);
 	}
 
 	switch (char) {
@@ -494,7 +493,7 @@ const tokenIndentedCodeBlock = 1,
 	case '9':
 		return parseOrderedListMarker(t);
 	case '':
-		return tokenReturn(tokenText, t);
+		return t.return(tokenText);
 	default:
 		return parseText(t);
 	}
@@ -503,7 +502,7 @@ const tokenIndentedCodeBlock = 1,
 	t.accept(">");
 	t.accept(" ");
 
-	return tokenReturn(tokenBlockQuote, t, parseBlock);
+	return t.return(tokenBlockQuote, parseBlock);
       },
       parseThematicBreak = (t: Tokeniser, firstParsed = false): [Token, TokenFn] => {
 	const char = t.peek();
@@ -527,27 +526,27 @@ const tokenIndentedCodeBlock = 1,
 	t.acceptRun(char + whiteSpace);
 	t.accept("\n");
 
-	return tokenReturn(tokenThematicBreak, t.get(), parseBlock);
+	return t.return(tokenThematicBreak, parseBlock);
       },
       parseSetextHeading = (t: Tokeniser): [Token, TokenFn] => {
-	const char = t.peek();
+	const char = t.next();
 
 	t.acceptRun(char);
 
 	if (!t.acceptRun(whiteSpace)) {
-		return tokenReturn(tokenSetextHeading, t);
+		return t.return(tokenSetextHeading);
 	} else if (!t.accept("\n")) {
 		return parseText(t);
 	}
 
-	return tokenReturn(tokenSetextHeading, t, parseBlock);
+	return t.return(tokenSetextHeading, parseBlock);
       },
       parseATXHeading = (t: Tokeniser): [Token, TokenFn] => {
 	t.acceptRun("#");
 
 	t.exceptRun("\n");
 
-	return tokenReturn(tokenATXHeading, t, parseBlock);
+	return t.return(tokenATXHeading, parseBlock);
       },
       [parseFencedCodeBlock, parseFencedCodeBlockContents] = (() => {
 	let fcbChar = "",
@@ -555,9 +554,7 @@ const tokenIndentedCodeBlock = 1,
 
 	return [
 		(t: Tokeniser): [Token, TokenFn] => {
-			fcbChar = t.peek();
-
-			t.accept(fcbChar);
+			fcbChar = t.next();
 
 			if (!t.accept(fcbChar) || !t.accept(fcbChar)) {
 				return parseText(t);
@@ -572,7 +569,7 @@ const tokenIndentedCodeBlock = 1,
 			t.exceptRun("\n");
 			t.accept("\n");
 
-			return tokenReturn(tokenFencedClodeBlockOpen, t, parseFencedCodeBlockContents);
+			return t.return(tokenFencedClodeBlockOpen, parseFencedCodeBlockContents);
 		},
 		(t: Tokeniser): [Token, TokenFn] => {
 			t.acceptRun(" ");
@@ -585,7 +582,7 @@ const tokenIndentedCodeBlock = 1,
 				t.acceptRun(whiteSpace);
 
 				if (!t.peek() || t.accept("\n")) {
-					return tokenReturn(tokenFencedClodeBlockClose, t, parseBlock);
+					return t.return(tokenFencedClodeBlockClose, parseBlock);
 				}
 			}
 
@@ -594,9 +591,7 @@ const tokenIndentedCodeBlock = 1,
 	];
       })(),
       parseBulletListMarker = (t: Tokeniser): [Token, TokenFn] => {
-	const char = t.peek();
-
-	t.accept(char);
+	const char = t.next();
 
 	if (!t.accept(whiteSpace)) {
 		if (char === "-") {
@@ -606,7 +601,7 @@ const tokenIndentedCodeBlock = 1,
 		return parseText(t);
 	}
 
-	return tokenReturn(tokenBulletListMarker, t, parseBlock);
+	return t.return(tokenBulletListMarker, parseBlock);
       },
       parseOrderedListMarker = (t: Tokeniser): [Token, TokenFn] => {
 	const l = t.length();
@@ -617,7 +612,7 @@ const tokenIndentedCodeBlock = 1,
 		return parseText(t);
 	}
 
-	return tokenReturn(tokenOrderedListMarker, t, parseBlock);
+	return t.return(tokenOrderedListMarker, parseBlock);
       },
       parseText = (t: Tokeniser): [Token, TokenFn] => {
       };
