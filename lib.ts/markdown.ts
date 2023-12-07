@@ -622,6 +622,12 @@ const tokenIndentedCodeBlock = 1,
 		if (t.accept("eE") && t.accept("xX") && t.accept("tT") && t.accept("aA") && t.accept("rR") && t.accept("eE") && t.accept("aA") && t.accept(" \t>\n")) {
 			return parseHTMLBlock1(t);
 		}
+
+		break;
+	case '!':
+		if (t.accept("-") && t.accept("-")) {
+			return parseHTMLBlock2(t);
+		}
 	}
       },
       parseHTMLBlock1 = (t: Tokeniser): [Token, TokenFn] => {
@@ -661,6 +667,21 @@ const tokenIndentedCodeBlock = 1,
 	}
       },
       parseHTMLBlock2 = (t: Tokeniser): [Token, TokenFn] => {
+	while (true) {
+		t.exceptRun("-");
+		t.accept("-");
+		
+		if (t.accept("-")) {
+			t.acceptRun("-");
+
+			if (t.accept(">")) {
+				t.exceptRun("\n");
+				t.accept("\n");
+
+				return t.return(tokenHTML, parseBlock);
+			}
+		}
+	}
       },
       parseHTMLBlock3 = (t: Tokeniser): [Token, TokenFn] => {
       },
