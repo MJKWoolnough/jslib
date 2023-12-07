@@ -461,11 +461,14 @@ const tokenIndentedCodeBlock = 1,
       whiteSpace = " \t",
       parseBlock = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.acceptRun(" ");
+
 	if (t.length() >= 4) {
 		return t.return(tokenIndentedCodeBlock, parseBlock);
 	}
 
 	switch (char) {
+	case '<':
+		return parseHTML(t);
 	case '>':
 		return parseBlockQuote(t);
 	case '*':
@@ -590,6 +593,85 @@ const tokenIndentedCodeBlock = 1,
 		}
 	];
       })(),
+      parseHTML = (t: Tokeniser): [Token, TokenFn] => {
+	t.accept("<");
+
+	switch (t.next()) {
+	case 'p':
+	case 'P':
+		if (t.accept("rR") && t.accept("eE")) {
+			return parseHTMLBlock1(t);
+		}
+
+		break;
+	case 's':
+	case 'S':
+		if (t.accept("cC")) {
+			if (t.accept("rR") && t.accept("iI") && t.accept("pP") && t.accept("tT") && t.accept(" \t>\n")) {
+				return parseHTMLBlock1(t);
+			}
+		} else if (t.accept("tT")) {
+			if (t.accept("yY") && t.accept("lL") && t.accept("eE") && t.accept(" \t>\n")) {
+				return parseHTMLBlock1(t);
+			}
+		}
+
+		break;
+	case 't':
+	case 'T':
+		if (t.accept("eE") && t.accept("xX") && t.accept("tT") && t.accept("aA") && t.accept("rR") && t.accept("eE") && t.accept("aA") && t.accept(" \t>\n")) {
+			return parseHTMLBlock1(t);
+		}
+	}
+      },
+      parseHTMLBlock1 = (t: Tokeniser): [Token, TokenFn] => {
+	while (true) {
+		if (t.exceptRun("<") === "") {
+			return t.return(tokenHTML);
+		}
+
+		if (t.accept("/")) {
+			if (t.accept("pP")) {
+				if (!t.accept("rR") || !t.accept("iI") || !t.accept("pP") || !t.accept("tT")) {
+					continue;
+				}
+			} else if (t.accept("sS")) {
+				if (t.accept("cC")) {
+					if (!t.accept("rR") || !t.accept("iI") || !t.accept("pP") || !t.accept("tT")) {
+						continue;
+					}
+				} else if (t.accept("tT")) {
+					if (!t.accept("yY") || !t.accept("lL") || !t.accept("eE")) {
+						continue;
+					}
+				} else {
+					continue;
+				}
+			} else if (!t.accept("tT") || !t.accept("eE") || !t.accept("xX") || !t.accept("tT") || !t.accept("aA") || !t.accept("rR") || !t.accept("eE") || !t.accept("aA")) {
+				continue;
+			}
+
+			if (t.accept(">")) {
+				t.exceptRun("\n");
+				t.accept("\n");
+
+				return t.return(tokenHTML, parseBlock);
+			}
+		}
+	}
+      },
+      parseHTMLBlock2 = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseHTMLBlock3 = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseHTMLBlock4 = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseHTMLBlock5 = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseHTMLBlock6 = (t: Tokeniser): [Token, TokenFn] => {
+      },
+      parseHTMLBlock7 = (t: Tokeniser): [Token, TokenFn] => {
+      },
       parseBulletListMarker = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.next();
 
