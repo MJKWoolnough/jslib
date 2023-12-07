@@ -380,7 +380,7 @@ export const withNumbers = function* (p) {
 
 		yield t;
 	}
-}
+};
 
 /**
  * The default function can parse a text stream into either a stream of tokens or a stream of phrases, depending on whether a phrase parsing function is provided.

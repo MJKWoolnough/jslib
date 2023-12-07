@@ -398,7 +398,7 @@ export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, 
 
 		yield t as any;
 	}
-}
+};
 
 /**
  * The default function can parse a text stream into either a stream of tokens or a stream of phrases, depending on whether a phrase parsing function is provided.
