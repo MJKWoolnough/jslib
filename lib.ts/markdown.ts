@@ -700,7 +700,7 @@ const tokenIndentedCodeBlock = 1,
       parseHTMLBlock5 = (t: Tokeniser): [Token, TokenFn] => {
 	while (true) {
 		if (!t.exceptRun("]")) {
-			return t.return(tokenText);
+			return t.return(tokenHTML);
 		}
 
 		t.accept("]");
