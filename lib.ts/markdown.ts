@@ -631,12 +631,12 @@ const tokenIndentedCodeBlock = 1,
 
 		break;
 	case '?':
-		return parseHTMLBlock3(3);
+		return parseHTMLBlock3(t);
 	}
       },
       parseHTMLBlock1 = (t: Tokeniser): [Token, TokenFn] => {
 	while (true) {
-		if (t.exceptRun("<") === "") {
+		if (!t.exceptRun("<")) {
 			return t.return(tokenHTML);
 		}
 
@@ -672,7 +672,10 @@ const tokenIndentedCodeBlock = 1,
       },
       parseHTMLBlock2 = (t: Tokeniser): [Token, TokenFn] => {
 	while (true) {
-		t.exceptRun("-");
+		if (!t.exceptRun("-")) {
+			return t.return(tokenHTML);
+		}
+
 		t.accept("-");
 		
 		if (t.accept("-")) {
@@ -689,7 +692,9 @@ const tokenIndentedCodeBlock = 1,
       },
       parseHTMLBlock3 = (t: Tokeniser): [Token, TokenFn] => {
 	while (true) {
-		t.exceptRun("?");
+		if (!t.exceptRun("?")) {
+			return t.return(tokenHTML);
+		}
 
 		if (t.accept(">")) {
 			return t.return(tokenHTML, parseBlock);
