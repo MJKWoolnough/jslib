@@ -625,8 +625,12 @@ const tokenIndentedCodeBlock = 1,
 
 		break;
 	case '!':
-		if (t.accept("-") && t.accept("-")) {
-			return parseHTMLBlock2(t);
+		if (t.accept("-")) {
+			if (t.accept("-")) {
+				return parseHTMLBlock2(t);
+			}
+		} else if (t.accept("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
+			return parseHTMLBlock4(t);
 		}
 
 		break;
@@ -702,6 +706,12 @@ const tokenIndentedCodeBlock = 1,
 	}
       },
       parseHTMLBlock4 = (t: Tokeniser): [Token, TokenFn] => {
+	t.exceptRun(">");
+	t.accept(">");
+	t.exceptRun("\n");
+	t.accept("\n");
+
+	return t.return(tokenHTML, parseBlock);
       },
       parseHTMLBlock5 = (t: Tokeniser): [Token, TokenFn] => {
       },
