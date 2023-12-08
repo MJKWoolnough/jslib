@@ -631,6 +631,8 @@ const tokenIndentedCodeBlock = 1,
 			}
 		} else if (t.accept("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
 			return parseHTMLBlock4(t);
+		} else if (t.accept("[") && t.accept("C") && t.accept("D") && t.accept("A") && t.accept("T") && t.accept("A") && t.accept("[")) {
+			return parseHTMLBlock5(t);
 		}
 
 		break;
@@ -714,6 +716,23 @@ const tokenIndentedCodeBlock = 1,
 	return t.return(tokenHTML, parseBlock);
       },
       parseHTMLBlock5 = (t: Tokeniser): [Token, TokenFn] => {
+	while (true) {
+		if (!t.exceptRun("]")) {
+			return t.return(tokenText);
+		}
+
+		t.accept("]");
+		if (t.accept("]")) {
+			t.acceptRun("]");
+
+			if (t.accept(">")) {
+				t.exceptRun("\n");
+				t.accept("\n");
+
+				return t.return(tokenHTML, parseBlock);
+			}
+		}
+	}
       },
       parseHTMLBlock6 = (t: Tokeniser): [Token, TokenFn] => {
       },
