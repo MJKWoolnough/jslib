@@ -593,52 +593,52 @@ const tokenIndentedCodeBlock = 1,
 		}
 	];
       })(),
+      parseWord = (t: Tokeniser, words: string[], caseSensitive = false) => {
+	let read = "";
+
+	while (true) {
+		const char = caseSensitive ? t.peek() : t.peek().toLowerCase();
+
+		words = words.filter(w => caseSensitive ? w.startsWith(char) : w.toLowerCase().startsWith(char)).map(w => w.slice(1));
+
+		if (!words.length) {
+			break;
+		}
+
+		read += t.next();
+	}
+
+	return read;
+      },
+      htmlElements = ["pre", "script", "style", "textarea", "address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"],
+      type1Elements = htmlElements.slice(0, 4),
       parseHTML = (t: Tokeniser): [Token, TokenFn] => {
 	t.accept("<");
 
-	switch (t.next()) {
-	case 'p':
-	case 'P':
-		if (t.accept("rR") && t.accept("eE")) {
-			return parseHTMLBlock1(t);
-		}
+	const tag = parseWord(t, htmlElements),
+	      i = htmlElements.indexOf(tag.toLowerCase());
 
-		break;
-	case 's':
-	case 'S':
-		if (t.accept("cC")) {
-			if (t.accept("rR") && t.accept("iI") && t.accept("pP") && t.accept("tT") && t.accept(" \t>\n")) {
-				return parseHTMLBlock1(t);
-			}
-		} else if (t.accept("tT")) {
-			if (t.accept("yY") && t.accept("lL") && t.accept("eE") && t.accept(" \t>\n")) {
-				return parseHTMLBlock1(t);
-			}
-		}
-
-		break;
-	case 't':
-	case 'T':
-		if (t.accept("eE") && t.accept("xX") && t.accept("tT") && t.accept("aA") && t.accept("rR") && t.accept("eE") && t.accept("aA") && t.accept(" \t>\n")) {
-			return parseHTMLBlock1(t);
-		}
-
-		break;
-	case '!':
-		if (t.accept("-")) {
+	if (i === -1) {
+		if (t.accept("!")) {
 			if (t.accept("-")) {
-				return parseHTMLBlock2(t);
+				if (t.accept("-")) {
+					return parseHTMLBlock2(t);
+				}
+			} else if (t.accept("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
+				return parseHTMLBlock4(t);
+			} else if (t.accept("[") && t.accept("C") && t.accept("D") && t.accept("A") && t.accept("T") && t.accept("A") && t.accept("[")) {
+				return parseHTMLBlock5(t);
 			}
-		} else if (t.accept("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
-			return parseHTMLBlock4(t);
-		} else if (t.accept("[") && t.accept("C") && t.accept("D") && t.accept("A") && t.accept("T") && t.accept("A") && t.accept("[")) {
-			return parseHTMLBlock5(t);
+		} else if (t.accept("?")) {
+			return parseHTMLBlock3(t);
 		}
-
-		break;
-	case '?':
-		return parseHTMLBlock3(t);
+	} else if (i < 4) {
+		if (t.accept(" \t\n")) {
+			return parseHTMLBlock1(t);
+		}
 	}
+
+	return parseText(t);
       },
       parseHTMLBlock1 = (t: Tokeniser): [Token, TokenFn] => {
 	while (true) {
@@ -646,33 +646,11 @@ const tokenIndentedCodeBlock = 1,
 			return t.return(tokenHTML);
 		}
 
-		if (t.accept("/")) {
-			if (t.accept("pP")) {
-				if (!t.accept("rR") || !t.accept("iI") || !t.accept("pP") || !t.accept("tT")) {
-					continue;
-				}
-			} else if (t.accept("sS")) {
-				if (t.accept("cC")) {
-					if (!t.accept("rR") || !t.accept("iI") || !t.accept("pP") || !t.accept("tT")) {
-						continue;
-					}
-				} else if (t.accept("tT")) {
-					if (!t.accept("yY") || !t.accept("lL") || !t.accept("eE")) {
-						continue;
-					}
-				} else {
-					continue;
-				}
-			} else if (!t.accept("tT") || !t.accept("eE") || !t.accept("xX") || !t.accept("tT") || !t.accept("aA") || !t.accept("rR") || !t.accept("eE") || !t.accept("aA")) {
-				continue;
-			}
+		if (t.accept("/") && type1Elements.indexOf(parseWord(t, type1Elements).toLowerCase()) !== -1 && t.accept(">")) {
+			t.exceptRun("\n");
+			t.accept("\n");
 
-			if (t.accept(">")) {
-				t.exceptRun("\n");
-				t.accept("\n");
-
-				return t.return(tokenHTML, parseBlock);
-			}
+			return t.return(tokenHTML, parseBlock);
 		}
 	}
       },
