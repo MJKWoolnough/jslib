@@ -9562,6 +9562,7 @@ type Tests = {
 
 					parser("abc", p => {
 						peeked = p.peek() === "a";
+
 						return p.done();
 					}).next();
 
@@ -9573,6 +9574,7 @@ type Tests = {
 					const {default: parser, TokenDone} = await import("./lib/parser.js"),
 					      tk = parser("cab", p => {
 						peeked = p.peek() === "c";
+
 						return p.done();
 					      }).next().value;
 
@@ -9582,23 +9584,19 @@ type Tests = {
 			"next": {
 				"123": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
-					      tk = parser("123abc", p => {
-						return [{
+					      tk = parser("123abc", p => [{
 							"type": 1 + +(p.next() === "1" && p.next() === "2" && p.next() === "3"),
 							"data": p.get()
-						}, () => p.done()];
-					      }).next().value;
+						}, () => p.done()]).next().value;
 
 					return tk.type === 2 && tk.data === "123";
 				},
 				"abc": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
-					      tk = parser("abc", p => {
-						return [{
+					      tk = parser("abc", p => [{
 							"type": +(p.next() === "a" && p.next() === "b" && p.next() === "c" && p.next() === ""),
 							"data": p.get()
-						}, () => p.done()];
-					      }).next().value;
+						}, () => p.done()]).next().value;
 
 					return tk.type === 1 && tk.data === "abc";
 				}
@@ -9610,6 +9608,7 @@ type Tests = {
 						p.accept("a");
 						p.accept("b");
 						p.accept("d");
+
 						return [{
 							"type": 1,
 							"data": p.get()
@@ -9624,6 +9623,7 @@ type Tests = {
 						p.accept("a");
 						p.accept("b");
 						p.accept("c");
+
 						return [{
 							"type": 2,
 							"data": p.get()
@@ -9641,6 +9641,7 @@ type Tests = {
 						p.accept("a");
 						p.accept("b");
 						p.accept("c");
+
 						return [{
 							"type": 1,
 							"data": p.get()
@@ -9690,6 +9691,7 @@ type Tests = {
 						p.acceptRun("a");
 						p.acceptRun("b");
 						p.acceptRun("d");
+
 						return [{
 							"type": 1,
 							"data": p.get()
@@ -9704,6 +9706,7 @@ type Tests = {
 						p.acceptRun("a");
 						p.acceptRun("b");
 						p.acceptRun("c");
+
 						return [{
 							"type": 2,
 							"data": p.get()
@@ -9719,6 +9722,7 @@ type Tests = {
 						p.acceptRun("b");
 						p.acceptRun("c");
 						p.acceptRun("d");
+
 						return [{
 							"type": 1,
 							"data": p.get()
@@ -9768,6 +9772,7 @@ type Tests = {
 						p.except("a");
 						p.except("b");
 						p.except("d");
+
 						return [{
 							"type": 1,
 							"data": p.get()
@@ -9782,6 +9787,7 @@ type Tests = {
 						p.except("a");
 						p.except("b");
 						p.except("c");
+
 						return [{
 							"type": 2,
 							"data": p.get()
@@ -9799,6 +9805,7 @@ type Tests = {
 						p.except("a");
 						p.except("b");
 						p.except("c");
+
 						return [{
 							"type": 1,
 							"data": p.get()
@@ -9815,6 +9822,7 @@ type Tests = {
 						p.exceptRun("a");
 						p.exceptRun("b");
 						p.exceptRun("cd");
+
 						return [{
 							"type": 1,
 							"data": p.get()
@@ -9829,6 +9837,7 @@ type Tests = {
 						p.exceptRun("a");
 						p.exceptRun("b");
 						p.exceptRun("c");
+
 						return [{
 							"type": 2,
 							"data": p.get()
@@ -9845,6 +9854,7 @@ type Tests = {
 						p.exceptRun("c");
 						p.exceptRun("d");
 						p.exceptRun("e");
+
 						return [{
 							"type": 1,
 							"data": p.get()
@@ -9942,7 +9952,7 @@ type Tests = {
 						peeked = p.peek() === 1;
 
 						return p.done();
-					      }).next();
+					}).next();
 
 					return peeked;
 				},
@@ -9955,7 +9965,7 @@ type Tests = {
 						peeked = p.peek() === 2;
 
 						return p.done();
-					      }).next();
+					}).next();
 
 					return peeked;
 				}
@@ -9974,8 +9984,6 @@ type Tests = {
 					      p = parser("", p => [{"type": 2, "data": "abcde"}, () => p.done()], p => {
 						return [{"type": 2 + +(p.next() === 2 && p.next() === -1), "data": p.get()}, () => p.done()];
 					      }).next().value;
-
-					console.log(p);
 
 					return JSON.stringify(p) === `{"type":3,"data":[{"type":2,"data":"abcde"}]}`;
 				}
