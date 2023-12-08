@@ -58,7 +58,7 @@ export type PhraseWithNumbers = {
  * @param {Tokeniser} p The tokeniser from which to parse the token.
  *
  * @returns {[Token, TokenFn]} Returns the parsed token and the next TokenFn with which to parse the next token.
- * */
+ */
 export type TokenFn = (p: Tokeniser) => [Token, TokenFn];
 
 /*
@@ -67,92 +67,73 @@ export type TokenFn = (p: Tokeniser) => [Token, TokenFn];
  * @param {Phraser} p The phraser from which to parse the phrase.
  *
  * @returns {[Phrase, PhraseFn]} Returns the parsed phrase and the next PhraseFn with which to parse the next phrase.
- * */
+ */
 export type PhraserFn = (p: Phraser) => [Phrase, PhraserFn];
 
 /** The StringParser interface represents an alternate to a string for parsing. */
-interface StringParser {
-	/** next() should return the next character in the stream */
-	next(): string;
-	/** backup() should undo the last character read. Will only be called after a successful call to next(). */
-	backup(): void;
-	/** length() should return the number of characters read since the last call to get() or from initialisation. */
-	length(): number;
-	/** get() should return all of the characters returned by next() since the last call to get() or from initialisation. */
-	get(): string;
-}
+type StringParser  = Iterator<string, void>;
 
 interface ParserOrPhraser {
 	(text: string | StringParser, parserFn: TokenFn): Generator<Token, never>;
 	(text: string | StringParser, parserFn: TokenFn, phraserFn: PhraserFn): Generator<Phrase, never>;
 }
 
-class StrParser {
-	#text: string;
-	#pos = 0;
-	#lastPos = 0;
-
-	constructor(text: string) {
-		this.#text = text;
-	}
-
-	next() {
-		if (this.#pos === this.#text.length) {
-			return "";
-		}
-
-		return this.#text.charAt(this.#pos++);
-	}
-
-	backup() {
-		if (this.#pos > this.#lastPos) {
-			this.#pos--;
-		}
-	}
-
-	length() {
-		return this.#pos - this.#lastPos;
-	}
-
-	get() {
-		return this.#text.slice(this.#lastPos, this.#lastPos = this.#pos);
-	}
-}
-
 class CTokeniser {
-	#sp: StringParser;
+	#text: StringParser;
+	#buffer = "";
+	#ignoreLast = false;
 
-	constructor(sp: StringParser) {
-		this.#sp = sp;
+	constructor(text: StringParser) {
+		this.#text = text;
 	}
 
 	/** next() adds the next character to the buffer and returns it. */
 	next() {
-		return this.#sp.next();
+		if (this.#ignoreLast) {
+			this.#ignoreLast = false;
+
+			return this.#buffer.at(-1)!;
+		}
+
+		const char = this.#text.next().value ?? "";
+
+		this.#buffer += char;
+
+		return char;
+	}
+
+	#backup() {
+		if (this.#buffer) {
+			this.#ignoreLast = true;
+		}
 	}
 
 	/** length() returns the number of characters in the buffer. */
 	length() {
-		return this.#sp.length();
+		return this.#buffer.length - +(this.#ignoreLast);
 	}
 
 	/** get() returns all of the characters processed, clearing the buffer. */
 	get() {
-		return this.#sp.get();
+		const buffer = this.#buffer.slice(0, this.#buffer.length - +(this.#ignoreLast));
+
+		this.#buffer = this.#ignoreLast ? this.#buffer.at(-1)! : "";
+
+		return buffer;
 	}
 
 	/** peek() looks ahead at the next character in the stream without adding it to the buffer. */
 	peek() {
-		const c = this.#sp.next();
-		this.#sp.backup();
+		const c = this.next();
+		this.#backup();
 
 		return c;
 	}
 
 	/** accept() adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. */
 	accept(chars: string) {
-		if (!chars.includes(this.#sp.next())) {
-			this.#sp.backup();
+		if (!chars.includes(this.next())) {
+			this.#backup();
 
 			return false;
 		}
@@ -163,14 +144,14 @@ class CTokeniser {
 	/** acceptRun() successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run. */
 	acceptRun(chars: string) {
 		while (true) {
-			const c = this.#sp.next();
+			const c = this.next();
 
 			if (!c) {
 				return "";
 			}
 
 			if (!chars.includes(c)) {
-				this.#sp.backup();
+				this.#backup();
 
 				return c;
 			}
@@ -179,10 +160,10 @@ class CTokeniser {
 	
 	/** except() adds the next character in the stream to the buffer as long as they are not in the string provided. Returns true if a character was added. */
 	except(chars: string) {
-		const c = this.#sp.next();
+		const c = this.next();
 
 		if (!c || chars.includes(c)) {
-			this.#sp.backup();
+			this.#backup();
 
 			return false;
 		}
@@ -193,14 +174,14 @@ class CTokeniser {
 	/** exceptRun() successively adds characters in the stream to the buffer as long as they are not in the string provided. Returns the character that stopped the run. */
 	exceptRun(chars: string) {
 		while (true) {
-			const c = this.#sp.next();
+			const c = this.next();
 
 			if (!c) {
 				return c;
 			}
 
 			if (chars.includes(c)) {
-				this.#sp.backup();
+				this.#backup();
 
 				return c;
 			}
@@ -408,9 +389,9 @@ export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, 
  * @param {PhraserFn} [phraserFn]    Optional phraser function to produce a phrase steam.
  *
  * @returns {Token | Phrase}         Returns a stream of either Tokens or Phrases.
- * */
+ */
 export default (function* (text: string | StringParser, parserFn: TokenFn, phraserFn?: PhraserFn) {
-	const parser = new CTokeniser(typeof text === "string" ? new StrParser(text) : text),
+	const parser = new CTokeniser(typeof text === "string" ? text[Symbol.iterator]() : text),
 	      p = phraserFn ? new CPhraser(parser, parserFn) : parser;
 
 	let fn = phraserFn ?? parserFn;
