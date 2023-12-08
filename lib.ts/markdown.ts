@@ -459,6 +459,8 @@ const tokenIndentedCodeBlock = 1,
       tokenOrderedListMarker = 10,
       tokenText = 11,
       whiteSpace = " \t",
+      letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      number = "0123456789",
       parseBlock = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.acceptRun(" ");
 
@@ -615,16 +617,72 @@ const tokenIndentedCodeBlock = 1,
       parseHTML = (t: Tokeniser): [Token, TokenFn] => {
 	t.accept("<");
 
-	const tag = parseWord(t, htmlElements),
+	const close = t.accept("/"),
+	      tag = parseWord(t, htmlElements),
 	      i = htmlElements.indexOf(tag.toLowerCase());
 
-	if (i === -1) {
-		if (t.accept("!")) {
+	if (close) {
+		if (i === -1) {
+			if (t.accept(letter)) {
+				t.acceptRun(letter + number + "-");
+				t.acceptRun(whiteSpace);
+				t.acceptRun("\n");
+				t.acceptRun(whiteSpace);
+				if (t.accept(">")) {
+					return parseHTMLBlock6(t);
+				}
+			}
+		} else if (t.accept(whiteSpace) || t.peek() === "\n" || (t.accept("/") && t.accept(">"))) {
+			return parseHTMLBlock6(t);
+		}
+	} else if (i === -1) {
+		if (tag) {
+			while (true) {
+				t.acceptRun(whiteSpace);
+				t.accept("\n");
+				t.acceptRun(whiteSpace);
+
+				if (t.accept("/")) {
+					if (t.accept(">")) {
+						return parseHTMLBlock6(t);
+					}
+
+					return parseText(t);
+				} else if (t.accept(">")) {
+					return parseHTMLBlock6(t);
+				} else if (!t.accept(letter + "_:")) {
+					return parseText(t);
+				}
+
+				t.acceptRun(letter + number + "_.:-");
+				t.acceptRun(whiteSpace);
+				t.accept("\n");
+				t.acceptRun(whiteSpace);
+
+				if (t.accept("=")) {
+					if (t.accept("'")) {
+						t.exceptRun("'");
+						if (!t.accept("'")) {
+							return parseText(t);
+						}
+					} else if (t.accept('"')) {
+						t.exceptRun('"');
+						if (!t.accept('"')) {
+							return parseText(t);
+						}
+					} else if (t.accept(whiteSpace + "\"'=<>`")) {
+						return parseText(t);
+					} else {
+						t.exceptRun(whiteSpace + "\"'=<>`");
+					}
+				}
+			}
+		} else if (t.accept("!")) {
 			if (t.accept("-")) {
 				if (t.accept("-")) {
 					return parseHTMLBlock2(t);
 				}
-			} else if (t.accept("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
+			} else if (t.accept(letter)) {
 				return parseHTMLBlock4(t);
 			} else if (t.accept("[") && t.accept("C") && t.accept("D") && t.accept("A") && t.accept("T") && t.accept("A") && t.accept("[")) {
 				return parseHTMLBlock5(t);
@@ -728,8 +786,6 @@ const tokenIndentedCodeBlock = 1,
 			return t.return(tokenHTML, parseBlock);
 		}
 	}
-      },
-      parseHTMLBlock7 = (t: Tokeniser): [Token, TokenFn] => {
       },
       parseBulletListMarker = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.next();
