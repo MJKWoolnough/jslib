@@ -751,7 +751,10 @@ const tokenIndentedCodeBlock = 1,
 	t.exceptRun(">");
 	t.accept(">");
 	t.exceptRun("\n");
-	t.accept("\n");
+
+	if (!t.accept("\n")) {
+		return t.return(tokenHTML);
+	}
 
 	return t.return(tokenHTML, parseBlock);
       },
