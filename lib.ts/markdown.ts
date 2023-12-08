@@ -633,8 +633,12 @@ const tokenIndentedCodeBlock = 1,
 			return parseHTMLBlock3(t);
 		}
 	} else if (i < 4) {
-		if (t.accept(" \t\n")) {
+		if (t.accept(whiteSpace) || t.peek() === "\n") {
 			return parseHTMLBlock1(t);
+		}
+	} else {
+		if (t.accept(whiteSpace) || t.peek() === "\n" || (t.accept("/") && t.accept(">"))) {
+			return parseHTMLBlock6(t);
 		}
 	}
 
@@ -713,6 +717,17 @@ const tokenIndentedCodeBlock = 1,
 	}
       },
       parseHTMLBlock6 = (t: Tokeniser): [Token, TokenFn] => {
+	while (true) {
+		if (!t.exceptRun("\n")) {
+			return t.return(tokenHTML);
+		}
+
+		t.accept("\n");
+		t.acceptRun(whiteSpace);
+		if (t.accept("\n")) {
+			return t.return(tokenHTML, parseBlock);
+		}
+	}
       },
       parseHTMLBlock7 = (t: Tokeniser): [Token, TokenFn] => {
       },
