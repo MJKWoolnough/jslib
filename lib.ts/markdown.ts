@@ -448,30 +448,34 @@ const tags: Tags = Object.assign({
       ] as const).map(k => Markdown.prototype[k]);
 
 class Block {
-	children: (Block | Leaf)[] = [];
+	open = true;
 }
 
-class BlockQuote extends Block {
+class ContainerBlock extends Block {
+	children: Block[] = [];
+}
+
+class BlockQuote extends ContainerBlock {
 
 }
 
-class Leaf {
+class LeafBlock extends Block {
 	lines: string[] = [];
 }
 
-class HTML extends Leaf {
+class HTML extends LeafBlock {
 }
 
-class Paragraph extends Leaf {
+class Paragraph extends LeafBlock {
 }
 
-class ATXHeading extends Leaf {
+class ATXHeading extends LeafBlock {
 }
 
-class FencedCodeBlock extends Leaf {
+class FencedCodeBlock extends LeafBlock {
 }
 
-class IndentedCodeBlock {
+class IndentedCodeBlock extends LeafBlock {
 
 }
 
