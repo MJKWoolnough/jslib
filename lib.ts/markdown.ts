@@ -479,8 +479,8 @@ const tokenIndentedCodeBlock = 1,
       tokenThematicBreak = 2,
       tokenATXHeading = 3,
       tokenSetextHeading = 4,
-      tokenFencedClodeBlockOpen = 5,
-      tokenFencedClodeBlockClose = 6,
+      tokenFencedCodeBlockOpen = 5,
+      tokenFencedCodeBlockClose = 6,
       tokenHTML = 7,
       tokenBlockQuote = 8,
       tokenBulletListMarker = 9,
@@ -602,7 +602,7 @@ const tokenIndentedCodeBlock = 1,
 			t.exceptRun("\n");
 			t.accept("\n");
 
-			return t.return(tokenFencedClodeBlockOpen, parseFencedCodeBlockContents);
+			return t.return(tokenFencedCodeBlockOpen, parseFencedCodeBlockContents);
 		},
 		(t: Tokeniser): [Token, TokenFn] => {
 			t.acceptRun(" ");
@@ -615,7 +615,7 @@ const tokenIndentedCodeBlock = 1,
 				t.acceptRun(whiteSpace);
 
 				if (!t.peek() || t.accept("\n")) {
-					return t.return(tokenFencedClodeBlockClose, parseBlock);
+					return t.return(tokenFencedCodeBlockClose, parseBlock);
 				}
 			}
 
