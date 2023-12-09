@@ -481,11 +481,17 @@ const tokenIndentedCodeBlock = 1,
       tokenSetextHeading = 4,
       tokenFencedCodeBlockOpen = 5,
       tokenFencedCodeBlockClose = 6,
-      tokenHTML = 7,
-      tokenBlockQuote = 8,
-      tokenBulletListMarker = 9,
-      tokenOrderedListMarker = 10,
-      tokenText = 11,
+      tokenHTMLKind1 = 7,
+      tokenHTMLKind2 = 8,
+      tokenHTMLKind3 = 9,
+      tokenHTMLKind4 = 10,
+      tokenHTMLKind5 = 11,
+      tokenHTMLKind6 = 12,
+      tokenHTMLKind7 = 13,
+      tokenBlockQuote = 14,
+      tokenBulletListMarker = 15,
+      tokenOrderedListMarker = 16,
+      tokenText = 17,
       whiteSpace = " \t",
       letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
       number = "0123456789",
@@ -649,6 +655,8 @@ const tokenIndentedCodeBlock = 1,
 	      tag = parseWord(t, htmlElements),
 	      i = htmlElements.indexOf(tag.toLowerCase());
 
+	let tokenType = tokenText;
+
 	if (close) {
 		if (i === -1) {
 			if (t.accept(letter)) {
@@ -657,11 +665,11 @@ const tokenIndentedCodeBlock = 1,
 				t.acceptRun("\n");
 				t.acceptRun(whiteSpace);
 				if (t.accept(">")) {
-					return parseHTMLBlock6(t);
+					tokenType = tokenHTMLKind7;
 				}
 			}
 		} else if (t.accept(whiteSpace) || t.peek() === "\n" || (t.accept("/") && t.accept(">"))) {
-			return parseHTMLBlock6(t);
+			tokenType = tokenHTMLKind6;
 		}
 	} else if (i === -1) {
 		if (tag) {
@@ -672,14 +680,18 @@ const tokenIndentedCodeBlock = 1,
 
 				if (t.accept("/")) {
 					if (t.accept(">")) {
-						return parseHTMLBlock6(t);
+						tokenType = tokenHTMLKind7;
+
+						break;
 					}
 
 					return parseText(t);
 				} else if (t.accept(">")) {
-					return parseHTMLBlock6(t);
+					tokenType = tokenHTMLKind7;
+
+					break;
 				} else if (!t.accept(letter + "_:")) {
-					return parseText(t);
+					break;
 				}
 
 				t.acceptRun(letter + number + "_.:-");
@@ -691,12 +703,12 @@ const tokenIndentedCodeBlock = 1,
 					if (t.accept("'")) {
 						t.exceptRun("'");
 						if (!t.accept("'")) {
-							return parseText(t);
+							break;
 						}
 					} else if (t.accept('"')) {
 						t.exceptRun('"');
 						if (!t.accept('"')) {
-							return parseText(t);
+							break;
 						}
 					} else if (t.accept(whiteSpace + "\"'=<>`")) {
 						return parseText(t);
@@ -708,115 +720,33 @@ const tokenIndentedCodeBlock = 1,
 		} else if (t.accept("!")) {
 			if (t.accept("-")) {
 				if (t.accept("-")) {
-					return parseHTMLBlock2(t);
+					tokenType = tokenHTMLKind2;
 				}
 			} else if (t.accept(letter)) {
-				return parseHTMLBlock4(t);
+				tokenType = tokenHTMLKind4;
 			} else if (t.accept("[") && t.accept("C") && t.accept("D") && t.accept("A") && t.accept("T") && t.accept("A") && t.accept("[")) {
-				return parseHTMLBlock5(t);
+				tokenType = tokenHTMLKind5;
 			}
 		} else if (t.accept("?")) {
-			return parseHTMLBlock3(t);
+			tokenType = tokenHTMLKind3;
 		}
 	} else if (i < 4) {
 		if (t.accept(whiteSpace) || t.peek() === "\n") {
-			return parseHTMLBlock1(t);
+			tokenType = tokenHTMLKind1;
 		}
 	} else {
 		if (t.accept(whiteSpace) || t.peek() === "\n" || (t.accept("/") && t.accept(">"))) {
-			return parseHTMLBlock6(t);
+			tokenType = tokenHTMLKind6;
 		}
 	}
 
-	return parseText(t);
-      },
-      parseHTMLBlock1 = (t: Tokeniser): [Token, TokenFn] => {
-	while (true) {
-		if (!t.exceptRun("<")) {
-			return t.return(tokenHTML);
-		}
-
-		if (t.accept("/") && type1Elements.indexOf(parseWord(t, type1Elements).toLowerCase()) !== -1 && t.accept(">")) {
-			t.exceptRun("\n");
-			t.accept("\n");
-
-			return t.return(tokenHTML, parseBlock);
-		}
-	}
-      },
-      parseHTMLBlock2 = (t: Tokeniser): [Token, TokenFn] => {
-	while (true) {
-		if (!t.exceptRun("-")) {
-			return t.return(tokenHTML);
-		}
-
-		t.accept("-");
-		
-		if (t.accept("-")) {
-			t.acceptRun("-");
-
-			if (t.accept(">")) {
-				t.exceptRun("\n");
-				t.accept("\n");
-
-				return t.return(tokenHTML, parseBlock);
-			}
-		}
-	}
-      },
-      parseHTMLBlock3 = (t: Tokeniser): [Token, TokenFn] => {
-	while (true) {
-		if (!t.exceptRun("?")) {
-			return t.return(tokenHTML);
-		}
-
-		if (t.accept(">")) {
-			return t.return(tokenHTML, parseBlock);
-		}
-	}
-      },
-      parseHTMLBlock4 = (t: Tokeniser): [Token, TokenFn] => {
-	t.exceptRun(">");
-	t.accept(">");
 	t.exceptRun("\n");
 
-	if (!t.accept("\n")) {
-		return t.return(tokenHTML);
+	if (t.accept("\n")) {
+		return t.return(tokenType, parseBlock);
 	}
 
-	return t.return(tokenHTML, parseBlock);
-      },
-      parseHTMLBlock5 = (t: Tokeniser): [Token, TokenFn] => {
-	while (true) {
-		if (!t.exceptRun("]")) {
-			return t.return(tokenHTML);
-		}
-
-		t.accept("]");
-		if (t.accept("]")) {
-			t.acceptRun("]");
-
-			if (t.accept(">")) {
-				t.exceptRun("\n");
-				t.accept("\n");
-
-				return t.return(tokenHTML, parseBlock);
-			}
-		}
-	}
-      },
-      parseHTMLBlock6 = (t: Tokeniser): [Token, TokenFn] => {
-	while (true) {
-		if (!t.exceptRun("\n")) {
-			return t.return(tokenHTML);
-		}
-
-		t.accept("\n");
-		t.acceptRun(whiteSpace);
-		if (t.accept("\n")) {
-			return t.return(tokenHTML, parseBlock);
-		}
-	}
+	return t.return(tokenType);
       },
       parseBulletListMarker = (t: Tokeniser): [Token, TokenFn] => {
 	const char = t.next();
