@@ -458,7 +458,73 @@ class Block {
 class ContainerBlock extends Block {
 	children: Block[] = [];
 
-	newBlock(_: Tokeniser) {
+	newBlock(tk: Tokeniser) {
+		this.children.push(this.parseBlockStart(tk));
+	}
+
+	parseBlockStart(tk: Tokeniser) {
+		if (tk.accept("\t")) {
+			return new IndentedCodeBlock(tk, true);
+		}
+
+		tk.accept(" ");
+		tk.accept(" ");
+		tk.accept(" ");
+
+		switch (tk.peek()) {
+		case " ":
+			return new IndentedCodeBlock(tk);
+		case ">":
+			return new BlockQuote(tk);
+		case '*':
+		case '_':
+			return thematicBreakOrText(tk);
+		case '=':
+			if (!(this.children.at(-1) instanceof ParagraphBlock)) {
+				return new ParagraphBlock(tk);
+			}
+
+			const paragraph = this.children.pop() as ParagraphBlock,
+			      stChar = tk.next();
+
+			tk.acceptRun(stChar);
+
+			if (!tk.acceptRun(whiteSpace)) {
+				return new SetextHeadingBlock(tk, paragraph);
+			} else if (!tk.accept("\n")) {
+				paragraph.add(tk);
+
+				return paragraph;
+			}
+
+			return new SetextHeadingBlock(tk, paragraph);
+		case '#':
+			tk.accept("#");
+			tk.accept("#");
+			tk.accept("#");
+			tk.accept("#");
+			tk.accept("#");
+			tk.accept("#");
+			if (tk.accept(whiteSpace) || tk.peek() === "\n" || !tk.peek()) {
+				return parseATXHeading(tk);
+			}
+		case '`':
+		case '~':
+			return parseFencedCodeBlock(tk);
+		case '-':
+		case '+':
+			return parseBulletListMarker(tk);
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+		}
 	}
 }
 
@@ -477,27 +543,67 @@ class Document extends ContainerBlock {
 }
 
 class BlockQuote extends ContainerBlock {
+	constructor(tk: Tokeniser) {
+		super();
 
+		tk.accept(" ");
+		tk.get();
+	}
 }
 
 class LeafBlock extends Block {
 	lines: string[] = [];
 }
 
-class HTML extends LeafBlock {
+class HTMLBlock extends LeafBlock {
 }
 
-class Paragraph extends LeafBlock {
+class ParagraphBlock extends LeafBlock {
+	constructor(tk: Tokeniser) {
+		super();
+
+		this.add(tk);
+	}
+
+	add(tk: Tokeniser) {
+		tk.acceptRun("\n");
+		tk.accept("\n");
+
+		this.lines.push(tk.get());
+	}
 }
 
-class ATXHeading extends LeafBlock {
+class SetextHeadingBlock extends LeafBlock {
+	constructor(tk: Tokeniser, p: ParagraphBlock) {
+		super();
+
+		this.lines = p.lines;
+
+		tk.get();
+	}
+}
+
+class ATXHeadingBlock extends LeafBlock {
 }
 
 class FencedCodeBlock extends LeafBlock {
 }
 
 class IndentedCodeBlock extends LeafBlock {
+	#isTab: boolean;
 
+	constructor(tk: Tokeniser, isTab = false) {
+		super();
+
+		if (!(this.#isTab = isTab)) {
+			tk.accept(" ");
+		}
+
+		tk.get();
+	}
+}
+
+class ThematicBreakBlock extends LeafBlock {
 }
 
 const tokenIndentedCodeBlock = 1,
