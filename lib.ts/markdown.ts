@@ -1,5 +1,5 @@
-import type {Token, TokenFn, Tokeniser} from './parser.js';
-import parser from './parser.js';
+import type {Token, TokenFn} from './parser.js';
+import {Tokeniser} from './parser.js';
 
 type Tags = {
 	allowedHTML: null | [string, ...string[]][];
@@ -449,10 +449,31 @@ const tags: Tags = Object.assign({
 
 class Block {
 	open = true;
+
+	accept(_: Tokeniser) {
+		return false;
+	}
 }
 
 class ContainerBlock extends Block {
 	children: Block[] = [];
+
+	newBlock(_: Tokeniser) {
+	}
+}
+
+class Document extends ContainerBlock {
+	constructor(text: string) {
+		super();
+
+		const tk = new Tokeniser(text[Symbol.iterator]());
+
+		while(tk.peek()) {
+			if (!this.accept(tk)) {
+				this.newBlock(tk);
+			}
+		}
+	}
 }
 
 class BlockQuote extends ContainerBlock {
