@@ -587,48 +587,20 @@ const tokenIndentedCodeBlock = 1,
 
 	return t.return(tokenATXHeading, parseBlock);
       },
-      [parseFencedCodeBlock, parseFencedCodeBlockContents] = (() => {
-	let fcbChar = "",
-	    fcbCount = 0;
+      parseFencedCodeBlock = (t: Tokeniser): [Token, TokenFn] => {
+	const fcbChar = t.next();
 
-	return [
-		(t: Tokeniser): [Token, TokenFn] => {
-			fcbChar = t.next();
+	if (!t.accept(fcbChar) || !t.accept(fcbChar)) {
+		return parseText(t);
+	}
 
-			if (!t.accept(fcbChar) || !t.accept(fcbChar)) {
-				return parseText(t);
-			}
+	t.acceptRun(fcbChar);
 
-			const l = t.length();
+	t.exceptRun("\n");
+	t.accept("\n");
 
-			t.acceptRun(fcbChar);
-
-			fcbCount = 3 + (t.length() - l);
-
-			t.exceptRun("\n");
-			t.accept("\n");
-
-			return t.return(tokenFencedCodeBlockOpen, parseFencedCodeBlockContents);
-		},
-		(t: Tokeniser): [Token, TokenFn] => {
-			t.acceptRun(" ");
-
-			const l = t.length();
-
-			t.acceptRun(fcbChar);
-
-			if (t.length() - l === fcbCount) {
-				t.acceptRun(whiteSpace);
-
-				if (!t.peek() || t.accept("\n")) {
-					return t.return(tokenFencedCodeBlockClose, parseBlock);
-				}
-			}
-
-			return parseText(t);
-		}
-	];
-      })(),
+	return t.return(tokenFencedCodeBlockOpen, parseBlock);
+      },
       parseWord = (t: Tokeniser, words: string[], caseSensitive = false) => {
 	let read = "";
 
