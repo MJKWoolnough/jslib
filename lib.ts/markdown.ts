@@ -447,6 +447,34 @@ const tags: Tags = Object.assign({
 	"parseThematicBreak"
       ] as const).map(k => Markdown.prototype[k]);
 
+class Block {
+	children: (Block | Leaf)[] = [];
+}
+
+class BlockQuote extends Block {
+
+}
+
+class Leaf {
+	lines: string[] = [];
+}
+
+class HTML extends Leaf {
+}
+
+class Paragraph extends Leaf {
+}
+
+class ATXHeading extends Leaf {
+}
+
+class FencedCodeBlock extends Leaf {
+}
+
+class IndentedCodeBlock {
+
+}
+
 const tokenIndentedCodeBlock = 1,
       tokenThematicBreak = 2,
       tokenATXHeading = 3,
