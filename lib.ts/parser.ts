@@ -78,7 +78,8 @@ interface ParserOrPhraser {
 	(text: string | StringParser, parserFn: TokenFn, phraserFn: PhraserFn): Generator<Phrase, never>;
 }
 
-class CTokeniser {
+/** A Tokeniser is a collection of methods that allow the easy parsing of a text stream. */
+export class Tokeniser {
 	#text: StringParser;
 	#buffer = "";
 	#ignoreLast = false;
@@ -208,16 +209,14 @@ class CTokeniser {
 	}
 }
 
-/** A Tokeniser is a collection of methods that allow the easy parsing of a text stream. */
-export type Tokeniser = CTokeniser;
-
-class CPhraser {
-	#parser: CTokeniser;
+/** A Phraser is a collection of methods that allow the easy parsing of a token stream. */
+export class Phraser {
+	#parser: Tokeniser;
 	#fn: TokenFn;
 	#tokens: Token[] = [];
 	#ignoreLast = false;
 
-	constructor(parser: CTokeniser, parserFn: TokenFn) {
+	constructor(parser: Tokeniser, parserFn: TokenFn) {
 		this.#parser = parser;
 		this.#fn = parserFn;
 	}
@@ -347,9 +346,6 @@ class CPhraser {
 	}
 }
 
-/** A Phraser is a collection of methods that allow the easy parsing of a token stream. */
-export type Phraser = CPhraser;
-
 /** withNumbers adds positional information to the tokens, either in the token stream or phrase stream. */
 export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, never>): Generator<T extends Token ? TokenWithNumbers : PhraseWithNumbers, void> {
 	const pos = {
@@ -391,8 +387,8 @@ export const withNumbers = function* <T extends Token | Phrase>(p: Generator<T, 
  * @returns {Token | Phrase}         Returns a stream of either Tokens or Phrases.
  */
 export default (function* (text: string | StringParser, parserFn: TokenFn, phraserFn?: PhraserFn) {
-	const parser = new CTokeniser(typeof text === "string" ? text[Symbol.iterator]() : text),
-	      p = phraserFn ? new CPhraser(parser, parserFn) : parser;
+	const parser = new Tokeniser(typeof text === "string" ? text[Symbol.iterator]() : text),
+	      p = phraserFn ? new Phraser(parser, parserFn) : parser;
 
 	let fn = phraserFn ?? parserFn;
 

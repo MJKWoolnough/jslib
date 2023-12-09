@@ -67,7 +67,7 @@ PhraseError = -2;
  */
 
 /** A Tokeniser is a collection of methods that allow the easy parsing of a text stream. */
-class CTokeniser {
+export class Tokeniser {
 	#text;
 	#buffer = "";
 	#ignoreLast = false;
@@ -198,7 +198,7 @@ class CTokeniser {
 }
 
 /** A Phraser is a collection of methods that allow the easy parsing of a token stream. */
-class CPhraser {
+export class Phraser {
 	#parser;
 	#fn;
 	#tokens = [];
@@ -375,8 +375,8 @@ export const withNumbers = function* (p) {
  * @returns {Token | Phrase}         Returns a stream of either Tokens or Phrases.
  */
 export default (function* (text, parserFn, phraserFn) {
-	const parser = new CTokeniser(typeof text === "string" ? text[Symbol.iterator]() : text),
-	      p = phraserFn ? new CPhraser(parser, parserFn) : parser;
+	const parser = new Tokeniser(typeof text === "string" ? text[Symbol.iterator]() : text),
+	      p = phraserFn ? new Phraser(parser, parserFn) : parser;
 
 	let fn = phraserFn ?? parserFn;
 
