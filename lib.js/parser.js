@@ -135,14 +135,22 @@ export class Tokeniser {
 	peek() {
 		const c = this.next();
 
-		this.backup();
+		if (c) {
+			this.backup();
+		}
 
 		return c;
 	}
 
 	/** accept() adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. */
 	accept(chars) {
-		if (!chars.includes(this.next())) {
+		const c = this.next();
+
+		if (!c) {
+			return false;
+		}
+
+		if (!chars.includes(c)) {
 			this.backup();
 
 			return false;
@@ -225,7 +233,11 @@ export class Tokeniser {
 	except(chars) {
 		const c = this.next();
 
-		if (!c || chars.includes(c)) {
+		if (!c) {
+			return false;
+		}
+
+		if (chars.includes(c)) {
 			this.backup();
 
 			return false;
