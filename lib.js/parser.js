@@ -111,6 +111,10 @@ export class Tokeniser {
 		}
 	}
 
+	reset() {
+		this.#pos = 0;
+	}
+
 	/** length() returns the number of characters in the buffer. */
 	length() {
 		return this.#pos;
