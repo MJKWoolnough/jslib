@@ -9947,7 +9947,7 @@ type Tests = {
 						}, () => p.done()];
 					      }).next().value;
 
-					return tk.type === 1 && tk.data === "ab";
+					return tk.type === 1 && tk.data === "abc";
 				}
 			},
 			"exceptRun": {
