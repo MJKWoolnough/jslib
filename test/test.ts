@@ -9758,6 +9758,67 @@ type Tests = {
 					return read === "12345";
 				}
 			},
+			"acceptWord": {
+				"123": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("1234567890", p => {
+						p.acceptWord([
+							"012345",
+							"123",
+							"124",
+						]);
+
+						return p.return(1);
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "123";
+				},
+				"125": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("125", p => {
+						p.acceptWord([
+							"012345",
+							"123",
+							"124",
+						]);
+
+						return p.return(1);
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "";
+				},
+				"1234567890": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("1234567890", p => {
+						p.acceptWord([
+							"012345",
+							"123",
+							"124",
+							"12354",
+							"1234567",
+						]);
+
+						return p.return(1);
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "1234567";
+				},
+				"AbCdEfGh": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("AbCdEfGh", p => {
+						p.acceptWord([
+							"abc",
+							"aBCDefgh",
+							"abcdfg",
+							"ABCDFG"
+						], false);
+
+						return p.return(1);
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "AbCdEfGh";
+				}
+			},
 			"acceptRun": {
 				"aabbbcccc": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
