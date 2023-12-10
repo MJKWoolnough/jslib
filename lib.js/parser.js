@@ -66,47 +66,63 @@ PhraseError = -2;
  * type StringParser  = Iterator<string, void>;
  */
 
+const noChar = {
+	"value": undefined,
+	"done": true
+      },
+      pseudoIterator = {
+	"next": () => noChar
+      };
+
 /** A Tokeniser is a collection of methods that allow the easy parsing of a text stream. */
 export class Tokeniser {
-	#text;
+	#text = pseudoIterator;
 	#buffer = "";
-	#ignoreLast = false;
+	#pos = 0;
 
 	constructor(text) {
-		this.#text = text;
+		if (typeof text === "string") {
+			this.#buffer = text;
+		} else {
+			this.#text = text;
+		}
 	}
 
 	/** next() adds the next character to the buffer and returns it. */
 	next() {
-		if (this.#ignoreLast) {
-			this.#ignoreLast = false;
-
-			return this.#buffer.at(-1);
+		if (this.#pos !== this.#buffer.length) {
+			return this.#buffer.at(this.#pos++);
 		}
 
 		const char = this.#text.next().value ?? "";
 
-		this.#buffer += char;
+		if (char) {
+			this.#buffer += char;
+
+			this.#pos++;
+		}
 
 		return char;
 	}
 
 	#backup() {
-		if (this.#buffer) {
-			this.#ignoreLast = true;
+		if (this.#pos) {
+			this.#pos--;
 		}
 	}
 
 	/** length() returns the number of characters in the buffer. */
 	length() {
-		return this.#buffer.length - +(this.#ignoreLast);
+		return this.#pos;
 	}
 
 	/** get() returns all of the characters processed, clearing the buffer. */
 	get() {
-		const buffer = this.#buffer.slice(0, this.#buffer.length - +(this.#ignoreLast));
+		const buffer = this.#buffer.slice(0, this.#pos);
 
-		this.#buffer = this.#ignoreLast ? this.#buffer.at(-1) : "";
+		this.#buffer = this.#buffer.slice(this.#pos);
+
+		this.#pos = 0;
 
 		return buffer;
 	}
