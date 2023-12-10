@@ -9639,6 +9639,42 @@ type Tests = {
 					return tk.type === 1 && tk.data === "abc";
 				}
 			},
+			"reset": {
+				"123": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("123abc", p => {
+						p.next();
+						p.next();
+						p.next();
+						p.reset();
+
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "";
+				},
+				"abc": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abc123", p => {
+						p.next();
+						p.next();
+						p.next();
+						p.reset();
+						p.next();
+						p.next();
+
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.type === 1 && tk.data === "ab";
+				}
+			},
 			"accept": {
 				"abc": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
