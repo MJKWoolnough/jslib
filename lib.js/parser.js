@@ -105,7 +105,7 @@ export class Tokeniser {
 		return char;
 	}
 
-	#backup() {
+	backup() {
 		if (this.#pos) {
 			this.#pos--;
 		}
@@ -130,7 +130,7 @@ export class Tokeniser {
 	/** peek() looks ahead at the next character in the stream without adding it to the buffer. */
 	peek() {
 		const c = this.next();
-		this.#backup();
+		this.backup();
 
 		return c;
 	}
@@ -138,7 +138,7 @@ export class Tokeniser {
 	/** accept() adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. */
 	accept(chars) {
 		if (!chars.includes(this.next())) {
-			this.#backup();
+			this.backup();
 
 			return false;
 		}
@@ -156,7 +156,7 @@ export class Tokeniser {
 			}
 
 			if (!chars.includes(c)) {
-				this.#backup();
+				this.backup();
 
 				return c;
 			}
@@ -168,7 +168,7 @@ export class Tokeniser {
 		const c = this.next();
 
 		if (!c || chars.includes(c)) {
-			this.#backup();
+			this.backup();
 
 			return false;
 		}
@@ -186,7 +186,7 @@ export class Tokeniser {
 			}
 
 			if (chars.includes(c)) {
-				this.#backup();
+				this.backup();
 
 				return c;
 			}
