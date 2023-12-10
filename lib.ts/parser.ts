@@ -300,71 +300,72 @@ export class Phraser {
 	#parser: Tokeniser;
 	#fn: TokenFn;
 	#tokens: Token[] = [];
-	#ignoreLast = false;
+	#pos = 0;
 
 	constructor(parser: Tokeniser, parserFn: TokenFn) {
 		this.#parser = parser;
 		this.#fn = parserFn;
 	}
 
-	#next() {
-		if (this.#ignoreLast) {
-			this.#ignoreLast = false;
-
-			return this.#tokens.at(-1)!.type;
-		}
-
-		const [tk, nextFn] = this.#fn(this.#parser);
-
-		this.#tokens.push(tk);
-		this.#fn = nextFn;
-
-		return tk.type;
-	}
-
-	#backup() {
-		if (this.#tokens.length > 0 && !this.#ignoreLast) {
-			this.#ignoreLast = true;
-		}
-	}
-
 	/** next() adds the next token to the buffer (if it's not a TokenDone or TokenError) and returns the TokenType. */
 	next() {
-		const type = this.#next();
-
-		if (type === TokenDone || type === TokenError) {
-			this.#backup();
+		if (this.#pos < this.#tokens.length) {
+			return this.#tokens.at(this.#pos++)!.type;
 		}
+
+		const [tk, nextFn] = this.#fn(this.#parser),
+		      type = tk.type;
+
+		if (type !== TokenDone && type !== TokenError) {
+			this.#tokens.push(tk);
+			this.#pos++;
+		}
+
+		this.#fn = nextFn;
 
 		return type;
 	}
 
+	#backup() {
+		if (this.#pos) {
+			this.#pos--;
+		}
+	}
+
 	/** length() returns the number of tokens in the buffer. */
 	length() {
-		return this.#tokens.length - +this.#ignoreLast;
+		return this.#pos;
 	}
 
 	/** get() returns all of the tokens processed, clearing the buffer. */
 	get() {
-		const toRet = this.#tokens;
+		const tks = this.#tokens.splice(0, this.#pos);
 
-		this.#tokens = toRet.splice(this.#tokens.length - +this.#ignoreLast, 1);
+		this.#pos = 0;
 
-		return toRet;
+		return tks;
 	}
 
 	/** peek() looks ahead at the next token in the stream without adding it to the buffer, and returns the TokenID. */
 	peek() {
-		const tk = this.#next();
+		const tk = this.next();
 
-		this.#backup();
+		if (tk !== TokenDone && tk !== TokenError) {
+			this.#backup();
+		}
 
 		return tk;
 	}
 
 	/** accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added. */
 	accept(...tokenTypes: TokenType[]) {
-		if (!tokenTypes.includes(this.#next())) {
+		const tk = this.next();
+
+		if (tk === TokenDone || tk === TokenError) {
+			return false;
+		}
+
+		if (!tokenTypes.includes(tk)) {
 			this.#backup();
 
 			return false;
@@ -376,7 +377,11 @@ export class Phraser {
 	/** acceptRun() successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added. */
 	acceptRun(...tokenTypes: TokenType[]) {
 		while (true) {
-			const tk = this.#next();
+			const tk = this.next();
+
+			if (tk === TokenDone || tk === TokenError) {
+				return tk;
+			}
 
 			if (!tokenTypes.includes(tk)) {
 				this.#backup();
@@ -388,9 +393,13 @@ export class Phraser {
 
 	/** except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added. */
 	except(...tokenTypes: TokenType[]) {
-		const tk = this.#next();
+		const tk = this.next();
 
-		if (tk < 0 || tokenTypes.includes(tk)) {
+		if (tk === TokenDone || tk === TokenError) {
+			return false;
+		}
+
+		if (tokenTypes.includes(tk)) {
 			this.#backup();
 
 			return false;
@@ -402,7 +411,11 @@ export class Phraser {
 	/** exceptRun() successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. Returns the TokenID of the last token added. */
 	exceptRun(...tokenTypes: TokenType[]) {
 		while (true) {
-			const tk = this.#next();
+			const tk = this.next();
+
+			if (tk === TokenDone || tk === TokenError) {
+				return tk;
+			}
 
 			if (tk < 0 || tokenTypes.includes(tk)) {
 				this.#backup();
