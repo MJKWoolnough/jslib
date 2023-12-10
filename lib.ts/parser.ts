@@ -146,6 +146,7 @@ export class Tokeniser {
 	/** peek() looks ahead at the next character in the stream without adding it to the buffer. */
 	peek() {
 		const c = this.next();
+
 		this.backup();
 
 		return c;
@@ -160,6 +161,59 @@ export class Tokeniser {
 		}
 
 		return true;
+	}
+
+	acceptWord(words: string[], caseSensitive = true) {
+		if (!caseSensitive) {
+			words = words.map(w => w.toLowerCase());
+		}
+
+		return this.#acceptWord(words, caseSensitive);
+	}
+
+	#acceptWord(words: string[], caseSensitive: boolean): string {
+		let read = "";
+
+		while (words.length) {
+			let found = false,
+			    char = this.next();
+
+			if (!char) {
+				break;
+			}
+
+			read += char;
+
+			if (!caseSensitive) {
+				char = char.toLowerCase();
+			}
+
+			const newWords: string[] = [];
+
+			for (const word of words) {
+				if (word.startsWith(char)) {
+					const w = word.slice(1);
+
+					if (w) {
+						newWords.push(w);
+					} else {
+						found = true;
+					}
+				}
+			}
+
+			if (found) {
+				return read + newWords.length ? this.#acceptWord(newWords, caseSensitive) : "";
+			}
+
+			words = newWords;
+		}
+
+		for (const _ of read) {
+			this.backup();
+		}
+
+		return "";
 	}
 
 	/** acceptRun() successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run. */
