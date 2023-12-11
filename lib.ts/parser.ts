@@ -84,6 +84,77 @@ const noChar = {
       },
       pseudoIterator = {
 	"next": () => noChar
+      },
+      invalidChar = (char: string) => !char,
+      invalidToken = (tokenType: TokenType) => tokenType === TokenDone || tokenType === TokenError,
+      peek = <Next extends string | TokenType>(p: {next(): Next; backup(): void}, isInvalid: (n: Next) => boolean) => {
+	const n = p.next();
+
+	if (isInvalid(n)) {
+		p.backup();
+	}
+
+	return n;
+      },
+      accept = <Next extends string | TokenType>(p: {next(): Next; backup(): void}, isInvalid: (n: Next) => boolean, match: {includes(s: Next): boolean}) => {
+	const n = p.next();
+
+	if (isInvalid(n)) {
+		return false;
+	}
+
+	if (!match.includes(n)) {
+		p.backup();
+
+		return false;
+	}
+
+	return true;
+      },
+      acceptRun = <Next extends string | TokenType>(p: {next(): Next; backup(): void}, isInvalid: (n: Next) => boolean, match: {includes(s: Next): boolean}) => {
+	while (true) {
+		const n = p.next();
+
+		if (isInvalid(n)) {
+			return n;
+		}
+
+		if (!match.includes(n)) {
+			p.backup();
+
+			return n;
+		}
+	}
+      },
+      except = <Next extends string | TokenType>(p: {next(): Next; backup(): void}, isInvalid: (n: Next) => boolean, match: {includes(s: Next): boolean}) => {
+	const n = p.next();
+
+	if (isInvalid(n)) {
+		return false;
+	}
+
+	if (match.includes(n)) {
+		p.backup();
+
+		return false;
+	}
+
+	return true;
+      },
+      exceptRun = <Next extends string | TokenType>(p: {next(): Next; backup(): void}, isInvalid: (n: Next) => boolean, match: {includes(s: Next): boolean}) => {
+	while (true) {
+		const n = p.next();
+
+		if (isInvalid(n)) {
+			return n;
+		}
+
+		if (match.includes(n)) {
+			p.backup();
+
+			return n;
+		}
+	}
       };
 
 /** A Tokeniser is a collection of methods that allow the easy parsing of a text stream. */
@@ -145,30 +216,12 @@ export class Tokeniser {
 
 	/** peek() looks ahead at the next character in the stream without adding it to the buffer. */
 	peek() {
-		const c = this.next();
-
-		if (c) {
-			this.backup();
-		}
-
-		return c;
+		return peek(this, invalidChar);
 	}
 
 	/** accept() adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. */
 	accept(chars: string) {
-		const c = this.next();
-
-		if (!c) {
-			return false;
-		}
-
-		if (!chars.includes(c)) {
-			this.backup();
-
-			return false;
-		}
-
-		return true;
+		return accept(this, invalidChar, chars);
 	}
 
 	acceptWord(words: string[], caseSensitive = true) {
@@ -226,53 +279,17 @@ export class Tokeniser {
 
 	/** acceptRun() successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run. */
 	acceptRun(chars: string) {
-		while (true) {
-			const c = this.next();
-
-			if (!c) {
-				return "";
-			}
-
-			if (!chars.includes(c)) {
-				this.backup();
-
-				return c;
-			}
-		}
+		return acceptRun(this, invalidChar, chars);
 	}
 	
 	/** except() adds the next character in the stream to the buffer as long as they are not in the string provided. Returns true if a character was added. */
 	except(chars: string) {
-		const c = this.next();
-
-		if (!c) {
-			return false;
-		}
-
-		if (chars.includes(c)) {
-			this.backup();
-
-			return false;
-		}
-
-		return true;
+		return except(this, invalidChar, chars);
 	}
 
 	/** exceptRun() successively adds characters in the stream to the buffer as long as they are not in the string provided. Returns the character that stopped the run. */
 	exceptRun(chars: string) {
-		while (true) {
-			const c = this.next();
-
-			if (!c) {
-				return c;
-			}
-
-			if (chars.includes(c)) {
-				this.backup();
-
-				return c;
-			}
-		}
+		return exceptRun(this, invalidChar, chars);
 	}
 
 	/** done() returns a Done token, with optional done message, and a recursive TokenFn which continually returns the same done Token. */
@@ -352,81 +369,27 @@ export class Phraser {
 
 	/** peek() looks ahead at the next token in the stream without adding it to the buffer, and returns the TokenID. */
 	peek() {
-		const tk = this.next();
-
-		if (tk !== TokenDone && tk !== TokenError) {
-			this.backup();
-		}
-
-		return tk;
+		return peek(this, invalidToken);
 	}
 
 	/** accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added. */
 	accept(...tokenTypes: TokenType[]) {
-		const tk = this.next();
-
-		if (tk === TokenDone || tk === TokenError) {
-			return false;
-		}
-
-		if (!tokenTypes.includes(tk)) {
-			this.backup();
-
-			return false;
-		}
-
-		return true;
+		return accept(this, invalidToken, tokenTypes);
 	}
 
 	/** acceptRun() successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added. */
 	acceptRun(...tokenTypes: TokenType[]) {
-		while (true) {
-			const tk = this.next();
-
-			if (tk === TokenDone || tk === TokenError) {
-				return tk;
-			}
-
-			if (!tokenTypes.includes(tk)) {
-				this.backup();
-
-				return tk;
-			}
-		}
+		return acceptRun(this, invalidToken, tokenTypes);
 	}
 
 	/** except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added. */
 	except(...tokenTypes: TokenType[]) {
-		const tk = this.next();
-
-		if (tk === TokenDone || tk === TokenError) {
-			return false;
-		}
-
-		if (tokenTypes.includes(tk)) {
-			this.backup();
-
-			return false;
-		}
-
-		return true;
+		return except(this, invalidToken, tokenTypes);
 	}
 
 	/** exceptRun() successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. Returns the TokenID of the last token added. */
 	exceptRun(...tokenTypes: TokenType[]) {
-		while (true) {
-			const tk = this.next();
-
-			if (tk === TokenDone || tk === TokenError) {
-				return tk;
-			}
-
-			if (tk < 0 || tokenTypes.includes(tk)) {
-				this.backup();
-
-				return tk;
-			}
-		}
+		return exceptRun(this, invalidToken, tokenTypes);
 	}
 
 	/** done() returns a Done phrase, optionally with a Done token with a done message, and a recursive PhraseFn which continually returns the same done Phrase. */
