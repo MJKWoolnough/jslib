@@ -206,12 +206,14 @@ export class Tokeniser {
 		return char;
 	}
 
+	/** backup() restores the state to before the last call to next() (either directly, or via accept, acceptWord, acceptRun, except, or exceptRun). */
 	backup() {
 		if (this.#pos) {
 			this.#pos--;
 		}
 	}
 
+	/** reset() restores the state to after the last get() call (or init, if get() has not been called). */
 	reset() {
 		this.#pos = 0;
 	}
@@ -361,12 +363,14 @@ export class Phraser {
 		return type;
 	}
 
+	/** backup() restores the state to before the last call to next() (either directly, or via accept, acceptRun, except, or exceptRun). */
 	backup() {
 		if (this.#pos) {
 			this.#pos--;
 		}
 	}
 
+	/** reset() restores the state to after the last get() call (or init, if get() has not been called). */
 	reset() {
 		this.#pos = 0;
 	}
