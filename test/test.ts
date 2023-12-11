@@ -10108,17 +10108,13 @@ type Tests = {
 			"next": {
 				"12345abcde": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
-					      p = parser("", p => [{"type": 1, "data": "12345"}, () => [{"type": 2, "data": "abcde"}, () => p.done()]], p => {
-						return [{"type": +(p.next() === 1 && p.next() === 2), "data": p.get()}, () => p.done()];
-					      }).next().value;
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => [{"type": 2, "data": "abcde"}, () => p.done()]], p => [{"type": +(p.next() === 1 && p.next() === 2), "data": p.get()}, () => p.done()]).next().value;
 
 					return JSON.stringify(p) === `{"type":1,"data":[{"type":1,"data":"12345"},{"type":2,"data":"abcde"}]}`;
 				},
 				"abcde": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
-					      p = parser("", p => [{"type": 2, "data": "abcde"}, () => p.done()], p => {
-						return [{"type": 2 + +(p.next() === 2 && p.next() === -1), "data": p.get()}, () => p.done()];
-					      }).next().value;
+					      p = parser("", p => [{"type": 2, "data": "abcde"}, () => p.done()], p => [{"type": 2 + +(p.next() === 2 && p.next() === -1), "data": p.get()}, () => p.done()]).next().value;
 
 					return JSON.stringify(p) === `{"type":3,"data":[{"type":2,"data":"abcde"}]}`;
 				}
