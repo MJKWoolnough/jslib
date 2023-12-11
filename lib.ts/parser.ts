@@ -458,7 +458,7 @@ export default (function* (text: string | StringParser, parserFn: TokenFn, phras
 	let fn = phraserFn ?? parserFn;
 
 	while(true) {
-		const [t, nextFn] = fn(p as any)
+		const [t, nextFn] = fn(p as any);
 
 		yield t;
 

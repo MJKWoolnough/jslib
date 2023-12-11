@@ -446,7 +446,7 @@ export default (function* (text, parserFn, phraserFn) {
 	let fn = phraserFn ?? parserFn;
 
 	while(true) {
-		const [t, nextFn] = fn(p)
+		const [t, nextFn] = fn(p);
 
 		yield t;
 
