@@ -332,6 +332,10 @@ export class Phraser {
 		}
 	}
 
+	reset() {
+		this.#pos = 0;
+	}
+
 	/** length() returns the number of tokens in the buffer. */
 	length() {
 		return this.#pos;
