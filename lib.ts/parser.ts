@@ -326,7 +326,7 @@ export class Phraser {
 		return type;
 	}
 
-	#backup() {
+	backup() {
 		if (this.#pos) {
 			this.#pos--;
 		}
@@ -351,7 +351,7 @@ export class Phraser {
 		const tk = this.next();
 
 		if (tk !== TokenDone && tk !== TokenError) {
-			this.#backup();
+			this.backup();
 		}
 
 		return tk;
@@ -366,7 +366,7 @@ export class Phraser {
 		}
 
 		if (!tokenTypes.includes(tk)) {
-			this.#backup();
+			this.backup();
 
 			return false;
 		}
@@ -384,7 +384,7 @@ export class Phraser {
 			}
 
 			if (!tokenTypes.includes(tk)) {
-				this.#backup();
+				this.backup();
 
 				return tk;
 			}
@@ -400,7 +400,7 @@ export class Phraser {
 		}
 
 		if (tokenTypes.includes(tk)) {
-			this.#backup();
+			this.backup();
 
 			return false;
 		}
@@ -418,7 +418,7 @@ export class Phraser {
 			}
 
 			if (tk < 0 || tokenTypes.includes(tk)) {
-				this.#backup();
+				this.backup();
 
 				return tk;
 			}
