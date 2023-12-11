@@ -2001,6 +2001,12 @@ class Phraser {
 	/** next() adds the next token to the buffer (if it's not a TokenDone or TokenError) and returns the TokenType. */
 	next(): string;
 
+	/** backup() restores the state to before the last call to next() (either directly, or via accept, acceptRun, except, or exceptRun). */
+	backup(): void;
+
+	/** reset() restores the state to after the last get() call (or init, if get() has not been called). */
+	reset(): void;
+
 	/** length() returns the number of tokens in the buffer. */
 	length(): number;
 
@@ -2059,6 +2065,12 @@ TokenFn is used by the parsing function to parse a Token from the text stream. T
 class Tokeniser {
 	/** next() adds the next character to the buffer and returns it. */
 	next(): string;
+
+	/** backup() restores the state to before the last call to next() (either directly, or via accept, acceptWord, acceptRun, except, or exceptRun). */
+	backup(): void;
+
+	/** reset() restores the state to after the last get() call (or init, if get() has not been called). */
+	reset(): void;
 
 	/** length() returns the number of characters in the buffer. */
 	length(): number;
