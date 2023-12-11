@@ -17,7 +17,37 @@ TokenError = -2,
 /** PhraseDone represents the successful end of a Phrase stream. */
 PhraseDone = -1,
 /** PhraseError represents the unsuccessful end of a Phrase stream. */
-PhraseError = -2;
+PhraseError = -2,
+/** withNumbers adds positional information to the tokens, either in the token stream or phrase stream. */
+withNumbers = function* (p) {
+	const pos = {
+		"pos": 0,
+		"line": 0,
+		"linePos": 0
+	      };
+
+	for (const t of p) {
+		for (const tk of t.data instanceof Array ? t.data : [t]) {
+			Object.assign(tk, pos);
+
+			if (tk.type === TokenDone || tk.type === TokenError) {
+				continue;
+			}
+
+			for (const c of tk.data) {
+				pos.pos++;
+				pos.linePos++;
+
+				if (c === "\n") {
+					pos.line++;
+					pos.linePos = 0;
+				}
+			}
+		}
+
+		yield t;
+	}
+};
 
 /**
  * Token represents a parsed token.
@@ -399,37 +429,6 @@ export class Phraser {
 		return [{type, "data": this.get()}, fn ?? (() => this.done())];
 	}
 }
-
-/** withNumbers adds positional information to the tokens, either in the token stream or phrase stream. */
-export const withNumbers = function* (p) {
-	const pos = {
-		"pos": 0,
-		"line": 0,
-		"linePos": 0
-	      };
-
-	for (const t of p) {
-		for (const tk of t.data instanceof Array ? t.data : [t]) {
-			Object.assign(tk, pos);
-
-			if (tk.type === TokenDone || tk.type === TokenError) {
-				continue;
-			}
-
-			for (const c of tk.data) {
-				pos.pos++;
-				pos.linePos++;
-
-				if (c === "\n") {
-					pos.line++;
-					pos.linePos = 0;
-				}
-			}
-		}
-
-		yield t;
-	}
-};
 
 /**
  * The default function can parse a text stream into either a stream of tokens or a stream of phrases, depending on whether a phrase parsing function is provided.
