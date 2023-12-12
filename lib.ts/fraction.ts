@@ -20,7 +20,7 @@ export default class Fraction {
 	 * The constructor of Fraction takes a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt | BigInt} numerator and an optional {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt | BigInt} denominator and returns a Fraction accordingly. A zero (0n) denominator would create a Fraction equivalent of {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN}).
 	 *
 	 * @param {bigint} numerator
-	 * @param {bigint} numerator
+	 * @param {bigint} [denominator=1n]
 	 */
 	constructor(numerator: bigint, denominator: bigint = 1n) {
 		if (denominator < 0n) {
