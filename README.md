@@ -1996,50 +1996,24 @@ type PhraserFn = (p: Phraser) => [Phrase, PhraserFn]
 PhraseFn is used by the parsing function to parse a Phrase from a token stream. Takes a [Phraser](#parser_phraser), and returns the parsed [Phrase](#parser_phraser) and the next PhraseFn with which to parse the next phrase.
 
 <a name="parser_phraser">Phraser<a/>
-```typescript
-class Phraser {
-	/** next() adds the next token to the buffer (if it's not a TokenDone or TokenError) and returns the TokenType. */
-	next(): string;
-
-	/** backup() restores the state to before the last call to next() (either directly, or via accept, acceptRun, except, or exceptRun). */
-	backup(): void;
-
-	/** reset() restores the state to after the last get() call (or init, if get() has not been called). */
-	reset(): void;
-
-	/** length() returns the number of tokens in the buffer. */
-	length(): number;
-
-	/** get() returns all of the tokens processed, clearing the buffer. */
-	get(): Token[];
-
-	/** peek() looks ahead at the next token in the stream without adding it to the buffer, and returns the TokenID. */
-	peek(): TokenID;
-
-	/** accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added. */
-	accept(...tokenTypes: TokenType[]): boolean;
-
-	/** acceptRun() successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added. */
-	acceptRun(...tokenTypes: TokenType[]): TokenType;
-
-	** except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added. */
-	except(...tokenTypes: TokenType[]): boolean;
-
-	/** exceptRun() successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. Returns the TokenID of the last token added. */
-	exceptRun(...tokenTypes: TokenType[]): TokenType;
-
-	/** done() returns a Done phrase, optionally with a Done token with a done message, and a recursive PhraseFn which continually returns the same done Phrase. */
-	done(msg = ""): [Phrase, PhraseFn];
-
-	/** error() returns an Error phrase, optionally with an Error token with an error message, and a recursive PhraseFn which continually returns the same error Phrase. */
-	error(err = "unknown error"): [Phrase, PhraseFn];
-
-	/** return() creates the [Phrase, PhraseFn] tuple, using the parsed tokens as the data. If no PhraseFn is supplied, Phraser.done() is used. */
-	return(type: PhraseType, fn?: PhraserFn): [Phrase, PhraserFn];
-}
-```
 
 A Phraser is a collection of methods that allow the easy parsing of a token stream.
+
+|  Method  |  Description  |
+|----------|---------------|
+| accept | Adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added. |
+| acceptRun | Successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added. |
+| backup | Restores the state to before the last call to next() (either directly, or via accept, acceptRun, except, or exceptRun). |
+| constructor | Takes a Tokeniser and an initial TokenFn to construct a new Phraser. |
+| done | Returns a Done phrase, optionally with a Done token with a done message, and a recursive PhraseFn which continually returns the same done Phrase. |
+| error | Returns an Error phrase, optionally with an Error token with an error message, and a recursive PhraseFn which continually returns the same error Phrase. |
+| except | Adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added. |
+| exceptRun | Successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. Returns the TokenID of the last token added.
+| get | Returns all of the tokens processed, clearing the buffer. |
+| length | Returns the number of tokens in the buffer. |
+| peek | Looks ahead at the next token in the stream without adding it to the buffer, and returns the TokenID. |
+| reset | Restores the state to after the last get() call (or init, if get() has not been called). |
+| return | Creates the [Phrase, PhraseFn] tuple, using the parsed tokens as the data. If no PhraseFn is supplied, Phraser.done() is used. |
 
 <a name="parser_token">Token</a>
 ```typescript
@@ -2061,50 +2035,25 @@ export type TokenFn = (p: Tokeniser) => [Token, TokenFn];
 TokenFn is used by the parsing function to parse a Token from the text stream. Takes a [Tokeniser](#parser_tokeniser), and returns the parsed [Token](#parser_token) and the next TokenFn with which to parse the next token.
 
 <a name="parser_tokeniser">Tokeniser</a>
-```typescript
-class Tokeniser {
-	/** next() adds the next character to the buffer and returns it. */
-	next(): string;
-
-	/** backup() restores the state to before the last call to next() (either directly, or via accept, acceptWord, acceptRun, except, or exceptRun). */
-	backup(): void;
-
-	/** reset() restores the state to after the last get() call (or init, if get() has not been called). */
-	reset(): void;
-
-	/** length() returns the number of characters in the buffer. */
-	length(): number;
-
-	/** get() returns all of the characters processed, clearing the buffer. */
-	get(): string;
-
-	/** peek() looks ahead at the next character in the stream without adding it to the buffer. */
-	peek(): string;
-
-	/** accept() adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. */
-	accept(chars: string): boolean;
-
-	/** acceptRun() successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run. */
-	acceptRun(chars: string): string;
-
-	/** except() adds the next character in the stream to the buffer as long as they are not in the string provided. Returns true if a character was added. */
-	except(chars: string): boolean;
-
-	/** exceptRun() successively adds characters in the stream to the buffer as long as they are not in the string provided. Returns the character that stopped the run. */
-	exceptRun(chars: string): string;
-
-	/** done() returns a Done token, with optional done message, and a recursive TokenFn which continually returns the same done Token. */
-	done(msg = ""): [Token, TokenFn];
-
-	/** error() returns an Error token, with optional error message, and a recursive TokenFn which continually returns the same error Token. */
-	error(err = "unknown error"): [Token, TokenFn];
-
-	/** return() creates the [Token, TokenFn] tuple, using the parsed characters as the data. If no TokenFn is supplied, Tokeniser.done() is used. */
-	return(type: TokenType, fn?: TokenFn): [Token, TokenFn];
-}
-```
 
 A Tokeniser is a collection of methods that allow the easy parsing of a text stream.
+
+|  Method  |  Description  |
+|----------|---------------|
+| accept | Adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. |
+| acceptRun | Successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run. |
+| acceptWord | Attempts to parse one of the words (string of characters) provided in the array. |
+| backup | Restores the state to before the last call to next() (either directly, or via accept, acceptWord, acceptRun, except, or exceptRun). |
+| constructor | Takes either a string or an iterator returning characters to construct a new Tokeniser. |
+| done | Returns a Done token, with optional done message, and a recursive TokenFn which continually returns the same done Token. |
+| error | Returns an Error token, with optional error message, and a recursive TokenFn which continually returns the same error Token. |
+| except | Adds the next character in the stream to the buffer as long as they are not in the string provided. Returns true if a character was added. |
+| exceptRun | Successively adds characters in the stream to the buffer as long as they are not in the string provided. Returns the character that stopped the run. |
+| get | Returns all of the characters processed, clearing the buffer. |
+| length | Returns the number of characters in the buffer that would be returned by a call to get(). |
+| peek | Looks ahead at the next character in the stream without adding it to the buffer. |
+| reset | Restores the state to after the last get() call (or init, if get() has not been called). |
+| return | Creates the [Token, TokenFn] tuple, using the parsed characters as the data. If no TokenFn is supplied, Tokeniser.done() is used. |
 
 ## <a name="router">router</a>
 
