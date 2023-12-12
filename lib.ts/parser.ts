@@ -426,11 +426,11 @@ export class Phraser {
 	/**
 	 * Constructs a new Phraser.
 	 *
-	 * @param {Tokeniser} parser The tokeniser to make phrases from.
-	 * @param {TokenFn} parserFn The initial TokenFn that will start the parsing.
+	 * @param {string | StringParser} text The text/iterator to be used for parsing.
+	 * @param {TokenFn} parserFn           The initial TokenFn that will start the parsing.
 	 */
-	constructor(parser: Tokeniser, parserFn: TokenFn) {
-		this.#parser = parser;
+	constructor(text: string | StringParser, parserFn: TokenFn) {
+		this.#parser = new Tokeniser(text);
 		this.#fn = parserFn;
 	}
 
@@ -593,8 +593,7 @@ export class Phraser {
  * @returns {Token | Phrase}         Returns a stream of either Tokens or Phrases.
  */
 export default (function* (text: string | StringParser, parserFn: TokenFn, phraserFn?: PhraserFn) {
-	const parser = new Tokeniser(text),
-	      p = phraserFn ? new Phraser(parser, parserFn) : parser;
+	const p = phraserFn ? new Phraser(text, parserFn) : new Tokeniser(text);
 
 	let fn = phraserFn ?? parserFn;
 
