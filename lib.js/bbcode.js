@@ -62,6 +62,9 @@ const textToken = 1,
 					t.except("");
 					break Loop;
 				default:
+					t.reset();
+					t.except("");
+
 					return parseText(t);
 				}
 			}
