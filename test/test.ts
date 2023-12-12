@@ -10396,7 +10396,7 @@ type Tests = {
 					p.acceptRun(1);
 
 					return p.return(4, () => {
-						p.acceptRun(2, 3)
+						p.acceptRun(2, 3);
 
 						return p.return(5);
 					});
