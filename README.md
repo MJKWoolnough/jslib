@@ -2004,7 +2004,7 @@ A Phraser is a collection of methods that allow the easy parsing of a token stre
 | accept | Adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added. |
 | acceptRun | Successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added. |
 | backup | Restores the state to before the last call to next() (either directly, or via accept, acceptRun, except, or exceptRun). |
-| constructor | Takes a Tokeniser and an initial TokenFn to construct a new Phraser. |
+| constructor | Takes either a string or an iterator returning characters, and an initial TokenFn to construct a new Phraser. |
 | done | Returns a Done phrase, optionally with a Done token with a done message, and a recursive PhraseFn which continually returns the same done Phrase. |
 | error | Returns an Error phrase, optionally with an Error token with an error message, and a recursive PhraseFn which continually returns the same error Phrase. |
 | except | Adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added. |
