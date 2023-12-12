@@ -9765,7 +9765,7 @@ type Tests = {
 						p.acceptWord([
 							"012345",
 							"123",
-							"124",
+							"124"
 						]);
 
 						return p.return(1);
@@ -9779,7 +9779,7 @@ type Tests = {
 						p.acceptWord([
 							"012345",
 							"123",
-							"124",
+							"124"
 						]);
 
 						return p.return(1);
@@ -9795,7 +9795,7 @@ type Tests = {
 							"123",
 							"124",
 							"12354",
-							"1234567",
+							"1234567"
 						]);
 
 						return p.return(1);
