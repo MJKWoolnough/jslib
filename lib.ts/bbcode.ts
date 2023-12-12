@@ -22,7 +22,7 @@ const textToken = 1,
       parseText = (t: PTokeniser): [Token, TokenFn] => {
 	if (!t.exceptRun(tagStart)) {
 		if (t.length()) {
-			return [{"type": textToken, "data": t.get()}, () => t.done()];
+			return t.return(textToken);
 		}
 
 		return t.done();

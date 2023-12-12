@@ -21,7 +21,7 @@ const textToken = 1,
       parseText = t => {
 	if (!t.exceptRun(tagStart)) {
 		if (t.length()) {
-			return [{"type": textToken, "data": t.get()}, () => t.done()];
+			return t.return(textToken);
 		}
 
 		return t.done();
