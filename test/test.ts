@@ -1624,6 +1624,32 @@ type Tests = {
 				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 			}, `[a][b][b][c][d][e][/c][f][/b][g][h][/b][/a][i]`);
 			return ret;
+		},
+		"good tag after bad tag": async () => {
+			const {default: bbcode, isOpenTag, isString} = await import("./lib/bbcode.js");
+
+			let ret = false;
+
+			bbcode({
+				"a": (_n: Node, t: any) => {
+					const checks = [
+						[isOpenTag, (tk: any) => tk.tagName === "a" && tk.attr === null],
+						[isString, (data: any) => data === "Some text [b=\"Bad"],
+						[isOpenTag, (tk: any) => tk.tagName === "b" && tk.attr === "Good"],
+					] as [Function, Function][];
+
+					ret = true;
+
+					for (let tk = t.next(true).value; tk; tk = t.next().value) {
+						const [typeCheck, valueCheck] = checks.shift()!;
+
+						ret &&= typeCheck(tk) && valueCheck(tk);
+					}
+				},
+				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
+			}, `[a]Some text [b="Bad[b=Good]`);
+
+			return ret;
 		}
 	},
 	"bbcode_tags.js": {
