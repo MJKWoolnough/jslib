@@ -75,7 +75,7 @@ withNumbers = function* (p) {
 
 /** PhraseWithNumbers represents a Phrase where the tokens are TokenWithNumbers. */
 
-/*
+/**
  * TokenFn is used by the parsing function to parse a Token from a text stream.
  *
  * @param {Tokeniser} p The tokeniser from which to parse the token.
@@ -83,7 +83,7 @@ withNumbers = function* (p) {
  * @returns {[Token, TokenFn]} Returns the parsed token and the next TokenFn with which to parse the next token.
  */
 
-/*
+/**
  * PhraseFn is used by the parsing function to parse a Phrase from a token stream.
  *
  * @param {Phraser} p The phraser from which to parse the phrase.
@@ -181,6 +181,11 @@ export class Tokeniser {
 	#buffer = "";
 	#pos = 0;
 
+	/**
+	 * Constructs a new Tokeniser.
+	 *
+	 * @param {string | StringParser} text The text/iterator to be used for parsing.
+	 */
 	constructor(text) {
 		if (typeof text === "string") {
 			this.#buffer = text;
@@ -189,7 +194,11 @@ export class Tokeniser {
 		}
 	}
 
-	/** next() adds the next character to the buffer and returns it. */
+	/**
+	 * next() adds the next character to the buffer and returns it.
+	 *
+	 * @return {string} The character that has been added to the buffer, or empty string if at EOF.
+	 */
 	next() {
 		if (this.#pos !== this.#buffer.length) {
 			return this.#buffer.at(this.#pos++);
@@ -218,12 +227,20 @@ export class Tokeniser {
 		this.#pos = 0;
 	}
 
-	/** length() returns the number of characters in the buffer. */
+	/**
+	 * length() returns the number of characters in the buffer that would be returned by a call to get().
+	 *
+	 * @return {number} The number of character in the buffer.
+	 */
 	length() {
 		return this.#pos;
 	}
 
-	/** get() returns all of the characters processed, clearing the buffer. */
+	/**
+	 * get() returns all of the characters processed, clearing the buffer.
+	 *
+	 * @return {string} The parsed characters.
+	 */
 	get() {
 		const buffer = this.#buffer.slice(0, this.#pos);
 
@@ -234,16 +251,34 @@ export class Tokeniser {
 		return buffer;
 	}
 
-	/** peek() looks ahead at the next character in the stream without adding it to the buffer. */
+	/**
+	 * peek() looks ahead at the next character in the stream without adding it to the buffer.
+	 *
+	 * @return {string} The next character in the buffer, or empty string if at EOF.
+	 */
 	peek() {
 		return peek(this, invalidChar);
 	}
 
-	/** accept() adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. */
+	/**
+	 * accept() adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added.
+	 *
+	 * @param {string} chars The characters to match against.
+	 *
+	 * @return {boolean} Returns true if next character matched a character in the provided string, false otherwise.
+	 */
 	accept(chars) {
 		return accept(this, invalidChar, chars);
 	}
 
+	/**
+	 * acceptWord attempts to parse one of the words (string of characters) provided in the array.
+	 *
+	 * @param {string[]} words        The list of words (strings of characters) to match against.
+	 * @param {boolean} caseSensitive Determines whether matches are made in a case sensitive manner or not; defaults to true.
+	 *
+	 * @return {string} The matched word, or empty string if not word in the list could be matched.
+	 */
 	acceptWord(words, caseSensitive = true) {
 		if (!caseSensitive) {
 			words = words.map(w => w.toLowerCase());
@@ -297,36 +332,73 @@ export class Tokeniser {
 		return "";
 	}
 
-	/** acceptRun() successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run. */
+	/**
+	 * acceptRun() successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run.
+	 *
+	 * @param {string} chars The characters to match against.
+	 *
+	 * @return {string} Returns the character that stopped the run, or empty string if at EOF.
+	 */
 	acceptRun(chars) {
 		return acceptRun(this, invalidChar, chars);
 	}
 	
-	/** except() adds the next character in the stream to the buffer as long as they are not in the string provided. Returns true if a character was added. */
+	/**
+	 * except() adds the next character in the stream to the buffer as long as they are not in the string provided. Returns true if a character was added.
+	 *
+	 * @param {string} chars The characters to match against.
+	 *
+	 * @return {boolean} Returns true if next character did not matched a character in the provided string, false otherwise.
+	 */
 	except(chars) {
 		return except(this, invalidChar, chars);
 	}
 
-	/** exceptRun() successively adds characters in the stream to the buffer as long as they are not in the string provided. Returns the character that stopped the run. */
+	/**
+	 * exceptRun() successively adds characters in the stream to the buffer as long as they are not in the string provided. Returns the character that stopped the run.
+	 *
+	 * @param {string} chars The characters to match against.
+	 *
+	 * @return {string} Returns the character that stopped the run, or empty string if at EOF.
+	 * */
 	exceptRun(chars) {
 		return exceptRun(this, invalidChar, chars);
 	}
 
-	/** done() returns a Done token, with optional done message, and a recursive TokenFn which continually returns the same done Token. */
+	/**
+	 * done() returns a Done token, with optional done message, and a recursive TokenFn which continually returns the same done Token.
+	 *
+	 * @param {string} [msg] An optional done message to be set as the data in the token.
+	 *
+	 * @return {[Token, TokenFn]} The return tuple which will cause a parser to recursively return a TokenDone.
+	 */
 	done(msg = "") {
 		const done = () => [{"type": TokenDone, "data": msg}, done];
 
 		return done();
 	}
 
-	/** error() returns an Error token, with optional error message, and a recursive TokenFn which continually returns the same error Token. */
+	/**
+	 * error() returns an Error token, with optional error message, and a recursive TokenFn which continually returns the same error Token.
+	 *
+	 * @param {string} [err="unknown error"] An optional error message to be set as the data in the token.
+	 *
+	 * @return {[Token, TokenFn]} The return tuple which will cause a parser to recursively return a TokenError.
+	 * */
 	error(err = "unknown error") {
 		const error = () => [{"type": TokenError, "data": err}, error];
 
 		return error();
 	}
 
-	/** return() creates the [Token, TokenFn] tuple, using the parsed characters as the data. If no TokenFn is supplied, Tokeniser.done() is used. */
+	/**
+	 * return() creates the [Token, TokenFn] tuple, using the parsed characters as the data. If no TokenFn is supplied, Tokeniser.done() is used.
+	 *
+	 * @param {TokenType} type The type of the token to be returned.
+	 * @param {TokenFn} [fn]   Optional TokenFn; defaults to this.done().
+	 *
+	 * @return {[Token, TokenFn]} The return tuple which will return a Token to a parser and provide the next TokenFn to be used in later parsing.
+	 */
 	return(type, fn) {
 		return [{type, "data": this.get()}, fn ?? (() => this.done())];
 	}
@@ -339,12 +411,22 @@ export class Phraser {
 	#tokens = [];
 	#pos = 0;
 
+	/**
+	 * Constructs a new Phraser.
+	 *
+	 * @param {Tokeniser} parser The tokeniser to make phrases from.
+	 * @param {TokenFn} parserFn The initial TokenFn that will start the parsing.
+	 */
 	constructor(parser, parserFn) {
 		this.#parser = parser;
 		this.#fn = parserFn;
 	}
 
-	/** next() adds the next token to the buffer (if it's not a TokenDone or TokenError) and returns the TokenType. */
+	/**
+	 * next() adds the next token to the buffer (if it's not a TokenDone or TokenError) and returns the TokenType.
+	 *
+	 * @return {TokenType} The type of the next token in the stream.
+	 */
 	next() {
 		if (this.#pos < this.#tokens.length) {
 			return this.#tokens.at(this.#pos++).type;
@@ -375,12 +457,20 @@ export class Phraser {
 		this.#pos = 0;
 	}
 
-	/** length() returns the number of tokens in the buffer. */
+	/**
+	 * length() returns the number of tokens in the buffer.
+	 *
+	 * @return {number} The number of tokens in the buffer that would be returned by a call to get().
+	 */
 	length() {
 		return this.#pos;
 	}
 
-	/** get() returns all of the tokens processed, clearing the buffer. */
+	/**
+	 * get() returns all of the tokens processed, clearing the buffer.
+	 *
+	 * @return {Token[]} The parsed tokens.
+	 */
 	get() {
 		const tks = this.#tokens.splice(0, this.#pos);
 
@@ -389,46 +479,93 @@ export class Phraser {
 		return tks;
 	}
 
-	/** peek() looks ahead at the next token in the stream without adding it to the buffer, and returns the TokenID. */
+	/**
+	 * peek() looks ahead at the next token in the stream without adding it to the buffer, and returns the TokenID.
+	 *
+	 * @return {TokenType} The type of the next token in the token stream.
+	 */
 	peek() {
 		return peek(this, invalidToken);
 	}
 
-	/** accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added. */
+	/**
+	 * accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added.
+	 *
+	 * @param {TokenType[]} ...tokenTypes The token types to match against.
+	 *
+	 * @return {boolean} Returns true if the next token in the stream is of a type in the supplied array.
+	 */
 	accept(...tokenTypes) {
 		return accept(this, invalidToken, tokenTypes);
 	}
 
-	/** acceptRun() successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added. */
+	/**
+	 * acceptRun() successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added.
+	 *
+	 * @param {TokenType[]} ...tokenTypes The token types to match against.
+	 *
+	 * @return {TokenType} The type of the token which stopped the run.
+	 */
 	acceptRun(...tokenTypes) {
 		return acceptRun(this, invalidToken, tokenTypes);
 	}
 
-	/** except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added. */
+	/**
+	 * except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added.
+	 *
+	 * @param {TokenType[]} ...tokenTypes The token types to match against.
+	 *
+	 * @return {boolean} Returns true if the next token in the stream is of a type not in the supplied array.
+	 */
 	except(...tokenTypes) {
 		return except(this, invalidToken, tokenTypes);
 	}
 
-	/** exceptRun() successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. Returns the TokenID of the last token added. */
+	/**
+	 * exceptRun() successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. Returns the TokenID of the last token added.
+	 *
+	 * @param {TokenType[]} ...tokenTypes The token types to match against.
+	 *
+	 * @return {TokenType} The type of the token which stopped the run.
+	 */
 	exceptRun(...tokenTypes) {
 		return exceptRun(this, invalidToken, tokenTypes);
 	}
 
-	/** done() returns a Done phrase, optionally with a Done token with a done message, and a recursive PhraseFn which continually returns the same done Phrase. */
+	/**
+	 * done() returns a Done phrase, optionally with a Done token with a done message, and a recursive PhraseFn which continually returns the same done Phrase.
+	 *
+	 * @param {string} [msg] An optional done message, which will cause a pseudo-token to be created in the phrase, with the data in the token set to the message.
+	 *
+	 * @return {[Phrase, PhraserFn]} The return tuple which will cause a parser to recursively return a PhraseDone.
+	 */
 	done(msg = "") {
 		const done = () => [{"type": PhraseDone, "data": msg ? [{"type": TokenDone, "data": msg}] : []}, done];
 
 		return done();
 	}
 
-	/** error() returns an Error phrase, optionally with an Error token with an error message, and a recursive PhraseFn which continually returns the same error Phrase. */
+	/**
+	 * error() returns an Error phrase, optionally with an Error token with an error message, and a recursive PhraseFn which continually returns the same error Phrase.
+	 *
+	 * @param {string} [err] An optional error message, which will cause a pseudo-token to be created in the phrase, with the data in the token set to the message.
+	 *
+	 * @return {[Phrase, PhraserFn]} The return tuple which will cause a parser to recursively return a PhraseError.
+	 */
 	error(err = "unknown error") {
 		const error = () => [{"type": PhraseError, "data": [{"type": TokenError, "data": err}]}, error];
 
 		return error();
 	}
 
-	/** return() creates the [Phrase, PhraseFn] tuple, using the parsed tokens as the data. If no PhraseFn is supplied, Phraser.done() is used. */
+	/**
+	 * return() creates the [Phrase, PhraseFn] tuple, using the parsed tokens as the data. If no PhraseFn is supplied, Phraser.done() is used.
+	 *
+	 * @param {PhraseType} type The type of the phrase to be returned.
+	 * @param {PhraserFn} [fn]   Optional PhraserFn; defaults to this.done().
+	 *
+	 * @return {[Phrase, PhraserFn]} The return tuple which will return a Phrase to a parser and provide the next PhraserFn to be used in later parsing.
+	 */
 	return(type, fn) {
 		return [{type, "data": this.get()}, fn ?? (() => this.done())];
 	}
