@@ -629,10 +629,13 @@ class ATXHeadingBlock extends LeafBlock {
 }
 
 class FencedCodeBlock extends LeafBlock {
+	#info: string;
+	#contents = "";
+
 	constructor(tk: Tokeniser) {
 		super();
 
-
+		this.#info = tk.get().trim().replace(/^`+/, "");
 	}
 }
 
