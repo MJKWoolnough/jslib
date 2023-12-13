@@ -509,7 +509,7 @@ class ContainerBlock extends Block {
 			const level = +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#");
 
 			if (tk.accept(whiteSpace) || tk.peek() === "\n" || !tk.peek()) {
-				return new ATXHeadingBlock(level);
+				return new ATXHeadingBlock(tk, level);
 			}
 		case '`':
 		case '~':
@@ -596,11 +596,20 @@ class SetextHeadingBlock extends LeafBlock {
 
 class ATXHeadingBlock extends LeafBlock {
 	#level: number;
+	#text: string;
 
-	constructor(level: number) {
+	constructor(tk: Tokeniser, level: number) {
 		super();
 
 		this.#level = level;
+		this.open = false;
+
+		tk.get();
+
+		tk.exceptRun("\n");
+		tk.accept("\n");
+
+		this.#text = tk.get().trim().replace(/( \t)+#+$/, "");
 	}
 }
 
