@@ -553,6 +553,8 @@ class ContainerBlock extends Block {
 			}
 		}
 
+		tk.reset();
+
 		return null;
 	}
 }
