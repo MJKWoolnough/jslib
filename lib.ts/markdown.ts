@@ -524,6 +524,15 @@ class ContainerBlock extends Block {
 		case '7':
 		case '8':
 		case '9':
+			const l = tk.length();
+
+			tk.accept(number);
+
+			if (tk.length() - l < 10 && tk.accept(".)") && tk.accept(whiteSpace)) {
+				const n = tk.get().trim().slice(0, -1);
+
+				return new ListBlock(n);
+			}
 		}
 	}
 }
