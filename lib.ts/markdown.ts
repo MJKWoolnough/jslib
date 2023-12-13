@@ -459,11 +459,19 @@ class ContainerBlock extends Block {
 	children: Block[] = [];
 
 	newBlock(tk: Tokeniser) {
-		this.children.push(this.parseBlockStart(tk));
+		const nb = this.parseBlockStart(tk, false);
+
+		if (nb) {
+			this.children.push(nb);
+		}
 	}
 
-	parseBlockStart(tk: Tokeniser) {
+	parseBlockStart(tk: Tokeniser, inParagraph: boolean): Block | null {
 		if (tk.accept("\t")) {
+			if (inParagraph) {
+				return null;
+			}
+
 			return new IndentedCodeBlock(tk, true);
 		}
 
@@ -473,6 +481,10 @@ class ContainerBlock extends Block {
 
 		switch (tk.peek()) {
 		case " ":
+			if (inParagraph) {
+				break;
+			}
+
 			return new IndentedCodeBlock(tk);
 		case ">":
 			return new BlockQuote(tk);
@@ -540,6 +552,8 @@ class ContainerBlock extends Block {
 				return new ListBlock(n);
 			}
 		}
+
+		return null;
 	}
 }
 
