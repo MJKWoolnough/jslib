@@ -477,22 +477,33 @@ class ContainerBlock extends Block {
 		case ">":
 			return new BlockQuote(tk);
 		case '*':
+		case '-':
 		case '_':
 			const tbChar = tk.next();
 
 			tk.acceptRun(whiteSpace);
-			if (!tk.accept(tbChar)) {
+			if (tk.accept(tbChar)) {
+				tk.acceptRun(whiteSpace);
+				if (tk.accept(tbChar)) {
+
+					tk.acceptRun(whiteSpace + tbChar);
+					if (tk.accept("\n") || !tk.peek()) {
+						return new ThematicBreakBlock();
+					}
+				}
+			}
+
+			if (tbChar === "_") {
 				break;
 			}
 
-			tk.acceptRun(whiteSpace);
-			if (!tk.accept(tbChar)) {
-				break;
-			}
+			tk.reset();
+			tk.acceptRun(" ");
+		case '+':
+			const blChar = tk.next();
 
-			tk.acceptRun(whiteSpace + tbChar);
-			if (tk.accept("\n") || !tk.peek()) {
-				return new ThematicBreakBlock();
+			if (tk.accept(whiteSpace)) {
+				return new ListBlock(blChar);
 			}
 		case '#':
 			tk.accept("#");
@@ -507,9 +518,6 @@ class ContainerBlock extends Block {
 		case '`':
 		case '~':
 			return parseFencedCodeBlock(tk);
-		case '-':
-		case '+':
-			return parseBulletListMarker(tk);
 		case '0':
 		case '1':
 		case '2':
@@ -544,6 +552,17 @@ class BlockQuote extends ContainerBlock {
 
 		tk.accept(" ");
 		tk.get();
+	}
+}
+
+
+class ListBlock extends ContainerBlock {
+	#marker: string;
+
+	constructor(marker: string) {
+		super();
+
+		this.#marker = marker;
 	}
 }
 
