@@ -513,7 +513,13 @@ class ContainerBlock extends Block {
 			}
 		case '`':
 		case '~':
-			return parseFencedCodeBlock(tk);
+			const fcbChar = tk.next();
+
+			if (tk.accept(fcbChar) && tk.accept(fcbChar) && tk.exceptRun("\n" + fcbChar) !== fcbChar) {
+				return new FencedCodeBlock(tk);
+			}
+
+			break;
 		case '0':
 		case '1':
 		case '2':
@@ -623,6 +629,11 @@ class ATXHeadingBlock extends LeafBlock {
 }
 
 class FencedCodeBlock extends LeafBlock {
+	constructor(tk: Tokeniser) {
+		super();
+
+
+	}
 }
 
 class IndentedCodeBlock extends LeafBlock {
