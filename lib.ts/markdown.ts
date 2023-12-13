@@ -478,7 +478,22 @@ class ContainerBlock extends Block {
 			return new BlockQuote(tk);
 		case '*':
 		case '_':
-			return thematicBreakOrText(tk);
+			const tbChar = tk.next();
+
+			tk.acceptRun(whiteSpace);
+			if (!tk.accept(tbChar)) {
+				break;
+			}
+
+			tk.acceptRun(whiteSpace);
+			if (!tk.accept(tbChar)) {
+				break;
+			}
+
+			tk.acceptRun(whiteSpace + tbChar);
+			if (tk.accept("\n") || !tk.peek()) {
+				return new ThematicBreakBlock();
+			}
 		case '=':
 			if (!(this.children.at(-1) instanceof ParagraphBlock)) {
 				return new ParagraphBlock(tk);
@@ -604,6 +619,11 @@ class IndentedCodeBlock extends LeafBlock {
 }
 
 class ThematicBreakBlock extends LeafBlock {
+	constructor() {
+		super();
+
+		this.open = false;
+	}
 }
 
 const tokenIndentedCodeBlock = 1,
