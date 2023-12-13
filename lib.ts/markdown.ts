@@ -506,14 +506,10 @@ class ContainerBlock extends Block {
 				return new ListBlock(blChar);
 			}
 		case '#':
-			tk.accept("#");
-			tk.accept("#");
-			tk.accept("#");
-			tk.accept("#");
-			tk.accept("#");
-			tk.accept("#");
+			const level = +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#");
+
 			if (tk.accept(whiteSpace) || tk.peek() === "\n" || !tk.peek()) {
-				return parseATXHeading(tk);
+				return new ATXHeadingBlock(level);
 			}
 		case '`':
 		case '~':
@@ -599,6 +595,13 @@ class SetextHeadingBlock extends LeafBlock {
 }
 
 class ATXHeadingBlock extends LeafBlock {
+	#level: number;
+
+	constructor(level: number) {
+		super();
+
+		this.#level = level;
+	}
 }
 
 class FencedCodeBlock extends LeafBlock {
