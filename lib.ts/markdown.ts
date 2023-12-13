@@ -494,25 +494,6 @@ class ContainerBlock extends Block {
 			if (tk.accept("\n") || !tk.peek()) {
 				return new ThematicBreakBlock();
 			}
-		case '=':
-			if (!(this.children.at(-1) instanceof ParagraphBlock)) {
-				return new ParagraphBlock(tk);
-			}
-
-			const paragraph = this.children.pop() as ParagraphBlock,
-			      stChar = tk.next();
-
-			tk.acceptRun(stChar);
-
-			if (!tk.acceptRun(whiteSpace)) {
-				return new SetextHeadingBlock(tk, paragraph);
-			} else if (!tk.accept("\n")) {
-				paragraph.add(tk);
-
-				return paragraph;
-			}
-
-			return new SetextHeadingBlock(tk, paragraph);
 		case '#':
 			tk.accept("#");
 			tk.accept("#");
