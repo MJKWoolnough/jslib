@@ -705,6 +705,10 @@ class ThematicBreakBlock extends LeafBlock {
 
 		this.open = false;
 	}
+
+	toHTML(uid: string) {
+		return tag(uid, "HR");
+	}
 }
 
 
