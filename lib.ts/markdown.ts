@@ -660,6 +660,10 @@ class FencedCodeBlock extends LeafBlock {
 
 		return false;
 	}
+
+	toHTML(uid: string) {
+		return tag(uid, "TEXTAREA", this.lines.join("\n"), ["type", this.#info]);
+	}
 }
 
 class IndentedCodeBlock extends LeafBlock {
