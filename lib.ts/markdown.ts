@@ -304,6 +304,13 @@ const tags: Tags = Object.assign({
 	}
 
 	return df;
+      },
+      openTag = (uid: string, name: string, close = false, attr?: [string, string]) => `<${name} ${uid}="" ${attr ? ` ${attr[0]}=${JSON.stringify(attr[1])}` : ""}` + (close ? " />" : ">"),
+      closeTag = (name: string) => `</${name}>`,
+      tag = (uid: string, name: string, contents?: string, attr?: [string, string]) => {
+		const close = contents === undefined;
+
+		return openTag(uid, name, close, attr) + (close ? "" : contents + closeTag(name));
       };
 
 abstract class Block {
