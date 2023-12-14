@@ -274,6 +274,12 @@ class Document extends ContainerBlock {
 			}
 		}
 	}
+
+	render(_tags: Tags) {
+		const doc = new DocumentFragment();
+
+		return doc;
+	}
 }
 
 class BlockQuote extends ContainerBlock {
@@ -390,6 +396,4 @@ class ThematicBreakBlock extends LeafBlock {
 }
 
 
-export default (markdown: string, tgs: Partial<Tags> = {}) => {
-	return new Markdown(Object.assign(Object.assign({}, tags), tgs), markdown).content;
-};
+export default (markdown: string, tgs: Partial<Tags> = {}) => new Document(markdown).render(Object.assign(Object.assign({}, tags), tgs));
