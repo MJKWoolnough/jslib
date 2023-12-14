@@ -239,12 +239,79 @@ const tags: Tags = Object.assign({
 	parseATXHeader,
 	parseFencedCodeBlockStart,
 	parseHTML
-      ];
+      ],
+      sanitise = (childNodes: NodeListOf<ChildNode>, tags: Tags, uid: string) => {
+	const df = document.createDocumentFragment();
+
+	Loop:
+	for (const node of Array.from(childNodes)) {
+		if (node instanceof Element) {
+			if (node.hasAttribute(uid)) {
+				switch (node.nodeName) {
+				case "P":
+					df.append(tags.paragraphs(sanitise(node.childNodes, tags, uid)));
+
+					break;
+				case "HR":
+					df.append(tags.thematicBreaks());
+
+					break;
+				case "TEXTAREA":
+					df.append(tags.code(node.getAttribute("type") ?? "", node.textContent ?? ""));
+
+					break;
+				case "BLOCKQUOTE":
+					df.append(tags.blockquote(sanitise(node.childNodes, tags, uid)));
+
+					break;
+				default:
+					df.append(tags[`heading${node.nodeName.charAt(1) as "1" | "2" | "3" | "4" | "5" | "6"}`](sanitise(node.childNodes, tags, uid)));
+
+					break;
+				}
+			} else {
+				if (tags.allowedHTML) {
+					for (const [name, ...attrs] of tags.allowedHTML) {
+						if (node.nodeName === name) {
+							const tag = document.createElement(node.nodeName);
+
+							for (const attr of attrs) {
+								const a = node.getAttributeNode(attr);
+
+								if (a) {
+									tag.setAttributeNode(a);
+								}
+							}
+
+							tag.append(sanitise(node.childNodes, tags, uid));
+
+							df.append(tag);
+
+							continue Loop;
+						}
+					}
+
+					df.append(sanitise(node.childNodes, tags, uid));
+				} else {
+					node.replaceChildren(sanitise(node.childNodes, tags, uid));
+
+					df.append(node);
+				}
+			}
+		} else {
+			df.append(node);
+		}
+	}
+
+	return df;
+      };
 
 abstract class Block {
 	open = true;
 
 	abstract accept(tk: Tokeniser): boolean;
+
+	abstract toHTML(tags: Tags, uid: string): string;
 }
 
 abstract class ContainerBlock extends Block {
@@ -291,11 +358,29 @@ abstract class ContainerBlock extends Block {
 
 		return false;
 	}
+
+	toHTML(tags: Tags, uid: string) {
+		return this.children.reduce((t, c) => t + c.toHTML(tags, uid), "");
+	}
 }
 
 class Document extends ContainerBlock {
+	#uid: string;
+
 	constructor(text: string) {
 		super();
+
+		while (true) {
+			this.#uid = "";
+
+			while (this.#uid.length < 20) {
+				this.#uid += String.fromCharCode(65 + Math.random() * 26);
+			}
+
+			if (!text.includes(this.#uid)) {
+				break;
+			}
+		}
 
 		const tk = new Tokeniser(text);
 
@@ -310,10 +395,12 @@ class Document extends ContainerBlock {
 		return false;
 	}
 
-	render(_tags: Tags) {
-		const doc = new DocumentFragment();
+	render(tags: Tags) {
+		const tmpl = document.createElement("template");
 
-		return doc;
+		tmpl.innerHTML = this.toHTML(tags, this.#uid);
+
+		return sanitise(tmpl.content.childNodes, tags, this.#uid);
 	}
 }
 
@@ -336,6 +423,10 @@ class BlockQuote extends ContainerBlock {
 		}
 
 		return false;
+	}
+
+	toHTML(tags: Tags) {
+		return tags.blockquote(super.toHTML(tags) as DocumentFragment);
 	}
 }
 
