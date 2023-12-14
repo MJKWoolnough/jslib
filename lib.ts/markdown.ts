@@ -134,13 +134,112 @@ const tags: Tags = Object.assign({
 
 	return null;
       },
+      parseHTML = (tk: Tokeniser) => {
+	if (!tk.accept("<")) {
+		return null;
+	}
+
+	const close = tk.accept("/"),
+	      tag = tk.acceptWord(htmlElements, false),
+	      i = htmlElements.indexOf(tag.toLowerCase());
+
+	let htmlKind = 0;
+
+	if (close) {
+		if (i === -1) {
+			if (tk.accept(letter)) {
+				tk.acceptRun(letter + number + "-");
+				tk.acceptRun(whiteSpace);
+				tk.acceptRun("\n");
+				tk.acceptRun(whiteSpace);
+				if (tk.accept(">")) {
+					htmlKind = 7;
+				}
+			}
+		} else if (tk.accept(whiteSpace) || tk.peek() === "\n" || (tk.accept("/") && tk.accept(">"))) {
+			htmlKind = 6;
+		}
+	} else if (i === -1) {
+		if (tag) {
+			while (true) {
+				tk.acceptRun(whiteSpace);
+				tk.accept("\n");
+				tk.acceptRun(whiteSpace);
+
+				if (tk.accept("/")) {
+					if (tk.accept(">")) {
+						htmlKind = 7;
+
+						break;
+					}
+
+					return null;
+				} else if (tk.accept(">")) {
+					htmlKind = 7;
+
+					break;
+				} else if (!tk.accept(letter + "_:")) {
+					break;
+				}
+
+				tk.acceptRun(letter + number + "_.:-");
+				tk.acceptRun(whiteSpace);
+				tk.accept("\n");
+				tk.acceptRun(whiteSpace);
+
+				if (tk.accept("=")) {
+					if (tk.accept("'")) {
+						tk.exceptRun("'");
+						if (!tk.accept("'")) {
+							break;
+						}
+					} else if (tk.accept('"')) {
+						tk.exceptRun('"');
+						if (!tk.accept('"')) {
+							break;
+						}
+					} else if (tk.accept(whiteSpace + "\"'=<>`")) {
+						return null;
+					} else {
+						tk.exceptRun(whiteSpace + "\"'=<>`");
+					}
+				}
+			}
+		} else if (tk.accept("!")) {
+			if (tk.accept("-")) {
+				if (tk.accept("-")) {
+					htmlKind = 2;
+				}
+			} else if (tk.accept(letter)) {
+				htmlKind = 4;
+			} else if (tk.accept("[") && tk.accept("C") && tk.accept("D") && tk.accept("A") && tk.accept("T") && tk.accept("A") && tk.accept("[")) {
+				htmlKind = 5;
+			}
+		} else if (tk.accept("?")) {
+			htmlKind = 3;
+		}
+	} else if (i < 4) {
+		if (tk.accept(whiteSpace) || tk.peek() === "\n") {
+			htmlKind = 1;
+		}
+	} else {
+		if (tk.accept(whiteSpace) || tk.peek() === "\n" || (tk.accept("/") && tk.accept(">"))) {
+			htmlKind = 6;
+		}
+	}
+
+	tk.exceptRun("\n");
+
+	return new HTMLBlock(tk, htmlKind);
+      },
       parseBlock = [
 	parseIndentedCodeBlockStart,
 	parseBlockQuoteStart,
 	parseThematicBreak,
 	parseListBlockStart,
 	parseATXHeader,
-	parseFencedCodeBlockStart
+	parseFencedCodeBlockStart,
+	parseHTML
       ];
 
 class Block {
@@ -202,6 +301,15 @@ class LeafBlock extends Block {
 }
 
 class HTMLBlock extends LeafBlock {
+	#htmlKind: number;
+
+	constructor(tk: Tokeniser, htmlKind: number) {
+		super();
+
+		this.lines.push(tk.get());
+
+		this.#htmlKind = htmlKind;
+	}
 }
 
 class ParagraphBlock extends LeafBlock {
