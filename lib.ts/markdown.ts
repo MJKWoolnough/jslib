@@ -697,6 +697,10 @@ class IndentedCodeBlock extends LeafBlock {
 
 		return false;
 	}
+
+	toHTML(uid: string) {
+		return tag(uid, "TEXTAREA", this.lines.join("\n"));
+	}
 }
 
 class ThematicBreakBlock extends LeafBlock {
