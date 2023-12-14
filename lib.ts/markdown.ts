@@ -242,15 +242,13 @@ const tags: Tags = Object.assign({
 	parseHTML
       ];
 
-class Block {
+abstract class Block {
 	open = true;
 
-	accept(_: Tokeniser) {
-		return false;
-	}
+	abstract accept(tk: Tokeniser): boolean;
 }
 
-class ContainerBlock extends Block {
+abstract class ContainerBlock extends Block {
 	children: Block[] = [];
 
 	newBlock(tk: Tokeniser) {
@@ -260,19 +258,57 @@ class ContainerBlock extends Block {
 			this.children.push(nb);
 		}
 	}
+
+	process(tk: Tokeniser) {
+		const lastChild = this.children.at(-1);
+
+		if (lastChild?.open) {
+			tk.accept(" ");
+			tk.accept(" ");
+			tk.accept(" ");
+
+			if (lastChild.accept(tk)) {
+				return true;
+			}
+
+			tk.reset();
+		}
+
+		for (const block of parseBlock) {
+			tk.accept(" ");
+			tk.accept(" ");
+			tk.accept(" ");
+
+			const b = block(tk);
+
+			if (b) {
+				this.children.push(b);
+
+				return true;
+			} else {
+				tk.reset();
+			}
+		}
+
+		return false;
+	}
 }
 
 class Document extends ContainerBlock {
 	constructor(text: string) {
 		super();
 
-		const tk = new Tokeniser(text[Symbol.iterator]());
+		const tk = new Tokeniser(text);
 
 		while(tk.peek()) {
 			if (!this.accept(tk)) {
 				this.newBlock(tk);
 			}
 		}
+	}
+
+	accept(_: Tokeniser) {
+		return false;
 	}
 
 	render(_tags: Tags) {
@@ -289,6 +325,19 @@ class BlockQuote extends ContainerBlock {
 		tk.accept(" ");
 		tk.get();
 	}
+
+	accept(tk: Tokeniser) {
+		if (tk.accept(">")) {
+			tk.accept(" ");
+			tk.get();
+
+			this.process(tk);
+
+			return true;
+		}
+
+		return false;
+	}
 }
 
 
@@ -300,10 +349,46 @@ class ListBlock extends ContainerBlock {
 
 		this.#marker = marker;
 	}
+
+	newItem(tk: Tokeniser) {
+		switch (this.#marker) {
+		case "-":
+		case "+":
+		case "*":
+			if (tk.accept(this.#marker) && tk.accept(whiteSpace)) {
+				tk.get();
+
+				return true;
+			}
+
+			break;
+		default:
+			if (tk.accept(number)) {
+				tk.acceptRun(number);
+
+				if (tk.accept(".)")) {
+					tk.get();
+					this.process(tk);
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	accept(_: Tokeniser) {
+		return false;
+	}
 }
 
-class LeafBlock extends Block {
+abstract class LeafBlock extends Block {
 	lines: string[] = [];
+
+	accept(_: Tokeniser) {
+		return false;
+	}
 }
 
 class HTMLBlock extends LeafBlock {
@@ -315,6 +400,92 @@ class HTMLBlock extends LeafBlock {
 		this.lines.push(tk.get());
 
 		this.#htmlKind = htmlKind;
+	}
+
+	accept(tk: Tokeniser) {
+		S:
+		switch (this.#htmlKind) {
+		case 1:
+			while (true) {
+				switch (tk.exceptRun("<\n")) {
+				case "<":
+					tk.except("");
+
+					if (tk.accept("/")) {
+						if (tk.acceptWord(type1Elements) && tk.accept(">")) {
+							this.open = false;
+
+							break S;
+						}
+					}
+				default:
+					break S;
+				}
+			}
+		case 2:
+			while (true) {
+				switch (tk.exceptRun("-\n")) {
+				case "-":
+					tk.except("");
+
+					if (tk.accept("-") && tk.acceptRun("-") === ">") {
+						this.open = false;
+
+						break S;
+					}
+
+					break;
+				default:
+					break S;
+				}
+			}
+		case 3:
+			while (true) {
+				switch (tk.exceptRun("?\n")) {
+				case "?":
+					tk.except("?");
+
+					if (tk.accept(">")) {
+						this.open = false;
+
+						break S;
+					}
+				default:
+					break S;
+				}
+			}
+		case 4:
+			this.open = tk.exceptRun(">\n") !== ">";
+
+			break;
+		case 5:
+			while (true) {
+				switch (tk.exceptRun("]\n")) {
+				case "]":
+					tk.except("");
+
+					if (tk.accept("]") && tk.accept(">")) {
+						this.open = false;
+
+						break S;
+					}
+				default:
+					break S;
+				}
+			}
+		case 6:
+		case 7:
+			this.open = tk.acceptRun(whiteSpace) !== "\n";
+
+			break;
+		}
+
+		tk.exceptRun("\n");
+		tk.except("");
+
+		this.lines.push(tk.get());
+
+		return false;
 	}
 }
 
@@ -330,6 +501,19 @@ class ParagraphBlock extends LeafBlock {
 		tk.accept("\n");
 
 		this.lines.push(tk.get());
+	}
+
+	accept(tk: Tokeniser) {
+		if (tk.acceptRun(whiteSpace) === "\n") {
+			this.open = false;
+		} else {
+			tk.exceptRun("\n");
+			tk.except("");
+
+			this.lines.push(tk.get());
+		}
+
+		return false;
 	}
 }
 
@@ -364,12 +548,20 @@ class ATXHeadingBlock extends LeafBlock {
 
 class FencedCodeBlock extends LeafBlock {
 	#info: string;
-	#contents = "";
 
 	constructor(tk: Tokeniser) {
 		super();
 
 		this.#info = tk.get().trim().replace(/^`+/, "");
+	}
+
+	accept(tk: Tokeniser) {
+		tk.exceptRun("\n");
+		tk.except("");
+
+		this.lines.push(tk.get());
+
+		return false;
 	}
 }
 
@@ -384,6 +576,29 @@ class IndentedCodeBlock extends LeafBlock {
 		}
 
 		tk.get();
+	}
+
+	accept(tk: Tokeniser) {
+		if (this.#isTab) {
+			if (!tk.accept("\t")) {
+				this.open = false;
+
+				return false;
+			}
+		} else {
+			if (!tk.accept(" ") || !tk.accept(" ") || !tk.accept(" ") || !tk.accept(" ")) {
+				this.open = false;
+
+				return false;
+			}
+		}
+
+		tk.exceptRun("\n");
+		tk.except("");
+
+		this.lines.push(tk.get());
+
+		return false;
 	}
 }
 
