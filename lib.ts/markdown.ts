@@ -587,6 +587,8 @@ class HTMLBlock extends LeafBlock {
 }
 
 class ParagraphBlock extends LeafBlock {
+	#settextLevel = 0;
+
 	constructor(tk: Tokeniser) {
 		super();
 
@@ -611,6 +613,10 @@ class ParagraphBlock extends LeafBlock {
 		}
 
 		return false;
+	}
+
+	toHTML(uid: string) {
+		return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, this.lines.join("\n"));
 	}
 }
 
