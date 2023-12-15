@@ -41,8 +41,8 @@ const tags: Tags = Object.assign({
       number = "0123456789",
       htmlElements = ["pre", "script", "style", "textarea", "address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"],
       type1Elements = htmlElements.slice(0, 4),
-      parseIndentedCodeBlockStart = (tk: Tokeniser) => {
-	if (tk.accept(" ")) {
+      parseIndentedCodeBlockStart = (tk: Tokeniser, inParagraph: boolean) => {
+	if (!inParagraph && tk.accept(" ")) {
 		return new IndentedCodeBlock(tk);
 	}
 
@@ -133,7 +133,7 @@ const tags: Tags = Object.assign({
 
 	return null;
       },
-      parseHTML = (tk: Tokeniser) => {
+      parseHTML = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!tk.accept("<")) {
 		return null;
 	}
@@ -146,7 +146,7 @@ const tags: Tags = Object.assign({
 
 	if (close) {
 		if (i === -1) {
-			if (tk.accept(letter)) {
+			if (!inParagraph && tk.accept(letter)) {
 				tk.acceptRun(letter + number + "-");
 				tk.acceptRun(whiteSpace);
 				tk.acceptRun("\n");
@@ -160,47 +160,49 @@ const tags: Tags = Object.assign({
 		}
 	} else if (i === -1) {
 		if (tag) {
-			while (true) {
-				tk.acceptRun(whiteSpace);
-				tk.accept("\n");
-				tk.acceptRun(whiteSpace);
+			if (!inParagraph) {
+				while (true) {
+					tk.acceptRun(whiteSpace);
+					tk.accept("\n");
+					tk.acceptRun(whiteSpace);
 
-				if (tk.accept("/")) {
-					if (tk.accept(">")) {
+					if (tk.accept("/")) {
+						if (tk.accept(">")) {
+							htmlKind = 7;
+
+							break;
+						}
+
+						return null;
+					} else if (tk.accept(">")) {
 						htmlKind = 7;
 
 						break;
+					} else if (!tk.accept(letter + "_:")) {
+						break;
 					}
 
-					return null;
-				} else if (tk.accept(">")) {
-					htmlKind = 7;
+					tk.acceptRun(letter + number + "_.:-");
+					tk.acceptRun(whiteSpace);
+					tk.accept("\n");
+					tk.acceptRun(whiteSpace);
 
-					break;
-				} else if (!tk.accept(letter + "_:")) {
-					break;
-				}
-
-				tk.acceptRun(letter + number + "_.:-");
-				tk.acceptRun(whiteSpace);
-				tk.accept("\n");
-				tk.acceptRun(whiteSpace);
-
-				if (tk.accept("=")) {
-					if (tk.accept("'")) {
-						tk.exceptRun("'");
-						if (!tk.accept("'")) {
-							break;
+					if (tk.accept("=")) {
+						if (tk.accept("'")) {
+							tk.exceptRun("'");
+							if (!tk.accept("'")) {
+								break;
+							}
+						} else if (tk.accept('"')) {
+							tk.exceptRun('"');
+							if (!tk.accept('"')) {
+								break;
+							}
+						} else if (tk.accept(whiteSpace + "\"'=<>`")) {
+							return null;
+						} else {
+							tk.exceptRun(whiteSpace + "\"'=<>`");
 						}
-					} else if (tk.accept('"')) {
-						tk.exceptRun('"');
-						if (!tk.accept('"')) {
-							break;
-						}
-					} else if (tk.accept(whiteSpace + "\"'=<>`")) {
-						return null;
-					} else {
-						tk.exceptRun(whiteSpace + "\"'=<>`");
 					}
 				}
 			}
@@ -231,7 +233,7 @@ const tags: Tags = Object.assign({
 
 	return new HTMLBlock(tk, htmlKind);
       },
-      parseBlock = [
+	parseBlock: ((tk: Tokeniser, inParagraph: boolean) => Block | null)[] = [
 	parseIndentedCodeBlockStart,
 	parseBlockQuoteStart,
 	parseThematicBreak,
@@ -333,7 +335,8 @@ abstract class ContainerBlock extends Block {
 	}
 
 	process(tk: Tokeniser) {
-		const lastChild = this.children.at(-1);
+		const lastChild = this.children.at(-1),
+		      inParagraph = lastChild instanceof ParagraphBlock
 
 		if (lastChild?.open) {
 			tk.accept(" ");
@@ -352,7 +355,7 @@ abstract class ContainerBlock extends Block {
 			tk.accept(" ");
 			tk.accept(" ");
 
-			const b = block(tk);
+			const b = block(tk, inParagraph);
 
 			if (b) {
 				this.children.push(b);
