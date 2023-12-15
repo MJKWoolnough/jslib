@@ -318,7 +318,7 @@ abstract class Block {
 
 	abstract accept(tk: Tokeniser): boolean;
 
-	abstract toHTML(tags: Tags, uid: string): string;
+	abstract toHTML(uid: string): string;
 }
 
 abstract class ContainerBlock extends Block {
@@ -366,8 +366,8 @@ abstract class ContainerBlock extends Block {
 		return false;
 	}
 
-	toHTML(tags: Tags, uid: string) {
-		return this.children.reduce((t, c) => t + c.toHTML(tags, uid), "");
+	toHTML(uid: string) {
+		return this.children.reduce((t, c) => t + c.toHTML(uid), "");
 	}
 }
 
@@ -405,7 +405,7 @@ class Document extends ContainerBlock {
 	render(tags: Tags) {
 		const tmpl = document.createElement("template");
 
-		tmpl.innerHTML = this.toHTML(tags, this.#uid);
+		tmpl.innerHTML = this.toHTML(this.#uid);
 
 		return sanitise(tmpl.content.childNodes, tags, this.#uid);
 	}
@@ -432,8 +432,8 @@ class BlockQuote extends ContainerBlock {
 		return false;
 	}
 
-	toHTML(tags: Tags) {
-		return tags.blockquote(super.toHTML(tags) as DocumentFragment);
+	toHTML(uid: string) {
+		return tag(uid, "BLOCKQUOTE", super.toHTML(uid));
 	}
 }
 
