@@ -641,6 +641,10 @@ class ATXHeadingBlock extends LeafBlock {
 
 		this.#text = tk.get().trim().replace(/( \t)+#+$/, "");
 	}
+
+	toHTML(uid: string) {
+		return tag(uid, "H" + this.#level, this.#text);
+	}
 }
 
 class FencedCodeBlock extends LeafBlock {
