@@ -614,16 +614,6 @@ class ParagraphBlock extends LeafBlock {
 	}
 }
 
-class SetextHeadingBlock extends LeafBlock {
-	constructor(tk: Tokeniser, p: ParagraphBlock) {
-		super();
-
-		this.lines = p.lines;
-
-		tk.get();
-	}
-}
-
 class ATXHeadingBlock extends LeafBlock {
 	#level: number;
 	#text: string;
