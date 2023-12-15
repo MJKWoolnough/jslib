@@ -334,14 +334,6 @@ abstract class Block {
 abstract class ContainerBlock extends Block {
 	children: Block[] = [];
 
-	newBlock(tk: Tokeniser) {
-		const nb = this.parseBlockStart(tk, false);
-
-		if (nb) {
-			this.children.push(nb);
-		}
-	}
-
 	process(tk: Tokeniser) {
 		const lastChild = this.children.at(-1),
 		      inParagraph = lastChild instanceof ParagraphBlock
@@ -403,9 +395,7 @@ class Document extends ContainerBlock {
 		const tk = new Tokeniser(text);
 
 		while(tk.peek()) {
-			if (!this.accept(tk)) {
-				this.newBlock(tk);
-			}
+			this.process(tk);
 		}
 	}
 
