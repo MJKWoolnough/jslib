@@ -233,14 +233,22 @@ const tags: Tags = Object.assign({
 
 	return new HTMLBlock(tk, htmlKind);
       },
-	parseBlock: ((tk: Tokeniser, inParagraph: boolean) => Block | null)[] = [
+      parseParagraph = (tk: Tokeniser, inParagraph: boolean) => {
+	if (!inParagraph) {
+		return new ParagraphBlock(tk);
+	}
+
+	return null;
+      },
+      parseBlock: ((tk: Tokeniser, inParagraph: boolean) => Block | null)[] = [
 	parseIndentedCodeBlockStart,
 	parseBlockQuoteStart,
 	parseThematicBreak,
 	parseListBlockStart,
 	parseATXHeader,
 	parseFencedCodeBlockStart,
-	parseHTML
+	parseHTML,
+	parseParagraph
       ],
       sanitise = (childNodes: NodeListOf<ChildNode>, tags: Tags, uid: string) => {
 	const df = document.createDocumentFragment();
