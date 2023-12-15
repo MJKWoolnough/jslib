@@ -584,6 +584,10 @@ class HTMLBlock extends LeafBlock {
 
 		return false;
 	}
+
+	toHTML() {
+		return this.lines.join("\n");
+	}
 }
 
 class ParagraphBlock extends LeafBlock {
