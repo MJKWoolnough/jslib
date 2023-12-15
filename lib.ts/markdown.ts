@@ -250,6 +250,13 @@ const tags: Tags = Object.assign({
 	parseHTML,
 	parseParagraph
       ],
+      encoder = document.createElement("div"),
+      punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
+      parseInline = (text: string) => {
+	encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text);
+
+	return encoder.innerHTML;
+      },
       sanitise = (childNodes: NodeListOf<ChildNode>, tags: Tags, uid: string) => {
 	const df = document.createDocumentFragment();
 
