@@ -373,6 +373,8 @@ abstract class ContainerBlock extends Block {
 			}
 		}
 
+		this.children.push(new ParagraphBlock(tk));
+
 		return false;
 	}
 
