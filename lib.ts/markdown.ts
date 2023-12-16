@@ -68,7 +68,7 @@ const tags: Tags = Object.assign({
 			if (tk.accept(tbChar)) {
 				tk.acceptRun(whiteSpace + tbChar);
 				if (tk.accept("\n") || !tk.peek()) {
-					return new ThematicBreakBlock();
+					return new ThematicBreakBlock(tk);
 				}
 			}
 		}
@@ -720,8 +720,10 @@ class IndentedCodeBlock extends LeafBlock {
 }
 
 class ThematicBreakBlock extends LeafBlock {
-	constructor() {
+	constructor(tk: Tokeniser) {
 		super();
+
+		tk.get();
 
 		this.open = false;
 	}
