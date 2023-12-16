@@ -596,7 +596,7 @@ class HTMLBlock extends LeafBlock {
 	}
 
 	toHTML() {
-		return this.lines.join();
+		return this.lines.join("");
 	}
 }
 
@@ -630,7 +630,7 @@ class ParagraphBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, this.lines.join());
+		return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, this.lines.join(""));
 	}
 }
 
@@ -676,7 +676,7 @@ class FencedCodeBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "TEXTAREA", this.lines.join(), ["type", this.#info]);
+		return tag(uid, "TEXTAREA", this.lines.join(""), ["type", this.#info]);
 	}
 }
 
@@ -717,7 +717,7 @@ class IndentedCodeBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "TEXTAREA", this.lines.join());
+		return tag(uid, "TEXTAREA", this.lines.join(""));
 	}
 }
 
