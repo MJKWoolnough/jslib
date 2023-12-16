@@ -674,7 +674,7 @@ class ATXHeadingBlock extends LeafBlock {
 		tk.exceptRun("\n");
 		tk.accept("\n");
 
-		this.#text = tk.get().trim().replace(/( \t)+#+$/, "");
+		this.#text = tk.get().trim().replace(/[ \t]+#*$/, "");
 	}
 
 	toHTML(uid: string) {
