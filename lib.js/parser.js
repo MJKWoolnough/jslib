@@ -108,7 +108,7 @@ const noChar = {
       peek = (p, isInvalid) => {
 	const n = p.next();
 
-	if (isInvalid(n)) {
+	if (!isInvalid(n)) {
 		p.backup();
 	}
 

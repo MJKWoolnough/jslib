@@ -120,7 +120,7 @@ const noChar = {
       peek = <Next extends string | TokenType>(p: {next(): Next; backup(): void}, isInvalid: (n: Next) => boolean) => {
 	const n = p.next();
 
-	if (isInvalid(n)) {
+	if (!isInvalid(n)) {
 		p.backup();
 	}
 
