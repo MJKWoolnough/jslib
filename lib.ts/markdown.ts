@@ -368,12 +368,16 @@ abstract class ContainerBlock extends Block {
 				this.children.push(b);
 
 				return true;
-			} else {
-				tk.reset();
 			}
+
+			tk.reset();
 		}
 
-		this.children.push(new ParagraphBlock(tk));
+		if (inParagraph) {
+			lastChild.add(tk);
+		} else {
+			this.children.push(new ParagraphBlock(tk));
+		}
 
 		return false;
 	}
@@ -610,7 +614,7 @@ class ParagraphBlock extends LeafBlock {
 	}
 
 	add(tk: Tokeniser) {
-		tk.acceptRun("\n");
+		tk.exceptRun("\n");
 		tk.accept("\n");
 
 		this.lines.push(tk.get());
@@ -619,18 +623,15 @@ class ParagraphBlock extends LeafBlock {
 	accept(tk: Tokeniser) {
 		if (tk.acceptRun(whiteSpace) === "\n") {
 			this.open = false;
-		} else {
-			tk.exceptRun("\n");
-			tk.except("");
 
-			this.lines.push(tk.get());
+			return true;
 		}
 
 		return false;
 	}
 
 	toHTML(uid: string) {
-		const text = this.lines.join("").trim();
+		const text = this.lines.map(l => l.trim()).join("\n").trim();
 
 		if (text) {
 			return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, text);
