@@ -343,7 +343,7 @@ abstract class ContainerBlock extends Block {
 
 	process(tk: Tokeniser) {
 		const lastChild = this.children.at(-1),
-		      inParagraph = lastChild instanceof ParagraphBlock
+		      inParagraph = lastChild instanceof ParagraphBlock && lastChild.open;
 
 		if (lastChild?.open) {
 			tk.accept(" ");
@@ -374,6 +374,9 @@ abstract class ContainerBlock extends Block {
 		}
 
 		if (inParagraph) {
+			tk.accept(" ");
+			tk.accept(" ");
+			tk.accept(" ");
 			lastChild.add(tk);
 		} else {
 			this.children.push(new ParagraphBlock(tk));
@@ -617,11 +620,26 @@ class ParagraphBlock extends LeafBlock {
 		tk.exceptRun("\n");
 		tk.accept("\n");
 
-		this.lines.push(tk.get());
+		this.lines.push(tk.get().trim());
 	}
 
 	accept(tk: Tokeniser) {
-		if (tk.acceptRun(whiteSpace) === "\n") {
+		if (this.lines.length && (tk.peek() === "-" || tk.peek() === "=")) {
+			const stChar = tk.next();
+
+			if (tk.accept(stChar) && tk.accept(stChar)) {
+				tk.acceptRun(stChar);
+
+				if (!tk.acceptRun(whiteSpace) || tk.accept("\n")) {
+					this.#settextLevel = 1 + +(stChar === '-');
+					this.open = false;
+
+					tk.get();
+
+					return true;
+				}
+			}
+		} else if (tk.acceptRun(whiteSpace) === "\n") {
 			this.open = false;
 
 			return true;
@@ -631,7 +649,7 @@ class ParagraphBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		const text = this.lines.map(l => l.trim()).join("\n").trim();
+		const text = this.lines.join("\n").trim();
 
 		if (text) {
 			return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, text);
