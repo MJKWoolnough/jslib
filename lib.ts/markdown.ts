@@ -114,7 +114,7 @@ const tags: Tags = Object.assign({
       parseATXHeader = (tk: Tokeniser) => {
 	const level = +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#");
 
-	if (level > 0 && tk.accept(whiteSpace) || tk.peek() === "\n" || !tk.peek()) {
+	if (level > 0 && (tk.accept(whiteSpace) || tk.peek() === "\n" || !tk.peek())) {
 		return new ATXHeadingBlock(tk, level);
 	}
 
