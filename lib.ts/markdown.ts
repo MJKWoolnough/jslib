@@ -630,7 +630,13 @@ class ParagraphBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, this.lines.join(""));
+		const text = this.lines.join("").trim();
+
+		if (text) {
+			return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, text);
+		}
+
+		return "";
 	}
 }
 
