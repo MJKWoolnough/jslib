@@ -127,7 +127,7 @@ const tags: Tags = Object.assign({
 	case '`':
 	case '~':
 		if (tk.accept(fcbChar) && tk.accept(fcbChar) && tk.exceptRun("\n" + (fcbChar === '`' ? '`' : "")) !== fcbChar) {
-			return new FencedCodeBlock(tk);
+			return new FencedCodeBlock(tk, fcbChar);
 		}
 	}
 
@@ -691,21 +691,58 @@ class ATXHeadingBlock extends LeafBlock {
 }
 
 class FencedCodeBlock extends LeafBlock {
+	#ticks: number;
+	#char: string;
+	#spaces: number;
 	#info: string;
 
-	constructor(tk: Tokeniser) {
+	constructor(tk: Tokeniser, fcbChar: string) {
 		super();
 
-		this.#info = tk.get().trim().replace(/^`+/, "");
+		const line = tk.get(),
+		      noSpace = line.trimStart(),
+		      info = noSpace.replace(new RegExp("^"+fcbChar+"+"), "");
+
+		this.#spaces = line.length - noSpace.length;
+		this.#ticks = noSpace.length - info.length;
+		this.#info = info.trimEnd();
+		this.#char = fcbChar;
 	}
 
 	accept(tk: Tokeniser) {
+		let ticks = 0;
+
+		while (tk.accept(this.#char)) {
+			ticks++;
+		}
+
+		if (ticks >= this.#ticks) {
+			tk.acceptRun(this.#char);
+			
+			const last = tk.acceptRun(whiteSpace);
+
+			if (!last || last === "\n") {
+				tk.get();
+
+				this.open = false;
+
+				return true;
+			}
+		}
+
+		tk.reset();
+
+		for (let i = 0; i < this.#spaces; i++) {
+			tk.accept(" ");
+		}
+
 		tk.exceptRun("\n");
 		tk.except("");
 
+
 		this.lines.push(tk.get());
 
-		return false;
+		return true;
 	}
 
 	toHTML(uid: string) {
