@@ -721,12 +721,20 @@ class IndentedCodeBlock extends LeafBlock {
 
 		if (this.#isTab) {
 			if (!tk.accept("\t")) {
+				if (this.#getBlankLine(tk)) {
+					return true;
+				}
+
 				this.open = false;
 
 				return false;
 			}
 		} else {
 			if (!tk.accept(" ") || !tk.accept(" ") || !tk.accept(" ") || !tk.accept(" ")) {
+				if (this.#getBlankLine(tk)) {
+					return true;
+				}
+
 				this.open = false;
 
 				return false;
@@ -736,6 +744,22 @@ class IndentedCodeBlock extends LeafBlock {
 		this.#getLine(tk);
 
 		return true;
+	}
+
+	#getBlankLine(tk: Tokeniser) {
+		const last = tk.acceptRun(whiteSpace);
+
+		if (!last || last === "\n") {
+			tk.accept("\n");
+
+			tk.get();
+
+			this.lines.push("\n");
+
+			return true;
+		}
+
+		return false;
 	}
 
 	#getLine(tk: Tokeniser) {
