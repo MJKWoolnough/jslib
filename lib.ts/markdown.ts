@@ -248,6 +248,11 @@ const tags: Tags = Object.assign({
 
 	return null;
       },
+      acceptThreeSpaces = (tk: Tokeniser) => {
+	tk.accept(" ");
+	tk.accept(" ");
+	tk.accept(" ");
+      },
       parseBlock: ((tk: Tokeniser, inParagraph: boolean) => Block | null)[] = [
 	parseIndentedCodeBlockStart,
 	parseBlockQuoteStart,
@@ -354,9 +359,7 @@ abstract class ContainerBlock extends Block {
 		      inParagraph = lastChild instanceof ParagraphBlock && lastChild.open;
 
 		if (lastChild?.open) {
-			tk.accept(" ");
-			tk.accept(" ");
-			tk.accept(" ");
+			acceptThreeSpaces(tk);
 
 			if (lastChild.accept(tk)) {
 				return true;
@@ -366,9 +369,7 @@ abstract class ContainerBlock extends Block {
 		}
 
 		for (const block of parseBlock) {
-			tk.accept(" ");
-			tk.accept(" ");
-			tk.accept(" ");
+			acceptThreeSpaces(tk);
 
 			const b = block(tk, inParagraph);
 
@@ -382,9 +383,7 @@ abstract class ContainerBlock extends Block {
 		}
 
 		if (inParagraph) {
-			tk.accept(" ");
-			tk.accept(" ");
-			tk.accept(" ");
+			acceptThreeSpaces(tk);
 			lastChild.add(tk);
 		} else {
 			tk.exceptRun("\n");
