@@ -713,8 +713,6 @@ class IndentedCodeBlock extends LeafBlock {
 			tk.accept(" ");
 		}
 
-		tk.get();
-
 		this.#getLine(tk);
 	}
 
@@ -741,6 +739,8 @@ class IndentedCodeBlock extends LeafBlock {
 	}
 
 	#getLine(tk: Tokeniser) {
+		tk.get();
+
 		tk.exceptRun("\n");
 		tk.except("");
 
