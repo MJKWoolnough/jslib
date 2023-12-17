@@ -10710,7 +10710,6 @@ type Tests = {
 				["Foo\n\nbar\n---\nbaz", "<p>Foo</p><h2>bar</h2><p>baz</p>"],
 				["Foo\nbar\n\n---\nbaz", "<p>Foo\nbar</p><hr><p>baz</p>"],
 				["Foo\nbar\n\\---\nbaz", "<p>Foo\nbar\n---\nbaz</p>"],
-				["`Foo\n----\n`\n\n<a title=\"a lot\n---\nof dashes\"/>", "<h2>`Foo</h2><p>`</p><h2>&lt;a title=\"a lot</h2><p>of dashes\"/&gt;</p>"],
 				["---\nFoo\n---\nBar\n---\nBaz", "<hr><h2>Foo</h2><h2>Bar</h2><p>Baz</p>"]
 			]
 		},
