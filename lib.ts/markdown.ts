@@ -235,7 +235,11 @@ const tags: Tags = Object.assign({
       },
       parseParagraph = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph) {
-		return new ParagraphBlock(tk);
+		const last = tk.acceptRun(whiteSpace)
+
+		if (last && last !== "\n") {
+			return new ParagraphBlock(tk);
+		}
 	}
 
 	return null;
@@ -379,7 +383,9 @@ abstract class ContainerBlock extends Block {
 			tk.accept(" ");
 			lastChild.add(tk);
 		} else {
-			this.children.push(new ParagraphBlock(tk));
+			tk.exceptRun("\n");
+			tk.accept("\n");
+			tk.get();
 		}
 
 		return false;
@@ -434,6 +440,8 @@ class BlockQuote extends ContainerBlock {
 
 		tk.accept(" ");
 		tk.get();
+
+
 	}
 
 	accept(tk: Tokeniser) {
@@ -445,6 +453,8 @@ class BlockQuote extends ContainerBlock {
 
 			return true;
 		}
+
+
 
 		return false;
 	}
@@ -599,7 +609,7 @@ class HTMLBlock extends LeafBlock {
 
 		this.lines.push(tk.get());
 
-		return false;
+		return true;
 	}
 
 	toHTML() {
