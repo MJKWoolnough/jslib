@@ -627,17 +627,15 @@ class ParagraphBlock extends LeafBlock {
 		if (this.lines.length && (tk.peek() === "-" || tk.peek() === "=")) {
 			const stChar = tk.next();
 
-			if (tk.accept(stChar) && tk.accept(stChar)) {
-				tk.acceptRun(stChar);
+			tk.acceptRun(stChar);
 
-				if (!tk.acceptRun(whiteSpace) || tk.accept("\n")) {
-					this.#settextLevel = 1 + +(stChar === '-');
-					this.open = false;
+			if (!tk.acceptRun(whiteSpace) || tk.accept("\n")) {
+				this.#settextLevel = 1 + +(stChar === '-');
+				this.open = false;
 
-					tk.get();
+				tk.get();
 
-					return true;
-				}
+				return true;
 			}
 		} else if (tk.acceptRun(whiteSpace) === "\n") {
 			this.open = false;
