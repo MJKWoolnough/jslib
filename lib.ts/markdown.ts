@@ -719,6 +719,8 @@ class IndentedCodeBlock extends LeafBlock {
 	}
 
 	accept(tk: Tokeniser) {
+		tk.reset();
+
 		if (this.#isTab) {
 			if (!tk.accept("\t")) {
 				this.open = false;
