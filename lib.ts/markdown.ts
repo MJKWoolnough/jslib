@@ -126,8 +126,12 @@ const tags: Tags = Object.assign({
 	switch (fcbChar) {
 	case '`':
 	case '~':
-		if (tk.accept(fcbChar) && tk.accept(fcbChar) && tk.exceptRun("\n" + (fcbChar === '`' ? '`' : "")) !== fcbChar) {
-			return new FencedCodeBlock(tk, fcbChar);
+		if (tk.accept(fcbChar) && tk.accept(fcbChar)) {
+			tk.acceptRun(fcbChar);
+
+			if (tk.exceptRun("\n" + (fcbChar === '`' ? '`' : "")) !== fcbChar) {
+				return new FencedCodeBlock(tk, fcbChar);
+			}
 		}
 	}
 
@@ -718,7 +722,7 @@ class FencedCodeBlock extends LeafBlock {
 
 		if (ticks >= this.#ticks) {
 			tk.acceptRun(this.#char);
-			
+
 			const last = tk.acceptRun(whiteSpace);
 
 			if (!last || last === "\n") {
