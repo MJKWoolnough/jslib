@@ -652,7 +652,7 @@ class ParagraphBlock extends LeafBlock {
 		const text = this.lines.join("\n").trim();
 
 		if (text) {
-			return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, text);
+			return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, parseInline(text));
 		}
 
 		return "";
@@ -678,7 +678,7 @@ class ATXHeadingBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "H" + this.#level, this.#text);
+		return tag(uid, "H" + this.#level, parseInline(this.#text));
 	}
 }
 
