@@ -349,7 +349,8 @@ const tags: Tags = Object.assign({
 		const close = contents === undefined;
 
 		return openTag(uid, name, close, attr) + (close ? "" : contents + closeTag(name));
-      };
+      },
+      isOpenParagraph = (b?: Block): b is ParagraphBlock => b instanceof ParagraphBlock && b.open;
 
 abstract class Block {
 	open = true;
@@ -364,7 +365,7 @@ abstract class ContainerBlock extends Block {
 
 	process(tk: Tokeniser) {
 		const lastChild = this.children.at(-1),
-		      inParagraph = lastChild instanceof ParagraphBlock && lastChild.open;
+		      inParagraph = isOpenParagraph(lastChild);
 
 		if (lastChild?.open) {
 			acceptThreeSpaces(tk);
@@ -452,22 +453,48 @@ class BlockQuote extends ContainerBlock {
 		tk.accept(" ");
 		tk.get();
 
-
+		this.process(tk);
 	}
 
 	accept(tk: Tokeniser) {
 		if (tk.accept(">")) {
 			tk.accept(" ");
 			tk.get();
+		} else if (isOpenParagraph(this.children.at(-1))) {
+			tk.reset();
 
-			this.process(tk);
+			const ftk = new Tokeniser(function* () {
+				while (true) {
+					yield tk.next();
+				}
+			}());
 
-			return true;
+			for (const block of parseBlock) {
+				acceptThreeSpaces(ftk);
+
+				const b = block(ftk, true);
+
+				if (b) {
+					tk.reset();
+
+					this.open = false;
+
+					return false;
+				}
+
+				ftk.reset();
+			}
+
+			tk.reset();
+		} else {
+			this.open = false;
+
+			return false;
 		}
 
+		this.process(tk);
 
-
-		return false;
+		return true;
 	}
 
 	toHTML(uid: string) {
