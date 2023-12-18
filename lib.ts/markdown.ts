@@ -138,6 +138,8 @@ const tags: Tags = Object.assign({
 			tk.acceptRun(fcbChar);
 
 			if (tk.exceptRun("\n" + (fcbChar === '`' ? '`' : "")) !== fcbChar) {
+				tk.accept("\n");
+
 				return new FencedCodeBlock(tk, fcbChar);
 			}
 		}
