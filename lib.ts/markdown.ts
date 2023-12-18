@@ -778,9 +778,10 @@ class FencedCodeBlock extends LeafBlock {
 			tk.accept(" ");
 		}
 
+		tk.get();
+
 		tk.exceptRun("\n");
 		tk.except("");
-
 
 		this.lines.push(tk.get());
 
