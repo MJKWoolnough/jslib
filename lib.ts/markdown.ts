@@ -785,7 +785,7 @@ class FencedCodeBlock extends LeafBlock {
 
 		const line = tk.get();
 
-		if (line || this.lines.length) {
+		if (line !== "\n" || this.lines.length) {
 			this.lines.push(line);
 		}
 
