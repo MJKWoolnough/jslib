@@ -783,7 +783,11 @@ class FencedCodeBlock extends LeafBlock {
 		tk.exceptRun("\n");
 		tk.except("");
 
-		this.lines.push(tk.get());
+		const line = tk.get();
+
+		if (line || this.lines.length) {
+			this.lines.push(line);
+		}
 
 		return true;
 	}
