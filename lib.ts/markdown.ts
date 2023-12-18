@@ -798,9 +798,7 @@ class IndentedCodeBlock extends LeafBlock {
 	constructor(tk: Tokeniser, isTab = false) {
 		super();
 
-		if (!(this.#isTab = isTab)) {
-			tk.accept(" ");
-		}
+		this.#isTab = isTab;
 
 		this.#getLine(tk);
 	}
