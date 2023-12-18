@@ -42,8 +42,16 @@ const tags: Tags = Object.assign({
       htmlElements = ["pre", "script", "style", "textarea", "address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"],
       type1Elements = htmlElements.slice(0, 4),
       parseIndentedCodeBlockStart = (tk: Tokeniser, inParagraph: boolean) => {
-	if (!inParagraph && tk.accept(" ")) {
-		return new IndentedCodeBlock(tk);
+	if (!inParagraph) {
+		if (tk.accept(" ")) {
+			return new IndentedCodeBlock(tk);
+		}
+
+		tk.reset();
+
+		if (tk.accept("\t")) {
+			return new IndentedCodeBlock(tk, true);
+		}
 	}
 
 	return null;
