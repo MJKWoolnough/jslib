@@ -465,6 +465,12 @@ class BlockQuote extends ContainerBlock {
 			tk.accept(" ");
 			tk.get();
 		} else if (isOpenParagraph(this.children.at(-1))) {
+			if (!tk.acceptRun(whiteSpace) || tk.accept("\n")) {
+				this.open = false;
+
+				return true;
+			}
+
 			tk.reset();
 
 			const ftk = new Tokeniser(function* () {
@@ -692,6 +698,9 @@ class ParagraphBlock extends LeafBlock {
 				return true;
 			}
 		} else if (tk.acceptRun(whiteSpace) === "\n") {
+			tk.except("");
+			tk.get();
+
 			this.open = false;
 
 			return true;
