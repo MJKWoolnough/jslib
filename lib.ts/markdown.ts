@@ -355,7 +355,7 @@ const tags: Tags = Object.assign({
 abstract class Block {
 	open = true;
 
-	abstract accept(tk: Tokeniser): boolean;
+	abstract accept(tk: Tokeniser, lazy: boolean): boolean;
 
 	abstract toHTML(uid: string): string;
 }
@@ -363,14 +363,14 @@ abstract class Block {
 abstract class ContainerBlock extends Block {
 	children: Block[] = [];
 
-	process(tk: Tokeniser) {
+	process(tk: Tokeniser, lazy = false) {
 		const lastChild = this.children.at(-1),
 		      inParagraph = isOpenParagraph(lastChild);
 
 		if (lastChild?.open) {
 			acceptThreeSpaces(tk);
 
-			if (lastChild.accept(tk)) {
+			if (lastChild.accept(tk, lazy)) {
 				return true;
 			}
 
@@ -457,6 +457,8 @@ class BlockQuote extends ContainerBlock {
 	}
 
 	accept(tk: Tokeniser) {
+		let lazy = false;
+
 		if (tk.accept(">")) {
 			tk.accept(" ");
 			tk.get();
@@ -486,13 +488,15 @@ class BlockQuote extends ContainerBlock {
 			}
 
 			tk.reset();
+
+			lazy = true;
 		} else {
 			this.open = false;
 
 			return false;
 		}
 
-		this.process(tk);
+		this.process(tk, lazy);
 
 		return true;
 	}
@@ -671,8 +675,8 @@ class ParagraphBlock extends LeafBlock {
 		this.lines.push(tk.get().trim());
 	}
 
-	accept(tk: Tokeniser) {
-		if (this.lines.length && (tk.peek() === "-" || tk.peek() === "=")) {
+	accept(tk: Tokeniser, lazy = false) {
+		if (!lazy && this.lines.length && (tk.peek() === "-" || tk.peek() === "=")) {
 			const stChar = tk.next();
 
 			tk.acceptRun(stChar);
