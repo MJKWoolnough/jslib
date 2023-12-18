@@ -747,7 +747,7 @@ class FencedCodeBlock extends LeafBlock {
 
 		this.#spaces = line.length - noSpace.length;
 		this.#ticks = noSpace.length - info.length;
-		this.#info = info.trimEnd();
+		this.#info = info.trim();
 		this.#char = fcbChar;
 	}
 
