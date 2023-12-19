@@ -619,13 +619,15 @@ class HTMLBlock extends LeafBlock {
 			while (true) {
 				switch (tk.exceptRun("?\n")) {
 				case "?":
-					tk.except("?");
+					tk.except("");
 
 					if (tk.accept(">")) {
 						this.open = false;
 
 						break S;
 					}
+
+					break;
 				default:
 					break S;
 				}
