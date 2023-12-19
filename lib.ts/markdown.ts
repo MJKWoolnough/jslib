@@ -571,6 +571,7 @@ class HTMLBlock extends LeafBlock {
 
 		this.#htmlKind = htmlKind;
 
+		tk.reset();
 		this.accept(tk);
 	}
 
