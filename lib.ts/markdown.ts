@@ -244,8 +244,6 @@ const tags: Tags = Object.assign({
 	}
 
 	if (htmlKind) {
-		tk.exceptRun("\n");
-
 		return new HTMLBlock(tk, htmlKind);
 	}
 
@@ -571,9 +569,9 @@ class HTMLBlock extends LeafBlock {
 	constructor(tk: Tokeniser, htmlKind: number) {
 		super();
 
-		this.lines.push(tk.get());
-
 		this.#htmlKind = htmlKind;
+
+		this.accept(tk);
 	}
 
 	accept(tk: Tokeniser) {
