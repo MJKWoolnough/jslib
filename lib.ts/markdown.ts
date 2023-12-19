@@ -238,7 +238,7 @@ const tags: Tags = Object.assign({
 			htmlKind = 1;
 		}
 	} else {
-		if (tk.accept(whiteSpace) || tk.peek() === "\n" || (tk.accept("/") && tk.accept(">"))) {
+		if (tk.accept(whiteSpace + ">") || tk.peek() === "\n" || (tk.accept("/") && tk.accept(">"))) {
 			htmlKind = 6;
 		}
 	}
