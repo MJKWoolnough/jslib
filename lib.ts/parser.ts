@@ -331,7 +331,7 @@ export class Tokeniser {
 			}
 
 			if (found) {
-				return read + newWords.length ? this.#acceptWord(newWords, caseSensitive) : "";
+				return read + (newWords.length ? this.#acceptWord(newWords, caseSensitive) : "");
 			}
 
 			words = newWords;
