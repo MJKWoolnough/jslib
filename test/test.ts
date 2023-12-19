@@ -10787,10 +10787,10 @@ type Tests = {
 		},
 		"raw html": {
 			"type 1": [
-				['<pre language="haskell"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\nokay', '<pre language="haskell"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre><p>okay</p>'],
-				['<script type="text/javascript">\n// JavaScript example\n\ndocument.getElementById("demo").innerHTML = "Hello JavaScript!";\n</script>\nokay', '<script type="text/javascript">\n// JavaScript example\n\ndocument.getElementById("demo").innerHTML = "Hello JavaScript!";\n</script><p>okay</p>'],
+				['<pre language="haskell"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\nokay', '<pre language="haskell"><code>\nimport Text.HTML.TagSoup\n\nmain :: IO ()\nmain = print $ parseTags tags\n</code></pre>\n<p>okay</p>'],
+				['<script type="text/javascript">\n// JavaScript example\n\ndocument.getElementById("demo").innerHTML = "Hello JavaScript!";\n</script>\nokay', '<script type="text/javascript">\n// JavaScript example\n\ndocument.getElementById("demo").innerHTML = "Hello JavaScript!";\n</script>\n<p>okay</p>'],
 				['<textarea>\n\n*foo*\n\n_bar_\n\n</textarea>', '<textarea>\n*foo*\n\n_bar_\n\n</textarea>'],
-				['<style\n  type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style>\nokay', '<style type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style><p>okay</p>']
+				['<style\n  type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style>\nokay', '<style type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style>\n<p>okay</p>']
 			],
 			"type 2": [
 				['<!-- foo -->*bar*\nbaz', '<!-- foo -->*bar*<p>baz</p>']
