@@ -473,11 +473,7 @@ class BlockQuote extends ContainerBlock {
 
 			tk.reset();
 
-			const ftk = new Tokeniser(function* () {
-				while (true) {
-					yield tk.next();
-				}
-			}());
+			const ftk = new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
 
 			for (const block of parseBlock) {
 				acceptThreeSpaces(ftk);
