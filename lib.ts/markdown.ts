@@ -234,7 +234,7 @@ const tags: Tags = Object.assign({
 			htmlKind = 3;
 		}
 	} else if (i < 4) {
-		if (tk.accept(whiteSpace) || tk.peek() === "\n") {
+		if (tk.accept(whiteSpace + ">") || tk.peek() === "\n") {
 			htmlKind = 1;
 		}
 	} else {
