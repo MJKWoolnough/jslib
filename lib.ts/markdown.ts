@@ -243,9 +243,13 @@ const tags: Tags = Object.assign({
 		}
 	}
 
-	tk.exceptRun("\n");
+	if (htmlKind) {
+		tk.exceptRun("\n");
 
-	return new HTMLBlock(tk, htmlKind);
+		return new HTMLBlock(tk, htmlKind);
+	}
+
+	return null;
       },
       parseParagraph = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph) {
