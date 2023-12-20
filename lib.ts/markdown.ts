@@ -352,7 +352,8 @@ const tags: Tags = Object.assign({
 
 		return openTag(uid, name, close, attr) + (close ? "" : contents + closeTag(name));
       },
-      isOpenParagraph = (b?: Block): b is ParagraphBlock => b instanceof ParagraphBlock && b.open;
+      isOpenParagraph = (b?: Block): b is ParagraphBlock => b instanceof ParagraphBlock && b.open,
+      isLastGrandChildOpenParagraph = (b?: Block): boolean => b instanceof ContainerBlock ? isLastGrandChildOpenParagraph(b.children.at(-1)) : b instanceof ParagraphBlock ? b.open : false;
 
 abstract class Block {
 	open = true;
@@ -400,9 +401,11 @@ abstract class ContainerBlock extends Block {
 			tk.exceptRun("\n");
 			tk.accept("\n");
 			tk.get();
+
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	toHTML(uid: string) {
@@ -458,13 +461,11 @@ class BlockQuote extends ContainerBlock {
 		this.process(tk);
 	}
 
-	accept(tk: Tokeniser) {
-		let lazy = false;
-
+	accept(tk: Tokeniser, lazy: boolean) {
 		if (tk.accept(">")) {
 			tk.accept(" ");
 			tk.get();
-		} else if (isOpenParagraph(this.children.at(-1))) {
+		} else if (!lazy) {
 			if (!tk.acceptRun(whiteSpace) || tk.accept("\n")) {
 				this.open = false;
 
@@ -491,16 +492,20 @@ class BlockQuote extends ContainerBlock {
 				ftk.reset();
 			}
 
-			tk.reset();
-
 			lazy = true;
-		} else {
-			this.open = false;
+		}
 
+		if (lazy && !isLastGrandChildOpenParagraph(this)) {
 			return false;
 		}
 
+		tk.reset();
+
 		this.process(tk, lazy);
+
+		if (lazy) {
+			this.open = this.children.at(-1)?.open ?? false;
+		}
 
 		return true;
 	}
