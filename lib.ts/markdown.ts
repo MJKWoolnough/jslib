@@ -249,7 +249,7 @@ const tags: Tags = Object.assign({
       },
       parseParagraph = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph) {
-		const last = tk.acceptRun(whiteSpace)
+		const last = tk.acceptRun(whiteSpace);
 
 		if (last && last !== "\n") {
 			return new ParagraphBlock(tk);
