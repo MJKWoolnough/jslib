@@ -173,54 +173,7 @@ const tags: Tags = Object.assign({
 			htmlKind = 6;
 		}
 	} else if (i === -1) {
-		if (tag) {
-			if (!inParagraph) {
-				while (true) {
-					tk.acceptRun(whiteSpace);
-					tk.accept("\n");
-					tk.acceptRun(whiteSpace);
-
-					if (tk.accept("/")) {
-						if (tk.accept(">")) {
-							htmlKind = 7;
-
-							break;
-						}
-
-						return null;
-					} else if (tk.accept(">")) {
-						htmlKind = 7;
-
-						break;
-					} else if (!tk.accept(letter + "_:")) {
-						break;
-					}
-
-					tk.acceptRun(letter + number + "_.:-");
-					tk.acceptRun(whiteSpace);
-					tk.accept("\n");
-					tk.acceptRun(whiteSpace);
-
-					if (tk.accept("=")) {
-						if (tk.accept("'")) {
-							tk.exceptRun("'");
-							if (!tk.accept("'")) {
-								break;
-							}
-						} else if (tk.accept('"')) {
-							tk.exceptRun('"');
-							if (!tk.accept('"')) {
-								break;
-							}
-						} else if (tk.accept(whiteSpace + "\"'=<>`")) {
-							return null;
-						} else {
-							tk.exceptRun(whiteSpace + "\"'=<>`");
-						}
-					}
-				}
-			}
-		} else if (tk.accept("!")) {
+		if (tk.accept("!")) {
 			if (tk.accept("-")) {
 				if (tk.accept("-")) {
 					htmlKind = 2;
@@ -232,6 +185,51 @@ const tags: Tags = Object.assign({
 			}
 		} else if (tk.accept("?")) {
 			htmlKind = 3;
+		} else if (!inParagraph) {
+			while (true) {
+				tk.acceptRun(whiteSpace);
+				tk.accept("\n");
+				tk.acceptRun(whiteSpace);
+
+				if (tk.accept("/")) {
+					if (tk.accept(">")) {
+						htmlKind = 7;
+
+						break;
+					}
+
+					return null;
+				} else if (tk.accept(">")) {
+					htmlKind = 7;
+
+					break;
+				} else if (!tk.accept(letter + "_:")) {
+					break;
+				}
+
+				tk.acceptRun(letter + number + "_.:-");
+				tk.acceptRun(whiteSpace);
+				tk.accept("\n");
+				tk.acceptRun(whiteSpace);
+
+				if (tk.accept("=")) {
+					if (tk.accept("'")) {
+						tk.exceptRun("'");
+						if (!tk.accept("'")) {
+							break;
+						}
+					} else if (tk.accept('"')) {
+						tk.exceptRun('"');
+						if (!tk.accept('"')) {
+							break;
+						}
+					} else if (tk.accept(whiteSpace + "\"'=<>`")) {
+						return null;
+					} else {
+						tk.exceptRun(whiteSpace + "\"'=<>`");
+					}
+				}
+			}
 		}
 	} else if (i < 4) {
 		if (tk.accept(whiteSpace + ">") || tk.peek() === "\n") {
