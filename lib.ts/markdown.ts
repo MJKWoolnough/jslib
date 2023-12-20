@@ -147,102 +147,100 @@ const tags: Tags = Object.assign({
 
 	return null;
       },
-      parseHTML = (tk: Tokeniser, inParagraph: boolean) => {
-	if (!tk.accept("<")) {
-		return null;
+      parseHTML1 = (tk: Tokeniser) => {
+	if (tk.accept("<")) {
+		tk.accept("/");
+
+		if (type1Elements.indexOf(tk.acceptWord(type1Elements, false).toLowerCase()) >= 0 && (tk.accept(whiteSpace + ">") || tk.peek() === "\n")) {
+			return new HTMLBlock(tk, 1);
+		}
 	}
 
-	const close = tk.accept("/"),
-	      tag = tk.acceptWord(htmlElements, false),
-	      i = htmlElements.indexOf(tag.toLowerCase());
+	return null;
+      },
+      parseHTML2 = (tk: Tokeniser) => {
+	if (tk.accept("<") && tk.accept("!") && tk.accept("-") && tk.accept("-")) {
+		return new HTMLBlock(tk, 2);
+	}
 
-	let htmlKind = 0;
+	return null;
+      },
+      parseHTML3 = (tk: Tokeniser) => {
+	if (tk.accept("<") && tk.accept("?")) {
+		return new HTMLBlock(tk, 3);
+	}
 
-	if (close) {
-		if (i === -1) {
-			if (!inParagraph && tk.accept(letter)) {
-				tk.acceptRun(letter + number + "-");
-				tk.acceptRun(whiteSpace);
-				tk.acceptRun("\n");
-				tk.acceptRun(whiteSpace);
-				if (tk.accept(">")) {
-					htmlKind = 7;
-				}
-			}
-		} else if (tk.accept(whiteSpace+">") || tk.peek() === "\n" || (tk.accept("/") && tk.accept(">"))) {
-			htmlKind = 6;
+	return null;
+      },
+      parseHTML4 = (tk: Tokeniser) => {
+	if (tk.accept("<") && tk.accept("!") && tk.accept(letter)) {
+		return new HTMLBlock(tk, 4);
+	}
+
+	return null;
+      },
+      parseHTML5 = (tk: Tokeniser) => {
+	if (tk.accept("<") && tk.accept("!") && tk.accept("[") && tk.accept("C") && tk.accept("D") && tk.accept("A") && tk.accept("T") && tk.accept("A") && tk.accept("[")) {
+		return new HTMLBlock(tk, 5);
+	}
+
+	return null;
+      },
+      parseHTML6 = (tk: Tokeniser) => {
+	if (tk.accept("<")) {
+		tk.accept("/");
+
+		if (htmlElements.indexOf(tk.acceptWord(htmlElements, false).toLowerCase()) >= 0 && (tk.accept(whiteSpace + ">") || (tk.accept("/") && tk.accept(">") || tk.peek() === "\n"))) {
+			return new HTMLBlock(tk, 6);
 		}
-	} else if (i === -1) {
-		if (tk.accept("!")) {
-			if (tk.accept("-")) {
-				if (tk.accept("-")) {
-					htmlKind = 2;
+	}
+
+	return null;
+      },
+      parseHTML7 = (tk: Tokeniser, inParagraph: boolean) => {
+	if (!inParagraph && tk.accept("<") && tk.accept(letter)) {
+		tk.acceptRun(letter + number + "-");
+
+		while (true) {
+			tk.acceptRun(whiteSpace);
+			tk.accept("\n");
+			tk.acceptRun(whiteSpace);
+
+			if (tk.accept("/")) {
+				if (tk.accept(">")) {
+					return new HTMLBlock(tk, 7);
 				}
-			} else if (tk.accept(letter)) {
-				htmlKind = 4;
-			} else if (tk.accept("[") && tk.accept("C") && tk.accept("D") && tk.accept("A") && tk.accept("T") && tk.accept("A") && tk.accept("[")) {
-				htmlKind = 5;
+
+				return null;
+			} else if (tk.accept(">")) {
+				return new HTMLBlock(tk, 7);
+			} else if (!tk.accept(letter + "_:")) {
+				break;
 			}
-		} else if (tk.accept("?")) {
-			htmlKind = 3;
-		} else if (!inParagraph) {
-			while (true) {
-				tk.acceptRun(whiteSpace);
-				tk.accept("\n");
-				tk.acceptRun(whiteSpace);
 
-				if (tk.accept("/")) {
-					if (tk.accept(">")) {
-						htmlKind = 7;
+			tk.acceptRun(letter + number + "_.:-");
+			tk.acceptRun(whiteSpace);
+			tk.accept("\n");
+			tk.acceptRun(whiteSpace);
 
+			if (tk.accept("=")) {
+				if (tk.accept("'")) {
+					tk.exceptRun("'");
+					if (!tk.accept("'")) {
 						break;
 					}
-
-					return null;
-				} else if (tk.accept(">")) {
-					htmlKind = 7;
-
-					break;
-				} else if (!tk.accept(letter + "_:")) {
-					break;
-				}
-
-				tk.acceptRun(letter + number + "_.:-");
-				tk.acceptRun(whiteSpace);
-				tk.accept("\n");
-				tk.acceptRun(whiteSpace);
-
-				if (tk.accept("=")) {
-					if (tk.accept("'")) {
-						tk.exceptRun("'");
-						if (!tk.accept("'")) {
-							break;
-						}
-					} else if (tk.accept('"')) {
-						tk.exceptRun('"');
-						if (!tk.accept('"')) {
-							break;
-						}
-					} else if (tk.accept(whiteSpace + "\"'=<>`")) {
-						return null;
-					} else {
-						tk.exceptRun(whiteSpace + "\"'=<>`");
+				} else if (tk.accept('"')) {
+					tk.exceptRun('"');
+					if (!tk.accept('"')) {
+						break;
 					}
+				} else if (tk.accept(whiteSpace + "\"'=<>`")) {
+					return null;
+				} else {
+					tk.exceptRun(whiteSpace + "\"'=<>`");
 				}
 			}
 		}
-	} else if (i < 4) {
-		if (tk.accept(whiteSpace + ">") || tk.peek() === "\n") {
-			htmlKind = 1;
-		}
-	} else {
-		if (tk.accept(whiteSpace + ">") || tk.peek() === "\n" || (tk.accept("/") && tk.accept(">"))) {
-			htmlKind = 6;
-		}
-	}
-
-	if (htmlKind) {
-		return new HTMLBlock(tk, htmlKind);
 	}
 
 	return null;
@@ -270,7 +268,13 @@ const tags: Tags = Object.assign({
 	parseListBlockStart,
 	parseATXHeader,
 	parseFencedCodeBlockStart,
-	parseHTML,
+	parseHTML1,
+	parseHTML2,
+	parseHTML3,
+	parseHTML4,
+	parseHTML5,
+	parseHTML6,
+	parseHTML7,
 	parseParagraph
       ],
       encoder = document.createElement("div"),
