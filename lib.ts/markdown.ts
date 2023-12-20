@@ -169,7 +169,7 @@ const tags: Tags = Object.assign({
 					htmlKind = 7;
 				}
 			}
-		} else if (tk.accept(whiteSpace) || tk.peek() === "\n" || (tk.accept("/") && tk.accept(">"))) {
+		} else if (tk.accept(whiteSpace+">") || tk.peek() === "\n" || (tk.accept("/") && tk.accept(">"))) {
 			htmlKind = 6;
 		}
 	} else if (i === -1) {
