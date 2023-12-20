@@ -198,46 +198,59 @@ const tags: Tags = Object.assign({
 	return null;
       },
       parseHTML7 = (tk: Tokeniser, inParagraph: boolean) => {
-	if (!inParagraph && tk.accept("<") && tk.accept(letter)) {
-		tk.acceptRun(letter + number + "-");
-
-		while (true) {
-			tk.acceptRun(whiteSpace);
-			tk.accept("\n");
+	if (!inParagraph && tk.accept("<")) {
+		if (tk.accept("/") && tk.accept(letter)) {
+			tk.acceptRun(letter + number + "-");
 			tk.acceptRun(whiteSpace);
 
-			if (tk.accept("/")) {
-				if (tk.accept(">")) {
-					return new HTMLBlock(tk, 7);
-				}
-
-				return null;
-			} else if (tk.accept(">")) {
-				return new HTMLBlock(tk, 7);
-			} else if (!tk.accept(letter + "_:")) {
-				break;
+			if (tk.accept("\n")) {
+				tk.acceptRun(whiteSpace);
 			}
 
-			tk.acceptRun(letter + number + "_.:-");
-			tk.acceptRun(whiteSpace);
-			tk.accept("\n");
-			tk.acceptRun(whiteSpace);
+			if (tk.accept(">")) {
+				return new HTMLBlock(tk, 7);
+			}
+		} else if (tk.accept(letter)) {
+			tk.acceptRun(letter + number + "-");
 
-			if (tk.accept("=")) {
-				if (tk.accept("'")) {
-					tk.exceptRun("'");
-					if (!tk.accept("'")) {
-						break;
+			while (true) {
+				tk.acceptRun(whiteSpace);
+				tk.accept("\n");
+				tk.acceptRun(whiteSpace);
+
+				if (tk.accept("/")) {
+					if (tk.accept(">")) {
+						return new HTMLBlock(tk, 7);
 					}
-				} else if (tk.accept('"')) {
-					tk.exceptRun('"');
-					if (!tk.accept('"')) {
-						break;
-					}
-				} else if (tk.accept(whiteSpace + "\"'=<>`")) {
+
 					return null;
-				} else {
-					tk.exceptRun(whiteSpace + "\"'=<>`");
+				} else if (tk.accept(">")) {
+					return new HTMLBlock(tk, 7);
+				} else if (!tk.accept(letter + "_:")) {
+					break;
+				}
+
+				tk.acceptRun(letter + number + "_.:-");
+				tk.acceptRun(whiteSpace);
+				tk.accept("\n");
+				tk.acceptRun(whiteSpace);
+
+				if (tk.accept("=")) {
+					if (tk.accept("'")) {
+						tk.exceptRun("'");
+						if (!tk.accept("'")) {
+							break;
+						}
+					} else if (tk.accept('"')) {
+						tk.exceptRun('"');
+						if (!tk.accept('"')) {
+							break;
+						}
+					} else if (tk.accept(whiteSpace + "\"'=<>`")) {
+						return null;
+					} else {
+						tk.exceptRun(whiteSpace + "\"'=<>`");
+					}
 				}
 			}
 		}
