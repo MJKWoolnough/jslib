@@ -10793,31 +10793,31 @@ type Tests = {
 				['<style\n  type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style>\nokay', '<style type="text/css">\nh1 {color:red;}\n\np {color:blue;}\n</style>\n<p>okay</p>']
 			],
 			"type 2": [
-				['<!-- foo -->*bar*\nbaz', '<!-- foo -->*bar*<p>baz</p>']
+				['<!-- foo -->*bar*\nbaz', '<!-- foo -->*bar*\n<p>baz</p>']
 			],
 			"type 3": [
-				["<?php\n\n\n  echo '>';\n\n?>\nokay", "<!--?php\n\n\n  echo '-->';\n\n?&gt;<p>okay</p>"]
+				["<?php\n\n\n  echo '>';\n\n?>\nokay", "<!--?php\n\n\n  echo '-->';\n\n?&gt;\n<p>okay</p>"]
 			],
 			"type 4": [
 				["<!DOCTYPE html>", ""]
 			],
 			"type 5": [
-				["<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\nokay", "<!--[CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]--><p>okay</p>"]
+				["<![CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]>\nokay", "<!--[CDATA[\nfunction matchwo(a,b)\n{\n  if (a < b && a < 0) then {\n    return 1;\n\n  } else {\n\n    return 0;\n  }\n}\n]]-->\n<p>okay</p>"]
 			],
 			"type 6": [
 				["<center>\nData\n</center>", "<center>\nData\n</center>"],
 				["<center>Data</center>", "<center>Data</center>"],
 				["<center>More\nData", "<center>More\nData</center>"],
 				["Text Before\n\n<center>\nData\n</center>\nText After", "<p>Text Before</p><center>\nData\n</center>\nText After"],
-				["Text Before\n\n<center>\nData\n</center>\n\nText After", "<p>Text Before</p><center>\nData\n</center>\n<p>Text After</p>"],
-				["<center>More\nData\n\nClose?", "<center>More\nData\n<p>Close?</p></center>"],
-				["</center>*bar*\n\nbaz", "*bar*\n<p>baz</p>"]
+				["Text Before\n\n<center>\nData\n</center>\n\nText After", "<p>Text Before</p><center>\nData\n</center>\n\n<p>Text After</p>"],
+				["<center>More\nData\n\nClose?", "<center>More\nData\n\n<p>Close?</p></center>"],
+				["</center>*bar*\n\nbaz", "*bar*\n\n<p>baz</p>"]
 			],
 			"type 7": [ // TODO: Update after adding inline parsing
 				["<Warning>\n*bar*\n</Warning>", "<warning>\n*bar*\n</warning>"],
 				['<i class="foo">\n*bar*\n</i>', '<i class="foo">\n*bar*\n</i>'],
 				["<del>\n*foo*\n</del>", "<del>\n*foo*\n</del>"],
-				["<del>\n\n*foo*\n\n</del>", "<del>\n<p>*foo*</p></del>"],
+				["<del>\n\n*foo*\n\n</del>", "<del>\n\n<p>*foo*</p></del>"],
 				['Foo\n<a href="bar">\nbaz', '<p>Foo\n<a href="bar">\nbaz</a></p>'],
 				['Foo\n<foo>\nbaz\n</foo>\n\nMore Foo\n\nMore Text', '<p>Foo\n<foo>\nbaz\n</foo>\n\nMore Foo</p><p>More Text</p>']
 			]
