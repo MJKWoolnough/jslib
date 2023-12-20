@@ -1635,7 +1635,7 @@ type Tests = {
 					const checks = [
 						[isOpenTag, (tk: any) => tk.tagName === "a" && tk.attr === null],
 						[isString, (data: any) => data === "Some text [b=\"Bad"],
-						[isOpenTag, (tk: any) => tk.tagName === "b" && tk.attr === "Good"],
+						[isOpenTag, (tk: any) => tk.tagName === "b" && tk.attr === "Good"]
 					] as [Function, Function][];
 
 					ret = true;
