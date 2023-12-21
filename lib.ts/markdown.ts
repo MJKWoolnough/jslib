@@ -570,7 +570,7 @@ class ListBlock extends ContainerBlock {
 			if (tk.accept(number)) {
 				tk.acceptRun(number);
 
-				if (tk.accept(".)")) {
+				if (tk.accept(this.#marker.at(-1)!)) {
 					tk.get();
 					this.process(tk);
 
