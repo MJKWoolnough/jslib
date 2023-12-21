@@ -552,7 +552,7 @@ class ListBlock extends ContainerBlock {
 
 		this.#marker = marker;
 
-		for (let i = 0; i < 4; i++) {
+		for (let i = 1; i < 4; i++) {
 			tk.accept(" ");
 		}
 
