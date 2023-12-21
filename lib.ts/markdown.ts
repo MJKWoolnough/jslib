@@ -635,6 +635,18 @@ class ListBlock extends ContainerBlock {
 
 		return true;
 	}
+
+	toHTML(uid: string) {
+		if (!this.#loose) {
+			for (const c of this.children as ListItemBlock[]) {
+				if (c.children.length > 1) {
+					this.#loose = true;
+
+					break;
+				}
+			}
+		}
+	}
 }
 
 abstract class LeafBlock extends Block {
