@@ -537,6 +537,11 @@ class BlockQuote extends ContainerBlock {
 	}
 }
 
+class ListItemBlock extends ContainerBlock {
+	accept(tk: Tokeniser) {
+		return this.process(tk);
+	}
+}
 
 class ListBlock extends ContainerBlock {
 	#marker: string;
@@ -545,6 +550,8 @@ class ListBlock extends ContainerBlock {
 		super();
 
 		this.#marker = marker;
+
+		this.children.push(new ListItemBlock());
 	}
 
 	newItem(tk: Tokeniser) {
