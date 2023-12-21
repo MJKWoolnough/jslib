@@ -538,6 +538,8 @@ class BlockQuote extends ContainerBlock {
 }
 
 class ListItemBlock extends ContainerBlock {
+	loose = false;
+
 	constructor(tk: Tokeniser) {
 		super();
 
@@ -545,6 +547,10 @@ class ListItemBlock extends ContainerBlock {
 	}
 	accept(tk: Tokeniser) {
 		return this.process(tk);
+	}
+
+	toHTML(uid: string) {
+		return tag(uid, "LI", !this.loose && this.children.length === 1 && this.children[0] instanceof ParagraphBlock && !this.children[0].isHeader() ? parseInline(this.children[0].lines.join("\n").trim()) : super.toHTML(uid));
 	}
 }
 
@@ -646,6 +652,25 @@ class ListBlock extends ContainerBlock {
 				}
 			}
 		}
+
+		if (this.#loose) {
+			for (const c of this.children as ListItemBlock[]) {
+				c.loose = true;
+			}
+		}
+
+		let attr: [string, string] | undefined = undefined;
+
+		switch (this.#marker) {
+		case "-":
+		case "+":
+		case "*":
+			break;
+		default:
+			attr = ["start", this.#marker.slice(0, -1)];
+		}
+
+		return tag(uid, attr ? "OL" : "UL", super.toHTML(uid), attr);
 	}
 }
 
@@ -814,6 +839,10 @@ class ParagraphBlock extends LeafBlock {
 		}
 
 		return "";
+	}
+
+	isHeader() {
+		return !!this.#settextLevel;
 	}
 }
 
