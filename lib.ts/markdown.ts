@@ -84,7 +84,7 @@ const tags: Tags = Object.assign({
 
 	return null;
       },
-      parseListBlockStart = (tk: Tokeniser) => {
+      parseListBlockStart = (tk: Tokeniser, inParagraph: boolean) => {
 	const lbChar = tk.next();
 
 	switch (lbChar) {
@@ -97,7 +97,6 @@ const tags: Tags = Object.assign({
 
 		break;
 	case '0':
-	case '1':
 	case '2':
 	case '3':
 	case '4':
@@ -106,9 +105,15 @@ const tags: Tags = Object.assign({
 	case '7':
 	case '8':
 	case '9':
+		if (inParagraph) {
+			break;
+		}
+	case '1':
 		const l = tk.length();
 
-		tk.acceptRun(number);
+		if (!inParagraph) {
+			tk.acceptRun(number);
+		}
 
 		if (tk.length() - l < 9 && tk.accept(".)") && tk.accept(whiteSpace)) {
 			const n = tk.get().trim().slice(0, -1);
