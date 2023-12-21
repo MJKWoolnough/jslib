@@ -551,6 +551,8 @@ class ListItemBlock extends ContainerBlock {
 class ListBlock extends ContainerBlock {
 	#marker: string;
 	#spaces: number;
+	#lastEmpty = false;
+	#loose = false;
 
 	constructor(tk: Tokeniser, marker: string) {
 		super();
@@ -604,6 +606,8 @@ class ListBlock extends ContainerBlock {
 			for (let i = tk.length(); i < this.#spaces; i++) {
 				if (!tk.accept(" ")) {
 					if (tk.peek() === "\n") {
+						this.#lastEmpty = true;
+
 						return this.children.at(-1)!.accept(tk, lazy);
 					}
 
@@ -611,8 +615,19 @@ class ListBlock extends ContainerBlock {
 				}
 			}
 
+			tk.get();
+			tk.acceptRun(whiteSpace);
+
+			this.#lastEmpty = tk.peek() === "\n";
+
+			tk.reset();
+
 			return this.children.at(-1)!.accept(tk, lazy);
 		} else if (this.newItem(tk)) {
+			if (this.#lastEmpty) {
+				this.#loose = true;
+			}
+
 			this.children.push(new ListItemBlock(tk));
 		} else {
 			this.open = false;
