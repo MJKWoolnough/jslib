@@ -594,8 +594,26 @@ class ListBlock extends ContainerBlock {
 		return true;
 	}
 
-	accept(_: Tokeniser) {
-		return false;
+	accept(tk: Tokeniser, lazy: boolean) {
+		if (tk.peek() === " ") {
+			for (let i = tk.length(); i < this.#spaces; i++) {
+				if (!tk.accept(" ")) {
+					if (tk.peek() === "\n") {
+						return this.children.at(-1)!.accept(tk, lazy);
+					}
+
+					return false;
+				}
+			}
+
+			return this.children.at(-1)!.accept(tk, lazy);
+		} else if (this.newItem(tk)) {
+			this.children.push(new ListItemBlock());
+		} else {
+			this.open = false;
+		}
+
+		return true;
 	}
 }
 
