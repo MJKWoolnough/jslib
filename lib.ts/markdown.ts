@@ -538,6 +538,11 @@ class BlockQuote extends ContainerBlock {
 }
 
 class ListItemBlock extends ContainerBlock {
+	constructor(tk: Tokeniser) {
+		super();
+
+		this.process(tk);
+	}
 	accept(tk: Tokeniser) {
 		return this.process(tk);
 	}
@@ -560,7 +565,7 @@ class ListBlock extends ContainerBlock {
 
 		tk.get();
 
-		this.children.push(new ListItemBlock());
+		this.children.push(new ListItemBlock(tk));
 	}
 
 	newItem(tk: Tokeniser) {
@@ -608,7 +613,7 @@ class ListBlock extends ContainerBlock {
 
 			return this.children.at(-1)!.accept(tk, lazy);
 		} else if (this.newItem(tk)) {
-			this.children.push(new ListItemBlock());
+			this.children.push(new ListItemBlock(tk));
 		} else {
 			this.open = false;
 		}
