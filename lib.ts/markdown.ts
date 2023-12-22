@@ -92,7 +92,7 @@ const tags: Tags = Object.assign({
 	case '-':
 	case '+':
 		if (tk.accept(whiteSpace)) {
-			return new ListBlock(tk, lbChar);
+			return new ListBlock(tk);
 		}
 
 		break;
@@ -116,9 +116,7 @@ const tags: Tags = Object.assign({
 		}
 
 		if (tk.length() - l < 9 && tk.accept(".)") && tk.accept(whiteSpace)) {
-			const n = tk.get().trim().slice(0, -1);
-
-			return new ListBlock(tk, n);
+			return new ListBlock(tk);
 		}
 	}
 
@@ -560,18 +558,16 @@ class ListBlock extends ContainerBlock {
 	#lastEmpty = false;
 	#loose = false;
 
-	constructor(tk: Tokeniser, marker: string) {
+	constructor(tk: Tokeniser) {
 		super();
 
-		this.#marker = marker;
 
 		for (let i = 1; i < 4; i++) {
 			tk.accept(" ");
 		}
 
 		this.#spaces = tk.length();
-
-		tk.get();
+		this.#marker = tk.get().trim();
 
 		this.children.push(new ListItemBlock(tk));
 	}
