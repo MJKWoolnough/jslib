@@ -11,6 +11,9 @@ type Tags = {
 	heading5: (c: DocumentFragment) => Element | DocumentFragment;
 	heading6: (c: DocumentFragment) => Element | DocumentFragment;
 	paragraphs: (c: DocumentFragment) => Element | DocumentFragment;
+	unorderedList: (c: DocumentFragment) => Element | DocumentFragment;
+	orderedList: (c: DocumentFragment) => Element | DocumentFragment;
+	listItem: (c: DocumentFragment) => Element | DocumentFragment;
 	thematicBreaks: () => Element | DocumentFragment;
 }
 
@@ -28,6 +31,9 @@ const tags: Tags = Object.assign({
       }, ([
 	["blockquote", "blockquote"],
 	["paragraphs", "p"],
+	["unorderedList", "ul"],
+	["orderedList", "ol"],
+	["listItem", "li"],
 	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, string])
       ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => {
 	      const t = document.createElement(tag);
@@ -322,6 +328,18 @@ const tags: Tags = Object.assign({
 					break;
 				case "BLOCKQUOTE":
 					df.append(tags.blockquote(sanitise(node.childNodes, tags, uid)));
+
+					break;
+				case "UL":
+					df.append(tags.unorderedList(sanitise(node.childNodes, tags, uid)));
+
+					break;
+				case "OL":
+					df.append(tags.orderedList(sanitise(node.childNodes, tags, uid)));
+
+					break;
+				case "LI":
+					df.append(tags.listItem(sanitise(node.childNodes, tags, uid)));
 
 					break;
 				default:
