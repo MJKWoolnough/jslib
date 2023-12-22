@@ -604,8 +604,10 @@ class ListBlock extends ContainerBlock {
 	}
 
 	accept(tk: Tokeniser, lazy: boolean) {
+		tk.reset();
+
 		if (tk.peek() === " ") {
-			for (let i = tk.length(); i < this.#spaces; i++) {
+			for (let i = 0; i < this.#spaces; i++) {
 				if (!tk.accept(" ")) {
 					if (tk.peek() === "\n") {
 						this.#lastEmpty = true;
