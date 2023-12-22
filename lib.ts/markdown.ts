@@ -665,11 +665,13 @@ class ListBlock extends ContainerBlock {
 			}
 
 			this.children.push(new ListItemBlock(tk));
+
+			return true;
 		} else {
 			this.open = false;
-		}
 
-		return true;
+			return false;
+		}
 	}
 
 	toHTML(uid: string) {
