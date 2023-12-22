@@ -10870,7 +10870,11 @@ type Tests = {
 		"list items": {
 			"simple": [
 				["1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
-				["- one\n\n two", "<ul><li>one</li></ul><p>two</p>"]
+				["- one\n\n two", "<ul><li>one</li></ul><p>two</p>"],
+				["- one\n\n  two", "<ul><li><p>one</p><p>two</p></li></ul>"],
+				[" -    one\n\n     two", "<ul><li>one</li></ul><pre><code> two</code></pre>"],
+				[" -    one\n\n      two", "<ul><li><p>one</p><p>two</p></li></ul>"],
+				["   > > 1.  one\n>>\n>>     two", "<blockquote><blockquote><ol><li><p>one</p><p>two</p></li></ol></blockquote></blockquote>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
