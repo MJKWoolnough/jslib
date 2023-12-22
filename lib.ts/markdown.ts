@@ -645,6 +645,10 @@ class ListBlock extends ContainerBlock {
 			tk.reset();
 
 			return this.children.at(-1)!.accept(tk, lazy);
+		} else if (tk.peek() === "\n") {
+			this.#loose = true;
+
+			return this.children.at(-1)!.accept(tk, lazy);
 		} else if (this.newItem(tk)) {
 			if (this.#lastEmpty) {
 				this.#loose = true;
