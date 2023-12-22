@@ -10866,6 +10866,11 @@ type Tests = {
 				["> > > foo\nbar", "<blockquote><blockquote><blockquote><p>foo\nbar</p></blockquote></blockquote></blockquote>"],
 				[">>> foo\n> bar\n>>baz", "<blockquote><blockquote><blockquote><p>foo\nbar\nbaz</p></blockquote></blockquote></blockquote>"]
 			]
+		},
+		"list items": {
+			"simple": [
+				["1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"]
+			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
