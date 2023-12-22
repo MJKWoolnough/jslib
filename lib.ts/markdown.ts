@@ -12,7 +12,7 @@ type Tags = {
 	heading6: (c: DocumentFragment) => Element | DocumentFragment;
 	paragraphs: (c: DocumentFragment) => Element | DocumentFragment;
 	unorderedList: (c: DocumentFragment) => Element | DocumentFragment;
-	orderedList: (c: DocumentFragment) => Element | DocumentFragment;
+	orderedList: (start: string, c: DocumentFragment) => Element | DocumentFragment;
 	listItem: (c: DocumentFragment) => Element | DocumentFragment;
 	thematicBreaks: () => Element | DocumentFragment;
 }
@@ -26,13 +26,23 @@ const tags: Tags = Object.assign({
 
 		return pre;
 	},
+	"orderedList": (start: string, c: DocumentFragment) => {
+		const ol = document.createElement("ol");
+
+		if (start) {
+			ol.setAttribute("start", start);
+		}
+
+		ol.append(c);
+
+		return ol;
+	},
 	"allowedHTML": null,
 	"thematicBreaks": () => document.createElement("hr")
       }, ([
 	["blockquote", "blockquote"],
 	["paragraphs", "p"],
 	["unorderedList", "ul"],
-	["orderedList", "ol"],
 	["listItem", "li"],
 	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, string])
       ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => {
@@ -335,7 +345,7 @@ const tags: Tags = Object.assign({
 
 					break;
 				case "OL":
-					df.append(tags.orderedList(sanitise(node.childNodes, tags, uid)));
+					df.append(tags.orderedList(node.getAttribute("start") ?? "", sanitise(node.childNodes, tags, uid)));
 
 					break;
 				case "LI":
@@ -679,7 +689,8 @@ class ListBlock extends ContainerBlock {
 			}
 		}
 
-		let attr: [string, string] | undefined = undefined;
+		let attr: [string, string] | undefined = undefined,
+		    type = "UL";
 
 		switch (this.#marker) {
 		case "-":
@@ -687,10 +698,16 @@ class ListBlock extends ContainerBlock {
 		case "*":
 			break;
 		default:
-			attr = ["start", this.#marker.slice(0, -1)];
+			const start = this.#marker.slice(0, -1);
+
+			type = "OL";
+
+			if (start !== "1") {
+				attr = ["start", start];
+			}
 		}
 
-		return tag(uid, attr ? "OL" : "UL", super.toHTML(uid), attr);
+		return tag(uid, type, super.toHTML(uid), attr);
 	}
 }
 
