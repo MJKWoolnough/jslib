@@ -10877,10 +10877,15 @@ type Tests = {
 				["   > > 1.  one\n>>\n>>     two", "<blockquote><blockquote><ol><li><p>one</p><p>two</p></li></ol></blockquote></blockquote>"],
 				[">>- one\n>>\n  >  > two", "<blockquote><blockquote><ul><li>one</li></ul><p>two</p></blockquote></blockquote>"],
 				["- foo\n\n\n\n  bar", "<ul><li><p>foo</p><p>bar</p></li></ul>"],
-				["1.  foo\n\n    ```\n    bar\n    ```\n    baz\n\n    > bam", "<ol><li><p>foo</p><pre><code>bar\n</code></pre><p>baz</p><blockquote><p>bam</p></blockquote></li></ol>"]
+				["1.  foo\n\n    ```\n    bar\n    ```\n    baz\n\n    > bam", "<ol><li><p>foo</p><pre><code>bar\n</code></pre><p>baz</p><blockquote><p>bam</p></blockquote></li></ol>"],
+				["- Foo\n\n      bar\n\n\n      baz", "<ul><li><p>Foo</p><pre><code>bar\n\n\nbaz</code></pre></li></ul>"],
+				["123456789. ok", "<ol start=\"123456789\"><li>ok</li></ol>"],
+				["0. ok", "<ol start=\"0\"><li>ok</li></ol>"],
+				["003. ok", "<ol start=\"3\"><li>ok</li></ol>"]
 			],
 			"not a list item": [
-				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"]
+				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"],
+				["1234567890. ok", "<p>1234567890. ok</p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
