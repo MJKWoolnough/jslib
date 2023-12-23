@@ -10881,11 +10881,15 @@ type Tests = {
 				["- Foo\n\n      bar\n\n\n      baz", "<ul><li><p>Foo</p><pre><code>bar\n\n\nbaz</code></pre></li></ul>"],
 				["123456789. ok", "<ol start=\"123456789\"><li>ok</li></ol>"],
 				["0. ok", "<ol start=\"0\"><li>ok</li></ol>"],
-				["003. ok", "<ol start=\"3\"><li>ok</li></ol>"]
+				["003. ok", "<ol start=\"3\"><li>ok</li></ol>"],
+				["- foo\n\n      bar", "<ul><li><p>foo</p><pre><code>bar</code></pre></li></ul>"],
+				["  10.  foo\n\n           bar", "<ol start=\"10\"><li><p>foo</p><pre><code>bar</code></pre></li></ol>"],
+				["1.     indented code\n\n   paragraph\n\n       more code", "<ol><li><pre><code>indented code\n</code></pre><p>paragraph</p><pre><code>more code</code></pre></li></ol>"]
 			],
 			"not a list item": [
 				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"],
-				["1234567890. ok", "<p>1234567890. ok</p>"]
+				["1234567890. ok", "<p>1234567890. ok</p>"],
+				["-1. not ok", "<p>-1. not ok</p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
