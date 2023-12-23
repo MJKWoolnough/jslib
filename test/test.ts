@@ -10875,7 +10875,9 @@ type Tests = {
 				[" -    one\n\n     two", "<ul><li>one</li></ul><pre><code> two</code></pre>"],
 				[" -    one\n\n      two", "<ul><li><p>one</p><p>two</p></li></ul>"],
 				["   > > 1.  one\n>>\n>>     two", "<blockquote><blockquote><ol><li><p>one</p><p>two</p></li></ol></blockquote></blockquote>"],
-				[">>- one\n>>\n  >  > two", "<blockquote><blockquote><ul><li>one</li></ul><p>two</p></blockquote></blockquote>"]
+				[">>- one\n>>\n  >  > two", "<blockquote><blockquote><ul><li>one</li></ul><p>two</p></blockquote></blockquote>"],
+				["- foo\n\n\n\n  bar", "<ul><li><p>foo</p><p>bar</p></li></ul>"],
+				["1.  foo\n\n    ```\n    bar\n    ```\n    baz\n\n    > bam", "<ol><li><p>foo</p><pre><code>bar\n</code></pre><p>baz</p><blockquote><p>bam</p></blockquote></li></ol>"]
 			],
 			"not a list item": [
 				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"]
