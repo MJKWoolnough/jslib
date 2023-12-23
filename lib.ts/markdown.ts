@@ -938,6 +938,7 @@ class FencedCodeBlock extends LeafBlock {
 			const last = tk.acceptRun(whiteSpace);
 
 			if (!last || last === "\n") {
+				tk.accept("\n");
 				tk.get();
 
 				this.open = false;
