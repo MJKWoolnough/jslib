@@ -605,7 +605,7 @@ class ListBlock extends ContainerBlock {
 		case "-":
 		case "+":
 		case "*":
-			if (tk.accept(this.#marker)) {
+			if (tk.accept(this.#marker) && tk.accept(whiteSpace)) {
 				break;
 			}
 
@@ -614,7 +614,7 @@ class ListBlock extends ContainerBlock {
 			if (tk.accept(number)) {
 				tk.acceptRun(number);
 
-				if (tk.accept(this.#marker.at(-1)!)) {
+				if (tk.accept(this.#marker.at(-1)!) && tk.accept(whiteSpace)) {
 					break;
 				}
 			}
