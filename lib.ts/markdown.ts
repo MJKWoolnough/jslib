@@ -935,8 +935,6 @@ class FencedCodeBlock extends LeafBlock {
 		}
 
 		if (ticks >= this.#ticks) {
-			tk.acceptRun(this.#char);
-
 			const last = tk.acceptRun(whiteSpace);
 
 			if (!last || last === "\n") {
