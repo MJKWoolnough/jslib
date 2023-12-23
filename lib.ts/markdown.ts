@@ -594,6 +594,12 @@ class ListBlock extends ContainerBlock {
 			tk.accept(" ");
 		}
 
+		if (tk.peek() === " ") {
+			tk.backup();
+			tk.backup();
+			tk.backup();
+		}
+
 		this.#spaces = tk.length();
 		this.#marker = tk.get().trim();
 
