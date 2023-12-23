@@ -700,7 +700,7 @@ class ListBlock extends ContainerBlock {
 		case "*":
 			break;
 		default:
-			const start = this.#marker.slice(0, -1);
+			const start = this.#marker.slice(0, -1).replace(/^0+(?!$)/, "");
 
 			type = "OL";
 
