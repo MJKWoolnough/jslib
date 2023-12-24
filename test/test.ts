@@ -10887,7 +10887,8 @@ type Tests = {
 				["1.     indented code\n\n   paragraph\n\n       more code", "<ol><li><pre><code>indented code\n</code></pre><p>paragraph</p><pre><code>more code</code></pre></li></ol>"],
 				["1.      indented code\n\n   paragraph\n\n       more code", "<ol><li><pre><code> indented code\n</code></pre><p>paragraph</p><pre><code>more code</code></pre></li></ol>"],
 				["-    foo\n\n  bar", "<ul><li>foo</li></ul><p>bar</p>"],
-				["-  foo\n\n   bar", "<ul><li><p>foo</p><p>bar</p></li></ul>"]
+				["-  foo\n\n   bar", "<ul><li><p>foo</p><p>bar</p></li></ul>"],
+				["-\n  foo\n-\n  ```\n  bar\n  ```\n-\n      baz", "<ul><li>foo</li><li><pre><code>bar\n</code></pre></li><li><pre><code>baz</code></pre></li></ul>"]
 			],
 			"not a list item": [
 				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"],
