@@ -107,11 +107,11 @@ const tags: Tags = Object.assign({
 	case '*':
 	case '-':
 	case '+':
-		if (tk.accept(whiteSpace + "\n")) {
+		if (tk.accept(whiteSpace + (inParagraph ? "" : "\n"))) {
 			tk.backup();
 
 			return new ListBlock(tk);
-		} else if (tk.peek() === "") {
+		} else if (!inParagraph && tk.peek() === "") {
 			return new ListBlock(tk);
 		}
 
@@ -136,11 +136,11 @@ const tags: Tags = Object.assign({
 		}
 
 		if (tk.length() - l < 9 && tk.accept(".)")) {
-			if (tk.accept(whiteSpace + "\n")) {
+			if (tk.accept(whiteSpace + (inParagraph ? "" : "\n"))) {
 				tk.backup();
 
 				return new ListBlock(tk);
-			} else if (tk.peek() === "") {
+			} else if (!inParagraph && tk.peek() === "") {
 				return new ListBlock(tk);
 			}
 		}
