@@ -10899,7 +10899,8 @@ type Tests = {
 			"not a list item": [
 				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"],
 				["1234567890. ok", "<p>1234567890. ok</p>"],
-				["-1. not ok", "<p>-1. not ok</p>"]
+				["-1. not ok", "<p>-1. not ok</p>"],
+				["foo\n*\n\nfoo\n1.", "<p>foo\n*</p><p>foo\n1.</p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
