@@ -10893,7 +10893,8 @@ type Tests = {
 				["-\n\n  foo", "<ul><li></li></ul><p>foo</p>"],
 				["- foo\n-\n- bar", "<ul><li>foo</li><li></li><li>bar</li></ul>"],
 				["- foo\n-   \n- bar", "<ul><li>foo</li><li></li><li>bar</li></ul>"],
-				["1. foo\n2.\n3. bar", "<ol><li>foo</li><li></li><li>bar</li></ol>"]
+				["1. foo\n2.\n3. bar", "<ol><li>foo</li><li></li><li>bar</li></ol>"],
+				["*", "<ul><li></li></ul>"]
 			],
 			"not a list item": [
 				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"],
