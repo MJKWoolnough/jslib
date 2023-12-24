@@ -107,7 +107,7 @@ const tags: Tags = Object.assign({
 	case '*':
 	case '-':
 	case '+':
-		if (tk.accept(whiteSpace) || tk.peek() === "\n") {
+		if (tk.accept(whiteSpace + "\n")) {
 			return new ListBlock(tk);
 		}
 
@@ -131,7 +131,7 @@ const tags: Tags = Object.assign({
 			tk.acceptRun(number);
 		}
 
-		if (tk.length() - l < 9 && tk.accept(".)") && (tk.accept(whiteSpace) || tk.peek() === "\n")) {
+		if (tk.length() - l < 9 && tk.accept(".)") && tk.accept(whiteSpace + "\n")) {
 			return new ListBlock(tk);
 		}
 	}
@@ -589,7 +589,9 @@ class ListBlock extends ContainerBlock {
 	constructor(tk: Tokeniser) {
 		super();
 
-		for (let i = 1; i < 4; i++) {
+		tk.backup();
+
+		for (let i = 0; i < 4; i++) {
 			tk.accept(" ");
 		}
 
@@ -600,7 +602,18 @@ class ListBlock extends ContainerBlock {
 		}
 
 		this.#spaces = tk.length();
-		this.#marker = tk.get().trim();
+
+		const marker = tk.get().trimEnd();
+
+		tk.acceptRun(whiteSpace);
+
+		if (tk.accept("\n")) {
+			this.#spaces = marker.length + 1;
+		}
+
+		tk.reset();
+
+		this.#marker = marker.trimStart();
 
 		this.children.push(new ListItemBlock(tk));
 	}
@@ -627,9 +640,11 @@ class ListBlock extends ContainerBlock {
 			return false;
 		}
 
-		for (let i = tk.length(); i < this.#spaces; i++) {
-			if (!tk.accept(" ")) {
-				return false;
+		if (tk.peek() !== "\n") {
+			for (let i = tk.length(); i < this.#spaces; i++) {
+				if (!tk.accept(" ")) {
+					return false;
+				}
 			}
 		}
 
