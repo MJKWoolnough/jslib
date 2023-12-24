@@ -10869,7 +10869,7 @@ type Tests = {
 		},
 		"list items": {
 			"simple": [
-				["1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
+				["1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
 				["- one\n\n two", "<ul><li>one</li></ul><p>two</p>"],
 				["- one\n\n  two", "<ul><li><p>one</p><p>two</p></li></ul>"],
 				[" -    one\n\n     two", "<ul><li>one</li></ul><pre><code> two</code></pre>"],

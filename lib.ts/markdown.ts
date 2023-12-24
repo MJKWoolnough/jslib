@@ -1047,6 +1047,14 @@ class IndentedCodeBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
+		while (this.lines.at(0) === "\n") {
+			this.lines.shift();
+		}
+
+		while (this.lines.at(-1) === "\n") {
+			this.lines.pop();
+		}
+
 		return tag(uid, "TEXTAREA", this.lines.join(""));
 	}
 }
