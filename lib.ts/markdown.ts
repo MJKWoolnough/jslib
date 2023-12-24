@@ -107,7 +107,7 @@ const tags: Tags = Object.assign({
 	case '*':
 	case '-':
 	case '+':
-		if (tk.accept(whiteSpace)) {
+		if (tk.accept(whiteSpace) || tk.peek() === "\n") {
 			return new ListBlock(tk);
 		}
 
@@ -131,7 +131,7 @@ const tags: Tags = Object.assign({
 			tk.acceptRun(number);
 		}
 
-		if (tk.length() - l < 9 && tk.accept(".)") && tk.accept(whiteSpace)) {
+		if (tk.length() - l < 9 && tk.accept(".)") && (tk.accept(whiteSpace) || tk.peek() === "\n")) {
 			return new ListBlock(tk);
 		}
 	}
@@ -589,7 +589,6 @@ class ListBlock extends ContainerBlock {
 	constructor(tk: Tokeniser) {
 		super();
 
-
 		for (let i = 1; i < 4; i++) {
 			tk.accept(" ");
 		}
@@ -611,7 +610,7 @@ class ListBlock extends ContainerBlock {
 		case "-":
 		case "+":
 		case "*":
-			if (tk.accept(this.#marker) && tk.accept(whiteSpace)) {
+			if (tk.accept(this.#marker) && (tk.accept(whiteSpace) || tk.peek() === "\n")) {
 				break;
 			}
 
@@ -620,7 +619,7 @@ class ListBlock extends ContainerBlock {
 			if (tk.accept(number)) {
 				tk.acceptRun(number);
 
-				if (tk.accept(this.#marker.at(-1)!) && tk.accept(whiteSpace)) {
+				if (tk.accept(this.#marker.at(-1)!) && (tk.accept(whiteSpace) || tk.peek() === "\n")) {
 					break;
 				}
 			}
@@ -633,6 +632,8 @@ class ListBlock extends ContainerBlock {
 				return false;
 			}
 		}
+
+		tk.get();
 
 		return true;
 	}
