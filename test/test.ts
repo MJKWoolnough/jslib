@@ -10899,6 +10899,7 @@ type Tests = {
 				["  1.  A paragraph\n      with two lines.\n\n          indented code\n\n      > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
 				["   1.  A paragraph\n       with two lines.\n\n           indented code\n\n       > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
 				["  1.  A paragraph\nwith two lines.\n\n          indented code\n\n      > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
+				["  1.  A paragraph\n    with two lines.", "<ol><li>A paragraph\nwith two lines.</li></ol>"]
 			],
 			"not a list item": [
 				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"],
