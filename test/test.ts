@@ -10903,7 +10903,12 @@ type Tests = {
 				["> 1. > Blockquote\ncontinued here.", "<blockquote><ol><li><blockquote><p>Blockquote\ncontinued here.</p></blockquote></li></ol></blockquote>"],
 				["> 1. > Blockquote\n> continued here.", "<blockquote><ol><li><blockquote><p>Blockquote\ncontinued here.</p></blockquote></li></ol></blockquote>"],
 				["- foo\n  - bar\n    - baz\n      - boo", "<ul><li>foo<ul><li>bar<ul><li>baz<ul><li>boo</li></ul></li></ul></li></ul></li></ul>"],
-				["- foo\n - bar\n  - baz\n   - boo", "<ul><li>foo</li><li>bar</li><li>baz</li><li>boo</li></ul>"]
+				["- foo\n - bar\n  - baz\n   - boo", "<ul><li>foo</li><li>bar</li><li>baz</li><li>boo</li></ul>"],
+				["10) foo\n    - bar", "<ol start=\"10\"><li>foo<ul><li>bar</li></ul></li></ol>"],
+				["10) foo\n   - bar", "<ol start=\"10\"><li>foo</li></ol><ul><li>bar</li></ul>"],
+				["- - foo", "<ul><li><ul><li>foo</li></ul></li></ul>"],
+				["1. - 2. foo", "<ol><li><ul><li><ol start=\"2\"><li>foo</li></ol></li></ul></li></ol>"],
+				["- # Foo\n- Bar\n  ---\n  baz", "<ul><li><h1>Foo</h1></li><li><h2>Bar</h2>baz</li></ul>"]
 			],
 			"not a list item": [
 				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"],
