@@ -716,15 +716,13 @@ class ListBlock extends ContainerBlock {
 			this.children.push(new ListItemBlock(tk));
 
 			return true;
-		} else {
-			if (this.#lazyContinuation(tk, lazy)) {
+		} if (this.#lazyContinuation(tk, lazy)) {
 				return true;
-			}
-
-			this.open = false;
-
-			return false;
 		}
+
+		this.open = false;
+
+		return false;
 	}
 
 	#hasSpaces(tk: Tokeniser) {
