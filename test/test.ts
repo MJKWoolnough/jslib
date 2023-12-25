@@ -10899,7 +10899,11 @@ type Tests = {
 				["  1.  A paragraph\n      with two lines.\n\n          indented code\n\n      > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
 				["   1.  A paragraph\n       with two lines.\n\n           indented code\n\n       > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
 				["  1.  A paragraph\nwith two lines.\n\n          indented code\n\n      > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
-				["  1.  A paragraph\n    with two lines.", "<ol><li>A paragraph\nwith two lines.</li></ol>"]
+				["  1.  A paragraph\n    with two lines.", "<ol><li>A paragraph\nwith two lines.</li></ol>"],
+				["> 1. > Blockquote\ncontinued here.", "<blockquote><ol><li><blockquote><p>Blockquote\ncontinued here.</p></blockquote></li></ol></blockquote>"],
+				["> 1. > Blockquote\n> continued here.", "<blockquote><ol><li><blockquote><p>Blockquote\ncontinued here.</p></blockquote></li></ol></blockquote>"],
+				["- foo\n  - bar\n    - baz\n      - boo", "<ul><li><p>foo</p><ul><li><p>bar</p><ul><li><p>baz</p><ul><li>boo</li></ul></li></ul></li></ul></li></ul>"],
+				["- foo\n - bar\n  - baz\n   - boo", "<ul><li>foo</li><li>bar</li><li>baz</li><li>boo</li></ul>"]
 			],
 			"not a list item": [
 				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"],
