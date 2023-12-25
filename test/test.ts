@@ -10902,7 +10902,7 @@ type Tests = {
 				["  1.  A paragraph\n    with two lines.", "<ol><li>A paragraph\nwith two lines.</li></ol>"],
 				["> 1. > Blockquote\ncontinued here.", "<blockquote><ol><li><blockquote><p>Blockquote\ncontinued here.</p></blockquote></li></ol></blockquote>"],
 				["> 1. > Blockquote\n> continued here.", "<blockquote><ol><li><blockquote><p>Blockquote\ncontinued here.</p></blockquote></li></ol></blockquote>"],
-				["- foo\n  - bar\n    - baz\n      - boo", "<ul><li><p>foo</p><ul><li><p>bar</p><ul><li><p>baz</p><ul><li>boo</li></ul></li></ul></li></ul></li></ul>"],
+				["- foo\n  - bar\n    - baz\n      - boo", "<ul><li>foo<ul><li>bar<ul><li>baz<ul><li>boo</li></ul></li></ul></li></ul></li></ul>"],
 				["- foo\n - bar\n  - baz\n   - boo", "<ul><li>foo</li><li>bar</li><li>baz</li><li>boo</li></ul>"]
 			],
 			"not a list item": [

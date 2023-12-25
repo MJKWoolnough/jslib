@@ -593,7 +593,15 @@ class ListItemBlock extends ContainerBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "LI", !this.loose && this.children.length === 1 && this.children[0] instanceof ParagraphBlock && !this.children[0].isHeader() ? parseInline(this.children[0].lines.join("\n").trim()) : super.toHTML(uid));
+		if (!this.loose) {
+			for (const c of this.children) {
+				if (c instanceof ParagraphBlock) {
+					c.loose = false;
+				}
+			}
+		}
+
+		return tag(uid, "LI", super.toHTML(uid));
 	}
 }
 
@@ -681,11 +689,21 @@ class ListBlock extends ContainerBlock {
 			tk.get();
 			tk.acceptRun(whiteSpace);
 
-			this.#lastEmpty = tk.peek() === "\n";
+			if (tk.peek() === "\n") {
+				this.#lastEmpty = true;
+			}
 
 			tk.reset();
 
-			return this.children.at(-1)!.accept(tk, lazy);
+			if (this.children.at(-1)!.accept(tk, lazy)) {
+				if (this.#lastEmpty) {
+					this.#loose = true;
+				}
+
+				return true;
+			}
+
+			return false;
 		} else if (tk.peek() === "\n") {
 			this.#lastEmpty = true;
 
@@ -746,16 +764,6 @@ class ListBlock extends ContainerBlock {
 	}
 
 	toHTML(uid: string) {
-		if (!this.#loose) {
-			for (const c of this.children as ListItemBlock[]) {
-				if (c.children.length > 1) {
-					this.#loose = true;
-
-					break;
-				}
-			}
-		}
-
 		if (this.#loose) {
 			for (const c of this.children as ListItemBlock[]) {
 				c.loose = true;
@@ -901,6 +909,7 @@ class HTMLBlock extends LeafBlock {
 
 class ParagraphBlock extends LeafBlock {
 	#settextLevel = 0;
+	loose = true;
 
 	constructor(tk: Tokeniser) {
 		super();
@@ -945,14 +954,10 @@ class ParagraphBlock extends LeafBlock {
 		const text = this.lines.join("\n").trim();
 
 		if (text) {
-			return tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, parseInline(text));
+			return this.loose || this.#settextLevel ? tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, parseInline(text)) : parseInline(text);
 		}
 
 		return "";
-	}
-
-	isHeader() {
-		return !!this.#settextLevel;
 	}
 }
 
