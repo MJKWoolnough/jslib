@@ -680,7 +680,7 @@ class ListBlock extends ContainerBlock {
 						return this.children.at(-1)!.accept(tk, lazy);
 					}
 
-					return false;
+					return this.#lazyContinuation(tk, lazy);
 				}
 			}
 
@@ -705,26 +705,32 @@ class ListBlock extends ContainerBlock {
 
 			return true;
 		} else {
-			if (!lazy) {
-				if (!isLazyBlock(tk)) {
-					this.open = false;
-
-					return false;
-				}
-
-				lazy = true;
-			}
-
-			if (lazy && isLastGrandChildOpenParagraph(this)) {
-				if (this.children.at(-1)!.accept(tk, lazy)) {
-					return true;
-				}
+			if (this.#lazyContinuation(tk, lazy)) {
+				return true;
 			}
 
 			this.open = false;
 
 			return false;
 		}
+	}
+
+	#lazyContinuation(tk: Tokeniser, lazy: boolean) {
+		if (!lazy) {
+			if (!isLazyBlock(tk)) {
+				return false;
+			}
+
+			lazy = true;
+		}
+
+		if (lazy && isLastGrandChildOpenParagraph(this)) {
+			if (this.children.at(-1)!.accept(tk, lazy)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	toHTML(uid: string) {
