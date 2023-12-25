@@ -411,7 +411,28 @@ const tags: Tags = Object.assign({
 		return openTag(uid, name, close, attr) + (close ? "" : contents + closeTag(name));
       },
       isOpenParagraph = (b?: Block): b is ParagraphBlock => b instanceof ParagraphBlock && b.open,
-      isLastGrandChildOpenParagraph = (b?: Block): boolean => b instanceof ContainerBlock ? isLastGrandChildOpenParagraph(b.children.at(-1)) : b instanceof ParagraphBlock ? b.open : false;
+      isLastGrandChildOpenParagraph = (b?: Block): boolean => b instanceof ContainerBlock ? isLastGrandChildOpenParagraph(b.children.at(-1)) : b instanceof ParagraphBlock ? b.open : false,
+      isLazyBlock = (tk: Tokeniser) => {
+	tk.reset();
+
+	const ftk = new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
+
+	for (const block of parseBlock) {
+		acceptThreeSpaces(ftk);
+
+		const b = block(ftk, true);
+
+		if (b) {
+			tk.reset();
+
+			return false;
+		}
+
+		ftk.reset();
+	}
+
+	return true;
+      };
 
 abstract class Block {
 	open = true;
@@ -530,24 +551,10 @@ class BlockQuote extends ContainerBlock {
 				return true;
 			}
 
-			tk.reset();
+			if (!isLazyBlock(tk)) {
+				this.open = false;
 
-			const ftk = new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
-
-			for (const block of parseBlock) {
-				acceptThreeSpaces(ftk);
-
-				const b = block(ftk, true);
-
-				if (b) {
-					tk.reset();
-
-					this.open = false;
-
-					return false;
-				}
-
-				ftk.reset();
+				return false;
 			}
 
 			lazy = true;
@@ -698,6 +705,22 @@ class ListBlock extends ContainerBlock {
 
 			return true;
 		} else {
+			if (!lazy) {
+				if (!isLazyBlock(tk)) {
+					this.open = false;
+
+					return false;
+				}
+
+				lazy = true;
+			}
+
+			if (lazy && isLastGrandChildOpenParagraph(this)) {
+				if (this.children.at(-1)!.accept(tk, lazy)) {
+					return true;
+				}
+			}
+
 			this.open = false;
 
 			return false;
