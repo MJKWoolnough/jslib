@@ -663,6 +663,12 @@ class ListBlock extends ContainerBlock {
 			}
 		}
 
+		this.#spaces = tk.length();
+
+		if (tk.peek() === "\n") {
+			this.#spaces++;
+		}
+
 		tk.get();
 
 		return true;
@@ -671,19 +677,7 @@ class ListBlock extends ContainerBlock {
 	accept(tk: Tokeniser, lazy: boolean) {
 		tk.reset();
 
-		if (tk.peek() === " ") {
-			for (let i = 0; i < this.#spaces; i++) {
-				if (!tk.accept(" ")) {
-					if (tk.peek() === "\n") {
-						this.#lastEmpty = true;
-
-						return this.children.at(-1)!.accept(tk, lazy);
-					}
-
-					return this.#lazyContinuation(tk, lazy);
-				}
-			}
-
+		if (this.#hasSpaces(tk)) {
 			tk.get();
 			tk.acceptRun(whiteSpace);
 
@@ -713,6 +707,24 @@ class ListBlock extends ContainerBlock {
 
 			return false;
 		}
+	}
+
+	#hasSpaces(tk: Tokeniser) {
+		if (tk.peek() === " ") {
+			for (let i = 0; i < this.#spaces; i++) {
+				if (!tk.accept(" ")) {
+					if (tk.peek() === "\n") {
+						this.#lastEmpty = true;
+					}
+
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	#lazyContinuation(tk: Tokeniser, lazy: boolean) {
