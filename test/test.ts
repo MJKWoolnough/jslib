@@ -10894,13 +10894,17 @@ type Tests = {
 				["- foo\n-\n- bar", "<ul><li>foo</li><li></li><li>bar</li></ul>"],
 				["- foo\n-   \n- bar", "<ul><li>foo</li><li></li><li>bar</li></ul>"],
 				["1. foo\n2.\n3. bar", "<ol><li>foo</li><li></li><li>bar</li></ol>"],
-				["*", "<ul><li></li></ul>"]
+				["*", "<ul><li></li></ul>"],
+				[" 1.  A paragraph\n     with two lines.\n\n         indented code\n\n     > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
+				["  1.  A paragraph\n      with two lines.\n\n          indented code\n\n      > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"],
+				["   1.  A paragraph\n       with two lines.\n\n           indented code\n\n       > A block quote.", "<ol><li><p>A paragraph\nwith two lines.</p><pre><code>indented code\n</code></pre><blockquote><p>A block quote.</p></blockquote></li></ol>"]
 			],
 			"not a list item": [
 				["-one\n\n2.two", "<p>-one</p><p>2.two</p>"],
 				["1234567890. ok", "<p>1234567890. ok</p>"],
 				["-1. not ok", "<p>-1. not ok</p>"],
-				["foo\n*\n\nfoo\n1.", "<p>foo\n*</p><p>foo\n1.</p>"]
+				["foo\n*\n\nfoo\n1.", "<p>foo\n*</p><p>foo\n1.</p>"],
+				["    1.  A paragraph\n        with two lines.\n\n            indented code\n\n        > A block quote.", "<pre><code>1.  A paragraph\n    with two lines.\n\n        indented code\n\n    &gt; A block quote.</code></pre>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
