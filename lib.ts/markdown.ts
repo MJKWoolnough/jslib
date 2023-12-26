@@ -590,7 +590,7 @@ class ListItemBlock extends ContainerBlock {
 	}
 
 	accept(tk: Tokeniser) {
-		return this.process(tk);
+		return this.process(tk) || !!this.children.length;
 	}
 
 	toHTML(uid: string) {
