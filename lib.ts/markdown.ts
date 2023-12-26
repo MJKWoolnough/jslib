@@ -588,6 +588,7 @@ class ListItemBlock extends ContainerBlock {
 
 		this.process(tk);
 	}
+
 	accept(tk: Tokeniser) {
 		return this.process(tk);
 	}
