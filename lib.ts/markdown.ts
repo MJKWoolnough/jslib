@@ -697,7 +697,9 @@ class ListBlock extends ContainerBlock {
 			tk.reset();
 
 			if (this.children.at(-1)!.accept(tk, lazy)) {
-				if (this.#lastEmpty) {
+				if ((this.children.at(-1) as ListItemBlock).children.at(-1) instanceof ListBlock) {
+					this.#lastEmpty = false;
+				} else if (this.#lastEmpty) {
 					this.#loose = true;
 				}
 
