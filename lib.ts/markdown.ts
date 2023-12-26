@@ -117,7 +117,6 @@ const tags: Tags = Object.assign({
 
 		break;
 	case '0':
-	case '1':
 	case '2':
 	case '3':
 	case '4':
@@ -126,6 +125,10 @@ const tags: Tags = Object.assign({
 	case '7':
 	case '8':
 	case '9':
+		if (inParagraph) {
+			break;
+		}
+	case '1':
 		const l = tk.length();
 
 		if (!inParagraph) {
@@ -409,7 +412,7 @@ const tags: Tags = Object.assign({
       },
       isOpenParagraph = (b?: Block): b is ParagraphBlock => b instanceof ParagraphBlock && b.open,
       isLastGrandChildOpenParagraph = (b?: Block): boolean => b instanceof ContainerBlock ? isLastGrandChildOpenParagraph(b.children.at(-1)) : b instanceof ParagraphBlock ? b.open : false,
-      isLazyBlock = (tk: Tokeniser) => {
+      isLazyBlock = (tk: Tokeniser, inList = false) => {
 	tk.reset();
 
 	const ftk = new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
@@ -417,7 +420,7 @@ const tags: Tags = Object.assign({
 	for (const block of parseBlock) {
 		acceptThreeSpaces(ftk);
 
-		const b = block(ftk, true);
+		const b = block(ftk, !inList || block !== parseListBlockStart);
 
 		if (b) {
 			tk.reset();
@@ -742,7 +745,7 @@ class ListBlock extends ContainerBlock {
 
 	#lazyContinuation(tk: Tokeniser, lazy: boolean) {
 		if (!lazy) {
-			if (!isLazyBlock(tk)) {
+			if (!isLazyBlock(tk, true)) {
 				return false;
 			}
 
