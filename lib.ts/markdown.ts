@@ -117,6 +117,7 @@ const tags: Tags = Object.assign({
 
 		break;
 	case '0':
+	case '1':
 	case '2':
 	case '3':
 	case '4':
@@ -125,10 +126,6 @@ const tags: Tags = Object.assign({
 	case '7':
 	case '8':
 	case '9':
-		if (inParagraph) {
-			break;
-		}
-	case '1':
 		const l = tk.length();
 
 		if (!inParagraph) {
@@ -717,7 +714,7 @@ class ListBlock extends ContainerBlock {
 
 			return true;
 		} if (this.#lazyContinuation(tk, lazy)) {
-				return true;
+			return true;
 		}
 
 		this.open = false;
