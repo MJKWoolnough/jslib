@@ -10915,7 +10915,8 @@ type Tests = {
 				["1234567890. ok", "<p>1234567890. ok</p>"],
 				["-1. not ok", "<p>-1. not ok</p>"],
 				["foo\n*\n\nfoo\n1.", "<p>foo\n*</p><p>foo\n1.</p>"],
-				["    1.  A paragraph\n        with two lines.\n\n            indented code\n\n        > A block quote.", "<pre><code>1.  A paragraph\n    with two lines.\n\n        indented code\n\n    &gt; A block quote.</code></pre>"]
+				["    1.  A paragraph\n        with two lines.\n\n            indented code\n\n        > A block quote.", "<pre><code>1.  A paragraph\n    with two lines.\n\n        indented code\n\n    &gt; A block quote.</code></pre>"],
+				["- foo\n\n- bar\n\n- baz", "<ul><li><p>foo</p></li><li><p>bar</p></li><li><p>baz</p></li></ul>"]
 			]
 		},
 		"list": {
@@ -10923,7 +10924,8 @@ type Tests = {
 				["- foo\n- bar\n+ baz", "<ul><li>foo</li><li>bar</li></ul><ul><li>baz</li></ul>"],
 				["1. foo\n2. bar\n3) baz", "<ol><li>foo</li><li>bar</li></ol><ol start=\"3\"><li>baz</li></ol>"],
 				["Foo\n- bar\n- baz", "<p>Foo</p><ul><li>bar</li><li>baz</li></ul>"],
-				["The number of windows in my house is\n1.  The number of doors is 6.", "<p>The number of windows in my house is</p><ol><li>The number of doors is 6.</li></ol>"]
+				["The number of windows in my house is\n1.  The number of doors is 6.", "<p>The number of windows in my house is</p><ol><li>The number of doors is 6.</li></ol>"],
+				["- foo\n  - bar\n    - baz\n\n\n      bim", "<ul><li>foo<ul><li>bar<ul><li><p>baz</p><p>bim</p></li></ul></li></ul></li></ul>"]
 			],
 			"not a list": [
 				["The number of windows in my house is\n14.  The number of doors is 6.", "<p>The number of windows in my house is\n14.  The number of doors is 6.</p>"],
