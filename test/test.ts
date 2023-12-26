@@ -10921,7 +10921,13 @@ type Tests = {
 		"list": {
 			"simple": [
 				["- foo\n- bar\n+ baz", "<ul><li>foo</li><li>bar</li></ul><ul><li>baz</li></ul>"],
-				["1. foo\n2. bar\n3) baz", "<ol><li>foo</li><li>bar</li></ol><ol start=\"3\"><li>baz</li></ol>"]
+				["1. foo\n2. bar\n3) baz", "<ol><li>foo</li><li>bar</li></ol><ol start=\"3\"><li>baz</li></ol>"],
+				["Foo\n- bar\n- baz", "<p>Foo</p><ul><li>bar</li><li>baz</li></ul>"],
+				["The number of windows in my house is\n1.  The number of doors is 6.", "<p>The number of windows in my house is</p><ol><li>The number of doors is 6.</li></ol>"]
+			],
+			"not a list": [
+				["The number of windows in my house is\n14.  The number of doors is 6.", "<p>The number of windows in my house is\n14.  The number of doors is 6.</p>"],
+				["The number of windows in my house is\n2.  The number of doors is 6.", "<p>The number of windows in my house is\n2.  The number of doors is 6.</p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
