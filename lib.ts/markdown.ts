@@ -642,7 +642,7 @@ class ListBlock extends ContainerBlock {
 		this.children.push(new ListItemBlock(tk));
 	}
 
-	newItem(tk: Tokeniser) {
+	#newItem(tk: Tokeniser) {
 		switch (this.#marker) {
 		case "-":
 		case "+":
@@ -709,7 +709,7 @@ class ListBlock extends ContainerBlock {
 			this.#lastEmpty = true;
 
 			return this.children.at(-1)!.accept(tk, lazy);
-		} else if (this.newItem(tk)) {
+		} else if (this.#newItem(tk)) {
 			if (this.#lastEmpty) {
 				this.#loose = true;
 			}
