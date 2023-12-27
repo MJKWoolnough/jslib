@@ -10936,7 +10936,14 @@ type Tests = {
 				["* a\n*\n\n* c", "<ul><li><p>a</p></li><li></li><li><p>c</p></li></ul>"],
 				["- a\n- b\n\n\n  c\n- d", "<ul><li><p>a</p></li><li><p>b</p><p>c</p></li><li><p>d</p></li></ul>"],
 				// ["- a\n- b\n\n\n  [ref]: /url\n- d", "<ul><li><p>a</p></li><li><p>b</p></li><li><p>d</p></li></ul>"],
-				["- a\n- ```\n  b\n\n\n\n  ```\n- c", "<ul><li>a</li><li><pre><code>b\n\n\n\n</code></pre></li><li>c</li></ul>"]
+				["- a\n- ```\n  b\n\n\n\n  ```\n- c", "<ul><li>a</li><li><pre><code>b\n\n\n\n</code></pre></li><li>c</li></ul>"],
+				["- a\n  - b\n\n    c\n- d", "<ul><li>a<ul><li><p>b</p><p>c</p></li></ul></li><li>d</li></ul>"],
+				["* a\n  > b\n  > \n* c", "<ul><li>a<blockquote><p>b</p></blockquote></li><li>c</li></ul>"],
+				["- a\n  > b\n  ```\n  c\n  ```\n- d", "<ul><li>a<blockquote><p>b</p></blockquote><pre><code>c\n</code></pre></li><li>d</li></ul>"],
+				["- a", "<ul><li>a</li></ul>"],
+				["- a\n  - b", "<ul><li>a<ul><li>b</li></ul></li></ul>"],
+				["1. ```\n   foo\n   ```\n\n   bar", "<ol><li><pre><code>foo\n</code></pre><p>bar</p></li></ol>"],
+				["- a\n  - b\n  - c\n\n- d\n  - e\n  - f", "<ul><li><p>a</p><ul><li>b</li><li>c</li></ul></li><li><p>d</p><ul><li>e</li><li>f</li></ul></li></ul>"]
 			],
 			"not a list": [
 				["The number of windows in my house is\n14.  The number of doors is 6.", "<p>The number of windows in my house is\n14.  The number of doors is 6.</p>"],
