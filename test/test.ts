@@ -10930,7 +10930,10 @@ type Tests = {
 				["-   foo\n\n    notcode\n\n-   foo\n\n<!-- -->\n\n    code", "<ul><li><p>foo</p><p>notcode</p></li><li><p>foo</p></li></ul><!-- -->\n<pre><code>code</code></pre>"],
 				["- a\n - b\n  - c\n   - d\n  - e\n - f\n- g", "<ul><li>a</li><li>b</li><li>c</li><li>d</li><li>e</li><li>f</li><li>g</li></ul>"],
 				["1. a\n\n  2. b\n\n   3. c", "<ol><li><p>a</p></li><li><p>b</p></li><li><p>c</p></li></ol>"],
-				["- a\n - b\n  - c\n   - d\n    - e", "<ul><li>a</li><li>b</li><li>c</li><li>d\n- e</li></ul>"]
+				["- a\n - b\n  - c\n   - d\n    - e", "<ul><li>a</li><li>b</li><li>c</li><li>d\n- e</li></ul>"],
+				["1. a\n\n  2. b\n\n    3. c", "<ol><li><p>a</p></li><li><p>b</p></li></ol><pre><code>3. c</code></pre>"],
+				["- a\n- b\n\n- c", "<ul><li><p>a</p></li><li><p>b</p></li><li><p>c</p></li></ul>"],
+				["* a\n*\n\n* c", "<ul><li><p>a</p></li><li></li><li><p>c</p></li></ul>"]
 			],
 			"not a list": [
 				["The number of windows in my house is\n14.  The number of doors is 6.", "<p>The number of windows in my house is\n14.  The number of doors is 6.</p>"],
