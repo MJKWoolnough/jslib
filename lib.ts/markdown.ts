@@ -582,6 +582,7 @@ class BlockQuote extends ContainerBlock {
 
 class ListItemBlock extends ContainerBlock {
 	loose = false;
+	hasEmpty = false;
 
 	constructor(tk: Tokeniser) {
 		super();
@@ -590,16 +591,31 @@ class ListItemBlock extends ContainerBlock {
 	}
 
 	accept(tk: Tokeniser) {
+		tk.acceptRun(whiteSpace);
+
 		if (!this.children.length && tk.peek() === "\n" || tk.peek() === "") {
 			tk.accept("\n");
 			tk.get();
 
+			this.hasEmpty = true;
 			this.open = false;
 
 			return true;
 		}
 
-		return this.process(tk) || !!this.children.length;
+		this.loose = this.hasEmpty;
+
+		const empty = tk.accept("\n");
+
+		tk.reset();
+
+		const ret = this.process(tk);
+
+		if (empty && this.children.at(-1)?.open === false) {
+			this.hasEmpty = true;
+		}
+
+		return ret || !!this.children.length;
 	}
 
 	toHTML(uid: string) {
@@ -619,7 +635,6 @@ class ListBlock extends ContainerBlock {
 	#marker: string;
 	#spaces: number;
 	#lastSpaces: number;
-	#hasEmpty = false;
 	#loose = false;
 
 	constructor(tk: Tokeniser) {
@@ -704,34 +719,10 @@ class ListBlock extends ContainerBlock {
 	}
 
 	accept(tk: Tokeniser, lazy: boolean) {
-		if (this.#hasSpaces(tk) && this.children.at(-1)?.open) {
-			tk.acceptRun(whiteSpace);
-
-			if (tk.peek() === "\n") {
-				this.#hasEmpty = true;
-			}
-
-			tk.reset();
-
-			if (this.children.at(-1)!.accept(tk, lazy)) {
-				if ((this.children.at(-1) as ListItemBlock).children.at(-1) instanceof ListBlock) {
-					this.#hasEmpty = false;
-				} else if (this.#hasEmpty) {
-					this.#loose = true;
-				}
-
-				return true;
-			}
-
-			return false;
-		} else if (tk.peek() === "\n") {
-			this.#hasEmpty = true;
-
+		if (this.#hasSpaces(tk) && this.children.at(-1)?.open || tk.peek() === "\n") {
 			return this.children.at(-1)!.accept(tk, lazy);
 		} else if (this.#newItem(tk)) {
-			if (this.#hasEmpty) {
-				this.#loose = true;
-			}
+			this.#loose ||= (this.children.at(-1) as ListItemBlock).hasEmpty
 
 			this.children.push(new ListItemBlock(tk));
 
@@ -751,10 +742,6 @@ class ListBlock extends ContainerBlock {
 		if (tk.peek() === " ") {
 			for (let i = 0; i < this.#lastSpaces; i++) {
 				if (!tk.accept(" ")) {
-					if (tk.peek() === "\n") {
-						this.#hasEmpty = true;
-					}
-
 					return false;
 				}
 			}
@@ -786,6 +773,16 @@ class ListBlock extends ContainerBlock {
 	}
 
 	toHTML(uid: string) {
+		if (!this.#loose) {
+			for (const c of this.children as ListItemBlock[]) {
+				if (c.loose) {
+					this.#loose = true;
+
+					break;
+				}
+			}
+		}
+
 		if (this.#loose) {
 			for (const c of this.children as ListItemBlock[]) {
 				c.loose = true;
