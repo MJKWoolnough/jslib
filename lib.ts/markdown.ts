@@ -646,6 +646,10 @@ class ListBlock extends ContainerBlock {
 	}
 
 	#newItem(tk: Tokeniser) {
+		if (tk.length() > 3) {
+			return false;
+		}
+
 		switch (this.#marker) {
 		case "-":
 		case "+":
