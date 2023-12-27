@@ -636,6 +636,7 @@ class ListBlock extends ContainerBlock {
 	#spaces: number;
 	#lastSpaces: number;
 	#loose = false;
+	#lastEmpty = false;
 
 	constructor(tk: Tokeniser) {
 		super();
@@ -719,15 +720,25 @@ class ListBlock extends ContainerBlock {
 	}
 
 	accept(tk: Tokeniser, lazy: boolean) {
+		tk.acceptRun(whiteSpace);
+
+		const empty = tk.accept("\n");
+
 		if (this.#hasSpaces(tk) && this.children.at(-1)?.open || tk.peek() === "\n") {
+			this.#lastEmpty = empty;
+
 			return this.children.at(-1)!.accept(tk, lazy);
 		} else if (this.#newItem(tk)) {
-			this.#loose ||= (this.children.at(-1) as ListItemBlock).hasEmpty
+			this.#loose ||= (this.children.at(-1) as ListItemBlock).hasEmpty || this.#lastEmpty;
+
+			this.#lastEmpty = false;
 
 			this.children.push(new ListItemBlock(tk));
 
 			return true;
 		} if (this.#lazyContinuation(tk, lazy)) {
+			this.#lastEmpty = empty;
+
 			return true;
 		}
 
