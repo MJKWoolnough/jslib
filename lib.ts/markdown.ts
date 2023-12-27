@@ -590,6 +590,15 @@ class ListItemBlock extends ContainerBlock {
 	}
 
 	accept(tk: Tokeniser) {
+		if (!this.children.length && tk.peek() === "\n" || tk.peek() === "") {
+			tk.accept("\n");
+			tk.get();
+
+			this.open = false;
+
+			return true;
+		}
+
 		return this.process(tk) || !!this.children.length;
 	}
 
@@ -610,7 +619,7 @@ class ListBlock extends ContainerBlock {
 	#marker: string;
 	#spaces: number;
 	#lastSpaces: number;
-	#lastEmpty = false;
+	#hasEmpty = false;
 	#loose = false;
 
 	constructor(tk: Tokeniser) {
@@ -695,19 +704,19 @@ class ListBlock extends ContainerBlock {
 	}
 
 	accept(tk: Tokeniser, lazy: boolean) {
-		if (this.#hasSpaces(tk)) {
+		if (this.#hasSpaces(tk) && this.children.at(-1)?.open) {
 			tk.acceptRun(whiteSpace);
 
 			if (tk.peek() === "\n") {
-				this.#lastEmpty = true;
+				this.#hasEmpty = true;
 			}
 
 			tk.reset();
 
 			if (this.children.at(-1)!.accept(tk, lazy)) {
 				if ((this.children.at(-1) as ListItemBlock).children.at(-1) instanceof ListBlock) {
-					this.#lastEmpty = false;
-				} else if (this.#lastEmpty) {
+					this.#hasEmpty = false;
+				} else if (this.#hasEmpty) {
 					this.#loose = true;
 				}
 
@@ -716,11 +725,11 @@ class ListBlock extends ContainerBlock {
 
 			return false;
 		} else if (tk.peek() === "\n") {
-			this.#lastEmpty = true;
+			this.#hasEmpty = true;
 
 			return this.children.at(-1)!.accept(tk, lazy);
 		} else if (this.#newItem(tk)) {
-			if (this.#lastEmpty) {
+			if (this.#hasEmpty) {
 				this.#loose = true;
 			}
 
@@ -743,7 +752,7 @@ class ListBlock extends ContainerBlock {
 			for (let i = 0; i < this.#lastSpaces; i++) {
 				if (!tk.accept(" ")) {
 					if (tk.peek() === "\n") {
-						this.#lastEmpty = true;
+						this.#hasEmpty = true;
 					}
 
 					return false;
