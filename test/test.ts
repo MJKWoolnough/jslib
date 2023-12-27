@@ -10927,7 +10927,8 @@ type Tests = {
 				["The number of windows in my house is\n1.  The number of doors is 6.", "<p>The number of windows in my house is</p><ol><li>The number of doors is 6.</li></ol>"],
 				["- foo\n  - bar\n    - baz\n\n\n      bim", "<ul><li>foo<ul><li>bar<ul><li><p>baz</p><p>bim</p></li></ul></li></ul></li></ul>"],
 				["- foo\n- bar\n\n<!-- -->\n\n- baz\n- bim", "<ul><li>foo</li><li>bar</li></ul><!-- -->\n<ul><li>baz</li><li>bim</li></ul>"],
-				["-   foo\n\n    notcode\n\n-   foo\n\n<!-- -->\n\n    code", "<ul><li><p>foo</p><p>notcode</p></li><li><p>foo</p></li></ul><!-- -->\n<pre><code>code</code></pre>"]
+				["-   foo\n\n    notcode\n\n-   foo\n\n<!-- -->\n\n    code", "<ul><li><p>foo</p><p>notcode</p></li><li><p>foo</p></li></ul><!-- -->\n<pre><code>code</code></pre>"],
+				["- a\n - b\n  - c\n   - d\n  - e\n - f\n- g", "<ul><li>a</li><li>b</li><li>c</li><li>d</li><li>e</li><li>f</li><li>g</li></ul>"]
 			],
 			"not a list": [
 				["The number of windows in my house is\n14.  The number of doors is 6.", "<p>The number of windows in my house is\n14.  The number of doors is 6.</p>"],
