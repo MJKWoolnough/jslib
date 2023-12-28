@@ -10950,7 +10950,31 @@ type Tests = {
 				["The number of windows in my house is\n14.  The number of doors is 6.", "<p>The number of windows in my house is\n14.  The number of doors is 6.</p>"],
 				["The number of windows in my house is\n2.  The number of doors is 6.", "<p>The number of windows in my house is\n2.  The number of doors is 6.</p>"]
 			]
-		}
+		},
+		"inline": {
+			"code": [
+				["`foo`", "<p><code>foo</code></p>"],
+				["`` foo ` bar ``", "<p><code>foo ` bar</code></p>"],
+				["` `` `", "<p><code>``</code></p>"],
+				["`  ``  `", "<p><code> `` </code></p>"],
+				["` a`", "<p><code> a</code></p>"],
+				["`\tb\t`", "<p><code>\tb\t</code></p>"],
+				["` `\n`  `", "<p><code> </code>\n<code>  </code></p>"],
+				["``\nfoo\nbar  \nbaz\n``", "<p><code>foo bar   baz</code></p>"],
+				["``\nfoo \n``", "<p><code>foo </code></p>"],
+				["`foo   bar \nbaz`", "<p><code>foo   bar  baz</code></p>"],
+				["`foo\\`bar`", "<p><code>foo\\</code>bar`</p>"],
+				["``foo`bar``", "<p><code>foo`bar</code></p>"],
+				["` foo `` bar `", "<p><code>foo `` bar</code></p>"],
+				["*foo`*`", "<p>*foo<code>*</code></p>"],
+				["[not a `link](/foo`)", "<p>[not a <code>link](/foo</code>)</p>"],
+				["`<a href=\"`\">`", "<p><code>&lt;a href=\"</code>\"&gt;`</p>"],
+				["`<http://foo.bar.`baz>`", "<p><code>&lt;http://foo.bar.</code>baz&gt;`</p>"],
+				["```foo``", "<p>```foo``</p>"],
+				["`foo", "<p>`foo</p>"],
+				["`foo``bar``", "<p>`foo<code>bar</code></p>"]
+			]
+		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
 		      {code, div, pre} = await import ("./lib/html.js"),
