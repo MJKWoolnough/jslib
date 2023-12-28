@@ -357,8 +357,8 @@ const tags: Tags = Object.assign({
 	while (true) {
 		switch (tk.exceptRun("\\`")) {
 		case '\\':
-			tk.except("");
-			tk.except("");
+			tk.next();
+			tk.next();
 			break;
 		case '`':
 			return tk.return(tokenText, parseCode);
@@ -582,7 +582,7 @@ abstract class ContainerBlock extends Block {
 			lastChild.add(tk);
 		} else {
 			tk.exceptRun("\n");
-			tk.accept("\n");
+			tk.next();
 			tk.get();
 
 			return false;
@@ -955,7 +955,7 @@ class HTMLBlock extends LeafBlock {
 			while (true) {
 				switch (tk.exceptRun("<\n")) {
 				case "<":
-					tk.except("");
+					tk.next();
 
 					if (tk.accept("/")) {
 						if (tk.acceptWord(type1Elements) && tk.accept(">")) {
@@ -974,7 +974,7 @@ class HTMLBlock extends LeafBlock {
 			while (true) {
 				switch (tk.exceptRun("-\n")) {
 				case "-":
-					tk.except("");
+					tk.next();
 
 					if (tk.accept("-") && tk.acceptRun("-") === ">") {
 						this.open = false;
@@ -991,7 +991,7 @@ class HTMLBlock extends LeafBlock {
 			while (true) {
 				switch (tk.exceptRun("?\n")) {
 				case "?":
-					tk.except("");
+					tk.next();
 
 					if (tk.accept(">")) {
 						this.open = false;
@@ -1012,7 +1012,7 @@ class HTMLBlock extends LeafBlock {
 			while (true) {
 				switch (tk.exceptRun("]\n")) {
 				case "]":
-					tk.except("");
+					tk.next();
 
 					if (tk.accept("]") && tk.accept(">")) {
 						this.open = false;
@@ -1031,7 +1031,7 @@ class HTMLBlock extends LeafBlock {
 		}
 
 		tk.exceptRun("\n");
-		tk.except("");
+		tk.next();
 
 		this.lines.push(tk.get());
 
@@ -1055,7 +1055,7 @@ class ParagraphBlock extends LeafBlock {
 
 	add(tk: Tokeniser) {
 		tk.exceptRun("\n");
-		tk.accept("\n");
+		tk.next();
 
 		this.lines.push(tk.get().trimStart());
 	}
@@ -1075,7 +1075,7 @@ class ParagraphBlock extends LeafBlock {
 				return true;
 			}
 		} else if (tk.acceptRun(whiteSpace) === "\n") {
-			tk.except("");
+			tk.next();
 			tk.get();
 
 			this.open = false;
@@ -1110,7 +1110,7 @@ class ATXHeadingBlock extends LeafBlock {
 		tk.get();
 
 		tk.exceptRun("\n");
-		tk.accept("\n");
+		tk.next();
 
 		this.#text = tk.get().trim().replace(/[ \t]+#*$/, "");
 	}
@@ -1150,7 +1150,7 @@ class FencedCodeBlock extends LeafBlock {
 			const last = tk.acceptRun(whiteSpace);
 
 			if (!last || last === "\n") {
-				tk.accept("\n");
+				tk.next();
 				tk.get();
 
 				this.open = false;
@@ -1168,7 +1168,7 @@ class FencedCodeBlock extends LeafBlock {
 		tk.get();
 
 		tk.exceptRun("\n");
-		tk.except("");
+		tk.next();
 
 		const line = tk.get();
 
@@ -1229,7 +1229,7 @@ class IndentedCodeBlock extends LeafBlock {
 		const last = tk.acceptRun(whiteSpace);
 
 		if (!last || last === "\n") {
-			tk.accept("\n");
+			tk.next();
 
 			tk.get();
 
@@ -1245,7 +1245,7 @@ class IndentedCodeBlock extends LeafBlock {
 		tk.get();
 
 		tk.exceptRun("\n");
-		tk.except("");
+		tk.next();
 
 		this.lines.push(tk.get());
 
