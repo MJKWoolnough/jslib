@@ -583,6 +583,7 @@ class BlockQuote extends ContainerBlock {
 class ListItemBlock extends ContainerBlock {
 	loose = false;
 	hasEmpty = false;
+	#lastEmpty = false;
 
 	constructor(tk: Tokeniser) {
 		super();
@@ -604,11 +605,17 @@ class ListItemBlock extends ContainerBlock {
 
 		this.loose = this.hasEmpty;
 
-		const ret = this.process(tk);
+		const prev = this.children.at(-1),
+		      ret = this.process(tk),
+		      now = this.children.at(-1);
 
-		if (empty && this.children.at(-1)?.open === false) {
+		if (this.#lastEmpty && prev !== now) {
+			this.loose = true;
+		} else if (empty && now?.open === false) {
 			this.hasEmpty = true;
 		}
+
+		this.#lastEmpty = empty;
 
 		return ret || !!this.children.length;
 	}
