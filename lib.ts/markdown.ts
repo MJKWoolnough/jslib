@@ -590,10 +590,9 @@ class ListItemBlock extends ContainerBlock {
 		this.process(tk);
 	}
 
-	accept(tk: Tokeniser) {
-		tk.acceptRun(whiteSpace);
-
-		if (!this.children.length && tk.peek() === "\n" || tk.peek() === "") {
+	accept(tk: Tokeniser, empty: boolean) {
+		if (!this.children.length && empty) {
+			tk.acceptRun(whiteSpace);
 			tk.accept("\n");
 			tk.get();
 
@@ -604,10 +603,6 @@ class ListItemBlock extends ContainerBlock {
 		}
 
 		this.loose = this.hasEmpty;
-
-		const empty = tk.accept("\n");
-
-		tk.reset();
 
 		const ret = this.process(tk);
 
@@ -722,12 +717,12 @@ class ListBlock extends ContainerBlock {
 	accept(tk: Tokeniser, lazy: boolean) {
 		tk.acceptRun(whiteSpace);
 
-		const empty = tk.accept("\n");
+		const empty = tk.accept("\n") || tk.peek() === "";
 
-		if (this.#hasSpaces(tk) && this.children.at(-1)?.open || tk.peek() === "\n") {
+		if (this.#hasSpaces(tk) && this.children.at(-1)?.open || empty) {
 			this.#lastEmpty = empty;
 
-			return this.children.at(-1)!.accept(tk, lazy);
+			return this.children.at(-1)!.accept(tk, empty);
 		} else if (this.#newItem(tk)) {
 			this.#loose ||= (this.children.at(-1) as ListItemBlock).hasEmpty || this.#lastEmpty;
 
