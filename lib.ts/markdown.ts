@@ -1,4 +1,5 @@
-import {Tokeniser} from './parser.js';
+import {Tokeniser, TokenDone} from './parser.js';
+import Parser from './parser.js';
 
 type Tags = {
 	allowedHTML: null | [string, ...string[]][];
@@ -349,10 +350,27 @@ const tags: Tags = Object.assign({
       ],
       encoder = document.createElement("div"),
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
-      parseInline = (text: string) => {
-	encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text);
+      tokenText = 1,
+      parseText = (tk: Tokeniser) => {
+	tk.exceptRun("");
 
-	return encoder.innerHTML;
+	return tk.return(tokenText);
+      },
+      parseInline = (text: string) => {
+	let res = "";
+
+	for (const tk of Parser(text, parseText)) {
+		switch (tk.type) {
+		case TokenDone:
+			return res;
+		case tokenText:
+			encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data);
+
+			res += encoder.innerHTML;
+		}
+	}
+
+	return "";
       },
       tagNameToTag = {
 	"P": "paragraphs",
@@ -1026,10 +1044,10 @@ class ParagraphBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		const text = this.lines.join("\n").trim();
+		const text = parseInline(this.lines.join("\n").trim());
 
 		if (text) {
-			return this.loose || this.#settextLevel ? tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, parseInline(text)) : parseInline(text);
+			return this.loose || this.#settextLevel ? tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, text) : text;
 		}
 
 		return "";
