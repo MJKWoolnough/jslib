@@ -1,3 +1,4 @@
+import type {TokenFn} from './parser.js';
 import {Tokeniser, TokenDone} from './parser.js';
 import Parser from './parser.js';
 
@@ -351,19 +352,47 @@ const tags: Tags = Object.assign({
       encoder = document.createElement("div"),
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
       tokenText = 1,
-      parseText = (tk: Tokeniser) => {
+      tokenCode = 2,
+      parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
-		switch (tk.exceptRun("\\")) {
+		switch (tk.exceptRun("\\`")) {
 		case '\\':
 			tk.except("");
 			tk.except("");
 			break;
+		case '`':
+			return tk.return(tokenText, parseCode);
 		default:
 			return tk.return(tokenText);
 		}
 	}
       },
-      parseInline = (text: string) => {
+      parseCode = (tk: Tokeniser) => {
+	tk.acceptRun("`");
+
+	const numTicks = tk.length();
+
+	while (true) {
+		switch (tk.exceptRun("`")) {
+		case "`":
+			const l = tk.length();
+
+			tk.acceptRun("`");
+
+			if (tk.length() - l === numTicks) {
+				return tk.return(tokenCode, parseText);
+			}
+
+			break;
+		default:
+			tk.reset();
+			tk.acceptRun("`");
+
+			return parseText(tk);
+		}
+	}
+      },
+      parseInline = (uid: string, text: string) => {
 	let res = "";
 
 	for (const tk of Parser(text, parseText)) {
@@ -374,6 +403,13 @@ const tags: Tags = Object.assign({
 			encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data);
 
 			res += encoder.innerHTML;
+
+			break;
+		case tokenCode:
+			encoder.textContent = tk.data.replace(/^`+/, "").replace(/`+$/, "").replaceAll("\n", " ").replace(/^ (.+) $/, "$1");
+			res += tag(uid, "code", encoder.innerHTML);
+
+			break;
 		}
 	}
 
@@ -1051,7 +1087,7 @@ class ParagraphBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		const text = parseInline(this.lines.join("\n").trim());
+		const text = parseInline(uid, this.lines.join("\n").trim());
 
 		if (text) {
 			return this.loose || this.#settextLevel ? tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, text) : text;
@@ -1080,7 +1116,7 @@ class ATXHeadingBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "H" + this.#level, parseInline(this.#text));
+		return tag(uid, "H" + this.#level, parseInline(uid, this.#text));
 	}
 }
 
