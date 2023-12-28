@@ -1057,7 +1057,7 @@ class ParagraphBlock extends LeafBlock {
 		tk.exceptRun("\n");
 		tk.accept("\n");
 
-		this.lines.push(tk.get().trim());
+		this.lines.push(tk.get().trimStart());
 	}
 
 	accept(tk: Tokeniser, lazy = false) {
@@ -1087,7 +1087,7 @@ class ParagraphBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		const text = parseInline(uid, this.lines.join("\n").trim());
+		const text = parseInline(uid, this.lines.join("").trim());
 
 		if (text) {
 			return this.loose || this.#settextLevel ? tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, text) : text;
