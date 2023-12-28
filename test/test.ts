@@ -10943,6 +10943,7 @@ type Tests = {
 				["- a", "<ul><li>a</li></ul>"],
 				["- a\n  - b", "<ul><li>a<ul><li>b</li></ul></li></ul>"],
 				["1. ```\n   foo\n   ```\n\n   bar", "<ol><li><pre><code>foo\n</code></pre><p>bar</p></li></ol>"],
+				["* foo\n  * bar\n\n  baz", "<ul><li><p>foo</p><ul><li>bar</li></ul><p>baz</p></li></ul>"],
 				["- a\n  - b\n  - c\n\n- d\n  - e\n  - f", "<ul><li><p>a</p><ul><li>b</li><li>c</li></ul></li><li><p>d</p><ul><li>e</li><li>f</li></ul></li></ul>"]
 			],
 			"not a list": [
