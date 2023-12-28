@@ -15,6 +15,12 @@ type Tags = {
 	orderedList: (start: string, c: DocumentFragment) => Element | DocumentFragment;
 	listItem: (c: DocumentFragment) => Element | DocumentFragment;
 	thematicBreaks: () => Element | DocumentFragment;
+	link: (href: string, title: string, c: DocumentFragment) => Element | DocumentFragment;
+	image: (src: string, title: string, alt: string) => Element | DocumentFragment;
+	inlineCode: (c: DocumentFragment) => Element | DocumentFragment;
+	italic: (c: DocumentFragment) => Element | DocumentFragment;
+	bold: (c: DocumentFragment) => Element | DocumentFragment;
+	break: () => Element | DocumentFragment;
 }
 
 const tags: Tags = Object.assign({
@@ -38,12 +44,34 @@ const tags: Tags = Object.assign({
 		return ol;
 	},
 	"allowedHTML": null,
-	"thematicBreaks": () => document.createElement("hr")
+	"thematicBreaks": () => document.createElement("hr"),
+	"link": (href: string, title: string, c: DocumentFragment) => {
+		const a = document.createElement("a");
+
+		a.setAttribute("href", href);
+		a.setAttribute("title", title);
+		a.append(c);
+
+		return a;
+	},
+	"image": (src: string, title: string, alt: string) => {
+		const img = document.createElement("img");
+
+		img.setAttribute("src", src);
+		img.setAttribute("title", title);
+		img.setAttribute("alt", alt);
+
+		return img;
+	},
+	"break": () => document.createElement("br")
       }, ([
 	["blockquote", "blockquote"],
 	["paragraphs", "p"],
 	["unorderedList", "ul"],
 	["listItem", "li"],
+	["inlineCode", "code"],
+	["italic", "em"],
+	["bold", "strong"],
 	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, string])
       ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => {
 	      const t = document.createElement(tag);
@@ -326,6 +354,15 @@ const tags: Tags = Object.assign({
 
 	return encoder.innerHTML;
       },
+      tagNameToTag = {
+	"P": "paragraphs",
+	"BLOCKQUOTE": "blockquote",
+	"UL": "unorderedList",
+	"LI": "listItem",
+	"CODE": "inlineCode",
+	"EM": "italic",
+	"STRONG": "bold"
+      } as const,
       sanitise = (childNodes: NodeListOf<ChildNode>, tags: Tags, uid: string) => {
 	const df = document.createDocumentFragment();
 
@@ -334,10 +371,6 @@ const tags: Tags = Object.assign({
 		if (node instanceof Element) {
 			if (node.hasAttribute(uid)) {
 				switch (node.nodeName) {
-				case "P":
-					df.append(tags.paragraphs(sanitise(node.childNodes, tags, uid)));
-
-					break;
 				case "HR":
 					df.append(tags.thematicBreaks());
 
@@ -346,20 +379,30 @@ const tags: Tags = Object.assign({
 					df.append(tags.code(node.getAttribute("type") ?? "", node.textContent ?? ""));
 
 					break;
-				case "BLOCKQUOTE":
-					df.append(tags.blockquote(sanitise(node.childNodes, tags, uid)));
-
-					break;
-				case "UL":
-					df.append(tags.unorderedList(sanitise(node.childNodes, tags, uid)));
-
-					break;
 				case "OL":
 					df.append(tags.orderedList(node.getAttribute("start") ?? "", sanitise(node.childNodes, tags, uid)));
 
 					break;
+				case "P":
+				case "BLOCKQUOTE":
+				case "UL":
 				case "LI":
-					df.append(tags.listItem(sanitise(node.childNodes, tags, uid)));
+				case "CODE":
+				case "EM":
+				case "STRONG":
+					df.append(tags[tagNameToTag[node.nodeName]](sanitise(node.childNodes, tags, uid)));
+
+					break;
+				case "BR":
+					df.append(tags.break());
+
+					break;
+				case "A":
+					df.append(tags.link(node.getAttribute("href") ?? "", node.getAttribute("title") ?? "", sanitise(node.childNodes, tags, uid)));
+
+					break;
+				case "IMG":
+					df.append(tags.image(node.getAttribute("src") ?? "", node.getAttribute("title") ?? "", node.getAttribute("alt") ?? ""));
 
 					break;
 				default:
