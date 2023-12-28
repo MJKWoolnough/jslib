@@ -352,9 +352,16 @@ const tags: Tags = Object.assign({
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
       tokenText = 1,
       parseText = (tk: Tokeniser) => {
-	tk.exceptRun("");
-
-	return tk.return(tokenText);
+	while (true) {
+		switch (tk.exceptRun("\\")) {
+		case '\\':
+			tk.except("");
+			tk.except("");
+			break;
+		default:
+			return tk.return(tokenText);
+		}
+	}
       },
       parseInline = (text: string) => {
 	let res = "";
