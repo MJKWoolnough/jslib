@@ -3,7 +3,7 @@ import {TokenDone, Tokeniser} from './parser.js';
 import Parser from './parser.js';
 
 type Tags = {
-	allowedHTML: null | [string, ...string[]][];
+	allowedHTML: null | [keyof HTMLElementTagNameMap, ...string[]][];
 	blockquote: (c: DocumentFragment) => Element | DocumentFragment;
 	code: (info: string, text: string) => Element | DocumentFragment;
 	heading1: (c: DocumentFragment) => Element | DocumentFragment;
@@ -25,8 +25,8 @@ type Tags = {
 	break: () => Element | DocumentFragment;
 }
 
-const makeNode = (nodeName: string, params: Record<string, string> = {}, children: string | DocumentFragment = "") => {
-	const node = document.createElement(nodeName);
+const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeName, params: Record<string, string> = {}, children: string | DocumentFragment = "") => {
+	const node = document.createElement(nodeName) as HTMLElementTagNameMap[NodeName];
 
 	for(const key in params) {
 		node.setAttribute(key, params[key]);
@@ -48,7 +48,7 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 	["inlineCode", "code"],
 	["italic", "em"],
 	["bold", "strong"],
-	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, string])
+	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, `h${1 | 2 | 3 | 4 | 5 | 6}`])
       ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => makeNode(tag, {}, c), o), {
 	"code": (_info: string, text: string) => makeNode("pre", {}, text),
 	"orderedList": (start: string, c: DocumentFragment) => makeNode("ol", start ? {start} : {}, c),
@@ -334,7 +334,7 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 	parseHTML7,
 	parseParagraph
       ],
-      encoder = document.createElement("div"),
+      encoder = makeNode("div"),
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
       tokenText = 1,
       tokenCode = 2,
@@ -460,7 +460,7 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 				if (tags.allowedHTML) {
 					for (const [name, ...attrs] of tags.allowedHTML) {
 						if (node.nodeName === name) {
-							const tag = document.createElement(node.nodeName);
+							const tag = makeNode(node.nodeName, {}, sanitise(node.childNodes, tags, uid));
 
 							for (const attr of attrs) {
 								const a = node.getAttributeNode(attr);
@@ -469,8 +469,6 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 									tag.setAttributeNode(a);
 								}
 							}
-
-							tag.append(sanitise(node.childNodes, tags, uid));
 
 							df.append(tag);
 
@@ -611,7 +609,7 @@ class Document extends ContainerBlock {
 	}
 
 	render(tags: Tags) {
-		const tmpl = document.createElement("template");
+		const tmpl = makeNode("template");
 
 		tmpl.innerHTML = this.toHTML(this.#uid);
 
