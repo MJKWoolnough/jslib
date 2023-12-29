@@ -154,8 +154,21 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 
 	return null;
       },
+      parseInOrder = (tk: Tokeniser, order: string) => {
+	let parsed = 0;
+
+	for (const c of order) {
+		if (!tk.accept(c)) {
+			break;
+		}
+
+		parsed++;
+	}
+
+	return parsed;
+      },
       parseATXHeader = (tk: Tokeniser) => {
-	const level = +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#") + +tk.accept("#");
+	const level = parseInOrder(tk, "######");
 
 	if (level > 0 && (tk.accept(whiteSpace) || tk.peek() === "\n" || !tk.peek())) {
 		return new ATXHeadingBlock(tk, level);
@@ -194,28 +207,28 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 	return null;
       },
       parseHTML2 = (tk: Tokeniser) => {
-	if (tk.accept("<") && tk.accept("!") && tk.accept("-") && tk.accept("-")) {
+	if (parseInOrder(tk, "<!--") === 4) {
 		return new HTMLBlock(tk, 2);
 	}
 
 	return null;
       },
       parseHTML3 = (tk: Tokeniser) => {
-	if (tk.accept("<") && tk.accept("?")) {
+	if (parseInOrder(tk, "<?") === 2) {
 		return new HTMLBlock(tk, 3);
 	}
 
 	return null;
       },
       parseHTML4 = (tk: Tokeniser) => {
-	if (tk.accept("<") && tk.accept("!") && tk.accept(letter)) {
+	if (parseInOrder(tk, "<!") === 2 && tk.accept(letter)) {
 		return new HTMLBlock(tk, 4);
 	}
 
 	return null;
       },
       parseHTML5 = (tk: Tokeniser) => {
-	if (tk.accept("<") && tk.accept("!") && tk.accept("[") && tk.accept("C") && tk.accept("D") && tk.accept("A") && tk.accept("T") && tk.accept("A") && tk.accept("[")) {
+	if (parseInOrder(tk, "<![CDATA[") === 9) {
 		return new HTMLBlock(tk, 5);
 	}
 
@@ -304,11 +317,7 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 
 	return null;
       },
-      acceptThreeSpaces = (tk: Tokeniser) => {
-	tk.accept(" ");
-	tk.accept(" ");
-	tk.accept(" ");
-      },
+      acceptThreeSpaces = (tk: Tokeniser) => parseInOrder(tk, "   "),
       parseBlock: ((tk: Tokeniser, inParagraph: boolean) => Block | null)[] = [
 	parseIndentedCodeBlockStart,
 	parseBlockQuoteStart,
@@ -723,9 +732,7 @@ class ListBlock extends ContainerBlock {
 	constructor(tk: Tokeniser) {
 		super();
 
-		for (let i = 0; i < 4; i++) {
-			tk.accept(" ");
-		}
+		parseInOrder(tk, "    ");
 
 		if (tk.peek() === " ") {
 			tk.backup();
@@ -1185,7 +1192,7 @@ class IndentedCodeBlock extends LeafBlock {
 				return false;
 			}
 		} else {
-			if (!tk.accept(" ") || !tk.accept(" ") || !tk.accept(" ") || !tk.accept(" ")) {
+			if (parseInOrder(tk, "    ") !== 4) {
 				if (this.#getBlankLine(tk)) {
 					return true;
 				}
