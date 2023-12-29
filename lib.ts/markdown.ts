@@ -392,7 +392,7 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 			break;
 		case tokenCode:
 			encoder.textContent = tk.data.replace(/^`+/, "").replace(/`+$/, "").replaceAll("\n", " ").replace(/^ (.+) $/, "$1");
-			res += tag(uid, "code", encoder.innerHTML);
+			res += tag(uid, "CODE", encoder.innerHTML);
 
 			break;
 		}
