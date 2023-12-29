@@ -519,6 +519,12 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	}
 
 	return true;
+      },
+      readEOL = (tk: Tokeniser) => {
+	tk.exceptRun("\n");
+	tk.next();
+
+	return tk.get();
       };
 
 abstract class Block {
@@ -564,9 +570,7 @@ abstract class ContainerBlock extends Block {
 			acceptThreeSpaces(tk);
 			lastChild.add(tk);
 		} else {
-			tk.exceptRun("\n");
-			tk.next();
-			tk.get();
+			readEOL(tk);
 
 			return false;
 		}
@@ -1011,10 +1015,7 @@ class HTMLBlock extends LeafBlock {
 			break;
 		}
 
-		tk.exceptRun("\n");
-		tk.next();
-
-		this.lines.push(tk.get());
+		this.lines.push(readEOL(tk));
 
 		return true;
 	}
@@ -1035,10 +1036,7 @@ class ParagraphBlock extends LeafBlock {
 	}
 
 	add(tk: Tokeniser) {
-		tk.exceptRun("\n");
-		tk.next();
-
-		this.lines.push(tk.get().trimStart());
+		this.lines.push(readEOL(tk).trimStart());
 	}
 
 	accept(tk: Tokeniser, lazy = false) {
@@ -1090,10 +1088,7 @@ class ATXHeadingBlock extends LeafBlock {
 
 		tk.get();
 
-		tk.exceptRun("\n");
-		tk.next();
-
-		this.#text = tk.get().trim().replace(/[ \t]+#*$/, "");
+		this.#text = readEOL(tk).trim().replace(/[ \t]+#*$/, "");
 	}
 
 	toHTML(uid: string) {
@@ -1148,10 +1143,7 @@ class FencedCodeBlock extends LeafBlock {
 
 		tk.get();
 
-		tk.exceptRun("\n");
-		tk.next();
-
-		const line = tk.get();
+		const line = readEOL(tk);
 
 		if (line !== "\n" || this.lines.length) {
 			this.lines.push(line);
@@ -1225,10 +1217,7 @@ class IndentedCodeBlock extends LeafBlock {
 	#getLine(tk: Tokeniser) {
 		tk.get();
 
-		tk.exceptRun("\n");
-		tk.next();
-
-		this.lines.push(tk.get());
+		this.lines.push(readEOL(tk));
 
 		return true;
 	}
