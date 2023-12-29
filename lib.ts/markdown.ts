@@ -525,7 +525,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	tk.next();
 
 	return tk.get();
-      };
+      },
+      links = new Map<string, [string, string?]>();
 
 abstract class Block {
 	open = true;
@@ -620,6 +621,7 @@ class Document extends ContainerBlock {
 		const ret =  sanitise(tmpl.content.childNodes, tags, this.#uid);
 
 		encoder.replaceChildren();
+		links.clear();
 
 		return ret;
 	}
