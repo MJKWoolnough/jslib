@@ -56,7 +56,7 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 	"thematicBreaks": () => makeNode("hr"),
 	"link": (href: string, title: string, c: DocumentFragment) => makeNode("a", {href, title}, c),
 	"image": (src: string, title: string, alt: string) => makeNode("img", {src, title, alt}),
-	"break": () => makeNode("br"),
+	"break": () => makeNode("br")
       } as any as Tags),
       whiteSpace = " \t",
       letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
