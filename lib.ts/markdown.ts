@@ -25,47 +25,29 @@ type Tags = {
 	break: () => Element | DocumentFragment;
 }
 
-const tags: Tags = Object.assign({
-	"code": (_info: string, text: string) => {
-		const pre = document.createElement("pre"),
-		      code = pre.appendChild(document.createElement("code"));
+const makeNode = (nodeName: string, params: Record<string, string> = {}, children: string | DocumentFragment = "") => {
+	const node = document.createElement(nodeName);
 
-		code.textContent = text;
+	for(const key in params) {
+		node.setAttribute(key, params[key]);
+	}
 
-		return pre;
-	},
-	"orderedList": (start: string, c: DocumentFragment) => {
-		const ol = document.createElement("ol");
+	if (typeof children === "string") {
+		node.innerText = children;
+	} else {
+		node.append(children);
+	}
 
-		if (start) {
-			ol.setAttribute("start", start);
-		}
-
-		ol.append(c);
-
-		return ol;
-	},
+	return node;
+      },
+      tags: Tags = Object.assign({
+	"code": (_info: string, text: string) => makeNode("pre", {}, text),
+	"orderedList": (start: string, c: DocumentFragment) => makeNode("ol", start ? {start} : {}, c),
 	"allowedHTML": null,
-	"thematicBreaks": () => document.createElement("hr"),
-	"link": (href: string, title: string, c: DocumentFragment) => {
-		const a = document.createElement("a");
-
-		a.setAttribute("href", href);
-		a.setAttribute("title", title);
-		a.append(c);
-
-		return a;
-	},
-	"image": (src: string, title: string, alt: string) => {
-		const img = document.createElement("img");
-
-		img.setAttribute("src", src);
-		img.setAttribute("title", title);
-		img.setAttribute("alt", alt);
-
-		return img;
-	},
-	"break": () => document.createElement("br")
+	"thematicBreaks": () => makeNode("hr"),
+	"link": (href: string, title: string, c: DocumentFragment) => makeNode("a", {href, title}, c),
+	"image": (src: string, title: string, alt: string) => makeNode("img", {src, title, alt}),
+	"break": () => makeNode("br"),
       }, ([
 	["blockquote", "blockquote"],
 	["paragraphs", "p"],
@@ -75,13 +57,7 @@ const tags: Tags = Object.assign({
 	["italic", "em"],
 	["bold", "strong"],
 	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, string])
-      ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => {
-	      const t = document.createElement(tag);
-
-	      t.append(c);
-
-	      return t;
-      }, o), {} as Record<keyof Tags, (c: DocumentFragment) => Element>), {}),
+      ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => makeNode(tag, {}, c), o), {} as Record<keyof Tags, (c: DocumentFragment) => Element>), {}),
       whiteSpace = " \t",
       letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
       number = "0123456789",
