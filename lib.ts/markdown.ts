@@ -617,7 +617,11 @@ class Document extends ContainerBlock {
 
 		tmpl.innerHTML = this.toHTML(this.#uid);
 
-		return sanitise(tmpl.content.childNodes, tags, this.#uid);
+		const ret =  sanitise(tmpl.content.childNodes, tags, this.#uid);
+
+		encoder.replaceChildren();
+
+		return ret;
 	}
 }
 
