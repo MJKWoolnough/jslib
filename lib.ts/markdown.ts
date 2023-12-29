@@ -40,15 +40,7 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 
 	return node;
       },
-      tags: Tags = Object.assign({
-	"code": (_info: string, text: string) => makeNode("pre", {}, text),
-	"orderedList": (start: string, c: DocumentFragment) => makeNode("ol", start ? {start} : {}, c),
-	"allowedHTML": null,
-	"thematicBreaks": () => makeNode("hr"),
-	"link": (href: string, title: string, c: DocumentFragment) => makeNode("a", {href, title}, c),
-	"image": (src: string, title: string, alt: string) => makeNode("img", {src, title, alt}),
-	"break": () => makeNode("br"),
-      }, ([
+      tags: Tags = ([
 	["blockquote", "blockquote"],
 	["paragraphs", "p"],
 	["unorderedList", "ul"],
@@ -57,7 +49,15 @@ const makeNode = (nodeName: string, params: Record<string, string> = {}, childre
 	["italic", "em"],
 	["bold", "strong"],
 	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, string])
-      ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => makeNode(tag, {}, c), o), {} as Record<keyof Tags, (c: DocumentFragment) => Element>), {}),
+      ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => makeNode(tag, {}, c), o), {
+	"code": (_info: string, text: string) => makeNode("pre", {}, text),
+	"orderedList": (start: string, c: DocumentFragment) => makeNode("ol", start ? {start} : {}, c),
+	"allowedHTML": null,
+	"thematicBreaks": () => makeNode("hr"),
+	"link": (href: string, title: string, c: DocumentFragment) => makeNode("a", {href, title}, c),
+	"image": (src: string, title: string, alt: string) => makeNode("img", {src, title, alt}),
+	"break": () => makeNode("br"),
+      } as any as Tags),
       whiteSpace = " \t",
       letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
       number = "0123456789",
