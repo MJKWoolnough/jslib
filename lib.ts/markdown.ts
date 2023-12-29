@@ -1,5 +1,5 @@
 import type {TokenFn} from './parser.js';
-import {Tokeniser, TokenDone} from './parser.js';
+import {TokenDone, Tokeniser} from './parser.js';
 import Parser from './parser.js';
 
 type Tags = {
