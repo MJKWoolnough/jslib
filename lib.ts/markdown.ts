@@ -1,4 +1,4 @@
-import type {TokenFn} from './parser.js';
+import type {Token, TokenFn} from './parser.js';
 import {TokenDone, Tokeniser} from './parser.js';
 import Parser from './parser.js';
 
@@ -398,7 +398,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       parseEmphasis = (tk: Tokeniser) => {
 	tk.acceptRun(tk.next());
-
+	
 	return tk.return(tokenEmphasis, parseText);
       },
       parseImageOpen = (tk: Tokeniser) => {
@@ -414,12 +414,44 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return tk.return(t, parseText);
       }),
+      processLinkImage = (_tokens: Token[]) => {
+	return false;
+      },
       parseInline = (uid: string, text: string) => {
 	const stack = Parser(text, parseText, p => {
 		p.exceptRun(TokenDone);
 
 		return p.return(0);
 	      }).next().value.data;
+
+	for (let i = 0; i < stack.length; i++) {
+		const closeTK = stack[i];
+
+		if (closeTK.type === tokenLinkClose) {
+			let closeOpenLinks = false;
+			for (let j = i; j >= 0; j--) {
+				const openTK = stack[j];
+
+				if (closeOpenLinks) {
+					if (openTK.type === tokenLinkOpen) {
+						openTK.type = tokenText;
+					}
+				} else if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
+					if (!processLinkImage(stack.slice(j, i + 1))) {
+						openTK.type = tokenText;
+					}
+
+					if (openTK.type == tokenImageOpen) {
+						break;
+					}
+
+					closeOpenLinks = true;
+				}
+			}
+
+			closeTK.type = tokenText;
+		}
+	}
 
 	let res = "";
 
