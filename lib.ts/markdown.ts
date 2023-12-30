@@ -415,7 +415,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return tk.return(t, parseText);
       }),
-      processLinkImage = (_tokens: Token[]) => {
+      processLinkImage = (_uid: string, _tokens: Token[]) => {
 	return false;
       },
       isWhitespace = /\s/,
@@ -541,7 +541,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 						openTK.type = tokenText;
 					}
 				} else if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
-					if (!processLinkImage(stack.slice(j, i + 1))) {
+					if (!processLinkImage(uid, stack.slice(j, i + 1))) {
 						openTK.type = tokenText;
 					}
 
