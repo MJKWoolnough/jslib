@@ -344,6 +344,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenLinkClose = 6,
       tokenParenOpen = 7,
       tokenParenClose = 8,
+      tokenHTML = 9,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
 		switch (tk.exceptRun("\\`*_![()")) {
@@ -465,6 +466,61 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return false;
       },
+      processEmphasis = (uid: string, stack: Token[]) => {
+	const levels = [0, 0, 0];
+
+	Loop:
+	for (let i = 1; i < stack.length; i++) {
+		if (isEmphasisClosing(stack, i)) {
+			const level = stack[i].data.length % 3;
+
+			for (let j = i - 1; j >= levels[level]; j--) {
+				if (isEmphasisOpening(stack, j)) {
+					const isStrong = stack[i].data.length > 1 && stack[j].data.length > 1,
+					      tag = isStrong ? "STRONG" : "EM",
+					      chars = isStrong ? 2 : 1,
+					      closingTag = {"type": tokenHTML, "data": closeTag(tag)},
+					      openingTag = {"type": tokenHTML, "data": openTag(uid, tag)};
+
+					for (let k = j + 1; k < i; k++) {
+						switch (stack[k].type) {
+						case tokenLinkOpen:
+						case tokenImageOpen:
+						case tokenEmphasis:
+							stack[k].type = tokenText;
+						}
+					}
+
+					stack[i].data = stack[i].data.slice(chars);
+					stack[j].data = stack[j].data.slice(chars);
+
+					if (stack[i].data) {
+						stack.splice(i, 0, closingTag);
+						i++;
+					} else {
+						stack[i] = closingTag;
+					}
+
+					if (stack[j].data) {
+						stack.splice(j, 0, openingTag);
+						i++;
+					} else {
+						stack[j] = openingTag;
+					}
+
+					continue Loop;
+				}
+			}
+
+			levels[level] = i;
+
+			if (!isEmphasisOpening(stack, i)) {
+				stack[i].type = tokenText;
+			}
+
+		}
+	}
+      },
       parseInline = (uid: string, text: string) => {
 	const stack = Parser(text, parseText, p => {
 		p.exceptRun(TokenDone);
@@ -501,6 +557,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 	}
 
+	processEmphasis(uid, stack);
+
 	let res = "";
 
 	for (const tk of stack) {
@@ -508,6 +566,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		case tokenCode:
 			encoder.textContent = tk.data.replace(/^`+/, "").replace(/`+$/, "").replaceAll("\n", " ").replace(/^ (.+) $/, "$1");
 			res += tag(uid, "CODE", encoder.innerHTML);
+
+			break;
+		case tokenHTML:
+			res += tk.data;
 
 			break;
 		default:
