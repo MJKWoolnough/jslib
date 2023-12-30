@@ -378,12 +378,16 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	}
       },
       parseInline = (uid: string, text: string) => {
+	const stack = Parser(text, parseText, p => {
+		p.exceptRun(TokenDone);
+
+		return p.return(0);
+	      }).next().value.data;
+
 	let res = "";
 
-	for (const tk of Parser(text, parseText)) {
+	for (const tk of stack) {
 		switch (tk.type) {
-		case TokenDone:
-			return res;
 		case tokenText:
 			encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data);
 
