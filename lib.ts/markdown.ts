@@ -417,6 +417,32 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       processLinkImage = (_tokens: Token[]) => {
 	return false;
       },
+      isWhitespace = /\s/,
+      isPunctuation = /\p{P}/u,
+      isLeftFlanking = (stack: Token[], pos: number) => {
+	const openTK = stack[pos];
+
+	if (openTK.type === tokenEmphasis) {
+		const lastChar = stack?.[pos - 1].data.at(-1) ?? "",
+		      nextChar = stack?.[pos + 1].data.at(0) ?? " ";
+
+		return !isWhitespace.test(nextChar) && (!isPunctuation.test(nextChar) || isWhitespace.test(lastChar) || isPunctuation.test(lastChar));
+	}
+
+	return false;
+      },
+      isRightFlanking = (stack: Token[], pos: number) => {
+	const closeTk = stack[pos];
+
+	if (closeTk.type === tokenEmphasis) {
+		const lastChar = stack?.[pos - 1].data.at(-1) ?? "",
+		      nextChar = stack?.[pos + 1].data.at(0) ?? " ";
+
+		return !isWhitespace.test(lastChar) && (!isPunctuation.test(lastChar) || isWhitespace.test(nextChar) || isPunctuation.test(nextChar));
+	}
+
+	return false;
+      },
       parseInline = (uid: string, text: string) => {
 	const stack = Parser(text, parseText, p => {
 		p.exceptRun(TokenDone);
