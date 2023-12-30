@@ -338,15 +338,34 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
       tokenText = 1,
       tokenCode = 2,
+      tokenEmphasis = 3,
+      tokenImageOpen = 4,
+      tokenLinkOpen = 5,
+      tokenLinkClose = 6,
+      tokenParenOpen = 7,
+      tokenParenClose = 8,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
-		switch (tk.exceptRun("\\`")) {
+		switch (tk.exceptRun("\\`*_![()")) {
 		case '\\':
 			tk.next();
 			tk.next();
 			break;
 		case '`':
 			return tk.return(tokenText, parseCode);
+		case '*':
+		case '_':
+			return tk.return(tokenText, parseEmphasis);
+		case '!':
+			return tk.return(tokenText, parseImageOpen);
+		case '[':
+			return tk.return(tokenText, parseLinkOpen);
+		case ']':
+			return tk.return(tokenText, parseLinkClose);
+		case '(':
+			return tk.return(tokenText, parseParenOpen);
+		case ')':
+			return tk.return(tokenText, parseParenClose);
 		default:
 			return tk.return(tokenText);
 		}
@@ -359,7 +378,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	while (true) {
 		switch (tk.exceptRun("`")) {
-		case "`":
+		case '`':
 			const l = tk.length();
 
 			tk.acceptRun("`");
@@ -377,6 +396,24 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 	}
       },
+      parseEmphasis = (tk: Tokeniser) => {
+	tk.acceptRun(tk.next());
+
+	return tk.return(tokenEmphasis, parseText);
+      },
+      parseImageOpen = (tk: Tokeniser) => {
+	tk.next();
+	if (tk.accept("[")) {
+		return tk.return(tokenImageOpen, parseText);
+	}
+
+	return parseText(tk);
+      },
+      [parseLinkOpen, parseLinkClose, parseParenOpen, parseParenClose] = [tokenLinkOpen, tokenLinkClose, tokenParenOpen, tokenParenClose].map(t => (tk: Tokeniser) => {
+	tk.next();
+
+	return tk.return(t, parseText);
+      }),
       parseInline = (uid: string, text: string) => {
 	const stack = Parser(text, parseText, p => {
 		p.exceptRun(TokenDone);
@@ -388,21 +425,21 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	for (const tk of stack) {
 		switch (tk.type) {
-		case tokenText:
-			encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data);
-
-			res += encoder.innerHTML;
-
-			break;
 		case tokenCode:
 			encoder.textContent = tk.data.replace(/^`+/, "").replace(/`+$/, "").replaceAll("\n", " ").replace(/^ (.+) $/, "$1");
 			res += tag(uid, "CODE", encoder.innerHTML);
 
 			break;
+		default:
+			encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data);
+
+			res += encoder.innerHTML;
+
+			break;
 		}
 	}
 
-	return "";
+	return res;
       },
       tagNameToTag = {
 	"P": "paragraphs",
