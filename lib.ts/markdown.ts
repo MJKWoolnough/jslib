@@ -418,6 +418,36 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       processLinkImage = (_uid: string, _tokens: Token[]) => {
 	return false;
       },
+      processLinksAndImages = (uid: string, stack: Token[]) => {
+	for (let i = 0; i < stack.length; i++) {
+		const closeTK = stack[i];
+
+		if (closeTK.type === tokenLinkClose) {
+			let closeOpenLinks = false;
+			for (let j = i; j >= 0; j--) {
+				const openTK = stack[j];
+
+				if (closeOpenLinks) {
+					if (openTK.type === tokenLinkOpen) {
+						openTK.type = tokenText;
+					}
+				} else if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
+					if (!processLinkImage(uid, stack.slice(j, i + 1))) {
+						openTK.type = tokenText;
+					}
+
+					if (openTK.type == tokenImageOpen) {
+						break;
+					}
+
+					closeOpenLinks = true;
+				}
+			}
+
+			closeTK.type = tokenText;
+		}
+	}
+      },
       isWhitespace = /\s/,
       isPunctuation = /\p{P}/u,
       isLeftFlanking = (stack: Token[], pos: number) => {
@@ -528,34 +558,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		return p.return(0);
 	      }).next().value.data;
 
-	for (let i = 0; i < stack.length; i++) {
-		const closeTK = stack[i];
-
-		if (closeTK.type === tokenLinkClose) {
-			let closeOpenLinks = false;
-			for (let j = i; j >= 0; j--) {
-				const openTK = stack[j];
-
-				if (closeOpenLinks) {
-					if (openTK.type === tokenLinkOpen) {
-						openTK.type = tokenText;
-					}
-				} else if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
-					if (!processLinkImage(uid, stack.slice(j, i + 1))) {
-						openTK.type = tokenText;
-					}
-
-					if (openTK.type == tokenImageOpen) {
-						break;
-					}
-
-					closeOpenLinks = true;
-				}
-			}
-
-			closeTK.type = tokenText;
-		}
-	}
+	processLinksAndImages(uid, stack);
 
 	processEmphasis(uid, stack);
 
