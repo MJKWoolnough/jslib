@@ -10973,6 +10973,14 @@ type Tests = {
 				["```foo``", "<p>```foo``</p>"],
 				["`foo", "<p>`foo</p>"],
 				["`foo``bar``", "<p>`foo<code>bar</code></p>"]
+			],
+			"emphasis": [
+				["*foo bar*", "<p><em>foo bar</em></p>"],
+				["a * foo bar*", "<p>a * foo bar*</p>"],
+				["a*\"foo\"*", "<p>a*\"foo\"*</p>"],
+				["* a *", "<p>*&nbsp;a&nbsp;*</p>"],
+				["foo*bar*", "<p>foo<em>bar</em></p>"],
+				["5*6*78", "<p>5<em>6</em>78</p>"]
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
