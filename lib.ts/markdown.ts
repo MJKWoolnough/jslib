@@ -476,7 +476,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       isEmphasisOpening = (stack: Token[], pos: number) => {
 	if (isLeftFlanking(stack, pos)) {
-		if (stack[pos].data.at(0) === "_" && (isRightFlanking(stack, pos) || !isPunctuation.test(stack[pos - 1]?.data.at(-1) ?? "_"))) {
+		if (stack[pos].data.at(0) === "_" && (isRightFlanking(stack, pos) && !isPunctuation.test(stack[pos - 1]?.data.at(-1) ?? "_"))) {
 			return false;
 		}
 
@@ -487,7 +487,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       isEmphasisClosing = (stack: Token[], pos: number) => {
 	if (isRightFlanking(stack, pos)) {
-		if (stack[pos].data.at(0) === "_" && (isLeftFlanking(stack, pos) || !isPunctuation.test(stack[pos + 1]?.data.at(0) ?? "_"))) {
+		if (stack[pos].data.at(0) === "_" && (isLeftFlanking(stack, pos) && !isPunctuation.test(stack[pos + 1]?.data.at(0) ?? "_"))) {
 			return false;
 		}
 
