@@ -10817,7 +10817,7 @@ type Tests = {
 				["<Warning>\n*bar*\n</Warning>", "<warning>\n*bar*\n</warning>"],
 				['<i class="foo">\n*bar*\n</i>', '<i class="foo">\n*bar*\n</i>'],
 				["<del>\n*foo*\n</del>", "<del>\n*foo*\n</del>"],
-				["<del>\n\n*foo*\n\n</del>", "<del>\n\n<p>*foo*</p></del>"],
+				["<del>\n\n*foo*\n\n</del>", "<del>\n\n<p><em>foo</em></p></del>"],
 				//['Foo\n<a href="bar">\nbaz', '<p>Foo\n<a href="bar">\nbaz</a></p>'],
 				//['Foo\n<foo>\nbaz\n</foo>\n\nMore Foo\n\nMore Text', '<p>Foo\n<foo>\nbaz\n</foo>\n\nMore Foo</p><p>More Text</p>']
 			]
