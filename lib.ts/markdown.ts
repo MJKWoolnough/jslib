@@ -558,7 +558,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		p.exceptRun(TokenDone);
 
 		return p.return(0);
-	      }).next().value.data;
+	      }).next().value.data.filter(t => t.data);
 
 	processLinksAndImages(uid, stack);
 
