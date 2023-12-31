@@ -496,11 +496,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return false;
       },
-      processEmphasis = (uid: string, stack: Token[]) => {
-	const levels = [0, 0, 0];
+      processEmphasis = (uid: string, stack: Token[], start = 0, end = stack.length) => {
+	const levels = [start, start, start];
 
 	Loop:
-	for (let i = 1; i < stack.length; i++) {
+	for (let i = start + 1; i < end; i++) {
 		if (isEmphasisClosing(stack, i)) {
 			const level = stack[i].data.length % 3;
 
@@ -527,6 +527,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					if (stack[i].data) {
 						stack.splice(i, 0, closingTag);
 						i++;
+						end++;
 					} else {
 						stack[i] = closingTag;
 					}
@@ -534,6 +535,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					if (stack[j].data) {
 						stack.splice(j, 0, openingTag);
 						i++;
+						end++;
 					} else {
 						stack[j] = openingTag;
 					}
