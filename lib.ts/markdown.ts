@@ -533,7 +533,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					}
 
 					if (stack[j].data) {
-						stack.splice(j, 0, openingTag);
+						stack.splice(j+1, 0, openingTag);
 						i++;
 						end++;
 					} else {
