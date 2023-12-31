@@ -505,7 +505,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			const level = stack[i].data.length % 3;
 
 			for (let j = i - 1; j >= levels[level]; j--) {
-				if (isEmphasisOpening(stack, j)) {
+				if (isEmphasisOpening(stack, j) && stack[i].data.at(0) === stack[j].data.at(0)) {
 					const isStrong = stack[i].data.length > 1 && stack[j].data.length > 1,
 					      tag = isStrong ? "STRONG" : "EM",
 					      chars = isStrong ? 2 : 1,
