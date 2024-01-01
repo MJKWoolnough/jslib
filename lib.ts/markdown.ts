@@ -502,11 +502,17 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	Loop:
 	for (let i = start + 1; i < end; i++) {
 		if (isEmphasisClosing(stack, i)) {
-			const level = stack[i].data.length % 3;
+			const close = stack[i],
+			      closeLength = close.data.length,
+			      level = closeLength % 3,
+			      isCloseOpen = isEmphasisOpening(stack, i);
 
 			for (let j = i - 1; j >= levels[level]; j--) {
-				if (isEmphasisOpening(stack, j) && stack[i].data.at(0) === stack[j].data.at(0)) {
-					const isStrong = stack[i].data.length > 1 && stack[j].data.length > 1,
+				const open = stack[j],
+				      openLength = open.data.length;
+
+				if (isEmphasisOpening(stack, j) && close.data.at(0) === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || (closeLength + openLength) % 3 !== 0 || !level || openLength % 3 === 0)) {
+					const isStrong = closeLength > 1 && openLength > 1,
 					      tag = isStrong ? "STRONG" : "EM",
 					      chars = isStrong ? 2 : 1,
 					      closingTag = {"type": tokenHTML, "data": closeTag(tag)},
