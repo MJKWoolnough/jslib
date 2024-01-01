@@ -551,7 +551,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			levels[level] = i;
 
-			if (!isEmphasisOpening(stack, i)) {
+			if (!isCloseOpen) {
 				stack[i].type = tokenText;
 			}
 
