@@ -11033,7 +11033,9 @@ type Tests = {
 				["_foo __bar__ baz_", "<p><em>foo <strong>bar</strong> baz</em></p>"],
 				["_foo _bar_ baz_", "<p><em>foo <em>bar</em> baz</em></p>"],
 				["__foo_ bar_", "<p><em><em>foo</em> bar</em></p>"],
-				["*foo *bar**", "<p><em>foo <em>bar</em></em></p>"]
+				["*foo *bar**", "<p><em>foo <em>bar</em></em></p>"],
+				["*foo **bar** baz*", "<p><em>foo <strong>bar</strong> baz</em></p>"],
+				["*foo**bar**baz*", "<p><em>foo<strong>bar</strong>baz</em></p>"]
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
