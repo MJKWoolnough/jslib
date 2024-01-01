@@ -497,7 +497,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return false;
       },
       processEmphasis = (uid: string, stack: Token[], start = 0, end = stack.length) => {
-	const levels = [start, start, start];
+	const levels = [[start, start, start], [start, start, start]];
 
 	Loop:
 	for (let i = start + 1; i < end; i++) {
@@ -505,13 +505,15 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			const close = stack[i],
 			      closeLength = close.data.length,
 			      level = (closeLength - 1) % 3,
-			      isCloseOpen = isEmphasisOpening(stack, i);
+			      isCloseOpen = isEmphasisOpening(stack, i),
+			      char = close.data.at(0),
+			      charLevel = levels[+(char === '*')];
 
-			for (let j = i - 1; j >= levels[level]; j--) {
+			for (let j = i - 1; j >= charLevel[level]; j--) {
 				const open = stack[j],
 				      openLength = open.data.length;
 
-				if (isEmphasisOpening(stack, j) && close.data.at(0) === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || (closeLength + openLength) % 3 !== 0 || closeLength % 3 === 0 || openLength % 3 === 0)) {
+				if (isEmphasisOpening(stack, j) && char === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || (closeLength + openLength) % 3 !== 0 || closeLength % 3 === 0 || openLength % 3 === 0)) {
 					const isStrong = closeLength > 1 && openLength > 1,
 					      tag = isStrong ? "STRONG" : "EM",
 					      chars = isStrong ? 2 : 1,
@@ -549,7 +551,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				}
 			}
 
-			levels[level] = i;
+			charLevel[level] = i;
 
 			if (!isCloseOpen) {
 				stack[i].type = tokenText;
