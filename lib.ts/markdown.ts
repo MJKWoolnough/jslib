@@ -526,7 +526,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 					if (stack[i].data) {
 						stack.splice(i, 0, closingTag);
-						i++;
 						end++;
 					} else {
 						stack[i] = closingTag;
