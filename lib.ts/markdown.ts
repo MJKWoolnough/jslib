@@ -504,14 +504,14 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		if (isEmphasisClosing(stack, i)) {
 			const close = stack[i],
 			      closeLength = close.data.length,
-			      level = closeLength % 3,
+			      level = (closeLength - 1) % 3,
 			      isCloseOpen = isEmphasisOpening(stack, i);
 
 			for (let j = i - 1; j >= levels[level]; j--) {
 				const open = stack[j],
 				      openLength = open.data.length;
 
-				if (isEmphasisOpening(stack, j) && close.data.at(0) === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || (closeLength + openLength) % 3 !== 0 || !level || openLength % 3 === 0)) {
+				if (isEmphasisOpening(stack, j) && close.data.at(0) === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || (closeLength + openLength) % 3 !== 0 || closeLength % 3 === 0 || openLength % 3 === 0)) {
 					const isStrong = closeLength > 1 && openLength > 1,
 					      tag = isStrong ? "STRONG" : "EM",
 					      chars = isStrong ? 2 : 1,
