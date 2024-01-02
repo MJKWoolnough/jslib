@@ -478,6 +478,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 	}
 
+	tk.reset();
+	tk.next();
+
 	return parseText(tk);
       },
       processLinkImage = (_uid: string, _tokens: Token[], _start: number, _end: number) => {
