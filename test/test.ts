@@ -11098,9 +11098,9 @@ type Tests = {
 				["*foo *bar baz*", "<p>*foo <em>bar baz</em></p>"],
 				//["*[bar*](/url)", "<p>*<a href=\"/url\">bar*</a></p>"],
 				//["_foo [bar_](/url)", "<p>_foo <a href=\"/url\">bar_</a></p>"],
-				//["*<img src=\"foo\" title=\"*\"/>", "<p>*<img src=\"foo\" title=\"*\"/></p>"],
-				//["**<a href=\"**\">", "<p>**<a href=\"**\"></p>"],
-				//["__<a href=\"__\">", "<p>__<a href=\"__\"></p>"],
+				["*<img src=\"foo\" title=\"*\"/>", "<p>*<img src=\"foo\" title=\"*\"></p>"],
+				["**<a href=\"**\">", "<p>**<a href=\"**\"></a></p>"],
+				["__<a href=\"__\">", "<p>__<a href=\"__\"></a></p>"],
 				["*a `*`*", "<p><em>a <code>*</code></em></p>"],
 				["_a `_`_", "<p><em>a <code>_</code></em></p>"]
 				//["**a<http://foo.bar/?q=**>", "<p>**a<a href=\"http://foo.bar?q=**\">http://foo.bar/?q=**</a></p>"],
