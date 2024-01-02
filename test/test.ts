@@ -11109,7 +11109,8 @@ type Tests = {
 			"HTML": [
 				["a\n<a><bab><c2c>", "<p>a\n<a><bab><c2c></c2c></bab></a></p>"],
 				["a\n<a/><b2/>", "<p>a\n<a><b2></b2></a></p>"],
-				["a\n<a  /><b2\ndata=\"foo\" >", "<p>a\n<a><b2 data=\"foo\"></b2></a></p>"]
+				["a\n<a  /><b2\ndata=\"foo\" >", "<p>a\n<a><b2 data=\"foo\"></b2></a></p>"],
+				["a\n<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />", "<p>a\n<a foo=\"bar\" bam=\"baz <em>&quot;</em>\" _boolean=\"\" zoop:33=\"zoop:33\"></a></p>"]
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
