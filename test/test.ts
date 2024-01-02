@@ -11110,7 +11110,12 @@ type Tests = {
 				["a\n<a><bab><c2c>", "<p>a\n<a><bab><c2c></c2c></bab></a></p>"],
 				["a\n<a/><b2/>", "<p>a\n<a><b2></b2></a></p>"],
 				["a\n<a  /><b2\ndata=\"foo\" >", "<p>a\n<a><b2 data=\"foo\"></b2></a></p>"],
-				["a\n<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />", "<p>a\n<a foo=\"bar\" bam=\"baz <em>&quot;</em>\" _boolean=\"\" zoop:33=\"zoop:33\"></a></p>"]
+				["a\n<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />", "<p>a\n<a foo=\"bar\" bam=\"baz <em>&quot;</em>\" _boolean=\"\" zoop:33=\"zoop:33\"></a></p>"],
+				["Foo <responsive-image src=\"foo.jpg\" />", "<p>Foo <responsive-image src=\"foo.jpg\"></responsive-image></p>"],
+				["a\n<33> <__>", "<p>a\n&lt;33&gt; &lt;__&gt;</p>"],
+				["a\n<a h*#ref=\"hi\">", "<p>a\n&lt;a h*#ref=\"hi\"&gt;</p>"],
+				["a\n<a href=\"hi'> <a href=hi'>", "<p>a\n&lt;a href=\"hi'&gt; &lt;a href=hi'&gt;</p>"],
+				["a\n< a><\nfoo><bar/ >\n<foo bar=baz\nbim!bop />", "<p>a\n&lt; a&gt;&lt;\nfoo&gt;&lt;bar/ &gt;\n&lt;foo bar=baz\nbim!bop /&gt;</p>"]
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
