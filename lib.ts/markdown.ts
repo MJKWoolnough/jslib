@@ -469,10 +469,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					if (!tk.accept('"')) {
 						break;
 					}
-				} else if (tk.accept(whiteSpace + "\"'=<>`")) {
+				} else if (tk.accept(whiteSpace + "\n\"'=<>`")) {
 					break;
 				} else {
-					tk.exceptRun(whiteSpace + "\"'=<>`");
+					tk.exceptRun(whiteSpace + "\n\"'=<>`");
 				}
 			}
 		}
