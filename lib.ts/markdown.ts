@@ -457,6 +457,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			tk.acceptRun(whiteSpace);
 
 			if (tk.accept("=")) {
+				tk.acceptRun(whiteSpace);
+
 				if (tk.accept("'")) {
 					tk.exceptRun("'");
 					if (!tk.accept("'")) {
