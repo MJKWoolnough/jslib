@@ -435,9 +435,17 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		tk.acceptRun(letter + number + "-");
 
 		while (true) {
-			tk.acceptRun(whiteSpace);
-			tk.accept("\n");
-			tk.acceptRun(whiteSpace);
+			let hasSpace = true;
+
+			if (tk.accept(whiteSpace)) {
+				tk.acceptRun(whiteSpace);
+				tk.accept("\n");
+				tk.acceptRun(whiteSpace);
+			} else if (tk.accept("\n")) {
+				tk.acceptRun(whiteSpace);
+			} else {
+				hasSpace = false;
+			}
 
 			if (tk.accept("/")) {
 				if (tk.accept(">")) {
@@ -447,14 +455,23 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				break;
 			} else if (tk.accept(">")) {
 				return tk.return(tokenHTML, parseText);
-			} else if (!tk.accept(letter + "_:")) {
+			} else if (!hasSpace || !tk.accept(letter + "_:")) {
 				break;
 			}
 
 			tk.acceptRun(letter + number + "_.:-");
-			tk.acceptRun(whiteSpace);
-			tk.accept("\n");
-			tk.acceptRun(whiteSpace);
+
+			hasSpace = true;
+
+			if (tk.accept(whiteSpace)) {
+				tk.acceptRun(whiteSpace);
+				tk.accept("\n");
+				tk.acceptRun(whiteSpace);
+			} else if (tk.accept("\n")) {
+				tk.acceptRun(whiteSpace);
+			} else {
+				hasSpace = false;
+			}
 
 			if (tk.accept("=")) {
 				tk.acceptRun(whiteSpace);
@@ -474,6 +491,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				} else {
 					tk.exceptRun(whiteSpace + "\n\"'=<>`");
 				}
+			} else if (hasSpace) {
+				tk.backup();
 			}
 		}
 	}
