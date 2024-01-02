@@ -347,7 +347,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenHTML = 9,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
-		switch (tk.exceptRun("\\`*_![()")) {
+		switch (tk.exceptRun("\\`*_![()<")) {
 		case '\\':
 			tk.next();
 			tk.next();
@@ -367,6 +367,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			return tk.return(tokenText, parseParenOpen);
 		case ')':
 			return tk.return(tokenText, parseParenClose);
+		case '<':
+			return tk.return(tokenText, parseHTML);
 		default:
 			return tk.return(tokenText);
 		}
@@ -415,6 +417,67 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return tk.return(t, parseText);
       }),
+      parseHTML = (tk: Tokeniser) => {
+	tk.next();
+
+	if (tk.accept("/") && tk.accept(letter)) {
+		tk.acceptRun(letter + number + "-");
+		tk.acceptRun(whiteSpace);
+
+		if (tk.accept("\n")) {
+			tk.acceptRun(whiteSpace);
+		}
+
+		if (tk.accept(">")) {
+			return tk.return(tokenHTML, parseText);
+		}
+	} else if (tk.accept(letter)) {
+		tk.acceptRun(letter + number + "-");
+
+		while (true) {
+			tk.acceptRun(whiteSpace);
+			tk.accept("\n");
+			tk.acceptRun(whiteSpace);
+
+			if (tk.accept("/")) {
+				if (tk.accept(">")) {
+					return tk.return(tokenHTML, parseText);
+				}
+
+				break;
+			} else if (tk.accept(">")) {
+				return tk.return(tokenHTML, parseText);
+			} else if (!tk.accept(letter + "_:")) {
+				break;
+			}
+
+			tk.acceptRun(letter + number + "_.:-");
+			tk.acceptRun(whiteSpace);
+			tk.accept("\n");
+			tk.acceptRun(whiteSpace);
+
+			if (tk.accept("=")) {
+				if (tk.accept("'")) {
+					tk.exceptRun("'");
+					if (!tk.accept("'")) {
+						break;
+					}
+				} else if (tk.accept('"')) {
+					tk.exceptRun('"');
+					if (!tk.accept('"')) {
+						break;
+					}
+				} else if (tk.accept(whiteSpace + "\"'=<>`")) {
+					break;
+				} else {
+					tk.exceptRun(whiteSpace + "\"'=<>`");
+				}
+			}
+		}
+	}
+
+	return parseText(tk);
+      },
       processLinkImage = (_uid: string, _tokens: Token[], _start: number, _end: number) => {
 	return false;
       },
