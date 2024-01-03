@@ -11128,6 +11128,12 @@ type Tests = {
 				["foo <a href=\"&ouml;\">", "<p>foo <a href=\"ö\"></a></p>"],
 				["foo <a href=\"\\*\">", "<p>foo <a href=\"\\*\"></a></p>"],
 				["<a href=\"\\\"\">", "<p>&lt;a href=\"\"\"&gt;</p>"],
+			],
+			"linebreaks": [
+				["foo  \nbaz", "<p>foo<br>baz</p>"],
+				["foo\\\nbaz", "<p>foo<br>baz</p>"],
+				["foo       \nbaz", "<p>foo<br>baz</p>"],
+				["foo  \n     bar", "<p>foo<br>bar</p>"]
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
