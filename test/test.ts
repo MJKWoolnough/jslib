@@ -11116,7 +11116,10 @@ type Tests = {
 				["a\n<a h*#ref=\"hi\">", "<p>a\n&lt;a h*#ref=\"hi\"&gt;</p>"],
 				["a\n<a href=\"hi'> <a href=hi'>", "<p>a\n&lt;a href=\"hi'&gt; &lt;a href=hi'&gt;</p>"],
 				["a\n< a><\nfoo><bar/ >\n<foo bar=baz\nbim!bop />", "<p>a\n&lt; a&gt;&lt;\nfoo&gt;&lt;bar/ &gt;\n&lt;foo bar=baz\nbim!bop /&gt;</p>"],
-				["a\n<a href='bar'title=title>", "<p>a\n&lt;a href='bar'title=title&gt;</p>"]
+				["a\n<a href='bar'title=title>", "<p>a\n&lt;a href='bar'title=title&gt;</p>"],
+				["a\n</a></foo >", "<p>a\n</p>"],
+				["a\n</a href=\"foo\">", "<p>a\n&lt;/a href=\"foo\"&gt;</p>"],
+				["foo <!-- this is a\ncomment - with hyphen -->", "<p>foo <!-- this is a\ncomment - with hyphen --></p>"]
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
