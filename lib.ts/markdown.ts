@@ -498,19 +498,23 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	} else if (tk.accept("!")) {
 		if (tk.accept("-")) {
 			if (tk.accept("-")) {
-				while (true) {
-					if (!tk.exceptRun("-")) {
-						break;
-					}
+				tk.accept("-");
 
-					tk.next();
-
-					if (tk.accept("-")) {
-						if (tk.accept(">")) {
-							return tk.return(tokenHTML, parseText);
+				if (!tk.accept(">")) {
+					while (true) {
+						if (!tk.exceptRun("-")) {
+							break;
 						}
 
-						break;
+						tk.next();
+
+						if (tk.accept("-")) {
+							if (tk.accept(">")) {
+								return tk.return(tokenHTML, parseText);
+							}
+
+							break;
+						}
 					}
 				}
 			}
