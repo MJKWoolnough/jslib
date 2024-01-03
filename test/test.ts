@@ -11119,7 +11119,9 @@ type Tests = {
 				["a\n<a href='bar'title=title>", "<p>a\n&lt;a href='bar'title=title&gt;</p>"],
 				["a\n</a></foo >", "<p>a\n</p>"],
 				["a\n</a href=\"foo\">", "<p>a\n&lt;/a href=\"foo\"&gt;</p>"],
-				["foo <!-- this is a\ncomment - with hyphen -->", "<p>foo <!-- this is a\ncomment - with hyphen --></p>"]
+				["foo <!-- this is a\ncomment - with hyphen -->", "<p>foo <!-- this is a\ncomment - with hyphen --></p>"],
+				["foo <!-- not a comment -- two hyphens -->", "<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>"],
+				["foo <!--> foo -->\n\nfoo <!-- foo--->", "<p>foo &lt;!--&gt; foo --&gt;</p><p>foo &lt;!-- foo---&gt;</p>"]
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
