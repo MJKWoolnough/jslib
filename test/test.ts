@@ -11121,7 +11121,13 @@ type Tests = {
 				["a\n</a href=\"foo\">", "<p>a\n&lt;/a href=\"foo\"&gt;</p>"],
 				["foo <!-- this is a\ncomment - with hyphen -->", "<p>foo <!-- this is a\ncomment - with hyphen --></p>"],
 				["foo <!-- not a comment -- two hyphens -->", "<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>"],
-				["foo <!--> foo -->\n\nfoo <!-- foo--->", "<p>foo &lt;!--&gt; foo --&gt;</p><p>foo &lt;!-- foo---&gt;</p>"]
+				["foo <!--> foo -->\n\nfoo <!-- foo--->", "<p>foo &lt;!--&gt; foo --&gt;</p><p>foo &lt;!-- foo---&gt;</p>"],
+				["foo <?php echo $a; ?>", "<p>foo <!--?php echo $a; ?--></p>"],
+				["foo <!ELEMENT br EMPTY>", "<p>foo <!--ELEMENT br EMPTY--></p>"],
+				["foo <![CDATA[>&<]]>", "<p>foo <!--[CDATA[-->&amp;&lt;]]&gt;</p>"],
+				["foo <a href=\"&ouml;\">", "<p>foo <a href=\"ö\"></a></p>"],
+				["foo <a href=\"\\*\">", "<p>foo <a href=\"\\*\"></a></p>"],
+				["<a href=\"\\\"\">", "<p>&lt;a href=\"\"\"&gt;</p>"],
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
