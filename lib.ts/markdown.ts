@@ -495,6 +495,60 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				tk.backup();
 			}
 		}
+	} else if (tk.accept("!")) {
+		if (tk.accept("-")) {
+			if (tk.accept("-")) {
+				while (true) {
+					if (!tk.exceptRun("-")) {
+						break;
+					}
+
+					tk.next();
+
+					if (tk.accept("-")) {
+						if (tk.accept(">")) {
+							return tk.return(tokenHTML, parseText);
+						}
+
+						break;
+					}
+				}
+			}
+		} else if (tk.accept(letter)) {
+			if (tk.exceptRun(">") === ">") {
+				tk.next();
+
+				return tk.return(tokenHTML, parseText);
+			}
+		} else if (parseInOrder(tk, "[CDATA[")) {
+			while (true) {
+				if (!tk.exceptRun("]")) {
+					break;
+				}
+
+				tk.next();
+
+				if (tk.accept("]")) {
+					tk.acceptRun("]");
+
+					if (tk.accept(">")) {
+						return tk.return(tokenHTML, parseText);
+					}
+				}
+			}
+		}
+	} else if (tk.accept("?")) {
+		while (true) {
+			if (!tk.exceptRun("?")) {
+				break;
+			}
+
+			tk.next();
+
+			if (tk.accept(">")) {
+				return tk.return(tokenHTML, parseText);
+			}
+		}
 	}
 
 	tk.reset();
