@@ -11134,7 +11134,17 @@ type Tests = {
 				["foo\\\nbaz", "<p>foo<br>baz</p>"],
 				["foo       \nbaz", "<p>foo<br>baz</p>"],
 				["foo  \n     bar", "<p>foo<br>bar</p>"],
-				["foo\\\n     bar", "<p>foo<br>bar</p>"]
+				["foo\\\n     bar", "<p>foo<br>bar</p>"],
+				["*foo  \nbar*", "<p><em>foo<br>bar</em></p>"],
+				["*foo\\\nbar*", "<p><em>foo<br>bar</em></p>"],
+				["`code  \nspan`", "<p><code>code   span</code></p>"],
+				["`code\\\nspan`", "<p><code>code\\ span</code></p>"],
+				["a <a href=\"foo  \nbar\">", "<p>a <a href=\"foo  \nbar\"></a></p>"],
+				["a <a href=\"foo\\\nbar\">", "<p>a <a href=\"foo\\\nbar\"></a></p>"],
+				["foo\\", "<p>foo\\</p>"],
+				["foo  ", "<p>foo</p>"],
+				["### foo\\", "<h3>foo\\</h3>"],
+				["### foo  ", "<h3>foo</h3>"]
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
