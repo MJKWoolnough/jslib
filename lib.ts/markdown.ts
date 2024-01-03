@@ -730,9 +730,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			break;
 		default:
-			encoder.textContent = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data);
+			res += punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data).split(/ + \n|\\\n/g).map(t => {
+				encoder.textContent = t;
 
-			res += encoder.innerHTML;
+				return encoder.innerHTML;
+			}).join(tag(uid, "BR"));
 
 			break;
 		}
