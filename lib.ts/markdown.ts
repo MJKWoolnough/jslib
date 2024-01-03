@@ -730,7 +730,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			break;
 		default:
-			res += punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data).split(/ + \n|\\\n/g).map(t => {
+			res += punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data).replaceAll(/\n +/g, "\n").split(/ + \n|\\\n/g).map(t => {
 				encoder.textContent = t;
 
 				return encoder.innerHTML;
