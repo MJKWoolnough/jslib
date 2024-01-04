@@ -154,21 +154,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return null;
       },
-      parseInOrder = (tk: Tokeniser, order: string) => {
-	let parsed = 0;
-
-	for (const c of order) {
-		if (!tk.accept(c)) {
-			break;
-		}
-
-		parsed++;
-	}
-
-	return parsed;
-      },
       parseATXHeader = (tk: Tokeniser) => {
-	const level = parseInOrder(tk, "######");
+	const level = tk.acceptString("######");
 
 	if (level > 0 && (tk.accept(whiteSpace) || tk.peek() === "\n" || !tk.peek())) {
 		return new ATXHeadingBlock(tk, level);
@@ -207,28 +194,28 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return null;
       },
       parseHTML2 = (tk: Tokeniser) => {
-	if (parseInOrder(tk, "<!--") === 4) {
+	if (tk.acceptString("<!--") === 4) {
 		return new HTMLBlock(tk, 2);
 	}
 
 	return null;
       },
       parseHTML3 = (tk: Tokeniser) => {
-	if (parseInOrder(tk, "<?") === 2) {
+	if (tk.acceptString("<?") === 2) {
 		return new HTMLBlock(tk, 3);
 	}
 
 	return null;
       },
       parseHTML4 = (tk: Tokeniser) => {
-	if (parseInOrder(tk, "<!") === 2 && tk.accept(letter)) {
+	if (tk.acceptString("<!") === 2 && tk.accept(letter)) {
 		return new HTMLBlock(tk, 4);
 	}
 
 	return null;
       },
       parseHTML5 = (tk: Tokeniser) => {
-	if (parseInOrder(tk, "<![CDATA[") === 9) {
+	if (tk.acceptString("<![CDATA[") === 9) {
 		return new HTMLBlock(tk, 5);
 	}
 
@@ -317,7 +304,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return null;
       },
-      acceptThreeSpaces = (tk: Tokeniser) => parseInOrder(tk, "   "),
+      acceptThreeSpaces = (tk: Tokeniser) => tk.acceptString("   "),
       parseBlock: ((tk: Tokeniser, inParagraph: boolean) => Block | null)[] = [
 	parseIndentedCodeBlockStart,
 	parseBlockQuoteStart,
@@ -524,7 +511,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 				return tk.return(tokenHTML, parseText);
 			}
-		} else if (parseInOrder(tk, "[CDATA[")) {
+		} else if (tk.acceptString("[CDATA[")) {
 			while (true) {
 				if (!tk.exceptRun("]")) {
 					break;
@@ -1082,7 +1069,7 @@ class ListBlock extends ContainerBlock {
 	constructor(tk: Tokeniser) {
 		super();
 
-		parseInOrder(tk, "    ");
+		tk.acceptString("    ");
 
 		if (tk.peek() === " ") {
 			tk.backup();
@@ -1530,7 +1517,7 @@ class IndentedCodeBlock extends LeafBlock {
 				return false;
 			}
 		} else {
-			if (parseInOrder(tk, "    ") !== 4) {
+			if (tk.acceptString("    ") !== 4) {
 				if (this.#getBlankLine(tk)) {
 					return true;
 				}
