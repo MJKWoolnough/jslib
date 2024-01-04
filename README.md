@@ -2042,6 +2042,7 @@ A Tokeniser is a collection of methods that allow the easy parsing of a text str
 |----------|---------------|
 | accept | Adds the next character in the stream to the buffer if it is in the string provided. Returns true if a character was added. |
 | acceptRun | Successively adds characters in the stream to the buffer as long as are in the string provided. Returns the character that stopped the run. |
+| acceptString | Attempts to accept each character from the given string, in order, returning the number of characters accepted before a failure. |
 | acceptWord | Attempts to parse one of the words (string of characters) provided in the array. |
 | backup | Restores the state to before the last call to next() (either directly, or via accept, acceptWord, acceptRun, except, or exceptRun). |
 | constructor | Takes either a string or an iterator returning characters to construct a new Tokeniser. |
