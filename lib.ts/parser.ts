@@ -283,7 +283,14 @@ export class Tokeniser {
 		return accept(this, invalidChar, chars);
 	}
 
-	acceptString(str: string) {
+	/**
+	 * acceptString() attempts to accept each character from the given string, in order, returning the number of characters accepted before a failure.
+	 *
+	 * @param {string} str The ordered characters to be accepted.
+	 *
+	 * @return {number} Returns the number of characters accepted.
+	 */
+	acceptString(str: string): number {
 		let parsed = 0;
 
 		for (const c of str) {
