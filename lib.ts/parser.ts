@@ -283,6 +283,20 @@ export class Tokeniser {
 		return accept(this, invalidChar, chars);
 	}
 
+	acceptString(str: string) {
+		let parsed = 0;
+
+		for (const c of str) {
+			if (!this.accept(c)) {
+				break;
+			}
+
+			parsed++;
+		}
+
+		return parsed;
+	}
+
 	/**
 	 * acceptWord attempts to parse one of the words (string of characters) provided in the array.
 	 *
