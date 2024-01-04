@@ -11129,7 +11129,7 @@ type Tests = {
 				["foo <a href=\"\\*\">", "<p>foo <a href=\"\\*\"></a></p>"],
 				["<a href=\"\\\"\">", "<p>&lt;a href=\"\"\"&gt;</p>"],
 			],
-			"linebreaks": [
+			"hard line breaks": [
 				["foo  \nbaz", "<p>foo<br>baz</p>"],
 				["foo\\\nbaz", "<p>foo<br>baz</p>"],
 				["foo       \nbaz", "<p>foo<br>baz</p>"],
@@ -11145,6 +11145,10 @@ type Tests = {
 				["foo  ", "<p>foo</p>"],
 				["### foo\\", "<h3>foo\\</h3>"],
 				["### foo  ", "<h3>foo</h3>"]
+			],
+			"soft line breaks": [
+				["foo\nbaz", "<p>foo\nbaz</p>"],
+				["foo \n baz", "<p>foo\nbaz</p>"],
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
