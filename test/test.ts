@@ -11149,6 +11149,11 @@ type Tests = {
 			"soft line breaks": [
 				["foo\nbaz", "<p>foo\nbaz</p>"],
 				["foo \n baz", "<p>foo\nbaz</p>"],
+			],
+			"textual content": [
+				["hello $.;'there", "<p>hello $.;'there</p>"],
+				["Foo χρῆν", "<p>Foo χρῆν</p>"],
+				["Multiple     spaces", "<p>Multiple     spaces</p>"]
 			]
 		},
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
