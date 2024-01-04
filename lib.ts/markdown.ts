@@ -511,7 +511,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 				return tk.return(tokenHTML, parseText);
 			}
-		} else if (tk.acceptString("[CDATA[")) {
+		} else if (tk.acceptString("[CDATA[") === 7) {
 			while (true) {
 				if (!tk.exceptRun("]")) {
 					break;
