@@ -9784,6 +9784,26 @@ type Tests = {
 					return read === "12345";
 				}
 			},
+			"acceptString": {
+				"123": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("1234567890", p => p.return(p.acceptString("123"))).next().value;
+
+					return tk.type === 3 && tk.data === "123";
+				},
+				"456": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("1234567890", p => p.return(p.acceptString("456"))).next().value;
+
+					return tk.type === 0 && tk.data === "";
+				},
+				"124": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("1234567890", p => p.return(p.acceptString("124"))).next().value;
+
+					return tk.type === 2 && tk.data === "12";
+				}
+			},
 			"acceptWord": {
 				"123": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
