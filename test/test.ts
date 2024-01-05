@@ -11136,7 +11136,12 @@ type Tests = {
 				["<http://../>", "<p><a href=\"http://../\">http://../</a></p>"],
 				["<localhost:5001/foo>", "<p><a href=\"localhost:5001/foo\">localhost:5001/foo</a></p>"],
 				["<http://foo.bar/baz bim>", "<p>&lt;http://foo.bar/baz bim&gt;</p>"],
-				["<http://example.com/\\[\\>", "<p><a href=\"http://example.com/\\\\[\\\\\">http://example.com/\\[\\</a></p>"]
+				["<http://example.com/\\[\\>", "<p><a href=\"http://example.com/\\\\[\\\\\">http://example.com/\\[\\</a></p>"],
+				["<foo@bar.example.com>", "<p><a href=\"mailto:foo@bar.example.com\">foo@bar.example.com</a></p>"],
+				["<foo+special@Bar.baz-bar0.com>", "<p><a href=\"mailto:foo+special@Bar.baz-bar0.com\">foo+special@Bar.baz-bar0.com</a></p>"],
+				["<foo\\+@bar.example.com>", "<p>&lt;foo+@bar.example.com&gt;</p>"],
+				["<>", "<p>&lt;&gt;</p>"],
+				["< http://foo.bar >", "<p>&lt; http://foo.bar &gt;</p>"]
 			],
 			"HTML": [
 				["a\n<a><bab><c2c>", "<p>a\n<a><bab><c2c></c2c></bab></a></p>"],
