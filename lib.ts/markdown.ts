@@ -236,63 +236,87 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return null;
       },
-      parseHTML7 = (tk: Tokeniser, inParagraph: boolean) => {
-	if (!inParagraph && tk.accept("<")) {
-		if (tk.accept("/") && tk.accept(letter)) {
-			tk.acceptRun(letter + number + "-");
+      isTag = (tk: Tokeniser) => {
+	if (tk.accept("/") && tk.accept(letter)) {
+		tk.acceptRun(letter + number + "-");
+		tk.acceptRun(whiteSpace);
+
+		if (tk.accept("\n")) {
 			tk.acceptRun(whiteSpace);
+		}
 
-			if (tk.accept("\n")) {
-				tk.acceptRun(whiteSpace);
-			}
+		return tk.accept(">");
+	} else if (tk.accept(letter)) {
+		tk.acceptRun(letter + number + "-");
 
-			if (tk.accept(">")) {
-				return new HTMLBlock(tk, 7);
-			}
-		} else if (tk.accept(letter)) {
-			tk.acceptRun(letter + number + "-");
+		while (true) {
+			let hasSpace = true;
 
-			while (true) {
+			if (tk.accept(whiteSpace)) {
 				tk.acceptRun(whiteSpace);
 				tk.accept("\n");
 				tk.acceptRun(whiteSpace);
+			} else if (tk.accept("\n")) {
+				tk.acceptRun(whiteSpace);
+			} else {
+				hasSpace = false;
+			}
 
-				if (tk.accept("/")) {
-					if (tk.accept(">")) {
-						return new HTMLBlock(tk, 7);
+			if (tk.accept("/")) {
+				if (tk.accept(">")) {
+					return true;
+				}
+
+				break;
+			} else if (tk.accept(">")) {
+				return true;
+			} else if (!hasSpace || !tk.accept(letter + "_:")) {
+				break;
+			}
+
+			tk.acceptRun(letter + number + "_.:-");
+
+			hasSpace = true;
+
+			if (tk.accept(whiteSpace)) {
+				tk.acceptRun(whiteSpace);
+				tk.accept("\n");
+				tk.acceptRun(whiteSpace);
+			} else if (tk.accept("\n")) {
+				tk.acceptRun(whiteSpace);
+			} else {
+				hasSpace = false;
+			}
+
+			if (tk.accept("=")) {
+				tk.acceptRun(whiteSpace);
+
+				if (tk.accept("'")) {
+					tk.exceptRun("'");
+					if (!tk.accept("'")) {
+						break;
 					}
-
-					return null;
-				} else if (tk.accept(">")) {
-					return new HTMLBlock(tk, 7);
-				} else if (!tk.accept(letter + "_:")) {
+				} else if (tk.accept('"')) {
+					tk.exceptRun('"');
+					if (!tk.accept('"')) {
+						break;
+					}
+				} else if (tk.accept(whiteSpace + "\n\"'=<>`")) {
 					break;
+				} else {
+					tk.exceptRun(whiteSpace + "\n\"'=<>`");
 				}
-
-				tk.acceptRun(letter + number + "_.:-");
-				tk.acceptRun(whiteSpace);
-				tk.accept("\n");
-				tk.acceptRun(whiteSpace);
-
-				if (tk.accept("=")) {
-					if (tk.accept("'")) {
-						tk.exceptRun("'");
-						if (!tk.accept("'")) {
-							break;
-						}
-					} else if (tk.accept('"')) {
-						tk.exceptRun('"');
-						if (!tk.accept('"')) {
-							break;
-						}
-					} else if (tk.accept(whiteSpace + "\"'=<>`")) {
-						return null;
-					} else {
-						tk.exceptRun(whiteSpace + "\"'=<>`");
-					}
-				}
+			} else if (hasSpace) {
+				tk.backup();
 			}
 		}
+	}
+
+	return false;
+      },
+      parseHTML7 = (tk: Tokeniser, inParagraph: boolean) => {
+	if (!inParagraph && tk.accept("<") && isTag(tk)) {
+		return new HTMLBlock(tk, 7);
 	}
 
 	return null;
@@ -413,82 +437,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       parseHTML = (tk: Tokeniser) => {
 	tk.next();
 
-	if (tk.accept("/") && tk.accept(letter)) {
-		tk.acceptRun(letter + number + "-");
-		tk.acceptRun(whiteSpace);
-
-		if (tk.accept("\n")) {
-			tk.acceptRun(whiteSpace);
-		}
-
-		if (tk.accept(">")) {
-			return tk.return(tokenHTML, parseText);
-		}
-	} else if (tk.accept(letter)) {
-		tk.acceptRun(letter + number + "-");
-
-		while (true) {
-			let hasSpace = true;
-
-			if (tk.accept(whiteSpace)) {
-				tk.acceptRun(whiteSpace);
-				tk.accept("\n");
-				tk.acceptRun(whiteSpace);
-			} else if (tk.accept("\n")) {
-				tk.acceptRun(whiteSpace);
-			} else {
-				hasSpace = false;
-			}
-
-			if (tk.accept("/")) {
-				if (tk.accept(">")) {
-					return tk.return(tokenHTML, parseText);
-				}
-
-				break;
-			} else if (tk.accept(">")) {
-				return tk.return(tokenHTML, parseText);
-			} else if (!hasSpace || !tk.accept(letter + "_:")) {
-				break;
-			}
-
-			tk.acceptRun(letter + number + "_.:-");
-
-			hasSpace = true;
-
-			if (tk.accept(whiteSpace)) {
-				tk.acceptRun(whiteSpace);
-				tk.accept("\n");
-				tk.acceptRun(whiteSpace);
-			} else if (tk.accept("\n")) {
-				tk.acceptRun(whiteSpace);
-			} else {
-				hasSpace = false;
-			}
-
-			if (tk.accept("=")) {
-				tk.acceptRun(whiteSpace);
-
-				if (tk.accept("'")) {
-					tk.exceptRun("'");
-					if (!tk.accept("'")) {
-						break;
-					}
-				} else if (tk.accept('"')) {
-					tk.exceptRun('"');
-					if (!tk.accept('"')) {
-						break;
-					}
-				} else if (tk.accept(whiteSpace + "\n\"'=<>`")) {
-					break;
-				} else {
-					tk.exceptRun(whiteSpace + "\n\"'=<>`");
-				}
-			} else if (hasSpace) {
-				tk.backup();
-			}
-		}
-	} else if (tk.accept("!")) {
+	if (tk.accept("!")) {
 		if (tk.accept("-")) {
 			if (tk.accept("-")) {
 				tk.accept("-");
@@ -546,6 +495,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				return tk.return(tokenHTML, parseText);
 			}
 		}
+	} else if (isTag(tk)) {
+		return tk.return(tokenHTML, parseText);
 	}
 
 	tk.reset();
