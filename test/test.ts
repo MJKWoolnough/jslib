@@ -11126,6 +11126,18 @@ type Tests = {
 				//["**a<http://foo.bar/?q=**>", "<p>**a<a href=\"http://foo.bar?q=**\">http://foo.bar/?q=**</a></p>"],
 				//["__a<http://foo.bar/?q=__>", "<p>__a<a href=\"http://foo.bar?q=__\">http://foo.bar/?q=__</a></p>"]
 			],
+			"autolinks": [
+				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
+				["<http://foo.bar.baz/test?q=hello&id=22&boolean>", "<p><a href=\"http://foo.bar.baz/test?q=hello&amp;id=22&amp;boolean\">http://foo.bar.baz/test?q=hello&amp;id=22&amp;boolean</a></p>"],
+				["<irc://foo.bar:2233/baz>", "<p><a href=\"irc://foo.bar:2233/baz\">irc://foo.bar:2233/baz</a></p>"],
+				["<MAILTO:FOO@BAR.BAZ>", "<p><a href=\"MAILTO:FOO@BAR.BAZ\">MAILTO:FOO@BAR.BAZ</a></p>"],
+				["<a+b+c:d>", "<p><a href=\"a+b+c:d\">a+b+c:d</a></p>"],
+				["<made-up-scheme://foo,bar>", "<p><a href=\"made-up-scheme://foo,bar\">made-up-scheme://foo,bar</a></p>"],
+				["<http://../>", "<p><a href=\"http://../\">http://../</a></p>"],
+				["<localhost:5001/foo>", "<p><a href=\"localhost:5001/foo\">localhost:5001/foo</a></p>"],
+				["<http://foo.bar/baz bim>", "<p>&lt;http://foo.bar/baz bim&gt;</p>"],
+				["<http://example.com/\\[\\>", "<p><a href=\"http://example.com/\\\\[\\\\\">http://example.com/\\[\\</a></p>"]
+			],
 			"HTML": [
 				["a\n<a><bab><c2c>", "<p>a\n<a><bab><c2c></c2c></bab></a></p>"],
 				["a\n<a/><b2/>", "<p>a\n<a><b2></b2></a></p>"],
