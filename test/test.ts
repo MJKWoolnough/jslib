@@ -11142,7 +11142,10 @@ type Tests = {
 				["<foo\\+@bar.example.com>", "<p>&lt;foo+@bar.example.com&gt;</p>"],
 				["<>", "<p>&lt;&gt;</p>"],
 				["< http://foo.bar >", "<p>&lt; http://foo.bar &gt;</p>"],
-				["<m:abc>", "<p>&lt;m:abc&gt;</p>"]
+				["<m:abc>", "<p>&lt;m:abc&gt;</p>"],
+				["<foo.bar.baz>", "<p>&lt;foo.bar.baz&gt;</p>"],
+				["http://example.com", "<p>http://example.com</p>"],
+				["foo@bar.example.com", "<p>foo@bar.example.com</p>"]
 			],
 			"HTML": [
 				["a\n<a><bab><c2c>", "<p>a\n<a><bab><c2c></c2c></bab></a></p>"],
