@@ -54,7 +54,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"orderedList": (start: string, c: DocumentFragment) => makeNode("ol", start ? {start} : {}, c),
 	"allowedHTML": null,
 	"thematicBreaks": () => makeNode("hr"),
-	"link": (href: string, title: string, c: DocumentFragment) => makeNode("a", {href, title}, c),
+	"link": (href: string, title: string, c: DocumentFragment) => makeNode("a", title ? {href, title} : {href}, c),
 	"image": (src: string, title: string, alt: string) => makeNode("img", {src, title, alt}),
 	"break": () => makeNode("br")
       } as any as Tags),
