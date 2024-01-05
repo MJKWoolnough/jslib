@@ -63,6 +63,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       number = "0123456789",
       scheme = letter + number + "+.-",
       control = Array.from({"length": 31}).reduce((t, _, n) => t + String.fromCharCode(n), String.fromCharCode(127)),
+      emailStart = letter + number + "!#$&&'*+-/=?^_`{|}~.",
+      emailLabelStr = letter + number + "-",
       htmlElements = ["pre", "script", "style", "textarea", "address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"],
       type1Elements = htmlElements.slice(0, 4),
       parseIndentedCodeBlockStart = (tk: Tokeniser, inParagraph: boolean) => {
@@ -335,6 +337,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenParenClose = 8,
       tokenHTML = 9,
       tokenAutoLink = 10,
+      tokenAutoEmail = 11,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
 		switch (tk.exceptRun("\\`*_![()<")) {
@@ -563,6 +566,40 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	}
 
 	tk.reset();
+
+	return parseEmailAutolink(tk);
+      },
+      parseEmailAutolink = (tk: Tokeniser) => {
+	tk.next();
+
+	if (tk.accept(emailStart)) {
+		tk.acceptRun(emailStart);
+
+		if (tk.accept("@")) {
+			let good = true;
+
+			do {
+				if (!tk.accept(number + letter)) {
+					good = false;
+
+					break;
+				}
+
+				tk.acceptRun(emailLabelStr);
+				tk.backup();
+
+				if (!tk.accept(number + letter)) {
+					good = false;
+				}
+			} while (tk.accept("."));
+
+			if (good && tk.accept(">")) {
+				return tk.return(tokenAutoEmail, parseText);
+			}
+		}
+	}
+
+	tk.reset();
 	tk.next();
 
 	return parseText(tk);
@@ -740,6 +777,12 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			const href = tk.data.slice(1, -1);
 
 			res += tag(uid, "A", href, ["href", href]);
+
+			break;
+		case tokenAutoEmail:
+			const email = tk.data.slice(1, -1);
+
+			res += tag(uid, "A", email, ["href", "mailto:" + email]);
 
 			break;
 		default:
