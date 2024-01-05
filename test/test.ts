@@ -11141,7 +11141,8 @@ type Tests = {
 				["<foo+special@Bar.baz-bar0.com>", "<p><a href=\"mailto:foo+special@Bar.baz-bar0.com\">foo+special@Bar.baz-bar0.com</a></p>"],
 				["<foo\\+@bar.example.com>", "<p>&lt;foo+@bar.example.com&gt;</p>"],
 				["<>", "<p>&lt;&gt;</p>"],
-				["< http://foo.bar >", "<p>&lt; http://foo.bar &gt;</p>"]
+				["< http://foo.bar >", "<p>&lt; http://foo.bar &gt;</p>"],
+				["<m:abc>", "<p>&lt;m:abc&gt;</p>"]
 			],
 			"HTML": [
 				["a\n<a><bab><c2c>", "<p>a\n<a><bab><c2c></c2c></bab></a></p>"],
