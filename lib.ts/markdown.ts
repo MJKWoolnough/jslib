@@ -555,7 +555,188 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return parseText(tk);
       },
-      processLinkImage = (_uid: string, _tokens: Token[], _start: number, _end: number) => {
+      emptyToken = {"type": tokenText, "data": ""},
+      processLinkImage = (uid: string, stack: Token[], start: number, end: number) => {
+	if (stack[start].type === tokenLinkOpen && stack[end+1]?.type === tokenParenOpen) {
+		let pos = end + 2,
+		    c = 0,
+		    hasDest = true,
+		    hasTitle = true,
+		    dest = "",
+		    title = "";
+
+		const tk = new Tokeniser({"next": () => {
+			if (c > stack[pos].data.length) {
+				pos++;
+				c = 0;
+			}
+
+			switch (stack[pos].type) {
+			case tokenCode:
+			case tokenAutoLink:
+			case tokenAutoEmail:
+			case tokenHTML:
+				return {"value": "", "done": false};
+			}
+
+			return {"value": stack[pos].data[c++], "done": false};
+		      }});
+
+		tk.acceptRun(whiteSpace);
+
+		if (tk.accept("\n")) {
+			tk.acceptRun(whiteSpace);
+		}
+
+		if (tk.accept("<")) {
+			tk.get();
+
+			Loop:
+			while (true) {
+				switch (tk.exceptRun("\n\\<>")) {
+				case '\\':
+					tk.next();
+					tk.next();
+
+					break;
+				case '>':
+					dest = tk.get();
+
+					tk.next();
+
+					break Loop;
+				default:
+					return false;
+				}
+			}
+		} else if (tk.peek() !== "\"" && tk.peek() !== "'") {
+			tk.get();
+
+			let paren = 0;
+
+			Loop:
+			while (true) {
+				switch (tk.exceptRun(control + " \\()")) {
+				case '\\':
+					tk.next();
+					tk.next();
+
+					break;
+				case '(':
+					tk.next();
+
+					paren++;
+
+					break;
+				case ')':
+					if (!paren) {
+						hasTitle = true;
+
+						dest = tk.get();
+
+						tk.next();
+
+						break Loop;
+					}
+
+					tk.next();
+
+					paren--;
+
+					break;
+				default:
+					dest = tk.get();
+
+					break Loop;
+				}
+			}
+		} else {
+			hasDest = false;
+		}
+
+		if (!hasTitle) {
+			if (hasDest) {
+				tk.acceptRun(whiteSpace);
+
+				if (tk.accept("\n")) {
+					tk.acceptRun(whiteSpace);
+				}
+			}
+
+			const next = tk.peek();
+
+			switch (next) {
+			case ')':
+				tk.next();
+
+				break;
+			case '"':
+			case '\'':
+			case '(':
+				let paren = 0;
+
+				tk.next();
+
+				Loop:
+				while (true) {
+					switch (tk.exceptRun(next === "(" ? "()\\" : "\\" + next)) {
+					case '\\':
+						tk.next();
+						tk.next();
+
+						break;
+					case '(':
+						tk.next();
+
+						paren++;
+
+						break;
+					case '"':
+					case '\'':
+						title = tk.get();
+
+						tk.next();
+
+						break Loop;
+					case ')':
+						if (!paren) {
+							title = tk.get();
+
+							tk.next();
+
+							break Loop;
+						}
+
+						tk.next();
+
+						paren--;
+					}
+				}
+			default:
+				return false;
+			}
+
+		}
+
+		processEmphasis(uid, stack, start + 1, end - 1)
+
+		stack[start] = {
+			"type": tokenHTML,
+			"data": openTag(uid, "A", false, ["href", dest], ["title", title]),
+		};
+
+		stack[end] = {
+			"type": tokenHTML,
+			"data": closeTag("A")
+		}
+
+		for (let tk = pos + 1; tk <= pos; tk++) {
+			stack[tk] = emptyToken;
+		}
+
+		return true;
+	}
+
 	return false;
       },
       processLinksAndImages = (uid: string, stack: Token[]) => {
@@ -840,12 +1021,12 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return df;
       },
-      openTag = (uid: string, name: string, close = false, attr?: [string, string]) => `<${name} ${uid}="" ${attr ? ` ${attr[0]}=${JSON.stringify(attr[1])}` : ""}` + (close ? " />" : ">"),
+      openTag = (uid: string, name: string, close = false, ...attr: [string, string][]) => `<${name} ${uid}="" ${attr.reduce((t, [p, v]) => t + ` ${p}=${JSON.stringify(v)}`, "")}` + (close ? " />" : ">"),
       closeTag = (name: string) => `</${name}>`,
-      tag = (uid: string, name: string, contents?: string, attr?: [string, string]) => {
+      tag = (uid: string, name: string, contents?: string, ...attr: [string, string][]) => {
 		const close = contents === undefined;
 
-		return openTag(uid, name, close, attr) + (close ? "" : contents + closeTag(name));
+		return openTag(uid, name, close, ...attr) + (close ? "" : contents + closeTag(name));
       },
       isOpenParagraph = (b?: Block): b is ParagraphBlock => b instanceof ParagraphBlock && b.open,
       isLastGrandChildOpenParagraph = (b?: Block): boolean => b instanceof ContainerBlock ? isLastGrandChildOpenParagraph(b.children.at(-1)) : b instanceof ParagraphBlock ? b.open : false,
@@ -1247,7 +1428,7 @@ class ListBlock extends ContainerBlock {
 			}
 		}
 
-		let attr: [string, string] | undefined = undefined,
+		let attr: [string, string][] = [],
 		    type = "UL";
 
 		switch (this.#marker) {
@@ -1261,11 +1442,11 @@ class ListBlock extends ContainerBlock {
 			type = "OL";
 
 			if (start !== "1") {
-				attr = ["start", start];
+				attr.push(["start", start]);
 			}
 		}
 
-		return tag(uid, type, super.toHTML(uid), attr);
+		return tag(uid, type, super.toHTML(uid), ...attr);
 	}
 }
 
