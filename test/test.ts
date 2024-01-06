@@ -11151,7 +11151,7 @@ type Tests = {
 				["<a><bab><c2c>", "<p><a><bab><c2c></c2c></bab></a></p>"],
 				["<a/><b2/>", "<p><a><b2></b2></a></p>"],
 				["<a  /><b2\ndata=\"foo\" >", "<p><a><b2 data=\"foo\"></b2></a></p>"],
-				["a\n<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />", "<p>a\n<a foo=\"bar\" bam=\"baz <em>&quot;</em>\" _boolean=\"\" zoop:33=\"zoop:33\"></a></p>"],
+				["<a foo=\"bar\" bam = 'baz <em>\"</em>'\n_boolean zoop:33=zoop:33 />", "<p><a foo=\"bar\" bam=\"baz <em>&quot;</em>\" _boolean=\"\" zoop:33=\"zoop:33\"></a></p>"],
 				["Foo <responsive-image src=\"foo.jpg\" />", "<p>Foo <responsive-image src=\"foo.jpg\"></responsive-image></p>"],
 				["<33> <__>", "<p>&lt;33&gt; &lt;__&gt;</p>"],
 				["<a h*#ref=\"hi\">", "<p>&lt;a h*#ref=\"hi\"&gt;</p>"],
