@@ -730,7 +730,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			"data": closeTag("A")
 		}
 
-		for (let tk = pos + 1; tk <= pos; tk++) {
+		for (let tk = end + 1; tk <= pos; tk++) {
 			stack[tk] = emptyToken;
 		}
 
