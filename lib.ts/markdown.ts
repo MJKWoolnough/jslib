@@ -236,12 +236,12 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return null;
       },
-      isTag = (tk: Tokeniser) => {
+      isTag = (tk: Tokeniser, multiline = false) => {
 	if (tk.accept("/") && tk.accept(letter)) {
 		tk.acceptRun(letter + number + "-");
 		tk.acceptRun(whiteSpace);
 
-		if (tk.accept("\n")) {
+		if (multiline && tk.accept("\n")) {
 			tk.acceptRun(whiteSpace);
 		}
 
@@ -256,7 +256,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				tk.acceptRun(whiteSpace);
 				tk.accept("\n");
 				tk.acceptRun(whiteSpace);
-			} else if (tk.accept("\n")) {
+			} else if (multiline && tk.accept("\n")) {
 				tk.acceptRun(whiteSpace);
 			} else {
 				hasSpace = false;
@@ -282,7 +282,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				tk.acceptRun(whiteSpace);
 				tk.accept("\n");
 				tk.acceptRun(whiteSpace);
-			} else if (tk.accept("\n")) {
+			} else if (multiline && tk.accept("\n")) {
 				tk.acceptRun(whiteSpace);
 			} else {
 				hasSpace = false;
@@ -495,7 +495,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				return tk.return(tokenHTML, parseText);
 			}
 		}
-	} else if (isTag(tk)) {
+	} else if (isTag(tk, true)) {
 		return tk.return(tokenHTML, parseText);
 	}
 
