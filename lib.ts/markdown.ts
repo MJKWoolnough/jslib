@@ -561,7 +561,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		let pos = end + 2,
 		    c = 0,
 		    hasDest = true,
-		    hasTitle = true,
+		    hasTitle = false,
 		    dest = "",
 		    title = "";
 
@@ -634,8 +634,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 						dest = tk.get();
 
-						tk.next();
-
 						break Loop;
 					}
 
@@ -654,15 +652,15 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			hasDest = false;
 		}
 
-		if (!hasTitle) {
-			if (hasDest) {
+		if (hasDest) {
+			tk.acceptRun(whiteSpace);
+
+			if (tk.accept("\n")) {
 				tk.acceptRun(whiteSpace);
-
-				if (tk.accept("\n")) {
-					tk.acceptRun(whiteSpace);
-				}
 			}
+		}
 
+		if (!hasTitle) {
 			const next = tk.peek();
 
 			switch (next) {
@@ -676,6 +674,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				let paren = 0;
 
 				tk.next();
+				tk.get();
 
 				Loop:
 				while (true) {
@@ -702,21 +701,32 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 						if (!paren) {
 							title = tk.get();
 
-							tk.next();
-
 							break Loop;
 						}
 
 						tk.next();
 
 						paren--;
+
+						break;
+					default:
+						return false;
 					}
 				}
+
+				break;
 			default:
 				return false;
 			}
 
+			tk.acceptRun(whiteSpace);
+
+			if (tk.accept("\n")) {
+				tk.acceptRun(whiteSpace);
+			}
 		}
+
+		tk.next();
 
 		processEmphasis(uid, stack, start + 1, end - 1)
 
