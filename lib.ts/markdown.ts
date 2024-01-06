@@ -315,7 +315,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return false;
       },
       parseHTML7 = (tk: Tokeniser, inParagraph: boolean) => {
-	if (!inParagraph && tk.accept("<") && isTag(tk)) {
+	if (!inParagraph && tk.accept("<") && isTag(tk) && (!tk.acceptRun(whiteSpace) || tk.accept("\n"))) {
 		return new HTMLBlock(tk, 7);
 	}
 
