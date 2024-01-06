@@ -559,12 +559,13 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return false;
       },
       processLinksAndImages = (uid: string, stack: Token[]) => {
-	for (let i = 0; i < stack.length; i++) {
+	for (let i = 2; i < stack.length; i++) {
 		const closeTK = stack[i];
 
 		if (closeTK.type === tokenLinkClose) {
 			let closeOpenLinks = false;
-			for (let j = i; j >= 0; j--) {
+
+			for (let j = i - 1; j >= 0; j--) {
 				const openTK = stack[j];
 
 				if (closeOpenLinks) {
@@ -572,11 +573,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 						openTK.type = tokenText;
 					}
 				} else if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
-					if (!processLinkImage(uid, stack, j, i + 1)) {
+					if (!processLinkImage(uid, stack, j, i)) {
 						openTK.type = tokenText;
 					}
 
-					if (openTK.type == tokenImageOpen) {
+					if (openTK.type === tokenImageOpen) {
 						break;
 					}
 
