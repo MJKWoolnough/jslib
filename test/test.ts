@@ -11158,7 +11158,7 @@ type Tests = {
 				["<a href=\"hi'> <a href=hi'>", "<p>&lt;a href=\"hi'&gt; &lt;a href=hi'&gt;</p>"],
 				["< a><\nfoo><bar/ >\n<foo bar=baz\nbim!bop />", "<p>&lt; a&gt;&lt;\nfoo&gt;&lt;bar/ &gt;\n&lt;foo bar=baz\nbim!bop /&gt;</p>"],
 				["<a href='bar'title=title>", "<p>&lt;a href='bar'title=title&gt;</p>"],
-				["a\n</a></foo >", "<p>a\n</p>"],
+				["</a></foo >", "<p></p>"],
 				["</a href=\"foo\">", "<p>&lt;/a href=\"foo\"&gt;</p>"],
 				["foo <!-- this is a\ncomment - with hyphen -->", "<p>foo <!-- this is a\ncomment - with hyphen --></p>"],
 				["foo <!-- not a comment -- two hyphens -->", "<p>foo &lt;!-- not a comment -- two hyphens --&gt;</p>"],
