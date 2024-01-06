@@ -364,7 +364,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenAutoEmail = 11,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
-		switch (tk.exceptRun("\\`*_![()<")) {
+		switch (tk.exceptRun("\\`*_![]()<")) {
 		case '\\':
 			tk.next();
 			tk.next();
