@@ -559,7 +559,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	if (stack[start].type === tokenLinkOpen && stack[end+1]?.type === tokenParenOpen) {
 		let pos = end + 2,
 		    c = 0,
-		    hasDest = true,
 		    hasTitle = false,
 		    dest = "",
 		    title = "";
@@ -608,7 +607,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					return false;
 				}
 			}
-		} else if (tk.peek() !== "\"" && tk.peek() !== "'") {
+		} else {
 			tk.get();
 
 			let paren = 0;
@@ -647,16 +646,12 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					break Loop;
 				}
 			}
-		} else {
-			hasDest = false;
 		}
 
-		if (hasDest) {
-			tk.acceptRun(whiteSpace);
+		tk.acceptRun(whiteSpace);
 
-			if (tk.accept("\n")) {
-				tk.acceptRun(whiteSpace);
-			}
+		if (tk.accept("\n")) {
+			tk.acceptRun(whiteSpace);
 		}
 
 		if (!hasTitle) {
