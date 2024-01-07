@@ -565,12 +565,12 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		    title = "";
 
 		const tk = new Tokeniser({"next": () => {
-			if (c > stack[pos].data.length) {
+			if (c > stack[pos]?.data.length) {
 				pos++;
 				c = 0;
 			}
 
-			switch (stack[pos].type) {
+			switch (stack[pos]?.type) {
 			case tokenCode:
 			case tokenAutoLink:
 			case tokenAutoEmail:
@@ -578,7 +578,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				return {"value": "", "done": false};
 			}
 
-			return {"value": stack[pos].data[c++], "done": false};
+			return {"value": stack[pos]?.data[c++] ?? "", "done": false};
 		      }});
 
 		tk.acceptRun(whiteSpace);
