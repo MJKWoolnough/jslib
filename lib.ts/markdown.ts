@@ -565,7 +565,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		    title = "";
 
 		const tk = new Tokeniser({"next": () => {
-			if (c > stack[pos]?.data.length) {
+			if (c >= stack[pos]?.data.length) {
 				pos++;
 				c = 0;
 			}
