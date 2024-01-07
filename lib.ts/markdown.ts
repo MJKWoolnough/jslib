@@ -555,7 +555,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return parseText(tk);
       },
-      emptyToken = {"type": tokenText, "data": ""},
       processLinkImage = (uid: string, stack: Token[], start: number, end: number) => {
 	if (stack[start].type === tokenLinkOpen && stack[end+1]?.type === tokenParenOpen) {
 		let pos = end + 2,
@@ -740,9 +739,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			"data": closeTag("A")
 		}
 
-		for (let tk = end + 1; tk <= pos; tk++) {
-			stack[tk] = emptyToken;
-		}
+		stack.splice(end + 1, pos - end);
 
 		return true;
 	}
