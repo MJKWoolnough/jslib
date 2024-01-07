@@ -731,7 +731,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 		stack[start] = {
 			"type": tokenHTML,
-			"data": openTag(uid, "A", false, ["href", dest], ["title", title]),
+			"data": openTag(uid, "A", false, ["href", processEscapedPunctuation(dest)], ["title", title]),
 		};
 
 		stack[end] = {
@@ -889,6 +889,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 	}
       },
+      processEscapedPunctuation = (text: string) => punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text),
       parseInline = (uid: string, text: string) => {
 	const stack = Parser(text, parseText, p => {
 		p.exceptRun(TokenDone);
@@ -926,7 +927,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			break;
 		default:
-			res += punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), tk.data).replaceAll(/\n +/g, "\n").split(/ + \n|\\\n/g).map(t => {
+			res += processEscapedPunctuation(tk.data).replaceAll(/\n +/g, "\n").split(/ + \n|\\\n/g).map(t => {
 				encoder.textContent = t.replaceAll(/ +\n/g, "\n");
 
 				return encoder.innerHTML;
