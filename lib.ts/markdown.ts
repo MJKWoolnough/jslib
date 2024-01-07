@@ -747,7 +747,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return false;
       },
       processLinksAndImages = (uid: string, stack: Token[]) => {
-	for (let i = 2; i < stack.length; i++) {
+	for (let i = 1; i < stack.length; i++) {
 		const closeTK = stack[i];
 
 		if (closeTK.type === tokenLinkClose) {
