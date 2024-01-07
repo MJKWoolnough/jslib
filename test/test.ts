@@ -11128,7 +11128,8 @@ type Tests = {
 			],
 			"links": [
 				["[link](/uri \"title\")", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
-				["[link](/uri)", "<p><a href=\"/uri\">link</a></p>"]
+				["[link](/uri)", "<p><a href=\"/uri\">link</a></p>"],
+				["[](./target.md)", "<p><a href=\"./target.md\"></a></p>"]
 			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
