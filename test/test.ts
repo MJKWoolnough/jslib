@@ -11139,7 +11139,8 @@ type Tests = {
 				["[link](<foo\nbar>)", "<p>[link](<foo bar=\"\">)</foo></p>"],
 				["[a](<b)c>)", "<p><a href=\"b)c\">a</a></p>"],
 				["[link](<foo\\>)", "<p>[link](&lt;foo&gt;)</p>"],
-				["[a](<b)c\n[a](<b)c>\n[a](<b>c)", "<p>[a](&lt;b)c\n[a](&lt;b)c&gt;\n[a](<b>c)</b></p>"]
+				["[a](<b)c\n[a](<b)c>\n[a](<b>c)", "<p>[a](&lt;b)c\n[a](&lt;b)c&gt;\n[a](<b>c)</b></p>"],
+				["[link](\\(foo\\))", "<p><a href=\"(foo)\">link</a></p>"]
 			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
