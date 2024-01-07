@@ -11129,7 +11129,17 @@ type Tests = {
 			"links": [
 				["[link](/uri \"title\")", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
 				["[link](/uri)", "<p><a href=\"/uri\">link</a></p>"],
-				["[](./target.md)", "<p><a href=\"./target.md\"></a></p>"]
+				["[](./target.md)", "<p><a href=\"./target.md\"></a></p>"],
+				["[link]()", "<p><a href=\"\">link</a></p>"],
+				["[link](<>)", "<p><a href=\"\">link</a></p>"],
+				["[]()", "<p><a href=\"\"></a></p>"],
+				["[link](/my uri)", "<p>[link](/my uri)</p>"],
+				["[link](</my uri>)", "<p><a href=\"/my uri\">link</a></p>"],
+				["[link](foo\nbar)", "<p>[link](foo\nbar)</p>"],
+				["[link](<foo\nbar>)", "<p>[link](<foo bar=\"\">)</foo></p>"],
+				["[a](<b)c>)", "<p><a href=\"b)c\">a</a></p>"],
+				["[link](<foo\\>)", "<p>[link](&lt;foo&gt;)</p>"],
+				["[a](<b)c\n[a](<b)c>\n[a](<b>c)", "<p>[a](&lt;b)c\n[a](&lt;b)c&gt;\n[a](<b>c)</b></p>"]
 			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
