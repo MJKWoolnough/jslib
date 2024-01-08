@@ -659,8 +659,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			switch (next) {
 			case ')':
-				tk.next();
-
 				break;
 			case '"':
 			case '\'':
@@ -722,7 +720,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			}
 		}
 
-		tk.next();
+		if (!tk.accept(")")) {
+			return false;
+		}
 
 		processEmphasis(uid, stack, start + 1, end - 1)
 
