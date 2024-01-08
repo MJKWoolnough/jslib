@@ -748,25 +748,19 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		const closeTK = stack[i];
 
 		if (closeTK.type === tokenLinkClose) {
-			let closeOpenLinks = false;
-
 			for (let j = i - 1; j >= 0; j--) {
 				const openTK = stack[j];
 
-				if (closeOpenLinks) {
-					if (openTK.type === tokenLinkOpen) {
-						openTK.type = tokenText;
-					}
-				} else if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
+				if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
 					if (!processLinkImage(uid, stack, j, i)) {
 						openTK.type = tokenText;
+
+						if (openTK.type === tokenLinkOpen) {
+							closeTK.type = tokenText;
+						}
 					}
 
-					if (openTK.type === tokenImageOpen) {
-						break;
-					}
-
-					closeOpenLinks = true;
+					break;
 				}
 			}
 
