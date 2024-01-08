@@ -695,6 +695,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 						if (!paren) {
 							title = tk.get();
 
+							tk.next();
+
 							break Loop;
 						}
 
