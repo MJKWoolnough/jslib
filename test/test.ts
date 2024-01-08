@@ -11140,7 +11140,16 @@ type Tests = {
 				["[a](<b)c>)", "<p><a href=\"b)c\">a</a></p>"],
 				["[link](<foo\\>)", "<p>[link](&lt;foo&gt;)</p>"],
 				["[a](<b)c\n[a](<b)c>\n[a](<b>c)", "<p>[a](&lt;b)c\n[a](&lt;b)c&gt;\n[a](<b>c)</b></p>"],
-				["[link](\\(foo\\))", "<p><a href=\"(foo)\">link</a></p>"]
+				["[link](\\(foo\\))", "<p><a href=\"(foo)\">link</a></p>"],
+				["[link](foo(and(bar)))", "<p><a href=\"foo(and(bar))\">link</a></p>"],
+				["[link](foo(and(bar))", "<p>[link](foo(and(bar))</p>"],
+				["[link](foo\\(and\\(bar\\))", "<p><a href=\"foo(and(bar)\">link</a></p>"],
+				["[link](<foo(and(bar)>)", "<p><a href=\"foo(and(bar)\">link</a></p>"],
+				["[link](foo\\)\\:)", "<p><a href=\"foo):\">link</a></p>"],
+				["[link](#fragment)\n\n[link](http://example.com#fragment)\n\n[link](http://example.com?foo=3#frag)", "<p><a href=\"#fragment\">link</a></p><p><a href=\"http://example.com#fragment\">link</a></p><p><a href=\"http://example.com?foo=3#frag\">link</a></p>"],
+				["[link](foo\\bar)", "<p><a href=\"foo\\bar\">link</a></p>"],
+				["[link](foo%20b&auml;)", "<p><a href=\"foo%20b&amp;auml;\">link</a></p>"],
+				["[link](\"title\")", "<p><a href=\"&quot;title&quot;\">link</a></p>"]
 			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
@@ -11152,7 +11161,7 @@ type Tests = {
 				["<http://../>", "<p><a href=\"http://../\">http://../</a></p>"],
 				["<localhost:5001/foo>", "<p><a href=\"localhost:5001/foo\">localhost:5001/foo</a></p>"],
 				["<http://foo.bar/baz bim>", "<p>&lt;http://foo.bar/baz bim&gt;</p>"],
-				["<http://example.com/\\[\\>", "<p><a href=\"http://example.com/\\\\[\\\\\">http://example.com/\\[\\</a></p>"],
+				["<http://example.com/\\[\\>", "<p><a href=\"http://example.com/\\[\\\">http://example.com/\\[\\</a></p>"],
 				["<foo@bar.example.com>", "<p><a href=\"mailto:foo@bar.example.com\">foo@bar.example.com</a></p>"],
 				["<foo+special@Bar.baz-bar0.com>", "<p><a href=\"mailto:foo+special@Bar.baz-bar0.com\">foo+special@Bar.baz-bar0.com</a></p>"],
 				["<foo\\+@bar.example.com>", "<p>&lt;foo+@bar.example.com&gt;</p>"],
