@@ -11149,7 +11149,8 @@ type Tests = {
 				["[link](#fragment)\n\n[link](http://example.com#fragment)\n\n[link](http://example.com?foo=3#frag)", "<p><a href=\"#fragment\">link</a></p><p><a href=\"http://example.com#fragment\">link</a></p><p><a href=\"http://example.com?foo=3#frag\">link</a></p>"],
 				["[link](foo\\bar)", "<p><a href=\"foo\\bar\">link</a></p>"],
 				["[link](foo%20b&auml;)", "<p><a href=\"foo%20b&amp;auml;\">link</a></p>"],
-				["[link](\"title\")", "<p><a href=\"&quot;title&quot;\">link</a></p>"]
+				["[link](\"title\")", "<p><a href=\"&quot;title&quot;\">link</a></p>"],
+				["[link](/url \"title\")\n[link](/url 'title')\n[link](/url (title))", "<p><a href=\"/url\" title=\"title\">link</a>\n<a href=\"/url\" title=\"title\">link</a>\n<a href=\"/url\" title=\"title\">link</a></p>"]
 			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
