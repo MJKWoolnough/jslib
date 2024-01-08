@@ -728,7 +728,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 		stack[start] = {
 			"type": tokenHTML,
-			"data": openTag(uid, "a", false, ["href", processEscapedPunctuation(dest)], ["title", title]),
+			"data": openTag(uid, "a", false, ["href", processEscapedPunctuation(dest)], ["title", processEscapedPunctuation(title)]),
 		};
 
 		stack[end] = {
