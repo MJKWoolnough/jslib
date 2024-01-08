@@ -159,7 +159,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return null;
       },
       parseATXHeader = (tk: Tokeniser) => {
-	const level = tk.acceptString("######");
+	const level = tk.acceptString("######") as 1 | 2 | 3 | 4 | 5 | 6;
 
 	if (level > 0 && (tk.accept(whiteSpace) || tk.peek() === "\n" || !tk.peek())) {
 		return new ATXHeadingBlock(tk, level);
@@ -726,12 +726,12 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 		stack[start] = {
 			"type": tokenHTML,
-			"data": openTag(uid, "A", false, ["href", processEscapedPunctuation(dest)], ["title", title]),
+			"data": openTag(uid, "a", false, ["href", processEscapedPunctuation(dest)], ["title", title]),
 		};
 
 		stack[end] = {
 			"type": tokenHTML,
-			"data": closeTag("A")
+			"data": closeTag("a")
 		}
 
 		stack.splice(end + 1, pos - end);
@@ -839,7 +839,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 				if (isEmphasisOpening(stack, j) && char === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || (closeLength + openLength) % 3 !== 0 || closeLength % 3 === 0 || openLength % 3 === 0)) {
 					const isStrong = closeLength > 1 && openLength > 1,
-					      tag = isStrong ? "STRONG" : "EM",
+					      tag = isStrong ? "strong" : "em",
 					      chars = isStrong ? 2 : 1,
 					      closingTag = {"type": tokenHTML, "data": closeTag(tag)},
 					      openingTag = {"type": tokenHTML, "data": openTag(uid, tag)};
@@ -902,7 +902,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		switch (tk.type) {
 		case tokenCode:
 			encoder.textContent = tk.data.replace(/^`+/, "").replace(/`+$/, "").replaceAll("\n", " ").replace(/^ (.+) $/, "$1");
-			res += tag(uid, "CODE", encoder.innerHTML);
+			res += tag(uid, "code", encoder.innerHTML);
 
 			break;
 		case tokenHTML:
@@ -912,13 +912,13 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		case tokenAutoLink:
 			const href = tk.data.slice(1, -1);
 
-			res += tag(uid, "A", href, ["href", href]);
+			res += tag(uid, "a", href, ["href", href]);
 
 			break;
 		case tokenAutoEmail:
 			const email = tk.data.slice(1, -1);
 
-			res += tag(uid, "A", email, ["href", "mailto:" + email]);
+			res += tag(uid, "a", email, ["href", "mailto:" + email]);
 
 			break;
 		default:
@@ -926,7 +926,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				encoder.textContent = t.replaceAll(/ +\n/g, "\n");
 
 				return encoder.innerHTML;
-			}).join(tag(uid, "BR"));
+			}).join(tag(uid, "br"));
 
 			break;
 		}
@@ -1024,9 +1024,19 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return df;
       },
-      openTag = (uid: string, name: string, close = false, ...attr: [string, string][]) => `<${name} ${uid}="" ${attr.reduce((t, [p, v]) => t + ` ${p}=${JSON.stringify(v)}`, "")}` + (close ? " />" : ">"),
+      openTag = (uid: string, name: keyof HTMLElementTagNameMap, close = false, ...attr: [string, string][]) => {
+	const t = makeNode(name, Object.fromEntries(attr));
+
+	t.toggleAttribute(uid);
+
+	if (close) {
+		return t.outerHTML;
+	}
+
+	return t.outerHTML.replace("</" + name + ">", "");
+      },
       closeTag = (name: string) => `</${name}>`,
-      tag = (uid: string, name: string, contents?: string, ...attr: [string, string][]) => {
+      tag = (uid: string, name: keyof HTMLElementTagNameMap, contents?: string, ...attr: [string, string][]) => {
 		const close = contents === undefined;
 
 		return openTag(uid, name, close, ...attr) + (close ? "" : contents + closeTag(name));
@@ -1207,7 +1217,7 @@ class BlockQuote extends ContainerBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "BLOCKQUOTE", super.toHTML(uid));
+		return tag(uid, "blockquote", super.toHTML(uid));
 	}
 }
 
@@ -1260,7 +1270,7 @@ class ListItemBlock extends ContainerBlock {
 			}
 		}
 
-		return tag(uid, "LI", super.toHTML(uid));
+		return tag(uid, "li", super.toHTML(uid));
 	}
 }
 
@@ -1432,7 +1442,7 @@ class ListBlock extends ContainerBlock {
 		}
 
 		let attr: [string, string][] = [],
-		    type = "UL";
+		    type: keyof HTMLElementTagNameMap = "ul";
 
 		switch (this.#marker) {
 		case "-":
@@ -1442,7 +1452,7 @@ class ListBlock extends ContainerBlock {
 		default:
 			const start = this.#marker.slice(0, -1).replace(/^0+(?!$)/, "");
 
-			type = "OL";
+			type = "ol";
 
 			if (start !== "1") {
 				attr.push(["start", start]);
@@ -1566,7 +1576,7 @@ class HTMLBlock extends LeafBlock {
 }
 
 class ParagraphBlock extends LeafBlock {
-	#settextLevel = 0;
+	#settextLevel: 0 | 1 | 2 = 0;
 	loose = true;
 
 	constructor(tk: Tokeniser) {
@@ -1586,7 +1596,7 @@ class ParagraphBlock extends LeafBlock {
 			tk.acceptRun(stChar);
 
 			if (!tk.acceptRun(whiteSpace) || tk.accept("\n")) {
-				this.#settextLevel = 1 + +(stChar === '-');
+				this.#settextLevel = 1 + +(stChar === '-') as 1 | 2;
 				this.open = false;
 
 				tk.get();
@@ -1609,7 +1619,7 @@ class ParagraphBlock extends LeafBlock {
 		const text = parseInline(uid, this.lines.join("").trim());
 
 		if (text) {
-			return this.loose || this.#settextLevel ? tag(uid, this.#settextLevel === 0 ? "P" : "H" + this.#settextLevel, text) : text;
+			return this.loose || this.#settextLevel ? tag(uid, this.#settextLevel === 0 ? "p" : `h${this.#settextLevel}`, text) : text;
 		}
 
 		return "";
@@ -1617,10 +1627,10 @@ class ParagraphBlock extends LeafBlock {
 }
 
 class ATXHeadingBlock extends LeafBlock {
-	#level: number;
+	#level: 1 | 2 | 3 | 4 | 5 | 6;
 	#text: string;
 
-	constructor(tk: Tokeniser, level: number) {
+	constructor(tk: Tokeniser, level: 1 | 2 | 3 | 4 | 5 | 6) {
 		super();
 
 		this.#level = level;
@@ -1632,7 +1642,7 @@ class ATXHeadingBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "H" + this.#level, parseInline(uid, this.#text));
+		return tag(uid, `h${this.#level}`, parseInline(uid, this.#text));
 	}
 }
 
@@ -1693,7 +1703,7 @@ class FencedCodeBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "TEXTAREA", this.lines.join(""), ["type", this.#info]);
+		return tag(uid, "textarea", this.lines.join(""), ["type", this.#info]);
 	}
 }
 
@@ -1771,7 +1781,7 @@ class IndentedCodeBlock extends LeafBlock {
 			this.lines.pop();
 		}
 
-		return tag(uid, "TEXTAREA", this.lines.join(""));
+		return tag(uid, "textarea", this.lines.join(""));
 	}
 }
 
@@ -1785,7 +1795,7 @@ class ThematicBreakBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "HR");
+		return tag(uid, "hr");
 	}
 }
 
