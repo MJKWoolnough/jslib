@@ -349,7 +349,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	parseHTML7,
 	parseParagraph
       ],
-      encoder = makeNode("div"),
+      encoder = makeNode("textarea"),
       punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
       tokenText = 1,
       tokenCode = 2,
@@ -886,7 +886,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 	}
       },
-      processEscapedPunctuation = (text: string) => punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text),
+      processEscapedPunctuation = (text: string) => {
+	encoder.innerHTML = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text);
+
+	return encoder.innerText;
+      },
       parseInline = (uid: string, text: string) => {
 	const stack = Parser(text, parseText, p => {
 		p.exceptRun(TokenDone);
