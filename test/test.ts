@@ -11153,7 +11153,11 @@ type Tests = {
 				["[link](/url \"title\")\n[link](/url 'title')\n[link](/url (title))", "<p><a href=\"/url\" title=\"title\">link</a>\n<a href=\"/url\" title=\"title\">link</a>\n<a href=\"/url\" title=\"title\">link</a></p>"],
 				["[link](/url \"title \\\"&quot;\")", "<p><a href=\"/url\" title=\"title &quot;&quot;\">link</a></p>"],
 				["[link](/url \"title\")", "<p><a href=\"/url&nbsp;&quot;title&quot;\">link</a></p>"],
-				["[link](/url \"title \"and\" title\")", "<p>[link](/url \"title \"and\" title\")</p>"]
+				["[link](/url \"title \"and\" title\")", "<p>[link](/url \"title \"and\" title\")</p>"],
+				["[link](/url 'title \"and\" title')", "<p><a href=\"/url\" title=\"title &quot;and&quot; title\">link</a></p>"],
+				["[link](   /uri\n  \"title\"  )", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
+				["[link] (/uri)", "<p>[link] (/uri)</p>"],
+				["[link [foo [bar]]](/uri)", "<p><a href=\"/uri\">link [foo [bar]]</a></p>"]
 			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
