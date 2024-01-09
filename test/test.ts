@@ -9802,6 +9802,36 @@ type Tests = {
 					      tk = parser("1234567890", p => p.return(p.acceptString("124"))).next().value;
 
 					return tk.type === 2 && tk.data === "12";
+				},
+				"abcdef": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abcd", p => p.return(p.acceptString("abcdef"))).next().value;
+
+					return tk.type === 4 && tk.data === "abcd";
+				},
+				"aBcDeF": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("aBcD", p => p.return(p.acceptString("abcdef"))).next().value;
+
+					return tk.type === 1 && tk.data === "a";
+				},
+				"abcdef (2)": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abcd", p => p.return(p.acceptString("aBcDeF"))).next().value;
+
+					return tk.type === 1 && tk.data === "a";
+				},
+				"aBcDeF (case insensitive)": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("aBcDeFgH", p => p.return(p.acceptString("abcdef", false))).next().value;
+
+					return tk.type === 6 && tk.data === "aBcDeF";
+				},
+				"aBcDeF (case insensitive, 2)": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abcdefgh", p => p.return(p.acceptString("aBcDeF", false))).next().value;
+
+					return tk.type === 6 && tk.data === "abcdef";
 				}
 			},
 			"acceptWord": {
