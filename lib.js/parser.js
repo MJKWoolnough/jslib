@@ -275,6 +275,7 @@ export class Tokeniser {
 	 * acceptString() attempts to accept each character from the given string, in order, returning the number of characters accepted before a failure.
 	 *
 	 * @param {string} str The ordered characters to be accepted.
+	 * @param {boolean} [caseSensitive] Should the match be made respecting case; defaults to true.
 	 *
 	 * @return {number} Returns the number of characters accepted.
 	 */
