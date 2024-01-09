@@ -362,6 +362,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenHTML = 9,
       tokenAutoLink = 10,
       tokenAutoEmail = 11,
+      tokenHTMLMD = 12,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
 		switch (tk.exceptRun("\\`*_![]()<")) {
@@ -724,15 +725,26 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			return false;
 		}
 
-		processEmphasis(uid, stack, start + 1, end - 1)
+		processEmphasis(uid, stack, start + 1, end - 1);
+
+		for (let i = start + 1; i < end; i++) {
+			switch (stack[i].type) {
+			case tokenEmphasis:
+			case tokenParenOpen:
+			case tokenParenClose:
+			case tokenLinkClose:
+			case tokenLinkOpen:
+				stack[i].type = tokenText;
+			}
+		}
 
 		stack[start] = {
-			"type": tokenHTML,
+			"type": tokenHTMLMD,
 			"data": openTag(uid, "a", false, ["href", processEscapedPunctuation(dest)], ["title", processEscapedPunctuation(title)]),
 		};
 
 		stack[end] = {
-			"type": tokenHTML,
+			"type": tokenHTMLMD,
 			"data": closeTag("a")
 		}
 
@@ -750,6 +762,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		if (closeTK.type === tokenLinkClose) {
 			for (let j = i - 1; j >= 0; j--) {
 				const openTK = stack[j];
+
+				if (openTK.type === tokenHTMLMD) {
+					break;
+				}
 
 				if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
 					if (!processLinkImage(uid, stack, j, i)) {
@@ -837,8 +853,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					const isStrong = closeLength > 1 && openLength > 1,
 					      tag = isStrong ? "strong" : "em",
 					      chars = isStrong ? 2 : 1,
-					      closingTag = {"type": tokenHTML, "data": closeTag(tag)},
-					      openingTag = {"type": tokenHTML, "data": openTag(uid, tag)};
+					      closingTag = {"type": tokenHTMLMD, "data": closeTag(tag)},
+					      openingTag = {"type": tokenHTMLMD, "data": openTag(uid, tag)};
 
 					for (let k = j + 1; k < i; k++) {
 						switch (stack[k].type) {
@@ -906,6 +922,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			break;
 		case tokenHTML:
+		case tokenHTMLMD:
 			res += tk.data;
 
 			break;
