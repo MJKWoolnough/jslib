@@ -308,8 +308,8 @@ export class Tokeniser {
 	/**
 	 * acceptWord attempts to parse one of the words (string of characters) provided in the array.
 	 *
-	 * @param {string[]} words        The list of words (strings of characters) to match against.
-	 * @param {boolean} caseSensitive Determines whether matches are made in a case sensitive manner or not; defaults to true.
+	 * @param {string[]} words          The list of words (strings of characters) to match against.
+	 * @param {boolean} [caseSensitive] Determines whether matches are made in a case sensitive manner or not; defaults to true.
 	 *
 	 * @return {string} The matched word, or empty string if not word in the list could be matched.
 	 */
