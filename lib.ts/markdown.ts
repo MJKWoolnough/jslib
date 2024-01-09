@@ -725,7 +725,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			return false;
 		}
 
-		processEmphasis(uid, stack, start + 1, end - 1);
+		processEmphasis(uid, stack, start, end);
 
 		for (let i = start + 1; i < end; i++) {
 			switch (stack[i].type) {
