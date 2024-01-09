@@ -290,11 +290,11 @@ export class Tokeniser {
 	 *
 	 * @return {number} Returns the number of characters accepted.
 	 */
-	acceptString(str: string): number {
+	acceptString(str: string, caseSensitive = true): number {
 		let parsed = 0;
 
 		for (const c of str) {
-			if (!this.accept(c)) {
+			if (!this.accept(caseSensitive ? c : c.toLowerCase() + c.toUpperCase())) {
 				break;
 			}
 
