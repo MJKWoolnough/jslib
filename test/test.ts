@@ -11160,7 +11160,17 @@ type Tests = {
 				["[link [foo [bar]]](/uri)", "<p><a href=\"/uri\">link [foo [bar]]</a></p>"],
 				["[link] bar](/uri)", "<p>[link] bar](/uri)</p>"],
 				["[link \\[bar](/uri)", "<p><a href=\"/uri\">link [bar</a></p>"],
-				["[link *foo **bar** `#`*](/uri)", "<p><a href=\"/uri\">link <em>foo <strong>bar</strong> <code>#</code></em></a></p>"]
+				["[link *foo **bar** `#`*](/uri)", "<p><a href=\"/uri\">link <em>foo <strong>bar</strong> <code>#</code></em></a></p>"],
+				//["[![moon](moon.jpg)](/uri)", "<p><a href=\"/uri\"><img src=\"moon.jpg\" alt=\"moon\" /></a></p>"],
+				["[foo [bar](/uri)](/uri)", "<p>[foo <a href=\"/uri\">bar</a>](/uri)</p>"],
+				["[foo *[bar [baz](/uri)](/uri)*](/uri)", "<p>[foo <em>[bar <a href=\"/uri\">baz</a>](/uri)</em>](/uri)</p>"],
+				//["![[[foo](uri1)](uri2)](uri3)", "<p><img src=\"uri3\" alt=\"[foo](uri2)\" /></p>"],
+				["*[foo*](/uri)", "<p>*<a href=\"/uri\">foo*</a></p>"],
+				["[foo *bar](baz*)", "<p><a href=\"baz*\">foo *bar</a></p>"],
+				["*foo [bar* baz]", "<p><em>foo [bar</em> baz]</p>"],
+				["[foo <bar attr=\"](baz)\">", "<p>[foo <bar attr=\"](baz)\"></bar></p>"],
+				["[foo`](/uri)`", "<p>[foo<code>](/uri)</code></p>"],
+				["[foo<http://example.com/?search=](uri)>", "<p>[foo<a href=\"http://example.com/?search=](uri)\">http://example.com/?search=](uri)</a></p>"]
 			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
