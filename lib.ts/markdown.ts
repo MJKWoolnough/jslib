@@ -122,7 +122,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	case '*':
 	case '-':
 	case '+':
-		if (tk.accept(whiteSpace + (inParagraph ? "" : nl))) {
+		if (tk.accept(inParagraph ? whiteSpace : whiteSpaceNL)) {
 			tk.backup();
 
 			return new ListBlock(tk);
@@ -151,7 +151,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 
 		if (tk.length() - l < 9 && tk.accept(".)")) {
-			if (tk.accept(whiteSpace + (inParagraph ? "" : nl))) {
+			if (tk.accept(inParagraph ? whiteSpace : whiteSpaceNL)) {
 				tk.backup();
 
 				return new ListBlock(tk);
