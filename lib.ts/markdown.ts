@@ -59,7 +59,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"break": () => makeNode("br")
       } as any as Tags),
       whiteSpace = " \t",
-      whiteSpaceNL = whiteSpace + "\n",
+      nl = "\n",
+      whiteSpaceNL = whiteSpace + nl,
       letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
       number = "0123456789",
       scheme = letter + number + "+.-",
@@ -105,7 +106,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			if (tk.accept(tbChar)) {
 				tk.acceptRun(whiteSpace + tbChar);
 
-				if (tk.accept("\n") || !tk.peek()) {
+				if (tk.accept(nl) || !tk.peek()) {
 					return new ThematicBreakBlock(tk);
 				}
 			}
@@ -121,7 +122,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	case '*':
 	case '-':
 	case '+':
-		if (tk.accept(whiteSpace + (inParagraph ? "" : "\n"))) {
+		if (tk.accept(whiteSpace + (inParagraph ? "" : nl))) {
 			tk.backup();
 
 			return new ListBlock(tk);
@@ -150,7 +151,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 
 		if (tk.length() - l < 9 && tk.accept(".)")) {
-			if (tk.accept(whiteSpace + (inParagraph ? "" : "\n"))) {
+			if (tk.accept(whiteSpace + (inParagraph ? "" : nl))) {
 				tk.backup();
 
 				return new ListBlock(tk);
@@ -165,7 +166,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       parseATXHeader = (tk: Tokeniser) => {
 	const level = tk.acceptString("######") as 1 | 2 | 3 | 4 | 5 | 6;
 
-	if (level > 0 && (tk.accept(whiteSpace) || tk.peek() === "\n" || !tk.peek())) {
+	if (level > 0 && (tk.accept(whiteSpace) || tk.peek() === nl || !tk.peek())) {
 		return new ATXHeadingBlock(tk, level);
 	}
 
@@ -180,8 +181,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		if (tk.accept(fcbChar) && tk.accept(fcbChar)) {
 			tk.acceptRun(fcbChar);
 
-			if (tk.exceptRun("\n" + (fcbChar === '`' ? '`' : "")) !== fcbChar) {
-				tk.accept("\n");
+			if (tk.exceptRun(nl + (fcbChar === '`' ? '`' : "")) !== fcbChar) {
+				tk.accept(nl);
 
 				return new FencedCodeBlock(tk, fcbChar);
 			}
@@ -194,7 +195,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	if (tk.accept("<")) {
 		tk.accept("/");
 
-		if (type1Elements.indexOf(tk.acceptWord(type1Elements, false).toLowerCase()) >= 0 && (tk.accept(whiteSpace + ">") || tk.peek() === "\n")) {
+		if (type1Elements.indexOf(tk.acceptWord(type1Elements, false).toLowerCase()) >= 0 && (tk.accept(whiteSpace + ">") || tk.peek() === nl)) {
 			return new HTMLBlock(tk, 1);
 		}
 	}
@@ -233,7 +234,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	if (tk.accept("<")) {
 		tk.accept("/");
 
-		if (htmlElements.indexOf(tk.acceptWord(htmlElements, false).toLowerCase()) >= 0 && (tk.accept(whiteSpace + ">") || (tk.accept("/") && tk.accept(">") || tk.peek() === "\n"))) {
+		if (htmlElements.indexOf(tk.acceptWord(htmlElements, false).toLowerCase()) >= 0 && (tk.accept(whiteSpace + ">") || (tk.accept("/") && tk.accept(">") || tk.peek() === nl))) {
 			return new HTMLBlock(tk, 6);
 		}
 	}
@@ -245,7 +246,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		tk.acceptRun(letter + number + "-");
 		tk.acceptRun(whiteSpace);
 
-		if (multiline && tk.accept("\n")) {
+		if (multiline && tk.accept(nl)) {
 			tk.acceptRun(whiteSpace);
 		}
 
@@ -258,9 +259,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			if (tk.accept(whiteSpace)) {
 				tk.acceptRun(whiteSpace);
-				tk.accept("\n");
+				tk.accept(nl);
 				tk.acceptRun(whiteSpace);
-			} else if (multiline && tk.accept("\n")) {
+			} else if (multiline && tk.accept(nl)) {
 				tk.acceptRun(whiteSpace);
 			} else {
 				hasSpace = false;
@@ -284,9 +285,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			if (tk.accept(whiteSpace)) {
 				tk.acceptRun(whiteSpace);
-				tk.accept("\n");
+				tk.accept(nl);
 				tk.acceptRun(whiteSpace);
-			} else if (multiline && tk.accept("\n")) {
+			} else if (multiline && tk.accept(nl)) {
 				tk.acceptRun(whiteSpace);
 			} else {
 				hasSpace = false;
@@ -321,7 +322,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return false;
       },
       parseHTML7 = (tk: Tokeniser, inParagraph: boolean) => {
-	if (!inParagraph && tk.accept("<") && isTag(tk) && (!tk.acceptRun(whiteSpace) || tk.accept("\n"))) {
+	if (!inParagraph && tk.accept("<") && isTag(tk) && (!tk.acceptRun(whiteSpace) || tk.accept(nl))) {
 		return new HTMLBlock(tk, 7);
 	}
 
@@ -331,7 +332,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	if (!inParagraph) {
 		const last = tk.acceptRun(whiteSpace);
 
-		if (last && last !== "\n") {
+		if (last && last !== nl) {
 			return new ParagraphBlock(tk);
 		}
 	}
@@ -914,7 +915,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	for (const tk of stack) {
 		switch (tk.type) {
 		case tokenCode:
-			encoder.textContent = tk.data.replace(/^`+/, "").replace(/`+$/, "").replaceAll("\n", " ").replace(/^ (.+) $/, "$1");
+			encoder.textContent = tk.data.replace(/^`+/, "").replace(/`+$/, "").replaceAll(nl, " ").replace(/^ (.+) $/, "$1");
 			res += tag(uid, "code", encoder.innerHTML);
 
 			break;
@@ -936,8 +937,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			break;
 		default:
-			res += processEscapedPunctuation(tk.data).replaceAll(/\n +/g, "\n").split(/ + \n|\\\n/g).map(t => {
-				encoder.textContent = t.replaceAll(/ +\n/g, "\n");
+			res += processEscapedPunctuation(tk.data).replaceAll(/\n +/g, nl).split(/ + \n|\\\n/g).map(t => {
+				encoder.textContent = t.replaceAll(/ +\n/g, nl);
 
 				return encoder.innerHTML;
 			}).join(tag(uid, "br"));
@@ -1079,7 +1080,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return true;
       },
       readEOL = (tk: Tokeniser) => {
-	tk.exceptRun("\n");
+	tk.exceptRun(nl);
 	tk.next();
 
 	return tk.get();
@@ -1200,7 +1201,7 @@ class BlockQuote extends ContainerBlock {
 			tk.accept(" ");
 			tk.get();
 		} else if (!lazy) {
-			if (!tk.acceptRun(whiteSpace) || tk.accept("\n")) {
+			if (!tk.acceptRun(whiteSpace) || tk.accept(nl)) {
 				this.open = false;
 
 				return true;
@@ -1249,7 +1250,7 @@ class ListItemBlock extends ContainerBlock {
 	accept(tk: Tokeniser, empty: boolean) {
 		if (!this.children.length && empty) {
 			tk.acceptRun(whiteSpace);
-			tk.accept("\n");
+			tk.accept(nl);
 			tk.get();
 
 			this.hasEmpty = true;
@@ -1312,7 +1313,7 @@ class ListBlock extends ContainerBlock {
 
 		tk.acceptRun(whiteSpace);
 
-		if (tk.accept("\n")) {
+		if (tk.accept(nl)) {
 			this.#spaces = marker.length + 1;
 		}
 
@@ -1334,7 +1335,7 @@ class ListBlock extends ContainerBlock {
 		case "-":
 		case "+":
 		case "*":
-			if (tk.accept(this.#marker) && (tk.accept(whiteSpace) || tk.peek() === "\n") || tk.peek() === "") {
+			if (tk.accept(this.#marker) && (tk.accept(whiteSpace) || tk.peek() === nl) || tk.peek() === "") {
 				break;
 			}
 
@@ -1343,7 +1344,7 @@ class ListBlock extends ContainerBlock {
 			if (tk.accept(number)) {
 				tk.acceptRun(number);
 
-				if (tk.accept(this.#marker.at(-1)!) && (tk.accept(whiteSpace) || tk.peek() === "\n") || tk.peek() === "") {
+				if (tk.accept(this.#marker.at(-1)!) && (tk.accept(whiteSpace) || tk.peek() === nl) || tk.peek() === "") {
 					break;
 				}
 			}
@@ -1351,7 +1352,7 @@ class ListBlock extends ContainerBlock {
 			return false;
 		}
 
-		if (tk.peek() !== "\n" && tk.peek() !== "") {
+		if (tk.peek() !== nl && tk.peek() !== "") {
 			for (let i = tk.length(); i < this.#spaces; i++) {
 				if (!tk.accept(" ")) {
 					return false;
@@ -1361,7 +1362,7 @@ class ListBlock extends ContainerBlock {
 
 		let lastSpaces = tk.length();
 
-		if (tk.peek() === "\n") {
+		if (tk.peek() === nl) {
 			lastSpaces++;
 		}
 
@@ -1377,7 +1378,7 @@ class ListBlock extends ContainerBlock {
 	accept(tk: Tokeniser, lazy: boolean) {
 		tk.acceptRun(whiteSpace);
 
-		const empty = tk.accept("\n") || tk.peek() === "";
+		const empty = tk.accept(nl) || tk.peek() === "";
 
 		if (this.#hasSpaces(tk) && this.children.at(-1)?.open || empty) {
 			this.#lastEmpty = empty;
@@ -1575,7 +1576,7 @@ class HTMLBlock extends LeafBlock {
 			}
 		case 6:
 		case 7:
-			this.open = tk.acceptRun(whiteSpace) !== "\n";
+			this.open = tk.acceptRun(whiteSpace) !== nl;
 
 			break;
 		}
@@ -1610,7 +1611,7 @@ class ParagraphBlock extends LeafBlock {
 
 			tk.acceptRun(stChar);
 
-			if (!tk.acceptRun(whiteSpace) || tk.accept("\n")) {
+			if (!tk.acceptRun(whiteSpace) || tk.accept(nl)) {
 				this.#settextLevel = 1 + +(stChar === '-') as 1 | 2;
 				this.open = false;
 
@@ -1618,7 +1619,7 @@ class ParagraphBlock extends LeafBlock {
 
 				return true;
 			}
-		} else if (tk.acceptRun(whiteSpace) === "\n") {
+		} else if (tk.acceptRun(whiteSpace) === nl) {
 			tk.next();
 			tk.get();
 
@@ -1690,7 +1691,7 @@ class FencedCodeBlock extends LeafBlock {
 		if (ticks >= this.#ticks) {
 			const last = tk.acceptRun(whiteSpace);
 
-			if (!last || last === "\n") {
+			if (!last || last === nl) {
 				tk.next();
 				tk.get();
 
@@ -1710,7 +1711,7 @@ class FencedCodeBlock extends LeafBlock {
 
 		const line = readEOL(tk);
 
-		if (line !== "\n" || this.lines.length) {
+		if (line !== nl || this.lines.length) {
 			this.lines.push(line);
 		}
 
@@ -1766,12 +1767,12 @@ class IndentedCodeBlock extends LeafBlock {
 	#getBlankLine(tk: Tokeniser) {
 		const last = tk.acceptRun(whiteSpace);
 
-		if (!last || last === "\n") {
+		if (!last || last === nl) {
 			tk.next();
 
 			tk.get();
 
-			this.lines.push("\n");
+			this.lines.push(nl);
 
 			return true;
 		}
@@ -1788,11 +1789,11 @@ class IndentedCodeBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		while (this.lines.at(0) === "\n") {
+		while (this.lines.at(0) === nl) {
 			this.lines.shift();
 		}
 
-		while (this.lines.at(-1) === "\n") {
+		while (this.lines.at(-1) === nl) {
 			this.lines.pop();
 		}
 
