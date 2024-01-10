@@ -59,6 +59,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"break": () => makeNode("br")
       } as any as Tags),
       whiteSpace = " \t",
+      whiteSpaceNL = whiteSpace + "\n",
       letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
       number = "0123456789",
       scheme = letter + number + "+.-",
@@ -584,11 +585,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		return {"value": stack[pos]?.data[c++] ?? "", "done": false};
 	      }});
 
-	tk.acceptRun(whiteSpace);
-
-	if (tk.accept("\n")) {
-		tk.acceptRun(whiteSpace);
-	}
+	tk.acceptRun(whiteSpaceNL);
 
 	if (tk.accept("<")) {
 		tk.get();
@@ -652,11 +649,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 	}
 
-	tk.acceptRun(whiteSpace);
-
-	if (tk.accept("\n")) {
-		tk.acceptRun(whiteSpace);
-	}
+	tk.acceptRun(whiteSpaceNL);
 
 	if (!hasTitle) {
 		const next = tk.peek();
@@ -717,11 +710,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			return false;
 		}
 
-		tk.acceptRun(whiteSpace);
-
-		if (tk.accept("\n")) {
-			tk.acceptRun(whiteSpace);
-		}
+		tk.acceptRun(whiteSpaceNL);
 	}
 
 	if (!tk.accept(")")) {
