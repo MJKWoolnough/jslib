@@ -45,6 +45,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return node;
       },
+      setText = <N extends Element>(node: N, text: string) => {
+	node.textContent = text;
+
+	return node;
+      },
       tags: Tags = ([
 	["blockquote", "blockquote"],
 	["paragraphs", "p"],
@@ -916,8 +921,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	for (const tk of stack) {
 		switch (tk.type) {
 		case tokenCode:
-			encoder.textContent = tk.data.replace(/^`+/, "").replace(/`+$/, "").replaceAll(nl, " ").replace(/^ (.+) $/, "$1");
-			res += tag(uid, "code", encoder.innerHTML);
+			res += tag(uid, "code", setText(encoder, tk.data.replace(/^`+/, "").replace(/`+$/, "").replaceAll(nl, " ").replace(/^ (.+) $/, "$1")).innerHTML);
 
 			break;
 		case tokenHTML:
@@ -938,11 +942,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			break;
 		default:
-			res += processEscapedPunctuation(tk.data).replaceAll(/\n +/g, nl).split(/ + \n|\\\n/g).map(t => {
-				encoder.textContent = t.replaceAll(/ +\n/g, nl);
-
-				return encoder.innerHTML;
-			}).join(tag(uid, "br"));
+			res += processEscapedPunctuation(tk.data).replaceAll(/\n +/g, nl).split(/ + \n|\\\n/g).map(t =>  setText(encoder, t.replaceAll(/ +\n/g, nl)).innerHTML).join(tag(uid, "br"));
 
 			break;
 		}
