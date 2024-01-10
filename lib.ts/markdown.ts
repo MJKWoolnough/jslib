@@ -556,66 +556,125 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return parseText(tk);
       },
-      processLinkImage = (uid: string, stack: Token[], start: number, end: number) => {
-	if (stack[start].type === tokenLinkOpen && stack[end+1]?.type === tokenParenOpen) {
-		let pos = end + 2,
-		    c = 0,
-		    hasTitle = false,
-		    dest = "",
-		    title = "";
+      processLink = (uid: string, stack: Token[], start: number, end: number) => {
+	if (stack[end+1]?.type !== tokenParenOpen){
+		return false;
+	}
 
-		const tk = new Tokeniser({"next": () => {
-			if (c >= stack[pos]?.data.length) {
-				pos++;
-				c = 0;
-			}
+	let pos = end + 2,
+	    c = 0,
+	    hasTitle = false,
+	    dest = "",
+	    title = "";
 
-			switch (stack[pos]?.type) {
-			case tokenCode:
-			case tokenAutoLink:
-			case tokenAutoEmail:
-			case tokenHTML:
-				return {"value": "", "done": false};
-			}
-
-			return {"value": stack[pos]?.data[c++] ?? "", "done": false};
-		      }});
-
-		tk.acceptRun(whiteSpace);
-
-		if (tk.accept("\n")) {
-			tk.acceptRun(whiteSpace);
+	const tk = new Tokeniser({"next": () => {
+		if (c >= stack[pos]?.data.length) {
+			pos++;
+			c = 0;
 		}
 
-		if (tk.accept("<")) {
-			tk.get();
+		switch (stack[pos]?.type) {
+		case tokenCode:
+		case tokenAutoLink:
+		case tokenAutoEmail:
+		case tokenHTML:
+			return {"value": "", "done": false};
+		}
 
-			Loop:
-			while (true) {
-				switch (tk.exceptRun("\n\\<>")) {
-				case '\\':
-					tk.next();
-					tk.next();
+		return {"value": stack[pos]?.data[c++] ?? "", "done": false};
+	      }});
 
-					break;
-				case '>':
+	tk.acceptRun(whiteSpace);
+
+	if (tk.accept("\n")) {
+		tk.acceptRun(whiteSpace);
+	}
+
+	if (tk.accept("<")) {
+		tk.get();
+
+		Loop:
+		while (true) {
+			switch (tk.exceptRun("\n\\<>")) {
+			case '\\':
+				tk.next();
+				tk.next();
+
+				break;
+			case '>':
+				dest = tk.get();
+
+				tk.next();
+
+				break Loop;
+			default:
+				return false;
+			}
+		}
+	} else {
+		tk.get();
+
+		let paren = 0;
+
+		Loop:
+		while (true) {
+			switch (tk.exceptRun(control + " \\()")) {
+			case '\\':
+				tk.next();
+				tk.next();
+
+				break;
+			case '(':
+				tk.next();
+
+				paren++;
+
+				break;
+			case ')':
+				if (!paren) {
+					hasTitle = true;
+
 					dest = tk.get();
 
-					tk.next();
-
 					break Loop;
-				default:
-					return false;
 				}
-			}
-		} else {
-			tk.get();
 
+				tk.next();
+
+				paren--;
+
+				break;
+			default:
+				dest = tk.get();
+
+				break Loop;
+			}
+		}
+	}
+
+	tk.acceptRun(whiteSpace);
+
+	if (tk.accept("\n")) {
+		tk.acceptRun(whiteSpace);
+	}
+
+	if (!hasTitle) {
+		const next = tk.peek();
+
+		switch (next) {
+		case ')':
+			break;
+		case '"':
+		case '\'':
+		case '(':
 			let paren = 0;
+
+			tk.next();
+			tk.get();
 
 			Loop:
 			while (true) {
-				switch (tk.exceptRun(control + " \\()")) {
+				switch (tk.exceptRun(next === "(" ? "()\\" : "\\" + next)) {
 				case '\\':
 					tk.next();
 					tk.next();
@@ -627,11 +686,18 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					paren++;
 
 					break;
+				case '"':
+				case '\'':
+					title = tk.get();
+
+					tk.next();
+
+					break Loop;
 				case ')':
 					if (!paren) {
-						hasTitle = true;
+						title = tk.get();
 
-						dest = tk.get();
+						tk.next();
 
 						break Loop;
 					}
@@ -642,11 +708,13 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 					break;
 				default:
-					dest = tk.get();
-
-					break Loop;
+					return false;
 				}
 			}
+
+			break;
+		default:
+			return false;
 		}
 
 		tk.acceptRun(whiteSpace);
@@ -654,106 +722,41 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		if (tk.accept("\n")) {
 			tk.acceptRun(whiteSpace);
 		}
-
-		if (!hasTitle) {
-			const next = tk.peek();
-
-			switch (next) {
-			case ')':
-				break;
-			case '"':
-			case '\'':
-			case '(':
-				let paren = 0;
-
-				tk.next();
-				tk.get();
-
-				Loop:
-				while (true) {
-					switch (tk.exceptRun(next === "(" ? "()\\" : "\\" + next)) {
-					case '\\':
-						tk.next();
-						tk.next();
-
-						break;
-					case '(':
-						tk.next();
-
-						paren++;
-
-						break;
-					case '"':
-					case '\'':
-						title = tk.get();
-
-						tk.next();
-
-						break Loop;
-					case ')':
-						if (!paren) {
-							title = tk.get();
-
-							tk.next();
-
-							break Loop;
-						}
-
-						tk.next();
-
-						paren--;
-
-						break;
-					default:
-						return false;
-					}
-				}
-
-				break;
-			default:
-				return false;
-			}
-
-			tk.acceptRun(whiteSpace);
-
-			if (tk.accept("\n")) {
-				tk.acceptRun(whiteSpace);
-			}
-		}
-
-		if (!tk.accept(")")) {
-			return false;
-		}
-
-		processEmphasis(uid, stack, start, end);
-
-		for (let i = start + 1; i < end; i++) {
-			switch (stack[i].type) {
-			case tokenEmphasis:
-			case tokenParenOpen:
-			case tokenParenClose:
-			case tokenLinkClose:
-			case tokenLinkOpen:
-				stack[i].type = tokenText;
-			}
-		}
-
-		stack[start] = {
-			"type": tokenHTMLMD,
-			"data": openTag(uid, "a", false, {"href": processEscapedPunctuation(dest), "title": processEscapedPunctuation(title)})
-		};
-
-		stack[end] = {
-			"type": tokenHTMLMD,
-			"data": closeTag("a")
-		}
-
-		stack.splice(end + 1, pos - end);
-
-		return true;
 	}
 
-	return false;
+	if (!tk.accept(")")) {
+		return false;
+	}
+
+	processEmphasis(uid, stack, start, end);
+
+	for (let i = start + 1; i < end; i++) {
+		switch (stack[i].type) {
+		case tokenEmphasis:
+		case tokenParenOpen:
+		case tokenParenClose:
+		case tokenLinkClose:
+		case tokenLinkOpen:
+			stack[i].type = tokenText;
+		}
+	}
+
+	stack[start] = {
+		"type": tokenHTMLMD,
+		"data": openTag(uid, "a", false, {"href": processEscapedPunctuation(dest), "title": processEscapedPunctuation(title)})
+	};
+
+	stack[end] = {
+		"type": tokenHTMLMD,
+		"data": closeTag("a")
+	}
+
+	stack.splice(end + 1, pos - end);
+
+	return true;
+      },
+      processImage = (_uid: string, _stack: Token[], _start: number, _end: number) => {
+	      return false;
       },
       processLinksAndImages = (uid: string, stack: Token[]) => {
 	for (let i = 1; i < stack.length; i++) {
@@ -768,12 +771,13 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				}
 
 				if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
-					if (!processLinkImage(uid, stack, j, i)) {
-						openTK.type = tokenText;
-
-						if (openTK.type === tokenLinkOpen) {
+					if (openTK.type === tokenLinkOpen) {
+						if (!processLink(uid, stack, j, i)) {
+							openTK.type = tokenText;
 							closeTK.type = tokenText;
 						}
+					} else if (processImage(uid, stack, j, i)) {
+						openTK.type = tokenText;
 					}
 
 					break;
