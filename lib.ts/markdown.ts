@@ -98,10 +98,13 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	case '-':
 	case '_':
 		tk.acceptRun(whiteSpace);
+
 		if (tk.accept(tbChar)) {
 			tk.acceptRun(whiteSpace);
+
 			if (tk.accept(tbChar)) {
 				tk.acceptRun(whiteSpace + tbChar);
+
 				if (tk.accept("\n") || !tk.peek()) {
 					return new ThematicBreakBlock(tk);
 				}
@@ -294,11 +297,13 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 				if (tk.accept("'")) {
 					tk.exceptRun("'");
+
 					if (!tk.accept("'")) {
 						break;
 					}
 				} else if (tk.accept('"')) {
 					tk.exceptRun('"');
+
 					if (!tk.accept('"')) {
 						break;
 					}
@@ -902,7 +907,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	      }).next().value.data.filter(t => t.data);
 
 	processLinksAndImages(uid, stack);
-
 	processEmphasis(uid, stack);
 
 	let res = "";
