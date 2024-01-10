@@ -40,6 +40,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return node;
       },
+      setHTML = <N extends Element>(node: N, html: string) => {
+	node.innerHTML = html;
+
+	return node;
+      },
       tags: Tags = ([
 	["blockquote", "blockquote"],
 	["paragraphs", "p"],
@@ -895,11 +900,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 	}
       },
-      processEscapedPunctuation = (text: string) => {
-	encoder.innerHTML = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text);
-
-	return encoder.innerText;
-      },
+      processEscapedPunctuation = (text: string) => setHTML(encoder, punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text)).innerText,
       parseInline = (uid: string, text: string) => {
 	const stack = Parser(text, parseText, p => {
 		p.exceptRun(TokenDone);
@@ -1173,11 +1174,7 @@ class Document extends ContainerBlock {
 	}
 
 	render(tags: Tags) {
-		const tmpl = makeNode("template");
-
-		tmpl.innerHTML = this.toHTML(this.#uid);
-
-		const ret = sanitise(tmpl.content.childNodes, tags, this.#uid);
+		const ret = sanitise(setHTML(makeNode("template"), this.toHTML(this.#uid)).content.childNodes, tags, this.#uid);
 
 		encoder.replaceChildren();
 		links.clear();
