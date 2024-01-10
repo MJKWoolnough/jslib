@@ -740,7 +740,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 		stack[start] = {
 			"type": tokenHTMLMD,
-			"data": openTag(uid, "a", false, ["href", processEscapedPunctuation(dest)], ["title", processEscapedPunctuation(title)])
+			"data": openTag(uid, "a", false, {"href": processEscapedPunctuation(dest), "title": processEscapedPunctuation(title)})
 		};
 
 		stack[end] = {
@@ -929,13 +929,13 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		case tokenAutoLink:
 			const href = tk.data.slice(1, -1);
 
-			res += tag(uid, "a", href, ["href", href]);
+			res += tag(uid, "a", href, {href});
 
 			break;
 		case tokenAutoEmail:
 			const email = tk.data.slice(1, -1);
 
-			res += tag(uid, "a", email, ["href", "mailto:" + email]);
+			res += tag(uid, "a", email, {"href": "mailto:" + email});
 
 			break;
 		default:
@@ -1041,8 +1041,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return df;
       },
-      openTag = (uid: string, name: keyof HTMLElementTagNameMap, close = false, ...attr: [string, string][]) => {
-	const t = makeNode(name, Object.fromEntries(attr));
+      openTag = (uid: string, name: keyof HTMLElementTagNameMap, close = false, attrs: Record<string, string> = {}) => {
+	const t = makeNode(name, attrs);
 
 	t.toggleAttribute(uid);
 
@@ -1053,10 +1053,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return t.outerHTML.replace("</" + name + ">", "");
       },
       closeTag = (name: string) => `</${name}>`,
-      tag = (uid: string, name: keyof HTMLElementTagNameMap, contents?: string, ...attr: [string, string][]) => {
+      tag = (uid: string, name: keyof HTMLElementTagNameMap, contents?: string, attrs: Record<string, string> = {}) => {
 		const close = contents === undefined;
 
-		return openTag(uid, name, close, ...attr) + (close ? "" : contents + closeTag(name));
+		return openTag(uid, name, close, attrs) + (close ? "" : contents + closeTag(name));
       },
       isOpenParagraph = (b?: Block): b is ParagraphBlock => b instanceof ParagraphBlock && b.open,
       isLastGrandChildOpenParagraph = (b?: Block): boolean => b instanceof ContainerBlock ? isLastGrandChildOpenParagraph(b.children.at(-1)) : b instanceof ParagraphBlock ? b.open : false,
@@ -1458,8 +1458,9 @@ class ListBlock extends ContainerBlock {
 			}
 		}
 
-		let attr: [string, string][] = [],
-		    type: keyof HTMLElementTagNameMap = "ul";
+		const attr: Record<string, string> = {};
+
+		let type: keyof HTMLElementTagNameMap = "ul";
 
 		switch (this.#marker) {
 		case "-":
@@ -1472,11 +1473,11 @@ class ListBlock extends ContainerBlock {
 			type = "ol";
 
 			if (start !== "1") {
-				attr.push(["start", start]);
+				attr["start"] = start;
 			}
 		}
 
-		return tag(uid, type, super.toHTML(uid), ...attr);
+		return tag(uid, type, super.toHTML(uid), attr);
 	}
 }
 
@@ -1720,7 +1721,7 @@ class FencedCodeBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "textarea", this.lines.join(""), ["type", this.#info]);
+		return tag(uid, "textarea", this.lines.join(""), {"type": this.#info});
 	}
 }
 
