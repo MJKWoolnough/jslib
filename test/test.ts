@@ -11202,6 +11202,9 @@ type Tests = {
 				["[foo`](/uri)`", "<p>[foo<code>](/uri)</code></p>"],
 				["[foo<http://example.com/?search=](uri)>", "<p>[foo<a href=\"http://example.com/?search=](uri)\">http://example.com/?search=](uri)</a></p>"]
 			],
+			"images": [
+				["![foo](/url \"title\")", "<p><img src=\"/url\" title=\"title\" alt=\"foo\"></p>"]
+			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
 				["<http://foo.bar.baz/test?q=hello&id=22&boolean>", "<p><a href=\"http://foo.bar.baz/test?q=hello&amp;id=22&amp;boolean\">http://foo.bar.baz/test?q=hello&amp;id=22&amp;boolean</a></p>"],
