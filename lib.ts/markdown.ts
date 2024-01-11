@@ -594,7 +594,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		case tokenCode:
 		case tokenAutoLink:
 		case tokenAutoEmail:
-		case tokenHTML:
+		case tokenHTMLMD:
 			return {"value": "", "done": false};
 		}
 
