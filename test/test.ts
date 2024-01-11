@@ -11205,7 +11205,8 @@ type Tests = {
 			"images": [
 				["![foo](/url \"title\")", "<p><img src=\"/url\" title=\"title\" alt=\"foo\"></p>"],
 				//["![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &amp; tracks\" alt=\"foo bar\"></p>"],
-				["![foo ![bar](/url)](/url2)", "<p><img src=\"/url2\" title=\"\" alt=\"foo bar\"></p>"]
+				["![foo ![bar](/url)](/url2)", "<p><img src=\"/url2\" title=\"\" alt=\"foo bar\"></p>"],
+				["![foo [bar](/url)](/url2)", "<p><img src=\"/url2\" title=\"\" alt=\"foo bar\"></p>"]
 			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],
