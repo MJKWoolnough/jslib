@@ -767,8 +767,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			const tk = stack[i];
 
 			if ("alt" in tk) {
-				alt += tk["alt"];
-			} else {
+				alt += tk.alt;
+			} else if (tk.type === tokenText) {
 				alt += tk.data;
 			}
 
