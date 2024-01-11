@@ -760,7 +760,24 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			"data": closeTag("a")
 		}
 
-	} else { }
+	} else {
+		let alt = "";
+
+		for (let i = start + 1; i < end; i++) {
+			alt += stack[i].data;
+
+			stack[i].type = tokenText;
+			stack[i].data = "";
+		}
+
+		stack[start] = {
+			"type": tokenHTMLMD,
+			"data": openTag(uid, "img", true, {"src": href, alt, title})
+		}
+
+		stack[end].type = tokenText;
+		stack[end].data = "";
+	}
 
 	stack.splice(end + 1, pos - end);
 
