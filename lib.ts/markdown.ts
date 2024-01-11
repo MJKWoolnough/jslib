@@ -764,16 +764,23 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		let alt = "";
 
 		for (let i = start + 1; i < end; i++) {
-			alt += stack[i].data;
+			const tk = stack[i];
 
-			stack[i].type = tokenText;
-			stack[i].data = "";
+			if ("alt" in tk) {
+				alt += tk["alt"];
+			} else {
+				alt += tk.data;
+			}
+
+			tk.type = tokenText;
+			tk.data = "";
 		}
 
 		stack[start] = {
 			"type": tokenHTMLMD,
-			"data": openTag(uid, "img", true, {"src": href, alt, title})
-		}
+			"data": openTag(uid, "img", true, {"src": href, alt, title}),
+			alt
+		} as Token;
 
 		stack[end].type = tokenText;
 		stack[end].data = "";
@@ -788,14 +795,14 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		const closeTK = stack[i];
 
 		if (closeTK.type === tokenLinkClose) {
+			let hasHTML = false;
+
 			for (let j = i - 1; j >= 0; j--) {
 				const openTK = stack[j];
 
-				if (openTK.type === tokenHTMLMD) {
-					break;
-				}
+				hasHTML ||= openTK.type === tokenHTMLMD;
 
-				if (openTK.type === tokenImageOpen || openTK.type === tokenLinkOpen) {
+				if (openTK.type === tokenImageOpen || !hasHTML && openTK.type === tokenLinkOpen) {
 					if (!processLinkAndImage(uid, stack, j, i)) {
 						openTK.type = tokenText;
 
