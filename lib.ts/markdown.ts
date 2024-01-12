@@ -768,8 +768,14 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			if ("alt" in tk) {
 				alt += tk.alt;
-			} else if (tk.type === tokenText) {
+			} else {
+				switch (tk.type) {
+				case tokenHTML:
+				case tokenHTMLMD:
+					break;
+				default:
 				alt += tk.data;
+				}
 			}
 
 			tk.type = tokenText;
