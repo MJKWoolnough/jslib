@@ -11191,7 +11191,7 @@ type Tests = {
 				["[link] bar](/uri)", "<p>[link] bar](/uri)</p>"],
 				["[link \\[bar](/uri)", "<p><a href=\"/uri\">link [bar</a></p>"],
 				["[link *foo **bar** `#`*](/uri)", "<p><a href=\"/uri\">link <em>foo <strong>bar</strong> <code>#</code></em></a></p>"],
-				//["[![moon](moon.jpg)](/uri)", "<p><a href=\"/uri\"><img src=\"moon.jpg\" alt=\"moon\" /></a></p>"],
+				["[![moon](moon.jpg)](/uri)", "<p><a href=\"/uri\"><img src=\"moon.jpg\" title=\"\" alt=\"moon\"></a></p>"],
 				["[foo [bar](/uri)](/uri)", "<p>[foo <a href=\"/uri\">bar</a>](/uri)</p>"],
 				["[foo *[bar [baz](/uri)](/uri)*](/uri)", "<p>[foo <em>[bar <a href=\"/uri\">baz</a>](/uri)</em>](/uri)</p>"],
 				//["![[[foo](uri1)](uri2)](uri3)", "<p><img src=\"uri3\" alt=\"[foo](uri2)\" /></p>"],
