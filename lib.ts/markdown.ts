@@ -774,7 +774,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				case tokenHTMLMD:
 					break;
 				default:
-				alt += tk.data;
+					alt += tk.data;
 				}
 			}
 
