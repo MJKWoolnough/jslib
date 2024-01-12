@@ -11203,14 +11203,14 @@ type Tests = {
 				["[foo<http://example.com/?search=](uri)>", "<p>[foo<a href=\"http://example.com/?search=](uri)\">http://example.com/?search=](uri)</a></p>"]
 			],
 			"images": [
-				["![foo](/url \"title\")", "<p><img src=\"/url\" title=\"title\" alt=\"foo\"></p>"],
+				["![foo](/url \"title\")", "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"],
 				//["![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &amp; tracks\" alt=\"foo bar\"></p>"],
 				["![foo ![bar](/url)](/url2)", "<p><img src=\"/url2\" alt=\"foo bar\"></p>"],
 				["![foo [bar](/url)](/url2)", "<p><img src=\"/url2\" alt=\"foo bar\"></p>"],
 				//["![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" title=\"train &amp; tracks\" alt=\"foo bar\"></p>"],
 				//["![foo *bar*][foobar]\n\n[FOOBAR]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo\"></p>"],
 				["![foo](train.jpg)", "<p><img src=\"train.jpg\" alt=\"foo\"></p>"],
-				["My ![foo bar](/path/to/train.jpg  \"title\"   )", "<p>My <img src=\"/path/to/train.jpg\" title=\"title\" alt=\"foo bar\"></p>"],
+				["My ![foo bar](/path/to/train.jpg  \"title\"   )", "<p>My <img src=\"/path/to/train.jpg\" alt=\"foo bar\" title=\"title\"></p>"],
 				["![foo](<url>)", "<p><img src=\"url\" alt=\"foo\"></p>"],
 				["![](/url)", "<p><img src=\"/url\" alt=\"\"></p>"]
 			],
