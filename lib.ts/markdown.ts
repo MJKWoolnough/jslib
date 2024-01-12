@@ -594,7 +594,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		case tokenCode:
 		case tokenAutoLink:
 		case tokenAutoEmail:
-		case tokenHTMLMD:
 			return {"value": "", "done": false};
 		}
 
@@ -795,14 +794,14 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		const closeTK = stack[i];
 
 		if (closeTK.type === tokenLinkClose) {
-			let hasHTML = false;
+			let hasNest = false;
 
 			for (let j = i - 1; j >= 0; j--) {
 				const openTK = stack[j];
 
-				hasHTML ||= openTK.type === tokenHTMLMD;
+				hasNest ||= openTK.type === tokenHTMLMD && openTK.data.at(1) === 'a';
 
-				if (openTK.type === tokenImageOpen || !hasHTML && openTK.type === tokenLinkOpen) {
+				if (openTK.type === tokenImageOpen || !hasNest && openTK.type === tokenLinkOpen) {
 					if (!processLinkAndImage(uid, stack, j, i)) {
 						openTK.type = tokenText;
 
