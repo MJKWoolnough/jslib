@@ -136,7 +136,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			tk.backup();
 
 			return new ListBlock(tk);
-		} else if (!inParagraph && tk.peek() === "") {
+		} else if (!inParagraph && !tk.peek()) {
 			return new ListBlock(tk);
 		}
 
