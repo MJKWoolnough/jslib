@@ -380,6 +380,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenAutoLink = 10,
       tokenAutoEmail = 11,
       tokenHTMLMD = 12,
+      tokenDeactivatedLink = 13,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
 		switch (tk.exceptRun("\\`*_![]()<")) {
@@ -794,20 +795,33 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		const closeTK = stack[i];
 
 		if (closeTK.type === tokenLinkClose) {
-			let hasNest = false;
+			let hasNest = false,
+			    linkDone = false;
 
 			for (let j = i - 1; j >= 0; j--) {
 				const openTK = stack[j];
 
 				hasNest ||= openTK.type === tokenHTMLMD && openTK.data.at(1) === 'a';
 
-				if (openTK.type === tokenImageOpen || !hasNest && openTK.type === tokenLinkOpen) {
+				if (linkDone) {
+					if (openTK.type === tokenLinkOpen) {
+						openTK.type = tokenDeactivatedLink;
+					}
+				} else if (openTK.type === tokenDeactivatedLink) {
+					openTK.type = tokenText;
+
+					break;
+				} else if (openTK.type === tokenImageOpen || !hasNest && openTK.type === tokenLinkOpen) {
 					if (!processLinkAndImage(uid, stack, j, i)) {
 						openTK.type = tokenText;
 
 						if (openTK.type === tokenLinkOpen) {
 							closeTK.type = tokenText;
 						}
+					} else if (openTK.type === tokenLinkOpen) {
+						linkDone = true;
+
+						continue;
 					}
 
 					break;
