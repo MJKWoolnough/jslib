@@ -11191,10 +11191,10 @@ type Tests = {
 				["[link] bar](/uri)", "<p>[link] bar](/uri)</p>"],
 				["[link \\[bar](/uri)", "<p><a href=\"/uri\">link [bar</a></p>"],
 				["[link *foo **bar** `#`*](/uri)", "<p><a href=\"/uri\">link <em>foo <strong>bar</strong> <code>#</code></em></a></p>"],
-				["[![moon](moon.jpg)](/uri)", "<p><a href=\"/uri\"><img src=\"moon.jpg\" title=\"\" alt=\"moon\"></a></p>"],
+				["[![moon](moon.jpg)](/uri)", "<p><a href=\"/uri\"><img src=\"moon.jpg\" alt=\"moon\"></a></p>"],
 				["[foo [bar](/uri)](/uri)", "<p>[foo <a href=\"/uri\">bar</a>](/uri)</p>"],
 				["[foo *[bar [baz](/uri)](/uri)*](/uri)", "<p>[foo <em>[bar <a href=\"/uri\">baz</a>](/uri)</em>](/uri)</p>"],
-				["![[[foo](uri1)](uri2)](uri3)", "<p><img src=\"uri3\" title=\"\" alt=\"[foo](uri2)\"></p>"],
+				["![[[foo](uri1)](uri2)](uri3)", "<p><img src=\"uri3\" alt=\"[foo](uri2)\"></p>"],
 				["*[foo*](/uri)", "<p>*<a href=\"/uri\">foo*</a></p>"],
 				["[foo *bar](baz*)", "<p><a href=\"baz*\">foo *bar</a></p>"],
 				["*foo [bar* baz]", "<p><em>foo [bar</em> baz]</p>"],
@@ -11205,14 +11205,14 @@ type Tests = {
 			"images": [
 				["![foo](/url \"title\")", "<p><img src=\"/url\" title=\"title\" alt=\"foo\"></p>"],
 				//["![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &amp; tracks\" alt=\"foo bar\"></p>"],
-				["![foo ![bar](/url)](/url2)", "<p><img src=\"/url2\" title=\"\" alt=\"foo bar\"></p>"],
-				["![foo [bar](/url)](/url2)", "<p><img src=\"/url2\" title=\"\" alt=\"foo bar\"></p>"],
+				["![foo ![bar](/url)](/url2)", "<p><img src=\"/url2\" alt=\"foo bar\"></p>"],
+				["![foo [bar](/url)](/url2)", "<p><img src=\"/url2\" alt=\"foo bar\"></p>"],
 				//["![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" title=\"train &amp; tracks\" alt=\"foo bar\"></p>"],
-				//["![foo *bar*][foobar]\n\n[FOOBAR]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" title=\"\" alt=\"foo\"></p>"],
-				["![foo](train.jpg)", "<p><img src=\"train.jpg\" title=\"\" alt=\"foo\"></p>"],
+				//["![foo *bar*][foobar]\n\n[FOOBAR]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo\"></p>"],
+				["![foo](train.jpg)", "<p><img src=\"train.jpg\" alt=\"foo\"></p>"],
 				["My ![foo bar](/path/to/train.jpg  \"title\"   )", "<p>My <img src=\"/path/to/train.jpg\" title=\"title\" alt=\"foo bar\"></p>"],
-				["![foo](<url>)", "<p><img src=\"url\" title=\"\" alt=\"foo\"></p>"],
-				["![](/url)", "<p><img src=\"/url\" title=\"\" alt=\"\"></p>"]
+				["![foo](<url>)", "<p><img src=\"url\" alt=\"foo\"></p>"],
+				["![](/url)", "<p><img src=\"/url\" alt=\"\"></p>"]
 			],
 			"autolinks": [
 				["<http://foo.bar.baz>", "<p><a href=\"http://foo.bar.baz\">http://foo.bar.baz</a></p>"],

@@ -65,7 +65,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"allowedHTML": null,
 	"thematicBreaks": () => makeNode("hr"),
 	"link": (href: string, title: string, c: DocumentFragment) => makeNode("a", title ? {href, title} : {href}, c),
-	"image": (src: string, title: string, alt: string) => makeNode("img", {src, title, alt}),
+	"image": (src: string, title: string, alt: string) => makeNode("img", title ? {src, title, alt} : {src, alt}),
 	"break": () => makeNode("br")
       } as any as Tags),
       whiteSpace = " \t",
