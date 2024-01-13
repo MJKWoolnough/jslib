@@ -10872,6 +10872,11 @@ type Tests = {
 				['Foo\n<foo>\nbaz\n</foo>\nMore Foo\n\nMore Text', '<p>Foo\n<foo>\nbaz\n</foo>\nMore Foo</p><p>More Text</p>']
 			]
 		},
+		"link reference": {
+			"simple": [
+				["[foo]: /url \"title\"\n\n[foo]", "<p><a href=\"/url\" title=\"title\">foo</a></p>"],
+			]
+		},
 		"paragraphs": {
 			"leading whitespace": [
 				["aaa\n\nbbb", "<p>aaa</p><p>bbb</p>"],
