@@ -383,12 +383,15 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				ftk.acceptRun(whiteSpace);
 			}
 
-			const title = parseLinkTitle(ftk),
-			      ref = tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase();
+			const title = parseLinkTitle(ftk);
 
-			links.set(ref, {href, title});
+			tk.acceptRun(whiteSpace);
 
-			return new LinkLabelBlock();
+			if (tk.accept("\n")) {
+				links.set(tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase(), {href, title});
+
+				return new LinkLabelBlock();
+			}
 		}
 	}
 
@@ -701,7 +704,16 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		tk.get();
 
 		while (true) {
-			switch (tk.exceptRun(next === "(" ? "()\\" : "\\" + next)) {
+			switch (tk.exceptRun(next === "(" ? "\n()\\" : "\n\\" + next)) {
+			case '\n':
+				tk.next();
+				tk.acceptRun(whiteSpace);
+
+				if (tk.accept(nl)) {
+					return "";
+				}
+
+				break;
 			case '\\':
 				tk.next();
 				tk.next();
