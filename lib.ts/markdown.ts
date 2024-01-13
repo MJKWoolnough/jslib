@@ -374,19 +374,19 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			tk.acceptRun(whiteSpace);
 		}
 
-		const linkDest = parseLinkDestination(ftk);
+		const href = parseLinkDestination(ftk);
 
-		if (linkDest) {
+		if (href) {
 			ftk.acceptRun(whiteSpace)
 
 			if (ftk.accept("\n")) {
 				ftk.acceptRun(whiteSpace);
 			}
 
-			const linkTitle = parseLinkTitle(ftk),
+			const title = parseLinkTitle(ftk),
 			      ref = tk.get().slice(0, colon - 2).trim().slice(1);
 
-			links.set(ref, [linkDest, linkTitle]);
+			links.set(ref, {href, title});
 
 			return new LinkLabelBlock();
 		}
@@ -882,7 +882,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 							if (refLink) {
 								stack[j] = {
 									"type": tokenHTMLMD,
-									"data": openTag(uid, "a", false, {"href": refLink[0], "title": refLink[1]})
+									"data": openTag(uid, "a", false, refLink)
 								};
 
 								stack[i] = {
@@ -1204,7 +1204,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return tk.get();
       },
-      links = new Map<string, [string, string]>();
+      links = new Map<string, {href: string; title: string}>();
 
 abstract class Block {
 	open = true;
