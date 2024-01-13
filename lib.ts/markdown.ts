@@ -870,11 +870,33 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					break;
 				} else if (openTK.type === tokenImageOpen || !hasNest && openTK.type === tokenLinkOpen) {
 					if (!processLinkAndImage(uid, stack, j, i)) {
-						openTK.type = tokenText;
-
 						if (openTK.type === tokenLinkOpen) {
+							let ref = "";
+
+							for (let k = j + 1; k < i; k++) {
+								ref += stack[k].data;
+							}
+
+							const refLink = links.get(ref.toLowerCase());
+
+							if (refLink) {
+								stack[j] = {
+									"type": tokenHTMLMD,
+									"data": openTag(uid, "a", false, {"href": refLink[0], "title": refLink[1]})
+								};
+
+								stack[i] = {
+									"type": tokenHTMLMD,
+									"data": closeTag("a")
+								};
+
+								break;
+							}
+
 							closeTK.type = tokenText;
 						}
+
+						openTK.type = tokenText;
 					} else if (openTK.type === tokenLinkOpen) {
 						linkDone = true;
 
@@ -1182,7 +1204,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return tk.get();
       },
-      links = new Map<string, [string, string?]>();
+      links = new Map<string, [string, string]>();
 
 abstract class Block {
 	open = true;
