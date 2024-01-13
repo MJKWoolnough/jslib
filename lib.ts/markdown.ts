@@ -384,7 +384,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			}
 
 			const title = parseLinkTitle(ftk),
-			      ref = tk.get().slice(0, colon - 2).trim().slice(1);
+			      ref = tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase();
 
 			links.set(ref, {href, title});
 
