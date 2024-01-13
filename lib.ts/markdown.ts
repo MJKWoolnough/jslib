@@ -338,6 +338,62 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return null;
       },
+      parseLinkLabel = (tk: Tokeniser) => {
+	if (tk.accept("[")) {
+		tk.acceptRun(whiteSpace);
+		if (!tk.accept("]")) {
+			Loop:
+			while (true) {
+				switch (tk.exceptRun("\\[]")) {
+				case ']':
+					tk.next();
+
+					return true;
+				case '\\':
+					tk.next();
+					tk.next();
+
+					break;
+				default:
+					break Loop;
+				}
+			}
+		}
+	}
+
+	return false;
+      },
+      parseLinkReference = (tk: Tokeniser, inParagraph: boolean) => {
+	if (!inParagraph && parseLinkLabel(tk) && tk.accept(":")) {
+		const colon = tk.length(),
+		      ftk = new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
+
+		tk.acceptRun(whiteSpace);
+
+		if (tk.accept("\n")) {
+			tk.acceptRun(whiteSpace);
+		}
+
+		const linkDest = parseLinkDestination(ftk);
+
+		if (linkDest) {
+			ftk.acceptRun(whiteSpace)
+
+			if (ftk.accept("\n")) {
+				ftk.acceptRun(whiteSpace);
+			}
+
+			const linkTitle = parseLinkTitle(ftk),
+			      ref = tk.get().slice(0, colon - 2).trim().slice(1);
+
+			links.set(ref, [linkDest, linkTitle]);
+
+			return new LinkLabelBlock();
+		}
+	}
+
+	return null;
+      },
       parseParagraph = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph) {
 		const last = tk.acceptRun(whiteSpace);
@@ -364,6 +420,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	parseHTML5,
 	parseHTML6,
 	parseHTML7,
+	parseLinkReference,
 	parseParagraph
       ],
       encoder = makeNode("textarea"),
@@ -1624,6 +1681,22 @@ class HTMLBlock extends LeafBlock {
 
 	toHTML() {
 		return this.lines.join("");
+	}
+}
+
+class LinkLabelBlock extends Block {
+	constructor() {
+		super();
+
+		this.open = false;
+	}
+
+	accept() {
+		return false;
+	}
+
+	toHTML() {
+		return "";
 	}
 }
 
