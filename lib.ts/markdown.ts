@@ -574,6 +574,117 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return parseText(tk);
       },
+      parseLinkDestination = (tk: Tokeniser) => {
+	if (tk.accept("<")) {
+		tk.get();
+
+		while (true) {
+			switch (tk.exceptRun("\n\\<>")) {
+			case '\\':
+				tk.next();
+				tk.next();
+
+				break;
+			case '>':
+				const dest = tk.get();
+
+				tk.next();
+
+				return dest;
+			default:
+				return "";
+			}
+		}
+	}
+
+	tk.get();
+
+	let paren = 0;
+
+	while (true) {
+		switch (tk.exceptRun(control + " \\()")) {
+		case '\\':
+			tk.next();
+			tk.next();
+
+			break;
+		case '(':
+			tk.next();
+
+			paren++;
+
+			break;
+		case ')':
+			if (!paren) {
+				return tk.get();
+			}
+
+			tk.next();
+
+			paren--;
+
+			break;
+		default:
+			return tk.get();
+		}
+	}
+      },
+      parseLinkTitle = (tk: Tokeniser) => {
+	const next = tk.peek();
+
+	switch (next) {
+	case ')':
+		break;
+	case '"':
+	case '\'':
+	case '(':
+		let paren = 0;
+
+		tk.next();
+		tk.get();
+
+		while (true) {
+			switch (tk.exceptRun(next === "(" ? "()\\" : "\\" + next)) {
+			case '\\':
+				tk.next();
+				tk.next();
+
+				break;
+			case '(':
+				tk.next();
+
+				paren++;
+
+				break;
+			case '"':
+			case '\'':
+				const titleText = tk.get();
+
+				tk.next();
+
+				return titleText;
+			case ')':
+				if (!paren) {
+					const titleText = tk.get();
+
+					tk.next();
+
+					return titleText;
+				}
+
+				tk.next();
+
+				paren--;
+
+				break;
+			default:
+				return "";
+			}
+		}
+	}
+
+	return "";
+      },
       processLinkAndImage = (uid: string, stack: Token[], start: number, end: number) => {
 	if (stack[end+1]?.type !== tokenParenOpen){
 		return false;
@@ -581,7 +692,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	let pos = end + 2,
 	    c = 0,
-	    hasTitle = false,
 	    dest = "",
 	    titleText = "";
 
@@ -603,128 +713,12 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	tk.acceptRun(whiteSpaceNL);
 
-	if (tk.accept("<")) {
-		tk.get();
-
-		Loop:
-		while (true) {
-			switch (tk.exceptRun("\n\\<>")) {
-			case '\\':
-				tk.next();
-				tk.next();
-
-				break;
-			case '>':
-				dest = tk.get();
-
-				tk.next();
-
-				break Loop;
-			default:
-				return false;
-			}
-		}
-	} else {
-		tk.get();
-
-		let paren = 0;
-
-		Loop:
-		while (true) {
-			switch (tk.exceptRun(control + " \\()")) {
-			case '\\':
-				tk.next();
-				tk.next();
-
-				break;
-			case '(':
-				tk.next();
-
-				paren++;
-
-				break;
-			case ')':
-				if (!paren) {
-					hasTitle = true;
-
-					dest = tk.get();
-
-					break Loop;
-				}
-
-				tk.next();
-
-				paren--;
-
-				break;
-			default:
-				dest = tk.get();
-
-				break Loop;
-			}
-		}
-	}
+	dest = parseLinkDestination(tk);
 
 	tk.acceptRun(whiteSpaceNL);
 
-	if (!hasTitle) {
-		const next = tk.peek();
-
-		switch (next) {
-		case ')':
-			break;
-		case '"':
-		case '\'':
-		case '(':
-			let paren = 0;
-
-			tk.next();
-			tk.get();
-
-			Loop:
-			while (true) {
-				switch (tk.exceptRun(next === "(" ? "()\\" : "\\" + next)) {
-				case '\\':
-					tk.next();
-					tk.next();
-
-					break;
-				case '(':
-					tk.next();
-
-					paren++;
-
-					break;
-				case '"':
-				case '\'':
-					titleText = tk.get();
-
-					tk.next();
-
-					break Loop;
-				case ')':
-					if (!paren) {
-						titleText = tk.get();
-
-						tk.next();
-
-						break Loop;
-					}
-
-					tk.next();
-
-					paren--;
-
-					break;
-				default:
-					return false;
-				}
-			}
-
-			break;
-		default:
-			return false;
-		}
+	if (tk.peek() !== ")") {
+		titleText = parseLinkTitle(tk);
 
 		tk.acceptRun(whiteSpaceNL);
 	}
