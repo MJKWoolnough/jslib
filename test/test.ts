@@ -10882,7 +10882,8 @@ type Tests = {
 				["[foo]: /url 'title\n\nwith blank line'\n\n[foo]", "<p>[foo]: /url 'title</p><p>with blank line'</p><p>[foo]</p>"],
 				["[foo]:\n/url\n\n[foo]", "<p><a href=\"/url\">foo</a></p>"],
 				["[foo]:\n\n[foo]", "<p>[foo]:</p><p>[foo]</p>"],
-				["[foo]: <>\n\n[foo]", "<p><a href=\"\">foo</a></p>"]
+				["[foo]: <>\n\n[foo]", "<p><a href=\"\">foo</a></p>"],
+				["[foo]: <bar>(baz)\n\n[foo]", "<p>[foo]: <bar>(baz)</bar></p><p>[foo]</p>"]
 			]
 		},
 		"paragraphs": {
