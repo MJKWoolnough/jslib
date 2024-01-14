@@ -374,16 +374,17 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			tk.acceptRun(whiteSpace);
 		}
 
-		const href = parseLinkDestination(ftk);
+		const h = parseLinkDestination(ftk);
 
-		if (href) {
+		if (h) {
 			ftk.acceptRun(whiteSpace)
 
 			if (ftk.accept(nl)) {
 				ftk.acceptRun(whiteSpace);
 			}
 
-			const title = parseLinkTitle(ftk);
+			const title = parseLinkTitle(ftk),
+			      href = h + "";
 
 			if (!title) {
 				ftk.reset();
@@ -654,7 +655,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 				tk.next();
 
-				return dest;
+				tk.get();
+
+				return dest || [];
 			default:
 				return "";
 			}
@@ -786,7 +789,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	tk.acceptRun(whiteSpaceNL);
 
-	dest = parseLinkDestination(tk);
+	dest = parseLinkDestination(tk) + "";
 
 	tk.acceptRun(whiteSpaceNL);
 
