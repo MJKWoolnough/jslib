@@ -377,25 +377,27 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		const h = parseLinkDestination(ftk);
 
 		if (h) {
-			ftk.acceptRun(whiteSpace)
+			if (ftk.accept(whiteSpace) || ftk.peek() === nl) {
+				ftk.acceptRun(whiteSpace)
 
-			if (ftk.accept(nl)) {
+				if (ftk.accept(nl)) {
+					ftk.acceptRun(whiteSpace);
+				}
+
+				const title = parseLinkTitle(ftk),
+				      href = h + "";
+
+				if (!title) {
+					ftk.reset();
+				}
+
 				ftk.acceptRun(whiteSpace);
-			}
 
-			const title = parseLinkTitle(ftk),
-			      href = h + "";
+				if (ftk.accept(nl)) {
+					links.set(tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase(), {href, title});
 
-			if (!title) {
-				ftk.reset();
-			}
-
-			ftk.acceptRun(whiteSpace);
-
-			if (ftk.accept(nl)) {
-				links.set(tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase(), {href, title});
-
-				return new LinkLabelBlock();
+					return new LinkLabelBlock();
+				}
 			}
 		}
 	}
@@ -790,6 +792,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	tk.acceptRun(whiteSpaceNL);
 
 	dest = parseLinkDestination(tk) + "";
+
+	if (!tk.accept(whiteSpace) && tk.peek() !== nl && tk.peek() !== ")") {
+		return false;
+	}
 
 	tk.acceptRun(whiteSpaceNL);
 
