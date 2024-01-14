@@ -384,8 +384,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					ftk.acceptRun(whiteSpace);
 				}
 
-				const title = parseLinkTitle(ftk),
-				      href = h + "";
+				const title = processEscapedPunctuation(parseLinkTitle(ftk)),
+				      href = processEscapedPunctuation(h + "");
 
 				if (!title) {
 					ftk.reset();
