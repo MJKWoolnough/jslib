@@ -377,7 +377,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		const h = parseLinkDestination(ftk);
 
 		if (h) {
-			if (ftk.accept(whiteSpace) || ftk.peek() === nl) {
+			if (ftk.accept(whiteSpace) || ftk.peek() === nl || !ftk.peek()) {
 				ftk.acceptRun(whiteSpace)
 
 				if (ftk.accept(nl)) {
@@ -393,7 +393,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 				ftk.acceptRun(whiteSpace);
 
-				if (ftk.accept(nl)) {
+				if (ftk.accept(nl) || !ftk.peek()) {
 					links.set(tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase(), {href, title});
 
 					return new LinkLabelBlock();
