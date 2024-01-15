@@ -10892,7 +10892,15 @@ type Tests = {
 				["[foo]: /url", ""],
 				["[\nfoo\n]: /url\nbar", "<p>bar</p>"],
 				["[foo]: /url \"title\" ok", "<p>[foo]: /url \"title\" ok</p>"],
-				["[foo]: /url\n\"title\" ok", "<p>\"title\" ok</p>"]
+				["[foo]: /url\n\"title\" ok", "<p>\"title\" ok</p>"],
+				["    [foo]: /url \"title\"\n\n[foo]", "<pre><code>[foo]: /url \"title\"\n</code></pre><p>[foo]</p>"],
+				["```\n[foo]: /url\n```\n\n\n[foo]", "<pre><code>[foo]: /url\n</code></pre><p>[foo]</p>"],
+				["Foo\n[bar]: /baz\n\n[bar]", "<p>Foo\n[bar]: /baz</p><p>[bar]</p>"],
+				["# [Foo]\n[foo]: /url\n> bar", "<h1><a href=\"/url\">Foo</a></h1><blockquote><p>bar</p></blockquote>"],
+				["[foo]: /url\nbar\n===\n[foo]", "<h1>bar</h1><p><a href=\"/url\">foo</a></p>"],
+				["[foo]: /url\n===\n[foo]", "<p>===\n<a href=\"/url\">foo</a></p>"],
+				["[foo]: /foo-url \"foo\"\n[bar]: /bar-url\n  \"bar\"\n[baz]: /baz-url\n\n[foo],\n[bar],\n[baz]", "<p><a href=\"/foo-url\" title=\"foo\">foo</a>,\n<a href=\"/bar-url\" title=\"bar\">bar</a>,\n<a href=\"/baz-url\">baz</a></p>"],
+				["[foo]\n\n> [foo]: /url", "<p><a href=\"/url\">foo</a></p><blockquote></blockquote>"]
 			]
 		},
 		"paragraphs": {
