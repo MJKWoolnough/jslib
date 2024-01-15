@@ -792,11 +792,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return "";
       },
       processLinkAndImage = (uid: string, stack: Token[], start: number, end: number) => {
-	if (stack[end+1]?.type !== tokenParenOpen){
-		return false;
-	}
-
-	let pos = end + 2,
+	let pos = end + 1,
 	    c = 0,
 	    dest = "",
 	    titleText = "";
@@ -816,6 +812,33 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 		return {"value": stack[pos]?.data[c++] ?? "", "done": false};
 	      }});
+
+	if (!tk.accept("(")) {
+		if (tk.peek() === "[") {
+			if (!parseLinkLabel(tk)) {
+				return false;
+			}
+
+			const refLink = links.get(tk.get().slice(1, -1).toLowerCase());
+
+			if (refLink) {
+				stack[start] = {
+					"type": tokenHTMLMD,
+					"data": openTag(uid, "a", false, refLink)
+				};
+
+				stack[end] = {
+					"type": tokenHTMLMD,
+					"data": closeTag("a")
+				};
+
+				stack.splice(end + 1, pos - end);
+
+				return true;
+			}
+		}
+		return false;
+	}
 
 	tk.acceptRun(whiteSpaceNL);
 
@@ -863,7 +886,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			"type": tokenHTMLMD,
 			"data": closeTag("a")
 		}
-
 	} else {
 		let alt = "";
 
