@@ -10886,7 +10886,12 @@ type Tests = {
 				["[foo]: <bar>(baz)\n\n[foo]", "<p>[foo]: <bar>(baz)</bar></p><p>[foo]</p>"],
 				["[foo]: /url\\bar\\*baz \"foo\\\"bar\\baz\"\n\n[foo]", "<p><a href=\"/url\\bar*baz\" title=\"foo&quot;bar\\baz\">foo</a></p>"],
 				["[foo]\n\n[foo]: url", "<p><a href=\"url\">foo</a></p>"],
-				["[foo]\n\n[foo]: first\n[foo]: second", "<p><a href=\"first\">foo</a></p>"]
+				["[foo]\n\n[foo]: first\n[foo]: second", "<p><a href=\"first\">foo</a></p>"],
+				["[FOO]: /url\n\n[Foo]", "<p><a href=\"/url\">Foo</a></p>"],
+				["[ΑΓΩ]: /φου\n\n[αγω]", "<p><a href=\"/φου\">αγω</a></p>"],
+				["[foo]: /url", ""],
+				["[\nfoo\n]: /url\nbar", "<p>bar</p>"],
+				["[foo]: /url \"title\" ok", "<p>[foo]: /url \"title\" ok</p>"]
 			]
 		},
 		"paragraphs": {
