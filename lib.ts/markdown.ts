@@ -374,7 +374,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			tk.acceptRun(whiteSpace);
 		}
 
-		const h = parseLinkDestination(ftk);
+		const h = parseLinkDestination(ftk),
+		      p = tk.length();
 
 		if (h) {
 			if (ftk.accept(whiteSpace) || ftk.peek() === nl || !ftk.peek()) {
@@ -389,6 +390,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 				if (!title) {
 					ftk.reset();
+					tk.reset();
+
+					for (let i = 0; i < p; i++) {
+						tk.next();
+					}
 				}
 
 				ftk.acceptRun(whiteSpace);
