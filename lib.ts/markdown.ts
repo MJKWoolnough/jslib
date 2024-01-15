@@ -394,7 +394,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				ftk.acceptRun(whiteSpace);
 
 				if (ftk.accept(nl) || !ftk.peek()) {
-					links.set(tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase(), {href, title});
+					const ref = tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase();
+
+					if (!links.has(ref)) {
+						links.set(ref, {href, title});
+					}
 
 					return new LinkLabelBlock();
 				}
