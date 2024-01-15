@@ -10891,7 +10891,8 @@ type Tests = {
 				["[ΑΓΩ]: /φου\n\n[αγω]", "<p><a href=\"/φου\">αγω</a></p>"],
 				["[foo]: /url", ""],
 				["[\nfoo\n]: /url\nbar", "<p>bar</p>"],
-				["[foo]: /url \"title\" ok", "<p>[foo]: /url \"title\" ok</p>"]
+				["[foo]: /url \"title\" ok", "<p>[foo]: /url \"title\" ok</p>"],
+				["[foo]: /url\n\"title\" ok", "<p>\"title\" ok</p>"]
 			]
 		},
 		"paragraphs": {
