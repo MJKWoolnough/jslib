@@ -381,7 +381,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			if (ftk.accept(whiteSpace) || ftk.peek() === nl || !ftk.peek()) {
 				ftk.acceptRun(whiteSpace)
 
-				if (ftk.accept(nl)) {
+				const hasNL = ftk.accept(nl),
+				      nlPos = tk.length();
+
+				if (hasNL) {
 					ftk.acceptRun(whiteSpace);
 				}
 
@@ -399,15 +402,30 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 				ftk.acceptRun(whiteSpace);
 
-				if (ftk.accept(nl) || !ftk.peek()) {
-					const ref = tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase();
+				let hasTitle = true;
 
-					if (!links.has(ref)) {
-						links.set(ref, {href, title});
+				if (!ftk.accept(nl) && ftk.peek()) {
+					if (!hasNL) {
+						return null;
 					}
 
-					return new LinkLabelBlock();
+					hasTitle = false;
+
+					ftk.reset();
+					tk.reset();
+
+					for (let i = 0; i < nlPos; i++) {
+						tk.next();
+					}
 				}
+
+				const ref = tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase();
+
+				if (!links.has(ref)) {
+					links.set(ref, {href, "title" : hasTitle ? title : ""});
+				}
+
+				return new LinkLabelBlock();
 			}
 		}
 	}
