@@ -9,6 +9,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [bbcode](#bbcode)                           | A BBCode parser. |
 | [bbcode_tags](#bbcode_tags)                 | A collection of BBCode tags. |
 | [bind](#bind)                               | Function for creating [Attr](https://developer.mozilla.org/en-US/docs/Web/API/Attr) and [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) nodes that update their textContent automatically. |
+| [casefold](#casefold)                       | A single function module that provides unicode case folding. |
 | [conn](#conn)                               | Convenience wrappers around [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket). |
 | [css](#css)                                 | A simple CSS management library. |
 | [dom](#dom)                                 | Functions for manipulating the DOM. |
@@ -45,7 +46,7 @@ Thematically, the above modules can be grouped into a few packages:
 | Decorum   | A collection of DOM manipulation libs. | [Bind](#bind), [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), [RPC](#rpc), and [URLState](#urlstate). |
 | Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), [Pagination](#pagination), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
-| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [Fraction](#fraction), [Load](#load), [Misc](#misc), [Parser](#parser), [Router](#router), [Transitions](#router_transitions), [Settings](#settings), and [TypeGuard](#typeguard). |
+| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [CaseFold](#casefold), [Fraction](#fraction), [Load](#load), [Misc](#misc), [Parser](#parser), [Router](#router), [Transitions](#router_transitions), [Settings](#settings), and [TypeGuard](#typeguard). |
 
 # Scripts
 
@@ -290,6 +291,14 @@ When the value on the class is changed, the values of the properties and the chi
 The transform method returns a new Binding that transforms the result of the template according to the specified function.
 
 The onChange method runs the provided callback whenever the value changes, passing the function the current value.
+
+## <a name="casefold">casefold</a>
+
+The casefold module provides a simple unicode case-folding function.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+|  (default)  | Function | The default export folds the case on the given string according to the following table of mappings: https://www.unicode.org/Public/UCD/latest/ucd/CaseFolding.txt |
 
 ## <a name="conn">conn</a>
 
