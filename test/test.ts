@@ -9578,6 +9578,19 @@ type Tests = {
 			}
 		}
 	},
+	"casefold": [
+		["A", "A", "a"],
+		["a", "a", "a"],
+		["A", "a", "a"],
+		["ẞ", "SS", "ss"],
+		["ẞ", "ss", "ss"],
+		["1# HarBOR Side", "1# HARboR SiDE", "1# harbor side"]
+	].reduce((o, [from, to, exact]) => (o[`${from} == ${to} (${exact})`] = async () => {
+		const {default: fold} = await import("./lib/casefold.js"),
+		      folded = fold(from);
+
+		return folded === fold(to) && folded === exact;
+	}, o), {} as Record<string, () => Promise<boolean>>),
 	"parser": {
 		"tokeniser": {
 			"peek": {
