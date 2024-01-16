@@ -364,6 +364,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return false;
       },
+      processLinkRef = (ref: string) => CaseFold(ref).replaceAll(/\W+/g, " "),
       parseLinkReference = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph && parseLinkLabel(tk) && tk.accept(":")) {
 		const colon = tk.length(),
@@ -420,7 +421,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					}
 				}
 
-				const ref = CaseFold(tk.get().slice(0, colon - 2).trim().slice(1));
+				const ref = processLinkRef(tk.get().slice(0, colon - 2).trim().slice(1));
 
 				if (!links.has(ref)) {
 					links.set(ref, {href, "title" : hasTitle ? title : ""});
@@ -820,7 +821,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				return false;
 			}
 
-			const refLink = links.get(CaseFold(tk.get().slice(1, -1)));
+			const refLink = links.get(processLinkRef(tk.get().slice(1, -1)));
 
 			if (refLink) {
 				stack[start] = {
@@ -955,7 +956,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 								ref += stack[k].data;
 							}
 
-							const refLink = links.get(CaseFold(ref));
+							const refLink = links.get(processLinkRef(ref));
 
 							if (refLink) {
 								stack[j] = {
