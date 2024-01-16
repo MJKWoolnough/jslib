@@ -1,3 +1,10 @@
+/**
+ * The casefold module provides a simple unicode case-folding function.
+ *
+ * @module casefold
+ */
+/** */
+
 const cf = new Map<string, string>(),
       add = (from: number, ...to: number[]) => {
 		cf.set(String.fromCharCode(from), String.fromCharCode(...to));
@@ -313,6 +320,15 @@ addRange(71840, 71871, 32);
 addRange(93760, 93791, 32);
 addRange(125184, 125217, 34);
 
+/**
+ * The default export folds the case on the given string according to the following table of mappings:
+ *
+ * https://www.unicode.org/Public/UCD/latest/ucd/CaseFolding.txt
+ *
+ * @param {string} str The string to be folded.
+ *
+ * @return {string} The folded string.
+ */
 export default (str: string) => {
 	let ret = "";
 
