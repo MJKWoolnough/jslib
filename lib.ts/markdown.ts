@@ -1,4 +1,5 @@
 import type {Token, TokenFn} from './parser.js';
+import CaseFold from './casefold.js';
 import {TokenDone, Tokeniser} from './parser.js';
 import Parser from './parser.js';
 
@@ -419,7 +420,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					}
 				}
 
-				const ref = tk.get().slice(0, colon - 2).trim().slice(1).toLowerCase();
+				const ref = CaseFold(tk.get().slice(0, colon - 2).trim().slice(1));
 
 				if (!links.has(ref)) {
 					links.set(ref, {href, "title" : hasTitle ? title : ""});
@@ -819,7 +820,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				return false;
 			}
 
-			const refLink = links.get(tk.get().slice(1, -1).toLowerCase());
+			const refLink = links.get(CaseFold(tk.get().slice(1, -1)));
 
 			if (refLink) {
 				stack[start] = {
@@ -954,7 +955,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 								ref += stack[k].data;
 							}
 
-							const refLink = links.get(ref.toLowerCase());
+							const refLink = links.get(CaseFold(ref));
 
 							if (refLink) {
 								stack[j] = {
