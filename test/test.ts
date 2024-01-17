@@ -11269,7 +11269,8 @@ type Tests = {
 				["[[[foo]]]\n\n[[[foo]]]: /url", "<p>[[[foo]]]</p><p>[[[foo]]]: /url</p>"],
 				["[foo][ref\\[]\n\n[ref\\[]: /uri", "<p><a href=\"/uri\">foo</a></p>"],
 				["[bar\\\\]: /uri\n\n[bar\\\\]", "<p><a href=\"/uri\">bar\\</a></p>"],
-				["[]\n\n[]: /uri", "<p>[]</p><p>[]: /uri</p>"]
+				["[]\n\n[]: /uri", "<p>[]</p><p>[]: /uri</p>"],
+				["[\n ]\n\n[\n ]: /uri", "<p>[\n]</p><p>[\n]: /uri</p>"]
 			],
 			"images": [
 				["![foo](/url \"title\")", "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"],
