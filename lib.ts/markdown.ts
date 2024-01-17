@@ -342,10 +342,24 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       parseLinkLabel = (tk: Tokeniser) => {
 	if (tk.accept("[")) {
 		tk.acceptRun(whiteSpace);
-		if (!tk.accept("]")) {
+
+		if (tk.accept("\n")) {
+			tk.acceptRun(whiteSpace);
+		}
+
+		if (!tk.accept("]") && !tk.accept(nl)) {
 			Loop:
 			while (true) {
-				switch (tk.exceptRun("\\[]")) {
+				switch (tk.exceptRun("\\[]\n")) {
+				case '\n':
+					tk.next();
+					tk.acceptRun(whiteSpace);
+
+					if (tk.peek() === nl) {
+						return false;
+					}
+
+					break;
 				case ']':
 					tk.next();
 
