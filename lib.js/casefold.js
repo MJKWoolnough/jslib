@@ -9,7 +9,7 @@ const cf = new Map(),
       add = (from, ...to) => {
 		cf.set(String.fromCharCode(from), String.fromCharCode(...to));
       },
-      addRange = (start, end, shift) => {
+      addRange = (start, end, shift = 32) => {
 	for (let i = start; i <= end; i++) {
 		add(i, i + shift);
 	}
@@ -20,10 +20,10 @@ const cf = new Map(),
 	}
       };
 
-addRange(65, 90, 32);
+addRange(65, 90);
 add(181, 956);
-addRange(192, 214, 32);
-addRange(216, 222, 32);
+addRange(192, 214);
+addRange(216, 222);
 add(223, 115, 115);
 altAdd(256, 302);
 add(304, 105, 775);
@@ -97,8 +97,8 @@ addRange(904, 906, 37);
 add(908, 972);
 addRange(910, 911, 63);
 add(912, 953, 776, 769);
-addRange(913, 929, 32);
-addRange(931, 939, 32);
+addRange(913, 929);
+addRange(931, 939);
 add(944, 965, 776, 769);
 add(962, 963);
 add(975, 983);
@@ -116,7 +116,7 @@ add(1017, 1010);
 add(1018, 1019);
 addRange(1021, 1023, -130);
 addRange(1024, 1039, 80);
-addRange(1040, 1071, 32);
+addRange(1040, 1071);
 altAdd(1120, 1152);
 altAdd(1162, 1214);
 add(1216, 1231);
@@ -308,7 +308,7 @@ add(64276, 1396, 1381);
 add(64277, 1396, 1387);
 add(64278, 1406, 1398);
 add(64279, 1396, 1389);
-addRange(65313, 65338, 32);
+addRange(65313, 65338);
 addRange(66560, 66599, 40);
 addRange(66736, 66771, 40);
 addRange(66928, 66938, 39);
@@ -316,8 +316,8 @@ addRange(66940, 66954, 39);
 addRange(66956, 66962, 39);
 addRange(66964, 66965, 39);
 addRange(68736, 68786, 64);
-addRange(71840, 71871, 32);
-addRange(93760, 93791, 32);
+addRange(71840, 71871);
+addRange(93760, 93791);
 addRange(125184, 125217, 34);
 
 /**
