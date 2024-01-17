@@ -364,7 +364,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return false;
       },
-      processLinkRef = (ref: string) => CaseFold(ref).replaceAll(/\W+/g, " "),
+      processLinkRef = (ref: string) => CaseFold(ref).replaceAll(/\s+/g, " "),
       parseLinkReference = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph && parseLinkLabel(tk) && tk.accept(":")) {
 		const colon = tk.length(),
