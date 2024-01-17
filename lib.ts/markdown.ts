@@ -983,6 +983,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 									"data": closeTag("a")
 								};
 
+								if (stack[i+1]?.type === tokenLinkOpen && stack[i+2]?.type === tokenLinkClose) {
+									stack.splice(i+1, 2);
+								}
+
 								break;
 							}
 
