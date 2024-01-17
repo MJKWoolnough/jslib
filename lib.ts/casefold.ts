@@ -329,7 +329,7 @@ addRange(125184, 125217, 34);
  *
  * @return {string} The folded string.
  */
-export default (str: string) => {
+export default (str: string): string => {
 	let ret = "";
 
 	for (const c of str) {
