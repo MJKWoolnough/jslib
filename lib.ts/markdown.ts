@@ -851,9 +851,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				stack.splice(end + 1, pos - end);
 
 				processEmphasis(uid, stack, start, end)
-
-				return true;
 			}
+
+			return true;
 		}
 		return false;
 	}
