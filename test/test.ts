@@ -11282,7 +11282,13 @@ type Tests = {
 				["[Foo]\n\n[foo]: /url \"title\"", "<p><a href=\"/url\" title=\"title\">Foo</a></p>"],
 				["[foo] bar\n\n[foo]: /url", "<p><a href=\"/url\">foo</a> bar</p>"],
 				["\\[foo]\n\n[foo]: /url \"title\"", "<p>[foo]</p>"],
-				["[foo*]: /url\n\n*[foo*]", "<p>*<a href=\"/url\">foo*</a></p>"]
+				["[foo*]: /url\n\n*[foo*]", "<p>*<a href=\"/url\">foo*</a></p>"],
+				["[foo][bar]\n\n[foo]: /url1\n[bar]: /url2", "<p><a href=\"/url2\">foo</a></p>"],
+				["[foo][]\n\n[foo]: /url1", "<p><a href=\"/url1\">foo</a></p>"],
+				["[foo]()\n\n[foo]: /url1", "<p><a href=\"\">foo</a></p>"],
+				["[foo](not a link)\n\n[foo]: /url1", "<p><a href=\"/url1\">foo</a>(not a link)</p>"],
+				["[foo][bar][baz]\n\n[baz]: /url", "<p>[foo]<a href=\"/url\">bar</a></p>"],
+				["[foo][bar][baz]\n\n[baz]: /url1\n[bar]: /url2", "<p><a href=\"/url2\">foo</a><a href=\"/url1\">baz</a></p>"]
 			],
 			"images": [
 				["![foo](/url \"title\")", "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"],
