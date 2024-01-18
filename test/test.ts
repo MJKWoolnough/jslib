@@ -11293,7 +11293,7 @@ type Tests = {
 			],
 			"images": [
 				["![foo](/url \"title\")", "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"],
-				//["![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &amp; tracks\" alt=\"foo bar\"></p>"],
+				["![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &amp; tracks\"></p>"],
 				["![foo ![bar](/url)](/url2)", "<p><img src=\"/url2\" alt=\"foo bar\"></p>"],
 				["![foo [bar](/url)](/url2)", "<p><img src=\"/url2\" alt=\"foo bar\"></p>"],
 				//["![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" title=\"train &amp; tracks\" alt=\"foo bar\"></p>"],
