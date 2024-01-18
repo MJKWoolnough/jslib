@@ -11296,7 +11296,7 @@ type Tests = {
 				["![foo *bar*]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &amp; tracks\"></p>"],
 				["![foo ![bar](/url)](/url2)", "<p><img src=\"/url2\" alt=\"foo bar\"></p>"],
 				["![foo [bar](/url)](/url2)", "<p><img src=\"/url2\" alt=\"foo bar\"></p>"],
-				//["![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" title=\"train &amp; tracks\" alt=\"foo bar\"></p>"],
+				["![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo bar\" title=\"train &amp; tracks\"></p>"],
 				//["![foo *bar*][foobar]\n\n[FOOBAR]: train.jpg \"train & tracks\"", "<p><img src=\"train.jpg\" alt=\"foo\"></p>"],
 				["![foo](train.jpg)", "<p><img src=\"train.jpg\" alt=\"foo\"></p>"],
 				["My ![foo bar](/path/to/train.jpg  \"title\"   )", "<p>My <img src=\"/path/to/train.jpg\" alt=\"foo bar\" title=\"title\"></p>"],
