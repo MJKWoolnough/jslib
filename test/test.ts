@@ -11281,7 +11281,8 @@ type Tests = {
 				["[[bar [foo]\n\n[foo]: /url", "<p>[[bar <a href=\"/url\">foo</a></p>"],
 				["[Foo]\n\n[foo]: /url \"title\"", "<p><a href=\"/url\" title=\"title\">Foo</a></p>"],
 				["[foo] bar\n\n[foo]: /url", "<p><a href=\"/url\">foo</a> bar</p>"],
-				["\\[foo]\n\n[foo]: /url \"title\"", "<p>[foo]</p>"]
+				["\\[foo]\n\n[foo]: /url \"title\"", "<p>[foo]</p>"],
+				["[foo*]: /url\n\n*[foo*]", "<p>*<a href=\"/url\">foo*</a></p>"]
 			],
 			"images": [
 				["![foo](/url \"title\")", "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"],
