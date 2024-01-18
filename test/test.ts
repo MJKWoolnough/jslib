@@ -11270,7 +11270,11 @@ type Tests = {
 				["[foo][ref\\[]\n\n[ref\\[]: /uri", "<p><a href=\"/uri\">foo</a></p>"],
 				["[bar\\\\]: /uri\n\n[bar\\\\]", "<p><a href=\"/uri\">bar\\</a></p>"],
 				["[]\n\n[]: /uri", "<p>[]</p><p>[]: /uri</p>"],
-				["[\n ]\n\n[\n ]: /uri", "<p>[\n]</p><p>[\n]: /uri</p>"]
+				["[\n ]\n\n[\n ]: /uri", "<p>[\n]</p><p>[\n]: /uri</p>"],
+				["[foo][]\n\n[foo]: /url \"title\"", "<p><a href=\"/url\" title=\"title\">foo</a></p>"],
+				["[*foo* bar][]\n\n[*foo* bar]: /url \"title\"", "<p><a href=\"/url\" title=\"title\"><em>foo</em> bar</a></p>"],
+				["[Foo][]\n\n[foo]: /url \"title\"", "<p><a href=\"/url\" title=\"title\">Foo</a></p>"],
+				["[foo] \n[]\n\n[foo]: /url \"title\"", "<p><a href=\"/url\" title=\"title\">foo</a>\n[]</p>"]
 			],
 			"images": [
 				["![foo](/url \"title\")", "<p><img src=\"/url\" alt=\"foo\" title=\"title\"></p>"],
