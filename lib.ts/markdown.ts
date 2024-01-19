@@ -395,7 +395,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 		if (h) {
 			if (ftk.accept(whiteSpace) || ftk.peek() === nl || !ftk.peek()) {
-				ftk.acceptRun(whiteSpace)
+				ftk.acceptRun(whiteSpace);
 
 				const hasNL = ftk.accept(nl),
 				      nlPos = tk.length();
