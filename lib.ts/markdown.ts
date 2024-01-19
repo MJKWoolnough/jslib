@@ -808,17 +808,17 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return "";
       },
       makeLink = (uid: string, stack: Token[], start: number, end: number, refLink: {href: string; title: string}) => {
-		stack[start] = {
-			"type": tokenHTMLMD,
-			"data": openTag(uid, "a", false, refLink)
-		};
+	stack[start] = {
+		"type": tokenHTMLMD,
+		"data": openTag(uid, "a", false, refLink)
+	};
 
-		stack[end] = {
-			"type": tokenHTMLMD,
-			"data": closeTag("a")
-		};
+	stack[end] = {
+		"type": tokenHTMLMD,
+		"data": closeTag("a")
+	};
 
-		processEmphasis(uid, stack, start, end)
+	processEmphasis(uid, stack, start, end)
       },
       makeImage = (uid: string, stack: Token[], start: number, end: number, refLink: {href: string; title: string}) => {
 	let alt = "";
