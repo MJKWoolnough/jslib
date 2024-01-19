@@ -894,6 +894,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			return true;
 		}
+
 		return false;
 	}
 
