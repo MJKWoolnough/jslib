@@ -807,7 +807,20 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return "";
       },
-      processAlt = (stack: Token[], start: number, end: number) => {
+      makeLink = (uid: string, stack: Token[], start: number, end: number, refLink: {href: string; title: string}) => {
+		stack[start] = {
+			"type": tokenHTMLMD,
+			"data": openTag(uid, "a", false, refLink)
+		};
+
+		stack[end] = {
+			"type": tokenHTMLMD,
+			"data": closeTag("a")
+		};
+
+		processEmphasis(uid, stack, start, end)
+      },
+      makeImage = (uid: string, stack: Token[], start: number, end: number, refLink: {href: string; title: string}) => {
 	let alt = "";
 
 	for (let i = start + 1; i < end; i++) {
@@ -830,7 +843,14 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		tk.data = "";
 	}
 
-	return alt;
+	stack[start] = {
+		"type": tokenHTMLMD,
+		"data": openTag(uid, "img", true, {"src": refLink.href, "title": refLink.title, alt}),
+		alt
+	} as Token;
+
+	stack[end].type = tokenText;
+	stack[end].data = "";
       },
       processLinkAndImage = (uid: string, stack: Token[], start: number, end: number) => {
 	let pos = end + 1,
@@ -863,19 +883,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			const refLink = links.get(processLinkRef(tk.get().slice(1, -1)));
 
 			if (refLink) {
-				stack[start] = {
-					"type": tokenHTMLMD,
-					"data": openTag(uid, "a", false, refLink)
-				};
-
-				stack[end] = {
-					"type": tokenHTMLMD,
-					"data": closeTag("a")
-				};
+				makeLink(uid, stack, start, end, refLink);
 
 				stack.splice(end + 1, pos - end);
-
-				processEmphasis(uid, stack, start, end)
 			}
 
 			return true;
@@ -903,11 +913,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		return false;
 	}
 
-	const href = processEscapedPunctuation(dest),
-	      title = processEscapedPunctuation(titleText);
+	const ref = {"href": processEscapedPunctuation(dest), "title": processEscapedPunctuation(titleText)};
 
 	if (stack[start].type === tokenLinkOpen) {
-		processEmphasis(uid, stack, start, end);
+		makeLink(uid, stack, start, end, ref);
 
 		for (let i = start + 1; i < end; i++) {
 			switch (stack[i].type) {
@@ -919,27 +928,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				stack[i].type = tokenText;
 			}
 		}
-
-		stack[start] = {
-			"type": tokenHTMLMD,
-			"data": openTag(uid, "a", false, {href, title})
-		};
-
-		stack[end] = {
-			"type": tokenHTMLMD,
-			"data": closeTag("a")
-		}
 	} else {
-		const alt = processAlt(stack, start, end);
-
-		stack[start] = {
-			"type": tokenHTMLMD,
-			"data": openTag(uid, "img", true, {"src": href, alt, title}),
-			alt
-		} as Token;
-
-		stack[end].type = tokenText;
-		stack[end].data = "";
+		makeImage(uid, stack, start, end, ref);
 	}
 
 	stack.splice(end + 1, pos - end);
@@ -980,28 +970,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 						if (refLink) {
 							if (openTK.type === tokenLinkOpen) {
-								stack[j] = {
-									"type": tokenHTMLMD,
-									"data": openTag(uid, "a", false, refLink)
-								};
-
-								stack[i] = {
-									"type": tokenHTMLMD,
-									"data": closeTag("a")
-								};
-
-								processEmphasis(uid, stack, j, i);
+								makeLink(uid, stack, j, i, refLink);
 							} else {
-								const alt = processAlt(stack, j, i);
-
-								stack[j] = {
-									"type": tokenHTMLMD,
-									"data": openTag(uid, "img", true, {"src": refLink.href, "title": refLink.title, alt}),
-									alt
-								} as Token;
-
-								stack[i].type = tokenText;
-								stack[i].data = "";
+								makeImage(uid, stack, j, i, refLink);
 							}
 
 							if (stack[i+1]?.type === tokenLinkOpen && stack[i+2]?.type === tokenLinkClose) {
