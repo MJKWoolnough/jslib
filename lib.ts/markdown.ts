@@ -1264,9 +1264,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       closeTag = (name: string) => `</${name}>`,
       tag = (uid: string, name: keyof HTMLElementTagNameMap, contents?: string, attrs: Record<string, string> = {}) => {
-		const close = contents === undefined;
+	const close = contents === undefined;
 
-		return openTag(uid, name, close, attrs) + (close ? "" : contents + closeTag(name));
+	return openTag(uid, name, close, attrs) + (close ? "" : contents + closeTag(name));
       },
       isOpenParagraph = (b?: Block): b is ParagraphBlock => b instanceof ParagraphBlock && b.open,
       isLastGrandChildOpenParagraph = (b?: Block): boolean => b instanceof ContainerBlock ? isLastGrandChildOpenParagraph(b.children.at(-1)) : b instanceof ParagraphBlock ? b.open : false,
