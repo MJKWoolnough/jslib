@@ -11029,7 +11029,7 @@ type Tests = {
 				["- a\n- b\n\n- c", "<ul><li><p>a</p></li><li><p>b</p></li><li><p>c</p></li></ul>"],
 				["* a\n*\n\n* c", "<ul><li><p>a</p></li><li></li><li><p>c</p></li></ul>"],
 				["- a\n- b\n\n\n  c\n- d", "<ul><li><p>a</p></li><li><p>b</p><p>c</p></li><li><p>d</p></li></ul>"],
-				// ["- a\n- b\n\n\n  [ref]: /url\n- d", "<ul><li><p>a</p></li><li><p>b</p></li><li><p>d</p></li></ul>"],
+				["- a\n- b\n\n\n  [ref]: /url\n- d", "<ul><li><p>a</p></li><li><p>b</p></li><li><p>d</p></li></ul>"],
 				["- a\n- ```\n  b\n\n\n\n  ```\n- c", "<ul><li>a</li><li><pre><code>b\n\n\n\n</code></pre></li><li>c</li></ul>"],
 				["- a\n  - b\n\n    c\n- d", "<ul><li>a<ul><li><p>b</p><p>c</p></li></ul></li><li>d</li></ul>"],
 				["* a\n  > b\n  > \n* c", "<ul><li>a<blockquote><p>b</p></blockquote></li><li>c</li></ul>"],
