@@ -883,7 +883,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			const refLink = links.get(processLinkRef(tk.get().slice(1, -1)));
 
 			if (refLink) {
-				makeLink(uid, stack, start, end, refLink);
+				if (stack[start].type === tokenLinkOpen) {
+					makeLink(uid, stack, start, end, refLink);
+				} else {
+					makeImage(uid, stack, start, end, refLink);
+				}
 
 				stack.splice(end + 1, pos - end);
 			}
