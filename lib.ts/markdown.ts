@@ -1122,11 +1122,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       processEscapedPunctuation = (text: string) => setHTML(encoder, punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text)).innerText,
       parseInline = (uid: string, text: string) => {
-	const stack = Parser(text, parseText, p => {
-		p.exceptRun(TokenDone);
-
-		return p.return(0);
-	      }).next().value.data.filter(t => t.data);
+	const stack = Parser(text, parseText, p => p.return(p.exceptRun(TokenDone))).next().value.data.filter(t => t.data);
 
 	processLinksAndImages(uid, stack);
 	processEmphasis(uid, stack);
