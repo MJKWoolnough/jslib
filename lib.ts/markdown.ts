@@ -23,6 +23,8 @@ type Tags = {
 	inlineCode: (c: DocumentFragment) => Element | DocumentFragment;
 	italic: (c: DocumentFragment) => Element | DocumentFragment;
 	bold: (c: DocumentFragment) => Element | DocumentFragment;
+	subscript: (c: DocumentFragment) => Element | DocumentFragment;
+	strikethrough: (c: DocumentFragment) => Element | DocumentFragment;
 	break: () => Element | DocumentFragment;
 }
 
@@ -59,6 +61,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	["inlineCode", "code"],
 	["italic", "em"],
 	["bold", "strong"],
+	["subscript", "sub"],
+	["strikethrough", "del"],
 	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, `h${1 | 2 | 3 | 4 | 5 | 6}`])
       ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => makeNode(tag, {}, c), o), {
 	"code": (_info: string, text: string) => makeNode("pre", {}, text),
@@ -1036,7 +1040,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       isLeftFlanking = (stack: Token[], pos: number) => {
 	const openTK = stack[pos];
 
-	if (openTK.type === tokenEmphasis) {
+	if (openTK.type === tokenEmphasis || openTK.type === tokenTilde) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
 		      nextChar = stack[pos + 1]?.data.at(0) ?? " ";
 
@@ -1048,7 +1052,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       isRightFlanking = (stack: Token[], pos: number) => {
 	const closeTk = stack[pos];
 
-	if (closeTk.type === tokenEmphasis) {
+	if (closeTk.type === tokenEmphasis || closeTk.type === tokenTilde) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
 		      nextChar = stack[pos + 1]?.data.at(0) ?? " ";
 
@@ -1081,12 +1085,14 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       emphasisTags: Record<string, (keyof HTMLElementTagNameMap)[]> = {
 	"*": ["em", "strong"],
-	"_": ["em", "strong"]
+	"_": ["em", "strong"],
+	"~": ["sub", "del"]
       },
       processEmphasis = (uid: string, stack: Token[], start = 0, end = stack.length) => {
 	const levels = {
 		"*": [start, start, start],
-		"_": [start, start, start]
+		"_": [start, start, start],
+		"~": [start, start]
 	      };
 
 	Loop:
@@ -1204,7 +1210,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"LI": "listItem",
 	"CODE": "inlineCode",
 	"EM": "italic",
-	"STRONG": "bold"
+	"STRONG": "bold",
+	"SUB": "subscript",
+	"DEL": "strikethrough"
       } as const,
       sanitise = (childNodes: NodeListOf<ChildNode>, tags: Tags, uid: string) => {
 	const df = document.createDocumentFragment();
@@ -1233,6 +1241,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				case "CODE":
 				case "EM":
 				case "STRONG":
+				case "SUB":
+				case "DEL":
 					df.append(tags[tagNameToTag[node.nodeName]](sanitise(node.childNodes, tags, uid)));
 
 					break;
