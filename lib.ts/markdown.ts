@@ -1118,8 +1118,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 					for (let k = j + 1; k < i; k++) {
 						switch (stack[k].type) {
-						case tokenLinkOpen:
-						case tokenImageOpen:
+						case tokenTilde:
 						case tokenEmphasis:
 							stack[k].type = tokenText;
 						}
