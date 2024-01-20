@@ -492,9 +492,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenAutoEmail = 11,
       tokenHTMLMD = 12,
       tokenDeactivatedLink = 13,
+      tokenTilde = 14,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
-		switch (tk.exceptRun("\\`*_![]()<")) {
+		switch (tk.exceptRun("\\`*_![]()<~")) {
 		case '\\':
 			tk.next();
 			tk.next();
@@ -516,6 +517,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			return tk.return(tokenText, parseParenClose);
 		case '<':
 			return tk.return(tokenText, parseHTML);
+		case '~':
+			return tk.return(tokenText, parseTilde);
 		default:
 			return tk.return(tokenText);
 		}
@@ -550,6 +553,17 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	tk.acceptRun(tk.next());
 	
 	return tk.return(tokenEmphasis, parseText);
+      },
+      parseTilde = (tk: Tokeniser) => {
+	tk.accept("~");
+
+	if (tk.accept("~") && tk.accept("~")) {
+		tk.acceptRun("~");
+
+		return parseText(tk);
+	}
+
+	return tk.return(tokenTilde, parseText);
       },
       parseImageOpen = (tk: Tokeniser) => {
 	tk.next();
