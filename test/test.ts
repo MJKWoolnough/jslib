@@ -11200,6 +11200,10 @@ type Tests = {
 				["**a<http://foo.bar/?q=**>", "<p>**a<a href=\"http://foo.bar/?q=**\">http://foo.bar/?q=**</a></p>"],
 				["__a<http://foo.bar/?q=__>", "<p>__a<a href=\"http://foo.bar/?q=__\">http://foo.bar/?q=__</a></p>"]
 			],
+			"subscript": [
+				["Subscript: H~2~O", "<p>Subscript: H<sub>2</sub>O</p>"],
+				["~foo\\~", "<p>~foo~</p>"]
+			],
 			"links": [
 				["[link](/uri \"title\")", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
 				["[link](/uri)", "<p><a href=\"/uri\">link</a></p>"],
