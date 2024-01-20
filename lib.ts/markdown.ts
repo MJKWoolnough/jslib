@@ -1108,20 +1108,22 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			for (let j = i - 1; j >= charLevel[level]; j--) {
 				const open = stack[j],
 				      openLength = open.data.length,
-				      isDouble = closeLength > 1 && openLength > 1;
+				      isDouble = closeLength > 1 && openLength > 1,
+				      escapedSpaces = !isDouble && char === "~";
 
-				if (!isDouble && char === "~") {
+				if (escapedSpaces) {
 					let lastEscape = false;
 
 					for (let k = j + 1; k < i; k++) {
 						for (const c of stack[k].data) {
-							console.log(c, lastEscape);
 							switch (c) {
 							case '\\':
 								lastEscape = true;
 
 								break;
 							case ' ':
+							case '\t':
+							case '\n':
 								if (!lastEscape) {
 									stack[j].type = stack[i].type = tokenText;
 
@@ -1145,6 +1147,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 						case tokenTilde:
 						case tokenEmphasis:
 							stack[k].type = tokenText;
+						}
+
+						if (escapedSpaces) {
+							stack[k].data = stack[k].data.replaceAll(/\\([ \n\t])/g, "$1");
 						}
 					}
 
