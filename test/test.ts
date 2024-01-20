@@ -11202,7 +11202,8 @@ type Tests = {
 			],
 			"subscript": [
 				["Subscript: H~2~O", "<p>Subscript: H<sub>2</sub>O</p>"],
-				["~foo\\~", "<p>~foo~</p>"]
+				["~foo\\~", "<p>~foo~</p>"],
+				["~foo bar~", "<p>~foo bar~</p>"]
 			],
 			"links": [
 				["[link](/uri \"title\")", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
