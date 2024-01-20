@@ -1107,11 +1107,35 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			for (let j = i - 1; j >= charLevel[level]; j--) {
 				const open = stack[j],
-				      openLength = open.data.length;
+				      openLength = open.data.length,
+				      isDouble = closeLength > 1 && openLength > 1;
+
+				if (!isDouble && char === "~") {
+					let lastEscape = false;
+
+					for (let k = j + 1; k < i; k++) {
+						for (const c of stack[k].data) {
+							console.log(c, lastEscape);
+							switch (c) {
+							case '\\':
+								lastEscape = true;
+
+								break;
+							case ' ':
+								if (!lastEscape) {
+									stack[j].type = stack[i].type = tokenText;
+
+									continue Loop;
+								}
+							default:
+								lastEscape = false;
+							}
+						}
+					}
+				}
 
 				if (isEmphasisOpening(stack, j) && char === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || (closeLength + openLength) % 3 !== 0 || closeLength % 3 === 0 || openLength % 3 === 0)) {
-					const isDouble = closeLength > 1 && openLength > 1,
-					      tag = emphasisTags[char][+isDouble],
+					const tag = emphasisTags[char][+isDouble],
 					      chars = isDouble ? 2 : 1,
 					      closingTag = {"type": tokenHTMLMD, "data": closeTag(tag)},
 					      openingTag = {"type": tokenHTMLMD, "data": openTag(uid, tag)};
