@@ -84,12 +84,14 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       emailLabelStr = letter + number + "-",
       htmlElements = ["pre", "script", "style", "textarea", "address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"],
       type1Elements = htmlElements.slice(0, 4),
+      notTable = () => null,
       parseTable = (tk: Tokeniser) => {
 	while (true) {
 		switch (tk.exceptRun("|\\\n")) {
 		case '|':
 			return new TableBlock(tk);
 		case '\\':
+			tk.next();
 			tk.next();
 
 			break;
@@ -479,10 +481,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       acceptThreeSpaces = (tk: Tokeniser) => tk.acceptString("   "),
       parseBlock: ((tk: Tokeniser, inParagraph: boolean) => Block | null)[] = [
-	parseTable,
 	parseIndentedCodeBlockStart,
 	parseBlockQuoteStart,
 	parseThematicBreak,
+	parseTable,
 	parseListBlockStart,
 	parseATXHeader,
 	parseFencedCodeBlockStart,
@@ -2041,6 +2043,8 @@ class TableBlock extends LeafBlock {
 	#firstLine: string;
 	#title: string[] = [];
 	#alignment?: number[];
+	#body?: string[][];
+	#notTable?: Document;
 
 	constructor(tk: Tokeniser) {
 		super();
@@ -2058,13 +2062,18 @@ class TableBlock extends LeafBlock {
 			switch (ftk.exceptRun("|\\\n")) {
 			case '\\':
 				tk.next();
+				tk.next();
 
 				break;
 			case '|':
+				tk.next();
+
 				this.#title.push(ftk.get().trim());
 
 				break;
 			default:
+				tk.next();
+
 				this.#title.push(ftk.get().trim());
 
 				break Loop;
@@ -2072,14 +2081,116 @@ class TableBlock extends LeafBlock {
 		}
 	}
 
-	#notATable(tk: Tokeniser) {
+	#notATable(_tk: Tokeniser) {
+		parseBlock[3] = notTable;
+
+		this.#notTable = new Document(this.#firstLine);
+
+		parseBlock[3] = parseTable;
+
 		return false;
 	}
 
 	accept(tk: Tokeniser) {
+		if (this.#notTable) {
+			return this.#notTable.process(tk);
+		} else if (!this.#alignment) {
+			if (tk.accept(" ")) {
+				return this.#notATable(tk);
+			}
+
+			tk.accept("|");
+
+			this.#alignment = [];
+
+			while (true) {
+				tk.acceptRun(whiteSpace);
+
+				const alignment = +tk.accept(":");
+
+				if (!tk.accept("-")) {
+					if (alignment) {
+						return this.#notATable(tk);
+					}
+
+					break;
+				}
+
+				tk.acceptRun("-");
+
+				this.#alignment.push(alignment + 2 * +tk.accept(":"));
+
+				tk.acceptRun(whiteSpace);
+
+				if (!tk.accept("|")) {
+					break;
+				}
+			}
+
+			tk.acceptRun(whiteSpace);
+
+			if (this.#alignment.length !== this.#title.length || !tk.accept("\n") && !tk.peek()) {
+				return this.#notATable(tk);
+			}
+
+			tk.get();
+
+			return true;
+		}
+
+		const hasRow = tk.accept("|"),
+		      row: string[] = [],
+		      ftk = new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
+
+		RowLoop:
+		for (let i = 0; i < this.#title.length; i++) {
+			ftk.acceptRun(whiteSpace);
+
+			ColLoop:
+			while (true) {
+				switch (ftk.exceptRun("|\\\n")) {
+				case '\\':
+					ftk.next();
+					ftk.next();
+
+					break;
+				case '|':
+					ftk.next();
+
+					break ColLoop;
+				default:
+					const cell = tk.get().trim();
+
+					if (cell) {
+						row.push(cell);
+					}
+
+					break RowLoop;
+				}
+			}
+
+			row.push(tk.get().trim());
+		}
+
+		if (!hasRow && row.length === 0) {
+			return false;
+		}
+
+		if (this.#body) {
+			this.#body.push(row);
+		} else {
+			this.#body = [row];
+		}
+
+		tk.exceptRun("\n");
+		tk.next();
+		tk.get();
+
+		return true;
 	}
 
-	toHTML(uid: string): string {
+	toHTML(uid: string) {
+		return uid;
 	}
 }
 
