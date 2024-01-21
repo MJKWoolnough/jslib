@@ -1269,7 +1269,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"EM": "italic",
 	"STRONG": "bold",
 	"SUB": "subscript",
-	"DEL": "strikethrough"
+	"DEL": "strikethrough",
+	"TABLE": "table",
+	"THEAD": "thead",
+	"TBODY": "tbody"
       } as const,
       sanitise = (childNodes: NodeListOf<ChildNode>, tags: Tags, uid: string) => {
 	const df = document.createDocumentFragment();
@@ -1300,6 +1303,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				case "STRONG":
 				case "SUB":
 				case "DEL":
+				case "TABLE":
+				case "THEAD":
+				case "TBODY":
 					df.append(tags[tagNameToTag[node.nodeName]](sanitise(node.childNodes, tags, uid)));
 
 					break;
@@ -1313,6 +1319,15 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					break;
 				case "IMG":
 					df.append(tags.image(node.getAttribute("src") ?? "", node.getAttribute("title") ?? "", node.getAttribute("alt") ?? ""));
+
+					break;
+
+				case "TH":
+					df.append(tags.th(node.getAttribute("align") ?? "", sanitise(node.childNodes, tags, uid)));
+
+					break;
+				case "TD":
+					df.append(tags.td(node.getAttribute("align") ?? "", sanitise(node.childNodes, tags, uid)));
 
 					break;
 				default:
