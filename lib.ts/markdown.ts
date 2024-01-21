@@ -2108,12 +2108,16 @@ class TableBlock extends LeafBlock {
 		}
 	}
 
-	#notATable(_tk: Tokeniser) {
+	#notATable(tk?: Tokeniser) {
 		parseBlock[3] = notTable;
 
 		this.#notTable = new Document(this.#firstLine);
 
 		parseBlock[3] = parseTable;
+
+		if (tk) {
+			return this.#notTable.process(tk);
+		}
 
 		return false;
 	}
