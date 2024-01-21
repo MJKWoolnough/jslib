@@ -25,6 +25,12 @@ type Tags = {
 	bold: (c: DocumentFragment) => Element | DocumentFragment;
 	subscript: (c: DocumentFragment) => Element | DocumentFragment;
 	strikethrough: (c: DocumentFragment) => Element | DocumentFragment;
+	table: (c: DocumentFragment) => Element | DocumentFragment;
+	thead: (c: DocumentFragment) => Element | DocumentFragment;
+	tbody: (c: DocumentFragment) => Element | DocumentFragment;
+	tr: (c: DocumentFragment) => Element | DocumentFragment;
+	th: (alignment: string, c: DocumentFragment) => Element | DocumentFragment;
+	td: (alignment: string, c: DocumentFragment) => Element | DocumentFragment;
 	break: () => Element | DocumentFragment;
 }
 
