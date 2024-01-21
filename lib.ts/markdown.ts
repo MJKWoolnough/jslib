@@ -413,7 +413,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       parseLinkReference = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph && parseLinkLabel(tk) && tk.accept(":")) {
 		const colon = tk.length(),
-		      ftk = new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
+		      ftk = subTokeniser(tk);
 
 		tk.acceptRun(whiteSpace);
 
@@ -1391,7 +1391,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       isLazyBlock = (tk: Tokeniser, inList = false) => {
 	tk.reset();
 
-	const ftk = new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
+	const ftk = subTokeniser(tk);
 
 	for (const block of parseBlock) {
 		acceptThreeSpaces(ftk);
@@ -1416,7 +1416,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return tk.get();
       },
       links = new Map<string, {href: string; title: string}>(),
-      alignParam = (alignment: number) => alignment ? {"align": alignment === 1 ? "left" : alignment === 2 ? "right" : "centre"} : undefined;
+      alignParam = (alignment: number) => alignment ? {"align": alignment === 1 ? "left" : alignment === 2 ? "right" : "centre"} : undefined,
+      subTokeniser = (tk: Tokeniser) => new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
 
 abstract class Block {
 	open = true;
@@ -2171,7 +2172,7 @@ class TableBlock extends LeafBlock {
 
 		const hasRow = tk.accept("|"),
 		      row: string[] = [],
-		      ftk = new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
+		      ftk = subTokeniser(tk);
 
 		RowLoop:
 		for (let i = 0; i < this.#title.length; i++) {
