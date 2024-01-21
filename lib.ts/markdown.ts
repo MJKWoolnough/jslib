@@ -2219,6 +2219,10 @@ class TableBlock extends LeafBlock {
 	toHTML(uid: string) {
 		if (this.#notTable) {
 			return this.#notTable.toHTML(uid);
+		} else if (!this.#alignment) {
+			this.#notATable();
+
+			return this.#notTable!.toHTML(uid);
 		}
 
 		return tag(uid, "table", tag(uid, "thead", tag(uid, "tr", this.#title.reduce((h, t, n) => h + tag(uid, "th", parseInline(uid, t), alignParam(this.#alignment![n])), ""))) + (this.#body?.length ? tag(uid, "tbody", this.#body.reduce((h, r) => h + tag(uid, "tr", r.reduce((h, c, n) => h + tag(uid, "td", parseInline(uid, c), alignParam(this.#alignment![n])), "")), "")) : ""));
