@@ -69,6 +69,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	["bold", "strong"],
 	["subscript", "sub"],
 	["strikethrough", "del"],
+	["table", "table"],
+	["thead", "thead"],
+	["tbody", "tbody"],
 	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, `h${1 | 2 | 3 | 4 | 5 | 6}`])
       ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => makeNode(tag, {}, c), o), {
 	"code": (_info: string, text: string) => makeNode("pre", {}, text),
@@ -77,6 +80,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"thematicBreaks": () => makeNode("hr"),
 	"link": (href: string, title: string, c: DocumentFragment) => makeNode("a", title ? {href, title} : {href}, c),
 	"image": (src: string, title: string, alt: string) => makeNode("img", title ? {src, alt, title} : {src, alt}),
+	"th": (alignment: string, c: DocumentFragment) => makeNode("th", alignment ? {"style": "text-align:"+alignment} : {}, c),
+	"td": (alignment: string, c: DocumentFragment) => makeNode("td", alignment ? {"style": "text-align:"+alignment} : {}, c),
 	"break": () => makeNode("br")
       } as any as Tags),
       whiteSpace = " \t",
