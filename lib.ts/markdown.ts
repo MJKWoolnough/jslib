@@ -1389,7 +1389,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return tk.get();
       },
-      links = new Map<string, {href: string; title: string}>();
+      links = new Map<string, {href: string; title: string}>(),
+      alignParam = (alignment: number) => alignment ? {"align": alignment === 1 ? "left" : alignment === 2 ? "right" : "centre"} : undefined;
 
 abstract class Block {
 	open = true;
@@ -2190,7 +2191,11 @@ class TableBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return uid;
+		if (this.#notTable) {
+			return this.#notTable.toHTML(uid);
+		}
+
+		return tag(uid, "table", tag(uid, "thead", tag(uid, "tr", this.#title.reduce((h, t, n) => h + tag(uid, "th", parseInline(uid, t), alignParam(this.#alignment![n])), ""))) + (this.#body?.length ? tag(uid, "tbody", this.#body.reduce((h, r) => h + tag(uid, "tr", r.reduce((h, c, n) => h + tag(uid, "td", parseInline(uid, c), alignParam(this.#alignment![n])), "")), "")) : ""));
 	}
 }
 
