@@ -84,6 +84,20 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       emailLabelStr = letter + number + "-",
       htmlElements = ["pre", "script", "style", "textarea", "address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col", "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr", "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol", "optgroup", "option", "p", "param", "section", "source", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "track", "ul"],
       type1Elements = htmlElements.slice(0, 4),
+      parseTable = (tk: Tokeniser) => {
+	while (true) {
+		switch (tk.exceptRun("|\\\n")) {
+		case '|':
+			return new TableBlock(tk);
+		case '\\':
+			tk.next();
+
+			break;
+		default:
+			return null;
+		}
+	}
+      },
       parseIndentedCodeBlockStart = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph) {
 		if (tk.accept(" ")) {
@@ -465,6 +479,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       acceptThreeSpaces = (tk: Tokeniser) => tk.acceptString("   "),
       parseBlock: ((tk: Tokeniser, inParagraph: boolean) => Block | null)[] = [
+	parseTable,
 	parseIndentedCodeBlockStart,
 	parseBlockQuoteStart,
 	parseThematicBreak,
@@ -2019,6 +2034,52 @@ class FencedCodeBlock extends LeafBlock {
 
 	toHTML(uid: string) {
 		return tag(uid, "textarea", this.lines.join(""), {"type": this.#info});
+	}
+}
+
+class TableBlock extends LeafBlock {
+	#firstLine: string;
+	#title: string[] = [];
+	#alignment?: number[];
+
+	constructor(tk: Tokeniser) {
+		super();
+
+		tk.exceptRun("\n");
+
+		const ftk = new Tokeniser(this.#firstLine = tk.get());
+
+		ftk.acceptRun(whiteSpace);
+		ftk.accept("|");
+		ftk.get();
+
+		Loop:
+		while (true) {
+			switch (ftk.exceptRun("|\\\n")) {
+			case '\\':
+				tk.next();
+
+				break;
+			case '|':
+				this.#title.push(ftk.get().trim());
+
+				break;
+			default:
+				this.#title.push(ftk.get().trim());
+
+				break Loop;
+			}
+		}
+	}
+
+	#notATable(tk: Tokeniser) {
+		return false;
+	}
+
+	accept(tk: Tokeniser) {
+	}
+
+	toHTML(uid: string): string {
 	}
 }
 
