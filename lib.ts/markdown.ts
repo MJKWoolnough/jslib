@@ -2088,18 +2088,18 @@ class TableBlock extends LeafBlock {
 		while (true) {
 			switch (ftk.exceptRun("|\\\n")) {
 			case '\\':
-				tk.next();
-				tk.next();
+				ftk.next();
+				ftk.next();
 
 				break;
 			case '|':
-				tk.next();
+				ftk.next();
 
 				this.#title.push(ftk.get().trim());
 
 				break;
 			default:
-				tk.next();
+				ftk.next();
 
 				this.#title.push(ftk.get().trim());
 
