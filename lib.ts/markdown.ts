@@ -2097,14 +2097,13 @@ class TableBlock extends LeafBlock {
 
 				break;
 			case '|':
-				ftk.next();
-
 				this.#title.push(ftk.get().trim());
+
+				ftk.next();
+				ftk.get();
 
 				break;
 			default:
-				ftk.next();
-
 				this.#title.push(ftk.get().trim());
 
 				break Loop;
