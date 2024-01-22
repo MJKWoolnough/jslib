@@ -2080,6 +2080,7 @@ class TableBlock extends LeafBlock {
 		super();
 
 		tk.exceptRun("\n");
+		tk.next();
 
 		const ftk = new Tokeniser(this.#firstLine = tk.get());
 
