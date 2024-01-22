@@ -1407,6 +1407,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		ftk.reset();
 	}
 
+	tk.reset();
+
 	return true;
       },
       readEOL = (tk: Tokeniser) => {
