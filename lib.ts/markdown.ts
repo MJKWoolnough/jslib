@@ -2192,11 +2192,9 @@ class TableBlock extends LeafBlock {
 
 					break;
 				case '|':
-					ftk.next();
-
 					break ColLoop;
 				default:
-					const cell = tk.get().trim();
+					const cell = ftk.get().trim();
 
 					if (cell) {
 						row.push(cell);
@@ -2206,7 +2204,9 @@ class TableBlock extends LeafBlock {
 				}
 			}
 
-			row.push(tk.get().trim());
+			row.push(ftk.get().trim());
+			ftk.next();
+			ftk.get();
 		}
 
 		if (!hasRow && row.length === 0) {
