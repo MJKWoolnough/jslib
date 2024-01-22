@@ -72,6 +72,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	["table", "table"],
 	["thead", "thead"],
 	["tbody", "tbody"],
+	["tr", "tr"],
 	...Array.from({"length": 6}, (_, n) => [`heading${n+1}`, `h${n+1}`] as [`heading${1 | 2 | 3 | 4 | 5 | 6}`, `h${1 | 2 | 3 | 4 | 5 | 6}`])
       ] as const).reduce((o, [key, tag]) => (o[key] = (c: DocumentFragment) => makeNode(tag, {}, c), o), {
 	"code": (_info: string, text: string) => makeNode("pre", {}, text),
@@ -1272,7 +1273,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"DEL": "strikethrough",
 	"TABLE": "table",
 	"THEAD": "thead",
-	"TBODY": "tbody"
+	"TBODY": "tbody",
+	"TR": "tr"
       } as const,
       sanitise = (childNodes: NodeListOf<ChildNode>, tags: Tags, uid: string) => {
 	const df = document.createDocumentFragment();
@@ -1306,6 +1308,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				case "TABLE":
 				case "THEAD":
 				case "TBODY":
+				case "TR":
 					df.append(tags[tagNameToTag[node.nodeName]](sanitise(node.childNodes, tags, uid)));
 
 					break;
