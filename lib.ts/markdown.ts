@@ -2176,26 +2176,25 @@ class TableBlock extends LeafBlock {
 		}
 
 		const hasRow = tk.accept("|"),
-		      row: string[] = [];
-
-		tk.get();
+		      row: string[] = [],
+		      ftk = subTokeniser(tk);
 
 		RowLoop:
 		for (let i = 0; i < this.#title.length; i++) {
-			tk.acceptRun(whiteSpace);
+			ftk.acceptRun(whiteSpace);
 
 			ColLoop:
 			while (true) {
-				switch (tk.exceptRun("|\\\n")) {
+				switch (ftk.exceptRun("|\\\n")) {
 				case '\\':
-					tk.next();
-					tk.next();
+					ftk.next();
+					ftk.next();
 
 					break;
 				case '|':
 					break ColLoop;
 				default:
-					const cell = tk.get().trim();
+					const cell = ftk.get().trim();
 
 					if (cell) {
 						row.push(cell);
@@ -2205,9 +2204,9 @@ class TableBlock extends LeafBlock {
 				}
 			}
 
-			row.push(tk.get().trim());
-			tk.next();
-			tk.get();
+			row.push(ftk.get().trim());
+			ftk.next();
+			ftk.get();
 		}
 
 		if (!hasRow && row.length === 0) {
@@ -2219,6 +2218,8 @@ class TableBlock extends LeafBlock {
 		} else {
 			this.#body = [row];
 		}
+
+		tk.backup();
 
 		tk.exceptRun("\n");
 		tk.next();
