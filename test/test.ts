@@ -11216,6 +11216,9 @@ type Tests = {
 				["~foo bar~", "<p>~foo bar~</p>"],
 				["~foo\\ bar\\ baz~", "<p><sub>foo bar baz</sub></p>"]
 			],
+			"strikethrough": [
+				["~~Strikeout~~", "<p><s>Strikeout</s></p>"]
+			],
 			"links": [
 				["[link](/uri \"title\")", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
 				["[link](/uri)", "<p><a href=\"/uri\">link</a></p>"],
