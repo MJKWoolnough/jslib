@@ -2122,6 +2122,8 @@ class TableBlock extends LeafBlock {
 		parseBlock[3] = parseTable;
 
 		if (tk) {
+			tk.reset();
+
 			return this.#notTable.process(tk);
 		}
 
