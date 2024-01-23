@@ -2172,7 +2172,7 @@ class TableBlock extends LeafBlock {
 
 			tk.acceptRun(whiteSpace);
 
-			if (this.#alignment.length < this.#title.length || !tk.accept("\n") && !tk.peek()) {
+			if (this.#alignment.length < this.#title.length || !tk.accept("\n") && tk.peek()) {
 				return this.#notATable(tk);
 			}
 
