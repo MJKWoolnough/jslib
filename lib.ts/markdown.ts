@@ -2107,7 +2107,11 @@ class TableBlock extends LeafBlock {
 
 				break;
 			default:
-				this.#title.push(ftk.get().trim());
+				const title = ftk.get().trim();
+
+				if (title) {
+					this.#title.push(title);
+				}
 
 				break Loop;
 			}
