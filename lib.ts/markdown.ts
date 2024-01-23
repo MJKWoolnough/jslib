@@ -1815,7 +1815,7 @@ class ListBlock extends ContainerBlock {
 abstract class LeafBlock extends Block {
 	lines: string[] = [];
 
-	accept(_: Tokeniser) {
+	accept(_tk: Tokeniser, _lazy: boolean) {
 		return false;
 	}
 }
@@ -2118,7 +2118,7 @@ class TableBlock extends LeafBlock {
 		}
 	}
 
-	#notATable(tk?: Tokeniser) {
+	#notATable(tk?: Tokeniser, lazy = false) {
 		parseBlock[3] = notTable;
 
 		this.#notTable = new Document(this.#firstLine);
@@ -2128,7 +2128,7 @@ class TableBlock extends LeafBlock {
 		if (tk) {
 			tk.reset();
 
-			const ret = this.#notTable.process(tk);
+			const ret = this.#notTable.process(tk, lazy);
 
 			this.open = this.#notTable.open;
 
@@ -2138,9 +2138,9 @@ class TableBlock extends LeafBlock {
 		return false;
 	}
 
-	accept(tk: Tokeniser) {
+	accept(tk: Tokeniser, lazy: boolean) {
 		if (this.#notTable) {
-			return this.#notTable.process(tk);
+			return this.#notTable.process(tk, lazy);
 		} else if (!this.#alignment) {
 			if (tk.accept(" ")) {
 				return this.#notATable(tk);
@@ -2157,7 +2157,7 @@ class TableBlock extends LeafBlock {
 
 				if (!tk.accept("-")) {
 					if (alignment) {
-						return this.#notATable(tk);
+						return this.#notATable(tk, lazy);
 					}
 
 					break;
@@ -2177,7 +2177,7 @@ class TableBlock extends LeafBlock {
 			tk.acceptRun(whiteSpace);
 
 			if (this.#alignment.length < this.#title.length || !tk.accept("\n") && tk.peek()) {
-				return this.#notATable(tk);
+				return this.#notATable(tk, lazy);
 			}
 
 			tk.get();
