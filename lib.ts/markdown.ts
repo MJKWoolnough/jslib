@@ -2185,6 +2185,17 @@ class TableBlock extends LeafBlock {
 		      row: string[] = [],
 		      ftk = subTokeniser(tk);
 
+		ftk.acceptRun(whiteSpace);
+
+		if (ftk.accept("\n")) {
+			this.open = false;
+			tk.get();
+
+			return true;
+		}
+
+		ftk.reset();
+
 		RowLoop:
 		for (let i = 0; i < this.#title.length; i++) {
 			ftk.acceptRun(whiteSpace);
