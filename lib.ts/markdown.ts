@@ -2128,7 +2128,11 @@ class TableBlock extends LeafBlock {
 		if (tk) {
 			tk.reset();
 
-			return this.#notTable.process(tk);
+			const ret = this.#notTable.process(tk);
+
+			this.open = this.#notTable.open;
+
+			return ret;
 		}
 
 		return false;
