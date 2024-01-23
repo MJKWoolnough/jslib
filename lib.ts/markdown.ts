@@ -68,7 +68,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	["italic", "em"],
 	["bold", "strong"],
 	["subscript", "sub"],
-	["strikethrough", "del"],
+	["strikethrough", "s"],
 	["table", "table"],
 	["thead", "thead"],
 	["tbody", "tbody"],
@@ -1115,7 +1115,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       emphasisTags: Record<string, (keyof HTMLElementTagNameMap)[]> = {
 	"*": ["em", "strong"],
 	"_": ["em", "strong"],
-	"~": ["sub", "del"]
+	"~": ["sub", "s"]
       },
       processEmphasis = (uid: string, stack: Token[], start = 0, end = stack.length) => {
 	const levels = {
@@ -1270,7 +1270,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"EM": "italic",
 	"STRONG": "bold",
 	"SUB": "subscript",
-	"DEL": "strikethrough",
+	"S": "strikethrough",
 	"TABLE": "table",
 	"THEAD": "thead",
 	"TBODY": "tbody",
@@ -1304,7 +1304,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				case "EM":
 				case "STRONG":
 				case "SUB":
-				case "DEL":
+				case "S":
 				case "TABLE":
 				case "THEAD":
 				case "TBODY":
