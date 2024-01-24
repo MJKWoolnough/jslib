@@ -11053,6 +11053,9 @@ type Tests = {
 				["> foo|foo\n> ---|---\n> bar|bar\nbaz|baz", "<blockquote><table><thead><tr><th>foo</th><th>foo</th></tr></thead><tbody><tr><td>bar</td><td>bar</td></tr></tbody></table></blockquote><p>baz|baz</p>"],
 				["| foo\n|----\n| test2", "<table><thead><tr><th>foo</th></tr></thead><tbody><tr><td>test2</td></tr></tbody></table>"],
 				["-   foo|foo\n---|---\nbar|bar", "<table><thead><tr><th>-   foo</th><th>foo</th></tr></thead><tbody><tr><td>bar</td><td>bar</td></tr></tbody></table>"]
+			],
+			"not a table": [
+				["foo|foo\n-----|-----s\nbar|bar", "<p>foo|foo\n-----|-----s\nbar|bar</p>"]
 			]
 		},
 		"inline": {
