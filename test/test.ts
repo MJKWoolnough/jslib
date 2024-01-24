@@ -11055,7 +11055,11 @@ type Tests = {
 				["-   foo|foo\n---|---\nbar|bar", "<table><thead><tr><th>-   foo</th><th>foo</th></tr></thead><tbody><tr><td>bar</td><td>bar</td></tr></tbody></table>"]
 			],
 			"not a table": [
-				["foo|foo\n-----|-----s\nbar|bar", "<p>foo|foo\n-----|-----s\nbar|bar</p>"]
+				["foo|foo\n-----|-----s\nbar|bar", "<p>foo|foo\n-----|-----s\nbar|bar</p>"],
+				["foo|foo\n-----:-----\nbar|bar", "<p>foo|foo\n-----:-----\nbar|bar</p>"],
+				["foo|foo\n-----||-----\nbar|bar", "<p>foo|foo\n-----||-----\nbar|bar</p>"],
+				["foo|foo\n-----|-::-\nbar|bar", "<p>foo|foo\n-----|-::-\nbar|bar</p>"],
+				["foo\n-----|-----\nbar|bar", "<p>foo\n-----|-----\nbar|bar</p>"]
 			]
 		},
 		"inline": {
