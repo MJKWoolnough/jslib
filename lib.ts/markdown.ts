@@ -2256,6 +2256,10 @@ class TableBlock extends ContainerBlock {
 			return false;
 		}
 
+		for (let i = row.length; i < this.#alignment.length; i++) {
+			row.push("");
+		}
+
 		if (this.#body) {
 			this.#body.push(row);
 		} else {
