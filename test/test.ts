@@ -11063,7 +11063,8 @@ type Tests = {
 				["| foo |\n:-----:\n| bar |", "<table><thead><tr><th style=\"text-align:center\">foo</th></tr></thead><tbody><tr><td style=\"text-align:center\">bar</td></tr></tbody></table>"],
 				["  | Col1a | Col2a |\n  | ----- | ----- |\n  | Col1b | Col2b |", "<table><thead><tr><th>Col1a</th><th>Col2a</th></tr></thead><tbody><tr><td>Col1b</td><td>Col2b</td></tr></tbody></table>"],
 				["    | Col1a | Col2a |\n  | ----- | ----- |\n  | Col1b | Col2b |", "<pre><code>| Col1a | Col2a |\n</code></pre><p>| ----- | ----- |\n| Col1b | Col2b |</p>"],
-				["  | Col1a | Col2a |\n    | ----- | ----- |\n  | Col1b | Col2b |", "<p>| Col1a | Col2a |\n| ----- | ----- |\n| Col1b | Col2b |</p>"]
+				["  | Col1a | Col2a |\n    | ----- | ----- |\n  | Col1b | Col2b |", "<p>| Col1a | Col2a |\n| ----- | ----- |\n| Col1b | Col2b |</p>"],
+				["  | Col1a | Col2a |\n  | ----- | ----- |\n    | Col1b | Col2b |", "<table><thead><tr><th>Col1a</th><th>Col2a</th></tr></thead></table><pre><code>| Col1b | Col2b |</code></pre>"]
 			],
 			"not a table": [
 				["foo|foo\n-----|-----s\nbar|bar", "<p>foo|foo\n-----|-----s\nbar|bar</p>"],
