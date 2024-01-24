@@ -1455,6 +1455,10 @@ abstract class ContainerBlock extends Block {
 			const b = block(tk, inParagraph);
 
 			if (b) {
+				if (lastChild?.open && b instanceof TableBlock) {
+					b.setLast(lastChild);
+				}
+
 				this.children.push(b);
 
 				return true;
@@ -1475,7 +1479,17 @@ abstract class ContainerBlock extends Block {
 		return true;
 	}
 
+	setTableEOF() {
+		const lastChild = this.children.at(-1);
+
+		if (lastChild instanceof TableBlock) {
+			lastChild.setEOF();
+		}
+	}
+
 	toHTML(uid: string) {
+		this.setTableEOF();
+
 		return this.children.reduce((t, c) => t + c.toHTML(uid), "");
 	}
 }
@@ -2072,12 +2086,12 @@ class FencedCodeBlock extends LeafBlock {
 	}
 }
 
-class TableBlock extends LeafBlock {
+class TableBlock extends ContainerBlock {
 	#firstLine: string;
 	#title: string[] = [];
 	#alignment?: number[];
 	#body?: string[][];
-	#notTable?: Document;
+	#lastSet = false;
 
 	constructor(tk: Tokeniser) {
 		super();
@@ -2118,19 +2132,27 @@ class TableBlock extends LeafBlock {
 		}
 	}
 
+	setLast(b: Block) {
+		this.children.push(b instanceof TableBlock ? b.children.at(-1) ?? b : b);
+
+		this.#lastSet = true;
+	}
+
 	#notATable(tk?: Tokeniser, lazy = false) {
 		parseBlock[3] = notTable;
 
-		this.#notTable = new Document(this.#firstLine);
+		this.process(new Tokeniser(this.#firstLine), lazy);
 
 		parseBlock[3] = parseTable;
+
+		this.#alignment = [];
 
 		if (tk) {
 			tk.reset();
 
-			const ret = this.#notTable.process(tk, lazy);
+			const ret = this.process(tk, lazy);
 
-			this.open = this.#notTable.open;
+			this.open = this.children.at(-1)?.open ?? false;
 
 			return ret;
 		}
@@ -2139,9 +2161,7 @@ class TableBlock extends LeafBlock {
 	}
 
 	accept(tk: Tokeniser, lazy: boolean) {
-		if (this.#notTable) {
-			return this.#notTable.process(tk, lazy);
-		} else if (!this.#alignment) {
+		if (!this.#alignment) {
 			if (tk.accept(" ")) {
 				return this.#notATable(tk);
 			}
@@ -2183,6 +2203,8 @@ class TableBlock extends LeafBlock {
 			tk.get();
 
 			return true;
+		} else if (!this.#alignment.length) {
+			return this.process(tk, lazy);
 		}
 
 		const hasRow = tk.accept("|"),
@@ -2249,13 +2271,17 @@ class TableBlock extends LeafBlock {
 		return true;
 	}
 
-	toHTML(uid: string) {
-		if (this.#notTable) {
-			return this.#notTable.toHTML(uid);
-		} else if (!this.#alignment) {
+	setEOF() {
+		if (!this.#alignment) {
 			this.#notATable();
+		}
 
-			return this.#notTable!.toHTML(uid);
+		super.setTableEOF();
+	}
+
+	toHTML(uid: string) {
+		if (!this.#alignment?.length) {
+			return this.#lastSet ? "" : super.toHTML(uid);
 		}
 
 		return tag(uid, "table", tag(uid, "thead", tag(uid, "tr", this.#title.reduce((h, t, n) => h + tag(uid, "th", parseInline(uid, t), alignment[this.#alignment![n]]), ""))) + (this.#body?.length ? tag(uid, "tbody", this.#body.reduce((h, r) => h + tag(uid, "tr", r.reduce((h, c, n) => h + tag(uid, "td", parseInline(uid, c), alignment[this.#alignment![n]]), "")), "")) : ""));
