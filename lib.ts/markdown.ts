@@ -2223,7 +2223,7 @@ class TableBlock extends ContainerBlock {
 		ftk.reset();
 
 		RowLoop:
-		for (let i = 0; i < this.#title.length; i++) {
+		for (let i = 0; i < this.#alignment.length; i++) {
 			ftk.acceptRun(whiteSpace);
 
 			ColLoop:
