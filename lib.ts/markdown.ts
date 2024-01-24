@@ -2211,6 +2211,12 @@ class TableBlock extends ContainerBlock {
 		      row: string[] = [],
 		      ftk = subTokeniser(tk);
 
+		if (!hasRow) {
+			if (tk.accept(whiteSpace)) {
+				return false;
+			}
+		}
+
 		ftk.acceptRun(whiteSpace);
 
 		if (ftk.accept("\n")) {
