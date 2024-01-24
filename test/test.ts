@@ -11059,7 +11059,11 @@ type Tests = {
 				["# | 1 | 2\n--|--|--\nx | `\\` | `x`", "<table><thead><tr><th>#</th><th>1</th><th>2</th></tr></thead><tbody><tr><td>x</td><td><code>\\</code></td><td><code>x</code></td></tr></tbody></table>"],
 				["# | 1 | 2\n--|--|--\nx | \\`\\` | `x`", "<table><thead><tr><th>#</th><th>1</th><th>2</th></tr></thead><tbody><tr><td>x</td><td>``</td><td><code>x</code></td></tr></tbody></table>"],
 				["| 1 | 2 |\n| :-----: |  :-----: |\n| 3 | 4 | 5 | 6 |", "<table><thead><tr><th style=\"text-align:center\">1</th><th style=\"text-align:center\">2</th></tr></thead><tbody><tr><td style=\"text-align:center\">3</td><td style=\"text-align:center\">4</td></tr></tbody></table>"],
-				["| 1 | 2 | 3 | 4 |\n| :-----: |  :-----: |  :-----: |  :-----: |\n| 5 | 6 |", "<table><thead><tr><th style=\"text-align:center\">1</th><th style=\"text-align:center\">2</th><th style=\"text-align:center\">3</th><th style=\"text-align:center\">4</th></tr></thead><tbody><tr><td style=\"text-align:center\">5</td><td style=\"text-align:center\">6</td><td style=\"text-align:center\"></td><td style=\"text-align:center\"></td></tr></tbody></table>"]
+				["| 1 | 2 | 3 | 4 |\n| :-----: |  :-----: |  :-----: |  :-----: |\n| 5 | 6 |", "<table><thead><tr><th style=\"text-align:center\">1</th><th style=\"text-align:center\">2</th><th style=\"text-align:center\">3</th><th style=\"text-align:center\">4</th></tr></thead><tbody><tr><td style=\"text-align:center\">5</td><td style=\"text-align:center\">6</td><td style=\"text-align:center\"></td><td style=\"text-align:center\"></td></tr></tbody></table>"],
+				["| foo |\n:-----:\n| bar |", "<table><thead><tr><th style=\"text-align:center\">foo</th></tr></thead><tbody><tr><td style=\"text-align:center\">bar</td></tr></tbody></table>"],
+				["  | Col1a | Col2a |\n  | ----- | ----- |\n  | Col1b | Col2b |", "<table><thead><tr><th>Col1a</th><th>Col2a</th></tr></thead><tbody><tr><td>Col1b</td><td>Col2b</td></tr></tbody></table>"],
+				["    | Col1a | Col2a |\n  | ----- | ----- |\n  | Col1b | Col2b |", "<pre><code>| Col1a | Col2a |\n</code></pre><p>| ----- | ----- |\n| Col1b | Col2b |</p>"],
+				["  | Col1a | Col2a |\n    | ----- | ----- |\n  | Col1b | Col2b |", "<p>| Col1a | Col2a |\n| ----- | ----- |\n| Col1b | Col2b |</p>"]
 			],
 			"not a table": [
 				["foo|foo\n-----|-----s\nbar|bar", "<p>foo|foo\n-----|-----s\nbar|bar</p>"],
