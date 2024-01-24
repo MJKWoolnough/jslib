@@ -11052,7 +11052,13 @@ type Tests = {
 				["Header 1|Header 2|Header 3|Header 4\n:-------|:------:|-------:|--------\nCell 1  |Cell 2  |Cell 3  |Cell 4\n*Cell 5*|Cell 6  |Cell 7  |Cell 8", "<table><thead><tr><th style=\"text-align:left\">Header 1</th><th style=\"text-align:center\">Header 2</th><th style=\"text-align:right\">Header 3</th><th>Header 4</th></tr></thead><tbody><tr><td style=\"text-align:left\">Cell 1</td><td style=\"text-align:center\">Cell 2</td><td style=\"text-align:right\">Cell 3</td><td>Cell 4</td></tr><tr><td style=\"text-align:left\"><em>Cell 5</em></td><td style=\"text-align:center\">Cell 6</td><td style=\"text-align:right\">Cell 7</td><td>Cell 8</td></tr></tbody></table>"],
 				["> foo|foo\n> ---|---\n> bar|bar\nbaz|baz", "<blockquote><table><thead><tr><th>foo</th><th>foo</th></tr></thead><tbody><tr><td>bar</td><td>bar</td></tr></tbody></table></blockquote><p>baz|baz</p>"],
 				["| foo\n|----\n| test2", "<table><thead><tr><th>foo</th></tr></thead><tbody><tr><td>test2</td></tr></tbody></table>"],
-				["-   foo|foo\n---|---\nbar|bar", "<table><thead><tr><th>-   foo</th><th>foo</th></tr></thead><tbody><tr><td>bar</td><td>bar</td></tr></tbody></table>"]
+				["-   foo|foo\n---|---\nbar|bar", "<table><thead><tr><th>-   foo</th><th>foo</th></tr></thead><tbody><tr><td>bar</td><td>bar</td></tr></tbody></table>"],
+				["|	foo	|	bar	|\n|	---	|	---	|\n|	baz	|	quux	|", "<table><thead><tr><th>foo</th><th>bar</th></tr></thead><tbody><tr><td>baz</td><td>quux</td></tr></tbody></table>"],
+				["paragraph\nfoo|foo\n---|---\nbar|bar", "<p>paragraph</p><table><thead><tr><th>foo</th><th>foo</th></tr></thead><tbody><tr><td>bar</td><td>bar</td></tr></tbody></table>"],
+				["| Heading 1 | Heading 2\n| --------- | ---------\n| Cell 1 | Cell 2\n| \\\\\\\`|\\\\\\\`", "<table><thead><tr><th>Heading 1</th><th>Heading 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>\\\`</td><td>\\\`</td></tr></tbody></table>"],
+				["# | 1 | 2\n--|--|--\nx | `\\` | `x`", "<table><thead><tr><th>#</th><th>1</th><th>2</th></tr></thead><tbody><tr><td>x</td><td><code>\\</code></td><td><code>x</code></td></tr></tbody></table>"],
+				["# | 1 | 2\n--|--|--\nx | \\`\\` | `x`", "<table><thead><tr><th>#</th><th>1</th><th>2</th></tr></thead><tbody><tr><td>x</td><td>``</td><td><code>x</code></td></tr></tbody></table>"],
+				["| 1 | 2 |\n| :-----: |  :-----: |\n| 3 | 4 | 5 | 6 |", "<table><thead><tr><th style=\"text-align:center\">1</th><th style=\"text-align:center\">2</th></tr></thead><tbody><tr><td style=\"text-align:center\">3</td><td style=\"text-align:center\">4</td></tr></tbody></table>"]
 			],
 			"not a table": [
 				["foo|foo\n-----|-----s\nbar|bar", "<p>foo|foo\n-----|-----s\nbar|bar</p>"],
