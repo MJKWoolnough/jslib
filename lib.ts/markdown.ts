@@ -101,6 +101,12 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	while (true) {
 		switch (tk.exceptRun("|\\\n")) {
 		case '|':
+			tk.next();
+
+			if (tk.acceptRun(whiteSpace) === "\n" || !tk.peek()) {
+				return null;
+			}
+
 			return new TableBlock(tk);
 		case '\\':
 			tk.next();
