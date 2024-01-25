@@ -11066,7 +11066,8 @@ type Tests = {
 				["  | Col1a | Col2a |\n    | ----- | ----- |\n  | Col1b | Col2b |", "<p>| Col1a | Col2a |\n| ----- | ----- |\n| Col1b | Col2b |</p>"],
 				["  | Col1a | Col2a |\n  | ----- | ----- |\n    | Col1b | Col2b |", "<table><thead><tr><th>Col1a</th><th>Col2a</th></tr></thead></table><pre><code>| Col1b | Col2b |</code></pre>"],
 				["  | Col1a | Col2a |\n  | ----- | ----- |", "<table><thead><tr><th>Col1a</th><th>Col2a</th></tr></thead></table>"],
-				["Col1a | Col1b | Col1c\n----- | -----\nCol2a | Col2b | Col2c", "<p>Col1a | Col1b | Col1c\n----- | -----\nCol2a | Col2b | Col2c</p>"]
+				["Col1a | Col1b | Col1c\n----- | -----\nCol2a | Col2b | Col2c", "<p>Col1a | Col1b | Col1c\n----- | -----\nCol2a | Col2b | Col2c</p>"],
+				["| Heading 1 | Heading 2\n| --------- | ---------\n| Cell 1 | Cell 2\n| `Cell 3\\|` | Cell 4", "<table><thead><tr><th>Heading 1</th><th>Heading 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td><code>Cell 3|</code></td><td>Cell 4</td></tr></tbody></table>"]
 			],
 			"not a table": [
 				["foo|foo\n-----|-----s\nbar|bar", "<p>foo|foo\n-----|-----s\nbar|bar</p>"],
