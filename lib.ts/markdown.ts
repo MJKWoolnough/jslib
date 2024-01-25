@@ -2246,18 +2246,21 @@ class TableBlock extends ContainerBlock {
 		      ftk = subTokeniser(tk);
 
 		if (!hasRow) {
-			if (tk.accept(whiteSpace)) {
-				return false;
+			if (ftk.accept(whiteSpace)) {
+				return this.open = false;
 			}
+
+			ftk.reset();
 		}
 
 		ftk.acceptRun(whiteSpace);
 
 		if (ftk.accept("\n")) {
-			this.open = false;
 			tk.get();
 
-			return true;
+			this.open = !hasRow;
+
+			return true
 		}
 
 		ftk.reset();
