@@ -11072,7 +11072,8 @@ type Tests = {
 				["- Level 1\n\n   - Level 2\n\n      | Column 1 | Column 2 |\n      | -------- | -------- |\n      | abcdefgh | ijklmnop |", "<ul><li><p>Level 1</p><ul><li><p>Level 2</p><table><thead><tr><th>Column 1</th><th>Column 2</th></tr></thead><tbody><tr><td>abcdefgh</td><td>ijklmnop</td></tr></tbody></table></li></ul></li></ul>"],
 				["| foo | bar |\n| --- | --- |\n| baz | bim |", "<table><thead><tr><th>foo</th><th>bar</th></tr></thead><tbody><tr><td>baz</td><td>bim</td></tr></tbody></table>"],
 				["| abc | defghi |\n:-: | -----------:\nbar | baz", "<table><thead><tr><th style=\"text-align:center\">abc</th><th style=\"text-align:right\">defghi</th></tr></thead><tbody><tr><td style=\"text-align:center\">bar</td><td style=\"text-align:right\">baz</td></tr></tbody></table>"],
-				["| f\\|oo  |\n| ------ |\n| b `\\|` az |\n| b **\\|** im |", "<table><thead><tr><th>f|oo</th></tr></thead><tbody><tr><td>b <code>|</code> az</td></tr><tr><td>b <strong>|</strong> im</td></tr></tbody></table>"]
+				["| f\\|oo  |\n| ------ |\n| b `\\|` az |\n| b **\\|** im |", "<table><thead><tr><th>f|oo</th></tr></thead><tbody><tr><td>b <code>|</code> az</td></tr><tr><td>b <strong>|</strong> im</td></tr></tbody></table>"],
+				["| abc | def |\n| --- | --- |\n| bar | baz |\n> bar", "<table><thead><tr><th>abc</th><th>def</th></tr></thead><tbody><tr><td>bar</td><td>baz</td></tr></tbody></table><blockquote><p>bar</p></blockquote>"]
 			],
 			"not a table": [
 				["foo|foo\n-----|-----s\nbar|bar", "<p>foo|foo\n-----|-----s\nbar|bar</p>"],
