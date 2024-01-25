@@ -2250,6 +2250,16 @@ class TableBlock extends ContainerBlock {
 				return this.open = false;
 			}
 
+			parseBlock[3] = notTable;
+
+			if (!isLazyBlock(ftk)) {
+				parseBlock[3] = parseTable;
+
+				return this.open = false;
+			}
+
+			parseBlock[3] = parseTable;
+
 			ftk.reset();
 		}
 
@@ -2259,7 +2269,6 @@ class TableBlock extends ContainerBlock {
 			tk.get();
 
 			this.open = !hasRow;
-
 			return true
 		}
 
