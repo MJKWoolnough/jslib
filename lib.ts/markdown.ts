@@ -1422,7 +1422,35 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       links = new Map<string, {href: string; title: string}>(),
       alignment = ["", "left", "right", "center"].map(align => (align ? {align}: {}) as Record<string, string>),
-      subTokeniser = (tk: Tokeniser) => new Tokeniser({"next": () => ({"value": tk.next(), "done": false})});
+      subTokeniser = (tk: Tokeniser) => new Tokeniser({"next": () => ({"value": tk.next(), "done": false})}),
+      fixEscapedPipesInCodeBlocks = (c: string) => {
+	const tk = new Tokeniser(c);
+
+	let ret = "";
+
+	while (true) {
+		switch (tk.exceptRun("\\")) {
+		case '\\':
+			tk.next();
+
+			if (tk.peek() === "|") {
+				tk.backup();
+
+				ret += tk.get();
+
+				tk.next();
+
+				tk.get();
+			}
+
+			tk.next();
+
+			break;
+		default:
+			return ret + tk.get();
+		}
+	}
+      };
 
 abstract class Block {
 	open = true;
@@ -2292,6 +2320,12 @@ class TableBlock extends ContainerBlock {
 	toHTML(uid: string) {
 		if (!this.#alignment?.length) {
 			return this.#lastSet ? "" : super.toHTML(uid);
+		}
+
+		for (const c of this.#body ?? []) {
+			for (let i = 0; i < c.length; i++) {
+				c[i] = fixEscapedPipesInCodeBlocks(c[i]);
+			}
 		}
 
 		return tag(uid, "table", tag(uid, "thead", tag(uid, "tr", this.#title.reduce((h, t, n) => h + tag(uid, "th", parseInline(uid, t), alignment[this.#alignment![n]]), ""))) + (this.#body?.length ? tag(uid, "tbody", this.#body.reduce((h, r) => h + tag(uid, "tr", r.reduce((h, c, n) => h + tag(uid, "td", parseInline(uid, c), alignment[this.#alignment![n]]), "")), "")) : ""));
