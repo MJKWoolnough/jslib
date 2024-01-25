@@ -11076,7 +11076,8 @@ type Tests = {
 				["foo|foo\n-----:-----\nbar|bar", "<p>foo|foo\n-----:-----\nbar|bar</p>"],
 				["foo|foo\n-----||-----\nbar|bar", "<p>foo|foo\n-----||-----\nbar|bar</p>"],
 				["foo|foo\n-----|-::-\nbar|bar", "<p>foo|foo\n-----|-::-\nbar|bar</p>"],
-				["foo\n-----|-----\nbar|bar", "<p>foo\n-----|-----\nbar|bar</p>"]
+				["foo\n-----|-----\nbar|bar", "<p>foo\n-----|-----\nbar|bar</p>"],
+				["|\n|\n|", "<p>|\n|\n|</p>"]
 			]
 		},
 		"inline": {
