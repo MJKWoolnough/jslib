@@ -24,6 +24,7 @@ type Tags = {
 	italic: (c: DocumentFragment) => Element | DocumentFragment;
 	bold: (c: DocumentFragment) => Element | DocumentFragment;
 	subscript: (c: DocumentFragment) => Element | DocumentFragment;
+	superscript: (c: DocumentFragment) => Element | DocumentFragment;
 	strikethrough: (c: DocumentFragment) => Element | DocumentFragment;
 	table: (c: DocumentFragment) => Element | DocumentFragment;
 	thead: (c: DocumentFragment) => Element | DocumentFragment;
@@ -68,6 +69,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	["italic", "em"],
 	["bold", "strong"],
 	["subscript", "sub"],
+	["superscript", "sup"],
 	["strikethrough", "s"],
 	["table", "table"],
 	["thead", "thead"],
@@ -1069,7 +1071,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       isLeftFlanking = (stack: Token[], pos: number) => {
 	const openTK = stack[pos];
 
-	if (openTK.type === tokenEmphasis || openTK.type === tokenTilde) {
+	if (openTK.type === tokenEmphasis || openTK.type === tokenTilde || openTK.type === tokenCaret) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
 		      nextChar = stack[pos + 1]?.data.at(0) ?? " ";
 
@@ -1081,7 +1083,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       isRightFlanking = (stack: Token[], pos: number) => {
 	const closeTk = stack[pos];
 
-	if (closeTk.type === tokenEmphasis || closeTk.type === tokenTilde) {
+	if (closeTk.type === tokenEmphasis || closeTk.type === tokenTilde || closeTk.type === tokenCaret) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
 		      nextChar = stack[pos + 1]?.data.at(0) ?? " ";
 
@@ -1115,13 +1117,15 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       emphasisTags: Record<string, (keyof HTMLElementTagNameMap)[]> = {
 	"*": ["em", "strong"],
 	"_": ["em", "strong"],
-	"~": ["sub", "s"]
+	"~": ["sub", "s"],
+	"^": ["sup"],
       },
       processEmphasis = (uid: string, stack: Token[], start = 0, end = stack.length) => {
 	const levels = {
 		"*": [start, start, start],
 		"_": [start, start, start],
-		"~": [start, start, start]
+		"~": [start, start, start],
+		"^": [start, start, start]
 	      };
 
 	Loop:
@@ -1270,6 +1274,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"EM": "italic",
 	"STRONG": "bold",
 	"SUB": "subscript",
+	"SUP": "superscript",
 	"S": "strikethrough",
 	"TABLE": "table",
 	"THEAD": "thead",
@@ -1304,6 +1309,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				case "EM":
 				case "STRONG":
 				case "SUB":
+				case "SUP":
 				case "S":
 				case "TABLE":
 				case "THEAD":
