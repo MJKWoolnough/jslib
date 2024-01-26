@@ -1121,7 +1121,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	const levels = {
 		"*": [start, start, start],
 		"_": [start, start, start],
-		"~": [start, start]
+		"~": [start, start, start]
 	      };
 
 	Loop:
