@@ -11243,7 +11243,10 @@ type Tests = {
 				["Subscript: H~2~O", "<p>Subscript: H<sub>2</sub>O</p>"],
 				["~foo\\~", "<p>~foo~</p>"],
 				["~foo bar~", "<p>~foo bar~</p>"],
-				["~foo\\ bar\\ baz~", "<p><sub>foo bar baz</sub></p>"]
+				["~foo\\ bar\\ baz~", "<p><sub>foo bar baz</sub></p>"],
+				["~foo\\\\\\\\\\\\\\\ bar~", "<p><sub>foo\\\\\\ bar</sub></p>"],
+				["**~foo~ bar**", "<p><strong><sub>foo</sub> bar</strong></p>"],
+				["*~f", "<p>*~f</p>"]
 			],
 			"strikethrough": [
 				["~~Strikeout~~", "<p><s>Strikeout</s></p>"]
