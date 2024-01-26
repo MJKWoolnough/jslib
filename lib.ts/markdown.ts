@@ -2305,7 +2305,7 @@ class TableBlock extends ContainerBlock {
 		}
 
 		if (!hasRow && row.length === 0) {
-			return false;
+			return this.open = false;
 		}
 
 		for (let i = row.length; i < this.#alignment.length; i++) {
