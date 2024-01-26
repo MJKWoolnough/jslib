@@ -2172,10 +2172,10 @@ class TableBlock extends ContainerBlock {
 		this.#lastSet = true;
 	}
 
-	#notATable(tk?: Tokeniser, lazy = false) {
+	#notATable(tk?: Tokeniser) {
 		parseBlock[3] = notTable;
 
-		this.process(new Tokeniser(this.#firstLine), lazy);
+		this.process(new Tokeniser(this.#firstLine));
 
 		parseBlock[3] = parseTable;
 
@@ -2184,7 +2184,7 @@ class TableBlock extends ContainerBlock {
 		if (tk) {
 			tk.reset();
 
-			const ret = this.process(tk, lazy);
+			const ret = this.process(tk);
 
 			this.open = this.children.at(-1)?.open ?? false;
 
@@ -2194,7 +2194,7 @@ class TableBlock extends ContainerBlock {
 		return false;
 	}
 
-	accept(tk: Tokeniser, lazy: boolean) {
+	accept(tk: Tokeniser) {
 		if (!this.#alignment) {
 			if (tk.accept(" ")) {
 				return this.#notATable(tk);
@@ -2211,7 +2211,7 @@ class TableBlock extends ContainerBlock {
 
 				if (!tk.accept("-")) {
 					if (alignment) {
-						return this.#notATable(tk, lazy);
+						return this.#notATable(tk);
 					}
 
 					break;
@@ -2231,14 +2231,14 @@ class TableBlock extends ContainerBlock {
 			tk.acceptRun(whiteSpace);
 
 			if (this.#alignment.length < this.#title.length || !tk.accept("\n") && tk.peek()) {
-				return this.#notATable(tk, lazy);
+				return this.#notATable(tk);
 			}
 
 			tk.get();
 
 			return true;
 		} else if (!this.#alignment.length) {
-			return this.process(tk, lazy);
+			return this.process(tk);
 		}
 
 		const hasRow = tk.accept("|"),
