@@ -597,13 +597,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	return tk.return(tokenEmphasis, parseText);
       },
       parseTilde = (tk: Tokeniser) => {
-	tk.next();
-
-	if (tk.accept("~") && tk.accept("~")) {
-		tk.acceptRun("~");
-
-		return parseText(tk);
-	}
+	tk.acceptRun("~");
 
 	return tk.return(tokenTilde, parseText);
       },
