@@ -1142,7 +1142,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				const open = stack[j],
 				      openLength = open.data.length,
 				      isDouble = closeLength > 1 && openLength > 1,
-				      escapedSpaces = !isDouble && char === "~";
+				      escapedSpaces = !isDouble && (char === "~" || char === "^");
 
 				if (escapedSpaces) {
 					let lastEscape = false;
