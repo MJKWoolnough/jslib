@@ -11248,6 +11248,9 @@ type Tests = {
 				["**~foo~ bar**", "<p><strong><sub>foo</sub> bar</strong></p>"],
 				["*~f", "<p>*~f</p>"]
 			],
+			"superscript": [
+				["^test^", "<p><sup>test</sup></p>"]
+			],
 			"strikethrough": [
 				["~~Strikeout~~", "<p><s>Strikeout</s></p>"],
 				["x ~~~~foo~~ bar~~", "<p>x <s><s>foo</s> bar</s></p>"],
