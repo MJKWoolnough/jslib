@@ -11249,7 +11249,8 @@ type Tests = {
 				["*~f", "<p>*~f</p>"]
 			],
 			"strikethrough": [
-				["~~Strikeout~~", "<p><s>Strikeout</s></p>"]
+				["~~Strikeout~~", "<p><s>Strikeout</s></p>"],
+				["x ~~~~foo~~ bar~~", "<p>x <s><s>foo</s> bar</s></p>"]
 			],
 			"links": [
 				["[link](/uri \"title\")", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
