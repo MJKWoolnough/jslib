@@ -122,14 +122,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       parseIndentedCodeBlockStart = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph) {
-		if (tk.accept(" ")) {
+		if (tk.accept(" ") && tk.length() === 4 || tk.accept("\t")) {
 			return new IndentedCodeBlock(tk);
-		}
-
-		tk.reset();
-
-		if (tk.accept("\t")) {
-			return new IndentedCodeBlock(tk, true);
 		}
 	}
 
@@ -2355,39 +2349,21 @@ class TableBlock extends ContainerBlock {
 }
 
 class IndentedCodeBlock extends LeafBlock {
-	#isTab: boolean;
-
-	constructor(tk: Tokeniser, isTab = false) {
+	constructor(tk: Tokeniser) {
 		super();
-
-		this.#isTab = isTab;
 
 		this.#getLine(tk);
 	}
 
 	accept(tk: Tokeniser) {
-		tk.reset();
-
-		if (this.#isTab) {
-			if (!tk.accept("\t")) {
-				if (this.#getBlankLine(tk)) {
-					return true;
-				}
-
-				this.open = false;
-
-				return false;
+		if (!tk.accept(whiteSpace)) {
+			if (this.#getBlankLine(tk)) {
+				return true;
 			}
-		} else {
-			if (tk.acceptString("    ") !== 4) {
-				if (this.#getBlankLine(tk)) {
-					return true;
-				}
 
-				this.open = false;
+			this.open = false;
 
-				return false;
-			}
+			return false;
 		}
 
 		this.#getLine(tk);
