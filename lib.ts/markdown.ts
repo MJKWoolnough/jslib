@@ -1155,7 +1155,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 						for (const c of stack[k].data) {
 							switch (c) {
 							case '\\':
-								lastEscape = true;
+								lastEscape = !lastEscape;
 
 								break;
 							case ' ':
