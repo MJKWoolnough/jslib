@@ -11256,7 +11256,8 @@ type Tests = {
 				["^foo~bar^baz^bar~foo^", "<p><sup>foo~bar</sup>baz<sup>bar~foo</sup></p>"],
 				["^\\ foo\\ ^", "<p><sup> foo </sup></p>"],
 				["^foo\\\\\\\\\\\\\\ bar^", "<p><sup>foo\\\\\\ bar</sup></p>"],
-				["^foo\\\\\\\\\\\\ bar^", "<p>^foo\\\\\\ bar^</p>"]
+				["^foo\\\\\\\\\\\\ bar^", "<p>^foo\\\\\\ bar^</p>"],
+				["**^foo^ bar**", "<p><strong><sup>foo</sup> bar</strong></p>"]
 			],
 			"strikethrough": [
 				["~~Strikeout~~", "<p><s>Strikeout</s></p>"],
