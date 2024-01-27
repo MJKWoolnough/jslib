@@ -1116,7 +1116,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"*": ["em", "strong"],
 	"_": ["em", "strong"],
 	"~": ["sub", "s"],
-	"^": ["sup"],
+	"^": ["sup"]
       },
       processEmphasis = (uid: string, stack: Token[], start = 0, end = stack.length) => {
 	const levels = {
