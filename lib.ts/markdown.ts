@@ -1069,25 +1069,29 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       isWhitespace = /\s/,
       isPunctuation = /\p{P}/u,
       isLeftFlanking = (stack: Token[], pos: number) => {
-	const openTK = stack[pos];
+	const openTk = stack[pos],
+	      allowEscapedWhitespace = openTk.type === tokenTilde || openTk.type === tokenCaret;
 
-	if (openTK.type === tokenEmphasis || openTK.type === tokenTilde || openTK.type === tokenCaret) {
+	if (openTk.type === tokenEmphasis || allowEscapedWhitespace) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
-		      nextChar = stack[pos + 1]?.data.at(0) ?? " ";
+		      nextChar = stack[pos + 1]?.data.at(0) ?? " ",
+		      nextNextChar = stack[pos + 1]?.data.at(1) ?? " ";
 
-		return !isWhitespace.test(nextChar) && (!isPunctuation.test(nextChar) || isWhitespace.test(lastChar) || isPunctuation.test(lastChar));
+		return !isWhitespace.test(nextChar) && ((!isPunctuation.test(nextChar) || allowEscapedWhitespace && nextChar === "\\" && isWhitespace.test(nextNextChar)) || isWhitespace.test(lastChar) || isPunctuation.test(lastChar));
 	}
 
 	return false;
       },
       isRightFlanking = (stack: Token[], pos: number) => {
-	const closeTk = stack[pos];
+	const closeTk = stack[pos],
+	      allowEscapedWhitespace = closeTk.type === tokenTilde || closeTk.type === tokenCaret;
 
-	if (closeTk.type === tokenEmphasis || closeTk.type === tokenTilde || closeTk.type === tokenCaret) {
+	if (closeTk.type === tokenEmphasis || allowEscapedWhitespace) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
+		      lastLastChar = stack[pos - 1]?.data.at(-2) ?? " ",
 		      nextChar = stack[pos + 1]?.data.at(0) ?? " ";
 
-		return !isWhitespace.test(lastChar) && (!isPunctuation.test(lastChar) || isWhitespace.test(nextChar) || isPunctuation.test(nextChar));
+		return (!isWhitespace.test(lastChar) || allowEscapedWhitespace && lastLastChar === "\\") && (!isPunctuation.test(lastChar) || isWhitespace.test(nextChar) || isPunctuation.test(nextChar));
 	}
 
 	return false;
