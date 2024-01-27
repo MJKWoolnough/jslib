@@ -1686,14 +1686,17 @@ class ListBlock extends ContainerBlock {
 			tk.backup();
 		}
 
-		this.#spaces = tk.length();
+		const spaces = tk.get(),
+		      marker = spaces.trimEnd();
 
-		const marker = tk.get().trimEnd();
+		this.#spaces = this.#countSpace(marker);
 
 		tk.acceptRun(whiteSpace);
 
 		if (tk.accept(nl)) {
-			this.#spaces = marker.length + 1;
+			this.#spaces++;
+		} else {
+			this.#spaces += spaces.length - marker.length;
 		}
 
 		this.#lastSpaces = this.#spaces;
@@ -1703,6 +1706,20 @@ class ListBlock extends ContainerBlock {
 		this.#marker = marker.trimStart();
 
 		this.children.push(new ListItemBlock(tk));
+	}
+
+	#countSpace(s: string) {
+		let count = 0;
+
+		for (const c of s) {
+			if (c === "\t") {
+				count += 4 - (count % 4);
+			} else {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	#newItem(tk: Tokeniser) {
@@ -1733,13 +1750,15 @@ class ListBlock extends ContainerBlock {
 
 		if (tk.peek() !== nl && tk.peek() !== "") {
 			for (let i = tk.length(); i < this.#spaces; i++) {
-				if (!tk.accept(" ")) {
+				if (tk.accept("\t")) {
+					i += 4 - (i % 4);
+				} else if (!tk.accept(" ")) {
 					return false;
 				}
 			}
 		}
 
-		let lastSpaces = tk.length();
+		let lastSpaces = this.#countSpace(tk.get());
 
 		if (tk.peek() === nl) {
 			lastSpaces++;
@@ -1749,7 +1768,6 @@ class ListBlock extends ContainerBlock {
 			this.#lastSpaces = lastSpaces;
 		}
 
-		tk.get();
 
 		return true;
 	}
@@ -1787,7 +1805,9 @@ class ListBlock extends ContainerBlock {
 
 		if (tk.peek() === " ") {
 			for (let i = 0; i < this.#lastSpaces; i++) {
-				if (!tk.accept(" ")) {
+				if (tk.accept("\t")) {
+					i += 4 - (i % 4);
+				} else if (!tk.accept(" ")) {
 					return false;
 				}
 			}
