@@ -11251,7 +11251,9 @@ type Tests = {
 			"superscript": [
 				["^test^", "<p><sup>test</sup></p>"],
 				["^foo\\^", "<p>^foo^</p>"],
-				["2^4 + 3^5", "<p>2^4 + 3^5</p>"]
+				["2^4 + 3^5", "<p>2^4 + 3^5</p>"],
+				["^foo~bar^baz^bar~foo^", "<p><sup>foo~bar</sup>baz<sup>bar~foo</sup></p>"],
+				["^\\ foo\\ ^", "<p><sup> foo </sup></p>"]
 			],
 			"strikethrough": [
 				["~~Strikeout~~", "<p><s>Strikeout</s></p>"],
