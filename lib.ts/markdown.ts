@@ -1426,7 +1426,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       links = new Map<string, {href: string; title: string}>(),
       alignment = ["", "left", "right", "center"].map(align => (align ? {align}: {}) as Record<string, string>),
-      subTokeniser = (tk: Tokeniser) => new Tokeniser({"next": () => ({"value": tk.next(), "done": false})}),
+      subTokeniser = (tk: Tokeniser) => tk instanceof TabStopTokeniser ? tk.sub() : new Tokeniser({"next": () => ({"value": tk.next(), "done": false})}),
       fixEscapedPipesInCodeBlocks = (c: string) => {
 	const tk = new Tokeniser(c);
 
@@ -1460,34 +1460,43 @@ class TabStopTokeniser extends Tokeniser {
 	#tabs: [number, number][];
 	#pos = 0;
 
-	constructor(text: string) {
-		let t = "",
-		    linePos = 0;
+	constructor(text: Iterator<string, void>, tabs: [number, number][], pos: number);
+	constructor(text: string);
+	constructor(text: string | Iterator<string, void>, tabs?: [number, number][], pos?: number) {
+		if (typeof text === "string") {
+			let t = "",
+			    linePos = 0;
 
-		const tabs: [number, number][] = [];
+			tabs = [];
 
-		for (const c of text) {
-			if (c === "\n") {
-				linePos = 0;
+			for (const c of text) {
+				if (c === "\n") {
+					linePos = 0;
 
-				t += c;
-			} else if (c === "\t") {
-				const ts = 4 - (linePos % 4);
+					t += c;
+				} else if (c === "\t") {
+					const ts = 4 - (linePos % 4);
 
-				tabs.push([t.length, ts]);
+					tabs.push([t.length, ts]);
 
-				linePos += ts;
+					linePos += ts;
 
-				t += " ".repeat(ts);
-			} else {
-				linePos++;
-				t += c;
+					t += " ".repeat(ts);
+				} else {
+					linePos++;
+					t += c;
+				}
 			}
+
+			text = t
+			tabs.reverse();
 		}
 
-		super(t);
+		super(text);
 
-		this.#tabs = tabs.reverse();
+
+		this.#tabs = tabs ?? [];
+		this.#pos = pos ?? 0;
 	}
 
 	get() {
@@ -1510,6 +1519,10 @@ class TabStopTokeniser extends Tokeniser {
 		this.#pos += l;
 
 		return t;
+	}
+
+	sub() {
+		return new TabStopTokeniser({"next": () => ({"value": this.next(), "done": false})}, this.#tabs, this.#pos + this.length());
 	}
 }
 
