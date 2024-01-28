@@ -1465,30 +1465,33 @@ class TabStopTokeniser extends Tokeniser {
 	constructor(text: string | Iterator<string, void>, tabs?: [number, number][], pos?: number) {
 		if (typeof text === "string") {
 			let t = "",
-			    linePos = 0;
+			    linePos = 0,
+			    curr = 0,
+			    last = 0;
 
 			tabs = [];
 
 			for (const c of text) {
 				if (c === "\n") {
 					linePos = 0;
-
-					t += c;
 				} else if (c === "\t") {
 					const ts = 4 - (linePos % 4);
 
-					tabs.push([t.length, ts]);
+					tabs.push([t.length + curr - last, ts]);
 
 					linePos += ts;
 
-					t += " ".repeat(ts);
+					t += text.slice(last, curr) + " ".repeat(ts);
+
+					last = curr + 1;
 				} else {
 					linePos++;
-					t += c;
 				}
+
+				curr++;
 			}
 
-			text = t
+			text = t + text.slice(last);
 			tabs.reverse();
 		}
 
