@@ -11267,6 +11267,9 @@ type Tests = {
 				["x ~~foo ~~bar~~~~", "<p>x <s>foo <s>bar</s></s></p>"],
 				["x ~~~~foo~~~~", "<p>x <s><s>foo</s></s></p>"]
 			],
+			"mark": [
+				["==Mark==", "<p><mark>Mark</mark></p>"]
+			],
 			"links": [
 				["[link](/uri \"title\")", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
 				["[link](/uri)", "<p><a href=\"/uri\">link</a></p>"],
