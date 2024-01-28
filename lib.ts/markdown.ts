@@ -1516,7 +1516,6 @@ class TabStopTokeniser extends Tokeniser {
 
 				t = t.slice(0, s) + "\t" + t.slice(s + ts);
 			}
-
 		}
 
 		this.#pos += l;
