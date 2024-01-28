@@ -26,6 +26,7 @@ type Tags = {
 	subscript: (c: DocumentFragment) => Element | DocumentFragment;
 	superscript: (c: DocumentFragment) => Element | DocumentFragment;
 	strikethrough: (c: DocumentFragment) => Element | DocumentFragment;
+	highlight: (c: DocumentFragment) => Element | DocumentFragment;
 	table: (c: DocumentFragment) => Element | DocumentFragment;
 	thead: (c: DocumentFragment) => Element | DocumentFragment;
 	tbody: (c: DocumentFragment) => Element | DocumentFragment;
@@ -71,6 +72,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	["subscript", "sub"],
 	["superscript", "sup"],
 	["strikethrough", "s"],
+	["highlight", "mark"],
 	["table", "table"],
 	["thead", "thead"],
 	["tbody", "tbody"],
@@ -529,9 +531,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenDeactivatedLink = 13,
       tokenTilde = 14,
       tokenCaret = 15,
+      tokenEquals = 16,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
-		switch (tk.exceptRun("\\`*_![]()<^~")) {
+		switch (tk.exceptRun("\\`*_![]()<^~=")) {
 		case '\\':
 			tk.next();
 			tk.next();
@@ -557,6 +560,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			return tk.return(tokenText, parseTilde);
 		case '^':
 			return tk.return(tokenText, parseCaret);
+		case '=':
+			return tk.return(tokenText, parseEquals);
 		default:
 			return tk.return(tokenText);
 		}
@@ -607,6 +612,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	}
 
 	return tk.return(tokenCaret, parseText);
+      },
+      parseEquals = (tk: Tokeniser) => {
+	tk.acceptRun("=");
+
+	return tk.return(tokenEquals, parseText);
       },
       parseImageOpen = (tk: Tokeniser) => {
 	tk.next();
@@ -1066,7 +1076,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	const openTk = stack[pos],
 	      allowEscapedWhitespace = openTk.type === tokenTilde || openTk.type === tokenCaret;
 
-	if (openTk.type === tokenEmphasis || allowEscapedWhitespace) {
+	if (openTk.type === tokenEmphasis || openTk.type === tokenEquals || allowEscapedWhitespace) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
 		      nextChar = stack[pos + 1]?.data.at(0) ?? " ",
 		      nextNextChar = stack[pos + 1]?.data.at(1) ?? " ";
@@ -1080,7 +1090,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	const closeTk = stack[pos],
 	      allowEscapedWhitespace = closeTk.type === tokenTilde || closeTk.type === tokenCaret;
 
-	if (closeTk.type === tokenEmphasis || allowEscapedWhitespace) {
+	if (closeTk.type === tokenEmphasis || closeTk.type === tokenEquals || allowEscapedWhitespace) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
 		      lastLastChar = stack[pos - 1]?.data.at(-2) ?? " ",
 		      nextChar = stack[pos + 1]?.data.at(0) ?? " ";
@@ -1116,14 +1126,16 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"*": ["em", "strong"],
 	"_": ["em", "strong"],
 	"~": ["sub", "s"],
-	"^": ["sup"]
+	"^": ["sup"],
+	"=": ["mark", "mark"]
       },
       processEmphasis = (uid: string, stack: Token[], start = 0, end = stack.length) => {
 	const levels = {
 		"*": [start, start, start],
 		"_": [start, start, start],
 		"~": [start, start, start],
-		"^": [start, start, start]
+		"^": [start, start, start],
+		"=": [start, start, start]
 	      };
 
 	Loop:
@@ -1141,6 +1153,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				      openLength = open.data.length,
 				      isDouble = closeLength > 1 && openLength > 1,
 				      escapedSpaces = !isDouble && (char === "~" || char === "^");
+
+				if (char === "=" && !isDouble) {
+					continue;
+				}
 
 				if (escapedSpaces) {
 					let lastEscape = false;
@@ -1274,6 +1290,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"SUB": "subscript",
 	"SUP": "superscript",
 	"S": "strikethrough",
+	"MARK": "highlight",
 	"TABLE": "table",
 	"THEAD": "thead",
 	"TBODY": "tbody",
@@ -1309,6 +1326,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				case "SUB":
 				case "SUP":
 				case "S":
+				case "MARK":
 				case "TABLE":
 				case "THEAD":
 				case "TBODY":
