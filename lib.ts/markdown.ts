@@ -87,7 +87,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"td": (alignment: string, c: DocumentFragment) => makeNode("td", alignment ? {"style": "text-align:"+alignment} : {}, c),
 	"break": () => makeNode("br")
       } as any as Tags),
-      whiteSpace = " \t",
+      whiteSpace = " ",
       nl = "\n",
       whiteSpaceNL = whiteSpace + nl,
       letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -122,7 +122,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       parseIndentedCodeBlockStart = (tk: Tokeniser, inParagraph: boolean) => {
 	if (!inParagraph) {
-		if (tk.accept(" ") && tk.length() === 4 || tk.accept("\t")) {
+		if (tk.accept(" ") && tk.length() === 4) {
 			return new IndentedCodeBlock(tk);
 		}
 	}
@@ -1759,7 +1759,7 @@ class ListBlock extends ContainerBlock {
 		const spaces = tk.get(),
 		      marker = spaces.trimEnd();
 
-		this.#spaces = this.#countSpace(marker);
+		this.#spaces = marker.length;
 
 		tk.acceptRun(whiteSpace);
 
@@ -1776,20 +1776,6 @@ class ListBlock extends ContainerBlock {
 		this.#marker = marker.trimStart();
 
 		this.children.push(new ListItemBlock(tk));
-	}
-
-	#countSpace(s: string) {
-		let count = 0;
-
-		for (const c of s) {
-			if (c === "\t") {
-				count += 4 - (count % 4);
-			} else {
-				count++;
-			}
-		}
-
-		return count;
 	}
 
 	#newItem(tk: Tokeniser) {
@@ -1820,15 +1806,13 @@ class ListBlock extends ContainerBlock {
 
 		if (tk.peek() !== nl && tk.peek() !== "") {
 			for (let i = tk.length(); i < this.#spaces; i++) {
-				if (tk.accept("\t")) {
-					i += 4 - (i % 4);
-				} else if (!tk.accept(" ")) {
+				if (!tk.accept(" ")) {
 					return false;
 				}
 			}
 		}
 
-		let lastSpaces = this.#countSpace(tk.get());
+		let lastSpaces = tk.get().length;
 
 		if (tk.peek() === nl) {
 			lastSpaces++;
@@ -1875,9 +1859,7 @@ class ListBlock extends ContainerBlock {
 
 		if (tk.peek() === " ") {
 			for (let i = 0; i < this.#lastSpaces; i++) {
-				if (tk.accept("\t")) {
-					i += 4 - (i % 4);
-				} else if (!tk.accept(" ")) {
+				if (!tk.accept(" ")) {
 					return false;
 				}
 			}
@@ -2139,7 +2121,7 @@ class ATXHeadingBlock extends LeafBlock {
 
 		tk.get();
 
-		this.#text = readEOL(tk).trim().replace(/[ \t]+#*$/, "");
+		this.#text = readEOL(tk).trim().replace(/ +#*$/, "");
 	}
 
 	toHTML(uid: string) {
