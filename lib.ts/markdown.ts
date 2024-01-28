@@ -1456,6 +1456,63 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	}
       };
 
+class TabStopTokeniser extends Tokeniser {
+	#tabs: [number, number][];
+	#pos = 0;
+
+	constructor(text: string) {
+		let t = "",
+		    linePos = 0;
+
+		const tabs: [number, number][] = [];
+
+		for (const c of text) {
+			if (c === "\n") {
+				linePos = 0;
+
+				t += c;
+			} else if (c === "\t") {
+				const ts = 4 - (linePos % 4);
+
+				tabs.push([t.length, ts]);
+
+				linePos += ts;
+
+				t += " ".repeat(ts);
+			} else {
+				linePos++;
+				t += c;
+			}
+		}
+
+		super(t);
+
+		this.#tabs = tabs.reverse();
+	}
+
+	get() {
+		let t = super.get();
+
+		const l = t.length;
+
+		for (const [start, ts] of this.#tabs) {
+			if (start < this.#pos) {
+				break;
+			} else if (start - this.#pos >= l) {
+				continue;
+			}
+
+			const s = start - this.#pos;
+
+			t = t.slice(0, s) + "\t" + t.slice(s + ts);
+		}
+
+		this.#pos += l;
+
+		return t;
+	}
+}
+
 abstract class Block {
 	open = true;
 
@@ -1544,7 +1601,7 @@ class Document extends ContainerBlock {
 			}
 		}
 
-		const tk = new Tokeniser(text);
+		const tk = new TabStopTokeniser(text);
 
 		while(tk.peek()) {
 			this.process(tk);
