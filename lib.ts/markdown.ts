@@ -1507,13 +1507,13 @@ class TabStopTokeniser extends Tokeniser {
 		for (const [start, ts] of this.#tabs) {
 			if (start < this.#pos) {
 				break;
-			} else if (start - this.#pos >= l) {
-				continue;
+			}
+			if (start - this.#pos < l) {
+				const s = start - this.#pos;
+
+				t = t.slice(0, s) + "\t" + t.slice(s + ts);
 			}
 
-			const s = start - this.#pos;
-
-			t = t.slice(0, s) + "\t" + t.slice(s + ts);
 		}
 
 		this.#pos += l;
