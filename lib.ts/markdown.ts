@@ -1193,6 +1193,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 						switch (stack[k].type) {
 						case tokenTilde:
 						case tokenEmphasis:
+						case tokenEquals:
 							stack[k].type = tokenText;
 						}
 
