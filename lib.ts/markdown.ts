@@ -1234,7 +1234,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	}
 
 	for (let i = start + 1; i < end; i++) {
-		if (stack[i].type === tokenEmphasis) {
+		switch (stack[i].type) {
+		case tokenTilde:
+		case tokenEmphasis:
+		case tokenEquals:
 			stack[i].type = tokenText;
 		}
 	}
