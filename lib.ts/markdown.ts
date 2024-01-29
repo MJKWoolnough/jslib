@@ -651,8 +651,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 							if (tk.accept(">")) {
 								return tk.return(tokenHTML, parseText);
 							}
-
-							break;
 						}
 					}
 				}
