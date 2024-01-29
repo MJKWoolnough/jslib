@@ -11274,7 +11274,12 @@ type Tests = {
 				["x ====foo====", "<p>x <mark><mark>foo</mark></mark></p>"],
 				["x ===foo===", "<p>x =<mark>foo</mark>=</p>"],
 				["**==test**==\n\n==**test==**", "<p><strong>==test</strong>==</p><p><mark>**test</mark>**</p>"],
-				["[==link]()==\n\n==[link==]()", "<p><a href=\"\">==link</a>==</p><p>==<a href=\"\">link==</a></p>"]
+				["[==link]()==\n\n==[link==]()", "<p><a href=\"\">==link</a>==</p><p>==<a href=\"\">link==</a></p>"],
+				["==`code==`\n\n`==code`==", "<p>==<code>code==</code></p><p><code>==code</code>==</p>"],
+				["==foo ==bar== baz==", "<p><mark>foo <mark>bar</mark> baz</mark></p>"],
+				["==f **o ==o b== a** r==", "<p><mark>f <strong>o <mark>o b</mark> a</strong> r</mark></p>"],
+				["foo == bar == baz", "<p>foo == bar == baz</p>"],
+				["==test\n== a\n\n==\ntest==\n\n==\ntest\n==", "<p>==test\n== a</p><p>==\ntest==</p><h1>==\ntest</h1>"]
 			],
 			"links": [
 				["[link](/uri \"title\")", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
