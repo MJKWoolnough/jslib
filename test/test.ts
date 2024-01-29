@@ -11268,7 +11268,11 @@ type Tests = {
 				["x ~~~~foo~~~~", "<p>x <s><s>foo</s></s></p>"]
 			],
 			"mark": [
-				["==Mark==", "<p><mark>Mark</mark></p>"]
+				["==Mark==", "<p><mark>Mark</mark></p>"],
+				["x ====foo== bar==", "<p>x <mark><mark>foo</mark> bar</mark></p>"],
+				["x ==foo ==bar====", "<p>x <mark>foo <mark>bar</mark></mark></p>"],
+				["x ====foo====", "<p>x <mark><mark>foo</mark></mark></p>"],
+				["x ===foo===", "<p>x =<mark>foo</mark>=</p>"]
 			],
 			"links": [
 				["[link](/uri \"title\")", "<p><a href=\"/uri\" title=\"title\">link</a></p>"],
