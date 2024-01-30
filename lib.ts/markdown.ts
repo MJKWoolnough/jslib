@@ -1087,28 +1087,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return false;
       },
-      isEmphasisOpening = (stack: Token[], pos: number) => {
-	if (isLeftFlanking(stack, pos)) {
-		if (stack[pos].data.at(0) === "_" && (isRightFlanking(stack, pos) && !isPunctuation.test(stack[pos - 1]?.data.at(-1) ?? "_"))) {
-			return false;
-		}
-
-		return true;
-	}
-
-	return false;
-      },
-      isEmphasisClosing = (stack: Token[], pos: number) => {
-	if (isRightFlanking(stack, pos)) {
-		if (stack[pos].data.at(0) === "_" && (isLeftFlanking(stack, pos) && !isPunctuation.test(stack[pos + 1]?.data.at(0) ?? "_"))) {
-			return false;
-		}
-
-		return true;
-	}
-
-	return false;
-      },
+      isEmphasisOpening = (stack: Token[], pos: number) => isLeftFlanking(stack, pos) && (stack[pos].data.at(0) !== "_" || !isRightFlanking(stack, pos) || isPunctuation.test(stack[pos - 1]?.data.at(-1) ?? "_")),
+      isEmphasisClosing = (stack: Token[], pos: number) => isRightFlanking(stack, pos) && (stack[pos].data.at(0) !== "_" || !isLeftFlanking(stack, pos) || isPunctuation.test(stack[pos + 1]?.data.at(0) ?? "_")),
       emphasisTags: Record<string, (keyof HTMLElementTagNameMap)[]> = {
 	"*": ["em", "strong"],
 	"_": ["em", "strong"],
