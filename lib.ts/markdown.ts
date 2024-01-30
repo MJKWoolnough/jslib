@@ -1242,7 +1242,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 			break;
 		default:
-			res += processEscapedPunctuation(tk.data).replaceAll(/\n +/g, nl).split(/ + \n|\\\n/g).map(t =>  setText(encoder, t.replaceAll(/ +\n/g, nl)).innerHTML).join(tag(uid, "br"));
+			res += processEscapedPunctuation(tk.data).replaceAll(/\n +/g, nl).split(/ + \n|\\\n/g).map(t => setText(encoder, t.replaceAll(/ +\n/g, nl)).innerHTML).join(tag(uid, "br"));
 
 			break;
 		}
