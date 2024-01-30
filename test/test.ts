@@ -11277,6 +11277,9 @@ type Tests = {
 				["a~~\"foo\"~~", "<p>a~~\"foo\"~~</p>"],
 				["-~~~~;~~~~~~", "<p>-<s><s>;</s></s>~~</p>"]
 			],
+			"insert": [
+				["++Insert++", "<p><ins>Insert</ins></p>"]
+			],
 			"mark": [
 				["==Mark==", "<p><mark>Mark</mark></p>"],
 				["x ====foo== bar==", "<p>x <mark><mark>foo</mark> bar</mark></p>"],
