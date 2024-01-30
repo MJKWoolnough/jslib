@@ -531,10 +531,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenAutoEmail = 11,
       tokenHTMLMD = 12,
       tokenDeactivatedLink = 13,
-      tokenTilde = 14,
-      tokenCaret = 15,
-      tokenEquals = 16,
-      tokenPlus = 16,
+      tokenCaret = 14,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
 		switch (tk.exceptRun("\\`*_![]()<^~=+")) {
@@ -546,6 +543,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			return tk.return(tokenText, parseCode);
 		case '*':
 		case '_':
+		case '~':
+		case '+':
+		case '=':
 			return tk.return(tokenText, parseEmphasis);
 		case '!':
 			return tk.return(tokenText, parseImageOpen);
@@ -559,14 +559,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			return tk.return(tokenText, parseParenClose);
 		case '<':
 			return tk.return(tokenText, parseHTML);
-		case '~':
-			return tk.return(tokenText, parseTilde);
 		case '^':
 			return tk.return(tokenText, parseCaret);
-		case '+':
-			return tk.return(tokenText, parsePlus);
-		case '=':
-			return tk.return(tokenText, parseEquals);
 		default:
 			return tk.return(tokenText);
 		}
@@ -602,11 +596,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	
 	return tk.return(tokenEmphasis, parseText);
       },
-      parseTilde = (tk: Tokeniser) => {
-	tk.acceptRun("~");
-
-	return tk.return(tokenTilde, parseText);
-      },
       parseCaret = (tk: Tokeniser) => {
 	tk.next();
 
@@ -617,16 +606,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	}
 
 	return tk.return(tokenCaret, parseText);
-      },
-      parseEquals = (tk: Tokeniser) => {
-	tk.acceptRun("=");
-
-	return tk.return(tokenEquals, parseText);
-      },
-      parsePlus = (tk: Tokeniser) => {
-	tk.acceptRun("+");
-
-	return tk.return(tokenPlus, parseText);
       },
       parseImageOpen = (tk: Tokeniser) => {
 	tk.next();
@@ -1082,9 +1061,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       isPunctuation = /\p{P}/u,
       isLeftFlanking = (stack: Token[], pos: number) => {
 	const openTk = stack[pos],
-	      allowEscapedWhitespace = openTk.type === tokenTilde || openTk.type === tokenCaret;
+	      allowEscapedWhitespace = openTk.type === tokenEmphasis && openTk.data.at(0) === "~" || openTk.type === tokenCaret;
 
-	if (openTk.type === tokenEmphasis || openTk.type === tokenEquals || allowEscapedWhitespace) {
+	if (openTk.type === tokenEmphasis || allowEscapedWhitespace) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
 		      nextChar = stack[pos + 1]?.data.at(0) ?? " ",
 		      nextNextChar = stack[pos + 1]?.data.at(1) ?? " ";
@@ -1096,9 +1075,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       isRightFlanking = (stack: Token[], pos: number) => {
 	const closeTk = stack[pos],
-	      allowEscapedWhitespace = closeTk.type === tokenTilde || closeTk.type === tokenCaret;
+	      allowEscapedWhitespace = closeTk.type === tokenEmphasis && closeTk.data.at(0) === "~" || closeTk.type === tokenCaret;
 
-	if (closeTk.type === tokenEmphasis || closeTk.type === tokenEquals || allowEscapedWhitespace) {
+	if (closeTk.type === tokenEmphasis || allowEscapedWhitespace) {
 		const lastChar = stack[pos - 1]?.data.at(-1) ?? " ",
 		      lastLastChar = stack[pos - 1]?.data.at(-2) ?? " ",
 		      nextChar = stack[pos + 1]?.data.at(0) ?? " ";
@@ -1201,10 +1180,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 					for (let k = j + 1; k < i; k++) {
 						switch (stack[k].type) {
-						case tokenTilde:
 						case tokenEmphasis:
-						case tokenEquals:
-						case tokenPlus:
+						case tokenCaret:
 							stack[k].type = tokenText;
 						}
 
@@ -1246,10 +1223,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	for (let i = start + 1; i < end; i++) {
 		switch (stack[i].type) {
-		case tokenTilde:
 		case tokenEmphasis:
-		case tokenEquals:
-		case tokenPlus:
+		case tokenCaret:
 			stack[i].type = tokenText;
 		}
 	}
