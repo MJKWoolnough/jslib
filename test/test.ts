@@ -11278,7 +11278,22 @@ type Tests = {
 				["-~~~~;~~~~~~", "<p>-<s><s>;</s></s>~~</p>"]
 			],
 			"insert": [
-				["++Insert++", "<p><ins>Insert</ins></p>"]
+				["++Insert++", "<p><ins>Insert</ins></p>"],
+				["x ++++foo++ bar++", "<p>x <ins><ins>foo</ins> bar</ins></p>"],
+				["x ++foo ++bar++++", "<p>x <ins>foo <ins>bar</ins></ins></p>"],
+				["x ++++foo++++", "<p>x <ins><ins>foo</ins></ins></p>"],
+				["x +++foo+++", "<p>x +<ins>foo</ins>+</p>"],
+				["**++test**++\n\n++**test++**", "<p><strong>++test</strong>++</p><p><ins>**test</ins>**</p>"],
+				["[++link]()++\n\n++[link++]()", "<p><a href=\"\">++link</a>++</p><p>++<a href=\"\">link++</a></p>"],
+				["++`code++`\n\n`++code`++", "<p>++<code>code++</code></p><p><code>++code</code>++</p>"],
+				["++foo ++bar++ baz++", "<p><ins>foo <ins>bar</ins> baz</ins></p>"],
+				["++f **o ++o b++ a** r++", "<p><ins>f <strong>o <ins>o b</ins> a</strong> r</ins></p>"],
+				["foo ++ bar ++ baz", "<p>foo ++ bar ++ baz</p>"],
+				["++test\n++\n\n++\ntest++\n\n++\ntest\n++", "<p>++test\n++</p><p>++\ntest++</p><p>++\ntest\n++</p>"],
+				["x ++a ++foo+++++++++++bar++ b++\n\nx ++a ++foo++++++++++++bar++ b++", "<p>x <ins>a <ins>foo</ins></ins>+++<ins><ins>bar</ins> b</ins></p><p>x <ins>a <ins>foo</ins></ins>++++<ins><ins>bar</ins> b</ins></p>"],
+				["a++\"foo\"++", "<p>a++\"foo\"++</p>"],
+				["[++foo++]()", "<p><a href=\"\"><ins>foo</ins></a></p>"],
+				["-++++;++++++", "<p>-<ins><ins>;</ins></ins>++</p>"]
 			],
 			"mark": [
 				["==Mark==", "<p><mark>Mark</mark></p>"],
