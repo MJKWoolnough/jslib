@@ -11266,7 +11266,16 @@ type Tests = {
 				["x ~~~~foo~~ bar~~", "<p>x <s><s>foo</s> bar</s></p>"],
 				["x ~~foo ~~bar~~~~", "<p>x <s>foo <s>bar</s></s></p>"],
 				["x ~~~~foo~~~~", "<p>x <s><s>foo</s></s></p>"],
-				["x ~~a ~~foo~~~~~~~~~~~bar~~ b~~\n\nx ~~a ~~foo~~~~~~~~~~~~bar~~ b~~", "<p>x <s>a <s>foo</s></s>~~~<s><s>bar</s> b</s></p><p>x <s>a <s>foo</s></s>~~~~<s><s>bar</s> b</s></p>"]
+				["x ~~a ~~foo~~~~~~~~~~~bar~~ b~~\n\nx ~~a ~~foo~~~~~~~~~~~~bar~~ b~~", "<p>x <s>a <s>foo</s></s>~~~<s><s>bar</s> b</s></p><p>x <s>a <s>foo</s></s>~~~~<s><s>bar</s> b</s></p>"],
+				["**~~test**~~\n\n~~**test~~**", "<p><strong>~~test</strong>~~</p><p><s>**test</s>**</p>"],
+				["[~~link]()~~\n\n~~[link~~]()", "<p><a href=\"\">~~link</a>~~</p><p>~~<a href=\"\">link~~</a></p>"],
+				["~~`code~~`\n\n`~~code`~~", "<p>~~<code>code~~</code></p><p><code>~~code</code>~~</p>"],
+				["~~foo ~~bar~~ baz~~\n\n~~f **o ~~o b~~ a** r~~", "<p><s>foo <s>bar</s> baz</s></p><p><s>f <strong>o <s>o b</s> a</strong> r</s></p>"],
+				["foo ~~ bar ~~ baz", "<p>foo ~~ bar ~~ baz</p>"],
+				["[~~foo~~]()", "<p><a href=\"\"><s>foo</s></a></p>"],
+				["~~test\n~~\n\n~~\ntest~~\n\n~~\ntest\n~~", "<p>~~test\n~~</p><p>~~\ntest~~</p><p>~~\ntest\n~~</p>"],
+				["a~~\"foo\"~~", "<p>a~~\"foo\"~~</p>"],
+				["-~~~~;~~~~~~", "<p>-<s><s>;</s></s>~~</p>"]
 			],
 			"mark": [
 				["==Mark==", "<p><mark>Mark</mark></p>"],
