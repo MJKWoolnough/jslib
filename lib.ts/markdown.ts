@@ -1181,7 +1181,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					}
 				}
 
-				if (isEmphasisOpening(stack, j) && char === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || char === "=" || (closeLength + openLength) % 3 !== 0 || closeLength % 3 === 0 || openLength % 3 === 0)) {
+				if (isEmphasisOpening(stack, j) && char === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || char === "=" || char === "~" || (closeLength + openLength) % 3 !== 0 || closeLength % 3 === 0 || openLength % 3 === 0)) {
 					const tag = emphasisTags[char][+isDouble],
 					      chars = isDouble ? 2 : 1,
 					      closingTag = {"type": tokenHTMLMD, "data": closeTag(tag)},
