@@ -11265,7 +11265,8 @@ type Tests = {
 				["~~Strikeout~~", "<p><s>Strikeout</s></p>"],
 				["x ~~~~foo~~ bar~~", "<p>x <s><s>foo</s> bar</s></p>"],
 				["x ~~foo ~~bar~~~~", "<p>x <s>foo <s>bar</s></s></p>"],
-				["x ~~~~foo~~~~", "<p>x <s><s>foo</s></s></p>"]
+				["x ~~~~foo~~~~", "<p>x <s><s>foo</s></s></p>"],
+				["x ~~a ~~foo~~~~~~~~~~~bar~~ b~~\n\nx ~~a ~~foo~~~~~~~~~~~~bar~~ b~~", "<p>x <s>a <s>foo</s></s>~~~<s><s>bar</s> b</s></p><p>x <s>a <s>foo</s></s>~~~~<s><s>bar</s> b</s></p>"]
 			],
 			"mark": [
 				["==Mark==", "<p><mark>Mark</mark></p>"],
