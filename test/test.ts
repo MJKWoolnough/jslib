@@ -11510,6 +11510,12 @@ type Tests = {
 				["~foo\\ bar\\ baz~", "<p>~foo\\ bar\\ baz~</p>"],
 				["~\\ foo\\ ~", "<p>~\\ foo\\ ~</p>"],
 				["~foo\\\\\\\\\\\\\\\ bar~", "<p>~foo\\\\\\\\ bar~</p>"]
+			],
+			"superscript": [
+				["^test^", "<p>^test^</p>"],
+				["^foo~bar^baz^bar~foo^", "<p>^foo~bar^baz^bar~foo^</p>"],
+				["^\\ foo\\ ^", "<p>^\\ foo\\ ^</p>"],
+				["^foo\\\\\\\\\\\\\\ bar^", "<p>^foo\\\\\\\\ bar^</p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
