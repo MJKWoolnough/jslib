@@ -11504,6 +11504,12 @@ type Tests = {
 				["| Header 1 | Header 2 | Header 3 | Header 4 |\n| :------: | -------: | :------- | -------- |\n| Cell 1   | Cell 2   | Cell 3   | Cell 4   |\n| Cell 5   | Cell 6   | Cell 7   | Cell 8   |", "<p>| Header 1 | Header 2 | Header 3 | Header 4 |\n| :------: | -------: | :------- | -------- |\n| Cell 1   | Cell 2   | Cell 3   | Cell 4   |\n| Cell 5   | Cell 6   | Cell 7   | Cell 8   |</p>"],
 				["Header 1|Header 2|Header 3|Header 4\n:-------|:------:|-------:|--------\nCell 1  |Cell 2  |Cell 3  |Cell 4\n*Cell 5*|Cell 6  |Cell 7  |Cell 8", "<p>Header 1|Header 2|Header 3|Header 4\n:-------|:------:|-------:|--------\nCell 1  |Cell 2  |Cell 3  |Cell 4\n<em>Cell 5</em>|Cell 6  |Cell 7  |Cell 8</p>"],
 				["> foo|foo\n> ---|---\n> bar|bar\nbaz|baz", "<blockquote><p>foo|foo\n---|---\nbar|bar\nbaz|baz</p></blockquote>"]
+			],
+			"subscript": [
+				["Subscript: H~2~O", "<p>Subscript: H~2~O</p>"],
+				["~foo\\ bar\\ baz~", "<p>~foo\\ bar\\ baz~</p>"],
+				["~\\ foo\\ ~", "<p>~\\ foo\\ ~</p>"],
+				["~foo\\\\\\\\\\\\\\\ bar~", "<p>~foo\\\\\\\\ bar~</p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
