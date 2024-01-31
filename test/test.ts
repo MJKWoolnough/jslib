@@ -11498,10 +11498,19 @@ type Tests = {
 				["Multiple     spaces", "<p>Multiple     spaces</p>"]
 			]
 		},
+		"no extension": {
+		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
 		      {code, div, pre} = await import ("./lib/html.js"),
-		      tags = {"code": (info: string, text: string) => pre({"class": info.replace(/[^\w ]/g, "").split(/[ \t]+/).filter(l => l.trim()).map(l => `language-${l}`) || null}, code(text))},
+		      tags: any = Object.assign({"code": (info: string, text: string) => pre({"class": info.replace(/[^\w ]/g, "").split(/[ \t]+/).filter(l => l.trim()).map(l => `language-${l}`) || null}, code(text))}, title === "no extension" ? {
+			"subscript": null,
+			"superscript": null,
+			"strikethrough": null,
+			"insert": null,
+			"highlight": null,
+			"table": null
+		      } : {}),
 		      generated = div(parseMarkdown(input, tags)).innerHTML;
 
 		if (generated !== output) {
