@@ -1100,13 +1100,13 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       isEmphasisOpening = (stack: Token[], pos: number) => isLeftFlanking(stack, pos) && (stack[pos].data.at(0) !== "_" || !isRightFlanking(stack, pos) || isPunctuation.test(stack[pos - 1]?.data.at(-1) ?? "_")),
       isEmphasisClosing = (stack: Token[], pos: number) => isRightFlanking(stack, pos) && (stack[pos].data.at(0) !== "_" || !isLeftFlanking(stack, pos) || isPunctuation.test(stack[pos + 1]?.data.at(0) ?? "_")),
-      emphasisTags: Record<string, (keyof HTMLElementTagNameMap)[]> = {
+      emphasisTags: Record<string, (keyof HTMLElementTagNameMap | "")[]> = {
 	"*": ["em", "strong"],
 	"_": ["em", "strong"],
 	"~": ["sub", "s"],
 	"^": ["sup"],
-	"=": ["mark", "mark"],
-	"+": ["ins", "ins"]
+	"=": ["", "mark"],
+	"+": ["", "ins"]
       },
       processEmphasis = (uid: string, stack: Token[], start = 0, end = stack.length) => {
 	const levels = {
@@ -1132,9 +1132,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				const open = stack[j],
 				      openLength = open.data.length,
 				      isDouble = closeLength > 1 && openLength > 1,
-				      escapedSpaces = !isDouble && (char === "~" || char === "^");
+				      escapedSpaces = !isDouble && (char === "~" || char === "^"),
+				      tag = emphasisTags[char][+isDouble];
 
-				if ((char === "=" || char === "+") && !isDouble) {
+				if ((char === "=" || char === "+") && !isDouble || !tag) {
 					continue;
 				}
 
@@ -1164,8 +1165,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				}
 
 				if (isEmphasisOpening(stack, j) && char === open.data.at(0) && (!isCloseOpen && !isEmphasisClosing(stack, j) || char === "=" || char === "~" || char === "+" || (closeLength + openLength) % 3 !== 0 || closeLength % 3 === 0 || openLength % 3 === 0)) {
-					const tag = emphasisTags[char][+isDouble],
-					      chars = isDouble ? 2 : 1,
+					const chars = isDouble ? 2 : 1,
 					      closingTag = {"type": tokenHTMLMD, "data": closeTag(tag)},
 					      openingTag = {"type": tokenHTMLMD, "data": openTag(uid, tag)};
 
