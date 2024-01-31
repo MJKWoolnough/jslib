@@ -46,6 +46,8 @@ type UserTags = Tags & {
 	table: null | ((c: DocumentFragment) => Element | DocumentFragment);
 }
 
+let inlineStarts = "";
+
 const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeName, params: Record<string, string> = {}, children: string | DocumentFragment = "") => {
 	const node = document.createElement(nodeName) as HTMLElementTagNameMap[NodeName];
 
@@ -543,7 +545,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       tokenCaret = 14,
       parseText: TokenFn = (tk: Tokeniser) => {
 	while (true) {
-		switch (tk.exceptRun("\\`*_![]()<^~=+")) {
+		switch (tk.exceptRun(inlineStarts)) {
 		case '\\':
 			tk.next();
 			tk.next();
@@ -2497,4 +2499,9 @@ class ThematicBreakBlock extends LeafBlock {
 }
 
 
-export default (markdown: string, tgs: Partial<UserTags> = {}) => new Document(markdown).render(Object.assign(Object.assign({}, tags), tgs));
+export default (markdown: string, tgs: Partial<UserTags> = {}) => {
+	inlineStarts = "\\`*_![]()<" + (tgs.superscript !== null ? "^" : "") + (tgs.subscript !== null ? "~" : "") + (tgs.highlight !== null ? "=" : "") + (tgs.insert !== null ? "+" : "");
+	parseBlock[3] = tgs.table !== null ? parseTable : notTable;
+
+	return new Document(markdown).render(Object.assign(Object.assign({}, tags), tgs))
+};
