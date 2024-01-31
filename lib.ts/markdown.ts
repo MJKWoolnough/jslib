@@ -37,6 +37,15 @@ type Tags = {
 	break: () => Element | DocumentFragment;
 }
 
+type UserTags = Tags & {
+	subscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
+	superscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
+	strikethrough: null | ((c: DocumentFragment) => Element | DocumentFragment);
+	insert: null | ((c: DocumentFragment) => Element | DocumentFragment);
+	highlight: null | ((c: DocumentFragment) => Element | DocumentFragment);
+	table: null | ((c: DocumentFragment) => Element | DocumentFragment);
+}
+
 const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeName, params: Record<string, string> = {}, children: string | DocumentFragment = "") => {
 	const node = document.createElement(nodeName) as HTMLElementTagNameMap[NodeName];
 
@@ -2488,4 +2497,4 @@ class ThematicBreakBlock extends LeafBlock {
 }
 
 
-export default (markdown: string, tgs: Partial<Tags> = {}) => new Document(markdown).render(Object.assign(Object.assign({}, tags), tgs));
+export default (markdown: string, tgs: Partial<UserTags> = {}) => new Document(markdown).render(Object.assign(Object.assign({}, tags), tgs));
