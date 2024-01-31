@@ -11516,6 +11516,12 @@ type Tests = {
 				["^foo~bar^baz^bar~foo^", "<p>^foo~bar^baz^bar~foo^</p>"],
 				["^\\ foo\\ ^", "<p>^\\ foo\\ ^</p>"],
 				["^foo\\\\\\\\\\\\\\ bar^", "<p>^foo\\\\\\\\ bar^</p>"]
+			],
+			"strikethrough": [
+				["~~Strikeout~~", "<p>~~Strikeout~~</p>"],
+				["x ~~~~foo~~ bar~~", "<p>x ~~~~foo~~ bar~~</p>"],
+				["x ~~foo ~~bar~~~~", "<p>x ~~foo ~~bar~~~~</p>"],
+				["x ~~~~foo~~~~", "<p>x ~~~~foo~~~~</p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
