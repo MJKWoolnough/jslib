@@ -1388,11 +1388,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	t.toggleAttribute(uid);
 
-	if (close) {
-		return t.outerHTML;
-	}
-
-	return t.outerHTML.replace("</" + name + ">", "");
+	return close ? t.outerHTML : t.outerHTML.replace("</" + name + ">", "");
       },
       closeTag = (name: string) => `</${name}>`,
       tag = (uid: string, name: keyof HTMLElementTagNameMap, contents?: string, attrs: Record<string, string> = {}) => {
