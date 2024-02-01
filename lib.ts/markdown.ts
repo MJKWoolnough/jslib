@@ -2507,8 +2507,8 @@ class ThematicBreakBlock extends LeafBlock {
 export default (markdown: string, tgs: Partial<UserTags> = {}) => {
 	inlineStarts = "\\`*_![]()<" + (tgs.superscript !== null ? "^" : "") + (tgs.subscript !== null || tgs.strikethrough !== null ? "~" : "") + (tgs.highlight !== null ? "=" : "") + (tgs.insert !== null ? "+" : "");
 	parseBlock[3] = tgs.table !== null ? parseTable : notTable;
-
-	emphasisTags["~"] = [tgs.subscript !== null ? "sub" : "", tgs.strikethrough !== null ? "s" : ""];
+	emphasisTags["~"][0] = tgs.subscript !== null ? "sub" : "";
+	emphasisTags["~"][1] = tgs.strikethrough !== null ? "s" : "";
 	emphasisTags["_"][0] = tgs.underline === null ? "em" : "u";
 
 	return new Document(markdown).render(Object.assign(Object.assign({}, tags), tgs))
