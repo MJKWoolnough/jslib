@@ -2110,11 +2110,7 @@ class ParagraphBlock extends LeafBlock {
 	toHTML(uid: string) {
 		const text = parseInline(uid, this.lines.join("").trim());
 
-		if (text) {
-			return this.loose || this.#settextLevel ? tag(uid, this.#settextLevel === 0 ? "p" : `h${this.#settextLevel}`, text) : text;
-		}
-
-		return "";
+		return text ? this.loose || this.#settextLevel ? tag(uid, this.#settextLevel === 0 ? "p" : `h${this.#settextLevel}`, text) : text : "";
 	}
 }
 
