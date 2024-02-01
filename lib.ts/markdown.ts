@@ -23,6 +23,7 @@ type Tags = {
 	inlineCode: (c: DocumentFragment) => Element | DocumentFragment;
 	italic: (c: DocumentFragment) => Element | DocumentFragment;
 	bold: (c: DocumentFragment) => Element | DocumentFragment;
+	underline: (c: DocumentFragment) => Element | DocumentFragment;
 	subscript: (c: DocumentFragment) => Element | DocumentFragment;
 	superscript: (c: DocumentFragment) => Element | DocumentFragment;
 	strikethrough: (c: DocumentFragment) => Element | DocumentFragment;
@@ -38,6 +39,7 @@ type Tags = {
 }
 
 type UserTags = Tags & {
+	underline: null | ((c: DocumentFragment) => Element | DocumentFragment);
 	subscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
 	superscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
 	strikethrough: null | ((c: DocumentFragment) => Element | DocumentFragment);
@@ -81,6 +83,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	["inlineCode", "code"],
 	["italic", "em"],
 	["bold", "strong"],
+	["underline", "u"],
 	["subscript", "sub"],
 	["superscript", "sup"],
 	["strikethrough", "s"],
@@ -1269,6 +1272,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"CODE": "inlineCode",
 	"EM": "italic",
 	"STRONG": "bold",
+	"U": "underline",
 	"SUB": "subscript",
 	"SUP": "superscript",
 	"S": "strikethrough",
@@ -1306,6 +1310,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				case "CODE":
 				case "EM":
 				case "STRONG":
+				case "U":
 				case "SUB":
 				case "SUP":
 				case "S":
