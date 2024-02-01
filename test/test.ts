@@ -11540,13 +11540,14 @@ type Tests = {
 		const {default: parseMarkdown} = await import("./lib/markdown.js"),
 		      {code, div, pre} = await import ("./lib/html.js"),
 		      tags: any = Object.assign({"code": (info: string, text: string) => pre({"class": info.replace(/[^\w ]/g, "").split(/[ \t]+/).filter(l => l.trim()).map(l => `language-${l}`) || null}, code(text))}, title === "no extension" ? {
+			"underline": null,
 			"subscript": null,
 			"superscript": null,
 			"strikethrough": null,
 			"insert": null,
 			"highlight": null,
 			"table": null
-		      } : {}),
+		      } : subtitle === "underline" ? {"underline": null} : {}),
 		      generated = div(parseMarkdown(input, tags)).innerHTML;
 
 		if (generated !== output) {
