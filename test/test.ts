@@ -11241,6 +11241,30 @@ type Tests = {
 				["**a<http://foo.bar/?q=**>", "<p>**a<a href=\"http://foo.bar/?q=**\">http://foo.bar/?q=**</a></p>"],
 				["__a<http://foo.bar/?q=__>", "<p>__a<a href=\"http://foo.bar/?q=__\">http://foo.bar/?q=__</a></p>"]
 			],
+			"underline": [
+				["_foo bar_", "<p><u>foo bar</u></p>"],
+				["aa_\"bb\"_cc", "<p>aa_\"bb\"_cc</p>"],
+				["foo-_(bar)_", "<p>foo-<u>(bar)</u></p>"],
+				["_(_foo)", "<p>_(_foo)</p>"],
+				["_(_foo_)_", "<p><u>(<u>foo</u>)</u></p>"],
+				["_foo_bar_baz_", "<p><u>foo_bar_baz</u></p>"],
+				["_(bar)_.", "<p><u>(bar)</u>.</p>"],
+				["foo__bar__", "<p>foo__bar__</p>"],
+				["5__6__78", "<p>5__6__78</p>"],
+				["__(__foo)", "<p>__(__foo)</p>"],
+				["_(__foo__)_", "<p><u>(<strong>foo</strong>)</u></p>"],
+				["_foo __bar__ baz_", "<p><u>foo <strong>bar</strong> baz</u></p>"],
+				["__foo _bar_ baz__", "<p><strong>foo <u>bar</u> baz</strong></p>"],
+				["foo ___", "<p>foo ___</p>"],
+				["foo _\\__", "<p>foo <u>_</u></p>"],
+				["foo _*_", "<p>foo <u>*</u></p>"],
+				["foo _____", "<p>foo _____</p>"],
+				["__foo_", "<p>_<u>foo</u></p>"],
+				["_foo__", "<p><u>foo</u>_</p>"],
+				["_foo____", "<p><u>foo</u>___</p>"],
+				["_____foo_____", "<p><u><strong><strong>foo</strong></strong></u></p>"],
+				["_a `_`_", "<p><u>a <code>_</code></u></p>"]
+			],
 			"subscript": [
 				["Subscript: H~2~O", "<p>Subscript: H<sub>2</sub>O</p>"],
 				["~foo\\~", "<p>~foo~</p>"],
@@ -11547,7 +11571,7 @@ type Tests = {
 			"insert": null,
 			"highlight": null,
 			"table": null
-		      } : subtitle === "underline" ? {"underline": null} : {}),
+		      } : subtitle === "underline" ? {} : {"underline": null}),
 		      generated = div(parseMarkdown(input, tags)).innerHTML;
 
 		if (generated !== output) {
