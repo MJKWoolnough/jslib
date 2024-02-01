@@ -1410,9 +1410,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	for (const block of parseBlock) {
 		acceptThreeSpaces(ftk);
 
-		const b = block(ftk, !inList || block !== parseListBlockStart);
-
-		if (b) {
+		if (block(ftk, !inList || block !== parseListBlockStart)) {
 			tk.reset();
 
 			return false;
