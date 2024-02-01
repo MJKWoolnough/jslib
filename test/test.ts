@@ -11558,6 +11558,12 @@ type Tests = {
 				["x ====foo== bar==", "<p>x ====foo== bar==</p>"],
 				["x ==foo ==bar====", "<p>x ==foo ==bar====</p>"],
 				["x ====foo====", "<p>x ====foo====</p>"]
+			],
+			"underline": [
+				["_foo bar_", "<p><em>foo bar</em></p>"],
+				["foo-_(bar)_", "<p>foo-<em>(bar)</em></p>"],
+				["_(_foo_)_", "<p><em>(<em>foo</em>)</em></p>"],
+				["_foo_bar_baz_", "<p><em>foo_bar_baz</em></p>"]
 			]
 		}
 	} as Record<string, Record<string, [string, string][]>>).reduce((o, [title, tests]) => (o[title] = Object.entries(tests).reduce((p, [subtitle, testArr]) => (p[subtitle] = testArr.reduce((q, [input, output], n) => (q[n+1] = Object.defineProperty(async () => {
