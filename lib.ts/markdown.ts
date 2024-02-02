@@ -127,7 +127,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		case '|':
 			tk.next();
 
-			if (tk.acceptRun(whiteSpace) === "\n" || !tk.peek()) {
+			if (tk.acceptRun(whiteSpace) === nl || !tk.peek()) {
 				return null;
 			}
 
@@ -399,7 +399,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	if (tk.accept("[")) {
 		tk.acceptRun(whiteSpace);
 
-		if (tk.accept("\n")) {
+		if (tk.accept(nl)) {
 			tk.acceptRun(whiteSpace);
 		}
 
@@ -407,7 +407,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			Loop:
 			while (true) {
 				switch (tk.exceptRun("\\[]\n")) {
-				case '\n':
+				case nl:
 					tk.next();
 					tk.acceptRun(whiteSpace);
 
@@ -830,7 +830,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 		while (true) {
 			switch (tk.exceptRun(next === "(" ? "\n()\\" : "\n\\" + next)) {
-			case '\n':
+			case nl:
 				tk.next();
 				tk.acceptRun(whiteSpace);
 
@@ -1158,7 +1158,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 								break;
 							case ' ':
 							case '\t':
-							case '\n':
+							case nl:
 								if (!lastEscape) {
 									stack[j].type = stack[i].type = tokenText;
 
@@ -1481,7 +1481,7 @@ class TabStopTokeniser extends Tokeniser {
 			tabs = [];
 
 			for (const c of text) {
-				if (c === "\n") {
+				if (c === nl) {
 					linePos = 0;
 				} else if (c === "\t") {
 					const ts = 4 - (linePos % 4);
@@ -1740,7 +1740,7 @@ class ListItemBlock extends ContainerBlock {
 		const firstChild = this.children.at(0);
 
 		if (firstChild instanceof ParagraphBlock) {
-			const t = (firstChild.lines.at(0) ?? "").replace(/^ *(\[[xX ]\] *)?.*/, "$1").replace("\n", "");
+			const t = (firstChild.lines.at(0) ?? "").replace(/^ *(\[[xX ]\] *)?.*/, "$1").replace(nl, "");
 
 			if (t) {
 				firstChild.lines[0] = firstChild.lines[0].replace(/^ *\[[xX ]\]/, "")
@@ -2223,7 +2223,7 @@ class TableBlock extends ContainerBlock {
 	constructor(tk: Tokeniser) {
 		super();
 
-		tk.exceptRun("\n");
+		tk.exceptRun(nl);
 		tk.next();
 
 		const ftk = new Tokeniser(this.#firstLine = tk.get());
@@ -2323,7 +2323,7 @@ class TableBlock extends ContainerBlock {
 
 			tk.acceptRun(whiteSpace);
 
-			if (this.#alignment.length < this.#title.length || !tk.accept("\n") && tk.peek()) {
+			if (this.#alignment.length < this.#title.length || !tk.accept(nl) && tk.peek()) {
 				return this.#notATable(tk);
 			}
 
@@ -2358,7 +2358,7 @@ class TableBlock extends ContainerBlock {
 
 		ftk.acceptRun(whiteSpace);
 
-		if (ftk.accept("\n")) {
+		if (ftk.accept(nl)) {
 			tk.get();
 
 			this.open = !hasRow;
@@ -2413,7 +2413,7 @@ class TableBlock extends ContainerBlock {
 
 		tk.backup();
 
-		tk.exceptRun("\n");
+		tk.exceptRun(nl);
 		tk.next();
 		tk.get();
 
