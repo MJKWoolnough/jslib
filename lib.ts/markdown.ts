@@ -40,6 +40,7 @@ type Tags = {
 }
 
 type UserTags = Tags & {
+	checkbox: null | ((checked: boolean) => Element | DocumentFragment);
 	underline: null | ((c: DocumentFragment) => Element | DocumentFragment);
 	subscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
 	superscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
@@ -49,7 +50,8 @@ type UserTags = Tags & {
 	table: null | ((c: DocumentFragment) => Element | DocumentFragment);
 }
 
-let inlineStarts = "";
+let inlineStarts = "",
+    taskListItems = false;
 
 const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeName, params: Record<string, string> = {}, children: string | DocumentFragment = "") => {
 	const node = document.createElement(nodeName) as HTMLElementTagNameMap[NodeName];
@@ -1759,7 +1761,7 @@ class ListItemBlock extends ContainerBlock {
 			}
 		}
 
-		return tag(uid, "li", this.#handleTaskList(uid));
+		return tag(uid, "li", taskListItems ? this.#handleTaskList(uid) : super.toHTML(uid));
 	}
 }
 
@@ -2522,6 +2524,7 @@ export default (markdown: string, tgs: Partial<UserTags> = {}) => {
 	emphasisTags["~"][0] = tgs.subscript !== null ? "sub" : "";
 	emphasisTags["~"][1] = tgs.strikethrough !== null ? "s" : "";
 	emphasisTags["_"][0] = tgs.underline === null ? "em" : "u";
+	taskListItems = tgs.checkbox !== null;
 
 	return new Document(markdown).render(Object.assign(Object.assign({}, tags), tgs))
 };
