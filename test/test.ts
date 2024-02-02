@@ -11046,6 +11046,11 @@ type Tests = {
 				["The number of windows in my house is\n2.  The number of doors is 6.", "<p>The number of windows in my house is\n2.  The number of doors is 6.</p>"]
 			]
 		},
+		"list task items": {
+			"simple": [
+				["- [ ] foo\n- [x] bar", "<ul><li><input disabled=\"\" type=\"checkbox\"> foo</li><li><input checked=\"\" disabled=\"\" type=\"checkbox\"> bar</li></ul>"]
+			]
+		},
 		"table": {
 			"simple": [
 				["| Heading 1 | Heading 2\n| --------- | ---------\n| Cell 1    | Cell 2\n| Cell 3    | Cell 4", "<table><thead><tr><th>Heading 1</th><th>Heading 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Cell 3</td><td>Cell 4</td></tr></tbody></table>"],
