@@ -11048,7 +11048,8 @@ type Tests = {
 		},
 		"list task items": {
 			"simple": [
-				["- [ ] foo\n- [x] bar", "<ul><li><input disabled=\"\" type=\"checkbox\"> foo</li><li><input checked=\"\" disabled=\"\" type=\"checkbox\"> bar</li></ul>"]
+				["- [ ] foo\n- [x] bar", "<ul><li><input disabled=\"\" type=\"checkbox\"> foo</li><li><input checked=\"\" disabled=\"\" type=\"checkbox\"> bar</li></ul>"],
+				["- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim", "<ul><li><input checked=\"\" disabled=\"\" type=\"checkbox\"> foo<ul><li><input disabled=\"\" type=\"checkbox\"> bar</li><li><input checked=\"\" disabled=\"\" type=\"checkbox\"> baz</li></ul></li><li><input disabled=\"\" type=\"checkbox\"> bim</li></ul>"]
 			]
 		},
 		"table": {
