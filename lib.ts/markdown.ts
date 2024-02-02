@@ -143,10 +143,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	}
       },
       parseIndentedCodeBlockStart = (tk: Tokeniser, inParagraph: boolean) => {
-	if (!inParagraph) {
-		if (tk.accept(" ") && tk.length() === 4) {
-			return new IndentedCodeBlock(tk);
-		}
+	if (!inParagraph && tk.accept(" ") && tk.length() === 4) {
+		return new IndentedCodeBlock(tk);
 	}
 
 	return null;
