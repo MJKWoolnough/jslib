@@ -17,6 +17,7 @@ type Tags = {
 	unorderedList: (c: DocumentFragment) => Element | DocumentFragment;
 	orderedList: (start: string, c: DocumentFragment) => Element | DocumentFragment;
 	listItem: (c: DocumentFragment) => Element | DocumentFragment;
+	checkbox: (checked: boolean) => Element | DocumentFragment;
 	thematicBreaks: () => Element | DocumentFragment;
 	link: (href: string, title: string, c: DocumentFragment) => Element | DocumentFragment;
 	image: (src: string, title: string, alt: string) => Element | DocumentFragment;
@@ -98,6 +99,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"code": (_info: string, text: string) => makeNode("pre", {}, text),
 	"orderedList": (start: string, c: DocumentFragment) => makeNode("ol", start ? {start} : {}, c),
 	"allowedHTML": null,
+	"checkbox": (checked: boolean) => makeNode("input", checked ? {"checked": "", "disabled": "", "type": "checkbox"} : {"disabled": "", "type": "checkbox"}),
 	"thematicBreaks": () => makeNode("hr"),
 	"link": (href: string, title: string, c: DocumentFragment) => makeNode("a", title ? {href, title} : {href}, c),
 	"image": (src: string, title: string, alt: string) => makeNode("img", title ? {src, alt, title} : {src, alt}),
@@ -1323,6 +1325,10 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 					df.append(tags[tagNameToTag[node.nodeName]](sanitise(node.childNodes, tags, uid)));
 
 					break;
+				case "INPUT":
+					df.append(tags.checkbox(node.hasAttribute("checked")));
+
+					break;
 				case "BR":
 					df.append(tags.break());
 
@@ -1728,6 +1734,22 @@ class ListItemBlock extends ContainerBlock {
 		return ret || !!this.children.length;
 	}
 
+	#handleTaskList(uid: string) {
+		const firstChild = this.children.at(0);
+
+		if (firstChild instanceof ParagraphBlock) {
+			const t = (firstChild.lines.at(0) ?? "").replace(/^ *(\[[xX ]\] *)?.*/, "$1").replace("\n", "");
+
+			if (t) {
+				firstChild.lines[0] = firstChild.lines[0].replace(/^ *\[[xX ]\]/, "")
+
+				return tag(uid, "input", undefined, t.at(1) === " " ? {} : {"checked": ""}) + t.slice(3) + super.toHTML(uid);
+			}
+		}
+
+		return super.toHTML(uid);
+	}
+
 	toHTML(uid: string) {
 		if (!this.loose) {
 			for (const c of this.children) {
@@ -1737,7 +1759,7 @@ class ListItemBlock extends ContainerBlock {
 			}
 		}
 
-		return tag(uid, "li", super.toHTML(uid));
+		return tag(uid, "li", this.#handleTaskList(uid));
 	}
 }
 
