@@ -1985,12 +1985,10 @@ class HTMLBlock extends LeafBlock {
 				case "<":
 					tk.next();
 
-					if (tk.accept("/")) {
-						if (tk.acceptWord(type1Elements) && tk.accept(">")) {
-							this.open = false;
+					if (tk.accept("/") && tk.acceptWord(type1Elements) && tk.accept(">")) {
+						this.open = false;
 
-							break S;
-						}
+						break S;
 					}
 
 					break;
