@@ -11529,6 +11529,10 @@ type Tests = {
 			]
 		},
 		"no extension": {
+			"task list items": [
+				["- [ ] foo\n- [x] bar", "<ul><li>[ ] foo</li><li>[x] bar</li></ul>"],
+				["- [x] foo\n  - [ ] bar\n  - [x] baz\n- [ ] bim", "<ul><li>[x] foo<ul><li>[ ] bar</li><li>[x] baz</li></ul></li><li>[ ] bim</li></ul>"]
+			],
 			"table": [
 				["| Heading 1 | Heading 2\n| --------- | ---------\n| Cell 1    | Cell 2\n| Cell 3    | Cell 4", "<p>| Heading 1 | Heading 2\n| --------- | ---------\n| Cell 1    | Cell 2\n| Cell 3    | Cell 4</p>"],
 				["| Header 1 | Header 2 | Header 3 | Header 4 |\n| :------: | -------: | :------- | -------- |\n| Cell 1   | Cell 2   | Cell 3   | Cell 4   |\n| Cell 5   | Cell 6   | Cell 7   | Cell 8   |", "<p>| Header 1 | Header 2 | Header 3 | Header 4 |\n| :------: | -------: | :------- | -------- |\n| Cell 1   | Cell 2   | Cell 3   | Cell 4   |\n| Cell 5   | Cell 6   | Cell 7   | Cell 8   |</p>"],
@@ -11582,7 +11586,8 @@ type Tests = {
 			"strikethrough": null,
 			"insert": null,
 			"highlight": null,
-			"table": null
+			"table": null,
+			"checkbox": null
 		      } : subtitle === "underline" ? {} : {"underline": null}),
 		      generated = div(parseMarkdown(input, tags)).innerHTML;
 
