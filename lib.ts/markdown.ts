@@ -625,6 +625,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       },
       parseImageOpen = (tk: Tokeniser) => {
 	tk.next();
+
 	if (tk.accept("[")) {
 		return tk.return(tokenImageOpen, parseText);
 	}
