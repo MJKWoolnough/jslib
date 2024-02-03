@@ -952,11 +952,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			const refLink = links.get(processLinkRef(tk.get().slice(1, -1)));
 
 			if (refLink) {
-				if (stack[start].type === tokenLinkOpen) {
-					makeLink(uid, stack, start, end, refLink);
-				} else {
-					makeImage(uid, stack, start, end, refLink);
-				}
+				(stack[start].type === tokenLinkOpen ? makeLink : makeImage)(uid, stack, start, end, refLink);
 
 				stack.splice(end + 1, pos - end);
 			}
@@ -1043,11 +1039,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 
 						if (refLink) {
-							if (openTK.type === tokenLinkOpen) {
-								makeLink(uid, stack, j, i, refLink);
-							} else {
-								makeImage(uid, stack, j, i, refLink);
-							}
+							(openTK.type === tokenLinkOpen ? makeLink : makeImage)(uid, stack, j, i, refLink);
 
 							if (stack[i+1]?.type === tokenLinkOpen && stack[i+2]?.type === tokenLinkClose) {
 								stack.splice(i+1, 2);
