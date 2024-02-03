@@ -2013,6 +2013,8 @@ class HTMLBlock extends LeafBlock {
 
 						break S;
 					}
+
+					break;
 				default:
 					break S;
 				}
