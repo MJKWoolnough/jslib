@@ -124,6 +124,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
       parseTable = (tk: Tokeniser) => {
 	while (true) {
 		switch (tk.exceptRun("|\\\n")) {
+		default:
+			return null;
 		case '|':
 			tk.next();
 
@@ -135,10 +137,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		case '\\':
 			tk.next();
 			tk.next();
-
-			break;
-		default:
-			return null;
 		}
 	}
       },
@@ -405,6 +403,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			Loop:
 			while (true) {
 				switch (tk.exceptRun("\\[]\n")) {
+				default:
+					break Loop;
 				case nl:
 					tk.next();
 					tk.acceptRun(whiteSpace);
@@ -421,10 +421,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				case '\\':
 					tk.next();
 					tk.next();
-
-					break;
-				default:
-					break Loop;
 				}
 			}
 		}
@@ -587,6 +583,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	while (true) {
 		switch (tk.exceptRun("`")) {
+		default:
+			tk.reset();
+			tk.acceptRun("`");
+
+			return parseText(tk);
 		case '`':
 			const l = tk.length();
 
@@ -595,13 +596,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			if (tk.length() - l === numTicks) {
 				return tk.return(tokenCode, parseText);
 			}
-
-			break;
-		default:
-			tk.reset();
-			tk.acceptRun("`");
-
-			return parseText(tk);
 		}
 	}
       },
@@ -760,11 +754,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 		while (true) {
 			switch (tk.exceptRun("\n\\<>")) {
-			case '\\':
-				tk.next();
-				tk.next();
-
-				break;
 			case '>':
 				const dest = tk.get();
 
@@ -775,6 +764,9 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				return dest || [];
 			default:
 				return "";
+			case '\\':
+				tk.next();
+				tk.next();
 			}
 		}
 	}
@@ -785,6 +777,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	while (true) {
 		switch (tk.exceptRun(control + " \\()")) {
+		default:
+			return tk.get();
 		case '\\':
 			tk.next();
 			tk.next();
@@ -804,10 +798,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			tk.next();
 
 			paren--;
-
-			break;
-		default:
-			return tk.get();
 		}
 	}
       },
@@ -827,6 +817,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 		while (true) {
 			switch (tk.exceptRun(next === "(" ? "\n()\\" : "\n\\" + next)) {
+			default:
+				return "";
 			case nl:
 				tk.next();
 				tk.acceptRun(whiteSpace);
@@ -866,10 +858,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				tk.next();
 
 				paren--;
-
-				break;
-			default:
-				return "";
 			}
 		}
 	}
@@ -899,12 +887,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			alt += tk.alt;
 		} else {
 			switch (tk.type) {
+			default:
+				alt += tk.data;
 			case tokenHTML:
 			case tokenHTMLMD:
 			case tokenEmphasis:
-				break;
-			default:
-				alt += tk.data;
 			}
 		}
 
@@ -1250,8 +1237,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			break;
 		default:
 			res += processEscapedPunctuation(tk.data).replaceAll(/\n +/g, nl).split(/ + \n|\\\n/g).map(t => setText(encoder, t.replaceAll(/ +\n/g, nl)).innerHTML).join(tag(uid, "br"));
-
-			break;
 		}
 	}
 
@@ -1410,6 +1395,8 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	while (true) {
 		switch (tk.exceptRun("\\")) {
+		default:
+			return ret + tk.get();
 		case '\\':
 			tk.next();
 
@@ -1424,10 +1411,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			}
 
 			tk.next();
-
-			break;
-		default:
-			return ret + tk.get();
 		}
 	}
       };
@@ -1906,10 +1889,6 @@ class ListBlock extends ContainerBlock {
 		let type: keyof HTMLElementTagNameMap = "ul";
 
 		switch (this.#marker) {
-		case "-":
-		case "+":
-		case "*":
-			break;
 		default:
 			const start = this.#marker.slice(0, -1).replace(/^0+(?!$)/, "");
 
@@ -1918,6 +1897,9 @@ class ListBlock extends ContainerBlock {
 			if (start !== "1") {
 				attr["start"] = start;
 			}
+		case "-":
+		case "+":
+		case "*":
 		}
 
 		return tag(uid, type, super.toHTML(uid), attr);
@@ -1950,6 +1932,8 @@ class HTMLBlock extends LeafBlock {
 		case 1:
 			while (true) {
 				switch (tk.exceptRun("<\n")) {
+				default:
+					break S;
 				case "<":
 					tk.next();
 
@@ -1958,15 +1942,13 @@ class HTMLBlock extends LeafBlock {
 
 						break S;
 					}
-
-					break;
-				default:
-					break S;
 				}
 			}
 		case 2:
 			while (true) {
 				switch (tk.exceptRun("-\n")) {
+				default:
+					break S;
 				case "-":
 					tk.next();
 
@@ -1975,15 +1957,13 @@ class HTMLBlock extends LeafBlock {
 
 						break S;
 					}
-
-					break;
-				default:
-					break S;
 				}
 			}
 		case 3:
 			while (true) {
 				switch (tk.exceptRun("?\n")) {
+				default:
+					break S;
 				case "?":
 					tk.next();
 
@@ -1992,10 +1972,6 @@ class HTMLBlock extends LeafBlock {
 
 						break S;
 					}
-
-					break;
-				default:
-					break S;
 				}
 			}
 		case 4:
@@ -2005,6 +1981,8 @@ class HTMLBlock extends LeafBlock {
 		case 5:
 			while (true) {
 				switch (tk.exceptRun("]\n")) {
+				default:
+					break S;
 				case "]":
 					tk.next();
 
@@ -2013,10 +1991,6 @@ class HTMLBlock extends LeafBlock {
 
 						break S;
 					}
-
-					break;
-				default:
-					break S;
 				}
 			}
 		case 6:
@@ -2202,6 +2176,14 @@ class TableBlock extends ContainerBlock {
 		Loop:
 		while (true) {
 			switch (ftk.exceptRun("|\\\n")) {
+			default:
+				const title = ftk.get().trim();
+
+				if (title) {
+					this.#title.push(title);
+				}
+
+				break Loop;
 			case '\\':
 				ftk.next();
 				ftk.next();
@@ -2212,16 +2194,6 @@ class TableBlock extends ContainerBlock {
 
 				ftk.next();
 				ftk.get();
-
-				break;
-			default:
-				const title = ftk.get().trim();
-
-				if (title) {
-					this.#title.push(title);
-				}
-
-				break Loop;
 			}
 		}
 	}
@@ -2341,11 +2313,6 @@ class TableBlock extends ContainerBlock {
 			ColLoop:
 			while (true) {
 				switch (ftk.exceptRun("|\\\n")) {
-				case '\\':
-					ftk.next();
-					ftk.next();
-
-					break;
 				case '|':
 					break ColLoop;
 				default:
@@ -2356,6 +2323,10 @@ class TableBlock extends ContainerBlock {
 					}
 
 					break RowLoop;
+				case '\\':
+					ftk.next();
+					ftk.next();
+
 				}
 			}
 
