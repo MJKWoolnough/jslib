@@ -638,11 +638,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				tk.accept("-");
 
 				if (!tk.accept(">")) {
-					while (true) {
-						if (!tk.exceptRun("-")) {
-							break;
-						}
-
+					while (tk.exceptRun("-")) {
 						tk.next();
 
 						if (tk.accept("-")) {
@@ -660,11 +656,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 				return tk.return(tokenHTML, parseText);
 			}
 		} else if (tk.acceptString("[CDATA[") === 7) {
-			while (true) {
-				if (!tk.exceptRun("]")) {
-					break;
-				}
-
+			while (tk.exceptRun("]")) {
 				tk.next();
 
 				if (tk.accept("]")) {
@@ -677,11 +669,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 			}
 		}
 	} else if (tk.accept("?")) {
-		while (true) {
-			if (!tk.exceptRun("?")) {
-				break;
-			}
-
+		while (tk.exceptRun("?")) {
 			tk.next();
 
 			if (tk.accept(">")) {
