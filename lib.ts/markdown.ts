@@ -1563,17 +1563,14 @@ class Document extends ContainerBlock {
 	constructor(text: string) {
 		super();
 
-		while (true) {
+		do {
 			this.#uid = "";
 
 			while (this.#uid.length < 20) {
 				this.#uid += String.fromCharCode(65 + Math.random() * 26);
 			}
 
-			if (!text.includes(this.#uid)) {
-				break;
-			}
-		}
+		} while (text.includes(this.#uid));
 
 		const tk = new TabStopTokeniser(text);
 
