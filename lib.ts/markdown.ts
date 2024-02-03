@@ -1326,32 +1326,30 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		if (node instanceof Element) {
 			if (node.hasAttribute(uid)) {
 				df.append(createMarkdownElement(tags, uid, node));
-			} else {
-				if (tags.allowedHTML) {
-					for (const [name, ...attrs] of tags.allowedHTML) {
-						if (node.nodeName === name) {
-							const tag = makeNode(node.nodeName, {}, sanitise(node.childNodes, tags, uid));
+			} else if (tags.allowedHTML) {
+				for (const [name, ...attrs] of tags.allowedHTML) {
+					if (node.nodeName === name) {
+						const tag = makeNode(node.nodeName, {}, sanitise(node.childNodes, tags, uid));
 
-							for (const attr of attrs) {
-								const a = node.getAttributeNode(attr);
+						for (const attr of attrs) {
+							const a = node.getAttributeNode(attr);
 
-								if (a) {
-									tag.setAttributeNode(a);
-								}
+							if (a) {
+								tag.setAttributeNode(a);
 							}
-
-							df.append(tag);
-
-							continue Loop;
 						}
+
+						df.append(tag);
+
+						continue Loop;
 					}
-
-					df.append(sanitise(node.childNodes, tags, uid));
-				} else {
-					node.replaceChildren(sanitise(node.childNodes, tags, uid));
-
-					df.append(node);
 				}
+
+				df.append(sanitise(node.childNodes, tags, uid));
+			} else {
+				node.replaceChildren(sanitise(node.childNodes, tags, uid));
+
+				df.append(node);
 			}
 		} else {
 			df.append(node);
