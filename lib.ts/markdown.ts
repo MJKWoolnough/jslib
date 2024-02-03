@@ -1286,6 +1286,48 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	"TBODY": "tbody",
 	"TR": "tr"
       } as const,
+      createMarkdownElement = (tags: Tags, uid: string, node: Element) => {
+	switch (node.nodeName) {
+	case "HR":
+		return tags.thematicBreaks();
+	case "TEXTAREA":
+		return tags.code(node.getAttribute("type") ?? "", node.textContent ?? "");
+	case "OL":
+		return tags.orderedList(node.getAttribute("start") ?? "", sanitise(node.childNodes, tags, uid));
+	case "P":
+	case "BLOCKQUOTE":
+	case "UL":
+	case "LI":
+	case "CODE":
+	case "EM":
+	case "STRONG":
+	case "U":
+	case "SUB":
+	case "SUP":
+	case "S":
+	case "INS":
+	case "MARK":
+	case "TABLE":
+	case "THEAD":
+	case "TBODY":
+	case "TR":
+		return tags[tagNameToTag[node.nodeName]](sanitise(node.childNodes, tags, uid));
+	case "INPUT":
+		return tags.checkbox(node.hasAttribute("checked"));
+	case "BR":
+		return tags.break();
+	case "A":
+		return tags.link(node.getAttribute("href") ?? "", node.getAttribute("title") ?? "", sanitise(node.childNodes, tags, uid));
+	case "IMG":
+		return tags.image(node.getAttribute("src") ?? "", node.getAttribute("title") ?? "", node.getAttribute("alt") ?? "");
+	case "TH":
+		return tags.th(node.getAttribute("align") ?? "", sanitise(node.childNodes, tags, uid));
+	case "TD":
+		return tags.td(node.getAttribute("align") ?? "", sanitise(node.childNodes, tags, uid));
+	}
+
+	return tags[`heading${node.nodeName.charAt(1) as "1" | "2" | "3" | "4" | "5" | "6"}`](sanitise(node.childNodes, tags, uid));
+      },
       sanitise = (childNodes: NodeListOf<ChildNode>, tags: Tags, uid: string) => {
 	const df = document.createDocumentFragment();
 
@@ -1293,69 +1335,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	for (const node of Array.from(childNodes)) {
 		if (node instanceof Element) {
 			if (node.hasAttribute(uid)) {
-				switch (node.nodeName) {
-				case "HR":
-					df.append(tags.thematicBreaks());
-
-					break;
-				case "TEXTAREA":
-					df.append(tags.code(node.getAttribute("type") ?? "", node.textContent ?? ""));
-
-					break;
-				case "OL":
-					df.append(tags.orderedList(node.getAttribute("start") ?? "", sanitise(node.childNodes, tags, uid)));
-
-					break;
-				case "P":
-				case "BLOCKQUOTE":
-				case "UL":
-				case "LI":
-				case "CODE":
-				case "EM":
-				case "STRONG":
-				case "U":
-				case "SUB":
-				case "SUP":
-				case "S":
-				case "INS":
-				case "MARK":
-				case "TABLE":
-				case "THEAD":
-				case "TBODY":
-				case "TR":
-					df.append(tags[tagNameToTag[node.nodeName]](sanitise(node.childNodes, tags, uid)));
-
-					break;
-				case "INPUT":
-					df.append(tags.checkbox(node.hasAttribute("checked")));
-
-					break;
-				case "BR":
-					df.append(tags.break());
-
-					break;
-				case "A":
-					df.append(tags.link(node.getAttribute("href") ?? "", node.getAttribute("title") ?? "", sanitise(node.childNodes, tags, uid)));
-
-					break;
-				case "IMG":
-					df.append(tags.image(node.getAttribute("src") ?? "", node.getAttribute("title") ?? "", node.getAttribute("alt") ?? ""));
-
-					break;
-
-				case "TH":
-					df.append(tags.th(node.getAttribute("align") ?? "", sanitise(node.childNodes, tags, uid)));
-
-					break;
-				case "TD":
-					df.append(tags.td(node.getAttribute("align") ?? "", sanitise(node.childNodes, tags, uid)));
-
-					break;
-				default:
-					df.append(tags[`heading${node.nodeName.charAt(1) as "1" | "2" | "3" | "4" | "5" | "6"}`](sanitise(node.childNodes, tags, uid)));
-
-					break;
-				}
+				df.append(createMarkdownElement(tags, uid, node));
 			} else {
 				if (tags.allowedHTML) {
 					for (const [name, ...attrs] of tags.allowedHTML) {
