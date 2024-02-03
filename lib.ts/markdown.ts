@@ -447,56 +447,54 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		const h = parseLinkDestination(ftk),
 		      p = tk.length();
 
-		if (h) {
-			if (ftk.accept(whiteSpace) || ftk.peek() === nl || !ftk.peek()) {
+		if (h && (ftk.accept(whiteSpace) || ftk.peek() === nl || !ftk.peek())) {
+			ftk.acceptRun(whiteSpace);
+
+			const hasNL = ftk.accept(nl),
+			      nlPos = tk.length();
+
+			if (hasNL) {
 				ftk.acceptRun(whiteSpace);
-
-				const hasNL = ftk.accept(nl),
-				      nlPos = tk.length();
-
-				if (hasNL) {
-					ftk.acceptRun(whiteSpace);
-				}
-
-				const title = processEscapedPunctuation(parseLinkTitle(ftk)),
-				      href = processEscapedPunctuation(h + "");
-
-				if (!title) {
-					ftk.reset();
-					tk.reset();
-
-					for (let i = 0; i < p; i++) {
-						tk.next();
-					}
-				}
-
-				ftk.acceptRun(whiteSpace);
-
-				let hasTitle = true;
-
-				if (!ftk.accept(nl) && ftk.peek()) {
-					if (!hasNL) {
-						return null;
-					}
-
-					hasTitle = false;
-
-					ftk.reset();
-					tk.reset();
-
-					for (let i = 0; i < nlPos; i++) {
-						tk.next();
-					}
-				}
-
-				const ref = processLinkRef(tk.get().slice(0, colon - 2).trim().slice(1));
-
-				if (!links.has(ref)) {
-					links.set(ref, {href, "title" : hasTitle ? title : ""});
-				}
-
-				return new LinkLabelBlock();
 			}
+
+			const title = processEscapedPunctuation(parseLinkTitle(ftk)),
+			      href = processEscapedPunctuation(h + "");
+
+			if (!title) {
+				ftk.reset();
+				tk.reset();
+
+				for (let i = 0; i < p; i++) {
+					tk.next();
+				}
+			}
+
+			ftk.acceptRun(whiteSpace);
+
+			let hasTitle = true;
+
+			if (!ftk.accept(nl) && ftk.peek()) {
+				if (!hasNL) {
+					return null;
+				}
+
+				hasTitle = false;
+
+				ftk.reset();
+				tk.reset();
+
+				for (let i = 0; i < nlPos; i++) {
+					tk.next();
+				}
+			}
+
+			const ref = processLinkRef(tk.get().slice(0, colon - 2).trim().slice(1));
+
+			if (!links.has(ref)) {
+				links.set(ref, {href, "title" : hasTitle ? title : ""});
+			}
+
+			return new LinkLabelBlock();
 		}
 	}
 
