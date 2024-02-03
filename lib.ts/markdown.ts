@@ -1696,7 +1696,7 @@ class ListItemBlock extends ContainerBlock {
 			}
 		}
 
-		return tag(uid, "li", taskListItems ? this.#handleTaskList(uid) : super.toHTML(uid));
+		return tag(uid, "li", taskListItems && !this.loose ? this.#handleTaskList(uid) : super.toHTML(uid));
 	}
 }
 
