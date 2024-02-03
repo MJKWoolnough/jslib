@@ -1720,7 +1720,7 @@ class ListItemBlock extends ContainerBlock {
 			const t = (firstChild.lines.at(0) ?? "").replace(/^ *(\[[xX ]\] *)?.*/, "$1").replace(nl, "");
 
 			if (t) {
-				firstChild.lines[0] = firstChild.lines[0].replace(/^ *\[[xX ]\]/, "")
+				firstChild.lines[0] = firstChild.lines[0].replace(/^ *\[[xX ]\]/, "");
 
 				return tag(uid, "input", undefined, t.at(1) === " " ? {} : {"checked": ""}) + t.slice(3) + super.toHTML(uid);
 			}
