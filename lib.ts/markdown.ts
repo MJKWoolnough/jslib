@@ -4,6 +4,15 @@ import {TokenDone, Tokeniser} from './parser.js';
 import Parser from './parser.js';
 
 /**
+ * This module contains a full CommonMark parser with several optional (enabled by default) extensions.
+ *
+ * @module markdown
+ * @requires module:casefold
+ * @requires module:parser
+ */
+/** */
+
+/**
  * This type allows for the overriding of default processing behaviour.
  *
  * Most of the fields simply allow for alternate Node creation behaviour and custom processing.
