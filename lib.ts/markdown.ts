@@ -3,7 +3,13 @@ import CaseFold from './casefold.js';
 import {TokenDone, Tokeniser} from './parser.js';
 import Parser from './parser.js';
 
+/**
+ * This type allows for the overriding of default processing behaviour.
+ *
+ * Most of the fields simply allow for alternate Node creation behaviour and custom processing.
+ */
 type Tags = {
+	/** This field allows the whitelisting of raw HTML elements. Takes an array of tuples, of which the first element is the HTML element name, and the remaining elements are allowed attributes names. */
 	allowedHTML: null | [keyof HTMLElementTagNameMap, ...string[]][];
 	blockquote: (c: DocumentFragment) => Element | DocumentFragment;
 	code: (info: string, text: string) => Element | DocumentFragment;
