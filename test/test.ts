@@ -11114,7 +11114,8 @@ type Tests = {
 				["`<http://foo.bar.`baz>`", "<p><code>&lt;http://foo.bar.</code>baz&gt;`</p>"],
 				["```foo``", "<p>```foo``</p>"],
 				["`foo", "<p>`foo</p>"],
-				["`foo``bar``", "<p>`foo<code>bar</code></p>"]
+				["`foo``bar``", "<p>`foo<code>bar</code></p>"],
+				["foo`</textarea>`", "<p>foo<code>&lt;/textarea&gt;</code></p>"]
 			],
 			"emphasis": [
 				["*foo bar*", "<p><em>foo bar</em></p>"],
