@@ -1253,7 +1253,7 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 	switch (node.nodeName) {
 	case "HR":
 		return tags.thematicBreaks();
-	case "TEXTAREA":
+	case "PRE":
 		return tags.code(node.getAttribute("type") ?? "", node.textContent ?? "");
 	case "OL":
 		return tags.orderedList(node.getAttribute("start") ?? "", sanitise(node.childNodes, tags, uid));
@@ -2135,7 +2135,7 @@ class FencedCodeBlock extends LeafBlock {
 	}
 
 	toHTML(uid: string) {
-		return tag(uid, "textarea", this.lines.join(""), {"type": this.#info});
+		return tag(uid, "pre", setText(encoder, this.lines.join("")).innerHTML, {"type": this.#info});
 	}
 }
 
@@ -2422,7 +2422,7 @@ class IndentedCodeBlock extends LeafBlock {
 			this.lines.pop();
 		}
 
-		return tag(uid, "textarea", this.lines.join(""));
+		return tag(uid, "pre", setText(encoder, this.lines.join("")).innerHTML);
 	}
 }
 
