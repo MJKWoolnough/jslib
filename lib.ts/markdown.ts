@@ -39,14 +39,32 @@ type Tags = {
 	break: () => Element | DocumentFragment;
 }
 
+/**
+ * This type allows for the disabling of various Markdown extensions.
+ */
 type UserTags = Tags & {
+	/** Set to null to disable the Task List Item extension. */
 	checkbox: null | ((checked: boolean) => Element | DocumentFragment);
+
+	/** Set to null to disable the underline extension. When enabled, will replace single underscore emphasis with underline tags. */
 	underline: null | ((c: DocumentFragment) => Element | DocumentFragment);
+
+	/** Set to null to disable the subscript extension.*/
 	subscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
+
+	/** Set to null to disable the superscript extension.*/
 	superscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
+
+	/** Set to null to disable the strikethrough extension.*/
 	strikethrough: null | ((c: DocumentFragment) => Element | DocumentFragment);
+
+	/** Set to null to disable the insert extension.*/
 	insert: null | ((c: DocumentFragment) => Element | DocumentFragment);
+
+	/** Set to null to disable the highlight extension.*/
 	highlight: null | ((c: DocumentFragment) => Element | DocumentFragment);
+
+	/** Set to null to disable the table extension.*/
 	table: null | ((c: DocumentFragment) => Element | DocumentFragment);
 }
 
