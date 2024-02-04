@@ -20,6 +20,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [html](#html)                               | Functions to create HTML elements. |
 | [inter](#inter)                             | Classes to provide different type of internal communication. |
 | [load](#load)                               | Used for initialisation. |
+| [markdown](#markdown)                       | A CommonMark Markdown parser with extensions. |
 | [math](#math)                               | Functions to create MathML elements. |
 | [menu](#menu)                               | Library for creating right-click menus. |
 | [misc](#misc)                               | Miscellaneous, simple, dependency-free functions. |
@@ -46,7 +47,7 @@ Thematically, the above modules can be grouped into a few packages:
 | Decorum   | A collection of DOM manipulation libs. | [Bind](#bind), [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), [RPC](#rpc), and [URLState](#urlstate). |
 | Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), [Pagination](#pagination), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
-| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [CaseFold](#casefold), [Fraction](#fraction), [Load](#load), [Misc](#misc), [Parser](#parser), [Router](#router), [Transitions](#router_transitions), [Settings](#settings), and [TypeGuard](#typeguard). |
+| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [CaseFold](#casefold), [Fraction](#fraction), [Load](#load), [Markdown](#markdown), [Misc](#misc), [Parser](#parser), [Router](#router), [Transitions](#router_transitions), [Settings](#settings), and [TypeGuard](#typeguard). |
 
 # Scripts
 
@@ -1571,7 +1572,67 @@ The WaitInfo type contains the following data:
 
 The load module contains a single default export, a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which is resolved when the page finished loading.
 
-## <A name="math">math</a>
+## <a name="markdown">markdown</a>
+
+The markdown module contains a full CommonMark parser with several optional (enabled by default) extensions.
+
+This module directly imports the [casefold](#casefold), and [parser](#parser) modules.
+
+This module provides a single, default export with the following signature:
+
+```typescript
+(markdown: string, tgs?: Partial<UserTags>): DocumentFragment;
+```
+
+This function is a markdown parser, that takes a markdown string, and an optional object that provides configuration; returns a DocumentFragment containing the result of the parsed code.
+
+The `tgs` object allow for the overriding of default processing behaviour; most of the fields simply allow for alternate Node creation behaviour and custom processing.
+
+```typescript
+type Tags = {
+        allowedHTML: null | [keyof HTMLElementTagNameMap, ...string[]][];
+        blockquote: (c: DocumentFragment) => Element | DocumentFragment;
+        code: (info: string, text: string) => Element | DocumentFragment;
+        heading1: (c: DocumentFragment) => Element | DocumentFragment;
+        heading2: (c: DocumentFragment) => Element | DocumentFragment;
+        heading3: (c: DocumentFragment) => Element | DocumentFragment;
+        heading4: (c: DocumentFragment) => Element | DocumentFragment;
+        heading5: (c: DocumentFragment) => Element | DocumentFragment;
+        heading6: (c: DocumentFragment) => Element | DocumentFragment;
+        paragraphs: (c: DocumentFragment) => Element | DocumentFragment;
+        unorderedList: (c: DocumentFragment) => Element | DocumentFragment;
+        orderedList: (start: string, c: DocumentFragment) => Element | DocumentFragment;
+        listItem: (c: DocumentFragment) => Element | DocumentFragment;
+        checkbox: null | ((checked: boolean) => Element | DocumentFragment);
+        thematicBreaks: () => Element | DocumentFragment;
+        link: (href: string, title: string, c: DocumentFragment) => Element | DocumentFragment;
+        image: (src: string, title: string, alt: string) => Element | DocumentFragment;
+        inlineCode: (c: DocumentFragment) => Element | DocumentFragment;
+        italic: (c: DocumentFragment) => Element | DocumentFragment;
+        bold: (c: DocumentFragment) => Element | DocumentFragment;
+        underline: null | ((c: DocumentFragment) => Element | DocumentFragment);
+        subscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
+        superscript: null | ((c: DocumentFragment) => Element | DocumentFragment);
+        strikethrough: null | ((c: DocumentFragment) => Element | DocumentFragment);
+        insert: null | ((c: DocumentFragment) => Element | DocumentFragment);
+        highlight: null | ((c: DocumentFragment) => Element | DocumentFragment);
+        table: null | ((c: DocumentFragment) => Element | DocumentFragment);
+        thead: (c: DocumentFragment) => Element | DocumentFragment;
+        tbody: (c: DocumentFragment) => Element | DocumentFragment;
+        tr: (c: DocumentFragment) => Element | DocumentFragment;
+        th: (alignment: string, c: DocumentFragment) => Element | DocumentFragment;
+        td: (alignment: string, c: DocumentFragment) => Element | DocumentFragment;
+        break: () => Element | DocumentFragment;
+}
+```
+
+The `allowedHTML` field allows the whitelisting of raw HTML elements. Takes an array of tuples, of which the first element is the HTML element name, and the remaining elements are allowed attributes names.
+
+The checkbox, underline, subscript, superscript, strikethrough, insert, highlight, and table fields can be set to null to disable that Markdown extension.
+
+NB: When the underline extension is disabled, the single underscore emphasis is parsed as italic (`<em>`).
+
+## <a name="math">math</a>
 
 The math module exports function for the creation of [MathMLElements](https://developer.mozilla.org/en-US/docs/Web/MathML).
 
