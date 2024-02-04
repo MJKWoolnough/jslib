@@ -10788,7 +10788,8 @@ type Tests = {
 				["    chunk1\n      \n      chunk2", "<pre><code>chunk1\n  \n  chunk2</code></pre>"],
 				["        foo\n    bar", "<pre><code>    foo\nbar</code></pre>"],
 				["    \n    foo\n    ", "<pre><code>foo\n</code></pre>"],
-				["    foo  ", "<pre><code>foo  </code></pre>"]
+				["    foo  ", "<pre><code>foo  </code></pre>"],
+				["    </textarea>", "<pre><code>&lt;/textarea&gt;</code></pre>"]
 			],
 			"code blocks with surrounding": [
 				["a simple\n      paragraph", "<p>a simple\nparagraph</p>"],
