@@ -1,3 +1,5 @@
+import parser from './parser.js';
+
 /**
  * This module contains a full {@link https://en.wikipedia.org/wiki/BBCode | BBCode} parser, allowing for custom tags and text handling.
  *
@@ -7,8 +9,6 @@
  * @requires module:parser
  */
 /** */
-
-import parser from './parser.js';
 
 const textToken = 1,
       openToken = 2,
