@@ -49,6 +49,15 @@ withNumbers = function* <T extends Token | Phrase>(p: Generator<T, never>): Gene
 
 		yield t as any;
 	}
+},
+processToEnd = function* <T extends Token | Phrase>(p: Generator<T, void>) {
+	for (const t of p) {
+		if (t.type < 0) {
+			break;
+		}
+
+		yield t;
+	}
 };
 
 /** Token represents a parsed token. */

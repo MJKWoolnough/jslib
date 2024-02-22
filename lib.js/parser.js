@@ -47,6 +47,15 @@ withNumbers = function* (p) {
 
 		yield t;
 	}
+},
+processToEnd = function* (p) {
+	for (const t of p) {
+		if (t.type < 0) {
+			break;
+		}
+
+		yield t;
+	}
 };
 
 /**
