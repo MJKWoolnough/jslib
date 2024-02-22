@@ -1,4 +1,4 @@
-import parser from './parser.js';
+import parser, {processToEnd} from './parser.js';
 
 /**
  * This module contains a full {@link https://en.wikipedia.org/wiki/BBCode | BBCode} parser, allowing for custom tags and text handling.
@@ -108,8 +108,7 @@ const textToken = 1,
       processText = function* (text) {
 	const tags = [];
 
-	Loop:
-	for (const tks of parser(text, parseText, mergeText)) {
+	for (const tks of processToEnd(parser(text, parseText, mergeText))) {
 		switch (tks.type) {
 		case textToken:
 			const text = tks.data.reduce((t, {data}) => t + data, "");
@@ -133,7 +132,7 @@ const textToken = 1,
 				}
 			}
 		}; break;
-		case closeToken: {
+		case closeToken:
 			const fullText = tks.data[0].data,
 			      tagName = fullText.slice(2, -1),
 			      close =  {tagName, fullText};
@@ -145,9 +144,6 @@ const textToken = 1,
 			}
 
 			while (yield close) {}
-		}; break;
-		default:
-			break Loop;
 		}
 	}
       };
