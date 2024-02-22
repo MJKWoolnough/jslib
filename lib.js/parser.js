@@ -48,6 +48,7 @@ withNumbers = function* (p) {
 		yield t;
 	}
 },
+/** processToEnd converts the infinite Generator, returned from the default fn, into a finite Generator only yielding non-Done and non-Error tokens and phrases. */
 processToEnd = function* (p) {
 	for (const t of p) {
 		if (t.type < 0) {

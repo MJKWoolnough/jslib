@@ -50,6 +50,7 @@ withNumbers = function* <T extends Token | Phrase>(p: Generator<T, never>): Gene
 		yield t as any;
 	}
 },
+/** processToEnd converts the infinite Generator, returned from the default fn, into a finite Generator only yielding non-Done and non-Error tokens and phrases. */
 processToEnd = function* <T extends Token | Phrase>(p: Generator<T, void>) {
 	for (const t of p) {
 		if (t.type < 0) {
