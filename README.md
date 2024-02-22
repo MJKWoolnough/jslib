@@ -2028,6 +2028,7 @@ The parse module can be used to parse text into token or phrase streams.
 | [Phraser](#parser_phraser) | Class | A Phraser is a collection of methods that allow the easy parsing of a token stream. |
 | PhraseType | Type | PhraseType is used to ID a particular class of Phrases. Negative numbers represent built-in states, so only positive numbers should be used by implementing functions. |
 | PhraseWithNumbers | Type | PhraseWithNumbers represents a Phrase where the tokens are TokenWithNumbers. |
+| processToEnd | Function | This function converts the infinite Generator, returned from the default fn, into a finite Generator only yielding non-Done and non-Error tokens and phrases. |
 | [Token](#parser_token) | Type | A Token represents a parsed token. |
 | TokenDone | Constant | Set to -1, this constant is a TokenType used by the `Tokeniser.done()` method to indicate that their are no more Tokens. |
 | TokenError | Constant | Set to -2, this constant is a TokenType used by the `Tokeniser.error()` method to indicate that an error has occurred in the token stream, and that there are no more Tokens. |
