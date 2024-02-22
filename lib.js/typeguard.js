@@ -170,7 +170,7 @@ class STypeGuard extends Function {
 	}
 
 	*[Symbol.iterator]() {
-		yield SpreadTypeGuard.from<T>(this);
+		yield SpreadTypeGuard.from(this);
 	}
 
 	def() {
