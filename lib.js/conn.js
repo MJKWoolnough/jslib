@@ -52,7 +52,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 	}
 	xh.addEventListener("readystatechange", () => {
 		if (xh.readyState === 4) {
-			if (xh.status === 200) {
+			if (xh.status >= 200 || xh.status < 300) {
 				if (props["response"] === "json" && props["checker"] && !props.checker(xh.response)) {
 					errorFn(new TypeError("received JSON does not match expected format"));
 				} else {
