@@ -324,8 +324,8 @@ Null = () => asTypeGuard(v => throwOrReturn(v === null, "null"), nullDef),
 /**
  * The Num function returns a TypeGuard that checks for numbers, and takes optional min and max (inclusive) values to range check.
  *
- * @param {number} min Minimum values for the number.
- * @param {number} max Maximum values for the number.
+ * @param {number} min Minimum value for the number.
+ * @param {number} max Maximum value for the number.
  *
  * @return {TypeGuard<number>}
  */
@@ -333,8 +333,8 @@ Num = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof
 /**
  * The Int function returns a TypeGuard that checks for integers, and takes optional min and max (inclusive) values to range check.
  *
- * @param {number} min Minimum values for the integer.
- * @param {number} max Maximum values for the integer.
+ * @param {number} min Minimum value for the integer.
+ * @param {number} max Maximum value for the integer.
  *
  * @return {TypeGuard<number>}
  */
@@ -342,8 +342,8 @@ Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGu
 /**
  * The BigInt function returns a TypeGuard that checks for bigints, and takes optional min and max (inclusive) values to range check.
  *
- * @param {number} min Minimum values for the bigint.
- * @param {number} max Maximum values for the bigint.
+ * @param {number} min Minimum value for the bigint.
+ * @param {number} max Maximum value for the bigint.
  *
  * @return {TypeGuard<bigint>}
  */
