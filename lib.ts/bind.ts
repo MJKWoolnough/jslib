@@ -125,6 +125,10 @@ export class Binding<T = string> {
 		return this.#value + "";
 	}
 
+	toJSON() {
+		return this.#value;
+	}
+
 	static template(strings: TemplateStringsArray, ...values: any[]) {
 		let ref: Binding | null = new ReadOnlyBinding(processTemplate(strings, values));
 

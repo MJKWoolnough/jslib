@@ -120,6 +120,10 @@ export class Binding {
 		return this.#value + "";
 	}
 
+	toJSON() {
+		return this.#value;
+	}
+
 	static template(strings, ...values) {
 		let ref = new ReadOnlyBinding(processTemplate(strings, values));
 
