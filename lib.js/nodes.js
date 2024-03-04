@@ -178,11 +178,12 @@ export class NodeArray {
 	 * @param {Function} [s]           An optional starting sort function.
 	 * @param {Iterable<T>} [elements] An optional set of starting elements of type `T`.
 	 */
-	constructor(h, s = noSort, elements = []) {
-		const root = this.#root = {s, h, l: 0, o: 1};
+	constructor(h, sort, elements) {
+		const s = sort instanceof Function ? sort : noSort,
+		      root = this.#root = {s, h, l: 0, o: 1};
 		Object.defineProperty(this, realTarget, {"value": this});
 		root.p = root.n = root;
-		for (const item of elements) {
+		for (const item of (sort instanceof Function ? elements : sort) ?? []) {
 			addItemAfter(root, root.p, item);
 		}
 		return new Proxy(this, proxyObj);

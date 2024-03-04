@@ -212,11 +212,14 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	 * @param {Function} [s]           An optional starting sort function.
 	 * @param {Iterable<T>} [elements] An optional set of starting elements of type `T`.
 	 */
-	constructor(h: H, s: sortFunc<T> = noSort, elements: Iterable<T> = []) {
-		const root = this.#root = {s, h, l: 0, o: 1} as Root<T, H>;
+	constructor(h: H, s?: sortFunc<T>, elements?: Iterable<T>);
+	constructor(h: H, elements?: Iterable<T>);
+	constructor(h: H, sort?: sortFunc<T> | Iterable<T>, elements?: Iterable<T>) {
+		const s = sort instanceof Function ? sort : noSort,
+		      root = this.#root = {s, h, l: 0, o: 1} as Root<T, H>;
 		Object.defineProperty(this, realTarget, {"value": this});
 		root.p = root.n = root;
-		for (const item of elements) {
+		for (const item of (sort instanceof Function ? elements : sort) ?? []) {
 			addItemAfter(root, root.p, item);
 		}
 		return new Proxy<NodeArray<T, H>>(this, proxyObj);
