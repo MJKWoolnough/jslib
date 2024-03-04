@@ -1831,6 +1831,7 @@ This type implements all fields and methods of the [Array](https://developer.moz
 ```typescript
 class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 	constructor(parent: H, sort: (a: T, b: T) => number = noSort, elements: Iterable<T> = []);
+	constructor(parent: H, elements: Iterable<T> = []);
 }
 ```
 
