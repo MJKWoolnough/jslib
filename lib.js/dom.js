@@ -252,6 +252,19 @@ clearNode = (node, properties, children) => {
 	}
 	return amendNode(node, properties, children);
 },
+/**
+ * This function can be used directly in the params object of a amendNode call to toggle an attribute on or off (depending on it's previous state); e.g.
+ *
+ * amendNode(myNode, {"attr": toggle});
+ *
+ * If a callback is provided, then it will be called with the eventual state of the toggle; e.g.
+ *
+ * amendNode(myNode, {"attr": toggle(state => myState = state)});
+ *
+ * @param {(v: boolean) => void} fn The callback function to receive the state.
+ *
+ * @return {(v: boolean) => void} Wrapped callback function that will be recognised by amendNode.
+ */
 toggle = fn => Object.assign(v => fn(v), {[toggleSym]: null});
 
 /**
