@@ -4522,6 +4522,17 @@ type Tests = {
 					      n = new NodeArray<MyNode>(div, noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
 					return n.length === 2 && n[0].num === 1 && n[1].num === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
 				},
+				"some nodes without sort": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node} = await import("./lib/nodes.js"),
+					      div = document.createElement("div"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(div, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
+
+					return n.length === 2 && n[0].num === 1 && n[1].num === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
+				},
 				"sorted nodes": async () => {
 					type MyNode = {
 						num: number;
