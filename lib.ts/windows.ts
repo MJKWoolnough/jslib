@@ -1,7 +1,7 @@
 import type {Binding} from './bind.js';
 import type {Children} from './dom.js';
 import CSS from './css.js';
-import {amendNode, bindElement, clearNode, event, eventCapture} from './dom.js';
+import {amendNode, bindElement, clearNode, event, eventCapture, toggle} from './dom.js';
 import {button, div, img, input, ns, slot, span} from './html.js';
 import {autoFocus} from './misc.js';
 import {ns as svgNS} from './svg.js';
@@ -622,15 +622,15 @@ export class WindowElement extends BaseElement {
 			div(Array.from({length: 8}, (_, n) => div({"onmousedown": (e: MouseEvent) => resizeWindow(this, n, e)}))),
 			div({"part": "titlebar", "onmousedown": (e: MouseEvent) => moveWindow(this, e), "ondblclick": (e: Event) => {
 				if (!(e.target instanceof HTMLButtonElement) && !this.hasAttribute("hide-maximise")) {
-					this.toggleAttribute("maximised");
+					amendNode(this, {"maximised": toggle});
 				}
 			}}, [
 				this.#icon = img({"part": "icon", "src": defaultIcon}),
 				this.#title = span({"part": "title"}),
 				div({"part": "controls"}, [
 					button({"part": "close", "title": lang["CLOSE"], "onclick": () => this.close()}),
-					this.#maximise = button({"part": "maximise", "title": lang["MAXIMISE"], "onclick": () => this.toggleAttribute("maximised")}),
-					button({"part": "minimise", "title": lang["MINIMISE"], "onclick": () => this.toggleAttribute("minimised")}),
+					this.#maximise = button({"part": "maximise", "title": lang["MAXIMISE"], "onclick": () => amendNode(this, {"maximised": toggle})}),
+					button({"part": "minimise", "title": lang["MINIMISE"], "onclick": () => amendNode(this, {"minimised": toggle})}),
 					this.#extra = span()
 				])
 			]),
@@ -712,7 +712,7 @@ export class WindowElement extends BaseElement {
 	}
 	/** The focus method will unset a set `minimise` attribute and bring the deepest child to the top of the window stack. */
 	focus() {
-		this.toggleAttribute("minimised", false);
+		amendNode(this, {"minimised": false});
 		const c = this.#child;
 		if (c) {
 			c.focus();
