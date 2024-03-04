@@ -90,7 +90,8 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	const attr = document.createAttributeNS(null, k);
 	attr.textContent = prop;
 	return attr;
-      };
+      },
+      toggleSym = Symbol("toggle");
 
 export const
 /** This symbol is used to denote a special Object that provides its own Children. */
@@ -142,6 +143,10 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
 			} else if (isNode) {
 				if (typeof prop === "boolean") {
 					node.toggleAttribute(k, prop);
+				} else if (prop === toggle) {
+					node.toggleAttribute(k);
+				} else if (prop instanceof Function && toggleSym in prop) {
+					prop(node.toggleAttribute(k));
 				} else if (prop === undefined) {
 					node.removeAttribute(k);
 				} else if (prop instanceof Array || prop instanceof DOMTokenList) {
@@ -264,7 +269,8 @@ clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Ch
 		}
 	}
 	return amendNode(node, properties, children);
-};
+},
+toggle = (fn: (v: boolean) => void) => Object.assign((v: boolean) => fn(v), {[toggleSym]: null});
 
 /**
  * This type represents an Object that uses the `attr` symbol to return a special Attr node.
