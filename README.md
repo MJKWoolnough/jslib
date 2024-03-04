@@ -590,6 +590,7 @@ The dom module can be used to manipulate DOM elements.
 | isChildren | Function | This function determines whether the passed in object can be used as a [Children](#dom_children) type. |
 | <a name="dom_props">Props</a> | Type | A [PropsObject](#dom_propsobject) or [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap). |
 | [PropsObject](#dom_propsobject) | Type | This object is used to set attributes and events on a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget with the [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode) functions. |
+| [toggle](#dom_toggle) | Function | Can be used directly to toggle an attribute, or accepts a callback to collect the state of the toggled attribute. |
 | value    | Symbol | This symbol is used to denote a special Object that might be an EventListener. |
 
 ### <a name="dom_amendnode">amendNode</a>
@@ -675,6 +676,22 @@ The keys of this type refer to the attribute names that are to be set. The key d
 | `class` | An array of strings, a [DOMTokenList](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList), or an object with string keys and boolean or undefined values, to be used to toggle classes. For the array and DOMTokenList, if a class begins with a `!`, the class will be removed, if the class begins with a `~`, the class will be toggled, otherwise the class will be set. For the object, a value that equates to true will set the class, and a value that equates to false (except nullables, which will toggle the class) will unset the class. |
 | `style` | A [CSSStyleDeclaration](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration) can be used to set the style directly, or an Object can be used to set individual style properties. |
 | `*` | For any key, a string or any object with a toString method can be used to set the field explicitly, a number can be used and converted to a string, a boolean can be used to toggle an attribute, and a undefined value can be used to remove an attribute. If a null value is specified, no action will be taken. |
+
+### <a name="dom_toggle">Toggle</a>
+```typescript
+(fn: (v: boolean) => void) => (v: boolean) => void;
+```
+This function can be used directly in the params object of a amendNode call to toggle an attribute on or off (depending on it's previous state); e.g.
+
+```typescript
+amendNode(myNode, {"attr": toggle});
+```
+
+If a callback is provided, then it will be called with the eventual state of the toggle; e.g.
+
+```typescript
+amendNode(myNode, {"attr": toggle(state => myState = state)});
+```
 
 ## <a name="drag">drag</a>
 
