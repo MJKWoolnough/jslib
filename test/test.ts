@@ -806,6 +806,27 @@ type Tests = {
 				      d = amendNode(document.createElement("div"), {"attr": "abc"});
 				amendNode(d, {"attr": null, "another": null});
 				return d.getAttribute("attr") === "abc" && d.getAttribute("another") === null;
+			},
+			"toggle": async () => {
+				const {amendNode, toggle} = await import("./lib/dom.js"),
+				      d = amendNode(document.createElement("div"), {"attr": toggle}),
+				      a = d.hasAttribute("attr"),
+				      b = amendNode(d, {"attr": toggle}).hasAttribute("attr"),
+				      c = amendNode(d, {"attr": toggle}).hasAttribute("attr");
+
+				return a && !b && c;
+			},
+			"toggle fn": async () => {
+				const {amendNode, toggle} = await import("./lib/dom.js"),
+				      states: boolean[] = [],
+				      toggleFn = (v: boolean) => states.push(v),
+				      d = document.createElement("div");;
+
+				amendNode(d, {"attr": toggle(toggleFn)});
+				amendNode(d, {"attr": toggle(toggleFn)});
+				amendNode(d, {"attr": toggle(toggleFn)});
+
+				return states[0] && !states[1] && states[2];
 			}
 		},
 		"event": {
