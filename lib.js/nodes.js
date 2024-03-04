@@ -175,7 +175,7 @@ export class NodeArray {
 	 * The NodeArray type is wrapped with a Proxy to implement {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array | Array}-like indexing.
 	 *
 	 * @param {H} h                    A parent element, onto which all {@link Item} elements will be attached.
-	 * @param {Function} [s]           An optional starting sort function.
+	 * @param {Function} [s]           An optional starting sort function. Can be omitted, with 'elements' as the second param.
 	 * @param {Iterable<T>} [elements] An optional set of starting elements of type `T`.
 	 */
 	constructor(h, sort, elements) {
