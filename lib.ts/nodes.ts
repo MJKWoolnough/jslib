@@ -2,6 +2,7 @@
  * The nodes module contains Classes for aiding in the accessing of DOM {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s.
  *
  * @module nodes
+ * @requires module:dom
  */
 /** */
 
