@@ -5,11 +5,14 @@
  */
 /** */
 
-export const
+import {child as node} from './dom.js';
+
 /**
  * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | link} of a type.
  */
-node = Symbol("node"),
+export {child as node} from './dom.js';
+
+export const
 /** A sorting function that does no sorting. */
 noSort = () => 0,
 /** A function to sort strings. */
