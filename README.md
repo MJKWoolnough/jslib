@@ -1894,6 +1894,7 @@ This type implements all fields and methods of the [Map](https://developer.mozil
 ```typescript
 class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
 	constructor(parent: H, sort: (a: T, b: T) => number = noSort, entries: Iterable<[K, T]> = []);
+	constructor(parent: H, elements: Iterable<[T, K]> = []);
 }
 ```
 
