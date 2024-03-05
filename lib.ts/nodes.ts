@@ -614,9 +614,9 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	 *
 	 * The sorting function is used to order {@link Item}s as they are inserted.
 	 *
-	 * @param {H} h The parent element, onto which all {@link Item} elements will be attached.
-	 * @param {Function} s An optional starting sort function.
-	 * @param {Iterable<[K, T]>} entries An optional set of starting elements of type `T`.
+	 * @param {H} h                        The parent element, onto which all {@link Item} elements will be attached.
+	 * @param {Function} [s]               An optional starting sort function. Can be omitted, with 'elements' as the second param.
+	 * @param {Iterable<[K, T]>} [entries] An optional set of starting elements of type `T`.
 	 */
 	constructor(h: H, s?: sortFunc<T>, entries?: Iterable<[K, T]>);
 	constructor(h: H, entries?: Iterable<[K, T]>);
