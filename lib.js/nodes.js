@@ -570,10 +570,11 @@ export class NodeMap {
 	 * @param {Function} s An optional starting sort function.
 	 * @param {Iterable<[K, T]>} entries An optional set of starting elements of type `T`.
 	 */
-	constructor(h, s = noSort, entries = []) {
-		const root = this.#root = {s, h, l: 0, o: 1, m: new Map()};
+	constructor(h, sort, entries) {
+		const s = sort instanceof Function ? sort : noSort,
+		      root = this.#root = {s, h, l: 0, o: 1, m: new Map()};
 		root.p = root.n = root;
-		for (const [k, item] of entries) {
+		for (const [k, item] of (sort instanceof Function ? entries : sort) ?? []) {
 			replaceKey(root, k, item, root.p);
 		}
 	}
