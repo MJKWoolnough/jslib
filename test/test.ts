@@ -5957,6 +5957,14 @@ type Tests = {
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
 					return n[5] === undefined;
 				}
+			},
+			"as child node": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      {div} = await import("./lib/html.js"),
+				      c = div(),
+				      n = div(new NodeArray(c));
+
+				return n.firstChild === c;
 			}
 		},
 		"NodeMap": {
@@ -6397,6 +6405,14 @@ type Tests = {
 					}
 					return good === 5;
 				}
+			},
+			"as child node": async () => {
+				const {NodeMap} = await import("./lib/nodes.js"),
+				      {div} = await import("./lib/html.js"),
+				      c = div(),
+				      n = div(new NodeMap(c));
+
+				return n.firstChild === c;
 			}
 		}
 	},
