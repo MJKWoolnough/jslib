@@ -30,7 +30,8 @@ addNodeRef = b => class extends b { [node] = this; };
  * @property {Node} {@link node}
  */
 
-const sortNodes = (root, n) => {
+const getChildNode = n => n instanceof Node ? n : n[node],
+      sortNodes = (root, n) => {
 	while (n.p.i && root.s(n.i, n.p.i) * root.o < 0) {
 		n.n.p = n.p;
 		n.p.n = n.n;
@@ -50,9 +51,9 @@ const sortNodes = (root, n) => {
 		nn.p = n;
 	}
 	if (n.n.i) {
-		root.h.insertBefore(n.i[node], n.n.i[node]);
+		root.h.insertBefore(getChildNode(n.i), getChildNode(n.n.i));
 	} else {
-		root.h.appendChild(n.i[node]);
+		root.h.appendChild(getChildNode(n.i));
 	}
 	return n;
       },
@@ -82,7 +83,7 @@ const sortNodes = (root, n) => {
 	n.p.n = n.n;
 	n.n.p = n.p;
 	if (n.i[node].parentNode === root.h) {
-		root.h.removeChild(n.i[node]);
+		root.h.removeChild(getChildNode(n.i));
 	}
 	root.l--;
       },
@@ -116,7 +117,7 @@ const sortNodes = (root, n) => {
 	root.o *= -1;
 	for (let curr = root.n; curr.i; curr = curr.n) {
 		[curr.n, curr.p] = [curr.p, curr.n];
-		root.h.appendChild(curr.i[node]);
+		root.h.appendChild(getChildNode(curr.i));
 	}
       },
       replaceKey = (root, k, item, prev) => {

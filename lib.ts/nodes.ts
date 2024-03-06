@@ -23,10 +23,12 @@ stringSort = new Intl.Collator().compare,
  */
 addNodeRef = <T extends new(...a: any[]) => HTMLElement>(b: T) => class extends b { [node] = this; };
 
+type ChildNode = Text | Element;
+
 /**
  * This unexported type satisfies any type has used the {@link node} {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} to delegate a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} element.
  */
-interface Item {
+type Item = ChildNode | {
 	[node]: Node;
 }
 
@@ -64,7 +66,8 @@ interface ItemOrRoot<T> {
 
 type Callback<T extends Item, U, thisType> = (element: T, index: number, array: thisType) => U;
 
-const sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
+const getChildNode = <T extends Item>(n: T) => n instanceof Node ? n : n[node],
+      sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
 	while (n.p.i && root.s(n.i, n.p.i) * root.o < 0) {
 		n.n.p = n.p;
 		n.p.n = n.n;
@@ -84,9 +87,9 @@ const sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
 		nn.p = n;
 	}
 	if (n.n.i) {
-		root.h.insertBefore(n.i[node], n.n.i[node]);
+		root.h.insertBefore(getChildNode(n.i), getChildNode(n.n.i));
 	} else {
-		root.h.appendChild(n.i[node]);
+		root.h.appendChild(getChildNode(n.i));
 	}
 	return n;
       },
@@ -115,8 +118,11 @@ const sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
       removeNode = (root: Root<any>, n: ItemNode<any>) => {
 	n.p.n = n.n;
 	n.n.p = n.p;
-	if (n.i[node].parentNode === root.h) {
-		root.h.removeChild(n.i[node]);
+
+	const cn = getChildNode(n.i);
+
+	if (cn.parentNode === root.h) {
+		root.h.removeChild(cn);
 	}
 	root.l--;
       },
@@ -150,7 +156,7 @@ const sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
 	root.o *= -1;
 	for (let curr = root.n; curr.i; curr = curr.n) {
 		[curr.n, curr.p] = [curr.p, curr.n];
-		root.h.appendChild(curr.i[node]);
+		root.h.appendChild(getChildNode(curr.i));
 	}
       },
       replaceKey = <K, T extends Item>(root: MapRoot<K, T>, k: K, item: T, prev: ItemOrRoot<T>) => {
