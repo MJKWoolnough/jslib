@@ -9,7 +9,7 @@
 import {child as node} from './dom.js';
 
 /**
- * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | link} of a type.
+ * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | link} of an Item type.
  */
 export {child as node} from './dom.js';
 
@@ -26,7 +26,7 @@ addNodeRef = <T extends new(...a: any[]) => HTMLElement>(b: T) => class extends 
 type ChildNode = Text | Element;
 
 /**
- * This unexported type satisfies any type has used the {@link node} {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} to delegate a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} element.
+ * This unexported type satisfies any type has used the {@link node} {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} to delegate a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} element, or is a {@link https://developer.mozilla.org/en-US/docs/Web/API/Text Text} Node or {@link https://developer.mozilla.org/en-US/docs/Web/API/Element Element}.
  */
 type Item = ChildNode | {
 	[node]: Node;
