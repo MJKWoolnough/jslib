@@ -174,6 +174,7 @@ const throwUnknownError = (v: boolean) => {
  *
  * In addition to being a callable typeguard function, has the following methods:
  *
+ * @method def    Returns a processable value that represents the type being guarded.
  * @method throw  Runs the underlying typeguard and will throw errors on type mismatch.
  * @method throws Returns a TypeGuard that will throw errors on failures.
  *
