@@ -5965,6 +5965,16 @@ type Tests = {
 				      n = div(new NodeArray(c));
 
 				return n.firstChild === c;
+			},
+			"with element item": async () => {
+				const {NodeArray} = await import("./lib/nodes.js"),
+				      {div} = await import("./lib/html.js"),
+				      c = div(),
+				      n = new NodeArray(div());
+
+				n.push(c);
+
+				return n.pop() === c;
 			}
 		},
 		"NodeMap": {
@@ -6413,6 +6423,16 @@ type Tests = {
 				      n = div(new NodeMap(c));
 
 				return n.firstChild === c;
+			},
+			"with element item": async () => {
+				const {NodeMap} = await import("./lib/nodes.js"),
+				      {div} = await import("./lib/html.js"),
+				      c = div(),
+				      n = new NodeMap(div());
+
+				n.set("", c);
+
+				return n.get("") === c;
 			}
 		}
 	},
