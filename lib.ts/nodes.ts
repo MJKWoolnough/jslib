@@ -64,7 +64,7 @@ interface ItemOrRoot<T> {
 
 type Callback<T extends Item, U, thisType> = (element: T, index: number, array: thisType) => U;
 
-const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
+const sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
 	while (n.p.i && root.s(n.i, n.p.i) * root.o < 0) {
 		n.n.p = n.p;
 		n.p.n = n.n;
@@ -126,7 +126,8 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
 	}
       },
       noItemFn = (n: Node) => ({[node]: n}),
-      sort = <T extends Item>(root: Root<T>, compareFunction?: sortFunc<T>) => {
+      isItemNode = <T extends Item>(n: ItemOrRoot<T>): n is ItemNode<T> => !!n.i,
+      sort = <T extends Item>(root: Root<T>, compareFunction?: Root<T>["s"]) => {
 	if (compareFunction) {
 		root.s = compareFunction;
 		root.o = 1;
@@ -136,7 +137,7 @@ const sortNodes = (root: Root<any>, n: ItemNode<any>) => {
 	}
 	let curr = root.n;
 	root.n = root.p = root;
-	while (curr.i) {
+	while (isItemNode(curr)) {
 		const next = curr.n;
 		curr.p = root.p;
 		curr.n = root;

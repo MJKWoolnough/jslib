@@ -92,6 +92,7 @@ const sortNodes = (root, n) => {
 	}
       },
       noItemFn = n => ({[node]: n}),
+      isItemNode = n => !!n.i,
       sort = (root, compareFunction) => {
 	if (compareFunction) {
 		root.s = compareFunction;
@@ -102,7 +103,7 @@ const sortNodes = (root, n) => {
 	}
 	let curr = root.n;
 	root.n = root.p = root;
-	while (curr.i) {
+	while (isItemNode(curr)) {
 		const next = curr.n;
 		curr.p = root.p;
 		curr.n = root;
