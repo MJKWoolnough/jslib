@@ -7,7 +7,7 @@
 
 const cf = new Map(),
       add = (from, ...to) => {
-		cf.set(String.fromCharCode(from), String.fromCharCode(...to));
+	cf.set(String.fromCharCode(from), String.fromCharCode(...to));
       },
       addRange = (start, end, shift = 32) => {
 	for (let i = start; i <= end; i++) {
