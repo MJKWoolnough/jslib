@@ -945,6 +945,8 @@ This unexported type is used to change how the elements are created and controll
 
 The event module is used for easy creation of global events.
 
+This module directly imports the [misc](#misc) module.
+
 |  Export        |  Type  |  Description  |
 |----------------|--------|---------------|
 | [hasKeyEvent](#events_haskeyevent) | Method | This function returns true if any function is currently active for the passed key. |
