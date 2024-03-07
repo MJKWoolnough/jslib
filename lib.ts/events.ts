@@ -2,6 +2,7 @@
  * The event module is used for easy creation of global events.
  *
  * @module events
+ * @requires misc
  */
 /** */
 
