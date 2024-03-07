@@ -3,6 +3,9 @@
  *
  * @module events
  */
+/** */
+
+import {setAndReturn} from './misc.js';
 
 let nextMouseID = 0;
 
@@ -89,13 +92,7 @@ const maxMouseButton = 16,
 	}
 	return combinationString(k);
       },
-      getSet = (m, k) => {
-	let a = m.get(k);
-	if (!a) {
-		m.set(k, a = new Set());
-	}
-	return a;
-      };
+      getSet = (m, k) =>  m.get(k) || setAndReturn(m, k, new Set());
 
 export let
 /**

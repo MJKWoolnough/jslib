@@ -3,6 +3,9 @@
  *
  * @module events
  */
+/** */
+
+import {setAndReturn} from './misc.js';
 
 type KeyFn = (e: KeyboardEvent) => void;
 
@@ -95,13 +98,7 @@ const maxMouseButton = 16,
 	}
 	return combinationString(k);
       },
-      getSet = <K, T>(m: Map<K, Set<T>>, k: K) => {
-	let a = m.get(k);
-	if (!a) {
-		m.set(k, a = new Set<T>());
-	}
-	return a;
-      };
+      getSet = <K, T>(m: Map<K, Set<T>>, k: K) =>  m.get(k) || setAndReturn(m, k, new Set<T>());
 
 export let
 /**
