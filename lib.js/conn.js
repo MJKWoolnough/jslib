@@ -83,7 +83,6 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 	case "blob":
 	case "arraybuffer":
 		xh.responseType = props["response"];
-		break;
 	}
 	if (props["signal"]) {
 		const signal = props["signal"];

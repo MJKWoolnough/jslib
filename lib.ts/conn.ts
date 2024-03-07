@@ -114,7 +114,6 @@ HTTPRequest: requestReturn = <T = any>(url: string, props: Properties = {}): Pro
 	case "blob":
 	case "arraybuffer":
 		xh.responseType = props["response"];
-		break;
 	}
 	if (props["signal"]) {
 		const signal = props["signal"];
