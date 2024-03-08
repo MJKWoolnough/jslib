@@ -173,6 +173,21 @@ export default class Fraction {
 			return `${this.#numerator} / ${this.#denominator}`;
 		}
 	}
+
+	static #compare(a: Fraction, b: Fraction[], v: -1 | 1) {
+		for (const c of b) {
+			const cmp = a.cmp(c);
+
+			if (isNaN(cmp)) {
+				return Fraction.NaN;
+			}
+
+			a = cmp === v ? a : c;
+		}
+
+		return a;
+	}
+
 	/**
 	 * This static method returns the smaller of the two passed `Fraction`, or {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN} is either param is equivalent to {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN}.
 	 *
@@ -181,8 +196,8 @@ export default class Fraction {
 	 *
 	 * @return {Fraction} Smallest Fraction.
 	 */
-	static min(a: Fraction, b: Fraction): Fraction {
-		return a.cmp(b) === -1 ? a : b;
+	static min(a: Fraction, ...b: Fraction[]): Fraction {
+		return Fraction.#compare(a, b, -1);
 	}
 	/**
 	 * This static method returns the larger of the two passed `Fraction`, or {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN} is either param is equivalent to {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN}.
@@ -192,7 +207,7 @@ export default class Fraction {
 	 *
 	 * @return {Fraction} Largest Fraction.
 	 */
-	static max(a: Fraction, b: Fraction): Fraction {
-		return a.cmp(b) === 1 ? a : b;
+	static max(a: Fraction, ...b: Fraction[]): Fraction {
+		return Fraction.#compare(a, b, 1);
 	}
 }
