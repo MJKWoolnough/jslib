@@ -3809,6 +3809,18 @@ type Tests = {
 			"-1, 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
 				return Fraction.min(new Fraction(-1n), new Fraction(2n)).cmp(new Fraction(-1n)) === 0;
+			},
+			"-1, 2, 3": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(new Fraction(-1n), new Fraction(2n), new Fraction(3n)).cmp(new Fraction(-1n)) === 0;
+			},
+			"-1, 2, 3, -2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(new Fraction(-1n), new Fraction(2n), new Fraction(3n), new Fraction(-2n)).cmp(new Fraction(-2n)) === 0;
+			},
+			"-1, NaN, 3 -2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.min(new Fraction(-1n), Fraction.NaN, new Fraction(3n), new Fraction(-2n))  === Fraction.NaN;
 			}
 		},
 		"max": {
@@ -3843,6 +3855,18 @@ type Tests = {
 			"-1, 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
 				return Fraction.max(new Fraction(-1n), new Fraction(2n)).cmp(new Fraction(2n)) === 0;
+			},
+			"-1, 2, 3": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.max(new Fraction(-1n), new Fraction(2n), new Fraction(3n)).cmp(new Fraction(3n)) === 0;
+			},
+			"-1, 2, 3, -2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.max(new Fraction(-1n), new Fraction(2n), new Fraction(3n), new Fraction(-2n)).cmp(new Fraction(3n)) === 0;
+			},
+			"-1, NaN, 3 -2": async () => {
+				const {default: Fraction} = await import("./lib/fraction.js");
+				return Fraction.max(new Fraction(-1n), Fraction.NaN, new Fraction(3n), new Fraction(-2n))  === Fraction.NaN;
 			}
 		},
 		"simplify": {
