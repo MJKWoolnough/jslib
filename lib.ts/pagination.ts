@@ -1,3 +1,12 @@
+/**
+ * The pagination module defines a simple {@link https://en.wikipedia.org/wiki/Pagination | pagination} creator.
+ *
+ * @module pagination
+ * @requires module:dom
+ * @requires module:html
+ */
+/** */
+
 import type {Binding} from './bind.js';
 import {amendNode, bindElement, clearNode} from './dom.js';
 import {a, li, ns, ul} from './html.js';
@@ -26,15 +35,7 @@ const link = (page: number, href: Href | null, contents?: string | Binding) => {
       };
 
 /**
- * The pagination module defines a simple [pagination](https://en.wikipedia.org/wiki/Pagination) creator.
- *
- * This module directly imports the [dom](#dom), and [html](#html) modules.
- *
- * |  Export  |  Type  |  Description  |
- * |----------|--------|---------------|
- * | (default) | Function | A [DOMBind](#dom_dombind) that creates a Pagination. |
- * | [Pagination](#pagination_pagination) | Class | This class represents the pagination custom element. |
- * | [setLanguage](#pagination_setlanguage) | Function | Used to set language entries used for Pagination. |
+ * This class represents the pagination custom element.
  *
  * CSS part attributes have been set on the various elements of Pagination to make styling simple.
  *
