@@ -1097,20 +1097,20 @@ The isNaN method returns true if the Fraction is equivalent to [NaN](https://dev
 ### <a name="fraction_max">max</a>
 ```typescript
 class Fraction {
-	static max(a: Fraction, b: Fraction) => Fraction;
+	static max(a: Fraction, ...b: Fraction[]) => Fraction;
 }
 ```
 
-This static method returns the larger of the two passed Fraction, or [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN) is either param is equivalent to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
+This static method returns the larger of the passed `Fraction`s, or Fraction.NaN if any param is Fraction.NaN.
 
 ### <a name="fraction_min">min</a>
 ```typescript
 class Fraction {
-	static min(a: Fraction, b: Fraction) => Fraction;
+	static min(a: Fraction, ...b: Fraction[]) => Fraction;
 }
 ```
 
-This static method returns the smaller of the two passed Fraction, or [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN) is either param is equivalent to [NaN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN).
+This static method returns the smaller of the passed `Fraction`s, or Fraction.NaN if any param is Fraction.NaN.
 
 ### <a name="fraction_mul">mul</a>
 ```typescript
