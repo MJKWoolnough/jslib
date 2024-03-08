@@ -142,7 +142,6 @@ export class Pipe<T> {
 					}
 				      };
 
-
 				pipe.receive(fn);
 				cancels.push(() => pipe.remove(fn));
 			}
