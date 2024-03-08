@@ -7,8 +7,8 @@ const link = (page, href, contents) => {
 	}
 
 	return li({"part": "page", "data-page": page}, contents ?? (page + 1) + "");
-},
-processPaginationSection = (ret, currPage, from, to, href) => {
+      },
+      processPaginationSection = (ret, currPage, from, to, href) => {
 	if (ret.length !== 0) {
 		ret.push(li({"part": "separator"}));
 	}

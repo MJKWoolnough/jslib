@@ -10,8 +10,8 @@ const link = (page: number, href: Href | null, contents?: string | Binding) => {
 	}
 
 	return li({"part": "page", "data-page": page}, contents ?? (page + 1) + "");
-},
-processPaginationSection = (ret: HTMLLIElement[], currPage: number, from: number, to: number, href: Href | null) => {
+      },
+      processPaginationSection = (ret: HTMLLIElement[], currPage: number, from: number, to: number, href: Href | null) => {
 	if (ret.length !== 0) {
 		ret.push(li({"part": "separator"}));
 	}
