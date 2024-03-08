@@ -189,10 +189,10 @@ export default class Fraction {
 	}
 
 	/**
-	 * This static method returns the smaller of the two passed `Fraction`, or {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN} is either param is equivalent to {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN}.
+	 * This static method returns the smaller of the passed `Fraction`s, or Fraction.NaN if any param is Fraction.NaN.
 	 *
-	 * @param {Fraction} a First Fraction.
-	 * @param {Fraction} b Second Fraction.
+	 * @param {Fraction} a      First Fraction.
+	 * @param {Fraction[]} ...b Fractions to compare.
 	 *
 	 * @return {Fraction} Smallest Fraction.
 	 */
@@ -200,10 +200,10 @@ export default class Fraction {
 		return Fraction.#compare(a, b, -1);
 	}
 	/**
-	 * This static method returns the larger of the two passed `Fraction`, or {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN} is either param is equivalent to {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN}.
+	 * This static method returns the larger of the passed `Fraction`s, or Fraction.NaN if any param is Fraction.NaN.
 	 *
-	 * @param {Fraction} a First Fraction.
-	 * @param {Fraction} b Second Fraction.
+	 * @param {Fraction} a      First Fraction.
+	 * @param {Fraction[]} ...b Fractions to compare.
 	 *
 	 * @return {Fraction} Largest Fraction.
 	 */
