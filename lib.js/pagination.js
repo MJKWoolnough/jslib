@@ -96,8 +96,6 @@ export class Pagination extends HTMLElement {
 				break;
 			case "page":
 				this.#page = val;
-
-				break;
 			}
 		}
 
