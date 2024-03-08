@@ -72,11 +72,7 @@ export class Pipe<T> {
 	 * @param {(data: T) => void} fn The Function to be registered.
 	 */
 	receive(fn: (data: T) => void) {
-		if (fn instanceof Function) {
-			this.#out.push(fn);
-		} else if (fn !== null && fn !== undefined) {
-			throw new TypeError("pipe.receive requires function type");
-		}
+		this.#out.push(fn);
 	}
 	/**
 	 * The passed function will be unregistered from the Pipe and will no longer receive values sent along it.
