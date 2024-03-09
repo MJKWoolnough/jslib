@@ -132,7 +132,7 @@ const getChildNode = <T extends Item>(n: T) => (n instanceof Node ? n : n[node])
 		yield [pos, curr.i];
 	}
       },
-      noItemFn = (n: Node) => ({[node]: n}),
+      noItemFn = (n: Node) => n,
       isItemNode = <T extends Item>(n: ItemOrRoot<T>): n is ItemNode<T> => !!n.i,
       sort = <T extends Item>(root: Root<T>, compareFunction?: Root<T>["s"]) => {
 	if (compareFunction) {

@@ -93,7 +93,7 @@ const getChildNode = n => n instanceof Node ? n : n[node],
 		yield [pos, curr.i];
 	}
       },
-      noItemFn = n => ({[node]: n}),
+      noItemFn = n => n,
       isItemNode = n => !!n.i,
       sort = (root, compareFunction) => {
 	if (compareFunction) {

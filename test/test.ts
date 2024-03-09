@@ -5023,15 +5023,15 @@ type Tests = {
 					      child = div.appendChild(document.createElement("span")),
 					      n = NodeArray.from(div);
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
-					return n.length === 1 && n[node] === div && n.at(0)?.[node] === child;
+					return n.length === 1 && n[node] === div && n.at(0) === child;
 				},
 				"many nodes": async () => {
-					const {NodeArray, node} = await import("./lib/nodes.js"),
+					const {NodeArray} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					      children = Array.from({length: 5}, () => div.appendChild(document.createElement("span"))),
 					      n = NodeArray.from(div);
-					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
-					return n.length === 5 && n.at(0)?.[node] === children[0] && n.at(4)?.[node] === children[4];
+
+					return n.length === 5 && n.at(0) === children[0] && n.at(4) === children[4];
 				},
 				"many nodes with fn": async () => {
 					let pos = 0;
