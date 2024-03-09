@@ -122,10 +122,8 @@ const getChildNode = <T extends Item>(n: T) => (n instanceof Node ? n : n[node])
 	n.p.n = n.n;
 	n.n.p = n.p;
 
-	const cn = n.c;
-
-	if (cn.parentNode === root.h) {
-		root.h.removeChild(cn);
+	if (n.c.parentNode === root.h) {
+		root.h.removeChild(n.c);
 	}
 	root.l--;
       },
