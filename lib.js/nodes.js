@@ -17,11 +17,7 @@ export const
 /** A sorting function that does no sorting. */
 noSort = () => 0,
 /** A function to sort strings. */
-stringSort = new Intl.Collator().compare,
-/**
- * A function that extends an HTMLElement based class, adding a [node] field set to `this`. Can be used with the {@link mod:elements} library as an extender function.
- */
-addNodeRef = b => class extends b { [node] = this; };
+stringSort = new Intl.Collator().compare;
 
 /**
  * This unexported type satisfies any type has used the {@link node} {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} to delegate a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} element, or is a {@link https://developer.mozilla.org/en-US/docs/Web/API/Text Text} Node or {@link https://developer.mozilla.org/en-US/docs/Web/API/Element Element}.

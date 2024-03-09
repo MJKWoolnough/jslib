@@ -1805,7 +1805,6 @@ This module directly imports the [dom](#dom) module.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
-| addNodeRef | Function | A function that extends an HTMLElement based class, adding a [node] field set to `this`. Can be used with the [elements](#elements) library as an extender function. |
 | <a name="nodes_node">node</a> | Symbol | This [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) is used to specify the [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) of an Item type. This symbol is the child symbol imported from the [dom](#dom) library. |
 | [NodeArray](#nodes_nodearray) | Class | This Class provides [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)-like access to DOM [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s. |
 | [NodeMap](#nodes_nodemap) | Class | This Class provides [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)-like access to DOM [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s. |
