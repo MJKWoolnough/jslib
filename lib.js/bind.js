@@ -27,8 +27,6 @@ const isEventListenerObject = prop => prop instanceof Object && prop.handleEvent
  * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.
  *
  * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
- *
- * NB: This class should not be used directly as an Item in the nodes module, as the [child] attribute will return a new Node each time it is accessed, instead use Binding[child].
  */
 export class Binding {
 	#pipe = new Pipe();
