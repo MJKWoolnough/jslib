@@ -9,7 +9,7 @@
 import {child as node} from './dom.js';
 
 /**
- * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | link} of an Item type.
+ * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Item} of an Item type.
  */
 export {child as node} from './dom.js';
 
