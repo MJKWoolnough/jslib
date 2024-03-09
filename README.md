@@ -274,8 +274,6 @@ When used as a tag function, this function will return a readonly [Binding](#bin
 
 Both returned types can be used as attributes or children in amendNode and clearNode calls.
 
-NB: This class should not be used directly as an Item in the module package, as the [child] attribute will return a new Node each time it is accessed, instead use Binding[child].
-
 ### <a name="bind_binding">Binding</a>
 ```typescript
 export type Binding<T = string> {
