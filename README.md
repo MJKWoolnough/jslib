@@ -1850,7 +1850,7 @@ The NodeArray type is wrapped with a Proxy to implement [Array](https://develope
 class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 	static from<_, H extends Node = Node>(parent: H) => NodeArray<Item, H>;
 	static from<T extends Item, H extends Node = Node>(parent: H, itemFn: (node: Node) => T|undefined) => NodeArray<T, H>;
-	static from<T extends Item = Item, H extends Node = Node>(parent: H, itemFn = (n: Node) => ({[node]: n})) => NodeArray<T, H>;
+	static from<T extends Item = Item, H extends Node = Node>(parent: H, itemFn = (n: Node) => n)) => NodeArray<T, H>;
 }
 ```
 
