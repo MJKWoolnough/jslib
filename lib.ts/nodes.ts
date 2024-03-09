@@ -42,12 +42,14 @@ type ItemNode<T> = {
 	p: ItemOrRoot<T>;
 	n: ItemOrRoot<T>;
 	i: T;
+	c: ChildNode;
 }
 
 type Root<T extends Item, H extends Node = Node> = {
 	p: ItemOrRoot<T>;
 	n: ItemOrRoot<T>;
 	i: undefined;
+	c: undefined;
 	s: sortFunc<T>;
 	h: H;
 	l: number;
@@ -62,11 +64,12 @@ interface ItemOrRoot<T> {
 	p: ItemOrRoot<T>;
 	n: ItemOrRoot<T>;
 	i: T | undefined;
+	c: ChildNode | undefined;
 }
 
 type Callback<T extends Item, U, thisType> = (element: T, index: number, array: thisType) => U;
 
-const getChildNode = <T extends Item>(n: T) => n instanceof Node ? n : n[node],
+const getChildNode = <T extends Item>(n: T) => (n instanceof Node ? n : n[node]) as ChildNode,
       sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
 	while (n.p.i && root.s(n.i, n.p.i) * root.o < 0) {
 		n.n.p = n.p;
@@ -86,10 +89,10 @@ const getChildNode = <T extends Item>(n: T) => n instanceof Node ? n : n[node],
 		n.n = nn;
 		nn.p = n;
 	}
-	if (n.n.i) {
-		root.h.insertBefore(getChildNode(n.i), getChildNode(n.n.i));
+	if (isItemNode(n.n)) {
+		root.h.insertBefore(n.c, n.n.c);
 	} else {
-		root.h.appendChild(getChildNode(n.i));
+		root.h.appendChild(n.c);
 	}
 	return n;
       },
@@ -113,13 +116,13 @@ const getChildNode = <T extends Item>(n: T) => n instanceof Node ? n : n[node],
       },
       addItemAfter = <T extends Item>(root: Root<T>, after: ItemOrRoot<T>, i: T) => {
 	root.l++;
-	return sortNodes(root, after.n = after.n.p = {"p": after, "n": after.n, i});
+	return sortNodes(root, after.n = after.n.p = {"p": after, "n": after.n, i, c: getChildNode(i)});
       },
       removeNode = (root: Root<any>, n: ItemNode<any>) => {
 	n.p.n = n.n;
 	n.n.p = n.p;
 
-	const cn = getChildNode(n.i);
+	const cn = n.c;
 
 	if (cn.parentNode === root.h) {
 		root.h.removeChild(cn);
@@ -154,9 +157,9 @@ const getChildNode = <T extends Item>(n: T) => n instanceof Node ? n : n[node],
       reverse = <T extends Item>(root: Root<T>) => {
 	[root.p, root.n] = [root.n, root.p];
 	root.o *= -1;
-	for (let curr = root.n; curr.i; curr = curr.n) {
+	for (let curr = root.n; isItemNode(curr); curr = curr.n) {
 		[curr.n, curr.p] = [curr.p, curr.n];
-		root.h.appendChild(getChildNode(curr.i));
+		root.h.appendChild(curr.c);
 	}
       },
       replaceKey = <K, T extends Item>(root: MapRoot<K, T>, k: K, item: T, prev: ItemOrRoot<T>) => {
@@ -278,7 +281,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	filterRemove(callback: Callback<T, any, this>, thisArg?: any) {
 		const root = this[realTarget].#root,
 		      filtered: T[] = [];
-		for (let curr = root.n, i = 0; curr.i; curr = curr.n, i++) {
+		for (let curr = root.n, i = 0; isItemNode(curr); curr = curr.n, i++) {
 			if (callback.call(thisArg, curr.i, i, this)) {
 				removeNode(root, curr);
 				filtered.push(curr.i);
@@ -347,7 +350,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		for (const c of n.childNodes) {
 			const i = itemFn(c) as T;
 			if (i) {
-				root.p = root.p.n = {"p": root.p, n: root, i};
+				root.p = root.p.n = {"p": root.p, n: root, i, c: getChildNode(i)};
 				root.l++;
 			}
 		}
@@ -395,7 +398,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	pop() {
 		const root = this[realTarget].#root,
 		      last = root.p;
-		if (last.i) {
+		if (isItemNode(last)) {
 			removeNode(root, last);
 		}
 		return last.i;
@@ -444,7 +447,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	shift() {
 		const root = this[realTarget].#root,
 		      first = root.n;
-		if (first.i) {
+		if (isItemNode(first)) {
 			removeNode(root, first);
 		}
 		return first.i;
@@ -492,7 +495,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		      removed: T[] = [];
 		let [curr] = getNode(root, start),
 		    adder = curr.p;
-		for (; curr.i && deleteCount > 0; deleteCount--, curr = curr.n) {
+		for (; isItemNode(curr) && deleteCount > 0; deleteCount--, curr = curr.n) {
 			removed.push(curr.i);
 			removeNode(root, curr);
 		}

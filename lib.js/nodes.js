@@ -50,10 +50,10 @@ const getChildNode = n => n instanceof Node ? n : n[node],
 		n.n = nn;
 		nn.p = n;
 	}
-	if (n.n.i) {
-		root.h.insertBefore(getChildNode(n.i), getChildNode(n.n.i));
+	if (isItemNode(n.n)) {
+		root.h.insertBefore(n.c, n.n.c);
 	} else {
-		root.h.appendChild(getChildNode(n.i));
+		root.h.appendChild(n.c);
 	}
 	return n;
       },
@@ -77,13 +77,16 @@ const getChildNode = n => n instanceof Node ? n : n[node],
       },
       addItemAfter = (root, after, i) => {
 	root.l++;
-	return sortNodes(root, after.n = after.n.p = {"p": after, "n": after.n, i});
+	return sortNodes(root, after.n = after.n.p = {"p": after, "n": after.n, i, c: getChildNode(i)});
       },
       removeNode = (root, n) => {
 	n.p.n = n.n;
 	n.n.p = n.p;
-	if (n.i[node].parentNode === root.h) {
-		root.h.removeChild(getChildNode(n.i));
+
+	const cn = n.c;
+
+	if (cn.parentNode === root.h) {
+		root.h.removeChild(cn);
 	}
 	root.l--;
       },
@@ -115,9 +118,9 @@ const getChildNode = n => n instanceof Node ? n : n[node],
       reverse = root => {
 	[root.p, root.n] = [root.n, root.p];
 	root.o *= -1;
-	for (let curr = root.n; curr.i; curr = curr.n) {
+	for (let curr = root.n; isItemNode(curr); curr = curr.n) {
 		[curr.n, curr.p] = [curr.p, curr.n];
-		root.h.appendChild(getChildNode(curr.i));
+		root.h.appendChild(curr.c);
 	}
       },
       replaceKey = (root, k, item, prev) => {
@@ -236,7 +239,7 @@ export class NodeArray {
 	filterRemove(callback, thisArg) {
 		const root = this[realTarget].#root,
 		      filtered = [];
-		for (let curr = root.n, i = 0; curr.i; curr = curr.n, i++) {
+		for (let curr = root.n, i = 0; isItemNode(curr); curr = curr.n, i++) {
 			if (callback.call(thisArg, curr.i, i, this)) {
 				removeNode(root, curr);
 				filtered.push(curr.i);
@@ -301,7 +304,7 @@ export class NodeArray {
 		for (const c of n.childNodes) {
 			const i = itemFn(c);
 			if (i) {
-				root.p = root.p.n = {"p": root.p, n: root, i};
+				root.p = root.p.n = {"p": root.p, n: root, i, c: getChildNode(i)};
 				root.l++;
 			}
 		}
@@ -349,7 +352,7 @@ export class NodeArray {
 	pop() {
 		const root = this[realTarget].#root,
 		      last = root.p;
-		if (last.i) {
+		if (isItemNode(last)) {
 			removeNode(root, last);
 		}
 		return last.i;
@@ -394,7 +397,7 @@ export class NodeArray {
 	shift() {
 		const root = this[realTarget].#root,
 		      first = root.n;
-		if (first.i) {
+		if (isItemNode(first)) {
 			removeNode(root, first);
 		}
 		return first.i;
@@ -442,7 +445,7 @@ export class NodeArray {
 		      removed = [];
 		let [curr] = getNode(root, start),
 		    adder = curr.p;
-		for (; curr.i && deleteCount > 0; deleteCount--, curr = curr.n) {
+		for (; isItemNode(curr) && deleteCount > 0; deleteCount--, curr = curr.n) {
 			removed.push(curr.i);
 			removeNode(root, curr);
 		}
@@ -539,6 +542,8 @@ export class NodeArray {
 			"flatMap": true,
 			"includes": true,
 			"keys": true,
+			"toLocaleString": undefined,
+			"toString": undefined,
 			"values": true
 		};
 	}
@@ -572,9 +577,9 @@ export class NodeMap {
 	 *
 	 * The sorting function is used to order {@link Item}s as they are inserted.
 	 *
-	 * @param {H} h The parent element, onto which all {@link Item} elements will be attached.
-	 * @param {Function} s An optional starting sort function.
-	 * @param {Iterable<[K, T]>} entries An optional set of starting elements of type `T`.
+	 * @param {H} h                        The parent element, onto which all {@link Item} elements will be attached.
+	 * @param {Function} [s]               An optional starting sort function. Can be omitted, with 'elements' as the second param.
+	 * @param {Iterable<[K, T]>} [entries] An optional set of starting elements of type `T`.
 	 */
 	constructor(h, sort, entries) {
 		const s = sort instanceof Function ? sort : noSort,
