@@ -214,9 +214,9 @@ export class NodeArray {
 	*entries() {
 		yield *entries(this[realTarget].#root);
 	}
-	every(callback, thisArg) {
+	every(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (!callback.call(thisArg, item, index, this)) {
+			if (!callback.call(thisArg ?? globalThis, item, index, this)) {
 				return false;
 			}
 		}
@@ -225,53 +225,53 @@ export class NodeArray {
 	fill(_value, _start, _end) {
 		throw new Error("invalid");
 	}
-	filter(callback, thisArg) {
+	filter(callback, thisArg = this) {
 		const filter = [];
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				filter.push(item);
 			}
 		}
 		return filter;
 	}
-	filterRemove(callback, thisArg) {
+	filterRemove(callback, thisArg = this) {
 		const root = this[realTarget].#root,
 		      filtered = [];
 		for (let curr = root.n, i = 0; isItemNode(curr); curr = curr.n, i++) {
-			if (callback.call(thisArg, curr.i, i, this)) {
+			if (callback.call(thisArg ?? globalThis, curr.i, i, this)) {
 				removeNode(root, curr);
 				filtered.push(curr.i);
 			}
 		}
 		return filtered;
 	}
-	find(callback, thisArg) {
+	find(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return item;
 			}
 		}
 		return undefined;
 	}
-	findIndex(callback, thisArg) {
+	findIndex(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return index;
 			}
 		}
 		return -1;
 	}
-	findLast(callback, thisArg) {
+	findLast(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return item;
 			}
 		}
 		return undefined;
 	}
-	findLastIndex(callback, thisArg) {
+	findLastIndex(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return index;
 			}
 		}
@@ -280,12 +280,12 @@ export class NodeArray {
 	flat(depth) {
 		return Array.from(this.values()).flat(depth);
 	}
-	flatMap(callback, thisArg) {
+	flatMap(callback, thisArg = this) {
 		return this.map(callback, thisArg).flat();
 	}
-	forEach(callback, thisArg) {
+	forEach(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			callback.call(thisArg, item, index, this);
+			callback.call(thisArg ?? globalThis, item, index, this);
 		}
 	}
 	/**
@@ -340,10 +340,10 @@ export class NodeArray {
 		}
 		return -1;
 	}
-	map(callback, thisArg) {
+	map(callback, thisArg = this) {
 		const map = [];
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			map.push(callback.call(thisArg, item, index, this));
+			map.push(callback.call(thisArg ?? globalThis, item, index, this));
 		}
 		return map;
 	}
@@ -419,9 +419,9 @@ export class NodeArray {
 		}
 		return slice;
 	}
-	some(callback, thisArg) {
+	some(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return true;
 			}
 		}
@@ -615,7 +615,7 @@ export class NodeMap {
 		}
 	}
 	forEach(callbackfn, thisArg = this) {
-		this.#root.m.forEach((v, k) => callbackfn.call(thisArg, v.i, k, this));
+		this.#root.m.forEach((v, k) => callbackfn.call(thisArg ?? globalThis, v.i, k, this));
 	}
 	get(k) {
 		return this.#root.m.get(k)?.i;

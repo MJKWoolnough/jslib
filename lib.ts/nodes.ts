@@ -256,9 +256,9 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	*entries(): IterableIterator<[number, T]> {
 		yield *entries(this[realTarget].#root);
 	}
-	every(callback: Callback<T, unknown, this>, thisArg?: any) {
+	every(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (!callback.call(thisArg, item, index, this)) {
+			if (!callback.call(thisArg ?? globalThis, item, index, this)) {
 				return false;
 			}
 		}
@@ -267,37 +267,37 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	fill(_value: T, _start?: number, _end?: number): this {
 		throw new Error("invalid");
 	}
-	filter(callback: Callback<T, any, this>, thisArg?: any) {
+	filter(callback: Callback<T, any, this>, thisArg: any = this) {
 		const filter: T[] = [];
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				filter.push(item);
 			}
 		}
 		return filter;
 	}
-	filterRemove(callback: Callback<T, any, this>, thisArg?: any) {
+	filterRemove(callback: Callback<T, any, this>, thisArg: any = this) {
 		const root = this[realTarget].#root,
 		      filtered: T[] = [];
 		for (let curr = root.n, i = 0; isItemNode(curr); curr = curr.n, i++) {
-			if (callback.call(thisArg, curr.i, i, this)) {
+			if (callback.call(thisArg ?? globalThis, curr.i, i, this)) {
 				removeNode(root, curr);
 				filtered.push(curr.i);
 			}
 		}
 		return filtered;
 	}
-	find(callback: Callback<T, any, this>, thisArg?: any) {
+	find(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return item;
 			}
 		}
 		return undefined;
 	}
-	findIndex(callback: Callback<T, any, this>, thisArg?: any) {
+	findIndex(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return index;
 			}
 		}
@@ -305,17 +305,17 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	}
 	findLast<S extends T>(predicate: (value: T, index: number, array: T[]) => value is S, thisArg?: any): S | undefined;
 	findLast(callback: Callback<T, any, this>, thisArg?: any): T | undefined;
-	findLast<S extends T>(callback: Callback<T, any, this> | ((value: T, index: number, array: T[]) => value is S), thisArg?: any) {
+	findLast<S extends T>(callback: Callback<T, any, this> | ((value: T, index: number, array: T[]) => value is S), thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return item;
 			}
 		}
 		return undefined;
 	}
-	findLastIndex(callback: Callback<T, any, this>, thisArg?: any) {
+	findLastIndex(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return index;
 			}
 		}
@@ -324,12 +324,12 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	flat<D extends number = 1>(depth?: D) {
 		return Array.from(this.values()).flat(depth) as FlatArray<any[], D>;
 	}
-	flatMap<U extends []>(callback: Callback<T, U, this>, thisArg?: any) {
+	flatMap<U extends []>(callback: Callback<T, U, this>, thisArg: any = this) {
 		return this.map(callback, thisArg).flat();
 	}
-	forEach(callback: Callback<T, void, this>, thisArg?: any) {
+	forEach(callback: Callback<T, void, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			callback.call(thisArg, item, index, this);
+			callback.call(thisArg ?? globalThis, item, index, this);
 		}
 	}
 	static from<_, H extends Node = Node>(n: H): NodeArray<Item, H>;
@@ -386,10 +386,10 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return -1;
 	}
-	map<U>(callback: Callback<T, U, this>, thisArg?: any) {
+	map<U>(callback: Callback<T, U, this>, thisArg: any = this) {
 		const map: U[] = [];
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			map.push(callback.call(thisArg, item, index, this));
+			map.push(callback.call(thisArg ?? globalThis, item, index, this));
 		}
 		return map;
 	}
@@ -469,9 +469,9 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		}
 		return slice;
 	}
-	some(callback: Callback<T, any, this>, thisArg?: any) {
+	some(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
-			if (callback.call(thisArg, item, index, this)) {
+			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return true;
 			}
 		}
@@ -668,7 +668,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		}
 	}
 	forEach(callbackfn: (value: T, key: K, map: NodeMap<K, T>) => void, thisArg: any = this) {
-		this.#root.m.forEach((v, k) => callbackfn.call(thisArg, v.i, k, this));
+		this.#root.m.forEach((v, k) => callbackfn.call(thisArg ?? globalThis, v.i, k, this));
 	}
 	get(k: K) {
 		return this.#root.m.get(k)?.i;
