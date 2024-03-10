@@ -90,7 +90,7 @@ HTTPRequest: requestReturn = <T = any>(url: string, props: Properties = {}): Pro
 					successFn(props["response"] === "xh" ? xh : xh.response);
 				}
 			} else {
-				errorFn(new Error(xh.responseText));
+				errorFn(new Error(xh.response));
 			}
 		}
 	});

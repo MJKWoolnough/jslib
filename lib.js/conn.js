@@ -59,7 +59,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 					successFn(props["response"] === "xh" ? xh : xh.response);
 				}
 			} else {
-				errorFn(new Error(xh.responseText));
+				errorFn(new Error(xh.response));
 			}
 		}
 	});
