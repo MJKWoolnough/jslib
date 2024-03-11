@@ -1236,7 +1236,7 @@ The Pipe Class is used to pass values to multiple registered functions, and cont
 |----------|---------------|
 | [any](#inter_pipe_any) | This static method can be used to combine the output of multiple pipes. |
 | [bind](#inter_pipe_bind) | This method can create simple bound functions for the receive, remove, and send methods. |
-| length   |  The field contains the numner of functions currently registered on the Pipe. |
+| length   |  The field contains the number of functions currently registered on the Pipe. |
 | [receive](#inter_pipe_receive) | The method is used to register a function to receive data from the Pipe. |
 | [remove](#inter_pipe_remove) | The method is used to unregister a function on the Pipe. |
 | [send](#inter_pipe_send) |  This method sends data to all registered functions on the Pipe. |
