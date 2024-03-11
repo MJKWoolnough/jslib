@@ -122,7 +122,6 @@ export class ShellElement extends BaseShellElement {
 				amendNode(data.item, taskbarItem);
 				taskbarObserver.observe(taskbarItem, taskbarObservations);
 				amendNode(target, {"onremove": event(() => taskbarItem.remove(), eventOnce)});
-				break;
 			}
 		      })),
 		      taskbar = footer();
