@@ -54,9 +54,7 @@ declare source="$(
 /** */
 
 const cf = new Map<string, string>(),#const cf = new Map(),
-      add = (from: number, ...to: number[]) => {#      add = (from, ...to) => {
-	cf.set(String.fromCharCode(from), String.fromCharCode(...to));
-      },
+      add = (from: number, ...to: number[]) => cf.set(String.fromCharCode(from), String.fromCharCode(...to)),#      add = (from, ...to) => cf.set(String.fromCharCode(from), String.fromCharCode(...to)),
       addRange = (start: number, end: number, shift = 32) => {#      addRange = (start, end, shift = 32) => {
 	for (let i = start; i <= end; i++) {
 		add(i, i + shift);
