@@ -1724,7 +1724,7 @@ The misc module contains various simple, dependency-free functions.
 
 ### <a name="misc_addandreturn">addAndReturn</a>
 ```typescript
-<V>(s: {add: (m: V) => any}, v: V) => V;
+<V>(s: {add: (m: V) => void}, v: V) => V;
 ```
 
 This function takes a Set-like object and calls the `add` method with the given value, before returning the value `v`.
@@ -1767,7 +1767,7 @@ Javascript does not have a built-in modulo operator, and as such this function i
 
 ### <a name="misc_pushandreturn">pushAndReturn</a>
 ```typescript
-<V>(a: {push: (m: V) => any}, v: V) => V;
+<V>(a: {push: (m: V) => void}, v: V) => V;
 ```
 
 This function takes an Array-like object and calls the `push` method with the given value, before returning the value `v`.
@@ -1783,7 +1783,7 @@ This function takes a function that will run after all functions that were previ
 
 ### <a name="misc_setandreturn">setAndReturn</a>
 ```typescript
-setAndReturn = <K, V>(m: {set: (k: K, v: V) => any}, k: K, v: V) => V;
+setAndReturn = <K, V>(m: {set: (k: K, v: V) => void}, k: K, v: V) => V;
 ```
 
 This function takes a map-like object and calls the `set` method with the given key and value, before returning the value `v`.
