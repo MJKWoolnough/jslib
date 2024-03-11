@@ -191,4 +191,4 @@ customElements.define("page-numbers", Pagination);
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link Pagination}.
  */
-export default bindElement(ns, "page-numbers")
+export default bindElement(ns, "page-numbers");
