@@ -191,7 +191,6 @@ export class ShellElement extends BaseShellElement {
 				break;
 			case "window-title":
 				amendNode(itm, target.getAttribute("window-title") ?? "");
-				break;
 			}
 		      }));
 		amendNode(this.attachShadow({"mode": "closed"}), [
