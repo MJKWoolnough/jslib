@@ -207,16 +207,9 @@ class Router extends HTMLElement {
 		}
 	}
 	connectedCallback() {
-		let n = this.parentNode;
-		while (n) {
-			if (n === document) {
-				break;
-			} else if (n instanceof ShadowRoot) {
-				n = n.host;
-			} else if (!n.parentNode || n instanceof Router) {
+		for (let n = this.parentNode; n && n !== document; n = n instanceof ShadowRoot ? n.host : n.parentNode) {
+			if (!n.parentNode || n instanceof Router) {
 				return;
-			} else {
-				n = n.parentNode;
 			}
 		}
 		routers.add(this);
