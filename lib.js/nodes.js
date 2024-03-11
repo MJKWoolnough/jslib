@@ -591,7 +591,7 @@ export class NodeMap {
 	}
 	clear() {
 		const root = this.#root;
-		for (let curr = root.n; curr.i; curr = curr.n) {
+		for (let curr = root.n; isItemNode(curr); curr = curr.n) {
 			removeNode(root, curr);
 		}
 		root.m.clear();
