@@ -6664,6 +6664,26 @@ type Tests = {
 				      d = text2DOM("<div><svg></svg></div>");
 				return d instanceof DocumentFragment && d.firstChild instanceof HTMLDivElement && d.firstChild?.firstChild instanceof SVGSVGElement;
 			}
+		},
+		"callable": async () => {
+			const {Callable}  = await import("./lib/misc.js"),
+			      Fn = class extends Callable<(o: number) => number> {
+				#num: number;
+				constructor(n: number) {
+					super((o: number) => this.#num = o);
+
+					this.#num = n;
+				}
+
+				value() {
+					return this.#num;
+				}
+			      },
+			      myFn = new Fn(1),
+			      old = myFn.value(),
+			      middle = myFn(3);
+
+			return old === 1 && middle === 3 && myFn.value() === 3;
 		}
 	},
 	"typeguard.js": {
