@@ -1720,7 +1720,7 @@ The misc module contains various simple, dependency-free functions.
 | [pushAndReturn](#misc_pushandreturn) | This function adds a value to an Array and returns the value. |
 | [queue](#misc_queue) | The function allows the simple queueing of functions that require a definite order. |
 | [setAndReturn](#misc_setandreturn) | This function sets a value on a map and returns the value. |
-| [text2DOM](#misc_text2dom) | This function convers valid HTML/SVG/MathML text into DOM Nodes. |
+| [text2DOM](#misc_text2dom) | This function converts valid HTML/SVG/MathML text into DOM Nodes. |
 
 ### <a name="misc_addandreturn">addAndReturn</a>
 ```typescript
