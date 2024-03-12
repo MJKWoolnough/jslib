@@ -8,7 +8,7 @@
  */
 /** */
 
-import {setAndReturn} from './misc.js';
+import {Callable, setAndReturn} from './misc.js';
 
 let throwErrors = false,
     allowUndefined = null,
@@ -145,13 +145,11 @@ const throwUnknownError = v => {
  *
  * @typedef {(v: unknown) => v is T} TypeGuard
  * */
-class STypeGuard extends Function {
-	static from(tg, def) {
-		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype);
+class STypeGuard extends Callable {
+	constructor(tg, def) {
+		super(tg);
 
-		definitions.set(tgFn, def);
-
-		return tgFn;
+		definitions.set(this, def);
 	}
 
 	throw(v) {
@@ -171,7 +169,7 @@ class STypeGuard extends Function {
 	}
 
 	*[Symbol.iterator]() {
-		yield SpreadTypeGuard.from(this);
+		yield new SpreadTypeGuard(this);
 	}
 
 	def() {
@@ -188,12 +186,12 @@ class STypeGuard extends Function {
 }
 
 class SpreadTypeGuard extends Function {
-	static from(tg) {
-		const stg = Object.setPrototypeOf(v => tg(v), SpreadTypeGuard.prototype);
+	constructor(tg) {
+		const stg = v => tg(v);
+
+		super(stg);
 
 		spreads.set(stg, tg);
-
-		return stg;
 	}
 
 	def() {
@@ -217,7 +215,7 @@ export const
  *
  * @return {TypeGuard<T>} The passed in typeguard, with additional functionality.
  */
-asTypeGuard = (tg, def = unknownDef) => STypeGuard.from(tg, def),
+asTypeGuard = (tg, def = unknownDef) => new STypeGuard(tg, def),
 /**
  * The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against.
  *

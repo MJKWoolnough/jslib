@@ -8,7 +8,7 @@
  */
 /** */
 
-import {setAndReturn} from './misc.js';
+import {Callable, setAndReturn} from './misc.js';
 
 /** This Type retrieves the guarded type from a TypeGuard. */
 export type TypeGuardOf<T> = T extends TypeGuard<infer U> ? U : never;
@@ -85,7 +85,7 @@ const throwUnknownError = (v: boolean) => {
       [unknownDef, anyDef, numberDef, bigIntDef, stringDef, booleanDef, functionDef, symbolDef, neverDef, undefinedDef, nullDef, voidDef] = [unknownStr, "any", "number", "bigint", "string", "boolean", "Function", "symbol", "never", "undefined", "null", "void"].map(v => Object.freeze(["", v] as const)),
       definitions = new WeakMap<STypeGuard<any>, StoredDefinition>(),
       strings = new WeakMap<Definition, string>(),
-      spreads = new WeakMap<SpreadTypeGuard, STypeGuard<any>>(),
+      spreads = new WeakMap<SpreadTypeGuard<any>, STypeGuard<any>>(),
       identifer = /^[_$\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/v,
       matchTemplate = (v: string, p: readonly (string | TypeGuard<string>)[]) => {
 	const [tg, s, ...rest] = p as readonly [TypeGuard<string>, string, ...(string | TypeGuard<string>)[]];
@@ -182,13 +182,11 @@ const throwUnknownError = (v: boolean) => {
  * */
 export type TypeGuard<T> = STypeGuard<T> & ((v: unknown) => v is T);
 
-class STypeGuard<T> extends Function {
-	static from<T>(tg: (v: unknown) => v is T, def: StoredDefinition) {
-		const tgFn = Object.setPrototypeOf(tg, STypeGuard.prototype) as TypeGuard<T>;
+class STypeGuard<T> extends Callable<(v: unknown) => v is T> {
+	constructor(tg: (v: unknown) => v is T, def: StoredDefinition) {
+		super(tg);
 
-		definitions.set(tgFn, def);
-
-		return tgFn;
+		definitions.set(this, def);
 	}
 
 	throw(v: unknown): v is T {
@@ -208,7 +206,7 @@ class STypeGuard<T> extends Function {
 	}
 
 	*[Symbol.iterator]() {
-		yield SpreadTypeGuard.from<T>(this);
+		yield new SpreadTypeGuard(this) as TypeGuard<T>;
 	}
 
 	def(): DefinitionWithDeps {
@@ -224,20 +222,20 @@ class STypeGuard<T> extends Function {
 	}
 }
 
-class SpreadTypeGuard extends Function {
-	static from<T>(tg: STypeGuard<T>) {
-		const stg = Object.setPrototypeOf((v: unknown): v is T => tg(v), SpreadTypeGuard.prototype) as TypeGuard<T>;
+class SpreadTypeGuard<T> extends Callable<STypeGuard<T>> {
+	constructor(tg: STypeGuard<T>) {
+		const stg = ((v: unknown): v is T => tg(v)) as TypeGuard<T>;
+
+		super(stg);
 
 		spreads.set(stg, tg);
-
-		return stg;
 	}
 
-	def() {
+	def(): DefinitionWithDeps {
 		return spreads.get(this)?.def() ?? unknownDef;
 	}
 
-	toString() {
+	toString(): string {
 		return spreads.get(this)?.toString() ?? unknownStr;
 	}
 }
@@ -254,7 +252,7 @@ export const
  *
  * @return {TypeGuard<T>} The passed in typeguard, with additional functionality.
  */
-asTypeGuard = <T>(tg: (v: unknown) => v is T, def: StoredDefinition = unknownDef) => STypeGuard.from(tg, def),
+asTypeGuard = <T>(tg: (v: unknown) => v is T, def: StoredDefinition = unknownDef): TypeGuard<T> => new STypeGuard(tg, def) as TypeGuard<T>,
 /**
  * The Bool function returns a TypeGuard that checks for boolean values, and takes an optional, specific boolean value to check against.
  *
