@@ -109,6 +109,7 @@ const textToken = 1,
       processText = function* (text: string): Tokeniser {
 	const tags: string[] = [];
 
+	Loop:
 	for (const tks of processToEnd(parser(text, parseText, mergeText))) {
 		switch (tks.type) {
 		case textToken:
@@ -122,17 +123,16 @@ const textToken = 1,
 			      [tagName, attr] = fullText.slice(1, -1).split(tagAttr),
 			      open = {tagName, "attr": attr?.startsWith("\"") ? JSON.parse(attr) : attr ?? null, fullText};
 
-			OpenLoop:
 			while (true) {
 				switch (yield open) {
 				default:
-					break OpenLoop;
+					continue Loop;
 				case 1:
 					tags.unshift(tagName);
 				case true:
 				}
 			}
-		}; break;
+		};
 		case closeToken:
 			const fullText = tks.data[0].data,
 			      tagName = fullText.slice(2, -1),
