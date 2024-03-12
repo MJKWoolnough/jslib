@@ -120,3 +120,9 @@ text2DOM = text => {
 	t.innerHTML = text;
 	return t.content;
 };
+
+export class Callable extends Function {
+	constructor(fn) {
+		return Object.setPrototypeOf(fn, new.target.prototype);
+	}
+}

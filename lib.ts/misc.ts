@@ -120,3 +120,11 @@ text2DOM = (text: string) => {
 	t.innerHTML = text;
 	return t.content;
 };
+
+export class Callable<Fn extends Function> extends Function {
+	constructor(fn: Fn) {
+		false && super();
+
+		return Object.setPrototypeOf(fn, new.target.prototype);
+	}
+};
