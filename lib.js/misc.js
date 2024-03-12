@@ -121,7 +121,13 @@ text2DOM = text => {
 	return t.content;
 };
 
-export class Callable extends Function {
+export
+/**
+ * This class provides a convenient way to extend a Function with class attributes and methods.
+ *
+ * The child class will need appropriate typing to make it correctly appear as the type of the passed function as well as the child class.
+ */
+class Callable extends Function {
 	constructor(fn) {
 		return Object.setPrototypeOf(fn, new.target.prototype);
 	}
