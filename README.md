@@ -1708,19 +1708,20 @@ The 'disable' attribute makes the item unselectable and unfocusable.
 
 ## <a name="misc">misc</a>
 
-The misc module contains various simple, dependency-free functions.
+The misc module contains various simple, dependency-free exports.
 
-|  Export  |  Description  |
-|----------|---------------|
-| [addAndReturn](#misc_addandreturn) | This function adds a value to a Set and returns the value. |
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [addAndReturn](#misc_addandreturn) | Function | This function adds a value to a Set and returns the value. |
 | [autoFocus](#misc_autofocus) | Function | This function queues a focus method call to the passed element. |
-| [checkInt](#misc_checkint) | This function determines whether the value passed is an integer, within a given range, returning either the valid integer or a default value. |
-| [isInt](#misc_isint) | This function determines whether the value passed is an integer, within a given range. |
-| [mod](#misc_mod) | This function performs the modulo operation on the two given numbers. |
-| [pushAndReturn](#misc_pushandreturn) | This function adds a value to an Array and returns the value. |
-| [queue](#misc_queue) | The function allows the simple queueing of functions that require a definite order. |
-| [setAndReturn](#misc_setandreturn) | This function sets a value on a map and returns the value. |
-| [text2DOM](#misc_text2dom) | This function converts valid HTML/SVG/MathML text into DOM Nodes. |
+| [Callable](#misc_callable) | Class | This class provides a convenient way to extend a Function with class attributes and methods. |
+| [checkInt](#misc_checkint) | Function | This function determines whether the value passed is an integer, within a given range, returning either the valid integer or a default value. |
+| [isInt](#misc_isint) | Function | This function determines whether the value passed is an integer, within a given range. |
+| [mod](#misc_mod) | Function | This function performs the modulo operation on the two given numbers. |
+| [pushAndReturn](#misc_pushandreturn) | Function | This function adds a value to an Array and returns the value. |
+| [queue](#misc_queue) | Function | The function allows the simple queueing of functions that require a definite order. |
+| [setAndReturn](#misc_setandreturn) | Function | This function sets a value on a map and returns the value. |
+| [text2DOM](#misc_text2dom) | Function | This function converts valid HTML/SVG/MathML text into DOM Nodes. |
 
 ### <a name="misc_addandreturn">addAndReturn</a>
 ```typescript
@@ -1737,6 +1738,17 @@ This functions is useful for one-liners where you need to store a value in a Set
 ```
 
 This queues a focus method call to the passed element, and will call select on any [HTMLInputElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement) or [HTMLTextAreaElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement), unless false is passed as the second param.
+
+### <a name="misc_callable">Callable</a>
+```typescript
+class Callable<Fn extends Function> extends Function {
+	constructor(fn: Fn);
+}
+```
+
+This class provides a convenient way to extend a Function (Fn) with class attributes and methods.
+
+The child class will need appropriate typing to make it correctly appear as the type of the passed function as well as the child class.
 
 ### <a name="misc_checkint">checkInt</a>
 ```typescript
