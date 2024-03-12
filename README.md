@@ -1274,7 +1274,7 @@ class Pipe {
 
 This method calls the passed function whenever a value from any of the pipes is received.
 
-Initial values for the Pipes can be set by using the Pipe in a typle with the default value.
+Initial values for the Pipes can be set by using the Pipe in a tuple with the default value.
 
 The returned function can be used to cancel the updates.
 
