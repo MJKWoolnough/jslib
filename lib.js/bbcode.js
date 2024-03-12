@@ -241,6 +241,11 @@ process = (node, t, p, closeTag) => {
  */
 
 /**
+ * This type represents an Object, which contains the tag parsers for specific tags and the text processor. This object **must** contain the {@link text} {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol}, specifying a text formatting function, which takes a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} to be appended to, and the string to be formatted. In addition, this object should contain string keys, which correspond to tag names, the values of which should be {@link TagFn}s.
+ * @typedef {{[key: string]: TagFn; [text]: (node: Node, t: string) => void}} Parsers
+ */
+
+/**
  * This function parses the given text according, handling the tags with the given parsers, and appending all generated {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s to a {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment}, which is returned.
  *
  * @param {Parsers} parsers The bbcode tag parsers.
