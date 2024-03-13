@@ -1073,6 +1073,7 @@ type Tests = {
 				      start = elm.textContent;
 
 				a(",");
+				// @ts-ignore: Deliberately mis-using fn
 				text("NO CHANGE");
 
 				return new Promise(sFn => setTimeout(sFn)).then(() => start === "HELLO WORLD" && start === startVal && elm.textContent === "HELLO,WORLD" && elm.textContent === text());
