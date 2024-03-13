@@ -1004,6 +1004,18 @@ type Tests = {
 				      start3 = elm2.getAttributeNS(null, "TEST3");
 				attr.value = "SECOND";
 				return start === "FIRST" && start2 === "FIRST" && start3 === "FIRST" && elm.getAttributeNS(null, "TEST") === "SECOND" && elm.getAttributeNS(null, "TEST2") === "SECOND" && elm2.getAttributeNS(null, "TEST3") === "SECOND";
+			},
+			"bind text using fn": async () => {
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
+				      text = bind("HELLO"),
+				      startVal = text(),
+				      elm = amendNode(document.createElement("div"), text),
+				      start = elm.textContent;
+
+				text("GOODBYE");
+
+				return start === "HELLO" && start === startVal && elm.textContent === "GOODBYE" && elm.textContent === text();
 			}
 		},
 		"template": {
@@ -1050,6 +1062,19 @@ type Tests = {
 				a.value = "Uno";
 				b.value = "Dos";
 				return new Promise(sFn => setTimeout(sFn)).then(() => start === `1: One\n2: Two` && elm.getAttribute("text") === `1: Uno\n2: Dos`);
+			},
+			"single bind using fn": async () => {
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
+				      a = bind(" "),
+				      text = bind`HELLO${a}WORLD`,
+				      startVal = text(),
+				      elm = amendNode(document.createElement("div"), text),
+				      start = elm.textContent;
+
+				a(",");
+
+				return new Promise(sFn => setTimeout(sFn)).then(() => start === "HELLO WORLD" && start === startVal && elm.textContent === "HELLO,WORLD" && elm.textContent === text());
 			}
 		},
 		"function": async () => {
