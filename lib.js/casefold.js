@@ -1,5 +1,5 @@
 /**
- * The casefold module provides a simple unicode case-folding function.
+ * The casefold module provides a simple Unicode case-folding function.
  *
  * @module casefold
  */

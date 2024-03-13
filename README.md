@@ -297,7 +297,7 @@ The onChange method runs the provided callback whenever the value changes, passi
 
 ## <a name="casefold">casefold</a>
 
-The casefold module provides a simple unicode case-folding function.
+The casefold module provides a simple Unicode case-folding function.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
