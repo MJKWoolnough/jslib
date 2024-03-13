@@ -38,6 +38,11 @@ const isEventListenerObject = (prop: unknown): prop is EventListenerObject => pr
  * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.
  *
  * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
+ *
+ * This class implements a function that can take a new value to set the binding value. This function can also be called with no argument to simply get the value of the binding.
+ *
+ * @param {T} [v] The value to set the binding to.
+ * @returns {T}   The value the binding is set to.
  */
 export class Binding<T = string> extends Callable<(v: T) => T> {
 	#pipe = new Pipe<T>();
