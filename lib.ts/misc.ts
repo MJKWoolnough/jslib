@@ -121,13 +121,12 @@ text2DOM = (text: string) => {
 	return t.content;
 };
 
-export
 /**
  * This class provides a convenient way to extend a Function with class attributes and methods.
  *
  * The child class will need appropriate typing to make it correctly appear as the type of the passed function as well as the child class.
  */
-class Callable<Fn extends Function> extends Function {
+export class Callable<Fn extends Function> extends Function {
 	constructor(fn: Fn) {
 		false && super();
 
