@@ -53,7 +53,7 @@ export class Binding extends Callable {
 				return;
 			}
 
-			if (arguments.length) {
+			if (arguments.length && Object.getOwnPropertyDescriptor(Object.getPrototypeOf(self), "value")?.set) {
 				self.value = v;
 			}
 
