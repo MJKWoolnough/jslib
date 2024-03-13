@@ -1,5 +1,6 @@
 import {attr, child, value} from './dom.js';
 import {Pipe} from './inter.js';
+import {Callable} from './misc.js';
 
 /**
  * This modules contains a Function for creating {@link https://developer.mozilla.org/en-US/docs/Web/API/Attr | Attr} and {@link https://developer.mozilla.org/en-US/docs/Web/API/Text | Text} nodes that update their textContent automatically.
@@ -12,8 +13,13 @@ import {Pipe} from './inter.js';
  */
 /** */
 
+interface BindingFn<T> extends Binding<T> {
+	(): T;
+	(v?: T): T;
+}
+
 interface BindFn {
-	<T>(t: T): Binding<T>;
+	<T>(t: T): BindingFn<T>;
 	(strings: TemplateStringsArray, ...bindings: any[]): ReadOnlyBinding<string>;
 }
 
@@ -33,12 +39,34 @@ const isEventListenerObject = (prop: unknown): prop is EventListenerObject => pr
  *
  * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
  */
-export class Binding<T = string> {
+export class Binding<T = string> extends Callable<(v: T) => T> {
 	#pipe = new Pipe<T>();
 	#value: T;
 	#refs = 0;
 
 	constructor(value: T) {
+		super(function(this: unknown, v: T) {
+			if (v instanceof Event && this instanceof EventTarget && this === v.currentTarget) {
+				const value = self.value;
+
+				if (value instanceof Function) {
+					return value.call(v.currentTarget, v);
+				} else if (isEventListenerObject(value)) {
+					return value.handleEvent(v);
+				}
+
+				return;
+			}
+
+			if (arguments.length) {
+				self.value = v;
+			}
+
+			return self.value;
+		});
+
+		const self = this;
+
 		this.#value = value;
 	}
 
@@ -97,14 +125,6 @@ export class Binding<T = string> {
 		this.#pipe.receive(fn);
 
 		return r;
-	}
-
-	handleEvent(e: Event) {
-		if (this.#value instanceof Function) {
-			this.#value.call(e.currentTarget, e);
-		} else if (isEventListenerObject(this.#value)) {
-			this.#value.handleEvent(e);
-		}
 	}
 
 	/** This method returns a new Binding that transforms the result of the template according to the specified function. */
@@ -187,5 +207,6 @@ export default (<T>(v: T | TemplateStringsArray, first?: any, ...bindings: any[]
 	if (v instanceof Array && first) {
 		return Binding.template(v, first, ...bindings);
 	}
-	return new Binding<T>(v as T);
+
+	return new Binding<T>(v as T) as BindingFn<T>;
 }) as BindFn;

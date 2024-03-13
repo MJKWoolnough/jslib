@@ -1,5 +1,6 @@
 import {attr, child, value} from './dom.js';
 import {Pipe} from './inter.js';
+import {Callable} from './misc.js';
 
 /**
  * This modules contains a Function for creating {@link https://developer.mozilla.org/en-US/docs/Web/API/Attr | Attr} and {@link https://developer.mozilla.org/en-US/docs/Web/API/Text | Text} nodes that update their textContent automatically.
@@ -28,12 +29,34 @@ const isEventListenerObject = prop => prop instanceof Object && prop.handleEvent
  *
  * When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
  */
-export class Binding {
+export class Binding extends Callable {
 	#pipe = new Pipe();
 	#value;
 	#refs = 0;
 
 	constructor(value) {
+		super(function(v) {
+			if (v instanceof Event && this instanceof EventTarget && this === v.currentTarget) {
+				const value = self.value;
+
+				if (value instanceof Function) {
+					return value.call(v.currentTarget, v);
+				} else if (isEventListenerObject(value)) {
+					return value.handleEvent(v);
+				}
+
+				return;
+			}
+
+			if (arguments.length) {
+				self.value = v;
+			}
+
+			return self.value;
+		});
+
+		const self = this;
+
 		this.#value = value;
 	}
 
@@ -92,14 +115,6 @@ export class Binding {
 		this.#pipe.receive(fn);
 
 		return r;
-	}
-
-	handleEvent(e) {
-		if (this.#value instanceof Function) {
-			this.#value.call(e.currentTarget, e);
-		} else if (isEventListenerObject(this.#value)) {
-			this.#value.handleEvent(e);
-		}
 	}
 
 	/** This method returns a new Binding that transforms the result of the template according to the specified function. */
