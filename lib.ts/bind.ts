@@ -15,12 +15,16 @@ import {Callable} from './misc.js';
 
 interface BindingFn<T> extends Binding<T> {
 	(): T;
-	(v?: T): T;
+	(v: T): T;
+}
+
+interface ReadOnlyBindingFn<T> extends ReadOnlyBinding<T> {
+	(): T;
 }
 
 interface BindFn {
 	<T>(t: T): BindingFn<T>;
-	(strings: TemplateStringsArray, ...bindings: any[]): ReadOnlyBinding<string>;
+	(strings: TemplateStringsArray, ...bindings: any[]): ReadOnlyBindingFn<string>;
 }
 
 const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
@@ -134,7 +138,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 
 	/** This method returns a new Binding that transforms the result of the template according to the specified function. */
 	transform<U>(fn: (v: T) => U): ReadOnlyBinding<U> {
-		return this.#handleRef(new ReadOnlyBinding(fn(this.#value)), (n, v) => n.#set(fn(v)), n => n.#refs > 0);
+		return this.#handleRef(new ReadOnlyBinding(fn(this.#value)), (n, v) => n.#set(fn(v)), n => n.#refs > 0) as ReadOnlyBinding<U>;
 	}
 
 	/** This method runs the provided callback whenever the value changes, passing the function the current value. */
@@ -184,7 +188,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 			}
 		}
 
-		return ref;
+		return ref as ReadOnlyBindingFn<string>;
 	}
 }
 
