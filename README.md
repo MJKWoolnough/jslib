@@ -262,8 +262,8 @@ This module directly imports the [dom](#dom), and [inter](#inter) modules.
 
 ### <a name="bind_bind">bind</a>
 ```typescript
-<T extends ToString = ToString>(t: T): Bind<T>;
-(strings: TemplateStringsArray, ...bindings: (Bind | ToString)[]): Binder;
+<T extends ToString = ToString>(t: T): Binding<T>;
+(strings: TemplateStringsArray, ...bindings: (Binding | ToString)[]): Binder;
 ```
 
 This function can be used either as a normal function, binding a single value, or as a template tag function.
@@ -288,6 +288,8 @@ export type Binding<T = string> {
 Objects that extend this type can be used in place of both property values and Children in calls to [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode), as well as the bound element functions from the [html.js](#html) and [svg.js](#svg) modules.
 
 When the value on the class is changed, the values of the properties and the child nodes will update accordingly.
+
+This class implements a function that can take a new value to set the binding value. This function can also be called with no argument to simply get the value of the binding.
 
 The transform method returns a new Binding that transforms the result of the template according to the specified function.
 
