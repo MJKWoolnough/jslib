@@ -70,7 +70,7 @@ export class DataTable extends HTMLElement {
 		amendNode(this.attachShadow({"mode": "closed"}), table([thead(this.#head), this.#body])).adoptedStyleSheets = style;
 	}
 
-	setData(data: Value[][]) {
+	setData(data: Value[][], titles?: string[]) {
 		this.#head.splice(0, this.#head.length);
 		this.#body.splice(0, this.#body.length);
 
@@ -102,7 +102,7 @@ export class DataTable extends HTMLElement {
 
 		for (let i = 0; i < maxCells; i++) {
 			this.#head.push({
-				[child]: th(colName(i+1))
+				[child]: th(titles?.[i] ?? colName(i+1))
 			});
 		}
 	}
