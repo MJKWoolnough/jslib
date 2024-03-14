@@ -1,3 +1,4 @@
+import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
 import {table, tbody, td, tr, ns} from './html.js';
 import {NodeArray} from './nodes.js';
@@ -9,6 +10,18 @@ type Cell = {
 	value: Value;
 }
 
+const style = [
+	new CSS().add({
+		"table": {
+			"border-collapse": "collapse",
+
+			" th, td": {
+				"border": "1px solid #000"
+			}
+		}
+	})
+      ];
+
 export class DataTable extends HTMLElement {
 	#body: NodeArray<NodeArray<Cell>>;
 	constructor() {
@@ -16,7 +29,7 @@ export class DataTable extends HTMLElement {
 
 		this.#body = new NodeArray(tbody());
 
-		amendNode(this.attachShadow({"mode": "closed"}), table(this.#body));
+		amendNode(this.attachShadow({"mode": "closed"}), table(this.#body)).adoptedStyleSheets = style;
 	}
 
 	setData(data: Value[][]) {
