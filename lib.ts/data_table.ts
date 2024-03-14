@@ -1,9 +1,11 @@
-import {bindElement, clearNode} from './dom.js';
-import {tbody, td, tr, ns} from './html.js';
+import {amendNode, bindElement, clearNode} from './dom.js';
+import {slot, table, tbody, td, tr, ns} from './html.js';
 
-export class DataTable extends HTMLTableElement {
+export class DataTable extends HTMLElement {
 	constructor() {
 		super();
+
+		amendNode(this.attachShadow({"mode": "closed"}), table(slot()));
 	}
 
 	setData(data: (string | number | boolean)[][]) {
@@ -11,6 +13,6 @@ export class DataTable extends HTMLTableElement {
 	}
 }
 
-customElements.define("data-table", DataTable, {"extends": "table"});
+customElements.define("data-table", DataTable);
 
 export const datatable = bindElement<DataTable>(ns, "data-table");
