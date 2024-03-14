@@ -10,10 +10,32 @@ type Cell = {
 	value: Value;
 }
 
-const style = [
+const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up} h38 l-19,${(2 * up - 1) * 18} z' fill='%23f00' stroke='%23000' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`,
+      style = [
 	new CSS().add({
 		"table": {
 			"border-collapse": "collapse",
+
+			" th": {
+				"padding": "0.5em 1.5em",
+				"background-color": "#ddd",
+				"cursor": "pointer",
+				"user-select": "none",
+
+				":hover": {
+					"text-decoration": "underline"
+				},
+
+				".s": {
+					"background-repeat": "no-repeat",
+					"background-position": "right 0px bottom 0.5em",
+					"background-size": "1em 1em",
+					"background-image": arrow(1)
+				},
+				".r": {
+					"background-image": arrow(0)
+				}
+			},
 
 			" th, td": {
 				"border": "1px solid #000"
