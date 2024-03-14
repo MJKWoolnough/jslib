@@ -91,6 +91,15 @@ export class DataTable extends HTMLElement {
 			maxCells = Math.max(maxCells, rowArr.length);
 		}
 
+		for (const row of this.#body) {
+			while (row.length < maxCells) {
+				row.push({
+					[child]: td(),
+					value: ""
+				})
+			}
+		}
+
 		for (let i = 0; i < maxCells; i++) {
 			this.#head.push({
 				[child]: th(colName(i+1))
