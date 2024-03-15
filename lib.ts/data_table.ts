@@ -61,6 +61,9 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
 	#body: NodeArray<NodeArray<Cell>>;
+	#sort = -1;
+	#rev = false;
+
 	constructor() {
 		super();
 
@@ -101,8 +104,30 @@ export class DataTable extends HTMLElement {
 		}
 
 		for (let i = 0; i < maxCells; i++) {
+			const h = th({"onclick": () => {
+				if (this.#sort !== i) {
+					if (this.#sort !== -1) {
+						amendNode(this.#head.at(this.#sort)?.[child], {"class": {"r": false, "s": false}});
+					}
+
+					amendNode(h, {"class": ["s"]});
+
+					this.#sort = i;
+					this.#rev = false;
+				} else if (this.#rev) {
+					this.#sort = -1;
+					this.#rev = false;
+
+					amendNode(h, {"class": {"r": false, "s": false}});
+				} else {
+					this.#rev = true;
+
+					amendNode(h, {"class": ["r"]});
+				}
+			      }}, titles?.[i] ?? colName(i+1));
+
 			this.#head.push({
-				[child]: th(titles?.[i] ?? colName(i+1))
+				[child]: h
 			});
 		}
 	}
