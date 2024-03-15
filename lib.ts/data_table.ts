@@ -96,7 +96,7 @@ export class DataTable extends HTMLElement {
 			let i = 0;
 
 			for (const cell of row) {
-				if (sorters.length < i) {
+				if (sorters.length === i) {
 					sorters.push(numberSorter);
 				}
 
