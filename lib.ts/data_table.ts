@@ -40,10 +40,10 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 					"background-repeat": "no-repeat",
 					"background-position": "right 0px bottom 0.5em",
 					"background-size": "1em 1em",
-					"background-image": arrow(1)
+					"background-image": arrow(0)
 				},
 				".r": {
-					"background-image": arrow(0)
+					"background-image": arrow(1)
 				}
 			},
 
