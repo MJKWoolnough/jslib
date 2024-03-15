@@ -74,7 +74,7 @@ export class DataTable extends HTMLElement {
 		this.#head.splice(0, this.#head.length);
 		this.#body.splice(0, this.#body.length);
 
-		let maxCells = 0;
+		let maxCells = titles?.length ?? 0;
 
 		for (const row of data) {
 			const rowArr = new NodeArray<Cell>(tr())
