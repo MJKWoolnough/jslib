@@ -10,6 +10,12 @@ type Cell = {
 	value: Value;
 }
 
+type Row = {
+	[child]: HTMLTableRowElement,
+	cells: NodeArray<Cell>,
+	row: number;
+}
+
 type Header = {
 	[child]: HTMLTableCellElement;
 }
@@ -60,7 +66,7 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
-	#body: NodeArray<NodeArray<Cell>>;
+	#body: NodeArray<Row>;
 	#sort = -1;
 	#rev = false;
 
@@ -81,10 +87,11 @@ export class DataTable extends HTMLElement {
 
 		const parseNum = (a: string) => parseFloat(a || "-Infinity"),
 		      numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
-		      sorters: ((a: string, b: string) => number)[] = [];
+		      sorters: ((a: string, b: string) => number)[] = [],
+		      nullSort = (a: Row, b: Row) => a.row - b.row;
 
 		for (const row of data) {
-			const rowArr = new NodeArray<Cell>(tr())
+			const rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr())
 
 			let i = 0;
 
@@ -105,14 +112,18 @@ export class DataTable extends HTMLElement {
 				});
 			}
 
-			this.#body.push(rowArr);
+			this.#body.push({
+				[child]: rowArr[child],
+				cells: rowArr,
+				row: this.#body.length
+			});
 
 			maxCells = Math.max(maxCells, rowArr.length);
 		}
 
 		for (const row of this.#body) {
-			while (row.length < maxCells) {
-				row.push({
+			while (row.cells.length < maxCells) {
+				row.cells.push({
 					[child]: td(),
 					value: ""
 				})
@@ -128,7 +139,7 @@ export class DataTable extends HTMLElement {
 
 					amendNode(h, {"class": ["s"]});
 
-					this.#body.sort((a: Cell[], b: Cell[]) => sorters[i](a[i].value + "", b[i].value + ""));
+					this.#body.sort((a: Row, b: Row) => sorters[i](a.cells[i].value + "", b.cells[i].value + ""));
 
 					this.#sort = i;
 					this.#rev = false;
@@ -137,6 +148,7 @@ export class DataTable extends HTMLElement {
 					this.#rev = false;
 
 					amendNode(h, {"class": {"r": false, "s": false}});
+					this.#body.sort(nullSort);
 				} else {
 					this.#rev = true;
 
