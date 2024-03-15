@@ -100,7 +100,7 @@ export class DataTable extends HTMLElement {
 					sorters.push(numberSorter);
 				}
 
-				if (typeof cell !== "number" || isNaN(parseNum(cell + ""))) {
+				if (typeof cell !== "number" && isNaN(parseNum(cell + ""))) {
 					sorters[i] = stringSort;
 				}
 
