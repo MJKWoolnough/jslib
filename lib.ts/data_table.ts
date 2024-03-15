@@ -128,6 +128,8 @@ export class DataTable extends HTMLElement {
 
 					amendNode(h, {"class": ["s"]});
 
+					this.#body.sort((a: Cell[], b: Cell[]) => sorters[i](a[i].value + "", b[i].value + ""));
+
 					this.#sort = i;
 					this.#rev = false;
 				} else if (this.#rev) {
