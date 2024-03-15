@@ -1,7 +1,7 @@
 import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
 import {table, tbody, td, th, thead, tr, ns} from './html.js';
-import {NodeArray} from './nodes.js';
+import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
 
@@ -79,10 +79,26 @@ export class DataTable extends HTMLElement {
 
 		let maxCells = titles?.length ?? 0;
 
+		const parseNum = (a: string) => parseFloat(a || "-Infinity"),
+		      numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
+		      sorters: ((a: string, b: string) => number)[] = [];
+
 		for (const row of data) {
 			const rowArr = new NodeArray<Cell>(tr())
 
+			let i = 0;
+
 			for (const cell of row) {
+				if (sorters.length < i) {
+					sorters.push(numberSorter);
+				}
+
+				if (typeof cell !== "number" || isNaN(parseNum(cell + ""))) {
+					sorters[i] = stringSort;
+				}
+
+				i++;
+
 				rowArr.push({
 					[child]: td(cell + ""),
 					value: cell
@@ -123,6 +139,8 @@ export class DataTable extends HTMLElement {
 					this.#rev = true;
 
 					amendNode(h, {"class": ["r"]});
+
+					this.#body.reverse();
 				}
 			      }}, titles?.[i] ?? colName(i+1));
 
