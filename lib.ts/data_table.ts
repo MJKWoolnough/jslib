@@ -92,7 +92,7 @@ export class DataTable extends HTMLElement {
 		      nullSort = (a: Row, b: Row) => a.row - b.row;
 
 		for (const row of data) {
-			const rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr())
+			const rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr());
 
 			let i = 0;
 
