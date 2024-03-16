@@ -168,23 +168,11 @@ export class DataTable extends HTMLElement {
 		const toRet: Value[][] = [];
 
 		if (includeTitles) {
-			const headers: string[] = [];
-
-			for (const header of this.#head) {
-				headers.push(header.title);
-			}
-
-			toRet.push(headers);
+			toRet.push(this.#head.map(h => h.title));
 		}
 
 		for (const row of this.#body) {
-			const rowData: Value[] = [];
-
-			for (const cell of row.cells) {
-				rowData.push(cell.value);
-			}
-
-			toRet.push(rowData);
+			toRet.push(row.cells.map(c => c.value));
 		}
 
 		return toRet;
