@@ -160,6 +160,22 @@ export class DataTable extends HTMLElement {
 			});
 		}
 	}
+
+	export() {
+		const toRet: Value[][] = [];
+
+		for (const row of this.#body) {
+			const rowData: Value[] = [];
+
+			for (const cell of row.cells) {
+				rowData.push(cell.value);
+			}
+
+			toRet.push(rowData);
+		}
+
+		return toRet;
+	}
 }
 
 customElements.define("data-table", DataTable);
