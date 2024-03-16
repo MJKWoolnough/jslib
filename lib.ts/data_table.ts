@@ -18,6 +18,7 @@ type Row = {
 
 type Header = {
 	[child]: HTMLTableCellElement;
+	title: string;
 }
 
 const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up} h38 l-19,${(2 * up - 1) * 18} z' fill='%23f00' stroke='%23000' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`,
@@ -131,7 +132,8 @@ export class DataTable extends HTMLElement {
 		}
 
 		for (let i = 0; i < maxCells; i++) {
-			const h = th({"onclick": () => {
+			const title = titles?.[i] ?? colName(i+1),
+			      h = th({"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], {"class": {"r": false, "s": false}});
 					amendNode(h, {"class": ["s"]});
@@ -153,10 +155,11 @@ export class DataTable extends HTMLElement {
 
 					this.#body.reverse();
 				}
-			      }}, titles?.[i] ?? colName(i+1));
+			      }}, title);
 
 			this.#head.push({
-				[child]: h
+				[child]: h,
+				title
 			});
 		}
 	}
