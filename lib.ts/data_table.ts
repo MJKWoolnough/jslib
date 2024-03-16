@@ -133,10 +133,7 @@ export class DataTable extends HTMLElement {
 		for (let i = 0; i < maxCells; i++) {
 			const h = th({"onclick": () => {
 				if (this.#sort !== i) {
-					if (this.#sort !== -1) {
-						amendNode(this.#head.at(this.#sort)?.[child], {"class": {"r": false, "s": false}});
-					}
-
+					amendNode(this.#head[this.#sort]?.[child], {"class": {"r": false, "s": false}});
 					amendNode(h, {"class": ["s"]});
 
 					this.#body.sort((a: Row, b: Row) => sorters[i](a.cells[i].value + "", b.cells[i].value + ""));
