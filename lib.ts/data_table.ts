@@ -164,8 +164,18 @@ export class DataTable extends HTMLElement {
 		}
 	}
 
-	export() {
+	export(includeTitles = false) {
 		const toRet: Value[][] = [];
+
+		if (includeTitles) {
+			const headers: string[] = [];
+
+			for (const header of this.#head) {
+				headers.push(header.title);
+			}
+
+			toRet.push(headers);
+		}
 
 		for (const row of this.#body) {
 			const rowData: Value[] = [];
