@@ -6008,6 +6008,15 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
 					return n[0]?.num === 1 && n[1]?.num === 2 && n[-1] === undefined;
+				},
+				"maximum index": async () => {
+					type MyNode = {
+						num: number;
+					}
+					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
+					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
+					return n[0]?.num === 1 && n[1]?.num === 2 && n[2] === undefined;
 				}
 			},
 			"as child node": async () => {
