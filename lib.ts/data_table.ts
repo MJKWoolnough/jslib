@@ -1,6 +1,6 @@
 import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
-import {table, tbody, td, th, thead, tr, ns} from './html.js';
+import {ns, table, tbody, td, th, thead, tr} from './html.js';
 import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
