@@ -140,7 +140,7 @@ const getChildNode = n => n instanceof Node ? n : n[node],
 	return undefined;
       },
       proxyObj = {
-	has: (target, name) => pIFn(name, index => index <= target.length) || name in target,
+	has: (target, name) => pIFn(name, index => index < target.length) || name in target,
 	get: (target, name) => pIFn(name, index => target.at(index)) || target[name],
 	set: (target, name, value) => pIFn(name, index => !!target.splice(index, 1, value)) || false,
 	deleteProperty: (target, name) => pIFn(name, index => target.splice(index, 1).length > 0) || delete target[name]

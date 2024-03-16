@@ -179,7 +179,7 @@ const getChildNode = <T extends Item>(n: T) => (n instanceof Node ? n : n[node])
 	return undefined;
       },
       proxyObj = {
-	has: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => index <= target.length) || name in target,
+	has: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => index < target.length) || name in target,
 	get: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => target.at(index)) || (target as any)[name],
 	set: <T extends Item>(target: NodeArray<T>, name: PropertyKey, value: T) => pIFn(name, index => !!target.splice(index, 1, value)) || false,
 	deleteProperty: <T extends Item>(target: NodeArray<T>, name: PropertyKey) => pIFn(name, index => target.splice(index, 1).length > 0) || delete (target as any)[name]
