@@ -133,14 +133,14 @@ const getChildNode = n => n instanceof Node ? n : n[node],
 		return fn(name);
 	} else if (typeof name === "string") {
 		const index = parseInt(name);
-		if (index.toString() === name) {
+		if (index >= 0 && index.toString() === name) {
 			return fn(index);
 		}
 	}
 	return undefined;
       },
       proxyObj = {
-	has: (target, name) => pIFn(name, index => index >= 0 && index <= target.length) || name in target,
+	has: (target, name) => pIFn(name, index => index <= target.length) || name in target,
 	get: (target, name) => pIFn(name, index => target.at(index)) || target[name],
 	set: (target, name, value) => pIFn(name, index => !!target.splice(index, 1, value)) || false,
 	deleteProperty: (target, name) => pIFn(name, index => target.splice(index, 1).length > 0) || delete target[name]
