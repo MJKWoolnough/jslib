@@ -107,12 +107,12 @@ export class DataTable extends HTMLElement {
 		      nullSort = (a: Row, b: Row) => a.row - b.row;
 
 		for (const row of data) {
-			const {class: className = null, style = null, cells} = row instanceof Array ? {cells: row} : row,
-			      rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr({"class": className, style}));
+			const {cells, ...attrs} = row instanceof Array ? {cells: row} : row,
+			      rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr(attrs));
 
 			for (const cell of cells) {
 				const i = rowArr.length,
-				      {value, display = null, class: className = null, style = null} = cell instanceof Object ? cell : {value: cell};
+				      {value, display = null, ...attrs} = cell instanceof Object ? cell : {value: cell};
 
 				if (sorters.length === i) {
 					sorters.push(numberSorter);
@@ -123,7 +123,7 @@ export class DataTable extends HTMLElement {
 				}
 
 				rowArr.push({
-					[child]: td({"class": className, style}, display ?? (cell + "")),
+					[child]: td(attrs, display ?? (cell + "")),
 					value
 				});
 			}
