@@ -94,9 +94,9 @@ export class DataTable extends HTMLElement {
 		for (const row of data) {
 			const rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr());
 
-			let i = 0;
-
 			for (const cell of row) {
+				const i = rowArr.length;
+
 				if (sorters.length === i) {
 					sorters.push(numberSorter);
 				}
@@ -104,8 +104,6 @@ export class DataTable extends HTMLElement {
 				if (typeof cell !== "number" && isNaN(parseNum(cell + ""))) {
 					sorters[i] = stringSort;
 				}
-
-				i++;
 
 				rowArr.push({
 					[child]: td(cell + ""),
