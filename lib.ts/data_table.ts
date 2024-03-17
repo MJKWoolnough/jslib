@@ -129,7 +129,7 @@ export class DataTable extends HTMLElement {
 				}
 
 				rowArr.push({
-					[child]: td(attrs, display ?? (cell + "")),
+					[child]: td(attrs, display ?? (value + "")),
 					value
 				});
 			}
