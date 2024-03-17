@@ -7,15 +7,15 @@ type Value = string | number | boolean;
 
 type CellData = Value | {
 	value: Value;
-	display: string;
-	class: string;
-	style: string | Record<string, string>;
+	display?: string;
+	class?: string;
+	style?: string | Record<string, string>;
 };
 
 type RowData = CellData[] | {
 	cells: CellData[];
-	class: string;
-	style: string | Record<string, string>;
+	class?: string;
+	style?: string | Record<string, string>;
 };
 
 type Data = RowData[];
