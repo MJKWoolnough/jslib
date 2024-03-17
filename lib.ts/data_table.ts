@@ -1,3 +1,4 @@
+import type {PropsObject} from './dom';
 import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
 import {ns, table, tbody, td, th, thead, tr} from './html.js';
@@ -8,15 +9,11 @@ type Value = string | number | boolean;
 type CellData = Value | {
 	value: Value;
 	display?: string;
-	class?: string;
-	style?: string | Record<string, string>;
-};
+} & PropsObject;
 
 type RowData = CellData[] | {
 	cells: CellData[];
-	class?: string;
-	style?: string | Record<string, string>;
-};
+} & PropsObject;
 
 type Data = RowData[];
 
