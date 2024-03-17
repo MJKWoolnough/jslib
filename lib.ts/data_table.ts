@@ -95,7 +95,7 @@ export class DataTable extends HTMLElement {
 		amendNode(this.attachShadow({"mode": "closed"}), table([thead(this.#head), this.#body])).adoptedStyleSheets = style;
 	}
 
-	setData(data: Value[][], titles?: string[]) {
+	setData(data: Data, titles?: string[]) {
 		this.#head.splice(0, this.#head.length);
 		this.#body.splice(0, this.#body.length);
 
@@ -107,22 +107,24 @@ export class DataTable extends HTMLElement {
 		      nullSort = (a: Row, b: Row) => a.row - b.row;
 
 		for (const row of data) {
-			const rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr());
+			const {class: className = null, style = null, cells} = row instanceof Array ? {cells: row} : row,
+			      rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr({"class": className, style}));
 
-			for (const cell of row) {
-				const i = rowArr.length;
+			for (const cell of cells) {
+				const i = rowArr.length,
+				      {value, display = null, class: className = null, style = null} = cell instanceof Object ? cell : {value: cell};
 
 				if (sorters.length === i) {
 					sorters.push(numberSorter);
 				}
 
-				if (typeof cell !== "number" && isNaN(parseNum(cell + ""))) {
+				if (typeof value !== "number" && isNaN(parseNum(cell + ""))) {
 					sorters[i] = stringSort;
 				}
 
 				rowArr.push({
-					[child]: td(cell + ""),
-					value: cell
+					[child]: td({"class": className, style}, display ?? (cell + "")),
+					value
 				});
 			}
 
