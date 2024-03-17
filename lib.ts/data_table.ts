@@ -5,6 +5,21 @@ import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
 
+type CellData = Value | {
+	value: Value;
+	display: string;
+	class: string;
+	style: string | Record<string, string>;
+};
+
+type RowData = CellData[] | {
+	cells: CellData[];
+	class: string;
+	style: string | Record<string, string>;
+};
+
+type Data = RowData[];
+
 type Cell = {
 	[child]: HTMLTableCellElement;
 	value: Value;
