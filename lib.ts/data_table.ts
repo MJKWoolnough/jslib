@@ -17,6 +17,14 @@ type RowData = CellData[] | {
 
 type Data = RowData[];
 
+type HeaderData = string | {
+	header: string;
+	allowNumber?: boolean;
+	allowSort?: boolean;
+} & PropsObject;
+
+type Headers = HeaderData[];
+
 type Cell = {
 	[child]: HTMLTableCellElement;
 	value: Value;
