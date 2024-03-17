@@ -18,7 +18,7 @@ type RowData = CellData[] | {
 type Data = RowData[];
 
 type HeaderData = string | {
-	header: string;
+	value: string;
 	allowNumber?: boolean;
 	allowSort?: boolean;
 } & PropsObject;
@@ -100,7 +100,7 @@ export class DataTable extends HTMLElement {
 		amendNode(this.attachShadow({"mode": "closed"}), table([thead(this.#head), this.#body])).adoptedStyleSheets = style;
 	}
 
-	setData(data: Data, titles?: string[]) {
+	setData(data: Data, titles?: Headers) {
 		this.#head.splice(0, this.#head.length);
 		this.#body.splice(0, this.#body.length);
 
@@ -117,13 +117,14 @@ export class DataTable extends HTMLElement {
 
 			for (const cell of cells) {
 				const i = rowArr.length,
-				      {value, display = null, ...attrs} = cell instanceof Object ? cell : {value: cell};
+				      {value, display = null, ...attrs} = cell instanceof Object ? cell : {value: cell},
+				      title = titles?.[i];
 
 				if (sorters.length === i) {
 					sorters.push(numberSorter);
 				}
 
-				if (typeof value !== "number" && isNaN(parseNum(value + ""))) {
+				if (title instanceof Object && !title.allowNumber || typeof value !== "number" && isNaN(parseNum(value + ""))) {
 					sorters[i] = stringSort;
 				}
 
@@ -152,8 +153,9 @@ export class DataTable extends HTMLElement {
 		}
 
 		for (let i = 0; i < maxCells; i++) {
-			const title = titles?.[i] ?? colName(i+1),
-			      h = th({"onclick": () => {
+			const t = titles?.[i] ?? colName(i+1),
+			      {value, allowNumber: _ = null, allowSort = null, ...attrs} = t instanceof Object ? t : {"value": t},
+			      h = th(allowSort ? Object.assign(Object.assign({}, attrs), {"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], {"class": {"r": false, "s": false}});
 					amendNode(h, {"class": ["s"]});
@@ -175,11 +177,11 @@ export class DataTable extends HTMLElement {
 
 					this.#body.reverse();
 				}
-			      }}, title);
+			      }}) : attrs, value);
 
 			this.#head.push({
 				[child]: h,
-				title
+				"title": value
 			});
 		}
 	}
