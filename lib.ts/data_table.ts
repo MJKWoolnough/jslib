@@ -84,7 +84,10 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 
 	return (r ? colName(q) : (q !== 1 ? colName(q - 1) : "")) + colName(r);
       },
-      layerObjects = (...objs: PropsObject[]) => objs.reduce((o, p) => Object.assign(o, p), {});
+      layerObjects = (...objs: PropsObject[]) => objs.reduce((o, p) => Object.assign(o, p), {}),
+      thPart = {"part": "th"},
+      trPart = {"part": "tr"},
+      tdPart = {"part": "td"};
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
@@ -114,7 +117,7 @@ export class DataTable extends HTMLElement {
 
 		for (const row of data) {
 			const {cells, ...attrs} = row instanceof Array ? {cells: row} : row,
-			      rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr(layerObjects(attrs, {"part": "tr"})));
+			      rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr(layerObjects(attrs, trPart)));
 
 			for (const cell of cells) {
 				const i = rowArr.length,
@@ -130,7 +133,7 @@ export class DataTable extends HTMLElement {
 				}
 
 				rowArr.push({
-					[child]: td(layerObjects(attrs, {"part": "td"}), display ?? (value + "")),
+					[child]: td(layerObjects(attrs, tdPart), display ?? (value + "")),
 					value
 				});
 			}
@@ -147,7 +150,7 @@ export class DataTable extends HTMLElement {
 		for (const row of this.#body) {
 			while (row.cells.length < maxCells) {
 				row.cells.push({
-					[child]: td({"part": "td"}),
+					[child]: td(tdPart),
 					value: ""
 				})
 			}
@@ -156,7 +159,7 @@ export class DataTable extends HTMLElement {
 		for (let i = 0; i < maxCells; i++) {
 			const t = titles?.[i] ?? colName(i+1),
 			      {value, allowNumber: _ = null, allowSort = true, ...attrs} = t instanceof Object ? t : {"value": t},
-			      h = th(layerObjects(attrs, {"part": "th"}, allowSort ? {"onclick": () => {
+			      h = th(layerObjects(attrs, thPart, allowSort ? {"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], {"class": {"r": false, "s": false}});
 					amendNode(h, {"class": ["s"]});
