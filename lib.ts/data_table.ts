@@ -156,7 +156,7 @@ export class DataTable extends HTMLElement {
 		for (let i = 0; i < maxCells; i++) {
 			const t = titles?.[i] ?? colName(i+1),
 			      {value, allowNumber: _ = null, allowSort = null, ...attrs} = t instanceof Object ? t : {"value": t},
-			      h = th(allowSort ? layerObjects(attrs, {"onclick": () => {
+			      h = th(layerObjects(attrs, allowSort ? {"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], {"class": {"r": false, "s": false}});
 					amendNode(h, {"class": ["s"]});
@@ -178,7 +178,7 @@ export class DataTable extends HTMLElement {
 
 					this.#body.reverse();
 				}
-			      }}) : attrs, value);
+			      }} : attrs), value);
 
 			this.#head.push({
 				[child]: h,
