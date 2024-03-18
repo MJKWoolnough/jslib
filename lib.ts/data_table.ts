@@ -114,7 +114,7 @@ export class DataTable extends HTMLElement {
 
 		for (const row of data) {
 			const {cells, ...attrs} = row instanceof Array ? {cells: row} : row,
-			      rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr(attrs));
+			      rowArr = new NodeArray<Cell, HTMLTableRowElement>(tr(layerObjects(attrs, {"part": "tr"})));
 
 			for (const cell of cells) {
 				const i = rowArr.length,
@@ -130,7 +130,7 @@ export class DataTable extends HTMLElement {
 				}
 
 				rowArr.push({
-					[child]: td(attrs, display ?? (value + "")),
+					[child]: td(layerObjects(attrs, {"part": "td"}), display ?? (value + "")),
 					value
 				});
 			}
@@ -147,7 +147,7 @@ export class DataTable extends HTMLElement {
 		for (const row of this.#body) {
 			while (row.cells.length < maxCells) {
 				row.cells.push({
-					[child]: td(),
+					[child]: td({"part": "td"}),
 					value: ""
 				})
 			}
@@ -156,7 +156,7 @@ export class DataTable extends HTMLElement {
 		for (let i = 0; i < maxCells; i++) {
 			const t = titles?.[i] ?? colName(i+1),
 			      {value, allowNumber: _ = null, allowSort = null, ...attrs} = t instanceof Object ? t : {"value": t},
-			      h = th(layerObjects(attrs, allowSort ? {"onclick": () => {
+			      h = th(layerObjects(attrs, {"part": "th"}, allowSort ? {"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], {"class": {"r": false, "s": false}});
 					amendNode(h, {"class": ["s"]});
