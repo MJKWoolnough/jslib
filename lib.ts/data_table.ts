@@ -178,7 +178,7 @@ export class DataTable extends HTMLElement {
 
 					this.#body.reverse();
 				}
-			      }} : attrs), value);
+			      }} : {}), value);
 
 			this.#head.push({
 				[child]: h,
