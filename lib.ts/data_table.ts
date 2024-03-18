@@ -90,7 +90,11 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       tdPart = {"part": "td"},
       unsetSort = {"class": {"r": false, "s": false}},
       setSort = {"class": ["s"]},
-      setReverse = {"class": ["r"]};
+      setReverse = {"class": ["r"]},
+      parseNum = (a: string) => parseFloat(a || "-Infinity"),
+      numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
+      sorters: ((a: string, b: string) => number)[] = [],
+      nullSort = (a: Row, b: Row) => a.row - b.row;
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
@@ -112,11 +116,6 @@ export class DataTable extends HTMLElement {
 		this.#body.splice(0, this.#body.length);
 
 		let maxCells = titles?.length ?? 0;
-
-		const parseNum = (a: string) => parseFloat(a || "-Infinity"),
-		      numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
-		      sorters: ((a: string, b: string) => number)[] = [],
-		      nullSort = (a: Row, b: Row) => a.row - b.row;
 
 		for (const row of data) {
 			const {cells, ...attrs} = row instanceof Array ? {cells: row} : row,
