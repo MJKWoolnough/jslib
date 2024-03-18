@@ -83,7 +83,8 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 	      r = n % 26;
 
 	return (r ? colName(q) : (q !== 1 ? colName(q - 1) : "")) + colName(r);
-      };
+      },
+      layerObjects = (...objs: PropsObject[]) => objs.reduce((o, p) => Object.assign(o, p), {});
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
@@ -155,7 +156,7 @@ export class DataTable extends HTMLElement {
 		for (let i = 0; i < maxCells; i++) {
 			const t = titles?.[i] ?? colName(i+1),
 			      {value, allowNumber: _ = null, allowSort = null, ...attrs} = t instanceof Object ? t : {"value": t},
-			      h = th(allowSort ? Object.assign(Object.assign({}, attrs), {"onclick": () => {
+			      h = th(allowSort ? layerObjects(attrs, {"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], {"class": {"r": false, "s": false}});
 					amendNode(h, {"class": ["s"]});
