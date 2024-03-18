@@ -87,7 +87,10 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       layerObjects = (...objs: PropsObject[]) => objs.reduce((o, p) => Object.assign(o, p), {}),
       thPart = {"part": "th"},
       trPart = {"part": "tr"},
-      tdPart = {"part": "td"};
+      tdPart = {"part": "td"},
+      unsetSort = {"class": {"r": false, "s": false}},
+      setSort = {"class": ["s"]},
+      setReverse = {"class": ["r"]};
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
@@ -161,8 +164,8 @@ export class DataTable extends HTMLElement {
 			      {value, allowNumber: _ = null, allowSort = true, ...attrs} = t instanceof Object ? t : {"value": t},
 			      h = th(layerObjects(attrs, thPart, allowSort ? {"onclick": () => {
 				if (this.#sort !== i) {
-					amendNode(this.#head[this.#sort]?.[child], {"class": {"r": false, "s": false}});
-					amendNode(h, {"class": ["s"]});
+					amendNode(this.#head[this.#sort]?.[child], unsetSort);
+					amendNode(h, setSort);
 
 					this.#body.sort((a: Row, b: Row) => sorters[i](a.cells[i].value + "", b.cells[i].value + ""));
 
@@ -172,12 +175,12 @@ export class DataTable extends HTMLElement {
 					this.#sort = -1;
 					this.#rev = false;
 
-					amendNode(h, {"class": {"r": false, "s": false}});
+					amendNode(h, unsetSort);
 					this.#body.sort(nullSort);
 				} else {
 					this.#rev = true;
 
-					amendNode(h, {"class": ["r"]});
+					amendNode(h, setReverse);
 
 					this.#body.reverse();
 				}
