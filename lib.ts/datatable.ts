@@ -70,6 +70,10 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 
 			" th, td": {
 				"border": "1px solid #000"
+			},
+
+			" tr.p": {
+				"display": "none"
 			}
 		}
 	})
@@ -133,6 +137,16 @@ export class DataTable extends HTMLElement {
 	}
 
 	#setPage() {
+		const start = this.#page * this.#perPage,
+		      end = (this.#page + 1) * this.#perPage;
+
+		let num = 0;
+
+		for (const row of this.#body) {
+			amendNode(row[child], {"class": {"p": num < start || num >= end}});
+
+			num++;
+		}
 	}
 
 	static get observedAttributes() {
@@ -211,6 +225,8 @@ export class DataTable extends HTMLElement {
 
 					this.#body.reverse();
 				}
+
+				this.#setPage();
 			      }} : {}), value);
 
 			this.#head.push({
@@ -218,6 +234,8 @@ export class DataTable extends HTMLElement {
 				"title": value
 			});
 		}
+
+		this.#setPage();
 	}
 
 	export(includeTitles = false) {
