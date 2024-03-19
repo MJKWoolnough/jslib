@@ -369,7 +369,9 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 	"([minimised]),>div:nth-child(1),([hide-titlebar])>div:nth-child(2),([hide-close])>div:nth-child(2)>div>button:nth-of-type(1),([hide-maximise])>div:nth-child(2)>div>button:nth-of-type(2),([hide-minimise])>div:nth-child(2)>div>button:nth-of-type(3),([window-hide])>div:nth-child(2)>div>button:nth-of-type(3)": {
 		"display": "none"
 	}
-      })];
+      })],
+      desktopObservedAttrs = Object.freeze(["slot"]),
+      windowObservedAttrs = Object.freeze(["maximised", "window-icon", "window-title"]);
 
 let focusingWindow: WindowElement | null = null, dragging = false;
 
@@ -558,7 +560,7 @@ export class DesktopElement extends HTMLElement {
 		}
 	}
 	static get observedAttributes() {
-		return ["slot"];
+		return desktopObservedAttrs;
 	}
 }
 
@@ -674,7 +676,7 @@ export class WindowElement extends BaseElement {
 		}
 	}
 	static get observedAttributes() {
-		return ["maximised", "window-icon", "window-title"];
+		return windowObservedAttrs;
 	}
 	/**
 	 * This method adds a `Window` as a child. If there is already a child, it is added as a child of that `Window`.
