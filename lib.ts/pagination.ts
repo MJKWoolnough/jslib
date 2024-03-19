@@ -114,7 +114,7 @@ export class Pagination extends HTMLElement {
 		if ("realValue" in attribute) {
 			const rv = attribute["realValue"];
 
-			if (rv instanceof Function &&attribute.name === "href") {
+			if (rv instanceof Function && attribute.name === "href") {
 				this.#hrefBase = rv as Href;
 
 				this.#build();
