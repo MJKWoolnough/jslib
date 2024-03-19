@@ -130,7 +130,7 @@ export class DataTable extends HTMLElement {
 
 			break;
 		case observedAttr[1]:
-			this.#perPage = safeVal;
+			this.#perPage = safeVal || Infinity;
 		}
 
 		this.#setPage();
