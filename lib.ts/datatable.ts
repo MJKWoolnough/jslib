@@ -251,6 +251,32 @@ export class DataTable extends HTMLElement {
 
 		return toRet;
 	}
+
+	exportPage(includeTitles = false) {
+		const toRet: Value[][] = [],
+		      start = this.#page * this.#perPage,
+		      end = (this.#page + 1) * this.#perPage;
+
+		if (includeTitles) {
+			toRet.push(this.#head.map(h => h.title));
+		}
+
+		let num = 0;
+
+		for (const row of this.#body) {
+			if (num > end) {
+				break;
+			}
+
+			if (num >= start) {
+				toRet.push(row.cells.map(c => c.value));
+			}
+
+			num++;
+		}
+
+		return toRet;
+	}
 }
 
 customElements.define("data-table", DataTable);
