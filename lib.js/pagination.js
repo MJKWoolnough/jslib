@@ -29,7 +29,8 @@ const link = (page, href, contents) => {
       lang = {
 	"NEXT": "Next",
 	"PREV": "Previous"
-      };
+      },
+      observedAttrs = Object.freeze(["href", "end", "surround", "total", "page"]);
 
 /**
  * This class represents the pagination custom element.
@@ -104,7 +105,7 @@ export class Pagination extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["href", "end", "surround", "total", "page"];
+		return observedAttrs;
 	}
 
 	setAttributeNode(attribute) {
