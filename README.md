@@ -2013,6 +2013,7 @@ CSS part attributes have been set on the various elements of Pagination to make 
 
 |  Part     |  Description  |
 |-----------|---------------|
+| active    | A 'page' element that can be clicked to change the page number. |
 | base      | The base HTMLUListElement. |
 | current   | The currently selected page. Will also be a 'page'. |
 | page      | An HTMLLIElement that contains the link and/or text for a page. |
