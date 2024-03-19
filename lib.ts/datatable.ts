@@ -94,13 +94,16 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       parseNum = (a: string) => parseFloat(a || "-Infinity"),
       numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
       sorters: ((a: string, b: string) => number)[] = [],
-      nullSort = (a: Row, b: Row) => a.row - b.row;
+      nullSort = (a: Row, b: Row) => a.row - b.row,
+      observedAttr = Object.freeze(["page", "perPage"]);
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
 	#body: NodeArray<Row>;
 	#sort = -1;
 	#rev = false;
+	#page = 0;
+	#perPage = Infinity;
 
 	constructor() {
 		super();
@@ -109,6 +112,31 @@ export class DataTable extends HTMLElement {
 		this.#body = new NodeArray(tbody());
 
 		amendNode(this.attachShadow({"mode": "closed"}), table([thead(this.#head), this.#body])).adoptedStyleSheets = style;
+	}
+
+	attributeChangedCallback(name: string, _: string | null, newValue: string | null) {
+		const val = parseInt(newValue ?? "0"),
+		      safeVal = isNaN(val) || val < 0 ? 0 : val;
+
+		switch (name) {
+		default:
+			return;
+		case observedAttr[0]:
+			this.#page = safeVal;
+
+			break;
+		case observedAttr[1]:
+			this.#perPage = safeVal;
+		}
+
+		this.#setPage();
+	}
+
+	#setPage() {
+	}
+
+	static get observedAttributes() {
+		return observedAttr;
 	}
 
 	setData(data: Data, titles?: Headers) {
