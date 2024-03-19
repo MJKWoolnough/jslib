@@ -12,10 +12,10 @@ import {a, li, ns, ul} from './html.js';
 
 const link = (page, href, contents) => {
 	if (href !== null) {
-		return li({"part": "page"}, a({"href": href instanceof Function ? href(page) : href + page, "data-page": page}, contents ?? (page + 1) + ""));
+		return li({"part": "active page"}, a({"href": href instanceof Function ? href(page) : href + page, "data-page": page}, contents ?? (page + 1) + ""));
 	}
 
-	return li({"part": "page", "data-page": page}, contents ?? (page + 1) + "");
+	return li({"part": "active page", "data-page": page}, contents ?? (page + 1) + "");
       },
       processPaginationSection = (ret, currPage, from, to, href) => {
 	if (ret.length !== 0) {
@@ -154,9 +154,9 @@ export class Pagination extends HTMLElement {
 		}
 
 		clearNode(this.#base, [
-			amendNode(currPage !== 0 ? link(currPage - 1, this.#hrefBase, lang["PREV"]) : li(lang["PREV"]), {"part": "page prev"}),
+			currPage !== 0 ? amendNode(link(currPage - 1, this.#hrefBase, lang["PREV"]), {"part": "active page prev"}) : li({"part": "page prev"}, lang["PREV"]),
 			pageLinks,
-			amendNode(currPage !== total ? link(currPage + 1, this.#hrefBase, lang["NEXT"]) : li(lang["NEXT"]), {"part": "page next"})
+			currPage !== total ? amendNode(link(currPage + 1, this.#hrefBase, lang["NEXT"]), {"part": "active page next"}) : li({"part": "page next"}, lang["NEXT"]),
 		]);
 	}
 
