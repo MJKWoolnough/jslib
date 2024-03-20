@@ -1,7 +1,7 @@
 import type {PropsObject} from './dom';
 import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
-import {div, ns, table, tbody, td, th, thead, tr} from './html.js';
+import {li, ns, table, tbody, td, th, thead, tr, ul} from './html.js';
 import {pushAndReturn} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
@@ -76,6 +76,22 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 			" tr.p": {
 				"display": "none"
 			}
+		},
+		":host > ul": {
+			"position": "absolute",
+			"list-style": "none",
+			"padding": "0.5em",
+			"outline": "none",
+			"border": "2px solid #000",
+			"background-color": "#f8f8f8",
+
+			":not(:focus-within)": {
+				"transform": "scale(0)",
+
+				" *": {
+					"display": "none"
+				}
+			}
 		}
 	})
       ],
@@ -102,7 +118,7 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       nullSort = (a: Row, b: Row) => a.row - b.row,
       observedAttr = Object.freeze(["page", "perPage"]),
       makeFilterDiv = (_parent: Node, _i: number) => {
-	return div();
+	return ul(li("Filter"));
       };
 
 export class DataTable extends HTMLElement {
