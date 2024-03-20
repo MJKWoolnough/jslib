@@ -1,7 +1,7 @@
 import type {PropsObject} from './dom';
 import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
-import {li, ns, table, tbody, td, th, thead, tr, ul} from './html.js';
+import {div, li, ns, table, tbody, td, th, thead, tr, ul} from './html.js';
 import {setAndReturn} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
@@ -45,19 +45,24 @@ type Header = {
 const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up}h38l-19,${(2 * up - 1) * 18}z' fill='%23f00' stroke='%23000' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`,
       style = [
 	new CSS().add({
-		":host>ul": {
-			"position": "absolute",
-			"list-style": "none",
-			"padding": "0.5em",
-			"outline": "none",
-			"border": "2px solid #000",
-			"background-color": "#f8f8f8",
+		":host>div": {
+			"position": "relative",
 
-			":not(:focus-within)": {
-				"transform": "scale(0)",
+			">ul": {
+				"position": "absolute",
+				"list-style": "none",
+				"padding": "0.5em",
+				"outline": "none",
+				"border": "2px solid #000",
+				"background-color": "#f8f8f8",
+				"margin": 0,
 
-				" *": {
-					"display": "none"
+				":not(:focus-within)": {
+					"transform": "scale(0)",
+
+					" *": {
+						"display": "none"
+					}
 				}
 			}
 		},
@@ -141,7 +146,10 @@ export class DataTable extends HTMLElement {
 		this.#head = new NodeArray(tr());
 		this.#body = new NodeArray(tbody());
 
-		amendNode(this.#filters = this.attachShadow({"mode": "closed"}), table([thead(this.#head), this.#body])).adoptedStyleSheets = style;
+		amendNode(this.attachShadow({"mode": "closed"}), [
+			this.#filters = div(),
+			table([thead(this.#head), this.#body])
+		]).adoptedStyleSheets = style;
 	}
 
 	attributeChangedCallback(name: string, _: string | null, newValue: string | null) {
@@ -256,7 +264,16 @@ export class DataTable extends HTMLElement {
 			      }} : {}, {"oncontextmenu": (e: MouseEvent) => {
 				e.preventDefault();
 
-				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, makeFilter(this.#filters, i)), {"style": `left:${e.clientX}px;top:${e.clientY}px`}).focus();
+				let {clientX, clientY} = e,
+				    p = this as HTMLElement | null;
+
+				while (p) {
+					clientX -= p.offsetLeft;
+					clientY -= p.offsetTop;
+					p = p.offsetParent as HTMLElement | null;
+				}
+
+				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, makeFilter(this.#filters, i)), {"style": `left:${clientX}px;top:${clientY}px`}).focus();
 			      }}), value);
 
 			this.#head.push({
