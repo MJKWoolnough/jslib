@@ -1,7 +1,7 @@
 import type {PropsObject} from './dom';
 import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
-import {div, li, ns, table, tbody, td, th, thead, tr, ul} from './html.js';
+import {button, div, input, label, li, ns, table, tbody, td, th, thead, tr, ul} from './html.js';
 import {setAndReturn} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
@@ -120,12 +120,20 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       parseNum = (a: string) => parseFloat(a || "-Infinity"),
       numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
       nullSort = (a: Row, b: Row) => a.row - b.row,
-      observedAttr = Object.freeze(["page", "perPage"]);
+      observedAttr = Object.freeze(["page", "perPage"]),
+      isBlankFilter = (s: string) => !s,
+      isNotBlankFilter = (s: string) => !!s,
+      regexpSpecials = "\\/.*+?|()[]{}".split(""),
+      makeToggleButton = (c: string, title: string, fn: (v: boolean) => void) => button({"class": "t", title, "onclick": function(this: HTMLButtonElement) {
+	fn(!this.classList.toggle("t"));
+      }}, c)
+
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
 	#body: NodeArray<Row>;
-	#filters: Node;
+	#filtersElm: Node;
+	#filters = new Map<number, Function>();
 	#sort = -1;
 	#rev = false;
 	#page = 0;
@@ -140,7 +148,7 @@ export class DataTable extends HTMLElement {
 		this.#body = new NodeArray(tbody());
 
 		amendNode(this.attachShadow({"mode": "closed"}), [
-			this.#filters = div(),
+			this.#filtersElm = div(),
 			table([thead(this.#head), this.#body])
 		]).adoptedStyleSheets = style;
 	}
@@ -278,12 +286,99 @@ export class DataTable extends HTMLElement {
 		this.#setPage();
 	}
 
-	#makeFilter = (i: number) => {
-		const filter = ul({"tabindex": "-1"}, li("Filter " + i));
+	#runFilters() {
+	}
 
-		amendNode(this.#filters, filter);
+	#makeFilter = (n: number) => {
+		let pre = false,
+		    post = false,
+		    text = "",
+		    caseInsensitive = false,
+		    re = new RegExp(""),
+		    min = -Infinity,
+		    max = Infinity;
 
-		return filter;
+		const textFilter = (s: string) => re.test(s),
+		      setTextFilter = () => {
+			l.checked = true;
+			re = new RegExp((pre ? "^" : "") + regexpSpecials.reduce((text, c) => text.replaceAll(c, "\\" + c), text) + (post ? "$" : ""), caseInsensitive ? "i" : "");
+			this.#filters.set(n, textFilter);
+			this.#runFilters();
+		      },
+		      numberFilter = (s: string) => {
+			const n = parseFloat(s);
+
+			return min <= n && n <= max || min === -Infinity && max === Infinity;
+		      },
+		      setNumberFilter = () => {
+			l.checked = true;
+			this.#filters.set(n, numberFilter);
+			this.#runFilters();
+		      },
+		      l = input({"type": "radio", "name": "F_"+n, "checked": "", "onclick": this.#sorters[n] === stringSort ? setTextFilter : setNumberFilter}),
+		      f = ul({"class": "F", "tabindex": "-1", "onkeydown": (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				(document.activeElement as HTMLElement | null)?.blur();
+			}
+		      }}, [
+			li([
+				l,
+				this.#sorters[n] === stringSort ? [
+					makeToggleButton("^", "Starts With", v => {
+						pre = v;
+						setTextFilter();
+					}),
+					input({"type": "text", "oninput": function(this: HTMLInputElement) {
+						text = this.value;
+						setTextFilter();
+					}}),
+					makeToggleButton("$", "Ends With", v => {
+						post = v;
+						setTextFilter();
+					}),
+					makeToggleButton("i", "Case Sensitivity", v => {
+						caseInsensitive = v;
+						setTextFilter();
+					})
+				] : [
+					input({"oninput": function(this: HTMLInputElement) {
+						min = parseFloat(this.value);
+						if (isNaN(min)) {
+							min = -Infinity;
+						}
+
+						setNumberFilter();
+					}}),
+					" ≤ x ≤ ",
+					input({"oninput": function(this: HTMLInputElement) {
+						max = parseFloat(this.value);
+						if (isNaN(max)) {
+							max = Infinity;
+						}
+
+						setNumberFilter();
+					}})
+				]
+			]),
+			li([
+				input({"type": "radio", "name": "F_"+n, "id": `F_${n}_1`, "onclick": () => {
+					this.#filters.set(n, isNotBlankFilter);
+					this.#runFilters();
+				}}),
+				label({"for": `F_${n}_1`}, "Remove Blank")
+			]),
+			li([
+				input({"type": "radio", "name": "F_"+n, "id": `F_${n}_2`, "onclick": () => {
+					this.#filters.set(n, isBlankFilter);
+					this.#runFilters();
+				}}),
+				label({"for": `F_${n}_2`}, "Only Blank")
+			])
+		      ]);
+
+		amendNode(this.#filtersElm, f);
+
+		return f;
 	}
 
 	export(includeTitles = false) {
