@@ -239,23 +239,11 @@ export class DataTable extends HTMLElement {
 	}
 
 	export(includeTitles = false) {
-		const toRet: Value[][] = [];
-
-		if (includeTitles) {
-			toRet.push(this.#head.map(h => h.title));
-		}
-
-		for (const row of this.#body) {
-			toRet.push(row.cells.map(c => c.value));
-		}
-
-		return toRet;
+		return this.#export(includeTitles);
 	}
 
-	exportPage(includeTitles = false) {
-		const toRet: Value[][] = [],
-		      start = this.#page * this.#perPage,
-		      end = (this.#page + 1) * this.#perPage;
+	#export(includeTitles = false, start = 0, end = Infinity) {
+		const toRet: Value[][] = [];
 
 		if (includeTitles) {
 			toRet.push(this.#head.map(h => h.title));
@@ -276,6 +264,10 @@ export class DataTable extends HTMLElement {
 		}
 
 		return toRet;
+	}
+
+	exportPage(includeTitles = false) {
+		return this.#export(includeTitles, this.#page * this.#perPage, (this.#page + 1) * this.#perPage);
 	}
 }
 
