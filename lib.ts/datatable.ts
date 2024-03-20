@@ -119,7 +119,6 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       setReverse = {"class": ["r"]},
       parseNum = (a: string) => parseFloat(a || "-Infinity"),
       numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
-      sorters: ((a: string, b: string) => number)[] = [],
       nullSort = (a: Row, b: Row) => a.row - b.row,
       observedAttr = Object.freeze(["page", "perPage"]);
 
@@ -132,6 +131,7 @@ export class DataTable extends HTMLElement {
 	#page = 0;
 	#perPage = Infinity;
 	#filterList = new Map<number, HTMLElement>();
+	#sorters: ((a: string, b: string) => number)[] = [];
 
 	constructor() {
 		super();
@@ -195,12 +195,12 @@ export class DataTable extends HTMLElement {
 				      {value, display = null, ...attrs} = cell instanceof Object ? cell : {value: cell},
 				      title = titles?.[i];
 
-				if (sorters.length === i) {
-					sorters.push(numberSorter);
+				if (this.#sorters.length === i) {
+					this.#sorters.push(numberSorter);
 				}
 
 				if (title instanceof Object && !title.allowNumber || typeof value !== "number" && isNaN(parseNum(value + ""))) {
-					sorters[i] = stringSort;
+					this.#sorters[i] = stringSort;
 				}
 
 				rowArr.push({
@@ -235,7 +235,7 @@ export class DataTable extends HTMLElement {
 					amendNode(this.#head[this.#sort]?.[child], unsetSort);
 					amendNode(h, setSort);
 
-					this.#body.sort((a: Row, b: Row) => sorters[i](a.cells[i].value + "", b.cells[i].value + ""));
+					this.#body.sort((a: Row, b: Row) => this.#sorters[i](a.cells[i].value + "", b.cells[i].value + ""));
 
 					this.#sort = i;
 					this.#rev = false;
