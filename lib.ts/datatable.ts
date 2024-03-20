@@ -2,7 +2,7 @@ import type {PropsObject} from './dom';
 import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
 import {li, ns, table, tbody, td, th, thead, tr, ul} from './html.js';
-import {pushAndReturn} from './misc.js';
+import {setAndReturn} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
@@ -129,7 +129,7 @@ export class DataTable extends HTMLElement {
 	#rev = false;
 	#page = 0;
 	#perPage = Infinity;
-	#filterList: HTMLElement[] = [];
+	#filterList = new Map<number, HTMLElement>();
 
 	constructor() {
 		super();
@@ -252,7 +252,7 @@ export class DataTable extends HTMLElement {
 			      }} : {}, {"oncontextmenu": (e: MouseEvent) => {
 				e.preventDefault();
 
-				amendNode(this.#filterList[i] ?? pushAndReturn(this.#filterList, makeFilterDiv(this.#filters, i)), {"style": `left:${e.clientX}px;top:${e.clientY}px`}).focus();
+				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList, i, makeFilterDiv(this.#filters, i)), {"style": `left:${e.clientX}px;top:${e.clientY}px`}).focus();
 			      }}), value);
 
 			this.#head.push({
