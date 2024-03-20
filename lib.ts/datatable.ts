@@ -1,7 +1,8 @@
 import type {PropsObject} from './dom';
 import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
-import {ns, table, tbody, td, th, thead, tr} from './html.js';
+import {div, ns, table, tbody, td, th, thead, tr} from './html.js';
+import {pushAndReturn} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
@@ -99,15 +100,20 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
       sorters: ((a: string, b: string) => number)[] = [],
       nullSort = (a: Row, b: Row) => a.row - b.row,
-      observedAttr = Object.freeze(["page", "perPage"]);
+      observedAttr = Object.freeze(["page", "perPage"]),
+      makeFilterDiv = (_parent: Node, _i: number) => {
+	return div();
+      };
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
 	#body: NodeArray<Row>;
+	#filters: Node;
 	#sort = -1;
 	#rev = false;
 	#page = 0;
 	#perPage = Infinity;
+	#filterList: HTMLElement[] = [];
 
 	constructor() {
 		super();
@@ -115,7 +121,7 @@ export class DataTable extends HTMLElement {
 		this.#head = new NodeArray(tr());
 		this.#body = new NodeArray(tbody());
 
-		amendNode(this.attachShadow({"mode": "closed"}), table([thead(this.#head), this.#body])).adoptedStyleSheets = style;
+		amendNode(this.#filters = this.attachShadow({"mode": "closed"}), table([thead(this.#head), this.#body])).adoptedStyleSheets = style;
 	}
 
 	attributeChangedCallback(name: string, _: string | null, newValue: string | null) {
@@ -227,7 +233,11 @@ export class DataTable extends HTMLElement {
 				}
 
 				this.#setPage();
-			      }} : {}), value);
+			      }} : {}, {"oncontextmenu": (e: MouseEvent) => {
+				e.preventDefault();
+
+				amendNode(this.#filterList[i] ?? pushAndReturn(this.#filterList, makeFilterDiv(this.#filters, i)), {"style": `left:${e.clientX}px;top:${e.clientY}px`}).focus();
+			      }}), value);
 
 			this.#head.push({
 				[child]: h,
