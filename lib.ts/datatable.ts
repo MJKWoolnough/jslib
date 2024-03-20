@@ -121,14 +121,7 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
       sorters: ((a: string, b: string) => number)[] = [],
       nullSort = (a: Row, b: Row) => a.row - b.row,
-      observedAttr = Object.freeze(["page", "perPage"]),
-      makeFilter = (parent: Node, i: number) => {
-	const filter = ul({"tabindex": "-1"}, li("Filter " + i));
-
-	amendNode(parent, filter);
-
-	return filter;
-      };
+      observedAttr = Object.freeze(["page", "perPage"]);
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
@@ -273,7 +266,7 @@ export class DataTable extends HTMLElement {
 					p = p.offsetParent as HTMLElement | null;
 				}
 
-				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, makeFilter(this.#filters, i)), {"style": `left:${clientX}px;top:${clientY}px`}).focus();
+				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, this.#makeFilter(i)), {"style": `left:${clientX}px;top:${clientY}px`}).focus();
 			      }}), value);
 
 			this.#head.push({
@@ -283,6 +276,14 @@ export class DataTable extends HTMLElement {
 		}
 
 		this.#setPage();
+	}
+
+	#makeFilter = (i: number) => {
+		const filter = ul({"tabindex": "-1"}, li("Filter " + i));
+
+		amendNode(this.#filters, filter);
+
+		return filter;
 	}
 
 	export(includeTitles = false) {
