@@ -45,6 +45,22 @@ type Header = {
 const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up}h38l-19,${(2 * up - 1) * 18}z' fill='%23f00' stroke='%23000' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`,
       style = [
 	new CSS().add({
+		":host>ul": {
+			"position": "absolute",
+			"list-style": "none",
+			"padding": "0.5em",
+			"outline": "none",
+			"border": "2px solid #000",
+			"background-color": "#f8f8f8",
+
+			":not(:focus-within)": {
+				"transform": "scale(0)",
+
+				" *": {
+					"display": "none"
+				}
+			}
+		},
 		"table": {
 			"border-collapse": "collapse",
 
@@ -76,22 +92,6 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 			" tr.p": {
 				"display": "none"
 			}
-		},
-		":host > ul": {
-			"position": "absolute",
-			"list-style": "none",
-			"padding": "0.5em",
-			"outline": "none",
-			"border": "2px solid #000",
-			"background-color": "#f8f8f8",
-
-			":not(:focus-within)": {
-				"transform": "scale(0)",
-
-				" *": {
-					"display": "none"
-				}
-			}
 		}
 	})
       ],
@@ -117,8 +117,12 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       sorters: ((a: string, b: string) => number)[] = [],
       nullSort = (a: Row, b: Row) => a.row - b.row,
       observedAttr = Object.freeze(["page", "perPage"]),
-      makeFilterDiv = (_parent: Node, _i: number) => {
-	return ul(li("Filter"));
+      makeFilter = (parent: Node, i: number) => {
+	const filter = ul({"tabindex": "-1"}, li("Filter " + i));
+
+	amendNode(parent, filter);
+
+	return filter;
       };
 
 export class DataTable extends HTMLElement {
@@ -252,7 +256,7 @@ export class DataTable extends HTMLElement {
 			      }} : {}, {"oncontextmenu": (e: MouseEvent) => {
 				e.preventDefault();
 
-				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList, i, makeFilterDiv(this.#filters, i)), {"style": `left:${e.clientX}px;top:${e.clientY}px`}).focus();
+				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, makeFilter(this.#filters, i)), {"style": `left:${e.clientX}px;top:${e.clientY}px`}).focus();
 			      }}), value);
 
 			this.#head.push({
