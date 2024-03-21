@@ -35,6 +35,7 @@ type Row = {
 	[child]: HTMLTableRowElement,
 	cells: NodeArray<Cell>,
 	row: number;
+	f: boolean;
 }
 
 type Header = {
@@ -186,7 +187,9 @@ export class DataTable extends HTMLElement {
 		for (const row of this.#body) {
 			amendNode(row[child], {"class": {"p": num < start || num >= end}});
 
-			num++;
+			if (!row.f) {
+				num++;
+			}
 		}
 	}
 
@@ -226,7 +229,8 @@ export class DataTable extends HTMLElement {
 			this.#body.push({
 				[child]: rowArr[child],
 				cells: rowArr,
-				row: this.#body.length
+				row: this.#body.length,
+				f: false
 			});
 
 			maxCells = Math.max(maxCells, rowArr.length);
@@ -294,18 +298,20 @@ export class DataTable extends HTMLElement {
 
 	#runFilters() {
 		for (const row of this.#body) {
-			let f = false;
+			row.f = false;
 
 			for (const [col, filter] of this.#filters) {
 				if (!filter(row.cells[col].value)) {
-					f = true;
+					row.f = true;
 
 					break;
 				}
 			}
 
-			amendNode(row[child], {"class": {f}});
+			amendNode(row[child], {"class": {"f": row.f}});
 		}
+
+		this.#setPage();
 	}
 
 	#makeFilter = (n: number) => {
