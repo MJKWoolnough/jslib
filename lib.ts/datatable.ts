@@ -160,6 +160,18 @@ export class DataTable extends HTMLElement {
 		]).adoptedStyleSheets = style;
 	}
 
+	get totalRows() {
+		let count = 0;
+
+		for (const row of this.#body) {
+			if (!row.f) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	attributeChangedCallback(name: string, _: string | null, newValue: string | null) {
 		const val = parseInt(newValue ?? "0"),
 		      safeVal = isNaN(val) || val < 0 ? 0 : val;
