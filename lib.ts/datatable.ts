@@ -428,7 +428,9 @@ export class DataTable extends HTMLElement {
 				toRet.push(row.cells.map(c => c.value));
 			}
 
-			num++;
+			if (!row.f) {
+				num++;
+			}
 		}
 
 		return toRet;
