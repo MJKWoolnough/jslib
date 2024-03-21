@@ -98,8 +98,10 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 				"border": "1px solid #000"
 			},
 
-			" tr.p": {
-				"display": "none"
+			" tr": {
+				".p,.f": {
+					"display": "none"
+				}
 			}
 		}
 	})
@@ -291,6 +293,19 @@ export class DataTable extends HTMLElement {
 	}
 
 	#runFilters() {
+		for (const row of this.#body) {
+			let f = false;
+
+			for (const [col, filter] of this.#filters) {
+				if (!filter(row.cells[col].value)) {
+					f = true;
+
+					break;
+				}
+			}
+
+			amendNode(row[child], {"class": {f}});
+		}
 	}
 
 	#makeFilter = (n: number) => {
