@@ -22,6 +22,7 @@ type HeaderData = string | {
 	value: string;
 	allowNumber?: boolean;
 	allowSort?: boolean;
+	allowFilter?: boolean;
 } & PropsObject;
 
 type Headers = HeaderData[];
@@ -259,7 +260,7 @@ export class DataTable extends HTMLElement {
 
 		for (let i = 0; i < maxCells; i++) {
 			const t = titles?.[i] ?? colName(i+1),
-			      {value, allowNumber: _ = null, allowSort = true, ...attrs} = t instanceof Object ? t : {"value": t},
+			      {value, allowNumber: _ = null, allowSort = true, allowFilter = true, ...attrs} = t instanceof Object ? t : {"value": t},
 			      h = th(layerObjects(attrs, thPart, allowSort ? {"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], unsetSort);
@@ -284,7 +285,7 @@ export class DataTable extends HTMLElement {
 				}
 
 				this.#setPage();
-			      }} : {}, {"oncontextmenu": (e: MouseEvent) => {
+			      }} : {}, allowFilter ? {"oncontextmenu": (e: MouseEvent) => {
 				e.preventDefault();
 
 				let {clientX, clientY} = e,
@@ -297,7 +298,7 @@ export class DataTable extends HTMLElement {
 				}
 
 				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, this.#makeFilter(i)), {"style": `left:${clientX}px;top:${clientY}px`}).focus();
-			      }}), value);
+			      }} : {}), value);
 
 			this.#head.push({
 				[child]: h,
