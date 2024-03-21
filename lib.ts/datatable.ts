@@ -297,7 +297,11 @@ export class DataTable extends HTMLElement {
 	}
 
 	#runFilters() {
+		let changed = false;
+
 		for (const row of this.#body) {
+			const old = row.f;
+
 			row.f = false;
 
 			for (const [col, filter] of this.#filters) {
@@ -308,10 +312,16 @@ export class DataTable extends HTMLElement {
 				}
 			}
 
+			changed ||= old !== row.f;
+
 			amendNode(row[child], {"class": {"f": row.f}});
 		}
 
 		this.#setPage();
+
+		if (changed) {
+			this.dispatchEvent(new Event("change"));
+		}
 	}
 
 	#makeFilter = (n: number) => {
