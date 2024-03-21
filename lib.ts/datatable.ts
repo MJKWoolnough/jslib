@@ -23,6 +23,8 @@ type HeaderData = string | {
 	allowNumber?: boolean;
 	allowSort?: boolean;
 	allowFilter?: boolean;
+	allowEmptyFilter?: boolean;
+	allowNonEmptyFilter?: boolean;
 } & PropsObject;
 
 type Headers = HeaderData[];
@@ -260,7 +262,7 @@ export class DataTable extends HTMLElement {
 
 		for (let i = 0; i < maxCells; i++) {
 			const t = titles?.[i] ?? colName(i+1),
-			      {value, allowNumber: _ = null, allowSort = true, allowFilter = true, ...attrs} = t instanceof Object ? t : {"value": t},
+			      {value, allowNumber: _ = null, allowSort = true, allowFilter = true, allowEmptyFilter = true, allowNonEmptyFilter = true, ...attrs} = t instanceof Object ? t : {"value": t},
 			      h = th(layerObjects(attrs, thPart, allowSort ? {"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], unsetSort);
@@ -297,7 +299,7 @@ export class DataTable extends HTMLElement {
 					p = p.offsetParent as HTMLElement | null;
 				}
 
-				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, this.#makeFilter(i)), {"style": `left:${clientX}px;top:${clientY}px`}).focus();
+				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, this.#makeFilter(i, allowEmptyFilter, allowNonEmptyFilter)), {"style": `left:${clientX}px;top:${clientY}px`}).focus();
 			      }} : {}), value);
 
 			this.#head.push({
@@ -337,7 +339,7 @@ export class DataTable extends HTMLElement {
 		}
 	}
 
-	#makeFilter = (n: number) => {
+	#makeFilter = (n: number, allowEmptyFilter: boolean, allowNonEmptyFilter: boolean) => {
 		let pre = false,
 		    post = false,
 		    text = "",
@@ -408,20 +410,20 @@ export class DataTable extends HTMLElement {
 					}})
 				]
 			]),
-			li([
+			allowNonEmptyFilter ? li([
 				input({"type": "radio", "name": "F_"+n, "id": `F_${n}_1`, "onclick": () => {
 					this.#filters.set(n, isNotBlankFilter);
 					this.#runFilters();
 				}}),
 				label({"for": `F_${n}_1`}, "Remove Blank")
-			]),
-			li([
+			]) : [],
+			allowEmptyFilter ? li([
 				input({"type": "radio", "name": "F_"+n, "id": `F_${n}_2`, "onclick": () => {
 					this.#filters.set(n, isBlankFilter);
 					this.#runFilters();
 				}}),
 				label({"for": `F_${n}_2`}, "Only Blank")
-			])
+			]) : []
 		      ]);
 
 		amendNode(this.#filtersElm, f);
