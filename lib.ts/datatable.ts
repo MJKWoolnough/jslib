@@ -242,7 +242,7 @@ export class DataTable extends HTMLElement {
 				[child]: rowArr[child],
 				cells: rowArr,
 				row: this.#body.length,
-				f: false
+				f: true
 			});
 
 			maxCells = Math.max(maxCells, rowArr.length);
@@ -305,7 +305,7 @@ export class DataTable extends HTMLElement {
 			});
 		}
 
-		this.#setPage();
+		this.#runFilters();
 	}
 
 	#runFilters() {
