@@ -1079,6 +1079,30 @@ type Tests = {
 				return new Promise(sFn => setTimeout(sFn)).then(() => start === "HELLO WORLD" && start === startVal && elm.textContent === "HELLO,WORLD" && elm.textContent === text());
 			}
 		},
+		"MultiBinding": {
+			"single binding": async () => {
+				const {default: bind} = await import("./lib/bind.js"),
+				      a = bind(1),
+				      b = bind((a: number) => a + 2, a),
+				      c = b();
+
+				a(4);
+
+				return c === 3 && b() === 6;
+			},
+			"multi binding": async () => {
+				const {default: bind} = await import("./lib/bind.js"),
+				      a = bind(1),
+				      b = bind(2),
+				      c = bind((a: number, b: number) => a + b, a, b),
+				      d = c();
+
+				a(4);
+				b(10);
+
+				return d === 3 && c() === 14;
+			}
+		},
 		"function": async () => {
 			const {amendNode} = await import("./lib/dom.js"),
 			      {default: bind} = await import("./lib/bind.js"),
