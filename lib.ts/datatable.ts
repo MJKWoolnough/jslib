@@ -84,11 +84,14 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 			" th": {
 				"padding": "0.5em 1.5em",
 				"background-color": "#ddd",
-				"cursor": "pointer",
-				"user-select": "none",
 
-				":hover": {
-					"text-decoration": "underline"
+				":not(.noSort)": {
+					"cursor": "pointer",
+					"user-select": "none",
+
+					":hover": {
+						"text-decoration": "underline"
+					},
 				},
 
 				".s": {
@@ -267,7 +270,7 @@ export class DataTable extends HTMLElement {
 		for (let i = 0; i < maxCells; i++) {
 			const t = titles?.[i] ?? colName(i+1),
 			      {value, allowNumber: _ = null, allowSort = true, allowFilter = true, allowEmptyFilter = true, allowNonEmptyFilter = true, ...attrs} = t instanceof Object ? t : {"value": t},
-			      h = th(layerObjects(attrs, thPart, allowSort ? {"onclick": () => {
+			      h = amendNode(th(layerObjects(attrs, thPart, allowSort ? {"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], unsetSort);
 					amendNode(h, setSort);
@@ -304,7 +307,7 @@ export class DataTable extends HTMLElement {
 				}
 
 				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, this.#makeFilter(i, allowEmptyFilter, allowNonEmptyFilter)), {"style": `left:${clientX}px;top:${clientY}px`}).focus();
-			      }} : {}), value);
+			      }} : {}), value), {"class": {"noSort": !allowSort}});
 
 			this.#head.push({
 				[child]: h,
