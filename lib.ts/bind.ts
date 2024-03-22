@@ -217,13 +217,15 @@ class MultiBinding<T, B extends readonly unknown[]> extends Binding<T> {
 }
 
 /**
- * This function can be used either as a normal function, binding a single value, or as a template tag function.
+ * This function can be used as a normal function, binding a single value, as a template tag function, or as a construtor for a MultiBinding.
  *
  * When used normally, this function takes a single starting value and returns a {@link Binding} class with that value set.
  *
  * When used as a tag function, this function will return a readonly {@link Binding}  that is bound to all Bind expressions used within the template.
  *
- * Both returned types can be used as attributes or children in {@link dom:amendNode} and {@link dom:clearNode} calls.
+ * When used to create a MultiBinding, it takes, as the first argument, the function which will combine the values of the passed bindings, and the remaining arguments will be the bindings from which the values will be taken.
+ *
+ * All returned types can be used as attributes or children in {@link dom:amendNode} and {@link dom:clearNode} calls.
  *
  * @typeParam T
  * @param {T} v Value to be bound so it can be changed when assigned to an element attribute or child.
