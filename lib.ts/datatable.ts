@@ -149,7 +149,7 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
 	#body: NodeArray<Row>;
-	#filtersElm: Node;
+	#filtersElm: Element;
 	#filters = new Map<number, Function>();
 	#sort = -1;
 	#rev = false;
@@ -222,6 +222,10 @@ export class DataTable extends HTMLElement {
 	setData(data: Data, titles?: Headers) {
 		this.#head.splice(0, this.#head.length);
 		this.#body.splice(0, this.#body.length);
+		this.#filterList.clear();
+		this.#filters.clear();
+		this.#filtersElm.replaceChildren()
+		this.#sorters = [];
 
 		let maxCells = titles?.length ?? 0;
 
