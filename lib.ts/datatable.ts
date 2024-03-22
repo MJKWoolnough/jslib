@@ -370,7 +370,7 @@ export class DataTable extends HTMLElement {
 			this.#runFilters();
 		      },
 		      l = input({"type": "radio", "name": "F_"+n, "checked": "", "onclick": this.#sorters[n] === stringSort ? setTextFilter : setNumberFilter}),
-		      f = ul({"tabindex": "-1", "onkeydown": (e: KeyboardEvent) => {
+		      f = ul({"part": "filter", "tabindex": "-1", "onkeydown": (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
 				((this.#filtersElm.parentNode as ShadowRoot).activeElement as HTMLElement | null)?.blur();
 			}
