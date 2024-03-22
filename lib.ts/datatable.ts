@@ -69,8 +69,12 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 					}
 				},
 
-				"button.f": {
+				" button.f": {
 					"color": "transparent"
+				},
+
+				" li:first-child:last-child input[type=radio]": {
+					"display": "none"
 				}
 			}
 		},
