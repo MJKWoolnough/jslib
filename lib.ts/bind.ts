@@ -198,6 +198,23 @@ class ReadOnlyBinding<T> extends Binding<T> {
 	}
 }
 
+export class MultiBinding<T, B extends readonly unknown[]> extends Binding<T> {
+	constructor(fn: (...v: B) => T, ...bindings: {[K in keyof B]: Binding<B[K]>}) {
+		const value = () => fn(...bindings.map(b => b()) as any),
+		      valueFn = () => super.value = value();
+
+		super(value());
+
+		for (const b of bindings) {
+			b.onChange(valueFn);
+		}
+	}
+
+	get value() {
+		return super.value;
+	}
+}
+
 /**
  * This function can be used either as a normal function, binding a single value, or as a template tag function.
  *

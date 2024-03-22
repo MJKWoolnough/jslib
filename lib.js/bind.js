@@ -184,6 +184,23 @@ class ReadOnlyBinding extends Binding {
 	}
 }
 
+export class MultiBinding extends Binding {
+	constructor(fn, ...bindings) {
+		const value = () => fn(...bindings.map(b => b())),
+		      valueFn = () => super.value = value();
+
+		super(value());
+
+		for (const b of bindings) {
+			b.onChange(valueFn);
+		}
+	}
+
+	get value() {
+		return super.value;
+	}
+}
+
 /**
  * This function can be used either as a normal function, binding a single value, or as a template tag function.
  *
