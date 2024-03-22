@@ -25,6 +25,7 @@ interface ReadOnlyBindingFn<T> extends ReadOnlyBinding<T> {
 interface BindFn {
 	<T>(t: T): BindingFn<T>;
 	(strings: TemplateStringsArray, ...bindings: any[]): ReadOnlyBindingFn<string>;
+	<T, B extends unknown[]>(fn: (...v: B) => T, ...bindings: {[K in keyof B]: Binding<B[K]>}): MultiBinding<T, B>;
 }
 
 const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
@@ -198,7 +199,7 @@ class ReadOnlyBinding<T> extends Binding<T> {
 	}
 }
 
-export class MultiBinding<T, B extends readonly unknown[]> extends Binding<T> {
+class MultiBinding<T, B extends readonly unknown[]> extends Binding<T> {
 	constructor(fn: (...v: B) => T, ...bindings: {[K in keyof B]: Binding<B[K]>}) {
 		const value = () => fn(...bindings.map(b => b()) as any),
 		      valueFn = () => super.value = value();
@@ -229,9 +230,13 @@ export class MultiBinding<T, B extends readonly unknown[]> extends Binding<T> {
  *
  * @return {Binding} Bound value.
  */
-export default (<T>(v: T | TemplateStringsArray, first?: any, ...bindings: any[]) => {
+export default (<T>(v: T | TemplateStringsArray | ((v: any, ...vs: unknown[]) => unknown), first?: any, ...bindings: any[]) => {
 	if (v instanceof Array && first) {
 		return Binding.template(v, first, ...bindings);
+	}
+
+	if (v instanceof Function && first instanceof Binding && bindings.every(b => b instanceof Binding)) {
+		return new MultiBinding(v, first, ...bindings);
 	}
 
 	return new Binding<T>(v as T) as BindingFn<T>;

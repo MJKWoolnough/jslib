@@ -184,7 +184,7 @@ class ReadOnlyBinding extends Binding {
 	}
 }
 
-export class MultiBinding extends Binding {
+class MultiBinding extends Binding {
 	constructor(fn, ...bindings) {
 		const value = () => fn(...bindings.map(b => b())),
 		      valueFn = () => super.value = value();
@@ -215,9 +215,14 @@ export class MultiBinding extends Binding {
  *
  * @return {Binding} Bound value.
  */
-export default (v, first, ...bindings) => {
+export default ((v, first, ...bindings) => {
 	if (v instanceof Array && first) {
 		return Binding.template(v, first, ...bindings);
 	}
+
+	if (v instanceof Function && first instanceof Binding && bindings.every(b => b instanceof Binding)) {
+		return new MultiBinding(v, first, ...bindings);
+	}
+
 	return new Binding(v);
-};
+});
