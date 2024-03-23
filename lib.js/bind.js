@@ -197,16 +197,29 @@ class ReadOnlyBinding extends Binding {
  *
  * When used normally, this function takes a single starting value and returns a {@link Binding} class with that value set.
  *
- * When used as a tag function, this function will return a readonly {@link Binding}  that is bound to all Bind expressions used within the template.
- *
- * When used to create a MultiBinding, it takes, as the first argument, the function which will combine the values of the passed bindings, and the remaining arguments will be the bindings from which the values will be taken.
- *
- * All returned types can be used as attributes or children in {@link dom:amendNode} and {@link dom:clearNode} calls.
- *
  * @typeParam T
  * @param {T} v Value to be bound so it can be changed when assigned to an element attribute or child.
  *
- * @return {Binding} Bound value.
+ * @return {Binding<T>} Bound value.
+ *
+ * When used as a tag function, this function will return a readonly {@link Binding}  that is bound to all Bind expressions used within the template.
+ *
+ * @param {TemplateStringsArray}            v    The strings portions of a temple.
+ * @param {...(Binding<unknown> | unknown)} args The non-string portions of a temple, which can include Bindings to watch.
+ *
+ * @return {ReadonlyBinding<string>} The Binding that will update when one of the passed Bindings is updated.
+ *
+ * When used to create a MultiBinding, it takes, as the first argument, the function which will combine the values of the passed bindings, and the remaining arguments will be the Bindings or static value.
+ *
+ * @typeParam T
+ * @typeParam {unknown[]} A
+ * @typeParam {(Binding<unknown> | unknown>} B
+ * @param {(b: ...A) => T} fn       The function to transform the values.
+ * @param {...B}           bindings The bindings or static values to be watched and passed to the fn.
+ *
+ * @return {ReadonlyBinding<T>} The binding that is the result of the fn function, which will be updated when one of the passed Bindings changes.
+ *
+ * All returned types can be used as attributes or children in {@link dom:amendNode} and {@link dom:clearNode} calls.
  */
 export default ((v, first, ...bindings) => {
 	if (v instanceof Array && first) {
