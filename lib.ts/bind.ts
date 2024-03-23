@@ -28,16 +28,7 @@ interface BindFn {
 	<T, B extends unknown[]>(fn: (...v: B) => T, ...bindings: {[K in keyof B]: B[K] | Binding<B[K]>}): ReadOnlyBinding<T>;
 }
 
-const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
-      processTemplate = (strings: TemplateStringsArray, values: any[]) => {
-	let str = "";
-
-	for (let i = 0; i < strings.length; i++) {
-		str += strings[i] + (values[i] ?? "");
-	}
-
-	return str;
-      };
+const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function;
 
 /**
  * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.
@@ -160,7 +151,15 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 	}
 
 	static template(strings: TemplateStringsArray, ...values: any[]) {
-		return Binding.#multiple(values => processTemplate(strings, values), values);
+		return Binding.#multiple(values => {
+			let str = "";
+
+			for (let i = 0; i < strings.length; i++) {
+				str += strings[i] + (values[i] ?? "");
+			}
+
+			return str;
+	      }, values);
 	}
 
 	static #multiple<T, B extends readonly any[]>(fn: (b: {[K in keyof B]: B[K] extends Binding<infer U> ? U : B[K]}) => T, values: B) {

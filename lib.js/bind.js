@@ -13,16 +13,7 @@ import {Callable} from './misc.js';
  */
 /** */
 
-const isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
-      processTemplate = (strings, values) => {
-	let str = "";
-
-	for (let i = 0; i < strings.length; i++) {
-		str += strings[i] + (values[i] ?? "");
-	}
-
-	return str;
-      };
+const isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function;
 
 /**
  * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.
@@ -145,7 +136,15 @@ export class Binding extends Callable {
 	}
 
 	static template(strings, ...values) {
-		return Binding.#multiple(values => processTemplate(strings, values), values);
+		return Binding.#multiple(values => {
+			let str = "";
+
+			for (let i = 0; i < strings.length; i++) {
+				str += strings[i] + (values[i] ?? "");
+			}
+
+			return str;
+	      }, values);
 	}
 
 	static #multiple(fn, values) {
