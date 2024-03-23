@@ -25,7 +25,7 @@ interface ReadOnlyBindingFn<T> extends ReadOnlyBinding<T> {
 interface BindFn {
 	<T>(t: T): BindingFn<T>;
 	(strings: TemplateStringsArray, ...bindings: any[]): ReadOnlyBindingFn<string>;
-	<T, B extends unknown[]>(fn: (...v: B) => T, ...bindings: {[K in keyof B]: Binding<B[K]>}): ReadOnlyBinding<T>;
+	<T, B extends unknown[]>(fn: (...v: B) => T, ...bindings: {[K in keyof B]: B[K] | Binding<B[K]>}): ReadOnlyBinding<T>;
 }
 
 const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
@@ -196,7 +196,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 		return ref as ReadOnlyBindingFn<T>;
 	}
 
-	static multiple<T, B extends readonly Binding<unknown>[]>(fn: (...v: {[K in keyof B]: B[K] extends Binding<infer U> ? U : never}) => T, ...bindings: B) {
+	static multiple<T, B extends readonly unknown[]>(fn: (...v: {[K in keyof B]: B[K] extends Binding<infer U> ? U : B[K]}) => T, ...bindings: B) {
 		return Binding.#multiple(values => fn(...values as any), bindings);
 	}
 }
