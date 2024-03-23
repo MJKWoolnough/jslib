@@ -236,7 +236,7 @@ class ReadOnlyBinding<T> extends Binding<T> {
  *
  * All returned types can be used as attributes or children in {@link dom:amendNode} and {@link dom:clearNode} calls.
  */
-export default (<T>(v: T | TemplateStringsArray | ((v: any, ...vs: unknown[]) => unknown), first?: any, ...bindings: any[]) => {
+export default (<T>(v: T | TemplateStringsArray | ((v: unknown, ...vs: unknown[]) => unknown), first?: unknown, ...bindings: unknown[]) => {
 	if (v instanceof Array && first) {
 		return Binding.template(v, first, ...bindings);
 	}
@@ -245,5 +245,5 @@ export default (<T>(v: T | TemplateStringsArray | ((v: any, ...vs: unknown[]) =>
 		return Binding.multiple(v, first, ...bindings);
 	}
 
-	return new Binding<T>(v as T) as BindingFn<T>;
+	return new Binding(v);
 }) as BindFn;
