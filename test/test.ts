@@ -1088,7 +1088,7 @@ type Tests = {
 
 				a(4);
 
-				return c === 3 && b() === 6;
+				return new Promise(sFn => setTimeout(sFn)).then(() => c === 3 && b() === 6);
 			},
 			"multi binding": async () => {
 				const {default: bind} = await import("./lib/bind.js"),
@@ -1100,7 +1100,7 @@ type Tests = {
 				a(4);
 				b(10);
 
-				return d === 3 && c() === 14;
+				return new Promise(sFn => setTimeout(sFn)).then(() => d === 3 && c() === 14);
 			}
 		},
 		"function": async () => {
