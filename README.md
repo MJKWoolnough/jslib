@@ -263,7 +263,8 @@ This module directly imports the [dom](#dom), and [inter](#inter) modules.
 ### <a name="bind_bind">bind</a>
 ```typescript
 <T extends ToString = ToString>(t: T): Binding<T>;
-(strings: TemplateStringsArray, ...bindings: (Binding | ToString)[]): Binder;
+(strings: TemplateStringsArray, ...bindings: (Binding | ToString)[]): ReadonlyBinding<T>;
+<T, B extends unknown[]>(fn: (...v: B) => T, ...bindings: {[K in keyof B]: B[K] | Binding<B[K]>}): ReadOnlyBinding<T>;
 ```
 
 This function can be used as a normal function, binding a single value, as a template tag function, or as a construtor for a MultiBinding.
@@ -272,7 +273,7 @@ When used normally, this function takes a single starting value and returns a [B
 
 When used as a tag function, this function will return a readonly [Binding](#bind_binding) that is bound to all Bind expressions used within the template.
 
-When used to create a MultiBinding, it takes, as the first argument, the function which will combine the values of the passed bindings, and the remaining arguments will be the bindings from which the values will be taken.
+When used to create a multi-binding, it takes, as the first argument, the function which will combine the values of the passed bindings, and the remaining arguments will be the Bindings or static value.
 
 Both returned types can be used as attributes or children in amendNode and clearNode calls.
 
