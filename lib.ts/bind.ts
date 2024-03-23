@@ -228,7 +228,7 @@ export default (<T>(v: T | TemplateStringsArray | ((v: any, ...vs: unknown[]) =>
 		return Binding.template(v, first, ...bindings);
 	}
 
-	if (v instanceof Function && first instanceof Binding && bindings.every(b => b instanceof Binding)) {
+	if (v instanceof Function && first) {
 		return Binding.multiple(v, first, ...bindings);
 	}
 
