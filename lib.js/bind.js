@@ -145,7 +145,11 @@ export class Binding extends Callable {
 	}
 
 	static template(strings, ...values) {
-		let ref = new ReadOnlyBinding(processTemplate(strings, values));
+		return Binding.#multiple(values => processTemplate(strings, values), values);
+	}
+
+	static #multiple(fn, values) {
+		let ref = new ReadOnlyBinding(fn(values.map(v => v instanceof Binding ? v.#value : v)));
 
 		const wref = new WeakRef(ref),
 		      cancel = Pipe.any(vals => {
@@ -165,7 +169,7 @@ export class Binding extends Callable {
 
 			ref = r.#refs ? r : null;
 
-			r.#set(processTemplate(strings, vals));
+			r.#set(fn(vals));
 		      }, ...values.map(v => v instanceof Binding ? [v.#pipe, v.value] : v));
 
 		for (const b of values) {
@@ -176,26 +180,13 @@ export class Binding extends Callable {
 
 		return ref;
 	}
+
+	static multiple(fn, ...bindings) {
+		return Binding.#multiple(values => fn(...values), bindings);
+	}
 }
 
 class ReadOnlyBinding extends Binding {
-	get value() {
-		return super.value;
-	}
-}
-
-class MultiBinding extends Binding {
-	constructor(fn, ...bindings) {
-		const value = () => fn(...bindings.map(b => b())),
-		      valueFn = () => super.value = value();
-
-		super(value());
-
-		for (const b of bindings) {
-			b.onChange(valueFn);
-		}
-	}
-
 	get value() {
 		return super.value;
 	}
@@ -223,7 +214,7 @@ export default ((v, first, ...bindings) => {
 	}
 
 	if (v instanceof Function && first instanceof Binding && bindings.every(b => b instanceof Binding)) {
-		return new MultiBinding(v, first, ...bindings);
+		return new Binding.multiple(v, first, ...bindings);
 	}
 
 	return new Binding(v);

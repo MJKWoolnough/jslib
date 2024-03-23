@@ -25,7 +25,7 @@ interface ReadOnlyBindingFn<T> extends ReadOnlyBinding<T> {
 interface BindFn {
 	<T>(t: T): BindingFn<T>;
 	(strings: TemplateStringsArray, ...bindings: any[]): ReadOnlyBindingFn<string>;
-	<T, B extends unknown[]>(fn: (...v: B) => T, ...bindings: {[K in keyof B]: Binding<B[K]>}): MultiBinding<T, B>;
+	<T, B extends unknown[]>(fn: (...v: B) => T, ...bindings: {[K in keyof B]: Binding<B[K]>}): ReadOnlyBinding<T>;
 }
 
 const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
@@ -160,7 +160,11 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 	}
 
 	static template(strings: TemplateStringsArray, ...values: any[]) {
-		let ref: Binding | null = new ReadOnlyBinding(processTemplate(strings, values));
+		return Binding.#multiple(values => processTemplate(strings, values), values);
+	}
+
+	static #multiple<T, B extends readonly any[]>(fn: (b: {[K in keyof B]: B[K] extends Binding<infer U> ? U : B[K]}) => T, values: B) {
+		let ref: Binding<T> | null = new ReadOnlyBinding(fn(values.map(v => v instanceof Binding ? v.#value : v) as any));
 
 		const wref = new WeakRef(ref),
 		      cancel = Pipe.any(vals => {
@@ -180,8 +184,8 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 
 			ref = r.#refs ? r : null;
 
-			r.#set(processTemplate(strings, vals));
-		      }, ...values.map(v => v instanceof Binding ? [v.#pipe, v.value] : v));
+			r.#set(fn(vals as any));
+		      }, ...values.map(v => v instanceof Binding ? [v.#pipe, v.value] : v) as {[K in keyof B]: B[K] extends Binding<infer U> ? [Pipe<U>, U] : B[K]});
 
 		for (const b of values) {
 			if (b instanceof Binding) {
@@ -189,28 +193,15 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 			}
 		}
 
-		return ref as ReadOnlyBindingFn<string>;
+		return ref as ReadOnlyBindingFn<T>;
+	}
+
+	static multiple<T, B extends readonly Binding<unknown>[]>(fn: (...v: {[K in keyof B]: B[K] extends Binding<infer U> ? U : never}) => T, ...bindings: B) {
+		return Binding.#multiple(values => fn(...values as any), bindings);
 	}
 }
 
 class ReadOnlyBinding<T> extends Binding<T> {
-	get value() {
-		return super.value;
-	}
-}
-
-class MultiBinding<T, B extends readonly unknown[]> extends Binding<T> {
-	constructor(fn: (...v: B) => T, ...bindings: {[K in keyof B]: Binding<B[K]>}) {
-		const value = () => fn(...bindings.map(b => b()) as any),
-		      valueFn = () => super.value = value();
-
-		super(value());
-
-		for (const b of bindings) {
-			b.onChange(valueFn);
-		}
-	}
-
 	get value() {
 		return super.value;
 	}
@@ -238,7 +229,7 @@ export default (<T>(v: T | TemplateStringsArray | ((v: any, ...vs: unknown[]) =>
 	}
 
 	if (v instanceof Function && first instanceof Binding && bindings.every(b => b instanceof Binding)) {
-		return new MultiBinding(v, first, ...bindings);
+		return Binding.multiple(v, first, ...bindings);
 	}
 
 	return new Binding<T>(v as T) as BindingFn<T>;
