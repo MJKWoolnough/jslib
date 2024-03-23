@@ -57,7 +57,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 	constructor(value: T) {
 		super(function(this: unknown, v: T) {
 			if (v instanceof Event && this instanceof EventTarget && this === v.currentTarget) {
-				const value = self.value;
+				const value = self.#value;
 
 				if (value instanceof Function) {
 					return value.call(v.currentTarget, v);
@@ -72,7 +72,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 				self.value = v;
 			}
 
-			return self.value;
+			return self.#value;
 		});
 
 		const self = this;
