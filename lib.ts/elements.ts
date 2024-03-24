@@ -1,5 +1,6 @@
+import type {Binding} from './bind.js';
 import type {Children, DOMBind, Props, PropsObject} from './dom.js';
-import bind, {Binding} from './bind.js';
+import bind from './bind.js';
 import {amendNode, isChildren} from './dom.js';
 import {setAndReturn} from './misc.js';
 
@@ -76,7 +77,7 @@ type ChildWatchFn = (added: NodeList, removed: NodeList) => void;
  * The `attr` method returns a {@link dom:Binding}. When monitoring a single attribute, the value of the Binding object will be set the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to a Map of the name to the value.
  */
 export type WithAttr = {
-	attr(name: string[]): BindMulti;
+	attr(name: string[]): Binding<Map<string, string>>;
 	attr(name: string): Binding<any>;
 }
 
@@ -113,28 +114,6 @@ type WithAttrsOption<SelectedOptions extends Options> = WithChildrenOption<Selec
 
 type ElementFactory = WithAttrsOption<{pseudo?: false}> & WithAttrsOption<{pseudo: true}> & ((fn: (elem: HTMLElement & WithAttr & WithChildren) => Children) => DOMBind<HTMLElement & WithAttr & WithChildren>);
 
-class BindMulti extends Binding<Map<string, any>> {
-	constructor(elem: Node, names: string[]) {
-		const m = new Map<string, any>();
-
-		for (const n of names) {
-			const attr = getAttr(elem, n);
-
-			attr.onChange(v => {
-				m.set(n, v);
-				super.value = m;
-			});
-			m.set(n, attr.value);
-		}
-
-		super(m);
-	}
-
-	get value() {
-		return super.value;
-	}
-}
-
 const attrs = new WeakMap<Node, Map<string, Binding<any>>>(),
       getAttr = (elem: Node, name: string) => {
 	const attrMap = attrs.get(elem)!;
@@ -158,7 +137,15 @@ const attrs = new WeakMap<Node, Map<string, Binding<any>>>(),
       },
       attr = (c: Node, names: string | string[]) => {
 	if (names instanceof Array) {
-		return new BindMulti(c, names);
+		const m = new Map(names.map(n => [n, ""]));
+
+		return bind((...vals: string[]) => {
+			for (const name of names) {
+				m.set(name, vals.shift()!);
+			}
+
+			return m;
+		}, ...names.map(n => getAttr(c, n)));
 	}
 
 	return getAttr(c, names);

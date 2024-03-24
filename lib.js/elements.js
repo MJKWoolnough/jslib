@@ -1,4 +1,4 @@
-import bind, {Binding} from './bind.js';
+import bind from './bind.js';
 import {amendNode, isChildren} from './dom.js';
 import {setAndReturn} from './misc.js';
 
@@ -51,28 +51,6 @@ import {setAndReturn} from './misc.js';
  * NB: For pseudo-elements, the callback function will not be triggered during construction.
  */
 
-class BindMulti extends Binding {
-	constructor(elem, names) {
-		const m = new Map();
-
-		for (const n of names) {
-			const attr = getAttr(elem, n);
-
-			attr.onChange(v => {
-				m.set(n, v);
-				super.value = m;
-			});
-			m.set(n, attr.value);
-		}
-
-		super(m);
-	}
-
-	get value() {
-		return super.value;
-	}
-}
-
 const attrs = new WeakMap(),
       getAttr = (elem, name) => {
 	const attrMap = attrs.get(elem);
@@ -96,7 +74,15 @@ const attrs = new WeakMap(),
       },
       attr = (c, names) => {
 	if (names instanceof Array) {
-		return new BindMulti(c, names);
+		const m = new Map(names.map(n => [n, ""]));
+
+		return bind(...vals => {
+			for (const name of names) {
+				m.set(name, vals.shift());
+			}
+
+			return m;
+		}, ...names.map(n => getAttr(c, n)));
 	}
 
 	return getAttr(c, names);
