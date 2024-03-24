@@ -4451,13 +4451,18 @@ type Tests = {
 				const {default: e} = await import("./lib/elements.js"),
 				      {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
-				      t = e(e => amendNode(div, {"someAttr": e.attr(["thatAttr", "otherAttr"]).transform(v => ((+(v.get("thatAttr") ?? 0) || 0) + 1) * ((+(v.get("otherAttr") ?? 0) || 0) + 1))}))();
-				res += +(div.getAttributeNS(null, "someAttr") === "1");
-				amendNode(t, {"thatAttr": 3});
-				res += +(div.getAttributeNS(null, "someAttr") === "4");
-				amendNode(t, {"otherAttr": 4});
-				res += +(div.getAttributeNS(null, "someAttr") === "20");
-				return res === 3;
+				      t = e(e => amendNode(div, {"someAttr": e.attr(["thatAttr", "otherAttr"]).transform(v => ((+(v.get("thatAttr") ?? 0) || 0) + 1) * ((+(v.get("otherAttr") ?? 0) || 0) + 1))}))(),
+				      wait = () => new Promise(sFn => setTimeout(sFn));
+
+				return wait()
+				.then(() => res += +(div.getAttributeNS(null, "someAttr") === "1"))
+				.then(() => amendNode(t, {"thatAttr": 3}))
+				.then(wait)
+				.then(() => res += +(div.getAttributeNS(null, "someAttr") === "4"))
+				.then(() => amendNode(t, {"otherAttr": 4}))
+				.then(wait)
+				.then(() => res += +(div.getAttributeNS(null, "someAttr") === "20"))
+				.then(() => res === 3);
 			},
 			"process fn": async () => {
 				let res = 0;
