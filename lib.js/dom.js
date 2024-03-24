@@ -77,11 +77,11 @@ const childrenArr = (children, res = []) => {
 
 export const
 /** This symbol is used to denote a special Object that provides its own Children. */
-child = Symbol("child"),
+child = Symbol.for("dom-child"),
 /** This symbol is used to denote a method on an object that will take an attribute name and return a new Attr Node. */
-attr = Symbol("attr"),
+attr = Symbol.for("dom-attr"),
 /** This symbol is used to denote a special Object that might be an EventListener. */
-value = Symbol("value"),
+value = Symbol.for("dom-value"),
 /**
  * This function determines whether the passed in object can be used as a {@link Children} type.
  *
