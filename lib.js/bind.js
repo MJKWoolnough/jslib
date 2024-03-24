@@ -169,7 +169,7 @@ export class Binding extends Callable {
 			ref = r.#refs ? r : null;
 
 			r.#set(fn(vals));
-		      }, ...values.map(v => v instanceof Binding ? [v.#pipe, v.value] : v));
+		      }, ...values.map(v => v instanceof Binding ? [v.#pipe, v.#value] : v));
 
 		for (const b of values) {
 			if (b instanceof Binding) {

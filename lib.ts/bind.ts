@@ -184,7 +184,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 			ref = r.#refs ? r : null;
 
 			r.#set(fn(vals as any));
-		      }, ...values.map(v => v instanceof Binding ? [v.#pipe, v.value] : v) as {[K in keyof B]: B[K] extends Binding<infer U> ? [Pipe<U>, U] : B[K]});
+		      }, ...values.map(v => v instanceof Binding ? [v.#pipe, v.#value] : v) as {[K in keyof B]: B[K] extends Binding<infer U> ? [Pipe<U>, U] : B[K]});
 
 		for (const b of values) {
 			if (b instanceof Binding) {
