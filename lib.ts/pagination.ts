@@ -160,7 +160,7 @@ export class Pagination extends HTMLElement {
 		clearNode(this.#base, [
 			currPage !== 0 ? amendNode(link(currPage - 1, this.#hrefBase, lang["PREV"]), {"part": "active page prev"}) : li({"part": "page prev"}, lang["PREV"]),
 			pageLinks,
-			currPage !== total ? amendNode(link(currPage + 1, this.#hrefBase, lang["NEXT"]), {"part": "active page next"}) : li({"part": "page next"}, lang["NEXT"]),
+			currPage !== total ? amendNode(link(currPage + 1, this.#hrefBase, lang["NEXT"]), {"part": "active page next"}) : li({"part": "page next"}, lang["NEXT"])
 		]);
 	}
 
