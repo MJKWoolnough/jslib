@@ -143,7 +143,7 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       regexpSpecials = "\\/.*+?|()[]{}".split(""),
       makeToggleButton = (c: string, title: string, fn: (v: boolean) => void) => button({"class": "t", title, "onclick": function(this: HTMLButtonElement) {
 	fn(!this.classList.toggle("t"));
-      }}, c)
+      }}, c);
 
 
 export class DataTable extends HTMLElement {
@@ -224,7 +224,7 @@ export class DataTable extends HTMLElement {
 		this.#body.splice(0, this.#body.length);
 		this.#filterList.clear();
 		this.#filters.clear();
-		this.#filtersElm.replaceChildren()
+		this.#filtersElm.replaceChildren();
 		this.#sorters = [];
 
 		let maxCells = titles?.length ?? 0;
