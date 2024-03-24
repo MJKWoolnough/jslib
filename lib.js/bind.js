@@ -220,14 +220,14 @@ class ReadOnlyBinding extends Binding {
  *
  * All returned types can be used as attributes or children in {@link dom:amendNode} and {@link dom:clearNode} calls.
  */
-export default ((v, first, ...bindings) => {
-	if (first) {
+export default ((v, ...bindings) => {
+	if (bindings.length) {
 		if (v instanceof Array) {
-			return Binding.template(v, first, ...bindings);
+			return Binding.template(v, ...bindings);
 		}
 
 		if (v instanceof Function) {
-			return Binding.multiple(v, first, ...bindings);
+			return Binding.multiple(v, ...bindings);
 		}
 	}
 
