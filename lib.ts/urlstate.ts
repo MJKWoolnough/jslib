@@ -285,9 +285,9 @@ export {urlChanged};
  *
  * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
  *
- * @param {string} name              Name to be used for the URL param.
- * @param {T}      value             Default value for the state.
- * @param {(v: T) => v is T} checker Function to confirm valid values.
+ * @param {string}                 name    Name to be used for the URL param.
+ * @param {T}                      value   Default value for the state.
+ * @param {(v: unknown) => v is T} checker Function to confirm valid values.
  *
  * @return {StateBound<T>}
  */
