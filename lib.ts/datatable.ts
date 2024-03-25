@@ -535,6 +535,49 @@ export class DataTable extends HTMLElement {
 		return filter;
 	}
 
+	filter(hid: string, filter: Filter) {
+		const header = this.#headers.get(hid);
+
+		if (header) {
+			const filterElem = this.#filterList.get(header.col)!;
+
+			switch (filter) {
+			case true:
+				filterElem.nonEmpty?.click();
+
+				break;
+			case false:
+				filterElem.empty?.click();
+
+				break;
+			default:
+				if ("min" in filter && "min" in filterElem) {
+					filterElem.min.value = filter.min + "";
+					filterElem.max.value = filter.max + "";
+
+					filterElem.min.dispatchEvent(new Event("input"));
+					filterElem.max.dispatchEvent(new Event("input"));
+				} else if ("text" in filter && "text" in filterElem) {
+					if (filterElem.isPrefix.classList.contains("t") === filter.isPrefix) {
+						filterElem.isPrefix.click();
+					}
+
+					if (filterElem.isSuffix.classList.contains("t") === filter.isSuffix) {
+						filterElem.isSuffix.click();
+					}
+
+					if (filterElem.isCaseInsensitive.classList.contains("t") === filter.isCaseInsensitive) {
+						filterElem.isCaseInsensitive.click();
+					}
+
+					filterElem.text.value = filter.text;
+
+					filterElem.text.dispatchEvent(new Event("input"));
+				}
+			}
+		}
+	}
+
 	export(includeTitles = false) {
 		return this.#export(includeTitles);
 	}
