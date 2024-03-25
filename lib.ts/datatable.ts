@@ -2,7 +2,6 @@ import type {PropsObject} from './dom';
 import CSS from './css.js';
 import {amendNode, bindElement, child} from './dom.js';
 import {button, div, input, label, li, ns, table, tbody, td, th, thead, tr, ul} from './html.js';
-import {setAndReturn} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
@@ -347,13 +346,17 @@ export class DataTable extends HTMLElement {
 					p = p.offsetParent as HTMLElement | null;
 				}
 
-				amendNode((this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, this.#makeFilter(i, allowEmptyFilter, allowNonEmptyFilter)))[child], {"style": `left:${clientX}px;top:${clientY}px`}).focus();
+				amendNode(this.#filterList.get(i)![child], {"style": `left:${clientX}px;top:${clientY}px`}).focus();
 			      }} : {}), value), {"class": {"noSort": !allowSort}}),
 			      header = {
 				[child]: h,
 				"title": value,
 				"col": this.#head.length
 			      };
+
+			if (allowFilter) {
+				this.#filterList.set(i, this.#makeFilter(i, allowEmptyFilter, allowNonEmptyFilter));
+			}
 
 			if (hid) {
 				this.#headers.set(hid, header);
