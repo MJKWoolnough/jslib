@@ -176,7 +176,7 @@ export class DataTable extends HTMLElement {
 	#rev = false;
 	#page = 0;
 	#perPage = Infinity;
-	#filterList = new Map<number, HTMLElement>();
+	#filterList = new Map<number, TextHeaderFilter | NumberHeaderFilter>();
 	#sorters: ((a: string, b: string) => number)[] = [];
 	#headers = new Map<string, Header>();
 
@@ -333,7 +333,7 @@ export class DataTable extends HTMLElement {
 					p = p.offsetParent as HTMLElement | null;
 				}
 
-				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, this.#makeFilter(i, allowEmptyFilter, allowNonEmptyFilter)), {"style": `left:${clientX}px;top:${clientY}px`}).focus();
+				amendNode((this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, this.#makeFilter(i, allowEmptyFilter, allowNonEmptyFilter)))[child], {"style": `left:${clientX}px;top:${clientY}px`}).focus();
 			      }} : {}), value), {"class": {"noSort": !allowSort}}),
 			      header = {
 				[child]: h,
@@ -451,32 +451,34 @@ export class DataTable extends HTMLElement {
 			this.#runFilters();
 		      },
 		      l = input({"type": "radio", "name": "F_"+n, "checked": "", "onclick": this.#sorters[n] === stringSort ? setTextFilter : setNumberFilter}),
-		      f = ul({"part": "filter", "tabindex": "-1", "onkeydown": (e: KeyboardEvent) => {
+		      filter = {} as TextHeaderFilter | NumberHeaderFilter;
+
+		filter[child] = ul({"part": "filter", "tabindex": "-1", "onkeydown": (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
 				((this.#filtersElm.parentNode as ShadowRoot).activeElement as HTMLElement | null)?.blur();
 			}
 		      }}, [
 			li([
-				l,
+				filter.primary = l,
 				this.#sorters[n] === stringSort ? [
-					makeToggleButton("^", "Starts With", v => {
+					(filter as TextHeaderFilter).isPrefix = makeToggleButton("^", "Starts With", v => {
 						pre = v;
 						setTextFilter();
 					}),
-					input({"type": "text", "oninput": function(this: HTMLInputElement) {
+					(filter as TextHeaderFilter).text = input({"type": "text", "oninput": function(this: HTMLInputElement) {
 						text = this.value;
 						setTextFilter();
 					}}),
-					makeToggleButton("$", "Ends With", v => {
+					(filter as TextHeaderFilter).isSuffix = makeToggleButton("$", "Ends With", v => {
 						post = v;
 						setTextFilter();
 					}),
-					makeToggleButton("i", "Case Sensitivity", v => {
+					(filter as TextHeaderFilter).isCaseInsensitive = makeToggleButton("i", "Case Sensitivity", v => {
 						caseInsensitive = v;
 						setTextFilter();
 					})
 				] : [
-					input({"oninput": function(this: HTMLInputElement) {
+					(filter as NumberHeaderFilter).min = input({"oninput": function(this: HTMLInputElement) {
 						min = parseFloat(this.value);
 						if (isNaN(min)) {
 							min = -Infinity;
@@ -485,7 +487,7 @@ export class DataTable extends HTMLElement {
 						setNumberFilter();
 					}}),
 					" ≤ x ≤ ",
-					input({"oninput": function(this: HTMLInputElement) {
+					(filter as NumberHeaderFilter).max = input({"oninput": function(this: HTMLInputElement) {
 						max = parseFloat(this.value);
 						if (isNaN(max)) {
 							max = Infinity;
@@ -496,14 +498,14 @@ export class DataTable extends HTMLElement {
 				]
 			]),
 			allowNonEmptyFilter ? li([
-				input({"type": "radio", "name": "F_"+n, "id": `F_${n}_1`, "onclick": () => {
+				filter.nonEmpty = input({"type": "radio", "name": "F_"+n, "id": `F_${n}_1`, "onclick": () => {
 					this.#filters.set(n, isNotBlankFilter);
 					this.#runFilters();
 				}}),
 				label({"for": `F_${n}_1`}, "Remove Blank")
 			]) : [],
 			allowEmptyFilter ? li([
-				input({"type": "radio", "name": "F_"+n, "id": `F_${n}_2`, "onclick": () => {
+				filter.empty = input({"type": "radio", "name": "F_"+n, "id": `F_${n}_2`, "onclick": () => {
 					this.#filters.set(n, isBlankFilter);
 					this.#runFilters();
 				}}),
@@ -511,9 +513,9 @@ export class DataTable extends HTMLElement {
 			]) : []
 		      ]);
 
-		amendNode(this.#filtersElm, f);
+		amendNode(this.#filtersElm, filter);
 
-		return f;
+		return filter;
 	}
 
 	export(includeTitles = false) {
