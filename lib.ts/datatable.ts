@@ -20,6 +20,7 @@ type Data = RowData[];
 
 type HeaderData = string | {
 	value: string;
+	hid?: string;
 	allowNumber?: boolean;
 	allowSort?: boolean;
 	allowFilter?: boolean;
@@ -157,6 +158,7 @@ export class DataTable extends HTMLElement {
 	#perPage = Infinity;
 	#filterList = new Map<number, HTMLElement>();
 	#sorters: ((a: string, b: string) => number)[] = [];
+	#headers = new Map<string, Header>();
 
 	constructor() {
 		super();
@@ -226,6 +228,7 @@ export class DataTable extends HTMLElement {
 		this.#filters.clear();
 		this.#filtersElm.replaceChildren();
 		this.#sorters = [];
+		this.#headers.clear();
 
 		let maxCells = titles?.length ?? 0;
 
@@ -273,7 +276,7 @@ export class DataTable extends HTMLElement {
 
 		for (let i = 0; i < maxCells; i++) {
 			const t = titles?.[i] ?? colName(i+1),
-			      {value, allowNumber: _ = null, allowSort = true, allowFilter = true, allowEmptyFilter = true, allowNonEmptyFilter = true, ...attrs} = t instanceof Object ? t : {"value": t},
+			      {value, hid = null, allowNumber: _ = null, allowSort = true, allowFilter = true, allowEmptyFilter = true, allowNonEmptyFilter = true, ...attrs} = t instanceof Object ? t : {"value": t},
 			      h = amendNode(th(layerObjects(attrs, thPart, allowSort ? {"onclick": () => {
 				if (this.#sort !== i) {
 					amendNode(this.#head[this.#sort]?.[child], unsetSort);
@@ -311,12 +314,17 @@ export class DataTable extends HTMLElement {
 				}
 
 				amendNode(this.#filterList.get(i) ?? setAndReturn(this.#filterList,i, this.#makeFilter(i, allowEmptyFilter, allowNonEmptyFilter)), {"style": `left:${clientX}px;top:${clientY}px`}).focus();
-			      }} : {}), value), {"class": {"noSort": !allowSort}});
-
-			this.#head.push({
+			      }} : {}), value), {"class": {"noSort": !allowSort}}),
+			      header = {
 				[child]: h,
 				"title": value
-			});
+			      };
+
+			if (hid) {
+				this.#headers.set(hid, header);
+			}
+
+			this.#head.push(header);
 		}
 
 		this.#runFilters();
