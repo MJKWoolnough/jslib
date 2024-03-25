@@ -148,7 +148,6 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 	fn(!this.classList.toggle("t"));
       }}, c);
 
-
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
 	#body: NodeArray<Row>;
