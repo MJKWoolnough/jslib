@@ -45,6 +45,7 @@ type Row = {
 type Header = {
 	[child]: HTMLTableCellElement;
 	title: string;
+	col: number;
 }
 
 const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up}h38l-19,${(2 * up - 1) * 18}z' fill='%23f00' stroke='%23000' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`,
@@ -135,6 +136,7 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       unsetSort = {"class": {"r": false, "s": false}},
       setSort = {"class": ["s"]},
       setReverse = {"class": ["r"]},
+      unsetReverse = {"class": {"r": false}},
       parseNum = (a: string) => parseFloat(a || "-Infinity"),
       numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
       nullSort = (a: Row, b: Row) => a.row - b.row,
@@ -317,7 +319,8 @@ export class DataTable extends HTMLElement {
 			      }} : {}), value), {"class": {"noSort": !allowSort}}),
 			      header = {
 				[child]: h,
-				"title": value
+				"title": value,
+				"col": this.#head.length
 			      };
 
 			if (hid) {
@@ -328,6 +331,51 @@ export class DataTable extends HTMLElement {
 		}
 
 		this.#runFilters();
+	}
+
+	sort(hid?: string, reverse = false) {
+		if (hid) {
+			const header = this.#headers.get(hid);
+
+			if (header) {
+				const i = header.col;
+
+				if (this.#sort === header.col) {
+					if (this.#rev !== reverse) {
+						amendNode(header[child], reverse ? setReverse : unsetReverse);
+
+						this.#body.reverse();
+
+						this.#rev = reverse;
+					} else {
+						return;
+					}
+				} else {
+					amendNode(this.#head[this.#sort]?.[child], unsetSort);
+					amendNode(header[child], setSort);
+
+					this.#body.sort((a: Row, b: Row) => this.#sorters[i](a.cells[i].value + "", b.cells[i].value + ""));
+
+					this.#sort = i;
+
+					if (this.#rev = reverse) {
+						amendNode(header[child], setReverse);
+						this.#body.reverse();
+					}
+				}
+			}
+		} else if (this.#sort !== -1) {
+			amendNode(this.#head[this.#sort][child], unsetSort);
+
+			this.#sort = -1;
+			this.#rev = false;
+
+			this.#body.sort(nullSort);
+		} else {
+			return;
+		}
+
+		this.#setPage();
 	}
 
 	#runFilters() {
