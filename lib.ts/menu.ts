@@ -1,6 +1,6 @@
 import CSS from './css.js';
-import {amendNode, bindElement, event, eventCapture, eventRemove} from './dom.js';
-import {ns, slot} from './html.js';
+import {amendNode, bindCustomElement, event, eventCapture, eventRemove} from './dom.js';
+import {slot} from './html.js';
 
 /**
  * The menu module adds custom elements to create context-menus.
@@ -280,20 +280,16 @@ export class SubMenuElement extends HTMLElement {
 	}
 }
 
-customElements.define("menu-menu", MenuElement);
-customElements.define("menu-item", ItemElement);
-customElements.define("menu-submenu", SubMenuElement);
-
 export const
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link MenuElement}.
  */
-menu = bindElement<MenuElement>(ns, "menu-menu"),
+menu = bindCustomElement("menu-menu", MenuElement),
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link ItemElement}.
  */
-item = bindElement<ItemElement>(ns, "menu-item"),
+item = bindCustomElement("menu-item", ItemElement),
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link SubMenuElement}.
  */
-submenu = bindElement<SubMenuElement>(ns, "menu-submenu");
+submenu = bindCustomElement("menu-submenu", SubMenuElement);
