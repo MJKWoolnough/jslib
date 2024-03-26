@@ -199,6 +199,11 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
  * @return {(props? Props | Children, children?: Children) => DOMBind<T>} Function used to create a `T` element with the specified properties and/or children.
  * */
 bindElement = <T extends Element>(ns: string, value: string) => Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(document.createElementNS(ns, value) as T, props, children), {"name": {value}, [child]: {"get": () => document.createElementNS(ns, value) as T}}) as DOMBind<T>,
+bindCustomElement = <T extends HTMLElement>(name: string, constructor: {new (...params: any[]): T}, options?: ElementDefinitionOptions | undefined) => {
+	customElements.define(name, constructor, options);
+
+	return Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(document.createElement(name) as T, props, children), {"name": {value}, [child]: {"get": () => document.createElement(name) as T}}) as DOMBind<T>;
+},
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.
  */
