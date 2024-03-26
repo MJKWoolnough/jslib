@@ -178,7 +178,12 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       regexpSpecials = "\\/.*+?|()[]{}".split(""),
       makeToggleButton = (c: string, title: string, fn: (v: boolean) => void) => button({"class": "t", title, "onclick": function(this: HTMLButtonElement) {
 	fn(!this.classList.toggle("t"));
-      }}, c);
+      }}, c),
+      setButton = (filterButton: HTMLButtonElement, set: boolean) => {
+	if (filterButton.classList.contains("t") === set) {
+		filterButton.click();
+	}
+      };
 
 export class DataTable extends HTMLElement {
 	#head: NodeArray<Header>;
@@ -558,17 +563,9 @@ export class DataTable extends HTMLElement {
 					filterElem.min.dispatchEvent(new Event("input"));
 					filterElem.max.dispatchEvent(new Event("input"));
 				} else if ("text" in filter && "text" in filterElem) {
-					if (filterElem.isPrefix.classList.contains("t") === filter.isPrefix) {
-						filterElem.isPrefix.click();
-					}
-
-					if (filterElem.isSuffix.classList.contains("t") === filter.isSuffix) {
-						filterElem.isSuffix.click();
-					}
-
-					if (filterElem.isCaseInsensitive.classList.contains("t") === filter.isCaseInsensitive) {
-						filterElem.isCaseInsensitive.click();
-					}
+					setButton(filterElem.isPrefix, filter.isPrefix);
+					setButton(filterElem.isSuffix, filter.isSuffix);
+					setButton(filterElem.isCaseInsensitive, filter.isCaseInsensitive);
 
 					filterElem.text.value = filter.text;
 
