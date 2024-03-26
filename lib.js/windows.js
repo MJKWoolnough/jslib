@@ -1,6 +1,6 @@
 import CSS from './css.js';
-import {amendNode, bindElement, clearNode, event, eventCapture} from './dom.js';
-import {button, div, img, input, ns, slot, span, toggle} from './html.js';
+import {amendNode, bindCustomElement, clearNode, event, eventCapture} from './dom.js';
+import {button, div, img, input, slot, span, toggle} from './html.js';
 import {autoFocus} from './misc.js';
 import {ns as svgNS} from './svg.js';
 
@@ -748,23 +748,19 @@ export class WindowElement extends BaseElement {
 	}
 }
 
-customElements.define("windows-shell", ShellElement);
-customElements.define("windows-desktop", DesktopElement);
-customElements.define("windows-window", WindowElement);
-
 export const
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link ShellElement}.
  */
-shell = bindElement(ns, "windows-shell"),
+shell = bindCustomElement("windows-shell", ShellElement),
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link DesktopElement}.
  */
-desktop = bindElement(ns, "windows-desktop"),
+desktop = bindCustomElement("windows-desktop", DesktopElement),
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link WindowsElement}.
  */
-windows = bindElement(ns, "windows-window"),
+windows = bindCustomElement("windows-window", WindowElement),
 /**
  * This function sets the `defaultIcon` variable, which is the icon used on all `WindowElements` if it isn't overridden.
  *
