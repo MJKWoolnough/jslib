@@ -1,7 +1,7 @@
 import type {PropsObject} from './dom';
 import CSS from './css.js';
-import {amendNode, bindElement, child} from './dom.js';
-import {button, div, input, label, li, ns, table, tbody, td, th, thead, tr, ul} from './html.js';
+import {amendNode, bindCustomElement, child} from './dom.js';
+import {button, div, input, label, li, table, tbody, td, th, thead, tr, ul} from './html.js';
 import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
@@ -631,6 +631,4 @@ export class DataTable extends HTMLElement {
 	}
 }
 
-customElements.define("data-table", DataTable);
-
-export const datatable = bindElement<DataTable>(ns, "data-table");
+export const datatable = bindCustomElement("data-table", DataTable);
