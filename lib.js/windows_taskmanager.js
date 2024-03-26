@@ -1,6 +1,6 @@
 import CSS from './css.js';
-import {amendNode, bindElement, clearNode, event, eventOnce} from './dom.js';
-import {div, footer, ns, slot} from './html.js';
+import {amendNode, bindCustomElement, clearNode, event, eventOnce} from './dom.js';
+import {div, footer, slot} from './html.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage, windows} from './windows.js';
 
 /**
@@ -154,10 +154,8 @@ export class ShellElement extends BaseShellElement {
 	}
 }
 
-customElements.define("windows-shell-taskmanager", ShellElement);
-
 export const
 /**
  * A {@link dom:DOMBind} that creates a ShellElement.
  */
-shell = bindElement(ns, "windows-shell-taskmanager");
+shell = bindCustomElement("windows-shell-taskmanager", ShellElement);
