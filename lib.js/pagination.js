@@ -7,8 +7,8 @@
  */
 /** */
 
-import {amendNode, bindElement, clearNode} from './dom.js';
-import {a, li, ns, ul} from './html.js';
+import {amendNode, bindCustomElement, clearNode} from './dom.js';
+import {a, li, ul} from './html.js';
 
 const link = (page, href, contents) => {
 	if (href !== null) {
@@ -193,4 +193,4 @@ customElements.define("page-numbers", Pagination);
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link Pagination}.
  */
-export default bindElement(ns, "page-numbers");
+export default bindCustomElement("page-numbers", Pagination);

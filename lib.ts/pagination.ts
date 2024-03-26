@@ -8,8 +8,8 @@
 /** */
 
 import type {Binding} from './bind.js';
-import {amendNode, bindElement, clearNode} from './dom.js';
-import {a, li, ns, ul} from './html.js';
+import {amendNode, bindCustomElement, clearNode} from './dom.js';
+import {a, li, ul} from './html.js';
 
 type Href = string | ((page: number) => string);
 
@@ -191,9 +191,7 @@ export const
  */
 setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)};
 
-customElements.define("page-numbers", Pagination);
-
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link Pagination}.
  */
-export default bindElement<Pagination>(ns, "page-numbers");
+export default bindCustomElement("page-numbers", Pagination);
