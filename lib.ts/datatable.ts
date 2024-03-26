@@ -196,6 +196,7 @@ export class DataTable extends HTMLElement {
 	#filterList = new Map<number, TextHeaderFilter | NumberHeaderFilter>();
 	#sorters: ((a: string, b: string) => number)[] = [];
 	#headers = new Map<string, Header>();
+	#debounce = false;
 
 	constructor() {
 		super();
@@ -418,31 +419,41 @@ export class DataTable extends HTMLElement {
 	}
 
 	#runFilters() {
-		let changed = false;
+		if (this.#debounce) {
+			return;
+		}
 
-		for (const row of this.#body) {
-			const old = row.f;
+		this.#debounce = true;
 
-			row.f = false;
+		queueMicrotask(() => {
+			this.#debounce = false;
 
-			for (const [col, filter] of this.#filters) {
-				if (!filter(row.cells[col].value)) {
-					row.f = true;
+			let changed = false;
 
-					break;
+			for (const row of this.#body) {
+				const old = row.f;
+
+				row.f = false;
+
+				for (const [col, filter] of this.#filters) {
+					if (!filter(row.cells[col].value)) {
+						row.f = true;
+
+						break;
+					}
 				}
+
+				changed ||= old !== row.f;
+
+				amendNode(row[child], {"class": {"f": row.f}});
 			}
 
-			changed ||= old !== row.f;
+			this.#setPage();
 
-			amendNode(row[child], {"class": {"f": row.f}});
-		}
-
-		this.#setPage();
-
-		if (changed) {
-			this.dispatchEvent(new Event("change"));
-		}
+			if (changed) {
+				this.dispatchEvent(new Event("change"));
+			}
+		});
 	}
 
 	#makeFilter = (n: number, allowEmptyFilter: boolean, allowNonEmptyFilter: boolean) => {
