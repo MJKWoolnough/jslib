@@ -1,7 +1,7 @@
 import type {Binding} from './bind.js';
 import CSS from './css.js';
-import {amendNode, bindElement, event, eventOnce} from './dom.js';
-import {div, img, li, ns, slot, span, ul} from './html.js';
+import {amendNode, bindCustomElement, event, eventOnce} from './dom.js';
+import {div, img, li, slot, span, ul} from './html.js';
 import {item, menu} from './menu.js';
 import {DesktopElement, ShellElement as BaseShellElement, WindowElement, defaultIcon, desktop, setDefaultIcon, setLanguage as setOtherLanguage, windows} from './windows.js';
 
@@ -239,13 +239,11 @@ export class ShellElement extends BaseShellElement {
 	}
 }
 
-customElements.define("windows-shell-taskbar", ShellElement);
-
 export const
 /**
  * A {@link dom:DOMBind} that creates a ShellElement.
  */
-shell = bindElement<ShellElement>(ns, "windows-shell-taskbar"),
+shell = bindCustomElement("windows-shell-taskbar", ShellElement),
 /**
  * A replacement for the {@link windows:setLanguage} function, which in addition to calling the original, sets the language entries used for the context menu for the items on the taskbar. The menu access keys are set to the first character of the entry.
  */
