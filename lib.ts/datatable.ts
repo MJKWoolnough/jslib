@@ -55,15 +55,14 @@ type HeaderFilter = {
 }
 
 type TextHeaderFilter = HeaderFilter & {
-	text: HTMLInputElement;
+	text: (text: string) => void;
 	isPrefix: HTMLButtonElement;
 	isSuffix: HTMLButtonElement;
 	isCaseInsensitive: HTMLButtonElement;
 }
 
 type NumberHeaderFilter = HeaderFilter & {
-	min: HTMLInputElement;
-	max: HTMLInputElement;
+	minMax: (min: number, max: number) => void;
 }
 
 type Filter = TextFilter | NumberFilter | boolean;
@@ -487,10 +486,19 @@ export class DataTable extends HTMLElement {
 						pre = v;
 						setTextFilter();
 					}),
-					(filter as TextHeaderFilter).text = input({"type": "text", "oninput": function(this: HTMLInputElement) {
-						text = this.value;
-						setTextFilter();
-					}}),
+					(() => {
+						const i = input({"type": "text", "oninput": function(this: HTMLInputElement) {
+							text = this.value;
+							setTextFilter();
+						}});
+
+						(filter as TextHeaderFilter).text = (t: string) => {
+							i.value = text = t;
+							setTextFilter();
+						};
+
+						return i;
+					})(),
 					(filter as TextHeaderFilter).isSuffix = makeToggleButton("$", "Ends With", v => {
 						post = v;
 						setTextFilter();
@@ -499,25 +507,33 @@ export class DataTable extends HTMLElement {
 						caseInsensitive = v;
 						setTextFilter();
 					})
-				] : [
-					(filter as NumberHeaderFilter).min = input({"oninput": function(this: HTMLInputElement) {
-						min = parseFloat(this.value);
-						if (isNaN(min)) {
-							min = -Infinity;
-						}
+				] : (() => {
+						const minE = input({"oninput": function(this: HTMLInputElement) {
+							min = parseFloat(this.value);
+							if (isNaN(min)) {
+								min = -Infinity;
+							}
 
-						setNumberFilter();
-					}}),
-					" ≤ x ≤ ",
-					(filter as NumberHeaderFilter).max = input({"oninput": function(this: HTMLInputElement) {
-						max = parseFloat(this.value);
-						if (isNaN(max)) {
-							max = Infinity;
-						}
+							setNumberFilter();
+						      }}),
+						      maxE = input({"oninput": function(this: HTMLInputElement) {
+							max = parseFloat(this.value);
+							if (isNaN(max)) {
+								max = Infinity;
+							}
 
-						setNumberFilter();
-					}})
-				]
+							setNumberFilter();
+						      }});
+
+						(filter as NumberHeaderFilter).minMax = (minN: number, maxN: number) => {
+							minE.value = (min = minN) + "";
+							maxE.value = (max = maxN) + "";
+
+							setNumberFilter();
+						};
+
+						return [minE, " ≤ x ≤ ", maxE];
+				})()
 			]),
 			allowNonEmptyFilter ? li([
 				filter.nonEmpty = input({"type": "radio", "name": "F_"+n, "id": `F_${n}_1`, "onclick": () => {
@@ -556,20 +572,14 @@ export class DataTable extends HTMLElement {
 
 				break;
 			default:
-				if ("min" in filter && "min" in filterElem) {
-					filterElem.min.value = filter.min + "";
-					filterElem.max.value = filter.max + "";
-
-					filterElem.min.dispatchEvent(new Event("input"));
-					filterElem.max.dispatchEvent(new Event("input"));
+				if ("min" in filter && "minMax" in filterElem) {
+					filterElem.minMax(filter.min, filter.max);
 				} else if ("text" in filter && "text" in filterElem) {
 					setButton(filterElem.isPrefix, filter.isPrefix);
 					setButton(filterElem.isSuffix, filter.isSuffix);
 					setButton(filterElem.isCaseInsensitive, filter.isCaseInsensitive);
 
-					filterElem.text.value = filter.text;
-
-					filterElem.text.dispatchEvent(new Event("input"));
+					filterElem.text(filter.text);
 				}
 			}
 		}
