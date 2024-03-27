@@ -181,6 +181,17 @@ amendNode = (node, properties, children) => {
  * @return {(props? Props | Children, children?: Children) => DOMBind<T>} Function used to create a `T` element with the specified properties and/or children.
  * */
 bindElement = (ns, value) => Object.defineProperties((props, children) => amendNode(document.createElementNS(ns, value), props, children), {"name": {value}, [child]: {"get": () => document.createElementNS(ns, value)}}),
+/**
+ * This function acts as bindElement, but with Custom Elements, first defining the element and then acting as bindElement.
+ *
+ * @typeParam {HTMLElement} T
+ *
+ * @param {string} name                          Name of the custom element.
+ * @param {CustomElementConstructor} constructor Constructor of the Custom Element
+ * @param {ElementDefinitionOptions} [options]   Options to pass to customElements.define.
+ *
+ * @return {(props? Props | Children, children?: Children) => DOMBind<T>} Function used to create a `T` element with the specified properties and/or children.
+ * */
 bindCustomElement = (name, constructor, options) => {
 	customElements.define(name, constructor, options);
 
