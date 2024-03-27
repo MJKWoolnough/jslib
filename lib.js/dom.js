@@ -73,7 +73,8 @@ const childrenArr = (children, res = []) => {
 	attr.textContent = prop;
 	return attr;
       },
-      toggleSym = Symbol("toggle");
+      toggleSym = Symbol("toggle"),
+      wrapElem = (name, fn) => Object.defineProperties((props, children) => amendNode(fn(), props, children), {"name": {"value": name}, [child]: {"get": fn}});
 
 export const
 /** This symbol is used to denote a special Object that provides its own Children. */
@@ -180,7 +181,7 @@ amendNode = (node, properties, children) => {
  *
  * @return {(props? Props | Children, children?: Children) => DOMBind<T>} Function used to create a `T` element with the specified properties and/or children.
  * */
-bindElement = (ns, value) => Object.defineProperties((props, children) => amendNode(document.createElementNS(ns, value), props, children), {"name": {value}, [child]: {"get": () => document.createElementNS(ns, value)}}),
+bindElement = (ns, value) => wrapElem(value, () => document.createElementNS(ns, value)),
 /**
  * This function acts as bindElement, but with Custom Elements, first defining the element and then acting as bindElement.
  *
@@ -195,7 +196,7 @@ bindElement = (ns, value) => Object.defineProperties((props, children) => amendN
 bindCustomElement = (name, constructor, options) => {
 	customElements.define(name, constructor, options);
 
-	return Object.defineProperties((props, children) => amendNode(new constructor(), props, children), {"name": {"value": name}, [child]: {"get": () => new constructor()}});
+	return wrapElem(name, () => new constructor());
 },
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.

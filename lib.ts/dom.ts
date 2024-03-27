@@ -91,7 +91,8 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	attr.textContent = prop;
 	return attr;
       },
-      toggleSym = Symbol("toggle");
+      toggleSym = Symbol("toggle"),
+      wrapElem = <T extends Element>(name: string, fn: () => T) => Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(fn(), props, children), {"name": {"value": name}, [child]: {"get": fn}}) as DOMBind<T>;
 
 export const
 /** This symbol is used to denote a special Object that provides its own Children. */
@@ -198,7 +199,7 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
  *
  * @return {(props? Props | Children, children?: Children) => DOMBind<T>} Function used to create a `T` element with the specified properties and/or children.
  * */
-bindElement = <T extends Element>(ns: string, value: string) => Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(document.createElementNS(ns, value) as T, props, children), {"name": {value}, [child]: {"get": () => document.createElementNS(ns, value) as T}}) as DOMBind<T>,
+bindElement = <T extends Element>(ns: string, value: string) => wrapElem(value, () => document.createElementNS(ns, value) as T),
 /**
  * This function acts as bindElement, but with Custom Elements, first defining the element and then acting as bindElement.
  *
@@ -213,7 +214,7 @@ bindElement = <T extends Element>(ns: string, value: string) => Object.definePro
 bindCustomElement = <T extends HTMLElement>(name: string, constructor: {new (...params: any[]): T}, options?: ElementDefinitionOptions | undefined) => {
 	customElements.define(name, constructor, options);
 
-	return Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(new constructor(), props, children), {"name": {"value": name}, [child]: {"get": () => new constructor()}}) as DOMBind<T>;
+	return wrapElem(name, () => new constructor());
 },
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.
