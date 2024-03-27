@@ -582,6 +582,7 @@ The dom module can be used to manipulate DOM elements.
 | [amendNode](#dom_amendnode) | Function | This convenience function modifies a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget. |
 | attr     | Symbol | This symbol is used to denote a method on an object that will take an attribute name and return a new Attr Node. |
 | [bindElement](#dom_bindelement) | Function | This function simplifies binding of [amendNode](#dom_amendnode). |
+| [bindCustomElement](#dom_bindcustomelement) | Function | This function simplified the registering of Custom Element and creating a DomBind, as in the bindElement function. |
 | child    | Symbol | This symbol is used to denote a special Object that provides its own Children. |
 | [Children](#dom_children) | Type | This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node), [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), [HTMLCollection](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection), [Binding](#bind_binding), or a recursive array of those. |
 | <a name="dom_clearnode">clearNode</a> | Function | This function acts identically to [amendNode](#dom_amendnode) except that it clears any children before amending. |
@@ -625,6 +626,12 @@ NB: Due to how this function uses instanceof to determine what can be applied to
 
 This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.
 
+### <a name="dom_bindcustomelement">bindCustomElement</a>
+```typescript
+<T extends HTMLElement>(name: string, constructor: {new (...params: any[]): T}, options?: ElementDefinitionOptions | undefined): T;
+```
+
+This function acts as bindElement, but with Custom Elements, first defining the element and then acting as [bindElement](#dom_bindelement).
 
 ### <a name="dom_children">Children</a>
 ```typescript
