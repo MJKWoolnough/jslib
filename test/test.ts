@@ -960,6 +960,21 @@ type Tests = {
 
 				return div(span).firstChild instanceof HTMLSpanElement;
 			}
+		},
+		"bindCustomElement": {
+			"custom": async () => {
+				const {bindCustomElement} = await import("./lib/dom.js"),
+				      elem = bindCustomElement("my-elem", class extends HTMLElement{a = 1});
+
+				return "a" in elem();
+			},
+			"raw": async () => {
+				const {bindCustomElement} = await import("./lib/dom.js"),
+				      a = bindCustomElement("my-other-elem", class extends HTMLElement{b = 2}),
+				      b = bindCustomElement("my-last-elem", class extends HTMLElement{c = 3});
+
+				return "c" in a(b).firstChild!;
+			}
 		}
 	},
 	"bind.js": {
