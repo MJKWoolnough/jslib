@@ -498,8 +498,8 @@ export class DataTable extends HTMLElement {
 						setTextFilter();
 					}),
 					(() => {
-						const i = input({"type": "text", "oninput": function(this: HTMLInputElement) {
-							text = this.value;
+						const i = input({"type": "text", "oninput": () => {
+							text = i.value;
 							setTextFilter();
 						}});
 
@@ -519,16 +519,16 @@ export class DataTable extends HTMLElement {
 						setTextFilter();
 					})
 				] : (() => {
-						const minE = input({"oninput": function(this: HTMLInputElement) {
-							min = parseFloat(this.value);
+						const minE = input({"oninput": () => {
+							min = parseFloat(minE.value);
 							if (isNaN(min)) {
 								min = -Infinity;
 							}
 
 							setNumberFilter();
 						      }}),
-						      maxE = input({"oninput": function(this: HTMLInputElement) {
-							max = parseFloat(this.value);
+						      maxE = input({"oninput": () => {
+							max = parseFloat(maxE.value);
 							if (isNaN(max)) {
 								max = Infinity;
 							}
