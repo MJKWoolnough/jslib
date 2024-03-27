@@ -11750,7 +11750,7 @@ type Tests = {
 				["foo <![CDATA[>&<]]>", "<p>foo <!--[CDATA[-->&amp;&lt;]]&gt;</p>"],
 				["foo <a href=\"&ouml;\">", "<p>foo <a href=\"ö\"></a></p>"],
 				["foo <a href=\"\\*\">", "<p>foo <a href=\"\\*\"></a></p>"],
-				["<a href=\"\\\"\">", "<p>&lt;a href=\"\"\"&gt;</p>"],
+				["<a href=\"\\\"\">", "<p>&lt;a href=\"\"\"&gt;</p>"]
 			],
 			"hard line breaks": [
 				["foo  \nbaz", "<p>foo<br>baz</p>"],
@@ -11771,7 +11771,7 @@ type Tests = {
 			],
 			"soft line breaks": [
 				["foo\nbaz", "<p>foo\nbaz</p>"],
-				["foo \n baz", "<p>foo\nbaz</p>"],
+				["foo \n baz", "<p>foo\nbaz</p>"]
 			],
 			"textual content": [
 				["hello $.;'there", "<p>hello $.;'there</p>"],
