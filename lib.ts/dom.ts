@@ -213,7 +213,7 @@ bindElement = <T extends Element>(ns: string, value: string) => Object.definePro
 bindCustomElement = <T extends HTMLElement>(name: string, constructor: {new (...params: any[]): T}, options?: ElementDefinitionOptions | undefined) => {
 	customElements.define(name, constructor, options);
 
-	return Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(document.createElement(name) as T, props, children), {"name": {value}, [child]: {"get": () => document.createElement(name) as T}}) as DOMBind<T>;
+	return Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(new constructor(), props, children), {"name": {value}, [child]: {"get": () => document.createElement(name) as T}}) as DOMBind<T>;
 },
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.

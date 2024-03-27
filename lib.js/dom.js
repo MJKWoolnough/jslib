@@ -195,7 +195,7 @@ bindElement = (ns, value) => Object.defineProperties((props, children) => amendN
 bindCustomElement = (name, constructor, options) => {
 	customElements.define(name, constructor, options);
 
-	return Object.defineProperties((props, children) => amendNode(document.createElement(name), props, children), {"name": {value}, [child]: {"get": () => document.createElement(name)}});
+	return Object.defineProperties((props, children) => amendNode(new constructor(), props, children), {"name": {value}, [child]: {"get": () => document.createElement(name)}});
 },
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.
