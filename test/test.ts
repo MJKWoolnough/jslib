@@ -959,6 +959,12 @@ type Tests = {
 				      span = bindElement("http://www.w3.org/1999/xhtml", "span");
 
 				return div(span).firstChild instanceof HTMLSpanElement;
+			},
+			"name": async () => {
+				const {bindElement} = await import("./lib/dom.js"),
+				      div = bindElement("http://www.w3.org/1999/xhtml", "div");
+
+				return div.name === "div";
 			}
 		},
 		"bindCustomElement": {
@@ -974,6 +980,12 @@ type Tests = {
 				      b = bindCustomElement("my-last-elem", class extends HTMLElement{c = 3});
 
 				return "c" in a(b).firstChild!;
+			},
+			"name": async () => {
+				const {bindCustomElement} = await import("./lib/dom.js"),
+				      elem = bindCustomElement("my-real-last-elem", class extends HTMLElement{});
+
+				return elem.name === "my-real-last-elem";
 			}
 		}
 	},
