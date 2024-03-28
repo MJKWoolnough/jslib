@@ -602,10 +602,10 @@ The dom module can be used to manipulate DOM elements.
 ### <a name="dom_amendnode">amendNode</a>
 ```typescript
 interface {
-	<T extends EventTarget>(element: T, properties: Record<`on${string}`, EventListenerObject | EventArray | Function>): T;
-	<T extends Node>(element: T, properties?: Props, children?: Children): T;
-	<T extends Node>(element: T, children?: Children): T;
-	<T extends Node>(element?: T | null, properties?: Props | Children, children?: Children): T;
+	<T extends EventTarget | BoundChild>(element: T, properties: Record<`on${string}`, EventListenerObject | EventArray | Function>): T;
+	<T extends Node | BoundChild>(element: T, properties?: Props, children?: Children): T;
+	<T extends Node | BoundChild>(element: T, children?: Children): T;
+	<T extends Node | BoundChild>(element?: T | null, properties?: Props | Children, children?: Children): T;
 }
 ```
 
