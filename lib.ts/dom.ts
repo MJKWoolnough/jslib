@@ -10,10 +10,10 @@ interface ToString {
 }
 
 interface mElement {
-	<T extends EventTarget>(element: T, properties: Record<`on${string}`, EventListenerObject | EventArray | Function>): T;
-	<T extends Node>(element: T, properties?: Props, children?: Children): T;
-	<T extends Node>(element: T, children?: Children): T;
-	<T extends Node>(element?: T | null, properties?: Props | Children, children?: Children): T;
+	<T extends EventTarget | BoundChild>(element: T, properties: Record<`on${string}`, EventListenerObject | EventArray | Function>): T;
+	<T extends Node | BoundChild>(element: T, properties?: Props, children?: Children): T;
+	<T extends Node | BoundChild>(element: T, children?: Children): T;
+	<T extends Node | BoundChild>(element?: T | null, properties?: Props | Children, children?: Children): T;
 }
 
 type ClassObj = Record<string, boolean | null>;
@@ -127,7 +127,9 @@ isChildren = (propertiesOrChildren: Props | Children): propertiesOrChildren is C
  *
  * @return {T} The passed EventTarget or Node.
  */
-amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children, children?: Children) => {
+amendNode: mElement = (n?: EventTarget | BoundChild | null, properties?: Props | Children, children?: Children) => {
+	const node = isChild(n) ? n[child] : n;
+
 	if (properties && isChildren(properties)) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
@@ -189,7 +191,7 @@ amendNode: mElement = (node?: EventTarget | null, properties?: Props | Children,
 			}
 		}
 	}
-	return node;
+	return n;
 },
 /**
  * This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.

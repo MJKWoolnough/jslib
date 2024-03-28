@@ -109,7 +109,9 @@ isChildren = propertiesOrChildren => propertiesOrChildren instanceof Array || ty
  *
  * @return {T} The passed EventTarget or Node.
  */
-amendNode = (node, properties, children) => {
+amendNode = (n, properties, children) => {
+	const node = isChild(n) ? n[child] : n;
+
 	if (properties && isChildren(properties)) {
 		children = properties;
 	} else if (properties instanceof NamedNodeMap && node instanceof Element) {
@@ -171,7 +173,7 @@ amendNode = (node, properties, children) => {
 			}
 		}
 	}
-	return node;
+	return n;
 },
 /**
  * This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.
