@@ -753,6 +753,16 @@ type Tests = {
 				      div2 = amendNode(document.createElement("div"), div1.children);
 				return div2.firstChild === span1 && div2.children[1] === span2 && div2.lastChild === span3;
 			},
+			"append BoundChild": async () => {
+				const {amendNode, child} = await import("./lib/dom.js"),
+				      span1 = document.createElement("span"),
+				      span2 = document.createElement("span"),
+				      childNode = {[child]: span2};
+
+				amendNode(span1, childNode);
+
+				return span1.firstChild === span2;
+			},
 			"property set + append": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
 				      span = document.createElement("span"),
