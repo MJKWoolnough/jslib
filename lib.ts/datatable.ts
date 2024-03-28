@@ -206,7 +206,10 @@ export class DataTable extends HTMLElement {
 
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			this.#filtersElm = div(),
-			table([thead(this.#head), this.#body])
+			table([
+				thead(this.#head),
+				this.#body
+			])
 		]).adoptedStyleSheets = style;
 	}
 
