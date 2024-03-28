@@ -594,6 +594,19 @@ type Tests = {
 				      div = amendNode(document.createElement("div"), {"style": {"font-size": "2em", "color": "rgb(255, 0, 0)"}});
 				return amendNode(document.createElement("div"), {"style": div.style}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
 			},
+			"set BoundAttr": async () => {
+				const {amendNode, attr} = await import("./lib/dom.js"),
+				      myAttr = {[attr]: (k: string) => {
+					const a = document.createAttribute(k);
+
+					a.textContent = "123";
+
+					return a;
+				      }},
+				      div = amendNode(document.createElement("div"), {"some-attr": myAttr});
+
+				return div.getAttribute("some-attr") === "123";
+			},
 			"event string set": async () => {
 				type W = typeof window & {
 					ares: number;
