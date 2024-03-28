@@ -519,31 +519,31 @@ export class DataTable extends HTMLElement {
 						setTextFilter();
 					})
 				] : (() => {
-						const minE = input({"oninput": () => {
-							min = parseFloat(minE.value);
-							if (isNaN(min)) {
-								min = -Infinity;
-							}
+					const minE = input({"oninput": () => {
+						min = parseFloat(minE.value);
+						if (isNaN(min)) {
+							min = -Infinity;
+						}
 
-							setNumberFilter();
-						      }}),
-						      maxE = input({"oninput": () => {
-							max = parseFloat(maxE.value);
-							if (isNaN(max)) {
-								max = Infinity;
-							}
+						setNumberFilter();
+					      }}),
+					      maxE = input({"oninput": () => {
+						max = parseFloat(maxE.value);
+						if (isNaN(max)) {
+							max = Infinity;
+						}
 
-							setNumberFilter();
-						      }});
+						setNumberFilter();
+					      }});
 
-						(filter as NumberHeaderFilter).minMax = (minN: number, maxN: number) => {
-							minE.value = (min = minN) + "";
-							maxE.value = (max = maxN) + "";
+					(filter as NumberHeaderFilter).minMax = (minN: number, maxN: number) => {
+						minE.value = (min = minN) + "";
+						maxE.value = (max = maxN) + "";
 
-							setNumberFilter();
-						};
+						setNumberFilter();
+					};
 
-						return [minE, " ≤ x ≤ ", maxE];
+					return [minE, " ≤ x ≤ ", maxE];
 				})()
 			]),
 			allowNonEmptyFilter ? li([
