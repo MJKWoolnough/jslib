@@ -247,7 +247,7 @@ export class DataTable extends HTMLElement {
 		let num = 0;
 
 		for (const row of this.#body) {
-			amendNode(row[child], {"class": {"p": num < start || num >= end}});
+			amendNode(row, {"class": {"p": num < start || num >= end}});
 
 			if (!row.f) {
 				num++;
@@ -317,7 +317,7 @@ export class DataTable extends HTMLElement {
 			      {value, hid = null, allowNumber: _ = null, allowSort = true, allowFilter = true, allowEmptyFilter = true, allowNonEmptyFilter = true, ...attrs} = t instanceof Object ? t : {"value": t},
 			      h = amendNode(th(layerObjects(attrs, thPart, allowSort ? {"onclick": () => {
 				if (this.#sort !== i) {
-					amendNode(this.#head[this.#sort]?.[child], unsetSort);
+					amendNode(this.#head[this.#sort], unsetSort);
 					amendNode(h, setSort);
 
 					this.#body.sort((a: Row, b: Row) => this.#sorters[i](a.cells[i].value + "", b.cells[i].value + ""));
@@ -382,7 +382,7 @@ export class DataTable extends HTMLElement {
 
 				if (this.#sort === header.col) {
 					if (this.#rev !== reverse) {
-						amendNode(header[child], reverse ? setReverse : unsetReverse);
+						amendNode(header, reverse ? setReverse : unsetReverse);
 
 						this.#body.reverse();
 
@@ -391,21 +391,21 @@ export class DataTable extends HTMLElement {
 						return;
 					}
 				} else {
-					amendNode(this.#head[this.#sort]?.[child], unsetSort);
-					amendNode(header[child], setSort);
+					amendNode(this.#head[this.#sort], unsetSort);
+					amendNode(header, setSort);
 
 					this.#body.sort((a: Row, b: Row) => this.#sorters[i](a.cells[i].value + "", b.cells[i].value + ""));
 
 					this.#sort = i;
 
 					if (this.#rev = reverse) {
-						amendNode(header[child], setReverse);
+						amendNode(header, setReverse);
 						this.#body.reverse();
 					}
 				}
 			}
 		} else if (this.#sort !== -1) {
-			amendNode(this.#head[this.#sort][child], unsetSort);
+			amendNode(this.#head[this.#sort], unsetSort);
 
 			this.#sort = -1;
 			this.#rev = false;
@@ -445,7 +445,7 @@ export class DataTable extends HTMLElement {
 
 				changed ||= old !== row.f;
 
-				amendNode(row[child], {"class": {"f": row.f}});
+				amendNode(row, {"class": {"f": row.f}});
 			}
 
 			this.#setPage();
