@@ -9,6 +9,20 @@ interface ToString {
 	toString(): string;
 }
 
+/**
+ * This type represents an Object that uses the `attr` symbol to return a special Attr node.
+ **/
+type BoundAttr = {
+	[attr]: (k: string) => Attr;
+}
+
+/**
+ * This type represents an Object that uses the `child` symbol to return a special Element or Text node.
+ **/
+type BoundChild = {
+	[child]: Element | Text;
+}
+
 interface mElement {
 	<T extends EventTarget | BoundChild>(element: T, properties: Record<`on${string}`, EventListenerObject | EventArray | Function>): T;
 	<T extends Node | BoundChild>(element: T, properties?: Props, children?: Children): T;
@@ -303,17 +317,3 @@ clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Ch
  * @return {(v: boolean) => void} Wrapped callback function that will be recognised by amendNode.
  */
 toggle = (fn: (v: boolean) => void) => Object.assign((v: boolean) => fn(v), {[toggleSym]: null});
-
-/**
- * This type represents an Object that uses the `attr` symbol to return a special Attr node.
- **/
-type BoundAttr = {
-	[attr]: (k: string) => Attr;
-}
-
-/**
- * This type represents an Object that uses the `child` symbol to return a special Element or Text node.
- **/
-type BoundChild = {
-	[child]: Element | Text;
-}

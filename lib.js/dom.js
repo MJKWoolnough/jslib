@@ -12,6 +12,20 @@
  */
 
 /**
+ * This type represents an Object that uses the `attr` symbol to return a special Attr node.
+ *
+ * @typedef {Object} BoundAttr
+ * @property {(k: string) => Attr} {@link attr}
+ **/
+
+/**
+ * This type represents an Object that uses the `child` symbol to return a special Element or Text node.
+ *
+ * @typedef {Object} BoundChild
+ * @property {Element | Text} {@link Child}
+ **/
+
+/**
  * This object is used to set attributes and events on a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node) or {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget | EventTarget} with the {@link amendNode} and {@link clearNode} functions.
  *
  * The keys of this type refer to the attribute names that are to be set. The key determines what type the value should be:
@@ -285,17 +299,3 @@ clearNode = (node, properties, children) => {
  * @return {(v: boolean) => void} Wrapped callback function that will be recognised by amendNode.
  */
 toggle = fn => Object.assign(v => fn(v), {[toggleSym]: null});
-
-/**
- * This type represents an Object that uses the `attr` symbol to return a special Attr node.
- *
- * @typedef {Object} BoundAttr
- * @property {(k: string) => Attr} {@link attr}
- **/
-
-/**
- * This type represents an Object that uses the `child` symbol to return a special Element or Text node.
- *
- * @typedef {Object} BoundChild
- * @property {Element | Text} {@link Child}
- **/
