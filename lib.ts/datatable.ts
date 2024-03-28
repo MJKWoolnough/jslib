@@ -308,7 +308,7 @@ export class DataTable extends HTMLElement {
 				row.cells.push({
 					[child]: td(tdPart),
 					value: ""
-				})
+				});
 			}
 		}
 
