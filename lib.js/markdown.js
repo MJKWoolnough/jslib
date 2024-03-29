@@ -3,6 +3,7 @@
  *
  * @module markdown
  * @requires module:casefold
+ * @requires module:misc
  * @requires module:parser
  */
 /** */

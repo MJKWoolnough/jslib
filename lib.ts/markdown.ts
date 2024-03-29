@@ -9,6 +9,7 @@ import Parser from './parser.js';
  *
  * @module markdown
  * @requires module:casefold
+ * @requires module:misc
  * @requires module:parser
  */
 /** */
