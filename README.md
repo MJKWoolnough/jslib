@@ -1607,7 +1607,7 @@ The load module contains a single default export, a [Promise](https://developer.
 
 The markdown module contains a full CommonMark parser with several optional (enabled by default) extensions.
 
-This module directly imports the [casefold](#casefold), and [parser](#parser) modules.
+This module directly imports the [casefold](#casefold), [misc](#misc), and [parser](#parser) modules.
 
 This module provides a single, default export with the following signature:
 
