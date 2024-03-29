@@ -850,6 +850,16 @@ type Tests = {
 				amendNode(d, {"attr": toggle(toggleFn)});
 
 				return states[0] && !states[1] && states[2];
+			},
+			"append to BoundChild": async () => {
+				const {amendNode, child} = await import("./lib/dom.js"),
+				      d = document.createElement("div"),
+				      e = {
+					      [child]: d
+				      } as any,
+				      s = document.createElement("span");
+
+				return amendNode(e, s) === e && d.firstChild === s;
 			}
 		},
 		"event": {
