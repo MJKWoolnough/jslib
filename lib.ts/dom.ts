@@ -135,14 +135,14 @@ isChildren = (propertiesOrChildren: Props | Children): propertiesOrChildren is C
  * NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/open | window.open}.
  *
  * @typeParam {EventTarget | BoundChild | null} T
- * @param {T} [node]                      The EventTarget or Node to be modified.
+ * @param {T} [element]                   The EventTarget or Node to be modified.
  * @param {Props | Children} [properties] The properties to be added to the EventTarget or Node. Can be omitted with Children in its place.
  * @param {Children} [children]           Children to be added to a Node. Should be omitted if `properties` was set to a Children type.
  *
  * @return {T} The passed EventTarget, Node, or BoundChild.
  */
-amendNode: mElement = (n?: EventTarget | BoundChild | null, properties?: Props | Children, children?: Children) => {
-	const node = isChild(n) ? n[child] : n;
+amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: Props | Children, children?: Children) => {
+	const node = isChild(element) ? element[child] : element;
 
 	if (properties && isChildren(properties)) {
 		children = properties;
@@ -205,7 +205,7 @@ amendNode: mElement = (n?: EventTarget | BoundChild | null, properties?: Props |
 			}
 		}
 	}
-	return n;
+	return element;
 },
 /**
  * This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.
