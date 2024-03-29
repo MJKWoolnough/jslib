@@ -1,5 +1,6 @@
 import type {Token, TokenFn} from './parser.js';
 import CaseFold from './casefold.js';
+import {text2DOM} from './misc.js';
 import {TokenDone, Tokeniser} from './parser.js';
 import Parser from './parser.js';
 
@@ -1605,7 +1606,7 @@ class Document extends ContainerBlock {
 	}
 
 	render(tags: Tags) {
-		const ret = sanitise(setHTML(makeNode("template"), this.toHTML(this.#uid)).content.childNodes, tags, this.#uid);
+		const ret = sanitise(text2DOM(this.toHTML(this.#uid)).childNodes, tags, this.#uid);
 
 		encoder.replaceChildren();
 		links.clear();
