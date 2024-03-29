@@ -212,7 +212,7 @@ bindElement = (ns, value) => wrapElem(value, () => document.createElementNS(ns, 
 bindCustomElement = (name, constructor, options) => {
 	customElements.define(name, constructor, options);
 
-	return wrapElem(name, () => new constructor());
+	return wrapElem(options?.extends ?? name, () => new constructor());
 },
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.

@@ -230,7 +230,7 @@ bindElement = <T extends Element>(ns: string, value: string) => wrapElem(value, 
 bindCustomElement = <T extends HTMLElement>(name: string, constructor: {new (...params: any[]): T}, options?: ElementDefinitionOptions | undefined) => {
 	customElements.define(name, constructor, options);
 
-	return wrapElem(name, () => new constructor());
+	return wrapElem(options?.extends ?? name, () => new constructor());
 },
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.
