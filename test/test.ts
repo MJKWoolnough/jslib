@@ -217,7 +217,7 @@ type Tests = {
 				    sFn = (_: boolean) => {};
 				const {Subscription} = await import("./lib/inter.js"),
 				      s = new Subscription<boolean>(s => sFn = s);
-				s.when(b => b).when(b => res = b).catch(() => res = false);;
+				s.when(b => b).when(b => res = b).catch(() => res = false);
 				sFn(true);
 				return res;
 			},
@@ -227,8 +227,8 @@ type Tests = {
 				const {Subscription} = await import("./lib/inter.js"),
 				      s = new Subscription<number>(s => sFn = s);
 				s.when(b => res += b).catch(() => res = 0);
-				s.when(b => res += b).catch(() => res = 0);;
-				s.when(b => res += b).catch(() => res = 0);;
+				s.when(b => res += b).catch(() => res = 0);
+				s.when(b => res += b).catch(() => res = 0);
 				sFn(1);
 				return res === 3;
 			},
@@ -843,7 +843,7 @@ type Tests = {
 				const {amendNode, toggle} = await import("./lib/dom.js"),
 				      states: boolean[] = [],
 				      toggleFn = (v: boolean) => states.push(v),
-				      d = document.createElement("div");;
+				      d = document.createElement("div");
 
 				amendNode(d, {"attr": toggle(toggleFn)});
 				amendNode(d, {"attr": toggle(toggleFn)});
@@ -2832,7 +2832,7 @@ type Tests = {
 				}
 				const {JSONSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_JSONSetting_3";
-				new JSONSetting(name, {"A": 1} as O, (o: any): o is O => o instanceof Object && typeof o.A === "number").set({"A": 2}).remove();;
+				new JSONSetting(name, {"A": 1} as O, (o: any): o is O => o instanceof Object && typeof o.A === "number").set({"A": 2}).remove();
 				return window.localStorage.getItem(name) === null;
 			},
 			"name": async () => {
@@ -5835,7 +5835,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items).toSorted((a, b) => b.num - a.num);
 
-					return n.at(0) === items[4] && n.at(1) === items[3] && n.at(2) === items[2] && n.at(3) === items[1] && n.at(4) === items[0];;
+					return n.at(0) === items[4] && n.at(1) === items[3] && n.at(2) === items[2] && n.at(3) === items[1] && n.at(4) === items[0];
 				}
 			},
 			"toSplice": {
