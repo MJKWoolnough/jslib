@@ -1,4 +1,4 @@
-import type {PropsObject} from './dom';
+import type {PropsObject} from './dom.js';
 import CSS from './css.js';
 import {amendNode, bindCustomElement, child} from './dom.js';
 import {button, div, input, label, li, table, tbody, td, th, thead, tr, ul} from './html.js';
