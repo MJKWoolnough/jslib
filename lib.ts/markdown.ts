@@ -102,11 +102,6 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 
 	return node;
       },
-      setHTML = <N extends Element>(node: N, html: string) => {
-	node.innerHTML = html;
-
-	return node;
-      },
       setText = <N extends Element>(node: N, text: string) => {
 	node.textContent = text;
 
@@ -1225,7 +1220,11 @@ const makeNode = <NodeName extends keyof HTMLElementTagNameMap>(nodeName: NodeNa
 		}
 	}
       },
-      processEscapedPunctuation = (text: string) => setHTML(encoder, punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text)).innerText,
+      processEscapedPunctuation = (text: string) => {
+	      encoder.innerHTML = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text);
+
+	      return encoder.innerText;
+      },
       parseInline = (uid: string, text: string) => {
 	const stack = Parser(text, parseText, p => p.return(p.exceptRun(TokenDone))).next().value.data.filter(t => t.data);
 

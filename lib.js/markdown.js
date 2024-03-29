@@ -70,11 +70,6 @@ const makeNode = (nodeName, params = {}, children = "") => {
 
 	return node;
       },
-      setHTML = (node, html) => {
-	node.innerHTML = html;
-
-	return node;
-      },
       setText = (node, text) => {
 	node.textContent = text;
 
@@ -1193,7 +1188,11 @@ const makeNode = (nodeName, params = {}, children = "") => {
 		}
 	}
       },
-      processEscapedPunctuation = text => setHTML(encoder, punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text)).innerText,
+      processEscapedPunctuation = text => {
+	      encoder.innerHTML = punctuation.split("").reduce((text, char) => text.replaceAll("\\"+char, char), text);
+
+	      return encoder.innerText;
+      },
       parseInline = (uid, text) => {
 	const stack = Parser(text, parseText, p => p.return(p.exceptRun(TokenDone))).next().value.data.filter(t => t.data);
 
