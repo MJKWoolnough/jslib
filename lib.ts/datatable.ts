@@ -2,6 +2,7 @@ import type {PropsObject} from './dom.js';
 import CSS from './css.js';
 import {amendNode, bindCustomElement, child} from './dom.js';
 import {button, div, input, label, li, table, tbody, td, th, thead, tr, ul} from './html.js';
+import {checkInt} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
@@ -225,19 +226,18 @@ export class DataTable extends HTMLElement {
 		return count;
 	}
 
-	attributeChangedCallback(name: string, _: string | null, newValue: string | null) {
-		const val = parseInt(newValue ?? "0"),
-		      safeVal = isNaN(val) || val < 0 ? 0 : val;
+	attributeChangedCallback(name: string, _: string, newValue: string) {
+		const val = parseInt(newValue);
 
 		switch (name) {
 		default:
 			return;
 		case observedAttr[0]:
-			this.#page = safeVal;
+			this.#page = checkInt(val, 0);
 
 			break;
 		case observedAttr[1]:
-			this.#perPage = safeVal || Infinity;
+			this.#perPage = checkInt(val, 1, Infinity, Infinity);
 		}
 
 		this.#setPage();
