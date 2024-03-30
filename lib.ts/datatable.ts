@@ -190,14 +190,14 @@ export class DataTable extends HTMLElement {
 	#body: HTMLSlotElement;
 	#filtersElm: Element;
 	#filters = new Map<number, Function>();
-	#sort = -1;
+	#sort: Element | null = null;
 	#rev = false;
 	#page = 0;
 	#perPage = Infinity;
 	#filterList = new Map<number, TextHeaderFilter | NumberHeaderFilter>();
 	#sorters: ((a: string, b: string) => number)[] = [];
-	#headers = new Map<HTMLTableCellElement, number>();
-	#data = new Map<HTMLTableRowElement, string[]>();
+	#headers = new Map<Element, number>();
+	#data = new Map<Element, string[]>();
 	#debounce = false;
 
 	constructor() {
@@ -206,7 +206,36 @@ export class DataTable extends HTMLElement {
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			this.#filtersElm = div(),
 			table([
-				this.#head = slot(),
+				this.#head = slot({"onclick": (e: MouseEvent) => {
+					let target = e.target as Element;
+
+					while (!this.#headers.has(target)) {
+						if (target === this) {
+							return;
+						}
+
+						target = target.parentElement!;
+					}
+
+					console.log(target);
+
+					if (this.#sort === target) {
+						if (this.#rev) {
+							amendNode(target, unsetSort);
+
+							this.#rev = false;
+							this.#sort = null;
+						} else {
+							amendNode(target, setReverse);
+							this.#rev = true;
+						}
+					} else {
+						amendNode(this.#sort, unsetSort);
+						amendNode(target, setSort);
+
+						this.#sort = target;
+					}
+				}}),
 				tbody(this.#body = slot())
 			])
 		]).adoptedStyleSheets = style;
@@ -235,6 +264,8 @@ export class DataTable extends HTMLElement {
 		this.#sorters = [];
 		this.#headers.clear();
 		this.#data.clear();
+		this.#sort = null;
+		this.#rev = false;
 
 		for (const elem of this.children) {
 			if (elem instanceof HTMLTableSectionElement && elem.nodeName === "THEAD" && elem.firstChild instanceof HTMLTableRowElement) {
