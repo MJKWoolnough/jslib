@@ -293,7 +293,7 @@ export class DataTable extends HTMLElement {
 
 				for (const child of elem.children) {
 					if (child instanceof HTMLTableCellElement) {
-						if (this.#sorters.length < data.length) {
+						if (this.#sorters.length <= data.length) {
 							this.#sorters.push(numberSorter);
 						}
 
@@ -321,7 +321,7 @@ export class DataTable extends HTMLElement {
 
 		for (const header of (head.firstChild as HTMLTableRowElement).children) {
 			if (header instanceof HTMLTableCellElement) {
-				this.#headers.set(header, ++headers);
+				this.#headers.set(header, headers++);
 			}
 		}
 
