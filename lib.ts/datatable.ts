@@ -231,6 +231,8 @@ export class DataTable extends HTMLElement {
 
 		const rows: HTMLTableRowElement[] = [];
 
+		this.#sorters = [];
+
 		for (const elem of this.children) {
 			if (elem instanceof HTMLTableSectionElement && elem.nodeName === "THEAD" && elem.firstChild instanceof HTMLTableRowElement) {
 				if (!head) {
@@ -244,6 +246,14 @@ export class DataTable extends HTMLElement {
 				for (const child of elem.children) {
 					if (child instanceof HTMLTableCellElement) {
 						cols++;
+
+						if (this.#sorters.length < cols) {
+							this.#sorters.push(numberSorter);
+						}
+
+						if (isNaN(parseNum(child.textContent + ""))) {
+							this.#sorters[cols] = stringSort;
+						}
 					}
 				}
 
