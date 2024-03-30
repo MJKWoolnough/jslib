@@ -211,6 +211,17 @@ export class DataTable extends HTMLElement {
 		]).adoptedStyleSheets = style;
 
 		this.#parseContent();
+
+		new MutationObserver((mutations: MutationRecord[]) => {
+			for (const mutation of mutations) {
+				if (mutation.type === "childList") {
+					this.#parseContent();
+				}
+			}
+		}).observe(this, {
+			"childList": true,
+			"subtree": true
+		});
 	}
 
 	#parseContent() {
