@@ -202,7 +202,7 @@ export class DataTable extends HTMLElement {
 	constructor() {
 		super();
 
-		amendNode(this.attachShadow({"mode": "closed"}), [
+		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			this.#filtersElm = div(),
 			table([
 				this.#head = slot(),
