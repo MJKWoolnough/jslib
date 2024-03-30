@@ -214,22 +214,55 @@ export class DataTable extends HTMLElement {
 	}
 
 	#parseContent() {
-		let hasHead = false;
+		let head: HTMLTableSectionElement | null = null,
+		    maxCols = 0,
+		    headers = 0;
 
 		const rows: HTMLTableRowElement[] = [];
 
 		for (const elem of this.children) {
-			if (elem.nodeName === "TH") {
-				if (!hasHead) {
-					hasHead = true;
-
-					this.#head.assign(elem);
+			if (elem instanceof HTMLTableSectionElement && elem.nodeName === "THEAD" && elem.firstChild instanceof HTMLTableRowElement) {
+				if (!head) {
+					head = elem;
 				}
 			} else if (elem instanceof HTMLTableRowElement) {
 				rows.push(elem);
+
+				let cols = 0;
+
+				for (const child of elem.children) {
+					if (child instanceof HTMLTableCellElement) {
+						cols++;
+					}
+				}
+
+				if (cols > maxCols) {
+					maxCols = cols;
+				}
 			}
 		}
 
+		if (!head) {
+			head = thead(tr());
+		}
+
+		for (const header of (head.firstChild as HTMLTableRowElement).children) {
+			if (header instanceof HTMLTableCellElement) {
+				headers++;
+			}
+		}
+
+		if (headers > maxCols) {
+			maxCols = headers;
+		} else if (headers < maxCols) {
+			for (; headers < maxCols; headers++) {
+				amendNode(head.firstChild, th(colName(headers + 1)));
+			}
+
+			return;
+		}
+
+		this.#head.assign(head);
 		this.#body.assign(...rows);
 	}
 
