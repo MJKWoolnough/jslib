@@ -171,7 +171,7 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       unsetReverse = {"class": {"r": false}},
       parseNum = (a: string) => parseFloat(a || "-Infinity"),
       numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
-      nullSort = (a: Row, b: Row) => a.row - b.row,
+      nullSort = () => 0,
       observedAttr = Object.freeze(["page", "perPage"]),
       isBlankFilter = (s: string) => !s,
       isNotBlankFilter = (s: string) => !!s,
@@ -196,7 +196,7 @@ export class DataTable extends HTMLElement {
 	#perPage = Infinity;
 	#filterList = new Map<number, TextHeaderFilter | NumberHeaderFilter>();
 	#sorters: ((a: string, b: string) => number)[] = [];
-	#headers = new Map<Element, number>();
+	#headers = new Map<HTMLElement, number>();
 	#data = new Map<Element, string[]>();
 	#debounce = false;
 
@@ -207,7 +207,7 @@ export class DataTable extends HTMLElement {
 			this.#filtersElm = div(),
 			table([
 				this.#head = slot({"onclick": (e: MouseEvent) => {
-					let target = e.target as Element;
+					let target = e.target as HTMLElement;
 
 					while (!this.#headers.has(target)) {
 						if (target === this) {
@@ -216,8 +216,6 @@ export class DataTable extends HTMLElement {
 
 						target = target.parentElement!;
 					}
-
-					console.log(target);
 
 					if (this.#sort === target) {
 						if (this.#rev) {
@@ -243,12 +241,28 @@ export class DataTable extends HTMLElement {
 		this.#parseContent();
 
 		new MutationObserver((mutations: MutationRecord[]) => {
+			let doneChildren = false,
+			    doneSort = false;
 			for (const mutation of mutations) {
-				if (mutation.type === "childList") {
-					this.#parseContent();
+				switch (mutation.type) {
+				case "childList":
+					if (!doneChildren) {
+						this.#parseContent();
+
+						doneChildren = true;
+					}
+
+					break;
+				case "attributes":
+					if (!doneSort) {
+						this.#parseSort();
+
+						doneSort = true;
+					}
 				}
 			}
 		}).observe(this, {
+			"attributeFilter": ["data-sort"],
 			"childList": true,
 			"subtree": true
 		});
@@ -327,6 +341,28 @@ export class DataTable extends HTMLElement {
 
 		this.#head.assign(head);
 		this.#body.assign(...rows);
+	}
+
+	#parseSort() {
+		let reverse = false;
+		for (const [header, num] of this.#headers) {
+			switch (header.dataset["sort"]) {
+			case "desc":
+				reverse = true;
+			case "asc":
+				this.#sortRows(num, reverse);
+
+				return;
+			}
+		}
+
+		this.#sortRows(-1);
+	}
+
+	#sortRows(col: number, reverse = false) {
+		const sorter = this.#sorters[col] ?? nullSort;
+
+		this.#body.assign(...Array.from(this.#data).sort(([, a], [, b]) => sorter(a[col], b[col]) * (reverse ? -1 : 1)).map(row => row[0]));
 	}
 
 	get totalRows() {
