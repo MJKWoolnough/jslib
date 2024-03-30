@@ -1,7 +1,7 @@
 import type {PropsObject} from './dom.js';
 import CSS from './css.js';
 import {amendNode, bindCustomElement, child} from './dom.js';
-import {button, div, input, label, li, table, tbody, td, th, thead, tr, ul} from './html.js';
+import {button, div, input, label, li, slot, table, tbody, td, th, thead, tr, ul} from './html.js';
 import {checkInt} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
@@ -186,8 +186,8 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       };
 
 export class DataTable extends HTMLElement {
-	#head: NodeArray<Header>;
-	#body: NodeArray<Row>;
+	#head: HTMLSlotElement;
+	#body: HTMLSlotElement;
 	#filtersElm: Element;
 	#filters = new Map<number, Function>();
 	#sort = -1;
@@ -202,16 +202,35 @@ export class DataTable extends HTMLElement {
 	constructor() {
 		super();
 
-		this.#head = new NodeArray(tr());
-		this.#body = new NodeArray(tbody());
-
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			this.#filtersElm = div(),
 			table([
-				thead(this.#head),
-				this.#body
+				this.#head = slot(),
+				tbody(this.#body = slot())
 			])
 		]).adoptedStyleSheets = style;
+
+		this.#parseContent();
+	}
+
+	#parseContent() {
+		let hasHead = false;
+
+		const rows: HTMLTableRowElement[] = [];
+
+		for (const elem of this.children) {
+			if (elem.nodeName === "TH") {
+				if (!hasHead) {
+					hasHead = true;
+
+					this.#head.assign(elem);
+				}
+			} else if (elem instanceof HTMLTableRowElement) {
+				rows.push(elem);
+			}
+		}
+
+		this.#body.assign(...rows);
 	}
 
 	get totalRows() {
