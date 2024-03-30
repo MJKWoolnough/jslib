@@ -2,7 +2,7 @@ import type {PropsObject} from './dom.js';
 import CSS from './css.js';
 import {amendNode, bindCustomElement, child} from './dom.js';
 import {button, div, input, label, li, slot, table, tbody, td, th, thead, tr, ul} from './html.js';
-import {checkInt} from './misc.js';
+import {checkInt, pushAndReturn} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
@@ -196,7 +196,8 @@ export class DataTable extends HTMLElement {
 	#perPage = Infinity;
 	#filterList = new Map<number, TextHeaderFilter | NumberHeaderFilter>();
 	#sorters: ((a: string, b: string) => number)[] = [];
-	#headers = new Map<string, Header>();
+	#headers = new Map<HTMLTableCellElement, number>();
+	#data = new Map<HTMLTableRowElement, string[]>();
 	#debounce = false;
 
 	constructor() {
@@ -232,6 +233,8 @@ export class DataTable extends HTMLElement {
 		const rows: HTMLTableRowElement[] = [];
 
 		this.#sorters = [];
+		this.#headers.clear();
+		this.#data.clear();
 
 		for (const elem of this.children) {
 			if (elem instanceof HTMLTableSectionElement && elem.nodeName === "THEAD" && elem.firstChild instanceof HTMLTableRowElement) {
@@ -241,25 +244,29 @@ export class DataTable extends HTMLElement {
 			} else if (elem instanceof HTMLTableRowElement) {
 				rows.push(elem);
 
-				let cols = 0;
+				const data: string[] = [];
 
 				for (const child of elem.children) {
 					if (child instanceof HTMLTableCellElement) {
-						cols++;
-
-						if (this.#sorters.length < cols) {
+						if (this.#sorters.length < data.length) {
 							this.#sorters.push(numberSorter);
 						}
 
-						if (isNaN(parseNum(child.textContent + ""))) {
-							this.#sorters[cols] = stringSort;
+						const cell = child.textContent ?? "";
+
+						if (isNaN(parseNum(cell))) {
+							this.#sorters[data.length] = stringSort;
 						}
+
+						data.push(cell);
 					}
 				}
 
-				if (cols > maxCols) {
-					maxCols = cols;
+				if (data.length > maxCols) {
+					maxCols = data.length;
 				}
+
+				this.#data.set(elem, data);
 			}
 		}
 
@@ -269,16 +276,20 @@ export class DataTable extends HTMLElement {
 
 		for (const header of (head.firstChild as HTMLTableRowElement).children) {
 			if (header instanceof HTMLTableCellElement) {
-				headers++;
+				this.#headers.set(header, ++headers);
 			}
 		}
 
 		if (headers > maxCols) {
 			maxCols = headers;
 		} else if (headers < maxCols) {
+			const toAdd: HTMLTableCellElement[] = [];
+
 			for (; headers < maxCols; headers++) {
-				amendNode(head.firstChild, th(colName(headers + 1)));
+				this.#headers.set(pushAndReturn(toAdd, th(colName(headers + 1))), headers);
 			}
+
+			amendNode(head.firstChild, toAdd);
 
 			return;
 		}
