@@ -188,7 +188,6 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 export class DataTable extends HTMLElement {
 	#head: HTMLSlotElement;
 	#body: HTMLSlotElement;
-	#filtersElm: Element;
 	#filters = new Map<number, Function>();
 	#sort: Element | null = null;
 	#rev = false;
@@ -203,18 +202,39 @@ export class DataTable extends HTMLElement {
 	constructor() {
 		super();
 
+		const filter = div(),
+		      mo = new MutationObserver((mutations: MutationRecord[]) => {
+			let doneChildren = false,
+			    doneSort = false;
+
+			for (const mutation of mutations) {
+				switch (mutation.type) {
+				case "childList":
+					if (!doneChildren) {
+						this.#parseContent();
+
+						doneChildren = true;
+					}
+
+					break;
+				case "attributes":
+					if (!doneSort) {
+						this.#parseSort();
+
+						doneSort = true;
+					}
+				}
+			}
+		      });
+
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			this.#filtersElm = div(),
+			filter,
 			table([
 				this.#head = slot({"onclick": (e: MouseEvent) => {
-					let target = e.target as HTMLElement;
+					const target = this.#getHeaderCell(e);
 
-					while (!this.#headers.has(target)) {
-						if (target === this) {
-							return;
-						}
-
-						target = target.parentElement!;
+					if (!target) {
+						return;
 					}
 
 					if (target.dataset["sortDisable"] !== undefined) {
@@ -237,44 +257,93 @@ export class DataTable extends HTMLElement {
 
 						this.#sort = target;
 					}
+				}, "oncontextmenu": (e: MouseEvent) => {
+					const target = this.#getHeaderCell(e);
+
+					if (!target) {
+						return;
+					}
+
+					e.preventDefault();
+
+					let {clientX, clientY} = e,
+					    p: HTMLElement | null = this;
+
+					while (p) {
+						clientX -= p.offsetLeft;
+						clientY -= p.offsetTop;
+						p = p.offsetParent as HTMLElement | null;
+					}
+
+					const firstRadio = input({"type": "radio", "checked": true, "name": "data-table-filter"}),
+					      list = ul({"tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "ofocusout": function(this: HTMLUListElement, e: FocusEvent) {
+						if (!e.relatedTarget || !list.contains(e.relatedTarget as Node)) {
+							this.remove();
+						}
+					      }}, [
+						li([
+							firstRadio,
+							this.#sorters[this.#headers.get(target)!] === numberSorter ? [
+								input({"oninput": () => {
+								}}),
+								" ≤ x ≤ ",
+								input({"oninput": () => {
+								}})
+							] : [
+								makeToggleButton("^", "Starts With", v => {
+								}),
+								input({"type": "text", "oninput": function(this: HTMLInputElement) {
+								}}),
+								 makeToggleButton("$", "Ends With", v => {
+								}),
+								makeToggleButton("i", "Case Sensitivity", v => {
+								})
+							]
+						]),
+						li([
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank",  "onclick": () => {
+							}}),
+							label({"for": "filter-remove-blank"}, "Remove Blank")
+						]),
+						li([
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "onclick": () => {
+							}}),
+							label({"for": "filter-only-blank"}, "Only Blank")
+						])
+					      ]);
+
+					amendNode(filter, list);
+					list.focus();
 				}}),
 				tbody(this.#body = slot())
 			])
-		]).adoptedStyleSheets = style;
+		      ]).adoptedStyleSheets = style;
 
 		this.#parseContent();
 
-		const mo = new MutationObserver((mutations: MutationRecord[]) => {
-			let doneChildren = false,
-			    doneSort = false;
-			for (const mutation of mutations) {
-				switch (mutation.type) {
-				case "childList":
-					if (!doneChildren) {
-						this.#parseContent();
-
-						doneChildren = true;
-					}
-
-					break;
-				case "attributes":
-					if (!doneSort) {
-						this.#parseSort();
-
-						doneSort = true;
-					}
-				}
-			}
-		});
 		mo.observe(this, {
-			"attributeFilter": ["data-sort"],
+			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-is-text", "data-empty", "data-not-empty",  "data-disallow-empty", "data-disallow-not-empty"],
 			"childList": true,
 			"subtree": true
 		});
 		mo.observe(this.#head, {
-			"attributeFilter": ["data-sort"],
+			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-empty", "data-not-empty"],
 			"subtree": true
 		});
+	}
+
+	#getHeaderCell(e: MouseEvent) {
+		let target = e.target as HTMLElement;
+
+		while (!this.#headers.has(target)) {
+			if (target === this) {
+				return null;
+			}
+
+			target = target.parentElement!;
+		}
+
+		return target;
 	}
 
 	#parseContent() {
@@ -408,6 +477,7 @@ export class DataTable extends HTMLElement {
 		return observedAttr;
 	}
 
+	/*
 	setData(data: Data, titles?: Headers) {
 		this.#head.splice(0, this.#head.length);
 		this.#body.splice(0, this.#body.length);
@@ -778,6 +848,7 @@ export class DataTable extends HTMLElement {
 	exportPage(includeTitles = false) {
 		return this.#export(includeTitles, this.#page * this.#perPage, (this.#page + 1) * this.#perPage);
 	}
+	*/
 }
 
 export const datatable = bindCustomElement("data-table", DataTable);
