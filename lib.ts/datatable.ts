@@ -243,12 +243,12 @@ export class DataTable extends HTMLElement {
 		this.#parseContent();
 
 		mo.observe(this, {
-			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-is-text", "data-empty", "data-not-empty",  "data-disallow-empty", "data-disallow-not-empty"],
+			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-is-text", "data-empty", "data-not-empty",  "data-disallow-empty", "data-disallow-not-empty", "data-is-case-insensitive"],
 			"childList": true,
 			"subtree": true
 		});
 		mo.observe(this.#head, {
-			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-empty", "data-not-empty"],
+			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-empty", "data-not-empty", "data-is-case-insensitive"],
 			"subtree": true
 		});
 	}
