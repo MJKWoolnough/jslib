@@ -1,8 +1,8 @@
 import type {PropsObject} from './dom.js';
 import CSS from './css.js';
-import {amendNode, bindCustomElement, child} from './dom.js';
+import {amendNode, bindCustomElement, child, clearNode} from './dom.js';
 import {button, div, input, label, li, slot, table, tbody, td, th, thead, tr, ul} from './html.js';
-import {checkInt, pushAndReturn} from './misc.js';
+import {checkInt} from './misc.js';
 import {NodeArray, stringSort} from './nodes.js';
 
 type Value = string | number | boolean;
@@ -240,7 +240,8 @@ export class DataTable extends HTMLElement {
 
 		this.#parseContent();
 
-		new MutationObserver((mutations: MutationRecord[]) => {
+		const mo = new MutationObserver((mutations: MutationRecord[]) => {
+			console.log(1);
 			let doneChildren = false,
 			    doneSort = false;
 			for (const mutation of mutations) {
@@ -261,17 +262,21 @@ export class DataTable extends HTMLElement {
 					}
 				}
 			}
-		}).observe(this, {
+		});
+		mo.observe(this, {
 			"attributeFilter": ["data-sort"],
 			"childList": true,
+			"subtree": true
+		});
+		mo.observe(this.#head, {
+			"attributeFilter": ["data-sort"],
 			"subtree": true
 		});
 	}
 
 	#parseContent() {
 		let head: HTMLTableSectionElement | null = null,
-		    maxCols = 0,
-		    headers = 0;
+		    maxCols = 0;
 
 		const rows: HTMLTableRowElement[] = [];
 
@@ -316,30 +321,17 @@ export class DataTable extends HTMLElement {
 		}
 
 		if (!head) {
-			head = thead(tr());
+			clearNode(this.#head, head = thead(tr(Array.from({"length": maxCols}, (_, n) => th(colName(n + 1))))));
+		} else {
+			this.#head.assign(head);
 		}
 
 		for (const header of (head.firstChild as HTMLTableRowElement).children) {
 			if (header instanceof HTMLTableCellElement) {
-				this.#headers.set(header, headers++);
+				this.#headers.set(header, this.#headers.size);
 			}
 		}
 
-		if (headers > maxCols) {
-			maxCols = headers;
-		} else if (headers < maxCols) {
-			const toAdd: HTMLTableCellElement[] = [];
-
-			for (; headers < maxCols; headers++) {
-				this.#headers.set(pushAndReturn(toAdd, th(colName(headers + 1))), headers);
-			}
-
-			amendNode(head.firstChild, toAdd);
-
-			return;
-		}
-
-		this.#head.assign(head);
 		this.#body.assign(...rows);
 	}
 
