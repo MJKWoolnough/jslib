@@ -275,7 +275,7 @@ export class DataTable extends HTMLElement {
 						p = p.offsetParent as HTMLElement | null;
 					}
 
-					const firstRadio = input({"type": "radio", "checked": true, "name": "data-table-filter", "onclick": () => {
+					const firstRadio = input({"type": "radio", "checked": target.dataset["empty"] === undefined && target.dataset["notEmpty"] === undefined, "name": "data-table-filter", "onclick": () => {
 						amendNode(target, {"data-not-empty": false, "data-empty": false});
 					      }}),
 					      list = ul({"tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "ofocusout": function(this: HTMLUListElement, e: FocusEvent) {
@@ -286,12 +286,12 @@ export class DataTable extends HTMLElement {
 						li([
 							firstRadio,
 							this.#sorters[this.#headers.get(target)!] === numberSorter ? [
-								input({"oninput": function(this: HTMLInputElement) {
+								input({"value": target.dataset["min"], "oninput": function(this: HTMLInputElement) {
 									amendNode(target, {"data-min": this.value});
 									firstRadio.click();
 								}}),
 								" ≤ x ≤ ",
-								input({"oninput": function(this: HTMLInputElement) {
+								input({"value": target.dataset["max"], "oninput": function(this: HTMLInputElement) {
 									amendNode(target, {"data-max": this.value});
 									firstRadio.click();
 								}})
@@ -300,11 +300,11 @@ export class DataTable extends HTMLElement {
 									amendNode(target, {"data-is-prefix": v});
 									firstRadio.click();
 								}),
-								input({"type": "text", "oninput": function(this: HTMLInputElement) {
+								input({"type": "text", "value": target.dataset["filter"], "oninput": function(this: HTMLInputElement) {
 									amendNode(target, {"data-filter": this.value});
 									firstRadio.click();
 								}}),
-								 makeToggleButton("$", "Ends With", v => {
+								makeToggleButton("$", "Ends With", v => {
 									amendNode(target, {"data-is-suffix": v});
 									firstRadio.click();
 								}),
@@ -315,13 +315,13 @@ export class DataTable extends HTMLElement {
 							]
 						]),
 						li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank",  "onclick": () => {
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": target.dataset["notEmpty"] !== undefined, "onclick": () => {
 								amendNode(target, {"data-not-empty": true, "data-empty": false});
 							}}),
 							label({"for": "filter-remove-blank"}, "Remove Blank")
 						]),
 						li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "onclick": () => {
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": target.dataset["empty"] !== undefined, "onclick": () => {
 								amendNode(target, {"data-not-empty": false, "data-empty": true});
 							}}),
 							label({"for": "filter-only-blank"}, "Only Blank")
