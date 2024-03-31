@@ -176,7 +176,7 @@ const arrow = (up: 0 | 1) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w
       isBlankFilter = (s: string) => !s,
       isNotBlankFilter = (s: string) => !!s,
       regexpSpecials = "\\/.*+?|()[]{}".split(""),
-      makeToggleButton = (c: string, title: string, fn: (v: boolean) => void) => button({"class": "t", title, "onclick": function(this: HTMLButtonElement) {
+      makeToggleButton = (c: string, title: string, initial: boolean, fn: (v: boolean) => void) => button({"class": {"t": initial}, title, "onclick": function(this: HTMLButtonElement) {
 	fn(!this.classList.toggle("t"));
       }}, c),
       setButton = (filterButton: HTMLButtonElement, set: boolean) => {
@@ -296,7 +296,7 @@ export class DataTable extends HTMLElement {
 									firstRadio.click();
 								}})
 							] : [
-								makeToggleButton("^", "Starts With", v => {
+								makeToggleButton("^", "Starts With", target.dataset["isPrefix"] === undefined, v => {
 									amendNode(target, {"data-is-prefix": v});
 									firstRadio.click();
 								}),
@@ -304,11 +304,11 @@ export class DataTable extends HTMLElement {
 									amendNode(target, {"data-filter": this.value});
 									firstRadio.click();
 								}}),
-								makeToggleButton("$", "Ends With", v => {
+								makeToggleButton("$", "Ends With", target.dataset["isSuffix"] === undefined, v => {
 									amendNode(target, {"data-is-suffix": v});
 									firstRadio.click();
 								}),
-								makeToggleButton("i", "Case Sensitivity", v => {
+								makeToggleButton("i", "Case Sensitivity", target.dataset["isCaseInsensitive"] === undefined, v => {
 									amendNode(target, {"data-is-case-insensitive": v});
 									firstRadio.click();
 								})
