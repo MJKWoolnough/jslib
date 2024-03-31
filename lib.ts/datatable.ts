@@ -217,6 +217,10 @@ export class DataTable extends HTMLElement {
 						target = target.parentElement!;
 					}
 
+					if (target.dataset["sortDisable"] !== undefined) {
+						return;
+					}
+
 					if (this.#sort === target) {
 						if (this.#rev) {
 							amendNode(target, unsetSort);
@@ -241,7 +245,6 @@ export class DataTable extends HTMLElement {
 		this.#parseContent();
 
 		const mo = new MutationObserver((mutations: MutationRecord[]) => {
-			console.log(1);
 			let doneChildren = false,
 			    doneSort = false;
 			for (const mutation of mutations) {
