@@ -68,26 +68,36 @@ export class DataTable extends HTMLElement {
 
 		const filter = div(),
 		      mo = new MutationObserver((mutations: MutationRecord[]) => {
-			let doneChildren = false,
-			    doneSort = false;
+			let doParseChildren = false,
+			    doFilter = false,
+			    doSort = false;
 
 			for (const mutation of mutations) {
 				switch (mutation.type) {
 				case "childList":
-					if (!doneChildren) {
-						this.#parseContent();
-
-						doneChildren = true;
-					}
+					doParseChildren = true;
 
 					break;
 				case "attributes":
-					if (!doneSort) {
-						this.#sortData();
+					if (this.#headers.has(mutation.target as HTMLElement)) {
+						switch (mutation.attributeName) {
+						case "data-sort":
+							doSort = true;
 
-						doneSort = true;
+							break;
+						default:
+							doFilter = true;
+						}
 					}
 				}
+			}
+
+			if (doParseChildren) {
+				this.#parseContent();
+			} else if (doFilter) {
+				this.#filterData();
+			} else if (doSort) {
+				this.#sortData();
 			}
 		      });
 
@@ -202,7 +212,7 @@ export class DataTable extends HTMLElement {
 		this.#parseContent();
 
 		mo.observe(this, {
-			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-is-text", "data-empty", "data-not-empty",  "data-disallow-empty", "data-disallow-not-empty", "data-is-case-insensitive"],
+			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-is-text", "data-empty", "data-not-empty", "data-is-case-insensitive"],
 			"childList": true,
 			"subtree": true
 		});
