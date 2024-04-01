@@ -354,6 +354,10 @@ export class DataTable extends HTMLElement {
 
 		this.#body.assign(...data);
 	}
+
+	get totalRows() {
+		return this.#filteredData.length;
+	}
 }
 
 export const datatable = bindCustomElement("data-table", DataTable);
