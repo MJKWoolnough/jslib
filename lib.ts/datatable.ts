@@ -1,6 +1,7 @@
 import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {button, div, input, label, li, slot, table, tbody, th, thead, tr, ul} from './html.js';
+import {checkInt} from './misc.js';
 import {stringSort} from './nodes.js';
 
 
@@ -332,7 +333,26 @@ export class DataTable extends HTMLElement {
 	}
 
 	#pageData() {
-		this.#body.assign(...this.#sortedData.map(e => e[0]));
+		const page = checkInt(parseInt(this.getAttribute("page") ?? "0"), 0),
+		      perPage = checkInt(parseInt(this.getAttribute("perPage") ?? "0"), 1, Infinity, Infinity),
+		      first = page * perPage,
+		      data: Element[] = [];
+
+		let pos = 0;
+
+		for (const row of this.#sortedData) {
+			if (data.length > perPage) {
+				break;
+			}
+
+			if (pos >= first) {
+				data.push(row[0])
+			} else {
+				pos++;
+			}
+		}
+
+		this.#body.assign(...data);
 	}
 }
 
