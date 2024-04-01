@@ -176,18 +176,18 @@ export class DataTable extends HTMLElement {
 								})
 							]
 						]),
-						li([
+						target.dataset["disallowNotEmpty"] === undefined ? li([
 							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": target.dataset["notEmpty"] !== undefined, "onclick": () => {
 								amendNode(target, {"data-not-empty": true, "data-empty": false});
 							}}),
 							label({"for": "filter-remove-blank"}, "Remove Blank")
-						]),
-						li([
+						]) : [],
+						target.dataset["disallowEmpty"] ? li([
 							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": target.dataset["empty"] !== undefined, "onclick": () => {
 								amendNode(target, {"data-not-empty": false, "data-empty": true});
 							}}),
 							label({"for": "filter-only-blank"}, "Only Blank")
-						])
+						]) : []
 					      ]);
 
 					amendNode(filter, list);
