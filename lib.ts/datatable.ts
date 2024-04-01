@@ -48,6 +48,7 @@ const style = [
       parseNum = (a: string) => parseFloat(a || "-Infinity"),
       numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
       nullSort = () => 0,
+      observedAttr = Object.freeze(["page", "perPage"]),
       makeToggleButton = (c: string, title: string, initial: boolean, fn: (v: boolean) => void) => button({"class": {"t": initial}, title, "onclick": function(this: HTMLButtonElement) {
 	fn(!this.classList.toggle("t"));
       }}, c);
@@ -220,6 +221,14 @@ export class DataTable extends HTMLElement {
 			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-empty", "data-not-empty", "data-is-case-insensitive"],
 			"subtree": true
 		});
+	}
+
+	attributeChangedCallback(_name: string, _oldValue: string | null, _newValue: string | null) {
+		this.#pageData();
+	}
+
+	static get observedAttributes() {
+		return observedAttr;
 	}
 
 	#getHeaderCell(e: MouseEvent) {
