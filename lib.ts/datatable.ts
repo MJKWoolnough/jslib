@@ -60,6 +60,8 @@ export class DataTable extends HTMLElement {
 	#sorters: ((a: string, b: string) => number)[] = [];
 	#headers = new Map<HTMLElement, number>();
 	#data = new Map<Element, string[]>();
+	#filteredData: [Element, string[]][] = [];
+	#sortedData: [Element, string[]][] = [];
 
 	constructor() {
 		super();
@@ -81,7 +83,7 @@ export class DataTable extends HTMLElement {
 					break;
 				case "attributes":
 					if (!doneSort) {
-						this.#parseSort();
+						this.#sortData();
 
 						doneSort = true;
 					}
@@ -278,29 +280,40 @@ export class DataTable extends HTMLElement {
 			}
 		}
 
-		this.#body.assign(...Array.from(this.#data).map(e => e[0]));
+		this.#filterData();
 	}
 
-	#parseSort() {
-		let reverse = false;
+	#filterData() {
+		this.#filteredData = Array.from(this.#data);
+
+		this.#sortData();
+	}
+
+	#sortData() {
+		let reverse = false,
+		    col = -1;
+
+		Loop:
 		for (const [header, num] of this.#headers) {
 			switch (header.dataset["sort"]) {
 			case "desc":
 				reverse = true;
 			case "asc":
-				this.#sortRows(num, reverse);
+				col = num;
 
-				return;
+				break Loop;
 			}
 		}
 
-		this.#sortRows(-1);
-	}
-
-	#sortRows(col: number, reverse = false) {
 		const sorter = this.#sorters[col] ?? nullSort;
 
-		this.#body.assign(...Array.from(this.#data).sort(([, a], [, b]) => sorter(a[col], b[col]) * (reverse ? -1 : 1)).map(row => row[0]));
+		this.#sortedData = this.#filteredData.toSorted(([, a], [, b]) => sorter(a[col], b[col]) * (reverse ? -1 : 1));
+
+		this.#pageData();
+	}
+
+	#pageData() {
+		this.#body.assign(...this.#sortedData.map(e => e[0]));
 	}
 }
 
