@@ -358,6 +358,10 @@ export class DataTable extends HTMLElement {
 	get totalRows() {
 		return this.#filteredData.length;
 	}
+
+	export() {
+		return this.#sortedData.map(e => e[1]);
+	}
 }
 
 export const datatable = bindCustomElement("data-table", DataTable);
