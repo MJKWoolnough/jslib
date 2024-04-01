@@ -228,8 +228,6 @@ export class DataTable extends HTMLElement {
 		let head: HTMLTableSectionElement | null = null,
 		    maxCols = 0;
 
-		const rows: HTMLTableRowElement[] = [];
-
 		this.#sorters = [];
 		this.#headers.clear();
 		this.#data.clear();
@@ -242,8 +240,6 @@ export class DataTable extends HTMLElement {
 					head = elem;
 				}
 			} else if (elem instanceof HTMLTableRowElement) {
-				rows.push(elem);
-
 				const data: string[] = [];
 
 				for (const child of elem.children) {
@@ -282,7 +278,7 @@ export class DataTable extends HTMLElement {
 			}
 		}
 
-		this.#body.assign(...rows);
+		this.#body.assign(...Array.from(this.#data).map(e => e[0]));
 	}
 
 	#parseSort() {
@@ -306,7 +302,6 @@ export class DataTable extends HTMLElement {
 
 		this.#body.assign(...Array.from(this.#data).sort(([, a], [, b]) => sorter(a[col], b[col]) * (reverse ? -1 : 1)).map(row => row[0]));
 	}
-
 }
 
 export const datatable = bindCustomElement("data-table", DataTable);
