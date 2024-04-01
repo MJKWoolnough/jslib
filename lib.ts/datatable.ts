@@ -155,7 +155,8 @@ export class DataTable extends HTMLElement {
 						p = p.offsetParent as HTMLElement | null;
 					}
 
-					const firstRadio = input({"type": "radio", "checked": target.dataset["empty"] === undefined && target.dataset["notEmpty"] === undefined, "name": "data-table-filter", "onclick": () => {
+					const {dataset} = target,
+					      firstRadio = input({"type": "radio", "checked": dataset["empty"] === undefined && dataset["notEmpty"] === undefined, "name": "data-table-filter", "onclick": () => {
 						amendNode(target, {"data-not-empty": false, "data-empty": false});
 					      }}),
 					      list = ul({"tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
@@ -166,42 +167,42 @@ export class DataTable extends HTMLElement {
 						li([
 							firstRadio,
 							this.#sorters[this.#headers.get(target)!] === numberSorter ? [
-								input({"value": target.dataset["min"], "oninput": function(this: HTMLInputElement) {
+								input({"value": dataset["min"], "oninput": function(this: HTMLInputElement) {
 									amendNode(target, {"data-min": this.value});
 									firstRadio.click();
 								}}),
 								" ≤ x ≤ ",
-								input({"value": target.dataset["max"], "oninput": function(this: HTMLInputElement) {
+								input({"value": dataset["max"], "oninput": function(this: HTMLInputElement) {
 									amendNode(target, {"data-max": this.value});
 									firstRadio.click();
 								}})
 							] : [
-								makeToggleButton("^", "Starts With", target.dataset["isPrefix"] === undefined, v => {
+								makeToggleButton("^", "Starts With", dataset["isPrefix"] === undefined, v => {
 									amendNode(target, {"data-is-prefix": v});
 									firstRadio.click();
 								}),
-								input({"type": "text", "value": target.dataset["filter"], "oninput": function(this: HTMLInputElement) {
+								input({"type": "text", "value": dataset["filter"], "oninput": function(this: HTMLInputElement) {
 									amendNode(target, {"data-filter": this.value});
 									firstRadio.click();
 								}}),
-								makeToggleButton("$", "Ends With", target.dataset["isSuffix"] === undefined, v => {
+								makeToggleButton("$", "Ends With", dataset["isSuffix"] === undefined, v => {
 									amendNode(target, {"data-is-suffix": v});
 									firstRadio.click();
 								}),
-								makeToggleButton("i", "Case Sensitivity", target.dataset["isCaseInsensitive"] === undefined, v => {
+								makeToggleButton("i", "Case Sensitivity", dataset["isCaseInsensitive"] === undefined, v => {
 									amendNode(target, {"data-is-case-insensitive": v});
 									firstRadio.click();
 								})
 							]
 						]),
-						target.dataset["disallowNotEmpty"] === undefined ? li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": target.dataset["notEmpty"] !== undefined, "onclick": () => {
+						dataset["disallowNotEmpty"] === undefined ? li([
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dataset["notEmpty"] !== undefined, "onclick": () => {
 								amendNode(target, {"data-not-empty": true, "data-empty": false});
 							}}),
 							label({"for": "filter-remove-blank"}, "Remove Blank")
 						]) : [],
-						target.dataset["disallowEmpty"] ? li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": target.dataset["empty"] !== undefined, "onclick": () => {
+						dataset["disallowEmpty"] ? li([
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dataset["empty"] !== undefined, "onclick": () => {
 								amendNode(target, {"data-not-empty": false, "data-empty": true});
 							}}),
 							label({"for": "filter-only-blank"}, "Only Blank")
@@ -310,16 +311,16 @@ export class DataTable extends HTMLElement {
 	#filterData() {
 		const filter: ((a: string) => boolean)[] = [];
 
-		for (const [header, col] of this.#headers) {
-			if (header.dataset["notEmpty"] !== undefined) {
+		for (const [{dataset}, col] of this.#headers) {
+			if (dataset["notEmpty"] !== undefined) {
 				filter.push(isNotBlankFilter);
-			} else if (header.dataset["empty"] !== undefined) {
+			} else if (dataset["empty"] !== undefined) {
 				filter.push(isBlankFilter);
-			} else if (this.#sorters[col] === stringSort || header.dataset["isText"] !== undefined) {
-				const isCaseInsensitive = header.dataset["isCaseInsensitive"] !== undefined,
-				      filterText = isCaseInsensitive ? (header.dataset["filter"] ?? "").toLowerCase() : header.dataset["filter"] ?? "",
-				      isPrefix = header.dataset["isPrefix"] !== undefined,
-				      isSuffix = header.dataset["isPrefix"] !== undefined;
+			} else if (this.#sorters[col] === stringSort || dataset["isText"] !== undefined) {
+				const isCaseInsensitive = dataset["isCaseInsensitive"] !== undefined,
+				      filterText = isCaseInsensitive ? (dataset["filter"] ?? "").toLowerCase() : dataset["filter"] ?? "",
+				      isPrefix = dataset["isPrefix"] !== undefined,
+				      isSuffix = dataset["isPrefix"] !== undefined;
 
 				if (filterText) {
 					if (isPrefix) {
@@ -337,8 +338,8 @@ export class DataTable extends HTMLElement {
 					filter.push(nullFilter);
 				}
 			} else {
-				const min = safeFloat(parseFloat(header.dataset["min"] ?? ""), -Infinity),
-				      max = safeFloat(parseFloat(header.dataset["max"] ?? ""), Infinity);
+				const min = safeFloat(parseFloat(dataset["min"] ?? ""), -Infinity),
+				      max = safeFloat(parseFloat(dataset["max"] ?? ""), Infinity);
 
 				filter.push(text => {
 					const num = parseFloat(text);
