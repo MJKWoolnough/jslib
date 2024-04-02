@@ -378,6 +378,8 @@ export class DataTable extends HTMLElement {
 			}
 		}
 
+		this.#filteredData = [];
+
 		Loop:
 		for (const row of this.#data) {
 			let col = 0;
