@@ -236,11 +236,23 @@ export class DataTable extends HTMLElement {
 		default:
 			return;
 		case "page":
-			this.#page = checkInt(parseInt(newValue ?? "0"), 0);
+			const page = checkInt(parseInt(newValue ?? "0"), 0);
+
+			if (page === this.#page) {
+				return;
+			}
+
+			this.#page = page;
 
 			break;
 		case "perPage":
-			this.#perPage = checkInt(parseInt(newValue ?? "0"), 1, Infinity, Infinity);
+			const perPage = checkInt(parseInt(newValue ?? "0"), 1, Infinity, Infinity);
+
+			if (perPage === this.#perPage) {
+				return;
+			}
+
+			this.#perPage = perPage;
 		}
 
 		this.#pageData();
