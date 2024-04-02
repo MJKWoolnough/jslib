@@ -446,6 +446,10 @@ export class DataTable extends HTMLElement {
 		return this.#filteredData.length;
 	}
 
+	get pageRows() {
+		return this.#body.assignedElements().length;
+	}
+
 	export() {
 		return this.#sortedData.map(e => e[1]);
 	}
