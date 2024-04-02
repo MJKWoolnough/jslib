@@ -409,6 +409,8 @@ export class DataTable extends HTMLElement {
 		}
 
 		this.#body.assign(...data);
+
+		this.dispatchEvent(new Event("render"));
 	}
 
 	get totalRows() {
