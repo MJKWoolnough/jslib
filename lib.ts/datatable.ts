@@ -354,7 +354,7 @@ export class DataTable extends HTMLElement {
 			let col = 0;
 
 			for (const cell of row[1]) {
-				if (!filter[col++](cell)) {
+				if (!(filter[col++] ?? nullFilter)(cell)) {
 					continue Loop;
 				}
 			}
