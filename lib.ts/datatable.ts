@@ -203,7 +203,7 @@ export class DataTable extends HTMLElement {
 							}}),
 							label({"for": "filter-remove-blank"}, "Remove Blank")
 						]) : [],
-						dataset["disallowEmpty"] ? li([
+						dataset["disallowEmpty"] === undefined ? li([
 							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dataset["empty"] !== undefined, "onclick": () => {
 								amendNode(target, {"data-not-empty": false, "data-empty": true});
 							}}),
