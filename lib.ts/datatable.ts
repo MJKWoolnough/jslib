@@ -68,6 +68,8 @@ export class DataTable extends HTMLElement {
 	#data = new Map<Element, string[]>();
 	#filteredData: [Element, string[]][] = [];
 	#sortedData: [Element, string[]][] = [];
+	#page = 0;
+	#perPage = Infinity;
 
 	constructor() {
 		super();
@@ -229,7 +231,18 @@ export class DataTable extends HTMLElement {
 		});
 	}
 
-	attributeChangedCallback(_name: string, _oldValue: string | null, _newValue: string | null) {
+	attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null) {
+		switch (name) {
+		default:
+			return;
+		case "page":
+			this.#page = checkInt(parseInt(newValue ?? "0"), 0);
+
+			break;
+		case "perPage":
+			this.#perPage = checkInt(parseInt(newValue ?? "0"), 1, Infinity, Infinity);
+		}
+
 		this.#pageData();
 	}
 
@@ -393,15 +406,13 @@ export class DataTable extends HTMLElement {
 	}
 
 	#pageData() {
-		const page = checkInt(parseInt(this.getAttribute("page") ?? "0"), 0),
-		      perPage = checkInt(parseInt(this.getAttribute("perPage") ?? "0"), 1, Infinity, Infinity),
-		      first = page * perPage || 0,
+		const first = this.#page * this.#perPage || 0,
 		      data: Element[] = [];
 
 		let pos = 0;
 
 		for (const row of this.#sortedData) {
-			if (data.length > perPage) {
+			if (data.length > this.#perPage) {
 				break;
 			}
 
