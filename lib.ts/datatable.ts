@@ -341,11 +341,15 @@ export class DataTable extends HTMLElement {
 				const min = safeFloat(parseFloat(dataset["min"] ?? ""), -Infinity),
 				      max = safeFloat(parseFloat(dataset["max"] ?? ""), Infinity);
 
-				filter.push(text => {
-					const num = parseFloat(text);
+				if (min === -Infinity && max === Infinity) {
+					filter.push(nullFilter);
+				} else {
+					filter.push(text => {
+						const num = parseFloat(text);
 
-					return min <= num && num <= max;
-				});
+						return min <= num && num <= max;
+					});
+				}
 			}
 		}
 
