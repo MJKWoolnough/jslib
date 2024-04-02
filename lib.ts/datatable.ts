@@ -418,6 +418,10 @@ export class DataTable extends HTMLElement {
 	export() {
 		return this.#sortedData.map(e => e[1]);
 	}
+
+	exportPage() {
+		return this.#body.assignedElements().map(e => this.#data.get(e)!);
+	}
 }
 
 export const datatable = bindCustomElement("data-table", DataTable);
