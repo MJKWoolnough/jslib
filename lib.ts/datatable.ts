@@ -391,7 +391,7 @@ export class DataTable extends HTMLElement {
 	#pageData() {
 		const page = checkInt(parseInt(this.getAttribute("page") ?? "0"), 0),
 		      perPage = checkInt(parseInt(this.getAttribute("perPage") ?? "0"), 1, Infinity, Infinity),
-		      first = page * perPage,
+		      first = page * perPage || 0,
 		      data: Element[] = [];
 
 		let pos = 0;
