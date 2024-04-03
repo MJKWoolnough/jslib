@@ -296,11 +296,7 @@ export class DataTable extends HTMLElement {
 		this.#rev = false;
 
 		for (const elem of this.children) {
-			if (elem instanceof HTMLTableSectionElement && elem.nodeName === "THEAD" && elem.firstChild instanceof HTMLTableRowElement) {
-				if (!head) {
-					head = elem;
-				}
-			} else if (elem instanceof HTMLTableRowElement) {
+			if (elem instanceof HTMLTableRowElement) {
 				const data: string[] = [];
 
 				for (const child of elem.children) {
@@ -324,6 +320,8 @@ export class DataTable extends HTMLElement {
 				}
 
 				this.#data.set(elem, data);
+			} else if (elem instanceof HTMLTableSectionElement && !head && elem.nodeName === "THEAD" && elem.firstChild instanceof HTMLTableRowElement) {
+				head = elem;
 			}
 		}
 
