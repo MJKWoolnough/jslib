@@ -83,7 +83,7 @@ export class DataTable extends HTMLElement {
 		super();
 
 		const filter = div(),
-		      mo = new MutationObserver((mutations: MutationRecord[]) => {
+		      mo = new MutationObserver(mutations => {
 			let doParseChildren = false,
 			    doFilter = false,
 			    doSort = false;
