@@ -58,6 +58,7 @@ const style = [
       makeToggleButton = (c: string, title: string | Binding, initial: boolean, fn: (v: boolean) => void) => button({"class": {"t": initial}, title, "onclick": function(this: HTMLButtonElement) {
 	fn(!this.classList.toggle("t"));
       }}, c),
+      dsHasKey = <K extends string>(ds: DOMStringMap, key: K): ds is DOMStringMap & Record<K, string> => ds[key] !== undefined,
       lang = {
 	"STARTS_WITH": "Starts With" as string | Binding,
 	"ENDS_WIDTH": "Ends With" as string | Binding,
@@ -127,7 +128,7 @@ export class DataTable extends HTMLElement {
 						return;
 					}
 
-					if (target.dataset["sortDisable"] !== undefined) {
+					if (dsHasKey(target.dataset, "sortDisable")) {
 						return;
 					}
 
@@ -166,7 +167,7 @@ export class DataTable extends HTMLElement {
 					}
 
 					const {dataset} = target,
-					      firstRadio = input({"type": "radio", "checked": dataset["empty"] === undefined && dataset["notEmpty"] === undefined, "name": "data-table-filter", "onclick": () => {
+					      firstRadio = input({"type": "radio", "checked": !dsHasKey(dataset, "empty") && !dsHasKey(dataset, "notEmpty"), "name": "data-table-filter", "onclick": () => {
 						amendNode(target, {"data-not-empty": false, "data-empty": false});
 					      }}),
 					      list = ul({"tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
@@ -187,7 +188,7 @@ export class DataTable extends HTMLElement {
 									firstRadio.click();
 								}})
 							] : [
-								makeToggleButton("^", lang["STARTS_WITH"], dataset["isPrefix"] === undefined, v => {
+								makeToggleButton("^", lang["STARTS_WITH"], !dsHasKey(dataset, "isPrefix"), v => {
 									amendNode(target, {"data-is-prefix": v});
 									firstRadio.click();
 								}),
@@ -195,24 +196,24 @@ export class DataTable extends HTMLElement {
 									amendNode(target, {"data-filter": this.value});
 									firstRadio.click();
 								}}),
-								makeToggleButton("$", lang["ENDS_WIDTH"], dataset["isSuffix"] === undefined, v => {
+								makeToggleButton("$", lang["ENDS_WIDTH"], !dsHasKey(dataset, "isSuffix"), v => {
 									amendNode(target, {"data-is-suffix": v});
 									firstRadio.click();
 								}),
-								makeToggleButton("i", lang["CASE_SENSITIVITY"], dataset["isCaseInsensitive"] === undefined, v => {
+								makeToggleButton("i", lang["CASE_SENSITIVITY"], !dsHasKey(dataset, "isCaseInsensitive"), v => {
 									amendNode(target, {"data-is-case-insensitive": v});
 									firstRadio.click();
 								})
 							]
 						]),
-						dataset["disallowNotEmpty"] === undefined ? li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dataset["notEmpty"] !== undefined, "onclick": () => {
+						!dsHasKey(dataset, "disallowNotEmpty") ? li([
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dsHasKey(dataset, "notEmpty"), "onclick": () => {
 								amendNode(target, {"data-not-empty": true, "data-empty": false});
 							}}),
 							label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
 						]) : [],
-						dataset["disallowEmpty"] === undefined ? li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dataset["empty"] !== undefined, "onclick": () => {
+						dsHasKey(dataset, "disallowEmpty") ? li([
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dsHasKey(dataset, "empty"), "onclick": () => {
 								amendNode(target, {"data-not-empty": false, "data-empty": true});
 							}}),
 							label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
@@ -345,15 +346,15 @@ export class DataTable extends HTMLElement {
 		const filter: ((a: string) => boolean)[] = [];
 
 		for (const [{dataset}, col] of this.#headers) {
-			if (dataset["notEmpty"] !== undefined) {
+			if (dsHasKey(dataset, "notEmpty")) {
 				filter.push(isNotBlankFilter);
-			} else if (dataset["empty"] !== undefined) {
+			} else if (dsHasKey(dataset, "empty")) {
 				filter.push(isBlankFilter);
-			} else if (this.#sorters[col] === stringSort || dataset["isText"] !== undefined) {
-				const isCaseInsensitive = dataset["isCaseInsensitive"] !== undefined,
+			} else if (this.#sorters[col] === stringSort || dsHasKey(dataset, "isText")) {
+				const isCaseInsensitive = dsHasKey(dataset, "isCaseInsensitive"),
 				      filterText = isCaseInsensitive ? (dataset["filter"] ?? "").toLowerCase() : dataset["filter"] ?? "",
-				      isPrefix = dataset["isPrefix"] !== undefined,
-				      isSuffix = dataset["isPrefix"] !== undefined;
+				      isPrefix = dsHasKey(dataset, "isPrefix"),
+				      isSuffix = dsHasKey(dataset, "isPrefix");
 
 				if (filterText) {
 					if (isPrefix) {
