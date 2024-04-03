@@ -1,3 +1,4 @@
+import type {Binding} from './bind.js';
 import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {button, div, input, label, li, slot, table, tbody, th, thead, tr, ul} from './html.js';
@@ -54,9 +55,16 @@ const style = [
       nullFilter = () => true,
       safeFloat = (n: number, def: number) => isNaN(n) ? def : n,
       observedAttr = Object.freeze(["page", "perPage"]),
-      makeToggleButton = (c: string, title: string, initial: boolean, fn: (v: boolean) => void) => button({"class": {"t": initial}, title, "onclick": function(this: HTMLButtonElement) {
+      makeToggleButton = (c: string, title: string | Binding, initial: boolean, fn: (v: boolean) => void) => button({"class": {"t": initial}, title, "onclick": function(this: HTMLButtonElement) {
 	fn(!this.classList.toggle("t"));
-      }}, c);
+      }}, c),
+      lang = {
+	"STARTS_WITH": "Starts With" as string | Binding,
+	"ENDS_WIDTH": "Ends With" as string | Binding,
+	"CASE_SENSITIVITY": "Case Sensitivity" as string | Binding,
+	"REMOVE_BLANK": "Remove Blank" as string | Binding,
+	"ONLY_BLANK": "Only Blank" as string | Binding
+      };
 
 export class DataTable extends HTMLElement {
 	#head: HTMLSlotElement;
@@ -179,7 +187,7 @@ export class DataTable extends HTMLElement {
 									firstRadio.click();
 								}})
 							] : [
-								makeToggleButton("^", "Starts With", dataset["isPrefix"] === undefined, v => {
+								makeToggleButton("^", lang["STARTS_WITH"], dataset["isPrefix"] === undefined, v => {
 									amendNode(target, {"data-is-prefix": v});
 									firstRadio.click();
 								}),
@@ -187,11 +195,11 @@ export class DataTable extends HTMLElement {
 									amendNode(target, {"data-filter": this.value});
 									firstRadio.click();
 								}}),
-								makeToggleButton("$", "Ends With", dataset["isSuffix"] === undefined, v => {
+								makeToggleButton("$", lang["ENDS_WIDTH"], dataset["isSuffix"] === undefined, v => {
 									amendNode(target, {"data-is-suffix": v});
 									firstRadio.click();
 								}),
-								makeToggleButton("i", "Case Sensitivity", dataset["isCaseInsensitive"] === undefined, v => {
+								makeToggleButton("i", lang["CASE_SENSITIVITY"], dataset["isCaseInsensitive"] === undefined, v => {
 									amendNode(target, {"data-is-case-insensitive": v});
 									firstRadio.click();
 								})
@@ -201,13 +209,13 @@ export class DataTable extends HTMLElement {
 							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dataset["notEmpty"] !== undefined, "onclick": () => {
 								amendNode(target, {"data-not-empty": true, "data-empty": false});
 							}}),
-							label({"for": "filter-remove-blank"}, "Remove Blank")
+							label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
 						]) : [],
 						dataset["disallowEmpty"] === undefined ? li([
 							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dataset["empty"] !== undefined, "onclick": () => {
 								amendNode(target, {"data-not-empty": false, "data-empty": true});
 							}}),
-							label({"for": "filter-only-blank"}, "Only Blank")
+							label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
 						]) : []
 					      ]);
 
@@ -458,5 +466,7 @@ export class DataTable extends HTMLElement {
 		return this.#body.assignedElements().map(e => this.#data.get(e)!);
 	}
 }
+
+export const setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)};
 
 export const datatable = bindCustomElement("data-table", DataTable);
