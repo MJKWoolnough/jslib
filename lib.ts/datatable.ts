@@ -328,7 +328,7 @@ export class DataTable extends HTMLElement {
 		}
 
 		if (!head) {
-			clearNode(this.#head, head = thead(tr(Array.from({"length": maxCols}, (_, n) => th(colName(n + 1))))));
+			clearNode(this.#head, head = thead(tr(Array.from({"length": maxCols}, (_, n) => th({"part": "header"}, colName(n + 1))))));
 		} else {
 			this.#head.assign(head);
 		}
