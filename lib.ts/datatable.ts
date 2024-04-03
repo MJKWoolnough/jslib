@@ -30,7 +30,7 @@ const style = [
 			}
 		},
 		"table": {
-			"border-collapse": "collapse",
+			"border-collapse": "collapse"
 		}
 	})
       ],
