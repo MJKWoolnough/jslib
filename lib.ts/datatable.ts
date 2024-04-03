@@ -167,9 +167,7 @@ export class DataTable extends HTMLElement {
 					}
 
 					const {dataset} = target,
-					      firstRadio = input({"type": "radio", "checked": !dsHasKey(dataset, "empty") && !dsHasKey(dataset, "notEmpty"), "name": "data-table-filter", "onclick": () => {
-						amendNode(target, {"data-not-empty": false, "data-empty": false});
-					      }}),
+					      firstRadio = input({"type": "radio", "checked": !dsHasKey(dataset, "empty") && !dsHasKey(dataset, "notEmpty"), "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
 					      list = ul({"tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
 						if (!e.relatedTarget || !list.contains(e.relatedTarget as Node)) {
 							this.remove();
@@ -207,15 +205,11 @@ export class DataTable extends HTMLElement {
 							]
 						]),
 						!dsHasKey(dataset, "disallowNotEmpty") ? li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dsHasKey(dataset, "notEmpty"), "onclick": () => {
-								amendNode(target, {"data-not-empty": true, "data-empty": false});
-							}}),
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dsHasKey(dataset, "notEmpty"), "onclick": () => amendNode(target, {"data-not-empty": true, "data-empty": false})}),
 							label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
 						]) : [],
 						dsHasKey(dataset, "disallowEmpty") ? li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dsHasKey(dataset, "empty"), "onclick": () => {
-								amendNode(target, {"data-not-empty": false, "data-empty": true});
-							}}),
+							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dsHasKey(dataset, "empty"), "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": true})}),
 							label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
 						]) : []
 					      ]);
