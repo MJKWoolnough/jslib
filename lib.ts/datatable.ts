@@ -346,7 +346,7 @@ export class DataTable extends HTMLElement {
 				const isCaseInsensitive = dsHasKey(dataset, "isCaseInsensitive"),
 				      filterText = isCaseInsensitive ? (dataset["filter"] ?? "").toLowerCase() : dataset["filter"] ?? "",
 				      isPrefix = dsHasKey(dataset, "isPrefix"),
-				      isSuffix = dsHasKey(dataset, "isPrefix");
+				      isSuffix = dsHasKey(dataset, "isSuffix");
 
 				if (filterText) {
 					if (isPrefix) {
