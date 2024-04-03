@@ -469,4 +469,4 @@ export class DataTable extends HTMLElement {
 
 export const setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)};
 
-export const datatable = bindCustomElement("data-table", DataTable);
+export default bindCustomElement("data-table", DataTable);
