@@ -54,7 +54,6 @@ const style = [
       isNotBlankFilter = (s: string) => !!s,
       nullFilter = () => true,
       safeFloat = (n: number, def: number) => isNaN(n) ? def : n,
-      observedAttr = Object.freeze(["page", "perPage"]),
       makeToggleButton = (c: string, title: string | Binding, initial: boolean, fn: (v: boolean) => void) => button({"class": {"t": initial}, title, "onclick": function(this: HTMLButtonElement) {
 	fn(!this.classList.toggle("t"));
       }}, c),
@@ -262,7 +261,7 @@ export class DataTable extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return observedAttr;
+		return ["page", "perPage"];
 	}
 
 	#getHeaderCell(e: MouseEvent) {
