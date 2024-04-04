@@ -192,7 +192,7 @@ class ReadOnlyBinding extends Binding {
 }
 
 /**
- * This function can be used as a normal function, binding a single value, as a template tag function, or as a construtor for a MultiBinding.
+ * This function can be used as a normal function, binding a single value, as a template tag function, or as a constructor for a MultiBinding.
  *
  * When used normally, this function takes a single starting value and returns a {@link Binding} class with that value set.
  *
