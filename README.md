@@ -264,7 +264,7 @@ This module directly imports the [dom](#dom), and [inter](#inter) modules.
 ```typescript
 <T extends ToString = ToString>(t: T): Binding<T>;
 (strings: TemplateStringsArray, ...bindings: (Binding | ToString)[]): ReadonlyBinding<T>;
-<T, B extends unknown[]>(fn: (...v: B) => T, ...bindings: {[K in keyof B]: B[K] | Binding<B[K]>}): ReadOnlyBinding<T>;
+<T, B extends unknown[]>(fn: (...v: {[K in keyof B]: B[K] extends Binding<infer S> ? S : B[K]}) => T, ...bindings: B): ReadOnlyBinding<T>;
 ```
 
 This function can be used as a normal function, binding a single value, as a template tag function, or as a construtor for a MultiBinding.
