@@ -75,7 +75,7 @@ const childrenArr = (children, res = []) => {
 	return res;
       },
       isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
-      isEventListenerOrEventListenerObject = prop => prop instanceof Function || isEventListenerObject(prop) && (value in prop ? isEventListenerOrEventListenerObject(prop[value]) : true),
+      isEventListenerOrEventListenerObject = prop => prop instanceof Function || isEventListenerObject(prop),
       isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object && !isAttr(prop),
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !isAttr(prop)),
@@ -95,8 +95,6 @@ export const
 child = Symbol.for("dom-child"),
 /** This symbol is used to denote a method on an object that will take an attribute name and return a new Attr Node. */
 attr = Symbol.for("dom-attr"),
-/** This symbol is used to denote a special Object that might be an EventListener. */
-value = Symbol.for("dom-value"),
 /**
  * This function determines whether the passed in object can be used as a {@link Children} type.
  *
