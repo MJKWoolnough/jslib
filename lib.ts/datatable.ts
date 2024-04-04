@@ -51,7 +51,7 @@ const style = [
       isNotBlankFilter = (s: string) => !!s,
       nullFilter = () => true,
       safeFloat = (n: number, def: number) => isNaN(n) ? def : n,
-      makeToggleButton = (c: string, title: string | Binding, initial: boolean, fn: (v: boolean) => void) => button({"class": {"t": initial}, title, "onclick": function(this: HTMLButtonElement) {
+      makeToggleButton = (c: string, title: string | Binding, initial: boolean, fn: (v: boolean) => void) => button({"part": "toggle", "class": {"t": initial}, title, "onclick": function(this: HTMLButtonElement) {
 	fn(!this.classList.toggle("t"));
       }}, c),
       dsHasKey = <K extends string>(ds: DOMStringMap, key: K): ds is DOMStringMap & Record<K, string> => ds[key] !== undefined,
@@ -163,8 +163,8 @@ export class DataTable extends HTMLElement {
 					}
 
 					const {dataset} = target,
-					      firstRadio = input({"type": "radio", "checked": !dsHasKey(dataset, "empty") && !dsHasKey(dataset, "notEmpty"), "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
-					      list = ul({"tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
+					      firstRadio = input({"part": "radio", "type": "radio", "checked": !dsHasKey(dataset, "empty") && !dsHasKey(dataset, "notEmpty"), "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
+					      list = ul({"part": "filter", "tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
 						if (!e.relatedTarget || !list.contains(e.relatedTarget as Node)) {
 							this.remove();
 						}
@@ -172,12 +172,12 @@ export class DataTable extends HTMLElement {
 						li([
 							firstRadio,
 							this.#sorters[this.#headers.get(target)!] === numberSorter ? [
-								input({"value": dataset["min"], "oninput": function(this: HTMLInputElement) {
+								input({"part": "filter min", "value": dataset["min"], "oninput": function(this: HTMLInputElement) {
 									amendNode(target, {"data-min": this.value});
 									firstRadio.click();
 								}}),
 								" ≤ x ≤ ",
-								input({"value": dataset["max"], "oninput": function(this: HTMLInputElement) {
+								input({"part": "filter max", "value": dataset["max"], "oninput": function(this: HTMLInputElement) {
 									amendNode(target, {"data-max": this.value});
 									firstRadio.click();
 								}})
@@ -186,7 +186,7 @@ export class DataTable extends HTMLElement {
 									amendNode(target, {"data-is-prefix": v});
 									firstRadio.click();
 								}),
-								input({"type": "text", "value": dataset["filter"], "oninput": function(this: HTMLInputElement) {
+								input({"part": "filter text", "type": "text", "value": dataset["filter"], "oninput": function(this: HTMLInputElement) {
 									amendNode(target, {"data-filter": this.value});
 									firstRadio.click();
 								}}),
