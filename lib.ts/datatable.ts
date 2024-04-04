@@ -5,7 +5,6 @@ import {button, div, input, label, li, slot, table, tbody, th, thead, tr, ul} fr
 import {checkInt} from './misc.js';
 import {stringSort} from './nodes.js';
 
-
 const style = [
 	new CSS().add({
 		":host>div": {
