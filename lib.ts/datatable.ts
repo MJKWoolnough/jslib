@@ -119,7 +119,7 @@ export class DataTable extends HTMLElement {
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			filter,
-			table([
+			table({"part": "table"}, [
 				this.#head = slot({"onclick": (e: MouseEvent) => {
 					const target = this.#getHeaderCell(e);
 
