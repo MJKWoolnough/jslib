@@ -28,9 +28,6 @@ const style = [
 					"display": "none"
 				}
 			}
-		},
-		"table": {
-			"border-collapse": "collapse"
 		}
 	})
       ],
