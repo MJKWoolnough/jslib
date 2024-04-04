@@ -1,4 +1,4 @@
-import {attr, child, value} from './dom.js';
+import {attr, child} from './dom.js';
 import {Pipe} from './inter.js';
 import {Callable} from './misc.js';
 
@@ -69,10 +69,6 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 		const self = this;
 
 		this.#value = value;
-	}
-
-	get [value]() {
-		return this.#value;
 	}
 
 	get value() {
