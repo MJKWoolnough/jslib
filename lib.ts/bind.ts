@@ -25,7 +25,7 @@ interface ReadOnlyBindingFn<T> extends ReadOnlyBinding<T> {
 interface BindFn {
 	<T>(t: T): BindingFn<T>;
 	(strings: TemplateStringsArray, ...bindings: any[]): ReadOnlyBindingFn<string>;
-	<T, B extends unknown[]>(fn: (...v: B) => T, ...bindings: {[K in keyof B]: B[K] | Binding<B[K]>}): ReadOnlyBinding<T>;
+	<T, B extends unknown[]>(fn: (...v: {[K in keyof B]: B[K] extends Binding<infer S> ? S : B[K]}) => T, ...bindings: B): ReadOnlyBinding<T>;
 }
 
 const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function;
