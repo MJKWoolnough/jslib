@@ -218,7 +218,7 @@ export class DataTable extends HTMLElement {
 				}}),
 				tbody(this.#body = slot())
 			])
-		      ]).adoptedStyleSheets = style;
+		]).adoptedStyleSheets = style;
 
 		this.#parseContent();
 
