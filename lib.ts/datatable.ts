@@ -479,19 +479,19 @@ export class DataTable extends HTMLElement {
 export const setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)},
 sortArrow = (asc = "#f00", desc = asc, stroke = "#000") => ({
 	"data-table": {
-		" th": {
+		" th,::part(header)": {
 			"background-repeat": "no-repeat",
 			"background-position": "right 0px",
 			"background-size": "1em 1em",
-			"padding-right": "1em",
+			"padding-right": "1em"
+		},
 
-			"[data-sort=asc]": {
-				"background-image": arrow(0, asc, stroke),
-			},
+		" th[data-sort=asc],::part(header asc)": {
+			"background-image": arrow(0, asc, stroke),
+		},
 
-			"[data-sort=desc]": {
-				"background-image": arrow(1, desc, stroke),
-			}
+		" th[data-sort=desc],::part(header desc)": {
+			"background-image": arrow(1, desc, stroke),
 		}
 	}
 });
