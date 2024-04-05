@@ -267,7 +267,7 @@ This module directly imports the [dom](#dom), and [inter](#inter) modules.
 <T, B extends unknown[]>(fn: (...v: {[K in keyof B]: B[K] extends Binding<infer S> ? S : B[K]}) => T, ...bindings: B): ReadOnlyBinding<T>;
 ```
 
-This function can be used as a normal function, binding a single value, as a template tag function, or as a construtor for a MultiBinding.
+This function can be used as a normal function, binding a single value, as a template tag function, or as a constructor for a MultiBinding.
 
 When used normally, this function takes a single starting value and returns a [Binding](#bind_binding) class with that value set.
 
