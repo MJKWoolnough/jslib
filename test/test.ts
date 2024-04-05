@@ -581,6 +581,47 @@ type Tests = {
 				const {amendNode} = await import("./lib/dom.js");
 				return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2", "class3"]}), {"class": {"class2": false, "class3": null, "class4": true, "class5": null}}).getAttribute("class") === "class1 class4 class5";
 			},
+			"part set string": async () => {
+				const {amendNode} = await import("./lib/dom.js");
+
+				return amendNode(document.createElement("div"), {"part": "part1 part2"}).getAttribute("part") === "part1 part2";
+			},
+			"part set array": async () => {
+				const {amendNode} = await import("./lib/dom.js");
+
+				return amendNode(document.createElement("div"), {"part": ["part1", "part2"]}).getAttribute("part") === "part1 part2";
+			},
+			"part set multi-array": async () => {
+				const {amendNode} = await import("./lib/dom.js");
+
+				return amendNode(amendNode(document.createElement("div"), {"part": ["part1", "part2"]}), {"part": ["part3"]}).getAttribute("part") === "part1 part2 part3";
+			},
+			"part set array -> string": async () => {
+				const {amendNode} = await import("./lib/dom.js");
+
+				return amendNode(amendNode(document.createElement("div"), {"part": ["part1", "part2"]}), {"part": "part3"}).getAttribute("part") === "part3";
+			},
+			"part set DOMTokenList": async () => {
+				const {amendNode} = await import("./lib/dom.js"),
+				      div = amendNode(document.createElement("div"), {"part": ["part1", "part2"]});
+
+				return amendNode(document.createElement("div"), {"part": div.part}).getAttribute("part") === "part1 part2";
+			},
+			"part set/unset parts": async () => {
+				const {amendNode} = await import("./lib/dom.js");
+
+				return amendNode(amendNode(document.createElement("div"), {"part": ["part1", "part2"]}), {"part": ["!part2", "part3"]}).getAttribute("part") === "part1 part3";
+			},
+			"part toggle parts": async () => {
+				const {amendNode} = await import("./lib/dom.js");
+
+				return amendNode(amendNode(document.createElement("div"), {"part": ["part1", "part2"]}), {"part": ["~part2", "~part3"]}).getAttribute("part") === "part1 part3";
+			},
+			"part toggle with object": async () => {
+				const {amendNode} = await import("./lib/dom.js");
+
+				return amendNode(amendNode(document.createElement("div"), {"part": ["part1", "part2", "part3"]}), {"part": {"part2": false, "part3": null, "part4": true, "part5": null}}).getAttribute("part") === "part1 part4 part5";
+			},
 			"style set string": async () => {
 				const {amendNode} = await import("./lib/dom.js");
 				return amendNode(document.createElement("div"), {"style": "font-size: 2em; color: rgb(255, 0, 0);"}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
