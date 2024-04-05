@@ -143,6 +143,7 @@ export class DataTable extends HTMLElement {
 						amendNode(target, setSort);
 
 						this.#sort = target;
+						this.#rev = false;
 					}
 				}, "oncontextmenu": (e: MouseEvent) => {
 					const target = this.#getHeaderCell(e);
