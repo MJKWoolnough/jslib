@@ -60,7 +60,8 @@ const style = [
 	"CASE_SENSITIVITY": "Case Sensitivity" as string | Binding,
 	"REMOVE_BLANK": "Remove Blank" as string | Binding,
 	"ONLY_BLANK": "Only Blank" as string | Binding
-      };
+      },
+      arrow = (up: 0 | 1, fill: string, stroke: string) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up}h38l-19,${(2 * up - 1) * 18}z' fill='${encodeURIComponent(fill)}' stroke='${encodeURIComponent(stroke)}' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`;
 
 export class DataTable extends HTMLElement {
 	#head: HTMLSlotElement;
@@ -455,6 +456,24 @@ export class DataTable extends HTMLElement {
 	}
 }
 
-export const setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)};
+export const setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)},
+sortArrow = (asc = "#f00", desc = asc, stroke = "#000") => ({
+	"data-table": {
+		" th": {
+			"background-repeat": "no-repeat",
+			"background-position": "right 0px",
+			"background-size": "1em 1em",
+			"padding-right": "1em",
+
+			"[data-sort=asc]": {
+				"background-image": arrow(0, asc, stroke),
+			},
+
+			"[data-sort=desc]": {
+				"background-image": arrow(1, desc, stroke),
+			}
+		}
+	}
+});
 
 export default bindCustomElement("data-table", DataTable);
