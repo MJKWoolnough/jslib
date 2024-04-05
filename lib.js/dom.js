@@ -147,16 +147,21 @@ amendNode = (element, properties, children) => {
 				} else if (prop === undefined) {
 					node.removeAttribute(k);
 				} else if (prop instanceof Array || prop instanceof DOMTokenList) {
-					if (k === "class" && prop.length) {
+					if ((k === "class" || k === "part") && prop.length) {
+						const attr = k === "class" ? "classList" : "part";
+
 						for (const c of prop) {
 							const f = c.slice(0, 1),
 							      m = f !== '!' && (f !== '~' || undefined);
-							node.classList.toggle(m ? c : c.slice(1), m);
+
+							node[attr].toggle(m ? c : c.slice(1), m);
 						}
 					}
-				} else if (k === "class" && isClassObj(prop)) {
+				} else if ((k === "class" || k === "part") && isClassObj(prop)) {
+					const attr = k === "class" ? "classList" : "part";
+
 					for (const k in prop) {
-						node.classList.toggle(k, prop[k] ?? undefined);
+						node[attr].toggle(k, prop[k] ?? undefined);
 					}
 				} else if (k === "style" && isStyleObj(prop)) {
 					for (const [k, p] of prop instanceof CSSStyleDeclaration ? Array.from(prop, k => [k, prop.getPropertyValue(k)]) : Object.entries(prop)) {
