@@ -43,6 +43,9 @@ const style = [
       unsetSort = {"data-sort": false},
       setSort = {"data-sort": "asc"},
       setReverse = {"data-sort": "desc"},
+      setSortPart = {"part": ["asc"]},
+      setRevPart = {"part": {"asc": false, "desc": true}},
+      unsetSortPart = {"part": {"asc": false, "desc": false}},
       parseNum = (a: string) => parseFloat(a || "-Infinity"),
       numberSorter = (a: string, b: string) => parseNum(a) - parseNum(b),
       nullSort = () => 0,
@@ -75,6 +78,7 @@ export class DataTable extends HTMLElement {
 	#sortedData: [Element, string[]][] = [];
 	#page = 0;
 	#perPage = Infinity;
+	#ownHeaders = false;
 
 	constructor() {
 		super();
@@ -131,16 +135,27 @@ export class DataTable extends HTMLElement {
 					if (this.#sort === target) {
 						if (this.#rev) {
 							amendNode(target, unsetSort);
+							if (this.#ownHeaders) {
+								amendNode(target, unsetSortPart);
+							}
 
 							this.#rev = false;
 							this.#sort = null;
 						} else {
 							amendNode(target, setReverse);
+							if (this.#ownHeaders) {
+								amendNode(target, setRevPart);
+							}
+
 							this.#rev = true;
 						}
 					} else {
 						amendNode(this.#sort, unsetSort);
 						amendNode(target, setSort);
+						if (this.#ownHeaders) {
+							amendNode(this.#sort, unsetSortPart);
+							amendNode(target, setSortPart);
+						}
 
 						this.#sort = target;
 						this.#rev = false;
@@ -318,8 +333,12 @@ export class DataTable extends HTMLElement {
 
 		if (!head) {
 			clearNode(this.#head, head = thead(tr(Array.from({"length": maxCols}, (_, n) => th({"part": "header"}, colName(n + 1))))));
+
+			this.#ownHeaders = true;
 		} else {
 			this.#head.assign(head);
+
+			this.#ownHeaders = false;
 		}
 
 		for (const header of (head.firstChild as HTMLTableRowElement).children) {
