@@ -1,3 +1,4 @@
+import type {BoundAttr, BoundChild} from './dom.js';
 import {attr, child} from './dom.js';
 import {Pipe} from './inter.js';
 import {Callable} from './misc.js';
@@ -40,7 +41,7 @@ const isEventListenerObject = (prop: unknown): prop is EventListenerObject => pr
  * @param {T} [v] The value to set the binding to.
  * @returns {T}   The value the binding is set to.
  */
-export class Binding<T = string> extends Callable<(v: T) => T> {
+export class Binding<T = string> extends Callable<(v: T) => T> implements BoundAttr, BoundChild {
 	#pipe = new Pipe<T>();
 	#value: T;
 	#refs = 0;
