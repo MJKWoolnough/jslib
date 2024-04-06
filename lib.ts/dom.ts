@@ -12,14 +12,14 @@ interface ToString {
 /**
  * This type represents an Object that uses the `attr` symbol to return a special Attr node.
  **/
-type BoundAttr = {
+export type BoundAttr = {
 	[attr]: (k: string) => Attr;
 }
 
 /**
  * This type represents an Object that uses the `child` symbol to return a special Element or Text node.
  **/
-type BoundChild = {
+export type BoundChild = {
 	[child]: Element | Text;
 }
 
