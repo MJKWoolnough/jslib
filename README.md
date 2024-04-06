@@ -12,6 +12,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [casefold](#casefold)                       | A single function module that provides unicode case folding. |
 | [conn](#conn)                               | Convenience wrappers around [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket). |
 | [css](#css)                                 | A simple CSS management library. |
+| [datatable](#datatable)                     | Custom Element for filtering, sorting, and paging a tabular data. |
 | [dom](#dom)                                 | Functions for manipulating the DOM. |
 | [drag](#drag)                               | Library for making browser Drag'n'Drop easier to use. |
 | [elements](#elements)                       | Library for easy custom element creation. |
@@ -572,6 +573,122 @@ type Value = string | number | ToString;
 ```
 
 This unexported type represents a CSS value, as either a string, number or any object with the [toString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/toString) method.
+
+## <a name="datatable">datatable</a>
+
+The datatable module adds a custom element for handling tabular data that can be filtered, sorted, and paged.
+
+This module relies directly on the [bind]{#bind}, [css]{#css}, [dom]{#dom}, [html]{#html}, [misc]{#misc], and [nodes]{nodes} modules.
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| (default) | DOMBind](#dom_dombind) | A DOMBind to create a DataTable. |
+| [DataTable](#datatable_datatable) | Class | Custom element to easily create a filterable, sortable, pageable table. |
+| [setLanguage](#datatable_setlanguage) | Function | Sets the language used by the module. |
+| [sortArrow](#datatable_sortarrorw)   | Function | Helper function to generate styles for a sort indicator. |
+
+### <a name="datatable_datatable">DataTable</a>
+```typescript
+class DataTable extends HTMLElement {
+	get totalRows(): number;
+	get pageRows(): number;
+	export(): string[][];
+	exportPage(): string[][];
+}
+```
+
+The DataTable custom element can be used to easily create filterable, sortable and pageable tables.
+
+The element registers with the name `data-table`
+
+This element directly handles the following attributes:
+
+|  Attribute  |  Type  |  Description  |
+|-------------|--------|---------------|
+| page        | Number | The page of data to show (0 indexed, default: 0).
+| perPage     | Number | The number of items to show on a page (defauly: Infinity).
+
+To add headers to the table, add a `thead` element containing a `tr` element. Inside that `tr` element you can add your `th` or `td` header elements. For example:
+
+```html
+<data-table>
+	<thead>
+		<tr>
+			<th>Column 1</th>
+			<th>Column 2</th>
+		</tr>
+	</thead>
+</data-table>
+```
+
+The follow data-* attributes have special meaning to header cells and determine how sorting and filtering take place:
+
+|  Attribute               |  Type     |  Description  |
+|--------------------------|-----------|---------------|
+| data-disallow-empty      | Boolean   | When set, disables the ability to filter out empty cells. |
+| data-disallow-not-empty  | Boolean   | When set, disables the ability to filter out non-empty cells. |
+| data-empty               | Boolean   | When set, filters out empty cells.
+| data-filter              | String    | Filters the cells to those containing the value of the attribute. |
+| data-is-case-insensitive | Boolean   | When set, the text filter is case insensitive.
+| data-is-prefix           | Boolean   | When set, the text filter is a prefix match. When set with data-is-suffix becomes an exact match filter. |
+| data-is-suffix           | Boolean   | When set, the text filter is a suffic match. When set with data-is-prefix becomes an exact match filter. |
+| data-is-text             | Boolean   | When set, the column is forced into text mode.
+| data-max                 | Number    | For columns of numbers, specifies a maximum value to filter by.
+| data-min                 | Number    | For columns of numbers, specifies a minimum value to filter by.
+| data-not-empty           | Boolean   | When set, filters out non-empty cells.
+| data-sort                | asc, desc | When set, sorts by the column in either asc(ending) of desc(ending) order.
+
+To add the table to the table, add successive `tr` elements which contain the cells for the columns. For example:
+
+```html
+<data-table>
+	<tr>
+		<td>Cell 1</td>
+		<td>Cell 2</td>
+		<td>Cell 3</td>
+	</tr>
+	<tr>
+		<td>Cell 4</td>
+		<td>Cell 5</td>
+		<td>Cell 6</td>
+	</tr>
+</data-table>
+```
+
+When no header is specified, one is generated with sequentially titled columns. If no header is wanted, add an empty `tr` element in a `thead` element:
+
+```html
+<data-table>
+	<thead>
+		<tr></tr>
+	</thead>
+</data-table>
+```
+
+The following helper methods are provided to get information about the data in the table:
+
+|  Field     |  Type  |  Description  |
+|------------|--------|---------------|
+| export     | Method | This method returns the data of the filtered and sorted table. |
+| exportPage | Method | This method returns the data of the visible portion of the table. |
+| pageRows   | Getter | This method returns the number of visible rows in the table, that is the number after filtering and paging. |
+| totalRows  | Getter | This method returns the total number of rows in the table after filtering. |
+
+### <a name="datatable_setlanguage">setLanguage</a>
+```typescript
+(l: {STARTS_WITH?: string | Binding; ENDS_WIDTH?: string | Binding; CASE_SENSITIVITY?: string | Binding; REMOVE_BLANK?: string | Binding; ONLY_BLANK?: string | Binding;}) => void;
+```
+
+The setLanguage function sets the language items used by the [DataTable]{#datatable_datatable} class.
+
+### <a name="datatable_sortarrow">sortArrow</a>
+```typescript
+(asc = "#f00", desc = asc, stroke = "#000") => Object;
+```
+
+The function generates an object which can be used with the {@link module:css | CSS} module to style the headers of a DataTable to include an arrow indicating the direction of sorting.
+
+The `asc` param specifies the colour of the Asc sorting arrow, the `desc` param specifies the colour of the Desc sorting arrow, and the `stroke` param specifies the outline colour of the arrows.
 
 ## <a name="dom">dom</a>
 
