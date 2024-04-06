@@ -5,6 +5,21 @@ import {button, div, input, label, li, slot, table, tbody, th, thead, tr, ul} fr
 import {checkInt} from './misc.js';
 import {stringSort} from './nodes.js';
 
+/**
+ * The datatable module adds a custom element for handling tabular data that can be filtered, sorted, and paged.
+ *
+ * This module relies directly on the {@link module:bind | Bind}, {@link module:css | CSS}, {@link module:dom | DOM}, {@link module:html | HTML}, {@link module:misc | Misc}, and {@link module:nodes | Nodes} modules.
+ *
+ * @module datatable
+ * @requires module:bind
+ * @requires module:css
+ * @requires module:dom
+ * @requires module:html
+ * @requires module:misc
+ * @requires module:nodes
+ */
+/** */
+
 const style = [
 	new CSS().add({
 		":host>div": {
@@ -66,6 +81,75 @@ const style = [
       },
       arrow = (up: 0 | 1, fill: string, stroke: string) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up}h38l-19,${(2 * up - 1) * 18}z' fill='${encodeURIComponent(fill)}' stroke='${encodeURIComponent(stroke)}' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`;
 
+/**
+ * The DataTable custom element can be used to easily create filterable, sortable and pageable tables.
+ *
+ * The element registers with the name `data-table`
+ *
+ * This element directly handles the following attributes:
+ *
+ * |  Attribute  |  Type  |  Description  |
+ * |-------------|--------|---------------|
+ * | page        | Number | The page of data to show (0 indexed, default: 0).
+ * | perPage     | Number | The number of items to show on a page (defauly: Infinity).
+ *
+ * To add headers to the table, add a `thead` element containing a `tr` element. Inside that `tr` element you can add your `th` or `td` header elements. For example:
+ *
+ * ```html
+ * <data-table>
+ * 	<thead>
+ * 		<tr>
+ * 			<th>Column 1</th>
+ * 			<th>Column 2</th>
+ * 		</tr>
+ * 	</thead>
+ * </data-table>
+ * ```
+ *
+ * The follow data-* attributes have special meaning to header cells and determine how sorting and filtering take place:
+ *
+ * |  Attribute               |  Type     |  Description  |
+ * |--------------------------|-----------|---------------|
+ * | data-disallow-empty      | Boolean   | When set, disables the ability to filter out empty cells. |
+ * | data-disallow-not-empty  | Boolean   | When set, disables the ability to filter out non-empty cells. |
+ * | data-empty               | Boolean   | When set, filters out empty cells.
+ * | data-filter              | String    | Filters the cells to those containing the value of the attribute. |
+ * | data-is-case-insensitive | Boolean   | When set, the text filter is case insensitive.
+ * | data-is-prefix           | Boolean   | When set, the text filter is a prefix match. When set with data-is-suffix becomes an exact match filter. |
+ * | data-is-suffix           | Boolean   | When set, the text filter is a suffic match. When set with data-is-prefix becomes an exact match filter. |
+ * | data-is-text             | Boolean   | When set, the column is forced into text mode.
+ * | data-max                 | Number    | For columns of numbers, specifies a maximum value to filter by.
+ * | data-min                 | Number    | For columns of numbers, specifies a minimum value to filter by.
+ * | data-not-empty           | Boolean   | When set, filters out non-empty cells.
+ * | data-sort                | asc, desc | When set, sorts by the column in either asc(ending) of desc(ending) order.
+ *
+ * To add the table to the table, add successive `tr` elements which contain the cells for the columns. For example:
+ *
+ * ```html
+ * <data-table>
+ * 	<tr>
+ * 		<td>Cell 1</td>
+ * 		<td>Cell 2</td>
+ * 		<td>Cell 3</td>
+ * 	</tr>
+ * 	<tr>
+ * 		<td>Cell 4</td>
+ * 		<td>Cell 5</td>
+ * 		<td>Cell 6</td>
+ * 	</tr>
+ * </data-table>
+ * ```
+ *
+ * When no header is specified, one is generated with sequentially titled columns. If no header is wanted, add an empty `tr` element in a `thead` element:
+ *
+ * ```html
+ * <data-table>
+ * 	<thead>
+ * 		<tr></tr>
+ * 	</thead>
+ * </data-table>
+ * ```
+ */
 export class DataTable extends HTMLElement {
 	#head: HTMLSlotElement;
 	#body: HTMLSlotElement;
@@ -459,24 +543,57 @@ export class DataTable extends HTMLElement {
 		this.dispatchEvent(new Event("render"));
 	}
 
-	get totalRows() {
+	/**
+	 * This method returns the total number of rows in the table after filtering.
+	 *
+	 * @return {number} The number of filtered rows.
+	 */
+	get totalRows(): number {
 		return this.#filteredData.length;
 	}
 
-	get pageRows() {
+	/**
+	 * This method returns the number of visible rows in the table, that is the number after filtering and paging.
+	 *
+	 * @return {number} The number of visible rows.
+	 */
+	get pageRows(): number {
 		return this.#body.assignedElements().length;
 	}
 
-	export() {
+	/**
+	 * This method returns the data of the filtered and sorted table.
+	 *
+	 * @return {string[][]} A two-dimensional array of the data.
+	 */
+	export(): string[][] {
 		return this.#sortedData.map(e => e[1]);
 	}
 
-	exportPage() {
+	/**
+	 * This method returns the data of the visible portion of the table.
+	 *
+	 * @return {string[][]} A two-dimensional array of the data.
+	 */
+	exportPage(): string[][] {
 		return this.#body.assignedElements().map(e => this.#data.get(e)!);
 	}
 }
 
-export const setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)},
+export const
+/**
+ * The setLanguage function sets the language items used by the {@link DataTable | DataTable} class.
+ *
+ * @param {{ STARTS_WITH?: string | Binding; ENDS_WIDTH?: string | Binding; CASE_SENSITIVITY?: string | Binding; REMOVE_BLANK?: string | Binding; ONLY_BLANK?: string | Binding; }} l The languages entries to be changed.
+ */
+setLanguage = (l: Partial<typeof lang>) => {Object.assign(lang, l)},
+/**
+ * The function generates an object which can be used with the {@link module:css | CSS} module to style the headers of a DataTable to include an arrow indicating the direction of sorting.
+ *
+ * @param {string} asc    The colour of the Asc sorting arrow.
+ * @param {string} desc   The colour of the Desc sorting arrow (defaults to the colour of the Asc arrow).
+ * @param {string} stroke The colour of the stroke of the arrows (defaults to black).
+ */
 sortArrow = (asc = "#f00", desc = asc, stroke = "#000") => ({
 	"data-table": {
 		" th,::part(header)": {
@@ -496,4 +613,7 @@ sortArrow = (asc = "#f00", desc = asc, stroke = "#000") => ({
 	}
 });
 
+/**
+ * {@link dom:DOMBind | DOMBind} that creates a {@link DataTable | DataTable}
+ */
 export default bindCustomElement("data-table", DataTable);
