@@ -1090,9 +1090,9 @@ type Tests = {
 				      {default: bind} = await import("./lib/bind.js"),
 				      attr = bind("FIRST"),
 				      elm = amendNode(document.createElement("div"), {"TEST": attr}),
-				      start = elm.getAttributeNS(null, "TEST");
+				      start = elm.getAttribute("TEST");
 				attr.value = "SECOND";
-				return start === "FIRST" && elm.getAttributeNS(null, "TEST") === "SECOND";
+				return start === "FIRST" && elm.getAttribute("TEST") === "SECOND";
 			},
 			"bind attr (multiple)": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
@@ -1100,11 +1100,11 @@ type Tests = {
 				      attr = bind("FIRST"),
 				      elm = amendNode(document.createElement("div"), {"TEST": attr, "TEST2": attr}),
 				      elm2 = amendNode(document.createElement("div"), {"TEST3": attr}),
-				      start = elm.getAttributeNS(null, "TEST"),
-				      start2 = elm.getAttributeNS(null, "TEST2"),
-				      start3 = elm2.getAttributeNS(null, "TEST3");
+				      start = elm.getAttribute("TEST"),
+				      start2 = elm.getAttribute("TEST2"),
+				      start3 = elm2.getAttribute("TEST3");
 				attr.value = "SECOND";
-				return start === "FIRST" && start2 === "FIRST" && start3 === "FIRST" && elm.getAttributeNS(null, "TEST") === "SECOND" && elm.getAttributeNS(null, "TEST2") === "SECOND" && elm2.getAttributeNS(null, "TEST3") === "SECOND";
+				return start === "FIRST" && start2 === "FIRST" && start3 === "FIRST" && elm.getAttribute("TEST") === "SECOND" && elm.getAttribute("TEST2") === "SECOND" && elm2.getAttribute("TEST3") === "SECOND";
 			},
 			"bind text using fn": async () => {
 				const {amendNode} = await import("./lib/dom.js"),

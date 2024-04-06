@@ -1,4 +1,4 @@
-import {attr, child} from './dom.js';
+import {amendNode, attr, child} from './dom.js';
 import {Pipe} from './inter.js';
 import {Callable} from './misc.js';
 
@@ -68,19 +68,16 @@ export class Binding extends Callable {
 		this.#pipe.send(this.#value = v);
 	}
 
-	[attr](name) {
-		const a = document.createAttributeNS(null, name);
-		a.textContent = this.#value + "";
+	[attr](n, name) {
+		const fn = (n, v) => amendNode(n, {[name]: v});
 
-		return this.#node(a);
+		fn(n, this.#value);
+
+		return this.#handleRef(n, fn, n => !!n.parentNode);
 	}
 
 	get [child]() {
-		return this.#node(new Text(this.#value + ""));
-	}
-
-	#node(n) {
-		return this.#handleRef(n, (n, v) => n.textContent = v + "", n instanceof Text ? n => !!n.parentNode : n => !!n.ownerElement);
+		return this.#handleRef(new Text(this.#value + ""), (n, v) => n.textContent = v + "", n => !!n.parentNode);
 	}
 
 	#handleRef(r, update, isActive) {

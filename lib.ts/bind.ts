@@ -1,5 +1,5 @@
 import type {BoundAttr, BoundChild} from './dom.js';
-import {attr, child} from './dom.js';
+import {amendNode, attr, child} from './dom.js';
 import {Pipe} from './inter.js';
 import {Callable} from './misc.js';
 
@@ -84,22 +84,19 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 		this.#pipe.send(this.#value = v);
 	}
 
-	[attr](name: string) {
-		const a = document.createAttributeNS(null, name);
-		a.textContent = this.#value + "";
+	[attr](n: Node, name: string) {
+		const fn = (n: Node, v: T) => amendNode(n, {[name]: v});
 
-		return this.#node(a);
+		fn(n, this.#value);
+
+		return this.#handleRef(n, fn, n => !!n.parentNode);
 	}
 
 	get [child]() {
-		return this.#node(new Text(this.#value + ""));
+		return this.#handleRef(new Text(this.#value + ""), (n, v) => n.textContent = v + "", n => !!n.parentNode);
 	}
 
-	#node<U extends Text | Attr>(n: U) {
-		return this.#handleRef(n, (n, v) => n.textContent = v + "", n instanceof Text ? n => !!n.parentNode : n => !!(n as Attr).ownerElement);
-	}
-
-	#handleRef<U extends Text | Attr | ReadOnlyBinding<any>>(r: U, update: (ref: U, value: T) => void, isActive: (ref: U) => boolean) {
+	#handleRef<U extends Node | ReadOnlyBinding<any>>(r: U, update: (ref: U, value: T) => void, isActive: (ref: U) => boolean) {
 		let ref: U | null = r;
 
 		this.#refs++;
