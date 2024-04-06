@@ -95,7 +95,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> {
 	}
 
 	#node<U extends Text | Attr>(n: U) {
-		return this.#handleRef(n, (n, v) => n.textContent = v + "", n => !!(n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement));
+		return this.#handleRef(n, (n, v) => n.textContent = v + "", n instanceof Text ? n => !!n.parentNode : n => !!(n as Attr).ownerElement);
 	}
 
 	#handleRef<U extends Text | Attr | ReadOnlyBinding<any>>(r: U, update: (ref: U, value: T) => void, isActive: (ref: U) => boolean) {

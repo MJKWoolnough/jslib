@@ -80,7 +80,7 @@ export class Binding extends Callable {
 	}
 
 	#node(n) {
-		return this.#handleRef(n, (n, v) => n.textContent = v + "", n => !!(n instanceof Text && n.parentNode || n instanceof Attr && n.ownerElement));
+		return this.#handleRef(n, (n, v) => n.textContent = v + "", n instanceof Text ? n => !!n.parentNode : n => !!n.ownerElement);
 	}
 
 	#handleRef(r, update, isActive) {
