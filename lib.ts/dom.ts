@@ -13,7 +13,7 @@ interface ToString {
  * This type represents an Object that uses the `attr` symbol to return a special Attr node.
  **/
 export type BoundAttr = {
-	[attr]: (k: string) => Attr;
+	[attr]: (n: NodeAttributes, k: string) => void;
 }
 
 /**
@@ -76,6 +76,7 @@ interface NodeAttributes extends Node {
 	readonly style: CSSStyleDeclaration;
 	removeAttribute(qualifiedName: string): void;
 	setAttributeNode(attr: Attr): Attr | null;
+	setAttribute(name: string, value: string): void;
 	toggleAttribute(qualifiedName: string, force?: boolean): boolean;
 }
 
@@ -98,14 +99,9 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       isEventObject = (prop: unknown): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !isAttr(prop),
       isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !isAttr(prop)),
-      isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute,
+      isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute && !!(n as NodeAttributes).setAttribute,
       isAttr = (prop: any): prop is BoundAttr => prop instanceof Object && attr in prop,
       isChild = (children: any): children is BoundChild => children instanceof Object && child in children,
-      makeAttr = (k: string, prop: string) => {
-	const attr = document.createAttributeNS(null, k);
-	attr.textContent = prop;
-	return attr;
-      },
       toggleSym = Symbol("toggle"),
       wrapElem = <T extends Element>(name: string, fn: () => T) => Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(fn(), props, children), {"name": {"value": name}, [child]: {"get": fn}}) as DOMBind<T>;
 
@@ -198,12 +194,16 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 							node.style.setProperty(k, p.toString());
 						}
 					}
+				} else if (prop instanceof Attr) {
+					node.setAttributeNode(prop);
+				} else if (isAttr(prop)) {
+					prop[attr](node, k);
 				} else if (prop !== null) {
 					if (k === "value" && (node instanceof HTMLInputElement || node instanceof HTMLSelectElement || node instanceof HTMLTextAreaElement) && typeof prop === "string") {
 						node.value = prop;
 					}
 
-					node.setAttributeNode(prop instanceof Attr ? prop : Object.assign(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop as string), {"realValue": prop}));
+					node.setAttribute(k, prop as string);
 				}
 			}
 		}

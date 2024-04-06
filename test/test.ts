@@ -637,12 +637,12 @@ type Tests = {
 			},
 			"set BoundAttr": async () => {
 				const {amendNode, attr} = await import("./lib/dom.js"),
-				      myAttr = {[attr]: (k: string) => {
+				      myAttr = {[attr]: (n: Element, k: string) => {
 					const a = document.createAttribute(k);
 
 					a.textContent = "123";
 
-					return a;
+					n.setAttributeNode(a);
 				      }},
 				      div = amendNode(document.createElement("div"), {"some-attr": myAttr});
 

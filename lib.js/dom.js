@@ -82,11 +82,6 @@ const childrenArr = (children, res = []) => {
       isNodeAttributes = n => !!n.style && !!n.classList && !!n.removeAttribute && !!n.setAttributeNode && !!n.toggleAttribute,
       isAttr = prop => prop instanceof Object && attr in prop,
       isChild = children => children instanceof Object && child in children,
-      makeAttr = (k, prop) => {
-	const attr = document.createAttributeNS(null, k);
-	attr.textContent = prop;
-	return attr;
-      },
       toggleSym = Symbol("toggle"),
       wrapElem = (name, fn) => Object.defineProperties((props, children) => amendNode(fn(), props, children), {"name": {"value": name}, [child]: {"get": fn}});
 
@@ -179,12 +174,16 @@ amendNode = (element, properties, children) => {
 							node.style.setProperty(k, p.toString());
 						}
 					}
+				} else if (prop instanceof Attr) {
+					node.setAttributeNode(prop);
+				} else if (isAttr(prop)) {
+					prop[attr](node, k);
 				} else if (prop !== null) {
 					if (k === "value" && (node instanceof HTMLInputElement || node instanceof HTMLSelectElement || node instanceof HTMLTextAreaElement) && typeof prop === "string") {
 						node.value = prop;
 					}
 
-					node.setAttributeNode(prop instanceof Attr ? prop : Object.assign(isAttr(prop) ? prop[attr](k) : makeAttr(k, prop), {"realValue": prop}));
+					node.setAttribute(k, prop);
 				}
 			}
 		}
