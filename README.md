@@ -15,7 +15,6 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [datatable](#datatable)                     | Custom Element for filtering, sorting, and paging a tabular data. |
 | [dom](#dom)                                 | Functions for manipulating the DOM. |
 | [drag](#drag)                               | Library for making browser Drag'n'Drop easier to use. |
-| [elements](#elements)                       | Library for easy custom element creation. |
 | [events](#events)                           | Functions to simplify starting & stopping global keyboard and mouse events. |
 | [fraction](#fraction)                       | An infinity precision fractional math type. |
 | [html](#html)                               | Functions to create HTML elements. |
@@ -45,7 +44,7 @@ Thematically, the above modules can be grouped into a few packages:
 
 |  Package  |  Description  |  Members  |
 |-----------|---------------|-----------|
-| Decorum   | A collection of DOM manipulation libs. | [Bind](#bind), [CSS](#css), [DOM](#dom), [Elements](#elements), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
+| Decorum   | A collection of DOM manipulation libs. | [Bind](#bind), [CSS](#css), [DOM](#dom), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), [RPC](#rpc), and [URLState](#urlstate). |
 | Guise     | Various modules to aid with UI and UX. | [Drag](#drag), [Events](#events), [Menu](#menu), [Pagination](#pagination), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
 | Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [CaseFold](#casefold), [Fraction](#fraction), [Load](#load), [Markdown](#markdown), [Misc](#misc), [Parser](#parser), [Router](#router), [Transitions](#router_transitions), [Settings](#settings), and [TypeGuard](#typeguard). |
@@ -957,115 +956,6 @@ interface Transfer<T> {
 ```
 
 The unexported Transfer interface describes an object that will transfer a T to a caller of [DragTransfer](#drag_dragtransfer)<T>.get.
-
-## <a name="elements">elements</a>
-
-The elements module allows for easy creation of custom elements, with simple attribute and event binding.
-
-This module directly imports the [bind](#bind), [dom](#dom), and [misc](#misc) modules.
-
-|  Export  |  Type  |  Description  |
-|----------|--------|---------------|
-| [(default)](#elements_default) | Function | A factory function used to create custom elements. |
-| [Null](#elements_null) | Object | The default value of attributes used in the attr and act methods of a custom element. |
-| [WithAttr](#element_withattr) | Type | The type added to an HTMLElement or DocumentFragment when the 'attrs' option is set to true. |
-| [WithChildren](#element_withchildren) | Type | The type added to an HTMLElement or DocumentFragment when the 'children' option is set to true. |
-
-### <a name="elements_default">(default)</a>
-```typescript
-(fn: (elem: HTMLElement & WithAttr & WithChildren) => Children) => DOMBind<HTMLElement & WithAttr & WithChild>;
-(options: Options, fn: (elem: T) => Children) => DOMBind<T>;
-(options: Options & {classOnly: true}, fn: (elem: T) => Children) => new() => T;
-(options: Options & {args: string[]}, fn: (elem: T, ...args: ToString[]) => Children) => DOMBind<T>;
-(options: Options & {args: string[], classOnly: true}, fn: (...args: ToString[], elem: T) => Children) => new(...args: ToString[]) => T;
-```
-
-The default export of the elements module is a function that can be used to create custom elements. The Type `T` is determined by the [Options](#elements_options) provided. The following table shows how setting options affects the type of `T`.
-
-|  attrs  |  observeChildren  |  pseudo  |  T  |
-|---------|-------------------|----------|-----|
-| true    | true              | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [WithAttr](#elements_withattr) & [WithChildren](#elements_withchildren) |
-| true    | false             | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [WithAttr](#elements_withattr) |
-| false   | true              | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) & [WithChildren](#elements_withchildren) |
-| false   | false             | false    | [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) |
-| true    | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [WithAttr](#elements_withattr) & [WithChildren](#elements_withchildren) |
-| true    | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [WithAttr](#elements_withattr) |
-| false   | true              | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) & [WithChildren](#elements_withchildren) |
-| false   | false             | true     | [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) |
-
-In addition, the type T can be further modified by the use of the `extend` Option, which will add a custom class to the prototype chain, allowing its methods and field to be used, including during the initialising `fn` call. As the `fn` initialising function will not have access to any private class members, it is recommended to either use Symbols, or a data sharing Class, such as [Pickup](#inter_pickup), to allow access to private fields.
-
-When the `args` Option is specified, the `fn` call (and the `classOnly` constructor) gain a number of parameters equal to the number of strings specified. For the [DOMBind](#dom_dombind) output, these parameters must be set in the [Props](#dom_props) object passed to the function with the key being the name specified in the array. For the `classOnly` output, these values must be specified manually in the constructor call. The default type for these parameters is ToString, but can be specified in the `fn` to set the type in both the DOMBind-like Props object, and the constructor call of the `classOnly` return. NB: When using the `args` options with the intention of creating the new element without the use of the returned class/function (e.g. directly from HTML) then you *should* make all of the args optional as there is no other way to pass attributes to the initialisation function during construction of the element.
-
-The [Children](#dom_children) returned from passed `fn` function are added either to the [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot), if the pseudo Option is false, or to the [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment), if the pseudo Option is true.
-
-If the `classOnly` Option is set to false (or unset), the resulting [DOMBind](#dom_dombind) can be used in the same way as any other DOMBind, creating your (pseudo-)element and applying the attributes and children accordingly.
-
-If the `classOnly` Option is set to true, the function will just return the generated class constructor, without creating a DOMBind function.
-
-### <a name="elements_withattr">WithAttr</a>
-```typescript
-class WithAttr {
-	attr(name: string): Binding;
-	attr(name: string[]): Binding;
-}
-```
-
-This class is added to an element created with the [(default)](#elements_default) function when the `attr` is `true` (or unset).
-
-The `attr` method returns a {@link dom:Binding}. When monitoring a single attribute, the value of the Binding object will be set the new attribute value. When monitoring multiple attributes, the value of the Binding object will be set to a Map of the name to the value.
-
-### <a name="elements_withchildren">WithChildren</a>
-```typescript
-class WithChildren {
-	observeChildren(fn: (added: NodeList, removed: NodeList) => void): void;
-}
-```
-
-This class is added to an element created with the [(default)](#elements_default) function when the `observeChildren` is `true` (or unset).
-
-The observeChildren method sets a callback function that will be called whenever children are added or removed from the element, with the lists of added and removed children.
-
-NB: For pseudo-elements, the callback function will not be triggered during construction.
-
-### <a name="elements_null">Null</a>
-
-The Null value is used by the act and attrs methods to indicate the non-existence of a value. It can act as a noop function, an empty string, an empty iterator, and NaN depending on how it is used.
-
-As this may be passed to any function passed to the act and attr methods, it should either be checked for directly (with an equality check), or used in a way in which it will be coerced to the correct data type.
-
-### <a name="elements_options">Options</a>
-```typescript
-type Options = {
-	args: string[];
-	attachRemoveEvent?: boolean;
-	attrs?: boolean;
-	classOnly?: boolean;
-	delegatesFocus?: boolean;
-	extend?: (<T extends ConstructorOf<DocumentFragment>, V extends T>(base: T) => V) | (<T extends ConstructorOf<HTMLElement>, V extends T>(base: T) => V);
-	manualSlot?: boolean;
-	name?: string;
-	observeChildren?: boolean;
-	pseudo?: boolean;
-	styles?: CSSStyleSheet[];
-}
-```
-
-This unexported type is used to change how the elements are created and controlled.
-
-|  Options          |  Default  |  Description  |
-|-------------------|-----------|---------------|
-| args              | []        | Each string of this array is a reference to an parameter that is passed to the initialising function. The value for each parameter is taken either from the properties object passed to the [DOMBind](#dom_dombind) creation function, or are specified directly in the constructor of the `classOnly` generated class. |
-| attachRemoveEvent | true      | When true, the resulting created element will send an 'attached' event when the element is attached to the document, and a 'removed' event when removed from the document. Has no effect when 'pseudo' is set to true. |
-| attrs             | true      | When true, enables both the 'act' and 'attr' methods on the element class. |
-| classOnly         | false     | When true, the return from the default function will be the generated class, when false the return from the default function will be a [DOMBind](#dom_dombind). If the 'name' option is set to empty string, the class will *not* be registered with the [Custom Elements Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). |
-| delegatesFocus    | false     | When true, sets the delegatesFocus option during attachShadow call to true. Has no effect when 'pseudo' is set to true. |
-| extend            | e => e    | Allows the generated class to be extended with a custom class. This extension will be applied before the passed fn function is called. |
-| manualSlot        | false     | When true, sets the slotAssignment option during attachShadow call to "manual". Has no effect when 'pseudo' is set to true. |
-| name              | undefined | Registers a custom element name for the generated element class, instead of a randomly generated one. Has no effect when 'pseudo' is set to true. |
-| observeChildren   | true      | When true, enables the observeChildren method on the element class. |
-| pseudo            | false     | When true, the class created is extended from DocumentFragment, instead of HTMLElement, and does not register a custom element. This will act, in many ways, like a custom element, but without a Shadow Root, any children are attached directly to the DOM on appending. |
-| styles            | []        | Sets the adoptedStyleSheets options on the Shadow Root. Has no effect when 'pseudo' is set to true. |
 
 ## <a name="events">events</a>
 
