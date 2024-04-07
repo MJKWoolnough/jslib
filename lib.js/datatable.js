@@ -1,8 +1,7 @@
 import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {button, div, input, label, li, slot, table, tbody, th, thead, tr, ul} from './html.js';
-import {checkInt} from './misc.js';
-import {stringSort} from './nodes.js';
+import {checkInt, stringSort} from './misc.js';
 
 /**
  * The datatable module adds a custom element for handling tabular data that can be filtered, sorted, and paged.
