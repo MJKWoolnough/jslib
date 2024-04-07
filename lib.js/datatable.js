@@ -14,7 +14,6 @@ import {checkInt, stringSort} from './misc.js';
  * @requires module:dom
  * @requires module:html
  * @requires module:misc
- * @requires module:nodes
  */
 /** */
 
