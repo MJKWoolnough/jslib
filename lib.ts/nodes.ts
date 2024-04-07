@@ -13,11 +13,11 @@ import {child as node} from './dom.js';
  */
 export {child as node} from './dom.js';
 
+export {stringSort} from './misc.js';
+
 export const
 /** A sorting function that does no sorting. */
-noSort = () => 0,
-/** A function to sort strings. */
-stringSort = new Intl.Collator().compare;
+noSort = () => 0;
 
 type ChildNode = Text | Element;
 
