@@ -1739,6 +1739,7 @@ The misc module contains various simple, dependency-free exports.
 | [pushAndReturn](#misc_pushandreturn) | Function | This function adds a value to an Array and returns the value. |
 | [queue](#misc_queue) | Function | The function allows the simple queueing of functions that require a definite order. |
 | [setAndReturn](#misc_setandreturn) | Function | This function sets a value on a map and returns the value. |
+| stringSort | Function | A simple function to be passed into a 'sort' function that will order elements lexically. |
 | [text2DOM](#misc_text2dom) | Function | This function converts valid HTML/SVG/MathML text into DOM Nodes. |
 
 ### <a name="misc_addandreturn">addAndReturn</a>
