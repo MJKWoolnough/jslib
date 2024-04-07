@@ -119,7 +119,9 @@ text2DOM = text => {
 	const t = document.createElement("template");
 	t.innerHTML = text;
 	return t.content;
-};
+},
+/** A function to sort strings. */
+stringSort = new Intl.Collator().compare;
 
 /**
  * This class provides a convenient way to extend a Function with class attributes and methods.
