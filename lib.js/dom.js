@@ -226,7 +226,13 @@ bindCustomElement = (name, constructor, options) => {
 
 	return wrapElem(options?.extends ?? name, () => new constructor());
 },
+/**
+ * This function is a typeguard for objects that satisfies the EventListenObject interface.
+ */
 isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
+/**
+ * This function is a typeguard for objects that are either {@link EventArray}s, Event Functions, or EventListenObjects.
+ */
 isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.
