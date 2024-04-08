@@ -710,6 +710,8 @@ The dom module can be used to manipulate DOM elements.
 | eventPassive | Number| Can be passed to the [event](#dom_event) function to set the `passive` property on an event. |
 | eventRemove | Number | Can be passed to the [event](#dom_event) function to set the event to be removed. |
 | isChildren | Function | This function determines whether the passed in object can be used as a [Children](#dom_children) type. |
+| isEventListenerObject | Function | This function is a typeguard for objects that satisfies the EventListenObject interface. |
+| isEventObject | Function | This function is a typeguard for objects that are either [EventArray](#dom_eventarray)s, Event Functions, or EventListenObjects. |
 | <a name="dom_props">Props</a> | Type | A [PropsObject](#dom_propsobject) or [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap). |
 | [PropsObject](#dom_propsobject) | Type | This object is used to set attributes and events on a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget with the [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode) functions. |
 | [toggle](#dom_toggle) | Function | Can be used directly to toggle an attribute, or accepts a callback to collect the state of the toggled attribute. |
