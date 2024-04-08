@@ -1832,7 +1832,7 @@ This function converts valid HTML/SVG/MathML text into DOM Nodes, stored within 
 
 The nodes module contains Classes for aiding in the accessing of DOM [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node)s.
 
-This module directly imports the [dom](#dom) module.
+This module directly imports the [dom](#dom), and [misc](#misc) modules.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
