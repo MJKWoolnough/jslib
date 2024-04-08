@@ -605,7 +605,7 @@ This element directly handles the following attributes:
 |  Attribute  |  Type  |  Description  |
 |-------------|--------|---------------|
 | page        | Number | The page of data to show (0 indexed, default: 0).
-| perPage     | Number | The number of items to show on a page (defauly: Infinity).
+| perPage     | Number | The number of items to show on a page (default: Infinity).
 
 To add headers to the table, add a `thead` element containing a `tr` element. Inside that `tr` element you can add your `th` or `td` header elements. For example:
 
@@ -630,7 +630,7 @@ The follow data-* attributes have special meaning to header cells and determine 
 | data-filter              | String    | Filters the cells to those containing the value of the attribute. |
 | data-is-case-insensitive | Boolean   | When set, the text filter is case insensitive.
 | data-is-prefix           | Boolean   | When set, the text filter is a prefix match. When set with data-is-suffix becomes an exact match filter. |
-| data-is-suffix           | Boolean   | When set, the text filter is a suffic match. When set with data-is-prefix becomes an exact match filter. |
+| data-is-suffix           | Boolean   | When set, the text filter is a suffix match. When set with data-is-prefix becomes an exact match filter. |
 | data-is-text             | Boolean   | When set, the column is forced into text mode.
 | data-max                 | Number    | For columns of numbers, specifies a maximum value to filter by.
 | data-min                 | Number    | For columns of numbers, specifies a minimum value to filter by.
