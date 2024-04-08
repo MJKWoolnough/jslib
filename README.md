@@ -762,6 +762,18 @@ This type is a string, [Node](https://developer.mozilla.org/en-US/docs/Web/API/N
 
 This function creates a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) that contains any [Children](#dom_children) passed to it, as with [amendNode](#dom_amendnode).
 
+### <a name="dom_clearnode">clearNode</a>
+```typescript
+interface {
+	<T extends EventTarget | BoundChild>(element: T, properties: Record<`on${string}`, EventListenerObject | EventArray | Function>): T;
+	<T extends Node | BoundChild>(element: T, properties?: Props, children?: Children): T;
+	<T extends Node | BoundChild>(element: T, children?: Children): T;
+	<T extends Node | BoundChild>(element?: T | null, properties?: Props | Children, children?: Children): T;
+}
+```
+
+This functions works similarly to [amendNode](#dom_amendnode) except that it replaces the children as opposed to adding to them.
+
 ### <a name="dom_dombind">DOMBind</a>
 ```typescript
 interface <T extends Node> {
