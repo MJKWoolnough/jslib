@@ -3,6 +3,7 @@
  *
  * @module nodes
  * @requires module:dom
+ * @requires module:misc
  */
 /** */
 
