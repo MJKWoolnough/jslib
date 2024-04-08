@@ -1117,6 +1117,28 @@ type Tests = {
 				text("GOODBYE");
 
 				return start === "HELLO" && start === startVal && elm.textContent === "GOODBYE" && elm.textContent === text();
+			},
+			"binary bind (true->false)": async () => {
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
+				      attr = bind(true),
+				      elm = amendNode(document.createElement("div"), {attr}),
+				      start = elm.hasAttribute("attr");
+
+				attr(false);
+
+				return start && !elm.hasAttribute("attr");
+			},
+			"binary bind (false->true)": async () => {
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
+				      attr = bind(false),
+				      elm = amendNode(document.createElement("div"), {attr}),
+				      start = elm.hasAttribute("attr");
+
+				attr(true);
+
+				return !start && elm.hasAttribute("attr");
 			}
 		},
 		"template": {
