@@ -1139,6 +1139,17 @@ type Tests = {
 				attr(true);
 
 				return !start && elm.hasAttribute("attr");
+			},
+			"bind class": async () => {
+				const {amendNode} = await import("./lib/dom.js"),
+				      {default: bind} = await import("./lib/bind.js"),
+				      classes = bind({"A": true, "B": false, "C": true} as Record<string, boolean>),
+				      elm = amendNode(document.createElement("div"), {"class": classes}),
+				      start = elm.getAttribute("class");
+
+				classes({"B": true, "C": false});
+
+				return start === "A C" && elm.getAttribute("class") == "A B";
 			}
 		},
 		"template": {
