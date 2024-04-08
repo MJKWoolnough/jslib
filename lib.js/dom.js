@@ -282,6 +282,10 @@ createDocumentFragment = children => {
  * @return {T} The Node being cleared.
  */
 clearNode = (node, properties, children) => {
+	if (!n) {
+		return n;
+	}
+
 	if (!node) {
 		return node;
 	}
@@ -297,7 +301,7 @@ clearNode = (node, properties, children) => {
 			node.lastChild.remove();
 		}
 	}
-	return amendNode(node, properties, children);
+	return amendNode(n, properties, children);
 },
 /**
  * This function can be used directly in the params object of a amendNode call to toggle an attribute on or off (depending on it's previous state); e.g.

@@ -301,10 +301,13 @@ createDocumentFragment = (children?: Children) => {
  *
  * @return {T} The Node being cleared.
  */
-clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Children) => {
-	if (!node) {
-		return node;
+clearNode: mElement = (n?: Node | BoundChild, properties?: Props | Children, children?: Children) => {
+	if (!n) {
+		return n;
 	}
+
+	const node = isChild(n) ? n[child] : n;
+
 	if (properties && isChildren(properties)) {
 		properties = void (children = properties);
 	}
@@ -317,7 +320,7 @@ clearNode: mElement = (node?: Node, properties?: Props | Children, children?: Ch
 			node.lastChild.remove();
 		}
 	}
-	return amendNode(node, properties, children);
+	return amendNode(n, properties, children);
 },
 /**
  * This function can be used directly in the params object of a amendNode call to toggle an attribute on or off (depending on it's previous state); e.g.
