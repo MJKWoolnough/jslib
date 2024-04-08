@@ -94,9 +94,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	}
 	return res;
       },
-      isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
       isEventListenerOrEventListenerObject = (prop: any): prop is EventListenerOrEventListenerObject => prop instanceof Function || isEventListenerObject(prop),
-      isEventObject = (prop: unknown): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !isAttr(prop),
       isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !isAttr(prop)),
       isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute && !!(n as NodeAttributes).setAttribute,
@@ -248,6 +246,8 @@ bindCustomElement = <T extends HTMLElement>(name: string, constructor: {new (...
 
 	return wrapElem(options?.extends ?? name, () => new constructor());
 },
+isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function,
+isEventObject = (prop: unknown): prop is (EventArray | EventListenerOrEventListenerObject) => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.
  */

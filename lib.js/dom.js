@@ -74,9 +74,7 @@ const childrenArr = (children, res = []) => {
 	}
 	return res;
       },
-      isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || isEventListenerObject(prop),
-      isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
       isClassObj = prop => prop instanceof Object && !isAttr(prop),
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !isAttr(prop)),
       isNodeAttributes = n => !!n.style && !!n.classList && !!n.removeAttribute && !!n.setAttributeNode && !!n.toggleAttribute,
@@ -228,6 +226,8 @@ bindCustomElement = (name, constructor, options) => {
 
 	return wrapElem(options?.extends ?? name, () => new constructor());
 },
+isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function,
+isEventObject = prop => isEventListenerOrEventListenerObject(prop) || (prop instanceof Array && prop.length === 3 && isEventListenerOrEventListenerObject(prop[0]) && prop[1] instanceof Object && typeof prop[2] === "boolean"),
 /**
  * Can be passed to the {@link event} function to set the `once` property on an event.
  */
