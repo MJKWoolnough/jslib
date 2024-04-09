@@ -1,5 +1,5 @@
 import type {BoundAttr, BoundChild} from './dom.js';
-import {amendNode, attr, child} from './dom.js';
+import {amendNode, attr, child, isEventListenerObject} from './dom.js';
 import {Pipe} from './inter.js';
 import {Callable} from './misc.js';
 
@@ -28,8 +28,6 @@ interface BindFn {
 	(strings: TemplateStringsArray, ...bindings: any[]): ReadOnlyBindingFn<string>;
 	<T, B extends unknown[]>(fn: (...v: {[K in keyof B]: B[K] extends Binding<infer S> ? S : B[K]}) => T, ...bindings: B): ReadOnlyBinding<T>;
 }
-
-const isEventListenerObject = (prop: unknown): prop is EventListenerObject => prop instanceof Object && (prop as EventListenerObject).handleEvent instanceof Function;
 
 /**
  * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.

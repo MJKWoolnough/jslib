@@ -1,4 +1,4 @@
-import {amendNode, attr, child} from './dom.js';
+import {amendNode, attr, child, isEventListenerObject} from './dom.js';
 import {Pipe} from './inter.js';
 import {Callable} from './misc.js';
 
@@ -12,8 +12,6 @@ import {Callable} from './misc.js';
  * @requires module:inter
  */
 /** */
-
-const isEventListenerObject = prop => prop instanceof Object && prop.handleEvent instanceof Function;
 
 /**
  * Objects that implement this type can be used in place of both property values and Children in calls to {@link dom:amendNode and {@link dom:clearNode}, as well as the bound element functions from the {@link module:html} and {@link module:svg} modules.
