@@ -51,4 +51,5 @@ class StorageBound<T> extends Binding<T> {
 	}
 }
 
-
+export const bindLocalStorage = <T>(name: string, value: NoInfer<T>, typeguard: (v: unknown) => v is T = (_: unknown): _ is any => true) => new StorageBound(window.localStorage, name, value, typeguard),
+bindSessionStorage = <T>(name: string, value: NoInfer<T>, typeguard: (v: unknown) => v is T = (_: unknown): _ is any => true) => new StorageBound(window.sessionStorage, name, value, typeguard);
