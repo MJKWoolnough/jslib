@@ -26,6 +26,6 @@ class StorageBound<T> extends Binding<T> {
 	}
 
 	set(value: T) {
-		super.value = value;
+		this.#storage.setItem(this.#name, JSON.stringify(super.value = value));
 	}
 }
