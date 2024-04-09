@@ -1,13 +1,15 @@
 import {Binding} from './bind.js';
 
 class StorageBound<T> extends Binding<T> {
+	#storage: Storage;
 	#name: string;
 	#typeguard: (v: unknown) => v is T;
 	#default: T;
 
-	constructor(name: string, value: T, typeguard: (v: unknown) => v is T) {
+	constructor(storage: Storage, name: string, value: T, typeguard: (v: unknown) => v is T) {
 		super(value);
 
+		this.#storage = storage;
 		this.#name = name;
 		this.#default = value;
 		this.#typeguard = typeguard;
