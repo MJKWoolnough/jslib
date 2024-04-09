@@ -13,6 +13,10 @@ class StorageBound<T> extends Binding<T> {
 		this.#typeguard = typeguard;
 	}
 
+	get name() {
+		return this.#name;
+	}
+
 	get value() {
 		return super.value;
 	}
