@@ -7,7 +7,9 @@ class StorageBound<T> extends Binding<T> {
 	#default: T;
 
 	constructor(storage: Storage, name: string, value: T, typeguard: (v: unknown) => v is T) {
-		super(value);
+		const val = JSON.parse(storage.getItem(name) ?? "");
+
+		super(typeguard(value) ? val : value);
 
 		this.#storage = storage;
 		this.#name = name;
