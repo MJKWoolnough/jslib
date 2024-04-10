@@ -440,9 +440,9 @@ export class DataTable extends HTMLElement {
 
 		for (const [{dataset}, col] of this.#headers) {
 			if (dsHasKey(dataset, "notEmpty")) {
-				filter.push(isNotBlankFilter);
+				filter.push([col, isNotBlankFilter]);
 			} else if (dsHasKey(dataset, "empty")) {
-				filter.push(isBlankFilter);
+				filter.push([col, isBlankFilter]);
 			} else if (this.#sorters[col] === stringSort || dsHasKey(dataset, "isText")) {
 				const isCaseInsensitive = dsHasKey(dataset, "isCaseInsensitive"),
 				      filterText = isCaseInsensitive ? (dataset["filter"] ?? "").toLowerCase() : dataset["filter"] ?? "",
@@ -452,47 +452,45 @@ export class DataTable extends HTMLElement {
 				if (filterText) {
 					if (isPrefix) {
 						if (isSuffix) {
-							filter.push(text => (isCaseInsensitive ? text.toLowerCase() : text) === filterText);
+							filter.push([col, text => (isCaseInsensitive ? text.toLowerCase() : text) === filterText]);
 						} else {
-							filter.push(text => (isCaseInsensitive ? text.toLowerCase() : text).startsWith(filterText));
+							filter.push([col, text => (isCaseInsensitive ? text.toLowerCase() : text).startsWith(filterText)]);
 						}
 					} else if (isSuffix) {
-						filter.push(text => (isCaseInsensitive ? text.toLowerCase() : text).endsWith(filterText));
+						filter.push([col, text => (isCaseInsensitive ? text.toLowerCase() : text).endsWith(filterText)]);
 					} else {
-						filter.push(text => (isCaseInsensitive ? text.toLowerCase() : text).includes(filterText));
+						filter.push([col, text => (isCaseInsensitive ? text.toLowerCase() : text).includes(filterText)]);
 					}
-				} else {
-					filter.push(nullFilter);
 				}
 			} else {
 				const min = safeFloat(parseFloat(dataset["min"] ?? ""), -Infinity),
 				      max = safeFloat(parseFloat(dataset["max"] ?? ""), Infinity);
 
-				if (min === -Infinity && max === Infinity) {
-					filter.push(nullFilter);
-				} else {
-					filter.push(text => {
+				if (min !== -Infinity || max !== Infinity) {
+					filter.push([col, text => {
 						const num = parseFloat(text);
 
 						return min <= num && num <= max;
-					});
+					}]);
 				}
 			}
 		}
 
-		this.#filteredData = [];
+		if (filter.length) {
+			this.#filteredData = [];
 
-		Loop:
-		for (const row of this.#data) {
-			let col = 0;
-
-			for (const cell of row[1]) {
-				if (!(filter[col++] ?? nullFilter)(cell)) {
-					continue Loop;
+			Loop:
+			for (const row of this.#data) {
+				for (const [col, filterFn] of filter) {
+					if (!filterFn(row[1][col])) {
+						continue Loop;
+					}
 				}
-			}
 
-			this.#filteredData.push(row);
+				this.#filteredData.push(row);
+			}
+		} else {
+			this.#filteredData = Array.from(this.#data.entries());
 		}
 
 		this.#sortData();
