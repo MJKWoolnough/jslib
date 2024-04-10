@@ -76,7 +76,7 @@ interface NodeAttributes extends Node {
 	readonly style: CSSStyleDeclaration;
 	removeAttribute(qualifiedName: string): void;
 	setAttributeNode(attr: Attr): Attr | null;
-	setAttribute(name: string, value: string): void;
+	setAttributeNS(ns: null | string, name: string, value: string): void;
 	toggleAttribute(qualifiedName: string, force?: boolean): boolean;
 }
 
@@ -97,7 +97,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       isEventListenerOrEventListenerObject = (prop: any): prop is EventListenerOrEventListenerObject => prop instanceof Function || isEventListenerObject(prop),
       isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !isAttr(prop),
       isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !isAttr(prop)),
-      isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute && !!(n as NodeAttributes).setAttribute,
+      isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute && !!(n as NodeAttributes).setAttributeNS,
       isAttr = (prop: any): prop is BoundAttr => prop instanceof Object && attr in prop,
       isChild = (children: any): children is BoundChild => children instanceof Object && child in children,
       toggleSym = Symbol("toggle"),
@@ -201,7 +201,7 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 						node.value = prop;
 					}
 
-					node.setAttribute(k, prop as string);
+					node.setAttributeNS(null, k, prop as string);
 				}
 			}
 		}

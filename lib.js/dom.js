@@ -77,7 +77,7 @@ const childrenArr = (children, res = []) => {
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || isEventListenerObject(prop),
       isClassObj = prop => prop instanceof Object && !isAttr(prop),
       isStyleObj = prop => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !isAttr(prop)),
-      isNodeAttributes = n => !!n.style && !!n.classList && !!n.removeAttribute && !!n.setAttributeNode && !!n.toggleAttribute,
+      isNodeAttributes = n => !!n.style && !!n.classList && !!n.removeAttribute && !!n.setAttributeNodeNS && !!n.toggleAttribute,
       isAttr = prop => prop instanceof Object && attr in prop,
       isChild = children => children instanceof Object && child in children,
       toggleSym = Symbol("toggle"),
@@ -181,7 +181,7 @@ amendNode = (element, properties, children) => {
 						node.value = prop;
 					}
 
-					node.setAttribute(k, prop);
+					node.setAttributeNS(null, k, prop);
 				}
 			}
 		}
