@@ -164,7 +164,11 @@ export class DataTable extends HTMLElement {
 	constructor() {
 		super();
 
-		const filter = div(),
+		const filter = div({"onkeydown": e => {
+			if (e.key === "Escape") {
+				e.target.blur();
+			}
+		      }}),
 		      mo = new MutationObserver(mutations => {
 			let doParseChildren = false,
 			    doFilter = false,
