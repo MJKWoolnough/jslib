@@ -212,10 +212,23 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 		} else if (children) {
 			if (children instanceof Node) {
 				node.appendChild(children);
-			} else if (node instanceof Element || node instanceof DocumentFragment) {
-				node.append(...childrenArr(children));
 			} else {
-				node.appendChild(createDocumentFragment(children));
+				const c = childrenArr(children),
+				      canAppend = (node instanceof Element || node instanceof DocumentFragment);
+
+				if (c.length < 1024 && canAppend) {
+					node.append(...c);
+				} else {
+					const df = canAppend ? node : new DocumentFragment();
+
+					for (let i = 0; i < c.length; i += 1024) {
+						df.append(...c.slice(i, i + 1024));
+					}
+
+					if (!canAppend) {
+						node.appendChild(df);
+					}
+				}
 			}
 		}
 	}
@@ -294,7 +307,15 @@ createDocumentFragment = (children?: Children) => {
 	} else if (children instanceof Node) {
 		df.append(children);
 	} else if (children !== undefined) {
-		df.append(...childrenArr(children));
+		const c = childrenArr(children);
+
+		if (c.length < 1024) {
+			df.append(...c);
+		} else {
+			for (let i = 0; i < c.length; i += 1024) {
+				df.append(...c.slice(i, i + 1024));
+			}
+		}
 	}
 	return df;
 },
@@ -320,7 +341,13 @@ clearNode: mElement = (n?: Node | BoundChild, properties?: Props | Children, chi
 	if (typeof children === "string") {
 		children = void (node.textContent = children);
 	} else if (children && node instanceof Element) {
-		children = void node.replaceChildren(...childrenArr(children));
+		const c = childrenArr(children);
+
+		if (c.length < 1024) {
+			children = void node.replaceChildren(...c);
+		} else {
+			children = void node.replaceChildren(createDocumentFragment(c));
+		}
 	} else {
 		while (node.lastChild) {
 			node.lastChild.remove();
