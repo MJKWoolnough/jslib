@@ -901,6 +901,16 @@ type Tests = {
 				      s = document.createElement("span");
 
 				return amendNode(e, s) === e && d.firstChild === s;
+			},
+			"set property with mixed case": async () => {
+				const {amendNode} = await import("./lib/dom.js"),
+				      d = document.createElement("div");
+
+				amendNode(d, {"miXED": "123"});
+
+				console.log(d);
+
+				return d.getAttributeNS(null, "miXED") === "123";
 			}
 		},
 		"event": {
