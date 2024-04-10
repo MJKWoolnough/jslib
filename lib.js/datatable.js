@@ -76,7 +76,23 @@ const style = [
 	"REMOVE_BLANK": "Remove Blank",
 	"ONLY_BLANK": "Only Blank"
       },
-      arrow = (up, fill, stroke) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up}h38l-19,${(2 * up - 1) * 18}z' fill='${encodeURIComponent(fill)}' stroke='${encodeURIComponent(stroke)}' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`;
+      arrow = (up, fill, stroke) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up}h38l-19,${(2 * up - 1) * 18}z' fill='${encodeURIComponent(fill)}' stroke='${encodeURIComponent(stroke)}' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`,
+      debounceFilter = (firstRadio, target, attr) => {
+	if (target === debounceTarget) {
+		clearTimeout(debounceID);
+	}
+
+	debounceTarget = target;
+
+	debounceID = setTimeout(() => {
+		amendNode(target, attr);
+		firstRadio.click();
+		debounceTarget = null;
+	}, 500);
+      };
+
+let debounceTarget = null,
+    debounceID = -1;
 
 /**
  * The DataTable custom element can be used to easily create filterable, sortable and pageable tables.
@@ -274,13 +290,11 @@ export class DataTable extends HTMLElement {
 							firstRadio,
 							this.#sorters[this.#headers.get(target)] === numberSorter ? [
 								input({"part": "filter min", "value": dataset["min"], "oninput": function() {
-									amendNode(target, {"data-min": this.value});
-									firstRadio.click();
+									debounceFilter(firstRadio, target, {"data-min": this.value});
 								}}),
 								" ≤ x ≤ ",
 								input({"part": "filter max", "value": dataset["max"], "oninput": function() {
-									amendNode(target, {"data-max": this.value});
-									firstRadio.click();
+									debounceFilter(firstRadio, target, {"data-max": this.value});
 								}})
 							] : [
 								makeToggleButton("^", lang["STARTS_WITH"], !dsHasKey(dataset, "isPrefix"), v => {
@@ -288,8 +302,7 @@ export class DataTable extends HTMLElement {
 									firstRadio.click();
 								}),
 								input({"part": "filter text", "type": "text", "value": dataset["filter"], "oninput": function() {
-									amendNode(target, {"data-filter": this.value});
-									firstRadio.click();
+									debounceFilter(firstRadio, target, {"data-filter": this.value});
 								}}),
 								makeToggleButton("$", lang["ENDS_WIDTH"], !dsHasKey(dataset, "isSuffix"), v => {
 									amendNode(target, {"data-is-suffix": v});
