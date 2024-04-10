@@ -407,7 +407,7 @@ export class DataTable extends HTMLElement {
 				}
 
 				this.#data.set(elem, data);
-			} else if (elem instanceof HTMLTableSectionElement && !head && elem.nodeName === "THEAD" && elem.firstChild instanceof HTMLTableRowElement) {
+			} else if (elem instanceof HTMLTableSectionElement && !head && elem.nodeName === "THEAD" && elem.lastChild instanceof HTMLTableRowElement) {
 				head = elem;
 			}
 		}
@@ -422,7 +422,7 @@ export class DataTable extends HTMLElement {
 			this.#ownHeaders = false;
 		}
 
-		for (const header of head.firstChild.children) {
+		for (const header of head.lastChild.children) {
 			if (header instanceof HTMLTableCellElement) {
 				this.#headers.set(header, this.#headers.size);
 			}
