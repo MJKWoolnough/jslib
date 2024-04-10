@@ -291,4 +291,4 @@ export {urlChanged};
  *
  * @return {StateBound<T>}
  */
-export default <T>(name: string, value: T, checker?: CheckerFn<T>): StateBound<T> => jsonCodec.bind(name, value, checker);
+export default <T>(name: string, value: NoInfer<T>, checker: CheckerFn<T> = (_: unknown): _ is T => true): StateBound<T> => jsonCodec.bind(name, value, checker);
