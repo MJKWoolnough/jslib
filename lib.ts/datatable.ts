@@ -318,7 +318,7 @@ export class DataTable extends HTMLElement {
 							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dsHasKey(dataset, "notEmpty"), "onclick": () => amendNode(target, {"data-not-empty": true, "data-empty": false})}),
 							label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
 						]) : [],
-						dsHasKey(dataset, "disallowEmpty") ? li([
+						!dsHasKey(dataset, "disallowEmpty") ? li([
 							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dsHasKey(dataset, "empty"), "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": true})}),
 							label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
 						]) : []
