@@ -908,8 +908,6 @@ type Tests = {
 
 				amendNode(d, {"miXED": "123"});
 
-				console.log(d);
-
 				return d.getAttributeNS(null, "miXED") === "123";
 			}
 		},
