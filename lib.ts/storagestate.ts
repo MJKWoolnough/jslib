@@ -14,7 +14,7 @@ class StorageBound<T> extends Binding<T> {
 			const val = JSON.parse(e.newValue ?? "");
 
 			for (const l of StorageBound.#listeners.get(e.storageArea!) ?? []) {
-				if (l.#name === e.key) {
+				if (l.#name === e.key && val !== l.value) {
 					l.#set(l.#typeguard(val) ? val : l.#default);
 				}
 			}
