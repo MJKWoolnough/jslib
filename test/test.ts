@@ -11488,12 +11488,21 @@ type Tests = {
 		return generated === output;
 	}, "toString", {"value": () => JSON.stringify(input) + " => " + JSON.stringify(output)}), q), {} as Record<string, () => Promise<boolean>>), p), {} as Record<string, Record<string, () => Promise<boolean>>>), o), {} as Record<string, Record<string, Record<string, () => Promise<boolean>>>>),
 	"storagestate": {
-		"simple set": async () => {
+		"session storage set": async () => {
 			const {bindSessionStorage} = await import("./lib/storagestate.js"),
-			      a = bindSessionStorage("myKey", 0, (v: unknown): v is number => typeof v === "number"),
+			      a = bindSessionStorage("mySessionKey", 0, (v: unknown): v is number => typeof v === "number"),
 			      rand = Math.random() * 1000 | 0;
 
-			bindSessionStorage("myKey", 1)(rand);
+			bindSessionStorage("mySessionKey", 1)(rand);
+
+			return new Promise(fn => setTimeout(fn)).then(() => a() === rand);
+		},
+		"local storage set": async () => {
+			const {bindLocalStorage} = await import("./lib/storagestate.js"),
+			      a = bindLocalStorage("myLocalKey", 0, (v: unknown): v is number => typeof v === "number"),
+			      rand = Math.random() * 1000 | 0;
+
+			bindLocalStorage("myLocalKey", 1)(rand);
 
 			return new Promise(fn => setTimeout(fn)).then(() => a() === rand);
 		}
