@@ -10,15 +10,15 @@ class StorageBound<T> extends Binding<T> {
 	static #listeners = new Map<Storage, StorageBound<any>[]>();
 
 	static {
-		window.addEventListener("storage", e => {
-			const val = parseJSON(e.newValue ?? "");
+		window.addEventListener("storage", e => StorageBound.#updateValues(e.storageArea, e.key, parseJSON(e.newValue ?? "")));
+	}
 
-			for (const l of StorageBound.#listeners.get(e.storageArea!) ?? []) {
-				if (l.#name === e.key && val !== l.value) {
-					l.#set(l.#typeguard(val) ? val : l.#default);
-				}
+	static #updateValues = (storageArea: Storage | null, key: string | null, val: any) => {
+		for (const l of StorageBound.#listeners.get(storageArea!) ?? []) {
+			if (l.#name === key && val !== l.value) {
+				l.#set(l.#typeguard(val) ? val : l.#default);
 			}
-		});
+		}
 	}
 
 	constructor(storage: Storage, name: string, value: T, typeguard: (v: unknown) => v is T) {
@@ -47,7 +47,7 @@ class StorageBound<T> extends Binding<T> {
 	}
 
 	set(value: T) {
-		this.#storage.setItem(this.#name, JSON.stringify(super.value = value));
+		StorageBound.#updateValues(this.#storage, this.#name, value);
 	}
 }
 
