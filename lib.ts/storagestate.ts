@@ -11,7 +11,7 @@ class StorageBound<T> extends Binding<T> {
 
 	static {
 		window.addEventListener("storage", e => {
-			const val = JSON.parse(e.newValue ?? "");
+			const val = parseJSON(e.newValue ?? "");
 
 			for (const l of StorageBound.#listeners.get(e.storageArea!) ?? []) {
 				if (l.#name === e.key && val !== l.value) {
@@ -22,7 +22,7 @@ class StorageBound<T> extends Binding<T> {
 	}
 
 	constructor(storage: Storage, name: string, value: T, typeguard: (v: unknown) => v is T) {
-		const val = JSON.parse(storage.getItem(name) ?? "");
+		const val = parseJSON(storage.getItem(name) ?? "");
 
 		super(typeguard(val) ? val : value);
 
@@ -48,6 +48,16 @@ class StorageBound<T> extends Binding<T> {
 
 	set(value: T) {
 		this.#storage.setItem(this.#name, JSON.stringify(super.value = value));
+	}
+}
+
+const parseJSON = (val: string) => {
+	try {
+		const v = JSON.parse(val);
+
+		return v;
+	} catch {
+		return null;
 	}
 }
 
