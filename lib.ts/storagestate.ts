@@ -46,7 +46,7 @@ class StorageBound<T> extends Binding<T> {
 		super.value = value;
 	}
 
-	set(value: T) {
+	set value(value: T) {
 		StorageBound.#updateValues(this.#storage, this.#name, value);
 	}
 }
