@@ -50,6 +50,7 @@ class StorageBound<T> extends Binding<T> {
 		this.#set(value);
 
 		StorageBound.#updateValues(this.#storage, this.#name, value);
+		this.#storage.setItem(this.#name, JSON.stringify(value));
 	}
 }
 
