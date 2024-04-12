@@ -347,11 +347,13 @@ export class DataTable extends HTMLElement {
 	}
 
 	attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null) {
+		const value = parseInt(newValue ?? "0");
+
 		switch (name) {
 		default:
 			return;
 		case "page":
-			const page = checkInt(parseInt(newValue ?? "0"), 0);
+			const page = checkInt(value, 0);
 
 			if (page === this.#page) {
 				return;
@@ -361,7 +363,7 @@ export class DataTable extends HTMLElement {
 
 			break;
 		case "perPage":
-			const perPage = checkInt(parseInt(newValue ?? "0"), 1, Infinity, Infinity);
+			const perPage = checkInt(value, 1, Infinity, Infinity);
 
 			if (perPage === this.#perPage) {
 				return;
