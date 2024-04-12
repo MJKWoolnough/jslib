@@ -13,7 +13,7 @@ class StorageBound extends Binding {
 		window.addEventListener("storage", e => StorageBound.#updateValues(e.storageArea, e.key, parseJSON(e.newValue ?? "")));
 	}
 
-	static #updateValues = (storageArea, key, val) => {
+	static #updateValues(storageArea, key, val) {
 		for (const l of StorageBound.#listeners.get(storageArea) ?? []) {
 			if (l.#name === key && val !== l.value) {
 				l.#set(l.#typeguard(val) ? val : l.#default);
