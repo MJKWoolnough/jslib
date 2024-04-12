@@ -398,8 +398,6 @@ export class DataTable extends HTMLElement {
 		this.#sorters = [];
 		this.#headers.clear();
 		this.#data.clear();
-		this.#lastSorted = -1;
-		this.#lastOrder = 0;
 
 		for (const elem of this.children) {
 			if (elem instanceof HTMLTableRowElement) {
@@ -451,6 +449,9 @@ export class DataTable extends HTMLElement {
 	}
 
 	#filterData() {
+		this.#lastSorted = -1;
+		this.#lastOrder = 0;
+
 		const filter = [];
 
 		for (const [{dataset}, col] of this.#headers) {
