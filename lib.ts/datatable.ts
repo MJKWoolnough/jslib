@@ -639,11 +639,11 @@ sortArrow = (asc = "#f00", desc = asc, stroke = "#000") => ({
 		},
 
 		" th[data-sort=asc],::part(header asc)": {
-			"background-image": arrow(0, asc, stroke),
+			"background-image": arrow(0, asc, stroke)
 		},
 
 		" th[data-sort=desc],::part(header desc)": {
-			"background-image": arrow(1, desc, stroke),
+			"background-image": arrow(1, desc, stroke)
 		}
 	}
 });
