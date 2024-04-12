@@ -11495,7 +11495,7 @@ type Tests = {
 
 			bindSessionStorage("mySessionKey", 1)(rand);
 
-			return new Promise(fn => setTimeout(fn)).then(() => a() === rand);
+			return new Promise(fn => setTimeout(fn)).then(() => a() === rand && window.sessionStorage.getItem("mySessionKey") === rand + "");
 		},
 		"local storage set": async () => {
 			const {bindLocalStorage} = await import("./lib/storagestate.js"),
@@ -11504,7 +11504,7 @@ type Tests = {
 
 			bindLocalStorage("myLocalKey", 1)(rand);
 
-			return new Promise(fn => setTimeout(fn)).then(() => a() === rand);
+			return new Promise(fn => setTimeout(fn)).then(() => a() === rand && window.localStorage.getItem("myLocalKey") === rand + "");
 		}
 	}
 });
