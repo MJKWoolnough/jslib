@@ -166,8 +166,6 @@ let debounceTarget = null,
 export class DataTable extends HTMLElement {
 	#head;
 	#body;
-	#sort = null;
-	#rev = false;
 	#sorters = [];
 	#headers = new Map();
 	#data = new Map();
@@ -233,33 +231,35 @@ export class DataTable extends HTMLElement {
 						return;
 					}
 
-					if (this.#sort === target) {
-						if (this.#rev) {
+					for (const header of this.#headers.keys()) {
+						if (dsHasKey(header.dataset, "sort") && header !== target) {
 							amendNode(target, unsetSort);
 							if (this.#ownHeaders) {
 								amendNode(target, unsetSortPart);
 							}
-
-							this.#rev = false;
-							this.#sort = null;
-						} else {
-							amendNode(target, setReverse);
-							if (this.#ownHeaders) {
-								amendNode(target, setRevPart);
-							}
-
-							this.#rev = true;
 						}
-					} else {
-						amendNode(this.#sort, unsetSort);
+					}
+
+					switch (target.dataset["sort"]) {
+					case "asc":
+						amendNode(target, setReverse);
+						if (this.#ownHeaders) {
+							amendNode(target, setRevPart);
+						}
+
+						break;
+					case "desc":
+						amendNode(target, unsetSort);
+						if (this.#ownHeaders) {
+							amendNode(target, unsetSortPart);
+						}
+
+						break;
+					default:
 						amendNode(target, setSort);
 						if (this.#ownHeaders) {
-							amendNode(this.#sort, unsetSortPart);
 							amendNode(target, setSortPart);
 						}
-
-						this.#sort = target;
-						this.#rev = false;
 					}
 				}, "oncontextmenu": e => {
 					const target = this.#getHeaderCell(e);
@@ -396,8 +396,6 @@ export class DataTable extends HTMLElement {
 		this.#sorters = [];
 		this.#headers.clear();
 		this.#data.clear();
-		this.#sort = null;
-		this.#rev = false;
 
 		for (const elem of this.children) {
 			if (elem instanceof HTMLTableRowElement) {
