@@ -235,9 +235,9 @@ export class DataTable extends HTMLElement {
 
 					for (const header of this.#headers.keys()) {
 						if (dsHasKey(header.dataset, "sort") && header !== target) {
-							amendNode(target, unsetSort);
+							amendNode(header, unsetSort);
 							if (this.#ownHeaders) {
-								amendNode(target, unsetSortPart);
+								amendNode(header, unsetSortPart);
 							}
 						}
 					}
