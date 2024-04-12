@@ -174,6 +174,8 @@ export class DataTable extends HTMLElement {
 	#page = 0;
 	#perPage = Infinity;
 	#ownHeaders = false;
+	#lastSorted = -1;
+	#lastOrder = 0;
 
 	constructor() {
 		super();
@@ -396,6 +398,8 @@ export class DataTable extends HTMLElement {
 		this.#sorters = [];
 		this.#headers.clear();
 		this.#data.clear();
+		this.#lastSorted = -1;
+		this.#lastOrder = 0;
 
 		for (const elem of this.children) {
 			if (elem instanceof HTMLTableRowElement) {
@@ -508,24 +512,42 @@ export class DataTable extends HTMLElement {
 	}
 
 	#sortData() {
-		let reverse = false,
+		let order = 1,
 		    col = -1;
 
 		Loop:
 		for (const [header, num] of this.#headers) {
 			switch (header.dataset["sort"]) {
 			case "desc":
-				reverse = true;
+				order = -1;
+				col = num;
+
+				break Loop;
 			case "asc":
+				order = 1;
 				col = num;
 
 				break Loop;
 			}
 		}
 
-		const sorter = this.#sorters[col] ?? nullSort;
+		if (col >= 0) {
+			if (this.#lastSorted === col) {
+				if (this.#lastOrder !== order) {
+					this.#sortedData.reverse();
+				}
+			} else {
+				const sorter = this.#sorters[col] ?? nullSort;
 
-		this.#sortedData = this.#filteredData.toSorted(([, a], [, b]) => sorter(a[col], b[col]) * (reverse ? -1 : 1));
+				this.#sortedData = this.#filteredData.toSorted(([, a], [, b]) => sorter(a[col], b[col]) * order);
+			}
+
+		} else {
+			this.#sortedData = this.#filteredData;
+		}
+
+		this.#lastSorted = col;
+		this.#lastOrder = order;
 
 		this.#pageData();
 	}
