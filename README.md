@@ -31,6 +31,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [router_transitions](#router_transitions)   | Transition effects for the Router. |
 | [rpc](#rpc)                                 | JSONRPC implementation. |
 | [settings](#settings)                       | Type-safe wrappers around localStorage. |
+| [storagestate](#storagestate)               | Bindings for localStorage and sessionStorage. |
 | [svg](#svg)                                 | Functions to create SVG elements. |
 | [typeguard](#typeguard)                     | Functions to create TypeGuards. |
 | [urlstate](#urlstate)                       | Store and retrieve state from the URL. |
@@ -45,7 +46,7 @@ Thematically, the above modules can be grouped into a few packages:
 |  Package  |  Description  |  Members  |
 |-----------|---------------|-----------|
 | Decorum   | A collection of DOM manipulation libs. | [Bind](#bind), [CSS](#css), [DOM](#dom), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
-| Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), [RPC](#rpc), and [URLState](#urlstate). |
+| Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), [RPC](#rpc), [StorageState](#storagestate), and [URLState](#urlstate). |
 | Guise     | Various modules to aid with UI and UX. | [DataTable](#datatable), [Drag](#drag), [Events](#events), [Menu](#menu), [Pagination](#pagination), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
 | Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [CaseFold](#casefold), [Fraction](#fraction), [Load](#load), [Markdown](#markdown), [Misc](#misc), [Parser](#parser), [Router](#router), [Transitions](#router_transitions), [Settings](#settings), and [TypeGuard](#typeguard). |
 
@@ -2506,6 +2507,39 @@ The wait method takes a function to be called on every setting value change. It 
 ### <a name="settings_stringsetting">StringSetting</a>
 
 The StringSetting class simply extends the [Setting](#settings_setting) class with a default of empty string ("").
+
+## <a name="storagestate">storagestate</a>
+
+The storagestate module is used to create [Binding](#bind_binding)s that bind to Storage objects.
+
+This module directly imports the [bind](#bind) and [misc](#misc) modules.
+
+|  Export  |  Description  |
+|----------|---------------|
+| [bindLocalStorage](#storagestate_bindlocalstorage) | This function creates a [Binding](#bind_binding) that retrieves it's value from localStorage, and stores it's value in localStorage when set. |
+| [bindSessionStorage](#storagestate_bindsessionstorage) | This function creates a [Binding](#bind_binding) that retrieves it's value from sessionStorage, and stores it's value in sessionStorage when set. |
+
+### <a name="storagestate_bindlocalstorage">bindLocalStorage</a>
+```typescript
+<T>(name: string, value: NoInfer<T>, typeguard: (v: unknown) => v is T = (_: unknown): _ is any => true): Binding<T>;
+```
+
+This function creates a [Binding](#bind_binding) that retrieves it's value from localStorage, and stores it's value in localStorage when set.
+
+The value automatically updates when another localStorage Binding Object with the same name is updated, or when the localStorage is set from another browsing context.
+
+The value given is used when a value retrieved from localStorage doesn't succeed the TypeGuard check.
+
+### <a name="storagestate_bindsessionstorage">bindSessionStorage</a>
+```typescript
+<T>(name: string, value: NoInfer<T>, typeguard: (v: unknown) => v is T = (_: unknown): _ is any => true): Binding<T>;
+```
+
+This function creates a [Binding](#bind_binding) that retrieves it's value from sessionStorage, and stores it's value in sessionStorage when set.
+
+The value automatically updates when another sessionStorage Binding Object with the same name is updated, or when the sessionStorage is set from another browsing context.
+
+The value given is used when a value retrieved from sessionStorage doesn't succeed the TypeGuard check.
 
 ## <a name="svg">svg</a>
 
