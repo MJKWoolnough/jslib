@@ -418,6 +418,20 @@ export class DataTable extends HTMLElement {
 						}
 
 						data.push(cell);
+
+						if (child.hasAttribute("colspan")) {
+							const colspan = parseInt(child.getAttribute("colspan"));
+
+							if (!isNaN(colspan)) {
+								for (let i = 1; i < colspan; i++) {
+									if (this.#sorters.length <= data.length) {
+										this.#sorters.push(numberSorter);
+									}
+
+									data.push("");
+								}
+							}
+						}
 					}
 				}
 
