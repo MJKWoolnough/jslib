@@ -411,7 +411,7 @@ export class DataTable extends HTMLElement {
 							this.#sorters.push(numberSorter);
 						}
 
-						const cell = child.innerText;
+						const cell = dsHasKey(child.dataset, "value") ? child.dataset["value"] : child.innerText;
 
 						if (isNaN(parseNum(cell))) {
 							this.#sorters[data.length] = stringSort;
