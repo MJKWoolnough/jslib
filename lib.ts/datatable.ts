@@ -204,14 +204,10 @@ export class DataTable extends HTMLElement {
 						case "colspan":
 						case "data-value":
 							doParseChildren = true;
-
-							break;
-						case "data-sort":
-							doSort = true;
-
-							break;
 						default:
 							doFilter = true;
+						case "data-sort":
+							doSort = true;
 						}
 					}
 				}
