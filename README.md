@@ -655,6 +655,8 @@ To add the table to the table, add successive `tr` elements which contain the ce
 </data-table>
 ```
 
+The data-value attribute can be specified on a cell to supply a value other than its text content.
+
 When no header is specified, one is generated with sequentially titled columns. If no header is wanted, add an empty `tr` element in a `thead` element:
 
 ```html
