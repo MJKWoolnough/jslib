@@ -456,8 +456,17 @@ export class DataTable extends HTMLElement {
 		}
 
 		for (const header of (head.lastChild as HTMLTableRowElement).children) {
+			let count = 0;
 			if (header instanceof HTMLTableCellElement) {
-				this.#headers.set(header, this.#headers.size);
+				this.#headers.set(header, count++);
+
+				if (header.hasAttribute("colspan")) {
+					const colspan = parseInt(header.getAttribute("colspan")!);
+
+					if (colspan > 1) {
+						count += colspan - 1
+					}
+				}
 			}
 		}
 
