@@ -201,6 +201,11 @@ export class DataTable extends HTMLElement {
 				case "attributes":
 					if (this.#headers.has(mutation.target)) {
 						switch (mutation.attributeName) {
+						case "colspan":
+						case "data-value":
+							doParseChildren = true;
+
+							break;
 						case "data-sort":
 							doSort = true;
 
@@ -338,7 +343,7 @@ export class DataTable extends HTMLElement {
 		this.#parseContent();
 
 		mo.observe(this, {
-			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-is-text", "data-empty", "data-not-empty", "data-is-case-insensitive"],
+			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-is-text", "data-empty", "data-not-empty", "data-is-case-insensitive", "colspan", "data-value"],
 			"childList": true,
 			"subtree": true
 		});
