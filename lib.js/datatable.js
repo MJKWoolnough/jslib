@@ -422,14 +422,12 @@ export class DataTable extends HTMLElement {
 						if (child.hasAttribute("colspan")) {
 							const colspan = parseInt(child.getAttribute("colspan"));
 
-							if (!isNaN(colspan)) {
-								for (let i = 1; i < colspan; i++) {
-									if (this.#sorters.length <= data.length) {
-										this.#sorters.push(numberSorter);
-									}
-
-									data.push("");
+							for (let i = 1; i < colspan; i++) {
+								if (this.#sorters.length <= data.length) {
+									this.#sorters.push(numberSorter);
 								}
+
+								data.push("");
 							}
 						}
 					}
@@ -457,6 +455,7 @@ export class DataTable extends HTMLElement {
 
 		for (const header of head.lastChild.children) {
 			let count = 0;
+
 			if (header instanceof HTMLTableCellElement) {
 				this.#headers.set(header, count++);
 
