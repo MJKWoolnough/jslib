@@ -28,7 +28,7 @@ isInt = (v, min = -Infinity, max = Infinity) => typeof v === "number" && (v|0) =
  *
  * @return {number} The number `n` if it is an integer between `min` and `max` inclusively, or `def` otherwise.
  */
-checkInt = (n, min = -Infinity, max = Infinity, def = Math.max(min, 0)) => isInt(n, min, max) ? n : def,
+checkInt = (n, min = -Infinity, max = Infinity, def = Math.max(min, 0)) => isInt(n, min, max) ? n : def|0,
 /**
  * Modulo function.
  *
