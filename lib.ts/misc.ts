@@ -26,7 +26,7 @@ isInt = (v: unknown, min = -Infinity, max = Infinity): v is number => typeof v =
  * @param {number} [max=+Infinity]        Maximum acceptable value.
  * @param {number} [def=Math.max(min, 0)] Default value to be returned if `n` is unacceptable.
  *
- * @return {number} The number `n` if it is an integer between `min` and `max` inclusively, or `def` otherwise.
+ * @return {number} The number `n` if it is an integer between `min` and `max` inclusively, or `def` (cast to an integer) otherwise.
  */
 checkInt = (n: unknown, min = -Infinity, max = Infinity, def = Math.max(min, 0)) => isInt(n, min, max) ? n : def|0,
 /**
