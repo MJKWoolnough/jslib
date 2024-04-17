@@ -1788,7 +1788,7 @@ The child class will need appropriate typing to make it correctly appear as the 
 
 ### <a name="misc_checkint">checkInt</a>
 ```typescript
-(n: unknown, min = -Infinity, max = Infinity, def = 0) => number;
+(n: unknown, min = -Infinity, max = Infinity, def = Math.max(min, 0)) => number;
 ```
 
 This function determines whether `n` is a valid integer, as determined by the [isInt](#misc_isint) function, and returns `n` if it is, or `def` otherwise.
