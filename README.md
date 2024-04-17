@@ -1791,7 +1791,7 @@ The child class will need appropriate typing to make it correctly appear as the 
 (n: unknown, min = -Infinity, max = Infinity, def = Math.max(min, 0)) => number;
 ```
 
-This function determines whether `n` is a valid integer, as determined by the [isInt](#misc_isint) function, and returns `n` if it is, or `def` otherwise.
+This function determines whether `n` is a valid integer, as determined by the [isInt](#misc_isint) function, and returns `n` if it is, or `def` (cast to an integer) otherwise.
 
 ### <a name="misc_isint">isInt</a>
 ```typescript
