@@ -422,16 +422,14 @@ export class DataTable extends HTMLElement {
 
 						data.push(cell);
 
-						if (child.hasAttribute("colspan")) {
-							const colspan = parseInt(child.getAttribute("colspan")!);
+						const colspan = checkInt(parseInt(child.getAttribute("colspan")!), 1);
 
-							for (let i = 1; i < colspan; i++) {
-								if (this.#sorters.length <= data.length) {
-									this.#sorters.push(numberSorter);
-								}
-
-								data.push("");
+						for (let i = 1; i < colspan; i++) {
+							if (this.#sorters.length <= data.length) {
+								this.#sorters.push(numberSorter);
 							}
+
+							data.push("");
 						}
 					}
 				}
@@ -460,15 +458,9 @@ export class DataTable extends HTMLElement {
 			let count = 0;
 
 			if (header instanceof HTMLTableCellElement) {
-				this.#headers.set(header, count++);
+				this.#headers.set(header, count);
 
-				if (header.hasAttribute("colspan")) {
-					const colspan = parseInt(header.getAttribute("colspan")!);
-
-					if (colspan > 1) {
-						count += colspan - 1
-					}
-				}
+				count += checkInt(parseInt(header.getAttribute("colspan")!), 1);
 			}
 		}
 
