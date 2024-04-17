@@ -7,10 +7,9 @@ import {checkInt, stringSort} from './misc.js';
 /**
  * The datatable module adds a custom element for handling tabular data that can be filtered, sorted, and paged.
  *
- * This module relies directly on the {@link module:bind | Bind}, {@link module:css | CSS}, {@link module:dom | DOM}, {@link module:html | HTML}, {@link module:misc | Misc}, and {@link module:nodes | Nodes} modules.
+ * This module relies directly on the {@link module:css | CSS}, {@link module:dom | DOM}, {@link module:html | HTML}, {@link module:misc | Misc}, and {@link module:nodes | Nodes} modules.
  *
  * @module datatable
- * @requires module:bind
  * @requires module:css
  * @requires module:dom
  * @requires module:html
