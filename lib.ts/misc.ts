@@ -21,10 +21,10 @@ isInt = (v: unknown, min = -Infinity, max = Infinity): v is number => typeof v =
 /**
  * This function determines whether `n` is a valid integer, as determined by the {@link isInt} function, and returns `n` if it is, or `def` otherwise.
  *
- * @param {unknown} n              The value to be checked.
- * @param {number} [min=-Infinity] Minimum acceptable value.
- * @param {number} [max=+Infinity] Maximum acceptable value.
- * @param {number} [def=0]         Default value to be returned if `n` is unacceptable.
+ * @param {unknown} n                     The value to be checked.
+ * @param {number} [min=-Infinity]        Minimum acceptable value.
+ * @param {number} [max=+Infinity]        Maximum acceptable value.
+ * @param {number} [def=Math.max(min, 0)] Default value to be returned if `n` is unacceptable.
  *
  * @return {number} The number `n` if it is an integer between `min` and `max` inclusively, or `def` otherwise.
  */
