@@ -6303,6 +6303,10 @@ type Tests = {
 			"-2 <= x <= 5, x = 6, def = 2": async () => {
 				const {checkInt} = await import("./lib/misc.js");
 				return checkInt(6, -2, 5, 2) === 2;
+			},
+			"2 <= x <= 5, x = 6": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+				return checkInt(6, 2, 5) === 2;
 			}
 		},
 		"mod": {
