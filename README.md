@@ -578,7 +578,7 @@ This unexported type represents a CSS value, as either a string, number or any o
 
 The datatable module adds a custom element for handling tabular data that can be filtered, sorted, and paged.
 
-This module relies directly on the [bind]{#bind}, [css]{#css}, [dom]{#dom}, [html]{#html}, and [misc]{#misc] modules.
+This module relies directly on the [css]{#css}, [dom]{#dom}, [html]{#html}, and [misc]{#misc] modules.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
