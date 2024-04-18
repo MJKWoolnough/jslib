@@ -14,7 +14,7 @@ declare toWithout953="";
 setStart() {
 	firstFrom="$from";
 	firstTo="$to";
-	setLast "$from" "$to";
+	setLast;
 	mode=1;
 
 	if $has953; then
@@ -24,8 +24,8 @@ setStart() {
 }
 
 setLast() {
-	lastFrom="$1";
-	lastTo="$2";
+	lastFrom="$from";
+	lastTo="$to";
 }
 
 printPrevious() {
@@ -111,35 +111,36 @@ HEREDOC
 				setStart "$from" "$to";;
 			1)
 				if [ "$(( $lastFrom + 1 ))" = "$from" -a "$(( $lastTo + 1 ))" = "$to" ]; then
-					setLast "$from" "$to";
+					setLast;
 					mode=2;
 				elif [ "$(( $lastFrom + 2 ))" = "$from" -a "$(( $lastTo + 2 ))" = "$to" ]; then
-					setLast "$from" "$to";
+					setLast;
 					mode=3;
 				else
 					printPrevious;
-					setStart "$from" "$to";
+					setStart;
 				fi;;
 			2)
 				if [ "$(( $lastFrom + 1 ))" = "$from" -a "$(( $lastTo + 1 ))" = "$to" ]; then
 					setLast "$from" "$to";
 				else
 					printPrevious;
-					setStart "$from" "$to";
+					setStart;
 				fi;;
 			3)
 				if [ "$(( $lastFrom + 2 ))" = "$from" -a "$(( $lastTo + 2 ))" = "$to" ]; then
 					setLast "$from" "$to";
 				else
 					printPrevious;
-					setStart "$from" "$to";
+					setStart;
 				fi;;
 			4)
 				if [ "$(( $lastFrom + 1 ))" = "$from" -a "$(( $lastTo + 1 ))" = "$toWithout953" -a $lastHad953 = $has953 ]; then
-					setLast "$from" "$toWithout953";
+					to="$toWithout953";
+					setLast;
 				else
 					printPrevious;
-					setStart "$from" "$to";
+					setStart;
 				fi;;
 			esac;
 		fi;
