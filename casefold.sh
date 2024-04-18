@@ -82,7 +82,7 @@ const cf = new Map<string, string>(),#const cf = new Map(),
 		add(i, i + shift);
 	}
       },
-      addRange953 = (start: number, end: number, shift = 32) => {#      addRange953 = (start, end, shift = 32) => {
+      addRange953 = (start: number, end: number, shift: number) => {#      addRange953 = (start, end, shift) => {
 	for (let i = start; i <= end; i++) {
 		add(i, i + shift, 953);
 	}
