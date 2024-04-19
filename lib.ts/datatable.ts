@@ -453,8 +453,9 @@ export class DataTable extends HTMLElement {
 			this.#ownHeaders = false;
 		}
 
+		let count = 0;
+
 		for (const header of (head.lastChild as HTMLTableRowElement).children) {
-			let count = 0;
 
 			if (header instanceof HTMLTableCellElement) {
 				this.#headers.set(header, count);
