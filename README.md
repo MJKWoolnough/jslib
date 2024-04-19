@@ -637,6 +637,7 @@ The follow data-* attributes have special meaning to header cells and determine 
 | data-min                 | Number    | For columns of numbers, specifies a minimum value to filter by.
 | data-not-empty           | Boolean   | When set, filters out non-empty cells.
 | data-sort                | asc, desc | When set, sorts by the column in either asc(ending) of desc(ending) order.
+| data-type                | string, number, date, time, datetime | When set, will determine how filters and sorting are conducted.
 
 To add the table to the table, add successive `tr` elements which contain the cells for the columns. For example:
 
