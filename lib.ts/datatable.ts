@@ -456,9 +456,12 @@ export class DataTable extends HTMLElement {
 		let count = 0;
 
 		for (const header of (head.lastChild as HTMLTableRowElement).children) {
-
 			if (header instanceof HTMLTableCellElement) {
 				this.#headers.set(header, count);
+
+				if (header.dataset["type"] === "string") {
+					this.#sorters[count] = stringSort;
+				}
 
 				count += checkInt(parseInt(header.getAttribute("colspan")!), 1);
 			}

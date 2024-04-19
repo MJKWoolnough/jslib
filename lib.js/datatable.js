@@ -460,6 +460,10 @@ export class DataTable extends HTMLElement {
 			if (header instanceof HTMLTableCellElement) {
 				this.#headers.set(header, count++);
 
+				if (header.dataset["type"] === "string") {
+					this.#sorters[count] = stringSort;
+				}
+
 				count += checkInt(parseInt(header.getAttribute("colspan")), 1);
 			}
 		}
