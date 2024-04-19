@@ -326,7 +326,7 @@ export class DataTable extends HTMLElement {
 							this.#sorters[colNum] === numberSorter ? [
 								numberInput(dataset, "min", firstRadio, target),
 								" ≤ x ≤ ",
-								numberInput(dataset, "max", firstRadio, target),
+								numberInput(dataset, "max", firstRadio, target)
 							] : [
 								makeToggleButton("^", lang["STARTS_WITH"], !dsHasKey(dataset, "isPrefix"), v => {
 									amendNode(target, {"data-is-prefix": v});
