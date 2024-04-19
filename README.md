@@ -605,8 +605,8 @@ This element directly handles the following attributes:
 
 |  Attribute  |  Type  |  Description  |
 |-------------|--------|---------------|
-| page        | Number | The page of data to show (0 indexed, default: 0).
-| perPage     | Number | The number of items to show on a page (default: Infinity).
+| page        | Number | The page of data to show (0 indexed, default: 0). |
+| perPage     | Number | The number of items to show on a page (default: Infinity). |
 
 To add headers to the table, add a `thead` element containing a `tr` element. Inside that `tr` element you can add your `th` or `td` header elements. For example:
 
