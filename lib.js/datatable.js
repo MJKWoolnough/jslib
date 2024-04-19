@@ -294,13 +294,31 @@ export class DataTable extends HTMLElement {
 						li([
 							firstRadio,
 							this.#sorters[this.#headers.get(target)] === numberSorter ? [
-								input({"part": "filter min", "value": dataset["min"], "oninput": function() {
-									debounceFilter(firstRadio, target, {"data-min": this.value});
-								}}),
-								" ≤ x ≤ ",
-								input({"part": "filter max", "value": dataset["max"], "oninput": function() {
-									debounceFilter(firstRadio, target, {"data-max": this.value});
-								}})
+								target.dataset["type"] === "date" ? [
+									input({"part": "filter min", "type": "date", "value": dataset["min"] ? new Date(parseInt(dataset["min"]) * 1000).toISOString().split("T")[0] : "", "oninput": function() {
+										debounceFilter(firstRadio, target, {"data-min": this.valueAsNumber / 1000 + ""});
+									}}),
+									" ≤ x ≤ ",
+									input({"part": "filter max", "type": "date", "value": dataset["max"] ? new Date(parseInt(dataset["max"]) * 1000).toISOString().split("T")[0] : "", "oninput": function() {
+										debounceFilter(firstRadio, target, {"data-max": this.valueAsNumber / 1000 + ""});
+									}})
+								] : target.dataset["type"] === "datetime" ? [
+									input({"part": "filter min", "type": "datetime-local", "value": dataset["min"] ? new Date(parseInt(dataset["min"]) * 1000).toISOString().replace(/[zZ]$/, "") : "", "oninput": function() {
+										debounceFilter(firstRadio, target, {"data-min": this.valueAsNumber / 1000 + ""});
+									}}),
+									" ≤ x ≤ ",
+									input({"part": "filter max", "type": "datetime-local", "value": dataset["max"] ? new Date(parseInt(dataset["max"]) * 1000).toISOString().replace(/[zZ]$/, "") : "", "oninput": function() {
+										debounceFilter(firstRadio, target, {"data-max": this.valueAsNumber / 1000 + ""});
+									}})
+								] : [
+									input({"part": "filter min", "value": dataset["min"], "oninput": function() {
+										debounceFilter(firstRadio, target, {"data-min": this.value});
+									}}),
+									" ≤ x ≤ ",
+									input({"part": "filter max", "value": dataset["max"], "oninput": function() {
+										debounceFilter(firstRadio, target, {"data-max": this.value});
+									}})
+								]
 							] : [
 								makeToggleButton("^", lang["STARTS_WITH"], !dsHasKey(dataset, "isPrefix"), v => {
 									amendNode(target, {"data-is-prefix": v});
