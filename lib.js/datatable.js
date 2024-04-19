@@ -199,6 +199,7 @@ export class DataTable extends HTMLElement {
 	#data = new Map();
 	#filteredData = [];
 	#sortedData = [];
+	#hasEmpty = [];
 	#page = 0;
 	#perPage = Infinity;
 	#ownHeaders = false;
@@ -311,6 +312,8 @@ export class DataTable extends HTMLElement {
 					}
 
 					const {dataset} = target,
+					      colNum = this.#headers.get(target),
+					      hasEmpty = this.#hasEmpty[colNum],
 					      firstRadio = input({"part": "radio", "type": "radio", "checked": !dsHasKey(dataset, "empty") && !dsHasKey(dataset, "notEmpty"), "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
 					      list = ul({"part": "filter", "tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(e) {
 						if (!e.relatedTarget || !list.contains(e.relatedTarget)) {
@@ -319,7 +322,7 @@ export class DataTable extends HTMLElement {
 					      }}, [
 						li([
 							firstRadio,
-							this.#sorters[this.#headers.get(target)] === numberSorter ? [
+							this.#sorters[colNum] === numberSorter ? [
 								numberInput(dataset, "min", firstRadio, target),
 								" ≤ x ≤ ",
 								numberInput(dataset, "max", firstRadio, target),
@@ -341,11 +344,11 @@ export class DataTable extends HTMLElement {
 								})
 							]
 						]),
-						!dsHasKey(dataset, "disallowNotEmpty") ? li([
+						hasEmpty && !dsHasKey(dataset, "disallowNotEmpty") ? li([
 							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dsHasKey(dataset, "notEmpty"), "onclick": () => amendNode(target, {"data-not-empty": true, "data-empty": false})}),
 							label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
 						]) : [],
-						!dsHasKey(dataset, "disallowEmpty") ? li([
+						hasEmpty && !dsHasKey(dataset, "disallowEmpty") ? li([
 							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dsHasKey(dataset, "empty"), "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": true})}),
 							label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
 						]) : []
@@ -423,6 +426,7 @@ export class DataTable extends HTMLElement {
 		    maxCols = 0;
 
 		this.#sorters = [];
+		this.#hasEmpty = [];
 		this.#headers.clear();
 		this.#data.clear();
 
@@ -436,6 +440,10 @@ export class DataTable extends HTMLElement {
 							this.#sorters.push(numberSorter);
 						}
 
+						if (this.#hasEmpty.length <= data.length) {
+							this.#hasEmpty.push(numberSorter);
+						}
+
 						const cell = dsHasKey(child.dataset, "value") ? child.dataset["value"] : child.innerText;
 
 						if (isNaN(parseNum(cell))) {
@@ -443,6 +451,10 @@ export class DataTable extends HTMLElement {
 						}
 
 						data.push(cell);
+
+						if (!cell) {
+							this.#hasEmpty[data.length] = true;
+						}
 
 						const colspan = checkInt(parseInt(child.getAttribute("colspan")), 1);
 
@@ -452,6 +464,8 @@ export class DataTable extends HTMLElement {
 							}
 
 							data.push("");
+
+							this.#hasEmpty[data.length] = true;
 						}
 					}
 				}
@@ -500,9 +514,11 @@ export class DataTable extends HTMLElement {
 		const filter = [];
 
 		for (const [{dataset}, col] of this.#headers) {
-			if (dsHasKey(dataset, "notEmpty")) {
+			const hasEmpty = this.#hasEmpty[col];
+
+			if (hasEmpty && dsHasKey(dataset, "notEmpty")) {
 				filter.push([col, isNotBlankFilter]);
-			} else if (dsHasKey(dataset, "empty")) {
+			} else if (hasEmpty && dsHasKey(dataset, "empty")) {
 				filter.push([col, isBlankFilter]);
 			} else if (this.#sorters[col] === stringSort || dsHasKey(dataset, "isText")) {
 				const isCaseInsensitive = dsHasKey(dataset, "isCaseInsensitive"),
