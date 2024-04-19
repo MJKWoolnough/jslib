@@ -88,6 +88,32 @@ const style = [
 		firstRadio.click();
 		debounceTarget = null;
 	}, 500);
+      },
+      numberInput = (dataset: DOMStringMap, minMax: string, firstRadio: HTMLInputElement, target: HTMLElement) => {
+	let value: string,
+	    type = dataset["type"],
+	    oninput: Function;
+
+	switch (dataset["type"]) {
+	default:
+		value = dataset[minMax] ?? "";
+		type = "number";
+		oninput = function(this: HTMLInputElement) {
+			debounceFilter(firstRadio, target, {["data-" + minMax]: this.value});
+		};
+
+		break;
+	case "datetime":
+		type += "-local";
+	case "date":
+	case "time":
+		value = dataset[minMax] ? new Date(parseInt(dataset[minMax]!) * 1000).toISOString().split(type === "datetime-local" ? "Z" : "T")[+(type === "time")].replace("Z", "") : "";
+		oninput = function(this: HTMLInputElement) {
+			debounceFilter(firstRadio, target, {["data-" + minMax]: this.valueAsNumber / 1000 + ""});
+		};
+	}
+
+	return input({"part": "filter " + minMax, type, value, oninput});
       };
 
 let debounceTarget: Element | null = null,
@@ -293,31 +319,9 @@ export class DataTable extends HTMLElement {
 						li([
 							firstRadio,
 							this.#sorters[this.#headers.get(target)!] === numberSorter ? [
-								target.dataset["type"] === "date" ? [
-									input({"part": "filter min", "type": "date", "value": dataset["min"] ? new Date(parseInt(dataset["min"]) * 1000).toISOString().split("T")[0] : "", "oninput": function(this: HTMLInputElement) {
-										debounceFilter(firstRadio, target, {"data-min": this.valueAsNumber / 1000 + ""});
-									}}),
-									" ≤ x ≤ ",
-									input({"part": "filter max", "type": "date", "value": dataset["max"] ? new Date(parseInt(dataset["max"]) * 1000).toISOString().split("T")[0] : "", "oninput": function(this: HTMLInputElement) {
-										debounceFilter(firstRadio, target, {"data-max": this.valueAsNumber / 1000 + ""});
-									}})
-								] : target.dataset["type"] === "datetime" ? [
-									input({"part": "filter min", "type": "datetime-local", "value": dataset["min"] ? new Date(parseInt(dataset["min"]) * 1000).toISOString().replace(/[zZ]$/, "") : "", "oninput": function(this: HTMLInputElement) {
-										debounceFilter(firstRadio, target, {"data-min": this.valueAsNumber / 1000 + ""});
-									}}),
-									" ≤ x ≤ ",
-									input({"part": "filter max", "type": "datetime-local", "value": dataset["max"] ? new Date(parseInt(dataset["max"]) * 1000).toISOString().replace(/[zZ]$/, "") : "", "oninput": function(this: HTMLInputElement) {
-										debounceFilter(firstRadio, target, {"data-max": this.valueAsNumber / 1000 + ""});
-									}})
-								] : [
-									input({"part": "filter min", "value": dataset["min"], "oninput": function(this: HTMLInputElement) {
-										debounceFilter(firstRadio, target, {"data-min": this.value});
-									}}),
-									" ≤ x ≤ ",
-									input({"part": "filter max", "value": dataset["max"], "oninput": function(this: HTMLInputElement) {
-										debounceFilter(firstRadio, target, {"data-max": this.value});
-									}})
-								]
+								numberInput(dataset, "min", firstRadio, target),
+								" ≤ x ≤ ",
+								numberInput(dataset, "max", firstRadio, target),
 							] : [
 								makeToggleButton("^", lang["STARTS_WITH"], !dsHasKey(dataset, "isPrefix"), v => {
 									amendNode(target, {"data-is-prefix": v});
