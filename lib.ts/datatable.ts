@@ -603,7 +603,7 @@ export class DataTable extends HTMLElement {
 			} else {
 				const sorter = this.#sorters[col] ?? nullSort;
 
-				this.#sortedData = this.#filteredData.toSorted(([, a], [, b]) => sorter(a[col], b[col]) * order);
+				this.#sortedData = this.#filteredData.toSorted(order === 1 ? ([, a], [, b]) => sorter(a[col], b[col]) : ([, a], [, b]) => sorter(b[col], a[col]));
 			}
 
 		} else {
