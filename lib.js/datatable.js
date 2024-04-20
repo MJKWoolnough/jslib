@@ -332,7 +332,7 @@ export class DataTable extends HTMLElement {
 									amendNode(target, {"data-is-prefix": v});
 									firstRadio.click();
 								}),
-								input({"part": "filter text", "type": "text", "value": dataset["filter"], "oninput": function() {
+								input({"part": "filter text", "type": "search", "value": dataset["filter"], "oninput": function() {
 									debounceFilter(firstRadio, target, {"data-filter": this.value});
 								}}),
 								makeToggleButton("$", lang["ENDS_WIDTH"], !dsHasKey(dataset, "isSuffix"), v => {
