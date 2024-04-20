@@ -531,14 +531,14 @@ export class DataTable extends HTMLElement {
 				if (filterText) {
 					if (isPrefix) {
 						if (isSuffix) {
-							filter.push([col, text => (isCaseInsensitive ? text.toLowerCase() : text) === filterText]);
+							filter.push([col, isCaseInsensitive ? text => text.toLowerCase() === filterText : text => text === filterText]);
 						} else {
-							filter.push([col, text => (isCaseInsensitive ? text.toLowerCase() : text).startsWith(filterText)]);
+							filter.push([col, isCaseInsensitive ? text => text.toLowerCase().startsWith(filterText) : text => text.startsWith(filterText)]);
 						}
 					} else if (isSuffix) {
-						filter.push([col, text => (isCaseInsensitive ? text.toLowerCase() : text).endsWith(filterText)]);
+						filter.push([col, isCaseInsensitive ? text => text.toLowerCase().endsWith(filterText) : text => text.endsWith(filterText)]);
 					} else {
-						filter.push([col, text => (isCaseInsensitive ? text.toLowerCase() : text).includes(filterText)]);
+						filter.push([col, isCaseInsensitive ? text => text.toLowerCase().includes(filterText) : text => text.includes(filterText)]);
 					}
 				}
 			} else {
