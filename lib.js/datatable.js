@@ -153,6 +153,7 @@ let debounceTarget = null,
  * | data-disallow-not-empty  | Boolean   | When set, disables the ability to filter out non-empty cells. |
  * | data-empty               | Boolean   | When set, filters out empty cells. |
  * | data-filter              | String    | Filters the cells to those containing the value of the attribute. |
+ * | data-filter-disable      | Boolean   | When set, disables user filtering. |
  * | data-is-case-insensitive | Boolean   | When set, the text filter is case insensitive. |
  * | data-is-prefix           | Boolean   | When set, the text filter is a prefix match. When set with data-is-suffix becomes an exact match filter. |
  * | data-is-suffix           | Boolean   | When set, the text filter is a suffix match. When set with data-is-prefix becomes an exact match filter. |
