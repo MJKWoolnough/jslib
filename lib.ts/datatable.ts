@@ -446,7 +446,8 @@ export class DataTable extends HTMLElement {
 							this.#hasEmpty.push(false);
 						}
 
-						const cell = dsHasKey(child.dataset, "value") ? child.dataset["value"] : child.innerText;
+						const cell = dsHasKey(child.dataset, "value") ? child.dataset["value"] : child.innerText,
+						      colspan = checkInt(parseInt(child.getAttribute("colspan")!), 1);
 
 						if (isNaN(parseNum(cell))) {
 							this.#sorters[data.length] = stringSort;
@@ -458,7 +459,6 @@ export class DataTable extends HTMLElement {
 							this.#hasEmpty[data.length] = true;
 						}
 
-						const colspan = checkInt(parseInt(child.getAttribute("colspan")!), 1);
 
 						for (let i = 1; i < colspan; i++) {
 							if (this.#sorters.length <= data.length) {
