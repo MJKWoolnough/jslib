@@ -298,7 +298,7 @@ export class DataTable extends HTMLElement {
 				}, "oncontextmenu": (e: MouseEvent) => {
 					const target = this.#getHeaderCell(e);
 
-					if (!target) {
+					if (!target || dsHasKey(target.dataset, "filterDisable")) {
 						return;
 					}
 
