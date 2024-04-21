@@ -81,7 +81,8 @@ const childrenArr = (children, res = []) => {
       isAttr = prop => prop instanceof Object && attr in prop,
       isChild = children => children instanceof Object && child in children,
       toggleSym = Symbol("toggle"),
-      wrapElem = (name, fn) => Object.defineProperties((props, children) => amendNode(fn(), props, children), {"name": {"value": name}, [child]: {"get": fn}});
+      wrapElem = (name, fn) => Object.defineProperties((props, children) => amendNode(fn(), props, children), {"name": {"value": name}, [child]: {"get": fn}}),
+      maxElems = 32768;
 
 export const
 /** This symbol is used to denote a special Object that provides its own Children. */
@@ -196,13 +197,13 @@ amendNode = (element, properties, children) => {
 				const c = childrenArr(children),
 				      canAppend = (node instanceof Element || node instanceof DocumentFragment);
 
-				if (c.length < 1024 && canAppend) {
+				if (c.length < maxElems && canAppend) {
 					node.append(...c);
 				} else {
 					const df = canAppend ? node : new DocumentFragment();
 
-					for (let i = 0; i < c.length; i += 1024) {
-						df.append(...c.slice(i, i + 1024));
+					for (let i = 0; i < c.length; i += maxElems) {
+						df.append(...c.slice(i, i + maxElems));
 					}
 
 					if (!canAppend) {
@@ -289,11 +290,11 @@ createDocumentFragment = children => {
 	} else if (children !== undefined) {
 		const c = childrenArr(children);
 
-		if (c.length < 1024) {
+		if (c.length < maxElems) {
 			df.append(...c);
 		} else {
-			for (let i = 0; i < c.length; i += 1024) {
-				df.append(...c.slice(i, i + 1024));
+			for (let i = 0; i < c.length; i += maxElems) {
+				df.append(...c.slice(i, i + maxElems));
 			}
 		}
 	}
@@ -324,7 +325,7 @@ clearNode = (node, properties, children) => {
 	} else if (children && node instanceof Element) {
 		const c = childrenArr(children);
 
-		if (c.length < 1024) {
+		if (c.length < maxElems) {
 			children = void node.replaceChildren(...c);
 		} else {
 			children = void node.replaceChildren(createDocumentFragment(c));
