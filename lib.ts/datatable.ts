@@ -369,7 +369,7 @@ export class DataTable extends HTMLElement {
 		this.#parseContent();
 
 		mo.observe(this, {
-			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-is-text", "data-empty", "data-not-empty", "data-is-case-insensitive", "colspan", "data-value", "data-type"],
+			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-empty", "data-not-empty", "data-is-case-insensitive", "colspan", "data-value", "data-type"],
 			"childList": true,
 			"subtree": true
 		});
@@ -525,7 +525,7 @@ export class DataTable extends HTMLElement {
 				filter.push([col, isNotBlankFilter]);
 			} else if (hasEmpty && dsHasKey(dataset, "empty")) {
 				filter.push([col, isBlankFilter]);
-			} else if (this.#sorters[col] === stringSort || dsHasKey(dataset, "isText")) {
+			} else if (this.#sorters[col] === stringSort) {
 				const isCaseInsensitive = dsHasKey(dataset, "isCaseInsensitive"),
 				      filterText = isCaseInsensitive ? (dataset["filter"] ?? "").toLowerCase() : dataset["filter"] ?? "",
 				      isPrefix = dsHasKey(dataset, "isPrefix"),
