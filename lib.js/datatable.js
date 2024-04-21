@@ -694,7 +694,7 @@ export class DataTable extends HTMLElement {
 	 * @return {string[][]} A two-dimensional array of the data.
 	 */
 	exportPage() {
-		return [].concat(...this.#slots.map(slot => slot.assignedElements().map(e => this.#data.get(e))));
+		return this.#perPage >= this.#sortedData.length ? this.export() : [].concat(...this.#slots.map(slot => slot.assignedElements().map(e => this.#data.get(e))));
 	}
 }
 
