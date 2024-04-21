@@ -635,7 +635,7 @@ export class DataTable extends HTMLElement {
 			}
 		}
 
-		this.#body.assign(...data);
+		this.#body.assign.apply(this.#body, data);
 
 		this.dispatchEvent(new Event("render"));
 	}
