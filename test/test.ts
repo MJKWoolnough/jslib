@@ -11531,6 +11531,48 @@ type Tests = {
 			      ]);
 
 			return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.export()) === "[[\"1\",\"2\",\"3\"],[\"4\",\"5\",\"6\"],[\"7\",\"8\",\"9\"]]");
+		},
+		"export with filters": async () => {
+			const {default: datatable} = await import("./lib/datatable.js"),
+			      {td, th, thead, tr} = await import("./lib/html.js"),
+			      {amendNode} = await import("./lib/dom.js"),
+			      {queue} = await import("./lib/misc.js"),
+			      cols = [
+				th("Col A"),
+				th("Col B"),
+				th("Col C")
+			      ],
+			      dt = datatable([
+				thead(tr(cols)),
+				tr([td("AA"), td("5"), td("3")]),
+				tr([td("BA"), td("80"), td("6")]),
+				tr([td("AC"), td("12"), td("9")])
+			      ]),
+			      delay = () => new Promise(fn => setTimeout(fn)),
+			      tests = [
+				[() => amendNode(cols[0], {"data-filter": "B"}), "[[\"BA\",\"80\",\"6\"]]"],
+				[() => amendNode(cols[0], {"data-filter": "C"}), "[[\"AC\",\"12\",\"9\"]]"],
+				[() => amendNode(cols[0], {"data-filter": "AA"}), "[[\"AA\",\"5\",\"3\"]]"],
+				[() => amendNode(cols[1], {"data-filter": 80}), "[[\"AA\",\"5\",\"3\"],[\"BA\",\"80\",\"6\"],[\"AC\",\"12\",\"9\"]]"],
+				[() => amendNode(cols[1], {"data-filter": 80, "data-is-text": true}), "[[\"BA\",\"80\",\"6\"]]"],
+				[() => amendNode(cols[1], {"data-min": 80}), "[[\"BA\",\"80\",\"6\"]]"],
+				[() => amendNode(cols[1], {"data-min": 5, "data-max": 20}), "[[\"AA\",\"5\",\"3\"],[\"AC\",\"12\",\"9\"]]"],
+				[() => amendNode(cols[1], {"data-min": 5, "data-max": 20}), "[[\"AA\",\"5\",\"3\"],[\"AC\",\"12\",\"9\"]]"],
+				[() => amendNode(cols[1], {"data-min": 10, "data-max": 20}), "[[\"AC\",\"12\",\"9\"]]"]
+			      ] as const;
+
+			let success = 0;
+
+			tests.map(([fn, result]) => {
+				queue(async () => {
+					cols.forEach(col => amendNode(col, Array.from(col.attributes, a => a.name).reduce((attrs, key) => Object.assign(attrs, {[key]: false}), {})));
+					fn();
+				});
+				queue(delay);
+				queue(async () => success += +(JSON.stringify(dt.export()) === result));
+			});
+
+			return queue(delay).then(() => success === tests.length);
 		}
 	}
 });
