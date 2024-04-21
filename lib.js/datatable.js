@@ -197,6 +197,7 @@ let debounceTarget = null,
 export class DataTable extends HTMLElement {
 	#head;
 	#body;
+	#slots = [];
 	#sorters = [];
 	#headers = new Map();
 	#data = new Map();
@@ -361,7 +362,7 @@ export class DataTable extends HTMLElement {
 					amendNode(filter, list);
 					list.focus();
 				}}),
-				tbody(this.#body = slot())
+				this.#body = tbody()
 			])
 		]).adoptedStyleSheets = style;
 
@@ -619,23 +620,43 @@ export class DataTable extends HTMLElement {
 
 	#pageData() {
 		const first = this.#page * this.#perPage || 0,
-		      data = [];
+		      data = Array.from({"length": Math.ceil(Math.min(this.#sortedData.length, this.#perPage) / maxElems)}, () => []);
 
-		let pos = 0;
+		let pos = 0,
+		    count = 0,
+		    index = 0;
 
 		for (const row of this.#sortedData) {
-			if (data.length > this.#perPage) {
+			if (count >= this.#perPage) {
 				break;
 			}
 
 			if (pos >= first) {
-				data.push(row[0])
+				data[index].push(row[0]);
+
+				if (data.length === maxElems) {
+					index++;
+				}
+
+				count++;
 			} else {
 				pos++;
 			}
 		}
 
-		this.#body.assign.apply(this.#body, data);
+		if (this.#slots.length > data.length) {
+			this.#slots.splice(data.length, this.#slots.length - data.length);
+		}
+
+		index = 0;
+
+		for (const elems of data) {
+			const s = this.#slots[index] ?? this.#body.appendChild(pushAndReturn(this.#slots, slot()));
+
+			s.assign.apply(s, elems);
+
+			index++;
+		}
 
 		this.dispatchEvent(new Event("render"));
 	}
@@ -655,7 +676,7 @@ export class DataTable extends HTMLElement {
 	 * @return {number} The number of visible rows.
 	 */
 	get pageRows() {
-		return this.#body.assignedElements().length;
+		return this.#slots.length ? (this.#slots.length - 1) * maxElems + this.#slots.at(-1).assignedElements().length : 0;
 	}
 
 	/**
@@ -673,7 +694,7 @@ export class DataTable extends HTMLElement {
 	 * @return {string[][]} A two-dimensional array of the data.
 	 */
 	exportPage() {
-		return this.#body.assignedElements().map(e => this.#data.get(e));
+		return [].concat(...this.#slots.map(slot => slot.assignedElements().map(e => this.#data.get(e))));
 	}
 }
 

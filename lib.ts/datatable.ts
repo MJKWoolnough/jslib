@@ -2,7 +2,7 @@ import type {Binding} from './bind.js';
 import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {button, div, input, label, li, slot, table, tbody, th, thead, tr, ul} from './html.js';
-import {checkInt, stringSort} from './misc.js';
+import {checkInt, pushAndReturn, stringSort} from './misc.js';
 
 /**
  * The datatable module adds a custom element for handling tabular data that can be filtered, sorted, and paged.
@@ -114,7 +114,8 @@ const style = [
 	}
 
 	return input({"part": "filter " + minMax, type, value, oninput});
-      };
+      },
+      maxElems = 32768;
 
 let debounceTarget: Element | null = null,
     debounceID = -1;
@@ -195,7 +196,8 @@ let debounceTarget: Element | null = null,
  */
 export class DataTable extends HTMLElement {
 	#head: HTMLSlotElement;
-	#body: HTMLSlotElement;
+	#body: HTMLTableSectionElement;
+	#slots: HTMLSlotElement[] = [];
 	#sorters: ((a: string, b: string) => number)[] = [];
 	#hasEmpty: boolean[] = [];
 	#headers = new Map<HTMLElement, number>();
@@ -360,7 +362,7 @@ export class DataTable extends HTMLElement {
 					amendNode(filter, list);
 					list.focus();
 				}}),
-				tbody(this.#body = slot())
+				this.#body = tbody()
 			])
 		]).adoptedStyleSheets = style;
 
@@ -619,23 +621,43 @@ export class DataTable extends HTMLElement {
 
 	#pageData() {
 		const first = this.#page * this.#perPage || 0,
-		      data: Element[] = [];
+		      data: Element[][] = Array.from({"length": Math.ceil(Math.min(this.#sortedData.length, this.#perPage) / maxElems)}, () => []);
 
-		let pos = 0;
+		let pos = 0,
+		    count = 0,
+		    index = 0;
 
 		for (const row of this.#sortedData) {
-			if (data.length > this.#perPage) {
+			if (count >= this.#perPage) {
 				break;
 			}
 
 			if (pos >= first) {
-				data.push(row[0])
+				data[index].push(row[0]);
+
+				if (data.length === maxElems) {
+					index++;
+				}
+
+				count++;
 			} else {
 				pos++;
 			}
 		}
 
-		this.#body.assign.apply(this.#body, data);
+		if (this.#slots.length > data.length) {
+			this.#slots.splice(data.length, this.#slots.length - data.length);
+		}
+
+		index = 0;
+
+		for (const elems of data) {
+			const s = this.#slots[index] ?? this.#body.appendChild(pushAndReturn(this.#slots, slot()));
+
+			s.assign.apply(s, elems);
+
+			index++;
+		}
 
 		this.dispatchEvent(new Event("render"));
 	}
@@ -655,7 +677,7 @@ export class DataTable extends HTMLElement {
 	 * @return {number} The number of visible rows.
 	 */
 	get pageRows(): number {
-		return this.#body.assignedElements().length;
+		return this.#slots.length ? (this.#slots.length - 1) * maxElems + this.#slots.at(-1)!.assignedElements().length : 0;
 	}
 
 	/**
@@ -673,7 +695,7 @@ export class DataTable extends HTMLElement {
 	 * @return {string[][]} A two-dimensional array of the data.
 	 */
 	exportPage(): string[][] {
-		return this.#body.assignedElements().map(e => this.#data.get(e)!);
+		return ([] as string[][]).concat(...this.#slots.map(slot => slot.assignedElements().map(e => this.#data.get(e)!)));
 	}
 }
 
