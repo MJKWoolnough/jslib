@@ -198,12 +198,12 @@ amendNode = (element, properties, children) => {
 				      canAppend = (node instanceof Element || node instanceof DocumentFragment);
 
 				if (c.length < maxElems && canAppend) {
-					node.append(...c);
+					node.append.apply(node, c);
 				} else {
 					const df = canAppend ? node : new DocumentFragment();
 
 					for (let i = 0; i < c.length; i += maxElems) {
-						df.append(...c.slice(i, i + maxElems));
+						df.append.apply(df, c.slice(i, i + maxElems));
 					}
 
 					if (!canAppend) {
@@ -291,10 +291,10 @@ createDocumentFragment = children => {
 		const c = childrenArr(children);
 
 		if (c.length < maxElems) {
-			df.append(...c);
+			df.append.apply(df, c);
 		} else {
 			for (let i = 0; i < c.length; i += maxElems) {
-				df.append(...c.slice(i, i + maxElems));
+				df.append.apply(df, c.slice(i, i + maxElems));
 			}
 		}
 	}
@@ -326,7 +326,7 @@ clearNode = (node, properties, children) => {
 		const c = childrenArr(children);
 
 		if (c.length < maxElems) {
-			children = void node.replaceChildren(...c);
+			children = void node.replaceChildren.apply(node, c);
 		} else {
 			children = void node.replaceChildren(createDocumentFragment(c));
 		}
