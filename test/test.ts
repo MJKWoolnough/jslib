@@ -11514,5 +11514,23 @@ type Tests = {
 
 			return new Promise(fn => setTimeout(fn)).then(() => a() === rand && window.localStorage.getItem("myLocalKey") === rand + "");
 		}
+	},
+	"datatable": {
+		"simple export": async () => {
+			const {default: datatable} = await import("./lib/datatable.js"),
+			      {td, th, thead, tr} = await import("./lib/html.js"),
+			      dt = datatable([
+				thead(tr([
+					th("Col A"),
+					th("Col B"),
+					th("Col C")
+				])),
+				tr([td("1"), td("2"), td("3")]),
+				tr([td("4"), td("5"), td("6")]),
+				tr([td("7"), td("8"), td("9")])
+			      ]);
+
+			return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.export()) === "[[\"1\",\"2\",\"3\"],[\"4\",\"5\",\"6\"],[\"7\",\"8\",\"9\"]]");
+		}
 	}
 });
