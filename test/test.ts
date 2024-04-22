@@ -11537,6 +11537,10 @@ type Tests = {
 			[{}, {}, {"data-sort": "desc"}, {}, [1, 2, 0]],
 			[{}, {}, {"data-sort": "asc", "data-type": "string"}, {}, [2, 0, 1]],
 			[{}, {}, {"data-sort": "desc", "data-type": "string"}, {}, [1, 0, 2]]
+		],
+		"export paged": [
+			[{"page": 0, "perPage": 2}, {}, {}, {}, [0, 1]],
+			[{"page": 1, "perPage": 2}, {}, {}, {}, [2]],
 		]
 	} as Record<string, [Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, number[]][]>).reduce((o, [section, tests]) => (o[section] = Object.fromEntries(Object.entries(tests.map(([pageAttrs, colA, colB, colC, res]) => async () => {
 		const {default: datatable} = await import("./lib/datatable.js"),
