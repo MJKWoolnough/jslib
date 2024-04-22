@@ -11558,7 +11558,7 @@ type Tests = {
 			])),
 			data.map(row => tr(row.map(cell => td(cell))))
 		      ]),
-		      result = JSON.stringify(res.map(row => data[row]))
+		      result = JSON.stringify(res.map(row => data[row]));
 
 		return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.exportPage()) === result);
 	}))), o), {} as Tests)
