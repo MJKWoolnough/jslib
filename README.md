@@ -633,7 +633,6 @@ The follow data-* attributes have special meaning to header cells and determine 
 | data-is-case-insensitive | Boolean   | When set, the text filter is case insensitive.
 | data-is-prefix           | Boolean   | When set, the text filter is a prefix match. When set with data-is-suffix becomes an exact match filter. |
 | data-is-suffix           | Boolean   | When set, the text filter is a suffix match. When set with data-is-prefix becomes an exact match filter. |
-| data-is-text             | Boolean   | When set, the column is forced into text mode.
 | data-max                 | Number    | For columns of numbers, specifies a maximum value to filter by.
 | data-min                 | Number    | For columns of numbers, specifies a minimum value to filter by.
 | data-not-empty           | Boolean   | When set, filters out non-empty cells.
