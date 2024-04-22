@@ -455,11 +455,11 @@ export class DataTable extends HTMLElement {
 							this.#sorters[data.length] = stringSort;
 						}
 
-						data.push(cell);
-
 						if (!cell) {
 							this.#hasEmpty[data.length] = true;
 						}
+
+						data.push(cell);
 
 						for (let i = 1; i < colspan; i++) {
 							if (this.#sorters.length <= data.length) {
