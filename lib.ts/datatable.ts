@@ -17,31 +17,27 @@ import {checkInt, pushAndReturn, stringSort} from './misc.js';
  */
 /** */
 
-const style = [
-	new CSS().add({
-		":host>div": {
-			"position": "relative",
+const style = [new CSS().add(":host>div", {
+	"position": "relative",
 
-			">ul": {
-				"position": "absolute",
-				"list-style": "none",
-				"padding": "0.5em",
-				"outline": "none",
-				"border": "2px solid #000",
-				"background-color": "#f8f8f8",
-				"margin": 0,
+	">ul": {
+		"position": "absolute",
+		"list-style": "none",
+		"padding": "0.5em",
+		"outline": "none",
+		"border": "2px solid #000",
+		"background-color": "#f8f8f8",
+		"margin": 0,
 
-				" button.t": {
-					"color": "transparent"
-				},
+		" button.t": {
+			"color": "transparent"
+		},
 
-				" li:first-child:last-child input[type=radio]": {
-					"display": "none"
-				}
-			}
+		" li:first-child:last-child input[type=radio]": {
+			"display": "none"
 		}
-	})
-      ],
+	}
+      })],
       colName = (n: number): string => {
 	if (n < 26) {
 		return String.fromCharCode(64 + (n || 26));
