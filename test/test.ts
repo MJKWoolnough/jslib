@@ -11517,28 +11517,28 @@ type Tests = {
 	},
 	"datatable": Object.entries({
 		"simple export": [
-			[{}, {}, {}, [0, 1, 2]]
+			[{}, {}, {}, {}, [0, 1, 2]]
 		],
 		"export with filters": [
-			[{"data-filter": "B"}, {}, {}, [1]],
-			[{"data-filter": "C"}, {}, {}, [2]],
-			[{"data-filter": "AA"}, {}, {}, [0]],
-			[{}, {"data-filter": 80}, {}, [0, 1, 2]],
-			[{}, {"data-filter": 80, "data-type": "string"}, {}, [1]],
-			[{}, {"data-min": 80}, {}, [1]],
-			[{}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
-			[{}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
-			[{}, {"data-min": 10, "data-max": 20}, {}, [2]]
+			[{}, {"data-filter": "B"}, {}, {}, [1]],
+			[{}, {"data-filter": "C"}, {}, {}, [2]],
+			[{}, {"data-filter": "AA"}, {}, {}, [0]],
+			[{}, {}, {"data-filter": 80}, {}, [0, 1, 2]],
+			[{}, {}, {"data-filter": 80, "data-type": "string"}, {}, [1]],
+			[{}, {}, {"data-min": 80}, {}, [1]],
+			[{}, {}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
+			[{}, {}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
+			[{}, {}, {"data-min": 10, "data-max": 20}, {}, [2]]
 		],
 		"export with sorts": [
-			[{"data-sort": "asc"}, {}, {}, [0, 2, 1]],
-			[{"data-sort": "desc"}, {}, {}, [1, 2, 0]],
-			[{}, {"data-sort": "asc"}, {}, [0, 2, 1]],
-			[{}, {"data-sort": "desc"}, {}, [1, 2, 0]],
-			[{}, {"data-sort": "asc", "data-type": "string"}, {}, [2, 0, 1]],
-			[{}, {"data-sort": "desc", "data-type": "string"}, {}, [1, 0, 2]]
+			[{}, {"data-sort": "asc"}, {}, {}, [0, 2, 1]],
+			[{}, {"data-sort": "desc"}, {}, {}, [1, 2, 0]],
+			[{}, {}, {"data-sort": "asc"}, {}, [0, 2, 1]],
+			[{}, {}, {"data-sort": "desc"}, {}, [1, 2, 0]],
+			[{}, {}, {"data-sort": "asc", "data-type": "string"}, {}, [2, 0, 1]],
+			[{}, {}, {"data-sort": "desc", "data-type": "string"}, {}, [1, 0, 2]]
 		]
-	} as Record<string, [Record<string, any>, Record<string, any>, Record<string, any>, number[]][]>).reduce((o, [section, tests]) => (o[section] = Object.fromEntries(Object.entries(tests.map(([colA, colB, colC, res]) => async () => {
+	} as Record<string, [Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, number[]][]>).reduce((o, [section, tests]) => (o[section] = Object.fromEntries(Object.entries(tests.map(([pageAttrs, colA, colB, colC, res]) => async () => {
 		const {default: datatable} = await import("./lib/datatable.js"),
 		      {td, th, thead, tr} = await import("./lib/html.js"),
 		      data = [
@@ -11546,7 +11546,7 @@ type Tests = {
 			["BA", "80", "6"],
 			["AC", "12", "9"]
 		      ],
-		      dt = datatable([
+		      dt = datatable(pageAttrs, [
 			thead(tr([
 				th(colA, "Col A"),
 				th(colB, "Col B"),
@@ -11556,6 +11556,6 @@ type Tests = {
 		      ]),
 		      result = JSON.stringify(res.map(row => data[row]))
 
-		return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.export()) === result);
+		return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.exportPage()) === result);
 	}))), o), {} as Tests)
 });
