@@ -11494,7 +11494,7 @@ type Tests = {
 		}
 
 		return generated === output;
-	}, "toString", {"value": () => JSON.stringify(input) + " => " + JSON.stringify(output)}), q), {} as Record<string, () => Promise<boolean>>), p), {} as Record<string, Record<string, () => Promise<boolean>>>), o), {} as Record<string, Record<string, Record<string, () => Promise<boolean>>>>),
+	}, "toString", {"value": () => JSON.stringify(input) + " => " + JSON.stringify(output)}), q), {} as Record<string, () => Promise<boolean>>), p), {} as Record<string, Record<string, () => Promise<boolean>>>), o), {} as Tests),
 	"storagestate": {
 		"session storage set": async () => {
 			const {bindSessionStorage} = await import("./lib/storagestate.js"),
