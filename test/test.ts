@@ -11515,103 +11515,47 @@ type Tests = {
 			return new Promise(fn => setTimeout(fn)).then(() => a() === rand && window.localStorage.getItem("myLocalKey") === rand + "");
 		}
 	},
-	"datatable": {
-		"simple export": async () => {
-			const {default: datatable} = await import("./lib/datatable.js"),
-			      {td, th, thead, tr} = await import("./lib/html.js"),
-			      dt = datatable([
-				thead(tr([
-					th("Col A"),
-					th("Col B"),
-					th("Col C")
-				])),
-				tr([td("1"), td("2"), td("3")]),
-				tr([td("4"), td("5"), td("6")]),
-				tr([td("7"), td("8"), td("9")])
-			      ]);
+	"datatable": Object.entries({
+		"simple export": [
+			[{}, {}, {}, [0, 1, 2]]
+		],
+		"export with filters": [
+			[{"data-filter": "B"}, {}, {}, [1]],
+			[{"data-filter": "C"}, {}, {}, [2]],
+			[{"data-filter": "AA"}, {}, {}, [0]],
+			[{}, {"data-filter": 80}, {}, [0, 1, 2]],
+			[{}, {"data-filter": 80, "data-type": "string"}, {}, [1]],
+			[{}, {"data-min": 80}, {}, [1]],
+			[{}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
+			[{}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
+			[{}, {"data-min": 10, "data-max": 20}, {}, [2]]
+		],
+		"export with sorts": [
+			[{"data-sort": "asc"}, {}, {}, [0, 2, 1]],
+			[{"data-sort": "desc"}, {}, {}, [1, 2, 0]],
+			[{}, {"data-sort": "asc"}, {}, [0, 2, 1]],
+			[{}, {"data-sort": "desc"}, {}, [1, 2, 0]],
+			[{}, {"data-sort": "asc", "data-type": "string"}, {}, [2, 0, 1]],
+			[{}, {"data-sort": "desc", "data-type": "string"}, {}, [1, 0, 2]]
+		]
+	} as Record<string, [Record<string, any>, Record<string, any>, Record<string, any>, number[]][]>).reduce((o, [section, tests]) => (o[section] = Object.fromEntries(Object.entries(tests.map(([colA, colB, colC, res]) => async () => {
+		const {default: datatable} = await import("./lib/datatable.js"),
+		      {td, th, thead, tr} = await import("./lib/html.js"),
+		      data = [
+			["AA", "5", "3"],
+			["BA", "80", "6"],
+			["AC", "12", "9"]
+		      ],
+		      dt = datatable([
+			thead(tr([
+				th(colA, "Col A"),
+				th(colB, "Col B"),
+				th(colC, "Col C")
+			])),
+			data.map(row => tr(row.map(cell => td(cell))))
+		      ]),
+		      result = JSON.stringify(res.map(row => data[row]))
 
-			return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.export()) === "[[\"1\",\"2\",\"3\"],[\"4\",\"5\",\"6\"],[\"7\",\"8\",\"9\"]]");
-		},
-		"export with filters": async () => {
-			const {default: datatable} = await import("./lib/datatable.js"),
-			      {td, th, thead, tr} = await import("./lib/html.js"),
-			      {amendNode} = await import("./lib/dom.js"),
-			      {queue} = await import("./lib/misc.js"),
-			      cols = [
-				th("Col A"),
-				th("Col B"),
-				th("Col C")
-			      ],
-			      dt = datatable([
-				thead(tr(cols)),
-				tr([td("AA"), td("5"), td("3")]),
-				tr([td("BA"), td("80"), td("6")]),
-				tr([td("AC"), td("12"), td("9")])
-			      ]),
-			      delay = () => new Promise(fn => setTimeout(fn)),
-			      tests = [
-				[() => amendNode(cols[0], {"data-filter": "B"}), "[[\"BA\",\"80\",\"6\"]]"],
-				[() => amendNode(cols[0], {"data-filter": "C"}), "[[\"AC\",\"12\",\"9\"]]"],
-				[() => amendNode(cols[0], {"data-filter": "AA"}), "[[\"AA\",\"5\",\"3\"]]"],
-				[() => amendNode(cols[1], {"data-filter": 80}), "[[\"AA\",\"5\",\"3\"],[\"BA\",\"80\",\"6\"],[\"AC\",\"12\",\"9\"]]"],
-				[() => amendNode(cols[1], {"data-filter": 80, "data-type": "string"}), "[[\"BA\",\"80\",\"6\"]]"],
-				[() => amendNode(cols[1], {"data-min": 80}), "[[\"BA\",\"80\",\"6\"]]"],
-				[() => amendNode(cols[1], {"data-min": 5, "data-max": 20}), "[[\"AA\",\"5\",\"3\"],[\"AC\",\"12\",\"9\"]]"],
-				[() => amendNode(cols[1], {"data-min": 5, "data-max": 20}), "[[\"AA\",\"5\",\"3\"],[\"AC\",\"12\",\"9\"]]"],
-				[() => amendNode(cols[1], {"data-min": 10, "data-max": 20}), "[[\"AC\",\"12\",\"9\"]]"]
-			      ] as const;
-
-			let success = 0;
-
-			tests.map(([fn, result]) => {
-				queue(async () => {
-					cols.forEach(col => amendNode(col, Array.from(col.attributes, a => a.name).reduce((attrs, key) => Object.assign(attrs, {[key]: false}), {})));
-					fn();
-				});
-				queue(delay);
-				queue(async () => success += +(JSON.stringify(dt.export()) === result));
-			});
-
-			return queue(delay).then(() => success === tests.length);
-		},
-		"export with sorts": async () => {
-			const {default: datatable} = await import("./lib/datatable.js"),
-			      {td, th, thead, tr} = await import("./lib/html.js"),
-			      {amendNode} = await import("./lib/dom.js"),
-			      {queue} = await import("./lib/misc.js"),
-			      cols = [
-				th("Col A"),
-				th("Col B"),
-				th("Col C")
-			      ],
-			      dt = datatable([
-				thead(tr(cols)),
-				tr([td("AA"), td("5"), td("3")]),
-				tr([td("BA"), td("80"), td("6")]),
-				tr([td("AC"), td("12"), td("9")])
-			      ]),
-			      delay = () => new Promise(fn => setTimeout(fn)),
-			      tests = [
-				[() => amendNode(cols[0], {"data-sort": "asc"}), "[[\"AA\",\"5\",\"3\"],[\"AC\",\"12\",\"9\"],[\"BA\",\"80\",\"6\"]]"],
-				[() => amendNode(cols[0], {"data-sort": "desc"}), "[[\"BA\",\"80\",\"6\"],[\"AC\",\"12\",\"9\"],[\"AA\",\"5\",\"3\"]]"],
-				[() => amendNode(cols[1], {"data-sort": "asc"}), "[[\"AA\",\"5\",\"3\"],[\"AC\",\"12\",\"9\"],[\"BA\",\"80\",\"6\"]]"],
-				[() => amendNode(cols[1], {"data-sort": "desc"}), "[[\"BA\",\"80\",\"6\"],[\"AC\",\"12\",\"9\"],[\"AA\",\"5\",\"3\"]]"],
-				[() => amendNode(cols[1], {"data-sort": "asc", "data-type": "string"}), "[[\"AC\",\"12\",\"9\"],[\"AA\",\"5\",\"3\"],[\"BA\",\"80\",\"6\"]]"],
-				[() => amendNode(cols[1], {"data-sort": "desc", "data-type": "string"}), "[[\"BA\",\"80\",\"6\"],[\"AA\",\"5\",\"3\"],[\"AC\",\"12\",\"9\"]]"]
-			      ] as const;
-
-			let success = 0;
-
-			tests.map(([fn, result]) => {
-				queue(async () => {
-					cols.forEach(col => amendNode(col, Array.from(col.attributes, a => a.name).reduce((attrs, key) => Object.assign(attrs, {[key]: false}), {})));
-					fn();
-				});
-				queue(delay);
-				queue(async () => success += +(JSON.stringify(dt.export()) === result));
-			});
-
-			return queue(delay).then(() => success === tests.length);
-		}
-	}
+		return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.export()) === result);
+	}))), o), {} as Tests)
 });
