@@ -592,8 +592,8 @@ This module relies directly on the [css]{#css}, [dom]{#dom}, [html]{#html}, and 
 class DataTable extends HTMLElement {
 	get totalRows(): number;
 	get pageRows(): number;
-	export(): string[][];
-	exportPage(): string[][];
+	export(title = false): string[][];
+	exportPage(title = flase): string[][];
 }
 ```
 
@@ -673,8 +673,8 @@ The following helper methods are provided to get information about the data in t
 
 |  Field     |  Type  |  Description  |
 |------------|--------|---------------|
-| export     | Method | This method returns the data of the filtered and sorted table. |
-| exportPage | Method | This method returns the data of the visible portion of the table. |
+| export     | Method | This method returns the data of the filtered and sorted table. When the title attribute is set to true, will prepend titles as first row of output. |
+| exportPage | Method | This method returns the data of the visible portion of the table. When the title attribute is set to true, will prepend titles as first row of output. |
 | pageRows   | Getter | This method returns the number of visible rows in the table, that is the number after filtering and paging. |
 | totalRows  | Getter | This method returns the total number of rows in the table after filtering. |
 
