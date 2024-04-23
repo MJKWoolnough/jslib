@@ -11579,6 +11579,29 @@ type Tests = {
 			      ]);
 
 			return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.export(true)) === JSON.stringify([["Col A", "Col B", "CCC"],["1", "2", "3"]]));
+		},
+		"exportPage with titles": async () => {
+			const {default: datatable} = await import("./lib/datatable.js"),
+			      {td, th, thead, tr} = await import("./lib/html.js"),
+			      dt = datatable({"page": 0, "perPage": 1}, [
+				thead(tr([
+					th("Col A"),
+					th("Col B"),
+					th({"data-title": "CCC"}, "Col C")
+				])),
+				tr([
+					td("1"),
+					td("2"),
+					td("3")
+				]),
+				tr([
+					td("4"),
+					td("5"),
+					td("6")
+				])
+			      ]);
+
+			return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.exportPage(true)) === JSON.stringify([["Col A", "Col B", "CCC"],["1", "2", "3"]]));
 		}
 	})
 });
