@@ -11533,6 +11533,8 @@ type Tests = {
 			[{}, {}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
 			[{}, {}, {"data-min": 10, "data-max": 20}, {}, [2]],
 			[{}, {"data-filter": "AA", "data-is-prefix": true}, {"data-filter": 1, "data-type": "string"}, {}, [3, 4]],
+			[{}, {}, {}, {"data-empty": true}, [0]],
+			[{}, {}, {}, {"data-not-empty": true}, [1, 2, 3, 4]]
 		],
 		"export with sorts": [
 			[{}, {"data-sort": "asc"}, {}, {}, [0, 3, 4, 2, 1]],
@@ -11551,7 +11553,7 @@ type Tests = {
 		const {default: datatable} = await import("./lib/datatable.js"),
 		      {td, th, thead, tr} = await import("./lib/html.js"),
 		      data = [
-			["AA", "5", "3"],
+			["AA", "5", ""],
 			["BA", "80", "6"],
 			["AC", "12", "9"],
 			["AAA", "-1", "30"],
