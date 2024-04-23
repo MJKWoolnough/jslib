@@ -11515,7 +11515,7 @@ type Tests = {
 			return new Promise(fn => setTimeout(fn)).then(() => a() === rand && window.localStorage.getItem("myLocalKey") === rand + "");
 		}
 	},
-	"datatable": Object.entries({
+	"datatable": Object.assign(Object.entries({
 		"simple export": [
 			[{}, {}, {}, {}, [0, 1, 2]]
 		],
@@ -11561,5 +11561,24 @@ type Tests = {
 		      result = JSON.stringify(res.map(row => data[row]));
 
 		return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.exportPage()) === result);
-	}))), o), {} as Tests)
+	}))), o), {} as Tests), {
+		"export with titles": async () => {
+			const {default: datatable} = await import("./lib/datatable.js"),
+			      {td, th, thead, tr} = await import("./lib/html.js"),
+			      dt = datatable([
+				thead(tr([
+					th("Col A"),
+					th("Col B"),
+					th({"data-title": "CCC"}, "Col C")
+				])),
+				tr([
+					td("1"),
+					td("2"),
+					td("3")
+				])
+			      ]);
+
+			return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.export(true)) === JSON.stringify([["Col A", "Col B", "CCC"],["1", "2", "3"]]));
+		}
+	})
 });
