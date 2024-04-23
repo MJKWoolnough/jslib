@@ -677,6 +677,8 @@ export class DataTable extends HTMLElement {
 	/**
 	 * This method returns the data of the filtered and sorted table.
 	 *
+	 * @param {boolean} [title] When true, will prepend titles as first row of output.
+	 *
 	 * @return {string[][]} A two-dimensional array of the data.
 	 */
 	export(title = false) {
@@ -703,6 +705,8 @@ export class DataTable extends HTMLElement {
 
 	/**
 	 * This method returns the data of the visible portion of the table.
+	 *
+	 * @param {boolean} [title] When true, will prepend titles as first row of output.
 	 *
 	 * @return {string[][]} A two-dimensional array of the data.
 	 */
