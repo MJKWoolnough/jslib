@@ -11517,13 +11517,13 @@ type Tests = {
 	},
 	"datatable": Object.assign(Object.entries({
 		"simple export": [
-			[{}, {}, {}, {}, [0, 1, 2]]
+			[{}, {}, {}, {}, [0, 1, 2, 3, 4]]
 		],
 		"export with filters": [
-			[{}, {"data-filter": "B"}, {}, {}, [1]],
+			[{}, {"data-filter": "B"}, {}, {}, [1, 4]],
 			[{}, {"data-filter": "C"}, {}, {}, [2]],
-			[{}, {"data-filter": "AA"}, {}, {}, [0]],
-			[{}, {}, {"data-filter": 80}, {}, [0, 1, 2]],
+			[{}, {"data-filter": "AA"}, {}, {}, [0, 3, 4]],
+			[{}, {}, {"data-filter": 80}, {}, [0, 1, 2, 3, 4]],
 			[{}, {}, {"data-filter": 80, "data-type": "string"}, {}, [1]],
 			[{}, {}, {"data-min": 80}, {}, [1]],
 			[{}, {}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
@@ -11531,16 +11531,16 @@ type Tests = {
 			[{}, {}, {"data-min": 10, "data-max": 20}, {}, [2]]
 		],
 		"export with sorts": [
-			[{}, {"data-sort": "asc"}, {}, {}, [0, 2, 1]],
-			[{}, {"data-sort": "desc"}, {}, {}, [1, 2, 0]],
-			[{}, {}, {"data-sort": "asc"}, {}, [0, 2, 1]],
-			[{}, {}, {"data-sort": "desc"}, {}, [1, 2, 0]],
-			[{}, {}, {"data-sort": "asc", "data-type": "string"}, {}, [2, 0, 1]],
-			[{}, {}, {"data-sort": "desc", "data-type": "string"}, {}, [1, 0, 2]]
+			[{}, {"data-sort": "asc"}, {}, {}, [0, 3, 4, 2, 1]],
+			[{}, {"data-sort": "desc"}, {}, {}, [1, 2, 4, 3, 0]],
+			[{}, {}, {"data-sort": "asc"}, {}, [4, 3, 0, 2, 1]],
+			[{}, {}, {"data-sort": "desc"}, {}, [1, 2, 0, 3, 4]],
+			[{}, {}, {"data-sort": "asc", "data-type": "string"}, {}, [3, 4, 2, 0, 1]],
+			[{}, {}, {"data-sort": "desc", "data-type": "string"}, {}, [1, 0, 2, 4, 3]]
 		],
 		"export paged": [
 			[{"page": 0, "perPage": 2}, {}, {}, {}, [0, 1]],
-			[{"page": 1, "perPage": 2}, {}, {}, {}, [2]]
+			[{"page": 1, "perPage": 2}, {}, {}, {}, [2, 3]]
 		]
 	} as Record<string, [Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, number[]][]>).reduce((o, [section, tests]) => (o[section] = Object.fromEntries(Object.entries(tests.map(([pageAttrs, colA, colB, colC, res]) => async () => {
 		const {default: datatable} = await import("./lib/datatable.js"),
@@ -11548,7 +11548,9 @@ type Tests = {
 		      data = [
 			["AA", "5", "3"],
 			["BA", "80", "6"],
-			["AC", "12", "9"]
+			["AC", "12", "9"],
+			["AAA", "-1", "30"],
+			["AAAB", "-15", "50"]
 		      ],
 		      dt = datatable(pageAttrs, [
 			thead(tr([
