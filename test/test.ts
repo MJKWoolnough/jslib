@@ -11531,7 +11531,8 @@ type Tests = {
 			[{}, {}, {"data-min": 80}, {}, [1]],
 			[{}, {}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
 			[{}, {}, {"data-min": 5, "data-max": 20}, {}, [0, 2]],
-			[{}, {}, {"data-min": 10, "data-max": 20}, {}, [2]]
+			[{}, {}, {"data-min": 10, "data-max": 20}, {}, [2]],
+			[{}, {"data-filter": "AA", "data-is-prefix": true}, {"data-filter": 1, "data-type": "string"}, {}, [3, 4]],
 		],
 		"export with sorts": [
 			[{}, {"data-sort": "asc"}, {}, {}, [0, 3, 4, 2, 1]],
