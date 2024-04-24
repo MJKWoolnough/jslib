@@ -696,7 +696,7 @@ export class DataTable extends HTMLElement {
 		const data =  this.#sortedData.map(e => e[1]);
 
 		if (title) {
-			return [this.#getHeaders()].concat(data);
+			return this.#getHeaders().concat(data);
 		}
 
 		return data;
@@ -711,7 +711,7 @@ export class DataTable extends HTMLElement {
 			headers.push(...Array.from({"length": checkInt(parseInt(header.getAttribute("colspan")), 1) - 1}, () => ""))
 		}
 
-		return headers;
+		return [headers];
 	}
 
 	/**
@@ -722,7 +722,7 @@ export class DataTable extends HTMLElement {
 	 * @return {string[][]} A two-dimensional array of the data.
 	 */
 	exportPage(title = false) {
-		return this.#perPage >= this.#sortedData.length ? this.export(title) : (title ? [this.#getHeaders()] : []).concat(...this.#slots.map(slot => slot.assignedElements().map(e => this.#data.get(e))));
+		return this.#perPage >= this.#sortedData.length ? this.export(title) : (title ? this.#getHeaders() : []).concat(...this.#slots.map(slot => slot.assignedElements().map(e => this.#data.get(e))));
 	}
 }
 
