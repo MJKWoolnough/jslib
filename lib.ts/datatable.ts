@@ -2,7 +2,7 @@ import type {Binding} from './bind.js';
 import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {button, div, input, label, li, slot, table, tbody, th, thead, tr, ul} from './html.js';
-import {checkInt, pushAndReturn, stringSort} from './misc.js';
+import {autoFocus, checkInt, pushAndReturn, stringSort} from './misc.js';
 
 /**
  * The datatable module adds a custom element for handling tabular data that can be filtered, sorted, and paged.
@@ -113,7 +113,8 @@ const style = [new CSS().add(":host>div", {
 
 	return input({"part": "filter " + minMax, type, value, oninput});
       },
-      maxElems = 32768;
+      maxElems = 32768,
+      focus = (focus: boolean, input: HTMLInputElement) => focus ? autoFocus(input) : input;
 
 let debounceTarget: DOMStringMap | null = null,
     debounceID = -1;
@@ -338,7 +339,8 @@ export class DataTable extends HTMLElement {
 		const {dataset} = target,
 		      colNum = this.#headers.get(target)!,
 		      hasEmpty = this.#hasEmpty[colNum],
-		      firstRadio = input({"part": "radio", "type": "radio", "checked": !dsHasKey(dataset, "empty") && !dsHasKey(dataset, "notEmpty"), "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
+		      selected = dsHasKey(dataset, "notEmpty") ? 1 : dsHasKey(dataset, "empty") ? 2 : 0,
+		      firstRadio = input({"part": "radio", "type": "radio", "checked": !selected, "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
 		      list = ul({"part": "filter", "tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
 			if (!e.relatedTarget || !list.contains(e.relatedTarget as Node)) {
 				this.remove();
@@ -347,7 +349,7 @@ export class DataTable extends HTMLElement {
 			li([
 				firstRadio,
 				this.#sorters[colNum] === numberSorter ? [
-					numberInput(dataset, "min", firstRadio),
+					focus(!selected, numberInput(dataset, "min", firstRadio)),
 					" ≤ x ≤ ",
 					numberInput(dataset, "max", firstRadio)
 				] : [
@@ -355,9 +357,9 @@ export class DataTable extends HTMLElement {
 						amendNode(target, {"data-is-prefix": v});
 						firstRadio.click();
 					}),
-					input({"part": "filter text", "type": "search", "value": dataset["filter"], "oninput": function(this: HTMLInputElement) {
+					focus(!selected, input({"part": "filter text", "type": "search", "value": dataset["filter"], "oninput": function(this: HTMLInputElement) {
 						debounceFilter(firstRadio, dataset, "filter", this.value);
-					}}),
+					}})),
 					makeToggleButton("$", lang["ENDS_WIDTH"], !dsHasKey(dataset, "isSuffix"), v => {
 						amendNode(target, {"data-is-suffix": v});
 						firstRadio.click();
@@ -369,11 +371,11 @@ export class DataTable extends HTMLElement {
 				]
 			]),
 			hasEmpty && !dsHasKey(dataset, "disallowNotEmpty") ? li([
-				input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dsHasKey(dataset, "notEmpty"), "onclick": () => amendNode(target, {"data-not-empty": true, "data-empty": false})}),
+				focus(selected === 1, input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": selected === 1, "onclick": () => amendNode(target, {"data-not-empty": true, "data-empty": false})})),
 				label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
 			]) : [],
 			hasEmpty && !dsHasKey(dataset, "disallowEmpty") ? li([
-				input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dsHasKey(dataset, "empty"), "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": true})}),
+				focus(selected === 2, input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": selected === 2, "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": true})})),
 				label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
 			]) : []
 		      ]);
