@@ -206,164 +206,26 @@ export class DataTable extends HTMLElement {
 	#ownHeaders = false;
 	#lastSorted = -1;
 	#lastOrder = 0;
+	#filter: HTMLDivElement;
 
 	constructor() {
 		super();
 
-		const filter = div({"onkeydown": (e: KeyboardEvent) => {
-			if (e.key === "Escape") {
-				(e.target as HTMLElement).blur();
-			}
-		      }}),
-		      mo = new MutationObserver(mutations => {
-			let doParseChildren = false,
-			    doFilter = false,
-			    doSort = false;
-
-			for (const mutation of mutations) {
-				switch (mutation.type) {
-				case "childList":
-					doParseChildren = true;
-
-					break;
-				case "attributes":
-					if (this.#headers.has(mutation.target as HTMLElement)) {
-						switch (mutation.attributeName) {
-						case "colspan":
-						case "data-value":
-						case "data-type":
-							doParseChildren = true;
-						default:
-							doFilter = true;
-						case "data-sort":
-							doSort = true;
-						}
-					}
-				}
-			}
-
-			if (doParseChildren) {
-				this.#parseContent();
-			} else if (doFilter) {
-				this.#filterData();
-			} else if (doSort) {
-				this.#sortData();
-			}
-		      });
-
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			filter,
+			this.#filter = div({"onkeydown": (e: KeyboardEvent) => {
+				if (e.key === "Escape") {
+					(e.target as HTMLElement).blur();
+				}
+			}}),
 			table({"part": "table"}, [
-				this.#head = slot({"onclick": (e: MouseEvent) => {
-					const target = this.#getHeaderCell(e);
-
-					if (!target) {
-						return;
-					}
-
-					if (dsHasKey(target.dataset, "sortDisable")) {
-						return;
-					}
-
-					for (const header of this.#headers.keys()) {
-						if (dsHasKey(header.dataset, "sort") && header !== target) {
-							amendNode(header, unsetSort);
-							if (this.#ownHeaders) {
-								amendNode(header, unsetSortPart);
-							}
-						}
-					}
-
-					switch (target.dataset["sort"]) {
-					case "asc":
-						amendNode(target, setReverse);
-						if (this.#ownHeaders) {
-							amendNode(target, setRevPart);
-						}
-
-						break;
-					case "desc":
-						amendNode(target, unsetSort);
-						if (this.#ownHeaders) {
-							amendNode(target, unsetSortPart);
-						}
-
-						break;
-					default:
-						amendNode(target, setSort);
-						if (this.#ownHeaders) {
-							amendNode(target, setSortPart);
-						}
-					}
-				}, "oncontextmenu": (e: MouseEvent) => {
-					const target = this.#getHeaderCell(e);
-
-					if (!target || dsHasKey(target.dataset, "filterDisable")) {
-						return;
-					}
-
-					e.preventDefault();
-
-					let {clientX, clientY} = e,
-					    p: HTMLElement | null = this;
-
-					while (p) {
-						clientX -= p.offsetLeft;
-						clientY -= p.offsetTop;
-						p = p.offsetParent as HTMLElement | null;
-					}
-
-					const {dataset} = target,
-					      colNum = this.#headers.get(target)!,
-					      hasEmpty = this.#hasEmpty[colNum],
-					      firstRadio = input({"part": "radio", "type": "radio", "checked": !dsHasKey(dataset, "empty") && !dsHasKey(dataset, "notEmpty"), "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
-					      list = ul({"part": "filter", "tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
-						if (!e.relatedTarget || !list.contains(e.relatedTarget as Node)) {
-							this.remove();
-						}
-					      }}, [
-						li([
-							firstRadio,
-							this.#sorters[colNum] === numberSorter ? [
-								numberInput(dataset, "min", firstRadio, target),
-								" ≤ x ≤ ",
-								numberInput(dataset, "max", firstRadio, target)
-							] : [
-								makeToggleButton("^", lang["STARTS_WITH"], !dsHasKey(dataset, "isPrefix"), v => {
-									amendNode(target, {"data-is-prefix": v});
-									firstRadio.click();
-								}),
-								input({"part": "filter text", "type": "search", "value": dataset["filter"], "oninput": function(this: HTMLInputElement) {
-									debounceFilter(firstRadio, target, {"data-filter": this.value});
-								}}),
-								makeToggleButton("$", lang["ENDS_WIDTH"], !dsHasKey(dataset, "isSuffix"), v => {
-									amendNode(target, {"data-is-suffix": v});
-									firstRadio.click();
-								}),
-								makeToggleButton("i", lang["CASE_SENSITIVITY"], !dsHasKey(dataset, "isCaseInsensitive"), v => {
-									amendNode(target, {"data-is-case-insensitive": v});
-									firstRadio.click();
-								})
-							]
-						]),
-						hasEmpty && !dsHasKey(dataset, "disallowNotEmpty") ? li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dsHasKey(dataset, "notEmpty"), "onclick": () => amendNode(target, {"data-not-empty": true, "data-empty": false})}),
-							label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
-						]) : [],
-						hasEmpty && !dsHasKey(dataset, "disallowEmpty") ? li([
-							input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dsHasKey(dataset, "empty"), "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": true})}),
-							label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
-						]) : []
-					      ]);
-
-					amendNode(filter, list);
-					list.focus();
-				}}),
+				this.#head = slot({"onclick": (e: MouseEvent) => this.#handleClicks(e), "oncontextmenu": (e: MouseEvent) => this.#handleContext(e)}),
 				this.#body = tbody()
 			])
 		]).adoptedStyleSheets = style;
 
 		this.#parseContent();
+
+		const mo = new MutationObserver(mutations => this.#handleMutations(mutations));
 
 		mo.observe(this, {
 			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-empty", "data-not-empty", "data-is-case-insensitive", "colspan", "data-value", "data-type"],
@@ -374,6 +236,150 @@ export class DataTable extends HTMLElement {
 			"attributeFilter": ["data-sort", "data-filter", "data-is-prefix", "data-is-suffix", "data-min", "data-max", "data-empty", "data-not-empty", "data-is-case-insensitive"],
 			"subtree": true
 		});
+	}
+
+	#handleMutations(mutations: MutationRecord[]) {
+		let doParseChildren = false,
+		    doFilter = false,
+		    doSort = false;
+
+		for (const mutation of mutations) {
+			switch (mutation.type) {
+			case "childList":
+				doParseChildren = true;
+
+				break;
+			case "attributes":
+				if (this.#headers.has(mutation.target as HTMLElement)) {
+					switch (mutation.attributeName) {
+					case "colspan":
+					case "data-value":
+					case "data-type":
+						doParseChildren = true;
+					default:
+						doFilter = true;
+					case "data-sort":
+						doSort = true;
+					}
+				}
+			}
+		}
+
+		if (doParseChildren) {
+			this.#parseContent();
+		} else if (doFilter) {
+			this.#filterData();
+		} else if (doSort) {
+			this.#sortData();
+		}
+	}
+
+	#handleClicks(e: MouseEvent) {
+		const target = this.#getHeaderCell(e);
+
+		if (!target) {
+			return;
+		}
+
+		if (dsHasKey(target.dataset, "sortDisable")) {
+			return;
+		}
+
+		for (const header of this.#headers.keys()) {
+			if (dsHasKey(header.dataset, "sort") && header !== target) {
+				amendNode(header, unsetSort);
+				if (this.#ownHeaders) {
+					amendNode(header, unsetSortPart);
+				}
+			}
+		}
+
+		switch (target.dataset["sort"]) {
+		case "asc":
+			amendNode(target, setReverse);
+			if (this.#ownHeaders) {
+				amendNode(target, setRevPart);
+			}
+
+			break;
+		case "desc":
+			amendNode(target, unsetSort);
+			if (this.#ownHeaders) {
+				amendNode(target, unsetSortPart);
+			}
+
+			break;
+		default:
+			amendNode(target, setSort);
+			if (this.#ownHeaders) {
+				amendNode(target, setSortPart);
+			}
+		}
+	}
+
+	#handleContext(e: MouseEvent) {
+		const target = this.#getHeaderCell(e);
+
+		if (!target || dsHasKey(target.dataset, "filterDisable")) {
+			return;
+		}
+
+		e.preventDefault();
+
+		let {clientX, clientY} = e,
+		    p: HTMLElement | null = this;
+
+		while (p) {
+			clientX -= p.offsetLeft;
+			clientY -= p.offsetTop;
+			p = p.offsetParent as HTMLElement | null;
+		}
+
+		const {dataset} = target,
+		      colNum = this.#headers.get(target)!,
+		      hasEmpty = this.#hasEmpty[colNum],
+		      firstRadio = input({"part": "radio", "type": "radio", "checked": !dsHasKey(dataset, "empty") && !dsHasKey(dataset, "notEmpty"), "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
+		      list = ul({"part": "filter", "tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
+			if (!e.relatedTarget || !list.contains(e.relatedTarget as Node)) {
+				this.remove();
+			}
+		      }}, [
+			li([
+				firstRadio,
+				this.#sorters[colNum] === numberSorter ? [
+					numberInput(dataset, "min", firstRadio, target),
+					" ≤ x ≤ ",
+					numberInput(dataset, "max", firstRadio, target)
+				] : [
+					makeToggleButton("^", lang["STARTS_WITH"], !dsHasKey(dataset, "isPrefix"), v => {
+						amendNode(target, {"data-is-prefix": v});
+						firstRadio.click();
+					}),
+					input({"part": "filter text", "type": "search", "value": dataset["filter"], "oninput": function(this: HTMLInputElement) {
+						debounceFilter(firstRadio, target, {"data-filter": this.value});
+					}}),
+					makeToggleButton("$", lang["ENDS_WIDTH"], !dsHasKey(dataset, "isSuffix"), v => {
+						amendNode(target, {"data-is-suffix": v});
+						firstRadio.click();
+					}),
+					makeToggleButton("i", lang["CASE_SENSITIVITY"], !dsHasKey(dataset, "isCaseInsensitive"), v => {
+						amendNode(target, {"data-is-case-insensitive": v});
+						firstRadio.click();
+					})
+				]
+			]),
+			hasEmpty && !dsHasKey(dataset, "disallowNotEmpty") ? li([
+				input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": dsHasKey(dataset, "notEmpty"), "onclick": () => amendNode(target, {"data-not-empty": true, "data-empty": false})}),
+				label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
+			]) : [],
+			hasEmpty && !dsHasKey(dataset, "disallowEmpty") ? li([
+				input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": dsHasKey(dataset, "empty"), "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": true})}),
+				label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
+			]) : []
+		      ]);
+
+		amendNode(this.#filter, list);
+		list.focus();
 	}
 
 	attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null) {
