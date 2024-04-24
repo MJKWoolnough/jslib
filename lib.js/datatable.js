@@ -706,9 +706,7 @@ export class DataTable extends HTMLElement {
 		const headers = [];
 
 		for (const header of this.#headers.keys()) {
-			headers.push(header.dataset["title"] ?? header.innerHTML);
-
-			headers.push(...Array.from({"length": checkInt(parseInt(header.getAttribute("colspan")), 1) - 1}, () => ""))
+			headers.push(header.dataset["title"] ?? header.innerHTML, ...Array.from({"length": checkInt(parseInt(header.getAttribute("colspan")), 1) - 1}, () => ""));
 		}
 
 		return [headers];
