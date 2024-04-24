@@ -648,7 +648,9 @@ export class DataTable extends HTMLElement {
 		}
 
 		if (this.#slots.length > data.length) {
-			this.#slots.splice(data.length, this.#slots.length - data.length);
+			for (const e of this.#slots.splice(data.length, this.#slots.length - data.length)) {
+				e.remove();
+			}
 		}
 
 		index = 0;
