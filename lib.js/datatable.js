@@ -113,7 +113,8 @@ const style = [new CSS().add(":host>div", {
 	}
 
 	return input({"part": "filter " + minMax, type, value, oninput});
-      };
+      },
+      maxElems = 32768;
 
 let debounceTarget = null,
     debounceID = -1;
