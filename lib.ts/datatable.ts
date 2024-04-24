@@ -105,7 +105,9 @@ const style = [new CSS().add(":host>div", {
 	case "time":
 		value = dataset[minMax] ? new Date(parseInt(dataset[minMax]!) * 1000).toISOString().split(type === "datetime-local" ? "Z" : "T")[+(type === "time")].replace("Z", "") : "";
 		oninput = function(this: HTMLInputElement) {
-			debounceFilter(firstRadio, target, {["data-" + minMax]: this.valueAsNumber / 1000 + ""});
+			const d = this.valueAsNumber / 1000;
+
+			debounceFilter(firstRadio, target, {["data-" + minMax]: isNaN(d) ? "" : d + ""});
 		};
 	}
 
