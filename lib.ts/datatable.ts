@@ -88,7 +88,7 @@ const style = [new CSS().add(":host>div", {
       numberInput = (dataset: DOMStringMap, minMax: string, firstRadio: HTMLInputElement) => {
 	let value: string,
 	    type = dataset["type"],
-	    oninput: Function;
+	    oninput: (this: HTMLInputElement) => void;
 
 	switch (dataset["type"]) {
 	default:
