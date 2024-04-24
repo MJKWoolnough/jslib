@@ -656,11 +656,9 @@ export class DataTable extends HTMLElement {
 		index = 0;
 
 		for (const elems of data) {
-			const s = this.#slots[index] ?? this.#body.appendChild(pushAndReturn(this.#slots, slot()));
+			const s = this.#slots[index++] ?? this.#body.appendChild(pushAndReturn(this.#slots, slot()));
 
 			s.assign.apply(s, elems);
-
-			index++;
 		}
 
 		this.dispatchEvent(new Event("render"));
