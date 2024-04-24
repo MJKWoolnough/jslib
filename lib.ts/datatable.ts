@@ -72,7 +72,7 @@ const style = [new CSS().add(":host>div", {
 	"ONLY_BLANK": "Only Blank" as string | Binding
       },
       arrow = (up: 0 | 1, fill: string, stroke: string) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up}h38l-19,${(2 * up - 1) * 18}z' fill='${encodeURIComponent(fill)}' stroke='${encodeURIComponent(stroke)}' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`,
-      debounceFilter = (firstRadio: HTMLInputElement, target: Element, attr: Record<string, string>) => {
+      debounceFilter = (firstRadio: HTMLInputElement, target: DOMStringMap, key: string, value: string) => {
 	if (target === debounceTarget) {
 		clearTimeout(debounceID);
 	}
@@ -80,12 +80,12 @@ const style = [new CSS().add(":host>div", {
 	debounceTarget = target;
 
 	debounceID = setTimeout(() => {
-		amendNode(target, attr);
+		target[key] = value;
 		firstRadio.click();
 		debounceTarget = null;
 	}, 500);
       },
-      numberInput = (dataset: DOMStringMap, minMax: string, firstRadio: HTMLInputElement, target: HTMLElement) => {
+      numberInput = (dataset: DOMStringMap, minMax: string, firstRadio: HTMLInputElement) => {
 	let value: string,
 	    type = dataset["type"],
 	    oninput: Function;
@@ -95,7 +95,7 @@ const style = [new CSS().add(":host>div", {
 		value = dataset[minMax] ?? "";
 		type = "number";
 		oninput = function(this: HTMLInputElement) {
-			debounceFilter(firstRadio, target, {["data-" + minMax]: this.value});
+			debounceFilter(firstRadio, dataset, minMax, this.value);
 		};
 
 		break;
@@ -107,7 +107,7 @@ const style = [new CSS().add(":host>div", {
 		oninput = function(this: HTMLInputElement) {
 			const d = this.valueAsNumber / 1000;
 
-			debounceFilter(firstRadio, target, {["data-" + minMax]: isNaN(d) ? "" : d + ""});
+			debounceFilter(firstRadio, dataset, minMax, isNaN(d) ? "" : d + "");
 		};
 	}
 
@@ -115,7 +115,7 @@ const style = [new CSS().add(":host>div", {
       },
       maxElems = 32768;
 
-let debounceTarget: Element | null = null,
+let debounceTarget: DOMStringMap | null = null,
     debounceID = -1;
 
 /**
@@ -347,16 +347,16 @@ export class DataTable extends HTMLElement {
 			li([
 				firstRadio,
 				this.#sorters[colNum] === numberSorter ? [
-					numberInput(dataset, "min", firstRadio, target),
+					numberInput(dataset, "min", firstRadio),
 					" ≤ x ≤ ",
-					numberInput(dataset, "max", firstRadio, target)
+					numberInput(dataset, "max", firstRadio)
 				] : [
 					makeToggleButton("^", lang["STARTS_WITH"], !dsHasKey(dataset, "isPrefix"), v => {
 						amendNode(target, {"data-is-prefix": v});
 						firstRadio.click();
 					}),
 					input({"part": "filter text", "type": "search", "value": dataset["filter"], "oninput": function(this: HTMLInputElement) {
-						debounceFilter(firstRadio, target, {"data-filter": this.value});
+						debounceFilter(firstRadio, dataset, "filter", this.value);
 					}}),
 					makeToggleButton("$", lang["ENDS_WIDTH"], !dsHasKey(dataset, "isSuffix"), v => {
 						amendNode(target, {"data-is-suffix": v});

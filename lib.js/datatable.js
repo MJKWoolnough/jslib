@@ -73,7 +73,7 @@ const style = [new CSS().add(":host>div", {
 	"ONLY_BLANK": "Only Blank"
       },
       arrow = (up, fill, stroke) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpath d='M1,${19 - 18 * up}h38l-19,${(2 * up - 1) * 18}z' fill='${encodeURIComponent(fill)}' stroke='${encodeURIComponent(stroke)}' stroke-linejoin='round' /%3E%3C/svg%3E%0A")`,
-      debounceFilter = (firstRadio, target, attr) => {
+      debounceFilter = (firstRadio, target, key, value) => {
 	if (target === debounceTarget) {
 		clearTimeout(debounceID);
 	}
@@ -81,12 +81,12 @@ const style = [new CSS().add(":host>div", {
 	debounceTarget = target;
 
 	debounceID = setTimeout(() => {
-		amendNode(target, attr);
+		target[key] = value;
 		firstRadio.click();
 		debounceTarget = null;
 	}, 500);
       },
-      numberInput = (dataset, minMax, firstRadio, target) => {
+      numberInput = (dataset, minMax, firstRadio) => {
 	let value,
 	    type = dataset["type"],
 	    oninput;
@@ -96,7 +96,7 @@ const style = [new CSS().add(":host>div", {
 		value = dataset[minMax] ?? "";
 		type = "number";
 		oninput = function() {
-			debounceFilter(firstRadio, target, {["data-" + minMax]: this.value});
+			debounceFilter(firstRadio, dataset, minMax, this.value);
 		};
 
 		break;
@@ -108,7 +108,7 @@ const style = [new CSS().add(":host>div", {
 		oninput = function() {
 			const d = this.valueAsNumber / 1000;
 
-			debounceFilter(firstRadio, target, {["data-" + minMax]: isNaN(d) ? "" : d + ""});
+			debounceFilter(firstRadio, dataset, minMax, isNaN(d) ? "" : d + "");
 		};
 	}
 
@@ -348,16 +348,16 @@ export class DataTable extends HTMLElement {
 			li([
 				firstRadio,
 				this.#sorters[colNum] === numberSorter ? [
-					numberInput(dataset, "min", firstRadio, target),
+					numberInput(dataset, "min", firstRadio),
 					" ≤ x ≤ ",
-					numberInput(dataset, "max", firstRadio, target)
+					numberInput(dataset, "max", firstRadio)
 				] : [
 					makeToggleButton("^", lang["STARTS_WITH"], !dsHasKey(dataset, "isPrefix"), v => {
 						amendNode(target, {"data-is-prefix": v});
 						firstRadio.click();
 					}),
 					input({"part": "filter text", "type": "search", "value": dataset["filter"], "oninput": function() {
-						debounceFilter(firstRadio, target, {"data-filter": this.value});
+						debounceFilter(firstRadio, dataset, "filter", this.value);
 					}}),
 					makeToggleButton("$", lang["ENDS_WIDTH"], !dsHasKey(dataset, "isSuffix"), v => {
 						amendNode(target, {"data-is-suffix": v});
