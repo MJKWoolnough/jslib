@@ -24,7 +24,6 @@ const style = [new CSS().add(":host>div", {
 		"position": "absolute",
 		"list-style": "none",
 		"padding": "0.5em",
-		"outline": "none",
 		"border": "2px solid #000",
 		"background-color": "#f8f8f8",
 		"margin": 0,
@@ -351,7 +350,7 @@ export class DataTable extends HTMLElement {
 		      colNum = this.#headers.get(target)!,
 		      selected = dsHasKey(dataset, "notEmpty") ? 1 : dsHasKey(dataset, "empty") ? 2 : 0,
 		      firstRadio = input({"part": "radio", "type": "radio", "checked": !selected, "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
-		      list = ul({"part": "filter", "tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
+		      list = ul({"part": "filter", "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(this: HTMLUListElement, e: FocusEvent) {
 			if (!e.relatedTarget || !list.contains(e.relatedTarget as Node)) {
 				this.remove();
 			}
@@ -393,7 +392,6 @@ export class DataTable extends HTMLElement {
 		      ]);
 
 		amendNode(this.#filter, list);
-		list.focus();
 	}
 
 	attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null) {
