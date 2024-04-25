@@ -623,7 +623,6 @@ export class DataTable extends HTMLElement {
 
 				this.#sortedData = this.#filteredData.toSorted(order === 1 ? ([, a], [, b]) => sorter(a[col], b[col]) : ([, a], [, b]) => sorter(b[col], a[col]));
 			}
-
 		} else {
 			this.#sortedData = this.#filteredData;
 		}
