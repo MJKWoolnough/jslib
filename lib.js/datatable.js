@@ -104,7 +104,9 @@ const style = [new CSS().add(":host>div", {
 		type += "-local";
 	case "date":
 	case "time":
-		value = dataset[minMax] ? new Date(parseInt(dataset[minMax]) * 1000).toISOString().split(type === "datetime-local" ? "Z" : "T")[+(type === "time")].replace("Z", "") : "";
+		const val = parseInt(dataset[minMax]);
+
+		value = isNaN(val) ? "" : new Date(val * 1000).toISOString().split(type === "datetime-local" ? "Z" : "T")[+(type === "time")].replace("Z", "");
 		oninput = function() {
 			const d = this.valueAsNumber / 1000;
 
