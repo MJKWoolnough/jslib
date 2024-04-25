@@ -59,7 +59,6 @@ const style = [new CSS().add(":host>div", {
       nullSort = () => 0,
       isBlankFilter = s => !s,
       isNotBlankFilter = s => !!s,
-      nullFilter = () => true,
       safeFloat = (n, def) => isNaN(n) ? def : n,
       makeToggleButton = (c, title, initial, fn) => button({"part": "toggle", "class": {"t": initial}, title, "onclick": function() {
 	fn(!this.classList.toggle("t"));
