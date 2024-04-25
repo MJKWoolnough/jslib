@@ -349,7 +349,6 @@ export class DataTable extends HTMLElement {
 
 		const {dataset} = target,
 		      colNum = this.#headers.get(target),
-		      hasEmpty = this.#hasEmpty[colNum],
 		      selected = dsHasKey(dataset, "notEmpty") ? 1 : dsHasKey(dataset, "empty") ? 2 : 0,
 		      firstRadio = input({"part": "radio", "type": "radio", "checked": !selected, "name": "data-table-filter", "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": false})}),
 		      list = ul({"part": "filter", "tabindex": -1, "style": {"left": clientX + "px", "top": clientY + "px"}, "onfocusout": function(e) {
@@ -381,14 +380,16 @@ export class DataTable extends HTMLElement {
 					})
 				]
 			]),
-			hasEmpty && !dsHasKey(dataset, "disallowNotEmpty") ? li([
-				focus(selected === 1, input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": selected === 1, "onclick": () => amendNode(target, {"data-not-empty": true, "data-empty": false})})),
-				label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
-			]) : [],
-			hasEmpty && !dsHasKey(dataset, "disallowEmpty") ? li([
-				focus(selected === 2, input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": selected === 2, "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": true})})),
-				label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
-			]) : []
+			this.#hasEmpty[colNum] ? [
+				!dsHasKey(dataset, "disallowNotEmpty") ? li([
+					focus(selected === 1, input({"type": "radio", "name": "data-table-filter", "id": "filter-remove-blank", "checked": selected === 1, "onclick": () => amendNode(target, {"data-not-empty": true, "data-empty": false})})),
+					label({"for": "filter-remove-blank"}, lang["REMOVE_BLANK"])
+				]) : [],
+				!dsHasKey(dataset, "disallowEmpty") ? li([
+					focus(selected === 2, input({"type": "radio", "name": "data-table-filter", "id": "filter-only-blank", "checked": selected === 2, "onclick": () => amendNode(target, {"data-not-empty": false, "data-empty": true})})),
+					label({"for": "filter-only-blank"}, lang["ONLY_BLANK"])
+				]) : []
+			] : []
 		      ]);
 
 		amendNode(this.#filter, list);
