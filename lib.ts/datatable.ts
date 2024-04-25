@@ -288,11 +288,7 @@ export class DataTable extends HTMLElement {
 	#handleClicks(e: Event) {
 		const target = this.#getHeaderCell(e);
 
-		if (!target) {
-			return;
-		}
-
-		if (dsHasKey(target.dataset, "sortDisable")) {
+		if (!target || dsHasKey(target.dataset, "sortDisable")) {
 			return;
 		}
 
