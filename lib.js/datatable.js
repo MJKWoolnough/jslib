@@ -214,13 +214,9 @@ export class DataTable extends HTMLElement {
 		super();
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			this.#filter = div({"onkeydown": e => {
-				if (e.key === "Escape") {
-					e.target.blur();
-				}
-			}}),
+			this.#filter = div({"onkeydown": this}),
 			table({"part": "table"}, [
-				this.#head = slot({"onclick": e => this.#handleClicks(e), "oncontextmenu": e => this.#handleContext(e)}),
+				this.#head = slot({"onclick": this, "oncontextmenu": this}),
 				this.#body = tbody()
 			])
 		]).adoptedStyleSheets = style;
@@ -273,6 +269,19 @@ export class DataTable extends HTMLElement {
 			this.#filterData();
 		} else if (doSort) {
 			this.#sortData();
+		}
+	}
+
+	handleEvent(e) {
+		switch (e.type) {
+		case "click":
+			return this.#handleClicks(e);
+		case "contextmenu":
+			return this.#handleContext(e);
+		case "keydown":
+			if (e.key === "Escape") {
+				e.target.blur();
+			}
 		}
 	}
 

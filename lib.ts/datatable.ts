@@ -213,13 +213,9 @@ export class DataTable extends HTMLElement {
 		super();
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			this.#filter = div({"onkeydown": (e: KeyboardEvent) => {
-				if (e.key === "Escape") {
-					(e.target as HTMLElement).blur();
-				}
-			}}),
+			this.#filter = div({"onkeydown": this}),
 			table({"part": "table"}, [
-				this.#head = slot({"onclick": (e: MouseEvent) => this.#handleClicks(e), "oncontextmenu": (e: MouseEvent) => this.#handleContext(e)}),
+				this.#head = slot({"onclick": this, "oncontextmenu": this}),
 				this.#body = tbody()
 			])
 		]).adoptedStyleSheets = style;
@@ -275,7 +271,20 @@ export class DataTable extends HTMLElement {
 		}
 	}
 
-	#handleClicks(e: MouseEvent) {
+	handleEvent(e: Event) {
+		switch (e.type) {
+		case "click":
+			return this.#handleClicks(e);
+		case "contextmenu":
+			return this.#handleContext(e as MouseEvent);
+		case "keydown":
+			if ((e as KeyboardEvent).key === "Escape") {
+				(e.target as HTMLElement).blur();
+			}
+		}
+	}
+
+	#handleClicks(e: Event) {
 		const target = this.#getHeaderCell(e);
 
 		if (!target) {
@@ -417,7 +426,7 @@ export class DataTable extends HTMLElement {
 		return ["page", "perPage"];
 	}
 
-	#getHeaderCell(e: MouseEvent) {
+	#getHeaderCell(e: Event) {
 		let target = e.target as HTMLElement;
 
 		while (!this.#headers.has(target)) {
