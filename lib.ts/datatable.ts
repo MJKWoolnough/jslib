@@ -427,11 +427,9 @@ export class DataTable extends HTMLElement {
 		let target = e.target as HTMLElement;
 
 		while (!this.#headers.has(target)) {
-			if (target === this) {
+			if (target === this || !(target = target.parentElement!)) {
 				return null;
 			}
-
-			target = target.parentElement!;
 		}
 
 		return target;
