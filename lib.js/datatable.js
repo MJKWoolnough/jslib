@@ -595,11 +595,7 @@ export class DataTable extends HTMLElement {
 			switch (header.dataset["sort"]) {
 			case "desc":
 				order = -1;
-				col = num;
-
-				break Loop;
 			case "asc":
-				order = 1;
 				col = num;
 
 				break Loop;
