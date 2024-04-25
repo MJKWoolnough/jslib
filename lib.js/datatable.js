@@ -615,14 +615,12 @@ export class DataTable extends HTMLElement {
 		}
 
 		if (col >= 0) {
-			if (this.#lastSorted === col) {
-				if (this.#lastOrder !== order) {
-					this.#sortedData.reverse();
-				}
-			} else {
+			if (this.#lastSorted !== col) {
 				const sorter = this.#sorters[col] ?? nullSort;
 
 				this.#sortedData = this.#filteredData.toSorted(order === 1 ? ([, a], [, b]) => sorter(a[col], b[col]) : ([, a], [, b]) => sorter(b[col], a[col]));
+			} else if (this.#lastOrder !== order) {
+				this.#sortedData.reverse();
 			}
 		} else {
 			this.#sortedData = this.#filteredData;
