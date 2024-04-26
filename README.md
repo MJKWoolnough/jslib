@@ -1169,7 +1169,7 @@ The sign method returns a number indicating the sign of the value:
 |------------------|----------------|
 | < 0              | -1             |
 | = 0              | 0              |
-| > 1              | 1              |
+| > 0              | 1              |
 | NaN              | NaN            |
 
 ### <a name="fraction_sub">sub</a>
