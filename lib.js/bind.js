@@ -192,7 +192,7 @@ class ReadOnlyBinding extends Binding {
  *
  * @return {Binding<T>} Bound value.
  *
- * When used as a tag function, this function will return a readonly {@link Binding}  that is bound to all Bind expressions used within the template.
+ * When used as a tag function, this function will return a readonly {@link Binding} that is bound to all Bind expressions used within the template.
  *
  * @param {TemplateStringsArray}            v    The strings portions of a temple.
  * @param {...(Binding<unknown> | unknown)} args The non-string portions of a temple, which can include Bindings to watch.
