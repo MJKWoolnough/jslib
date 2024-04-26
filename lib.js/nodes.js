@@ -286,7 +286,7 @@ export class NodeArray {
 		}
 	}
 	/**
-	 * This function will create a NodeArray from the given parent {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}, iterating over every child and running the itemFn to generate an {@link Item}  to be append to the NodeArray.
+	 * This function will create a NodeArray from the given parent {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}, iterating over every child and running the itemFn to generate an {@link Item} to be append to the NodeArray.
 	 *
 	 * @param {H} n Parent Node.
 	 * @param {(node: Node) => T | undefined} [itemFn] Function to create Items from nodes.

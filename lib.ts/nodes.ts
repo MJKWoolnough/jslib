@@ -332,7 +332,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	static from<_, H extends Node = Node>(n: H): NodeArray<Item, H>;
 	static from<T extends Item, H extends Node = Node>(n: H, itemFn: (node: Node) => T | undefined): NodeArray<T, H>;
 	/**
-	 * This function will create a NodeArray from the given parent {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}, iterating over every child and running the itemFn to generate an {@link Item}  to be append to the NodeArray.
+	 * This function will create a NodeArray from the given parent {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}, iterating over every child and running the itemFn to generate an {@link Item} to be append to the NodeArray.
 	 *
 	 * @param {H} n Parent Node.
 	 * @param {(node: Node) => T | undefined} [itemFn] Function to create Items from nodes.
