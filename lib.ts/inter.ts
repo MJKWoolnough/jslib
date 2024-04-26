@@ -80,14 +80,19 @@ export class Pipe<T> {
 	 * NB: If the function is registered multiple times, only a single entry will be unregistered.
 	 *
 	 * @param {(data: T) => void} fn The Function to be removed.
+	 *
+	 * @return {boolean} Returns true when a function is unregistered, false otherwise.
 	 */
-	remove(fn: (data: T) => void) {
+	remove(fn: (data: T) => void): boolean {
 		for (const [i, afn] of this.#out.entries()) {
 			if (afn === fn) {
 				this.#out.splice(i, 1);
-				return;
+
+				return true;
 			}
 		}
+
+		return false;
 	}
 	/**
 	 * This method returns an Array of functions bound to the send, receive, and remove methods of the Pipe Class. The bindmask determines which methods are bound.
@@ -105,10 +110,10 @@ export class Pipe<T> {
 	bind(bindmask: 1): [(data: T) => void, undefined, undefined];
 	bind(bindmask: 2): [undefined, (fn: (data: T) => void) => void, undefined];
 	bind(bindmask: 3): [(data: T) => void, (fn: (data: T) => void) => void, undefined];
-	bind(bindmask: 4): [undefined, undefined, (fn: (data: T) => void) => void];
-	bind(bindmask: 5): [(data: T) => void, undefined, (fn: (data: T) => void) => void];
-	bind(bindmask: 6): [undefined, (fn: (data: T) => void) => void, (fn: (data: T) => void) => void];
-	bind(bindmask?: 7): [(data: T) => void, (fn: (data: T) => void) => void, (fn: (data: T) => void) => void];
+	bind(bindmask: 4): [undefined, undefined, (fn: (data: T) => void) => boolean];
+	bind(bindmask: 5): [(data: T) => void, undefined, (fn: (data: T) => void) => boolean];
+	bind(bindmask: 6): [undefined, (fn: (data: T) => void) => void, (fn: (data: T) => void) => boolean];
+	bind(bindmask?: 7): [(data: T) => void, (fn: (data: T) => void) => void, (fn: (data: T) => void) => boolean];
 	bind(bindmask: 1 | 2 | 3 | 4 | 5 | 6 | 7 = 7) {
 		return [bindmask&1 ? (data: T) => this.send(data) : undefined, bindmask&2 ? (fn: (data: T) => void) => this.receive(fn) : undefined, bindmask&4 ? (fn: (data: T) => void) => this.remove(fn) : undefined] as const;
 	}

@@ -54,14 +54,19 @@ export class Pipe {
 	 * NB: If the function is registered multiple times, only a single entry will be unregistered.
 	 *
 	 * @param {(data: T) => void} fn The Function to be removed.
+	 *
+	 * @return {boolean} Returns true when a function is unregistered, false otherwise.
 	 */
 	remove(fn) {
 		for (const [i, afn] of this.#out.entries()) {
 			if (afn === fn) {
 				this.#out.splice(i, 1);
-				return;
+
+				return true;
 			}
 		}
+
+		return false;
 	}
 	/**
 	 * This method returns an Array of functions bound to the send, receive, and remove methods of the Pipe Class. The bindmask determines which methods are bound.
