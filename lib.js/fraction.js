@@ -113,7 +113,7 @@ export default class Fraction {
 	 * |------------------|----------------|
 	 * | < 0              | -1             |
 	 * | = 0              | 0              |
-	 * | > 1              | 1              |
+	 * | > 0              | 1              |
 	 * | NaN              | NaN            |
 	 *
 	 * @return {-1 | 0 | 1 | NaN} As per the table above.
