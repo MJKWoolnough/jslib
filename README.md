@@ -2381,7 +2381,7 @@ This unexported type is the interface used by [RPC](#rpc_rpc) to send and receiv
 #### <a name="rpc_rpc_await">await</a>
 ```typescript
 class RPC {
-	await<T = any>(id: number, typeCheck?: (a: any) => a is T): Promise<T>;
+	await<T = any>(id: number, typeCheck?: (a: unknown) => a is T): Promise<T>;
 }
 ```
 
@@ -2394,8 +2394,8 @@ It is recommended to use a checker function, and the [TypeGuard](#typeguard) mod
 #### <a name="rpc_rpc_request">request</a>
 ```typescript
 class RPC {
-	request<T = any>(method: string, typeCheck?: (a: any) => a is T): Promise<T>;
-	request<T = any>(method: string, params: any, typeCheck?: (a: any) => a is T): Promise<T>;
+	request<T = any>(method: string, typeCheck?: (a: unknown) => a is T): Promise<T>;
+	request<T = any>(method: string, params: any, typeCheck?: (a: unknown) => a is T): Promise<T>;
 }
 ```
 
@@ -2410,7 +2410,7 @@ The Promise will resolve with the returned data from the remote procedure call.
 #### <a name="rpc_rpc_subscribe">subscribe</a>
 ```typescript
 class RPC {
-	subscribe<T = any>(id: number, typeCheck?: (a: any) => a is T): Subscription<T>;
+	subscribe<T = any>(id: number, typeCheck?: (a: unknown) => a is T): Subscription<T>;
 }
 ```
 
