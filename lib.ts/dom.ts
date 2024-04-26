@@ -94,12 +94,12 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	}
 	return res;
       },
-      isEventListenerOrEventListenerObject = (prop: any): prop is EventListenerOrEventListenerObject => prop instanceof Function || isEventListenerObject(prop),
+      isEventListenerOrEventListenerObject = (prop: unknown): prop is EventListenerOrEventListenerObject => prop instanceof Function || isEventListenerObject(prop),
       isClassObj = (prop: unknown): prop is ClassObj => prop instanceof Object && !isAttr(prop),
       isStyleObj = (prop: unknown): prop is StyleObj => prop instanceof CSSStyleDeclaration || (prop instanceof Object && !isAttr(prop)),
       isNodeAttributes = (n: EventTarget): n is NodeAttributes => !!(n as NodeAttributes).style && !!(n as NodeAttributes).classList && !!(n as NodeAttributes).removeAttribute && !!(n as NodeAttributes).setAttributeNode && !!(n as NodeAttributes).toggleAttribute && !!(n as NodeAttributes).setAttributeNS,
-      isAttr = (prop: any): prop is BoundAttr => prop instanceof Object && attr in prop,
-      isChild = (children: any): children is BoundChild => children instanceof Object && child in children,
+      isAttr = (prop: unknown): prop is BoundAttr => prop instanceof Object && attr in prop,
+      isChild = (children: unknown): children is BoundChild => children instanceof Object && child in children,
       toggleSym = Symbol("toggle"),
       wrapElem = <T extends Element>(name: string, fn: () => T) => Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(fn(), props, children), {"name": {"value": name}, [child]: {"get": fn}}) as DOMBind<T>,
       maxElems = 32768;
