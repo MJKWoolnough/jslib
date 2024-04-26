@@ -140,8 +140,8 @@ export class RPC {
 
 		c?.close();
 	}
-	request<T = any>(method: string, typeCheck?: (a: any) => a is T): Promise<T>;
-	request<T = any>(method: string, params: any, typeCheck?: (a: any) => a is T): Promise<T>;
+	request<T = any>(method: string, typeCheck?: (a: unknown) => a is T): Promise<T>;
+	request<T = any>(method: string, params: any, typeCheck?: (a: unknown) => a is T): Promise<T>;
 	/**
 	 * The request method calls the remote procedure named by the `method` param, and sends any `params` data, JSON encoded, to it.
 	 *
@@ -150,13 +150,13 @@ export class RPC {
 	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
 	 *
 	 * @typeParam {any} T
-	 * @param {string} method                                                     The method name to be called.
-	 * @param {Exclude<any, Function> | ((a: any) => a is T)} [paramsOrTypeCheck] Either the params to be sent to the specified method, or a typecheck function.
-	 * @param {(a: any) => a is T} [typeCheck]                                    A typecheck function, if one was supplied to the second param.
+	 * @param {string} method                                                         The method name to be called.
+	 * @param {Exclude<any, Function> | ((a: unknown) => a is T)} [paramsOrTypeCheck] Either the params to be sent to the specified method, or a typecheck function.
+	 * @param {(a: unknown) => a is T} [typeCheck]                                    A typecheck function, if one was supplied to the second param.
 	 *
 	 * @return {Promise<T>} A Promise that will resolve with the returned data from the remote procedure call.
 	 */
-	request<T = any>(method: string, paramsOrTypeCheck?: Exclude<any, Function> | ((a: any) => a is T), typeCheck?: (a: any) => a is T): Promise<T> {
+	request<T = any>(method: string, paramsOrTypeCheck?: Exclude<any, Function> | ((a: unknown) => a is T), typeCheck?: (a: unknown) => a is T): Promise<T> {
 		const c = this.#c;
 		return c ? new Promise<T>((sFn, eFn) => {
 			typeCheck ??= paramsOrTypeCheck instanceof Function ? paramsOrTypeCheck : undefined;
@@ -176,12 +176,12 @@ export class RPC {
 	 *
 	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
 	 *
-	 * @param {number} id                      The ID to wait for.
-	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
+	 * @param {number} id                          The ID to wait for.
+	 * @param {(a: unknown) => a is T} [typeCheck] An optional typecheck function.
 	 *
 	 * @return {Promise<T>} A Promise that will resolve with the returned data.
 	 */
-	await<T = any>(id: number, typeCheck?: (a: any) => a is T): Promise<T> {
+	await<T = any>(id: number, typeCheck?: (a: unknown) => a is T): Promise<T> {
 		const h: handler = [noop, noop],
 		      a = this.#a,
 		      s = a.get(id) ?? newSet(a, id),
@@ -199,12 +199,12 @@ export class RPC {
 	 *
 	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
 	 *
-	 * @param {number} id                      The ID to wait for.
-	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
+	 * @param {number} id                          The ID to wait for.
+	 * @param {(a: unknown) => a is T} [typeCheck] An optional typecheck function.
 	 *
 	 * @return {Subscription<T>} A Subscription that will resolve whenever data is received.
 	 */
-	subscribe<T = any>(id: number, typeCheck?: (a: any) => a is T): Subscription<T> {
+	subscribe<T = any>(id: number, typeCheck?: (a: unknown) => a is T): Subscription<T> {
 		return new Subscription<T>((sFn, eFn, cFn) => {
 			const h = makeHandler(sFn, eFn, typeCheck),
 			      a = this.#a,
