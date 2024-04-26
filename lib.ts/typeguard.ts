@@ -161,7 +161,7 @@ const throwUnknownError = (v: boolean) => {
 	case "Or":
 		return (def[1] as Definition[]).map(d => def[0] === "And" && d[0] === "Or" ? `(${toString(d)})` : toString(d)).join(def[0] === "And" ? " & " : " | ");
 	case "Object":
-		return (Object.entries(def[1]) as [string, Definition][]).filter(([k]) => typeof k === "string").map(([k, d]) => `	${k.match(identifer) ? k : JSON.stringify(k)}${(d[0] === "" && d[1] === "undefined") || d[0] === "Or" && (d[1] as Definition[]).some(e => e[0] === "" && e[1] === "undefined") ? "?" : ""}: ${toString(d).replaceAll("\n", "\n	")};\n`).reduce((t, e, n) => t + (!n ? "\n" : "") + e, "{")  + "}";
+		return (Object.entries(def[1]) as [string, Definition][]).filter(([k]) => typeof k === "string").map(([k, d]) => `	${k.match(identifer) ? k : JSON.stringify(k)}${(d[0] === "" && d[1] === "undefined") || d[0] === "Or" && (d[1] as Definition[]).some(e => e[0] === "" && e[1] === "undefined") ? "?" : ""}: ${toString(d).replaceAll("\n", "\n	")};\n`).reduce((t, e, n) => t + (!n ? "\n" : "") + e, "{") + "}";
 	case "Tuple":
 		return "[" + (def[1] as Definition[]).map(toString).concat(def[2] ? "..." + (["Or", "And"].includes(def[2][0]) ? `(${toString(def[2])})` : toString(def[2])) + "[]" : []).join(", ") + "]";
 	default:
