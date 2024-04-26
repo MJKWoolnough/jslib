@@ -1353,11 +1353,11 @@ NB: The same function can be set multiple times, and will be for each time it is
 #### <a name="inter_pipe_remove">remove</a>
 ```typescript
 class Pipe<T> {
-	remove(fn: (data: T) => void) => void;
+	remove(fn: (data: T) => void) => boolean;
 }
 ```
 
-The passed function will be unregistered from the Pipe and will no longer receive values sent along it.
+The passed function will be unregistered from the Pipe and will no longer receive values sent along it. Returns true if a function was unregistered, false otherwise.
 
 NB: If the function is registered multiple times, only a single entry will be unregistered.
 
