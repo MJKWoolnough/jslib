@@ -1,4 +1,5 @@
-import {bindCustomElement} from './dom.js';
+import {amendNode, bindCustomElement} from './dom.js';
+import {svg} from './svg.js';
 
 type data = {
 	x: number;
@@ -11,9 +12,12 @@ class ScatterChart extends HTMLElement {
 	#maxX = -Infinity;
 	#minY = Infinity;
 	#maxY = -Infinity;
+	#svg: SVGSVGElement;
 
 	constructor() {
 		super();
+
+		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#svg = svg());
 
 		this.#parseContent();
 
