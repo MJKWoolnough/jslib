@@ -4,6 +4,8 @@ import {circle, svg} from './svg.js';
 type data = {
 	x: number;
 	y: number;
+	fill: string;
+	size: number;
 }
 
 class ScatterChart extends HTMLElement {
@@ -40,16 +42,19 @@ class ScatterChart extends HTMLElement {
 		this.#maxX = -Infinity;
 		this.#minY = Infinity;
 		this.#maxY = -Infinity;
-		this.#fill = this.getAttribute("fill") ?? "#000";
-		this.#size = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, 1);
+
+		const defaultFill = this.getAttribute("fill") ?? "#000",
+		      defaultSize = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, 1);
 
 		for (const elem of this.children) {
 			if (elem instanceof ChartPoint) {
 				const x = parseFloat(elem.getAttribute("x") ?? ""),
-				      y = parseFloat(elem.getAttribute("y") ?? "");
+				      y = parseFloat(elem.getAttribute("y") ?? ""),
+				      fill = this.getAttribute("fill") ?? defaultFill,
+				      size = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, defaultSize);
 
 				if (!isNaN(x) && !isNaN(y)) {
-					this.#points.push({x, y});
+					this.#points.push({x, y, fill, size});
 
 					this.#maxX = Math.max(this.#maxX, x);
 					this.#minX = Math.min(this.#minX, x);
