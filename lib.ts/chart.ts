@@ -26,7 +26,7 @@ class ScatterChart extends HTMLElement {
 		new MutationObserver(mutations => this.#handleMutations(mutations)).observe(this, {
 			"attributeFilter": ["x", "y"],
 			"childList": true,
-			"subtree": true,
+			"subtree": true
 		});
 	}
 
