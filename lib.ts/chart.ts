@@ -6,4 +6,11 @@ class ScatterChart extends HTMLElement {
 	}
 }
 
-export const scatter = bindCustomElement("scatter-chart", ScatterChart);
+class ChartPoint extends HTMLElement {
+	constructor() {
+		super();
+	}
+}
+
+export const scatter = bindCustomElement("scatter-chart", ScatterChart),
+point = bindCustomElement("chart-point", ChartPoint);
