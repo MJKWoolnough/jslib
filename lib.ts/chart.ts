@@ -16,6 +16,16 @@ class ScatterChart extends HTMLElement {
 		super();
 
 		this.#parseContent();
+
+		new MutationObserver(mutations => this.#handleMutations(mutations)).observe(this, {
+			"attributeFilter": ["x", "y"],
+			"childList": true,
+			"subtree": true,
+		});
+	}
+
+	#handleMutations(_mutations: MutationRecord[]) {
+		this.#parseContent();
 	}
 
 	#parseContent() {
