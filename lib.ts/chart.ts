@@ -13,6 +13,8 @@ class ScatterChart extends HTMLElement {
 	#minY = Infinity;
 	#maxY = -Infinity;
 	#svg: SVGSVGElement;
+	#fill = "";
+	#size = 1;
 
 	constructor() {
 		super();
@@ -38,6 +40,8 @@ class ScatterChart extends HTMLElement {
 		this.#maxX = -Infinity;
 		this.#minY = Infinity;
 		this.#maxY = -Infinity;
+		this.#fill = this.getAttribute("fill") ?? "#000";
+		this.#size = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, 1);
 
 		for (const elem of this.children) {
 			if (elem instanceof ChartPoint) {
@@ -59,7 +63,7 @@ class ScatterChart extends HTMLElement {
 	}
 
 	#render() {
-		clearNode(this.#svg, {"viewBox": `0 0 ${this.#maxX - this.#minX} ${this.#maxY - this.#minY}`}, this.#points.map(({x, y}) => circle({"cx": x, "cy": y, "r": 1, "fill": "#000"})));
+		clearNode(this.#svg, {"viewBox": `0 0 ${this.#maxX - this.#minX} ${this.#maxY - this.#minY}`}, this.#points.map(({x, y}) => circle({"cx": x, "cy": y, "r": this.#size, "fill": this.#fill})));
 	}
 }
 
