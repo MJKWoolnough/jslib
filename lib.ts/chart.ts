@@ -1,5 +1,5 @@
-import {amendNode, bindCustomElement} from './dom.js';
-import {svg} from './svg.js';
+import {amendNode, bindCustomElement, clearNode} from './dom.js';
+import {circle, svg} from './svg.js';
 
 type data = {
 	x: number;
@@ -54,6 +54,12 @@ class ScatterChart extends HTMLElement {
 				}
 			}
 		}
+
+		this.#render();
+	}
+
+	#render() {
+		clearNode(this.#svg, {"viewBox": `0 0 ${this.#maxX - this.#minX} ${this.#maxY - this.#minY}`}, this.#points.map(({x, y}) => circle({"cx": x, "cy": y, "r": 1, "fill": "#000"})));
 	}
 }
 
