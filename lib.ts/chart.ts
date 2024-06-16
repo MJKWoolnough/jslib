@@ -8,20 +8,18 @@ type data = {
 	size: number;
 }
 
-class ScatterChart extends HTMLElement {
-	#points: data[] = [];
-	#minX = Infinity;
-	#maxX = -Infinity;
-	#minY = Infinity;
-	#maxY = -Infinity;
-	#svg: SVGSVGElement;
-	#fill = "";
-	#size = 1;
+type renderFn = (svg: SVGSVGElement, points: data[], minX: number, maxX: number, minY: number, maxY: number, fill: string, size: number) => void;
 
-	constructor() {
+class Chart extends HTMLElement {
+	#svg: SVGSVGElement;
+	#render: renderFn;
+
+	constructor(render: renderFn) {
 		super();
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#svg = svg());
+
+		this.#render = render;
 
 		this.#parseContent();
 
@@ -37,14 +35,14 @@ class ScatterChart extends HTMLElement {
 	}
 
 	#parseContent() {
-		this.#points = [];
-		this.#minX = Infinity;
-		this.#maxX = -Infinity;
-		this.#minY = Infinity;
-		this.#maxY = -Infinity;
-
 		const defaultFill = this.getAttribute("fill") ?? "#000",
 		      defaultSize = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, 1);
+
+		let points = [],
+		    minX = Infinity,
+		    maxX = -Infinity,
+		    minY = Infinity,
+		    maxY = -Infinity;
 
 		for (const elem of this.children) {
 			if (elem instanceof ChartPoint) {
@@ -54,21 +52,29 @@ class ScatterChart extends HTMLElement {
 				      size = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, defaultSize);
 
 				if (!isNaN(x) && !isNaN(y)) {
-					this.#points.push({x, y, fill, size});
+					points.push({x, y, fill, size});
 
-					this.#maxX = Math.max(this.#maxX, x+size);
-					this.#minX = Math.min(this.#minX, x-size);
-					this.#maxY = Math.max(this.#maxY, y+size);
-					this.#minY = Math.min(this.#minY, y-size);
+					maxX = Math.max(maxX, x+size);
+					minX = Math.min(minX, x-size);
+					maxY = Math.max(maxY, y+size);
+					minY = Math.min(minY, y-size);
 				}
 			}
 		}
 
-		this.#render();
+		this.#render(this.#svg, points, minX, maxX, minY, maxY, defaultFill, defaultSize);
 	}
+}
 
-	#render() {
-		clearNode(this.#svg, {"viewBox": `0 0 ${this.#maxX - this.#minX} ${this.#maxY - this.#minY}`}, this.#points.map(({x, y}) => circle({"cx": x, "cy": y, "r": this.#size, "fill": this.#fill})));
+class AxisChart extends Chart {
+	constructor(render: renderFn) {
+		super(render);
+	}
+}
+
+class ScatterChart extends AxisChart {
+	constructor() {
+		super((svg, points, minX, maxX, minY, maxY, fill, size) => clearNode(svg, {"viewBox": `0 0 ${maxX - minX} ${maxY - minY}`}, points.map(({x, y}) => circle({"cx": x, "cy": y, "r": size, fill}))));
 	}
 }
 
