@@ -75,7 +75,7 @@ class AxisChart extends Chart {
 
 class ScatterChart extends AxisChart {
 	constructor() {
-		super((svg, points, minX, maxX, minY, maxY, fill, size) => clearNode(svg, {"viewBox": `0 0 ${maxX - minX} ${maxY - minY}`}, points.map(({x, y}) => circle({"cx": x, "cy": y, "r": size, fill}))));
+		super((svg, points, minX, maxX, minY, maxY, fill, size) => clearNode(svg, {"viewBox": `0 0 ${maxX - minX} ${maxY - minY}`}, points.map(({x, y, elem}) => forwardEvents(circle({"cx": x, "cy": y, "r": size, fill}), elem))));
 	}
 }
 
@@ -84,6 +84,9 @@ class ChartPoint extends HTMLElement {
 		super();
 	}
 }
+
+const forwardedEvents = ["mouseover", "mouseout", "mouseenter", "mouseleave", "mousedown", "mouseup", "click", "dblclick", "auxclick", "contextmenu", "pointerdown", "pointerup"],
+      forwardEvents = (from: Element, to: ChartPoint) => amendNode(from, forwardedEvents.reduce((evs, evt) => (evs[evt] = (e: Event) => to.dispatchEvent(e), evs), {} as Record<string, Function>));
 
 export const scatter = bindCustomElement("scatter-chart", ScatterChart),
 point = bindCustomElement("chart-point", ChartPoint);
