@@ -75,7 +75,7 @@ class AxisChart extends Chart {
 
 class ScatterChart extends AxisChart {
 	constructor() {
-		super((svg, points, minX, maxX, minY, maxY) => clearNode(svg, {"viewBox": `0 0 ${maxX - minX} ${maxY - minY}`}, points.map(({x, y, size, fill, elem}) => forwardEvents(circle({"cx": x, "cy": y, "r": size, fill}), elem))));
+		super((svg, points, minX, maxX, minY, maxY) => clearNode(svg, {"viewBox": `0 0 ${maxX - minX} ${maxY - minY}`}, points.map(({x, y, size, fill, elem}) => forwardEvents(circle({"cx": x, "cy": maxY - y, "r": size, fill}), elem))));
 	}
 }
 
