@@ -52,8 +52,8 @@ class Chart extends HTMLElement {
 			if (elem instanceof ChartPoint) {
 				const x = parseFloat(elem.getAttribute("x") ?? ""),
 				      y = parseFloat(elem.getAttribute("y") ?? ""),
-				      fill = this.getAttribute("fill") ?? defaultFill,
-				      size = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, defaultSize);
+				      fill = elem.getAttribute("fill") ?? defaultFill,
+				      size = Math.max(parseFloat(elem.getAttribute("size") ?? "1") || 0, defaultSize);
 
 				if (!isNaN(x) && !isNaN(y)) {
 					points.push({x, y, fill, size, elem});
