@@ -1,3 +1,4 @@
+import type {Children, PropsObject} from './dom.js'
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {circle, svg} from './svg.js';
 
@@ -9,7 +10,7 @@ type data = {
 	elem: ChartPoint;
 }
 
-type renderFn = (svg: SVGSVGElement, points: data[], minX: number, maxX: number, minY: number, maxY: number) => void;
+type renderFn = (points: data[], minX: number, maxX: number, minY: number, maxY: number) => Children | [PropsObject, Children];
 
 class Chart extends HTMLElement {
 	#svg: SVGSVGElement;
@@ -63,7 +64,10 @@ class Chart extends HTMLElement {
 			}
 		}
 
-		this.#render(this.#svg, points, minX, maxX, minY, maxY);
+		const ret = this.#render(points, minX, maxX, minY, maxY),
+		      [params, children] = ret instanceof Array ? ret : [{}, ret];
+
+		clearNode(this.#svg, params, children);
 	}
 }
 
@@ -75,7 +79,7 @@ class AxisChart extends Chart {
 
 class ScatterChart extends AxisChart {
 	constructor() {
-		super((svg, points, minX, maxX, minY, maxY) => clearNode(svg, {"viewBox": `0 0 ${maxX - minX} ${maxY - minY}`}, points.map(({x, y, size, fill, elem}) => forwardEvents(circle({"cx": x, "cy": maxY - y, "r": size, fill}), elem))));
+		super((points, _minX, _maxX, _minY, maxY) => points.map(({x, y, size, fill, elem}) => forwardEvents(circle({"cx": x, "cy": maxY - y, "r": size, fill}), elem)));
 	}
 }
 
