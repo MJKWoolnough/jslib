@@ -9,7 +9,7 @@ type data = {
 	elem: ChartPoint;
 }
 
-type renderFn = (svg: SVGSVGElement, points: data[], minX: number, maxX: number, minY: number, maxY: number, fill: string, size: number) => void;
+type renderFn = (svg: SVGSVGElement, points: data[], minX: number, maxX: number, minY: number, maxY: number) => void;
 
 class Chart extends HTMLElement {
 	#svg: SVGSVGElement;
@@ -63,7 +63,7 @@ class Chart extends HTMLElement {
 			}
 		}
 
-		this.#render(this.#svg, points, minX, maxX, minY, maxY, defaultFill, defaultSize);
+		this.#render(this.#svg, points, minX, maxX, minY, maxY);
 	}
 }
 
@@ -75,7 +75,7 @@ class AxisChart extends Chart {
 
 class ScatterChart extends AxisChart {
 	constructor() {
-		super((svg, points, minX, maxX, minY, maxY, fill, size) => clearNode(svg, {"viewBox": `0 0 ${maxX - minX} ${maxY - minY}`}, points.map(({x, y, elem}) => forwardEvents(circle({"cx": x, "cy": y, "r": size, fill}), elem))));
+		super((svg, points, minX, maxX, minY, maxY) => clearNode(svg, {"viewBox": `0 0 ${maxX - minX} ${maxY - minY}`}, points.map(({x, y, size, fill, elem}) => forwardEvents(circle({"cx": x, "cy": y, "r": size, fill}), elem))));
 	}
 }
 
