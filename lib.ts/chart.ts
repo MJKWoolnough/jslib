@@ -6,6 +6,7 @@ type data = {
 	y: number;
 	fill: string;
 	size: number;
+	elem: ChartPoint;
 }
 
 type renderFn = (svg: SVGSVGElement, points: data[], minX: number, maxX: number, minY: number, maxY: number, fill: string, size: number) => void;
@@ -52,7 +53,7 @@ class Chart extends HTMLElement {
 				      size = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, defaultSize);
 
 				if (!isNaN(x) && !isNaN(y)) {
-					points.push({x, y, fill, size});
+					points.push({x, y, fill, size, elem});
 
 					maxX = Math.max(maxX, x+size);
 					minX = Math.min(minX, x-size);
