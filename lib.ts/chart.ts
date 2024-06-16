@@ -56,10 +56,10 @@ class ScatterChart extends HTMLElement {
 				if (!isNaN(x) && !isNaN(y)) {
 					this.#points.push({x, y, fill, size});
 
-					this.#maxX = Math.max(this.#maxX, x);
-					this.#minX = Math.min(this.#minX, x);
-					this.#maxY = Math.max(this.#maxY, y);
-					this.#minY = Math.min(this.#minY, y);
+					this.#maxX = Math.max(this.#maxX, x+size);
+					this.#minX = Math.min(this.#minX, x-size);
+					this.#maxY = Math.max(this.#maxY, y+size);
+					this.#minY = Math.min(this.#minY, y-size);
 				}
 			}
 		}
