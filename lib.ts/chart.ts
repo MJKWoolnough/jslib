@@ -1,6 +1,6 @@
 import type {Children, PropsObject} from './dom.js'
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
-import {circle, svg} from './svg.js';
+import {circle, g, path, svg} from './svg.js';
 
 type data = {
 	x: number;
@@ -11,6 +11,8 @@ type data = {
 }
 
 type renderFn = (points: data[], minX: number, maxX: number, minY: number, maxY: number) => Children | [PropsObject, Children];
+
+type renderOnlyChildren = (points: data[], minX: number, maxX: number, minY: number, maxY: number) => Children;
 
 class Chart extends HTMLElement {
 	#svg: SVGSVGElement;
@@ -72,8 +74,18 @@ class Chart extends HTMLElement {
 }
 
 class AxisChart extends Chart {
-	constructor(render: renderFn) {
-		super(render);
+	constructor(render: renderOnlyChildren) {
+		super((points, minX, maxX, minY, maxY) => {
+			const rendered = g({"transform": "translate(15 5)"}, render(points, minX, maxX, minY, maxY));
+
+			return [
+				{"viewBox": `0 0 ${maxX - minX + 20} ${maxY - minY + 10}`},
+				[
+					path({"d": `M15,5 v${maxY - minY} h${maxX - minX}`, "stroke": "#000", "fill": "none"}),
+					rendered,
+				]
+			];
+		});
 	}
 }
 
