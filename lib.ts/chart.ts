@@ -31,15 +31,11 @@ class Chart extends HTMLElement {
 
 		this.#parseContent();
 
-		new MutationObserver(mutations => this.#handleMutations(mutations)).observe(this, {
+		new MutationObserver(() => this.#parseContent()).observe(this, {
 			"attributeFilter": extraAttrs.concat(["x", "y"]),
 			"childList": true,
 			"subtree": true
 		});
-	}
-
-	#handleMutations(_mutations: MutationRecord[]) {
-		this.#parseContent();
 	}
 
 	#parseContent() {
