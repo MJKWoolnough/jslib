@@ -92,12 +92,13 @@ class AxisChart extends Chart {
 		super((points, minX, maxX, minY, maxY) => {
 			const rendered = g({"transform": "translate(15 5)"}, render(points, minX, maxX, minY, maxY)),
 			      stroke = this.getAttribute("axis-stroke") ?? "#000",
-			      strokeWidth = Math.max(parseInt(this.getAttribute("axis-width") ?? "1"), 0) || 1;
+			      strokeWidth = Math.max(parseInt(this.getAttribute("axis-width") ?? "1"), 0),
+			      hasAxis = +(stroke && strokeWidth);
 
 			return [
-				{"viewBox": `0 0 ${maxX - minX + 20} ${maxY - minY + 10}`},
+				{"viewBox": `0 0 ${maxX - minX + 20 * hasAxis} ${maxY - minY + 10 * hasAxis}`},
 				[
-					path({"d": `M15,5 v${maxY - minY} h${maxX - minX}`, stroke, "stroke-width": strokeWidth, "fill": "none"}),
+					hasAxis ? path({"d": `M15,5 v${maxY - minY} h${maxX - minX}`, stroke, "stroke-width": strokeWidth, "fill": "none"}) : [],
 					rendered,
 				]
 			];
