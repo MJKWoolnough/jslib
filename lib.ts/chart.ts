@@ -22,7 +22,7 @@ class Chart extends HTMLElement {
 	#svg: SVGSVGElement;
 	#render: renderFn;
 
-	constructor(render: renderFn) {
+	constructor(render: renderFn, ...extraAttrs: string[]) {
 		super();
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#svg = svg());
@@ -32,7 +32,7 @@ class Chart extends HTMLElement {
 		this.#parseContent();
 
 		new MutationObserver(mutations => this.#handleMutations(mutations)).observe(this, {
-			"attributeFilter": ["x", "y"],
+			"attributeFilter": extraAttrs.concat(["x", "y"]),
 			"childList": true,
 			"subtree": true
 		});
