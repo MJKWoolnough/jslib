@@ -10,9 +10,13 @@ type data = {
 	elem: ChartPoint;
 }
 
-type renderFn = (points: data[], minX: number, maxX: number, minY: number, maxY: number) => Children | [PropsObject, Children];
+type dataOrGroup = data | dataGroup;
 
-type renderOnlyChildren = (points: data[], minX: number, maxX: number, minY: number, maxY: number) => Children;
+type dataGroup = dataOrGroup[];
+
+type renderFn = (points: dataOrGroup[], minX: number, maxX: number, minY: number, maxY: number) => Children | [PropsObject, Children];
+
+type renderOnlyChildren = (points: dataOrGroup[], minX: number, maxX: number, minY: number, maxY: number) => Children;
 
 class Chart extends HTMLElement {
 	#svg: SVGSVGElement;
@@ -91,7 +95,10 @@ class AxisChart extends Chart {
 
 class ScatterChart extends AxisChart {
 	constructor() {
-		super((points, _minX, _maxX, _minY, maxY) => points.map(({x, y, size, fill, elem}) => forwardEvents(circle({"cx": x, "cy": maxY - y, "r": size, fill}), elem)));
+		const render: renderOnlyChildren = (points, minX, maxX, minY, maxY) => points.map(c => c instanceof Array ? render(c, minX, maxX, minY, maxY) : renderPoint(c, maxY)),
+		      renderPoint = ({x, y, size, fill, elem}: data, maxY: number) => forwardEvents(circle({"cx": x, "cy": maxY - y, "r": size, fill}), elem);
+
+		super(render);
 	}
 }
 
