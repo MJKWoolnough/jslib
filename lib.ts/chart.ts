@@ -43,8 +43,7 @@ class Chart extends HTMLElement {
 	}
 
 	#parseContent() {
-		const defaultFill = this.getAttribute("fill") ?? "#000",
-		      defaultSize = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, 1),
+		const [defaultFill, defaultSize] = parsePointAttrs(this, "#000", 1),
 		      [points, minX, maxX, minY, maxY] = this.#parseChildren(this.children, defaultFill, defaultSize),
 		      ret = this.#render(points, minX, maxX, minY, maxY),
 		      [params, nodes] = ret instanceof Array ? ret : [{}, ret];
@@ -60,8 +59,7 @@ class Chart extends HTMLElement {
 		    maxY = -Infinity;
 
 		for (const elem of children) {
-			const fill = elem.getAttribute("fill") ?? defaultFill,
-			      size = Math.max(parseFloat(elem.getAttribute("size") ?? "1") || 0, defaultSize);
+			const [fill, size] = parsePointAttrs(elem, defaultFill, defaultSize);
 
 			if (elem instanceof ChartPoint) {
 				const x = parseFloat(elem.getAttribute("x") ?? ""),
@@ -123,7 +121,8 @@ class ChartPoint extends HTMLElement {}
 class ChartGroup extends HTMLElement {}
 
 const forwardedEvents = ["mouseover", "mouseout", "mouseenter", "mouseleave", "mousedown", "mouseup", "click", "dblclick", "auxclick", "contextmenu", "pointerdown", "pointerup"],
-      forwardEvents = (from: Element, to: ChartPoint) => amendNode(from, forwardedEvents.reduce((evs, evt) => (evs["on" + evt] = (e: Event) => to.dispatchEvent(new MouseEvent(evt, e)), evs), {} as Record<string, Function>));
+      forwardEvents = (from: Element, to: ChartPoint) => amendNode(from, forwardedEvents.reduce((evs, evt) => (evs["on" + evt] = (e: Event) => to.dispatchEvent(new MouseEvent(evt, e)), evs), {} as Record<string, Function>)),
+      parsePointAttrs = (elem: Element, defaultFill: string, defaultSize: number) => [elem.getAttribute("fill") ?? defaultFill, Math.max(parseFloat(elem.getAttribute("fill") ?? "0"), 0) || defaultSize] as const;
 
 export const scatter = bindCustomElement("scatter-chart", ScatterChart),
 point = bindCustomElement("chart-point", ChartPoint),
