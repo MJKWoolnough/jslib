@@ -52,8 +52,8 @@ class Chart extends HTMLElement {
 	}
 
 	#parseChildren(children: HTMLCollection, defaultFill: string, defaultSize: number) {
-		let points: dataGroup = [],
-		    minX = Infinity,
+		const points: dataGroup = [];
+		let minX = Infinity,
 		    maxX = -Infinity,
 		    minY = Infinity,
 		    maxY = -Infinity;
