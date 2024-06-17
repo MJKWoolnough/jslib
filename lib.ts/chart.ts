@@ -44,20 +44,28 @@ class Chart extends HTMLElement {
 
 	#parseContent() {
 		const defaultFill = this.getAttribute("fill") ?? "#000",
-		      defaultSize = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, 1);
+		      defaultSize = Math.max(parseFloat(this.getAttribute("fill") ?? "1") || 0, 1),
+		      [points, minX, maxX, minY, maxY] = this.#parseChildren(this.children, defaultFill, defaultSize),
+		      ret = this.#render(points, minX, maxX, minY, maxY),
+		      [params, nodes] = ret instanceof Array ? ret : [{}, ret];
 
-		let points = [],
+		clearNode(this.#svg, params, nodes);
+	}
+
+	#parseChildren(children: HTMLCollection, defaultFill: string, defaultSize: number) {
+		let points: dataGroup = [],
 		    minX = Infinity,
 		    maxX = -Infinity,
 		    minY = Infinity,
 		    maxY = -Infinity;
 
-		for (const elem of this.children) {
+		for (const elem of children) {
+			const fill = elem.getAttribute("fill") ?? defaultFill,
+			      size = Math.max(parseFloat(elem.getAttribute("size") ?? "1") || 0, defaultSize);
+
 			if (elem instanceof ChartPoint) {
 				const x = parseFloat(elem.getAttribute("x") ?? ""),
-				      y = parseFloat(elem.getAttribute("y") ?? ""),
-				      fill = elem.getAttribute("fill") ?? defaultFill,
-				      size = Math.max(parseFloat(elem.getAttribute("size") ?? "1") || 0, defaultSize);
+				      y = parseFloat(elem.getAttribute("y") ?? "");
 
 				if (!isNaN(x) && !isNaN(y)) {
 					points.push({x, y, fill, size, elem});
@@ -67,13 +75,21 @@ class Chart extends HTMLElement {
 					maxY = Math.max(maxY, y+size);
 					minY = Math.min(minY, y-size);
 				}
+			} else if (elem instanceof ChartGroup) {
+				const [bpoints, bminX, bmaxX, bminY, bmaxY] = this.#parseChildren(elem.children, fill, size);
+
+				if (bpoints.length) {
+					maxX = Math.max(maxX, bmaxX);
+					minX = Math.min(minX, bminX);
+					maxY = Math.max(maxY, bmaxY);
+					minY = Math.min(minY, bminY);
+
+					points.push(bpoints);
+				}
 			}
 		}
 
-		const ret = this.#render(points, minX, maxX, minY, maxY),
-		      [params, children] = ret instanceof Array ? ret : [{}, ret];
-
-		clearNode(this.#svg, params, children);
+		return [points, minX, maxX, minY, maxY] as const;
 	}
 }
 
@@ -102,9 +118,9 @@ class ScatterChart extends AxisChart {
 	}
 }
 
-class ChartPoint extends HTMLElement { }
+class ChartPoint extends HTMLElement {}
 
-class ChartGroup extends HTMLElement { }
+class ChartGroup extends HTMLElement {}
 
 const forwardedEvents = ["mouseover", "mouseout", "mouseenter", "mouseleave", "mousedown", "mouseup", "click", "dblclick", "auxclick", "contextmenu", "pointerdown", "pointerup"],
       forwardEvents = (from: Element, to: ChartPoint) => amendNode(from, forwardedEvents.reduce((evs, evt) => (evs["on" + evt] = (e: Event) => to.dispatchEvent(new MouseEvent(evt, e)), evs), {} as Record<string, Function>));
