@@ -95,14 +95,13 @@ class ScatterChart extends AxisChart {
 	}
 }
 
-class ChartPoint extends HTMLElement {
-	constructor() {
-		super();
-	}
-}
+class ChartPoint extends HTMLElement { }
+
+class ChartGroup extends HTMLElement { }
 
 const forwardedEvents = ["mouseover", "mouseout", "mouseenter", "mouseleave", "mousedown", "mouseup", "click", "dblclick", "auxclick", "contextmenu", "pointerdown", "pointerup"],
       forwardEvents = (from: Element, to: ChartPoint) => amendNode(from, forwardedEvents.reduce((evs, evt) => (evs["on" + evt] = (e: Event) => to.dispatchEvent(new MouseEvent(evt, e)), evs), {} as Record<string, Function>));
 
 export const scatter = bindCustomElement("scatter-chart", ScatterChart),
-point = bindCustomElement("chart-point", ChartPoint);
+point = bindCustomElement("chart-point", ChartPoint),
+group = bindCustomElement("chart-group", ChartGroup);
