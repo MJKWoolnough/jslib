@@ -94,16 +94,18 @@ class Chart extends HTMLElement {
 class AxisChart extends Chart {
 	constructor(render: renderOnlyChildren) {
 		super((points, minX, maxX, minY, maxY) => {
-			const rendered = g({"transform": "translate(15 5)"}, render(points, minX, maxX, minY, maxY));
+			const rendered = g({"transform": "translate(15 5)"}, render(points, minX, maxX, minY, maxY)),
+			      stroke = this.getAttribute("axis-stroke") ?? "#000",
+			      strokeWidth = Math.max(parseInt(this.getAttribute("axis-width") ?? "1"), 0) || 1;
 
 			return [
 				{"viewBox": `0 0 ${maxX - minX + 20} ${maxY - minY + 10}`},
 				[
-					path({"d": `M15,5 v${maxY - minY} h${maxX - minX}`, "stroke": "#000", "fill": "none"}),
+					path({"d": `M15,5 v${maxY - minY} h${maxX - minX}`, stroke, "stroke-width": strokeWidth, "fill": "none"}),
 					rendered,
 				]
 			];
-		});
+		}, "axis-stroke", "axis-width");
 	}
 }
 
