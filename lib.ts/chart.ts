@@ -66,12 +66,12 @@ class Chart extends HTMLElement {
 				      y = parseFloat(elem.getAttribute("y") ?? "");
 
 				if (!isNaN(x) && !isNaN(y)) {
-					points.push({x, y, fill, size, elem});
-
 					maxX = Math.max(maxX, x+size);
 					minX = Math.min(minX, x-size);
 					maxY = Math.max(maxY, y+size);
 					minY = Math.min(minY, y-size);
+
+					points.push({x, y, fill, size, elem});
 				}
 			} else if (elem instanceof ChartGroup) {
 				const [bpoints, bminX, bmaxX, bminY, bmaxY] = this.#parseChildren(elem.children, fill, size);
