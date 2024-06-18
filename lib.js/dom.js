@@ -72,6 +72,7 @@ const childrenArr = (children, res = []) => {
 	} else if (children instanceof NodeList || children instanceof HTMLCollection) {
 		res.push(...children);
 	}
+
 	return res;
       },
       isEventListenerOrEventListenerObject = prop => prop instanceof Function || isEventListenerObject(prop),
@@ -126,10 +127,13 @@ amendNode = (element, properties, children) => {
 		}
 	} else if (node && typeof properties === "object") {
 		const isNode = isNodeAttributes(node);
+
 		for (const k in properties) {
 			const prop = properties[k];
+
 			if (isEventObject(prop) && k.startsWith("on")) {
 				const arr = prop instanceof Array;
+
 				node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.slice(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 			} else if (isNode) {
 				if (typeof prop === "boolean") {
@@ -283,6 +287,7 @@ event = (fn, options, signal) => [fn, {"once": !!(options&eventOnce), "capture":
  */
 createDocumentFragment = children => {
 	const df = document.createDocumentFragment();
+
 	if (typeof children === "string") {
 		df.textContent = children;
 	} else if (children instanceof Node) {
@@ -317,9 +322,11 @@ clearNode = (node, properties, children) => {
 	if (!node) {
 		return node;
 	}
+
 	if (properties && isChildren(properties)) {
 		properties = void (children = properties);
 	}
+
 	if (typeof children === "string") {
 		children = void (node.textContent = children);
 	} else if (children && node instanceof Element) {
@@ -335,6 +342,7 @@ clearNode = (node, properties, children) => {
 			node.lastChild.remove();
 		}
 	}
+
 	return amendNode(n, properties, children);
 },
 /**

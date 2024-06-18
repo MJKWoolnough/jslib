@@ -92,6 +92,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
 	} else if (children instanceof NodeList || children instanceof HTMLCollection) {
 		res.push(...children);
 	}
+
 	return res;
       },
       isEventListenerOrEventListenerObject = (prop: unknown): prop is EventListenerOrEventListenerObject => prop instanceof Function || isEventListenerObject(prop),
@@ -146,10 +147,13 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 		}
 	} else if (node && typeof properties === "object") {
 		const isNode = isNodeAttributes(node);
+
 		for (const k in properties) {
 			const prop = properties[k as keyof Props];
+
 			if (isEventObject(prop) && k.startsWith("on")) {
 				const arr = prop instanceof Array;
+
 				node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.slice(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 			} else if (isNode) {
 				if (typeof prop === "boolean") {
@@ -303,6 +307,7 @@ event = (fn: Function | EventListenerObject, options: number, signal?: AbortSign
  */
 createDocumentFragment = (children?: Children) => {
 	const df = document.createDocumentFragment();
+
 	if (typeof children === "string") {
 		df.textContent = children;
 	} else if (children instanceof Node) {
@@ -339,6 +344,7 @@ clearNode: mElement = (n?: Node | BoundChild, properties?: Props | Children, chi
 	if (properties && isChildren(properties)) {
 		properties = void (children = properties);
 	}
+
 	if (typeof children === "string") {
 		children = void (node.textContent = children);
 	} else if (children && node instanceof Element) {
@@ -354,6 +360,7 @@ clearNode: mElement = (n?: Node | BoundChild, properties?: Props | Children, chi
 			node.lastChild.remove();
 		}
 	}
+
 	return amendNode(n, properties, children);
 },
 /**
