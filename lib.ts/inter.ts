@@ -140,8 +140,10 @@ export class Pipe<T> {
 
 					if (!debounce) {
 						debounce = true;
+
 						queueMicrotask(() => {
 							cb(defs);
+
 							debounce = false;
 						});
 					}
@@ -172,11 +174,13 @@ export class Requester<T, U extends any[] = any[]> {
 	 */
 	request(...data: U): T {
 		const r = this.#responder;
+
 		if (r === undefined) {
 			throw new Error("no responder set");
 		} else if (r instanceof Function) {
 			return r(...data);
 		}
+
 		return r;
 	}
 	/*
@@ -212,6 +216,7 @@ export class Subscription<T> implements SubscriptionType<T> {
 		const [successSend, successReceive] = new Pipe<T>().bind(3),
 		      errPipe = new Pipe<any>(),
 		      [, errorReceive] = errPipe.bind(2);
+
 		fn(successSend, (err: any) => {
 			if (errPipe.length) {
 				errPipe.send(err);
@@ -219,6 +224,7 @@ export class Subscription<T> implements SubscriptionType<T> {
 				throw err;
 			}
 		}, (fn: () => void) => this.#cancel = fn);
+
 		this.#success = successReceive;
 		this.#error = errorReceive;
 	}
@@ -239,6 +245,7 @@ export class Subscription<T> implements SubscriptionType<T> {
 					eFn(e);
 				}
 			} : sFn as any);
+
 			this.#error(errorFn instanceof Function ? (data: any) => {
 				try {
 					sFn(errorFn(data));
@@ -247,7 +254,9 @@ export class Subscription<T> implements SubscriptionType<T> {
 				}
 			} : eFn);
 		});
+
 		s.#cancelBind = s.#cancel = this.#cancelBind ??= () => this.#cancel?.();
+
 		return s;
 	}
 	/** This method sends a signal up the Subscription chain to the cancel function set during the construction of the original Subscription. */
@@ -274,6 +283,7 @@ export class Subscription<T> implements SubscriptionType<T> {
 	finally(afterFn: () => void): Subscription<T> {
 		return this.when((data: T) => (afterFn(), data), (error: any) => {
 			afterFn();
+
 			throw error;
 		});
 	}
@@ -287,16 +297,21 @@ export class Subscription<T> implements SubscriptionType<T> {
 	splitCancel(cancelOnEmpty: boolean = false): () => Subscription<T> {
 		const [successSend, successReceive, successRemove] = new Pipe<T>().bind(),
 		      [errorSend, errorReceive, errorRemove] = new Pipe<any>().bind();
+
 		let n = 0;
+
 		this.when(successSend, errorSend);
+
 		return () => new Subscription<T>((sFn, eFn, cancelFn) => {
+			n++;
+
 			successReceive(sFn);
 			errorReceive(eFn);
-			n++;
 			cancelFn(() => {
 				successRemove(sFn);
 				errorRemove(eFn);
 				cancelFn(() => {});
+
 				if (!--n && cancelOnEmpty) {
 					this.cancel();
 				}
@@ -315,6 +330,7 @@ export class Subscription<T> implements SubscriptionType<T> {
 			for (const s of subs) {
 				s.when(success, error);
 			}
+
 			cancel(() => {
 				for(const s of subs) {
 					s.cancel();
@@ -349,8 +365,10 @@ export class Subscription<T> implements SubscriptionType<T> {
 
 					if (!debounce) {
 						debounce = true;
+
 						queueMicrotask(() => {
 							sFn(defs);
+
 							debounce = false;
 						});
 					}
@@ -392,11 +410,13 @@ export class Subscription<T> implements SubscriptionType<T> {
 		let successFn: (data: T) => void,
 		    errorFn: (data: any) => void,
 		    cancelFn: (data: () => void) => void;
+
 		const s = new Subscription<T>((sFn, eFn, cFn) => {
 			successFn = sFn;
 			errorFn = eFn;
 			cancelFn = cFn;
-		});
+		      });
+
 		return [s, bindmask&1 ? successFn! : undefined, bindmask&2 ? errorFn! : undefined, bindmask&4 ? cancelFn! : undefined];
 	}
 }
@@ -411,16 +431,19 @@ export class WaitGroup {
 	/** This method adds to the number of registered tasks. */
 	add() {
 		this.#waits++;
+
 		this.#updateWG();
 	}
 	/** This method adds to the number of complete tasks. */
 	done() {
 		this.#done++;
+
 		this.#updateWG();
 	}
 	/** This method adds to the number of failed tasks. */
 	error() {
 		this.#errors++;
+
 		this.#updateWG();
 	}
 	/**
@@ -432,6 +455,7 @@ export class WaitGroup {
 	 */
 	onUpdate(fn: (wi: WaitInfo) => void): () => void {
 		this.#update.receive(fn);
+
 		return () => this.#update.remove(fn);
 	}
 	/**
@@ -443,6 +467,7 @@ export class WaitGroup {
 	 */
 	onComplete(fn: (wi: WaitInfo) => void): () => void {
 		this.#complete.receive(fn);
+
 		return () => this.#complete.remove(fn);
 	}
 	#updateWG() {
@@ -450,8 +475,10 @@ export class WaitGroup {
 			"waits": this.#waits,
 			"done": this.#done,
 			"errors": this.#errors
-		};
+		      };
+
 		this.#update.send(data);
+
 		if (this.#done + this.#errors === this.#waits) {
 			this.#complete.send(data);
 		}
@@ -480,7 +507,9 @@ export class Pickup<T> {
 	 */
 	get() {
 		const d = this.#data;
+
 		this.#data = undefined;
+
 		return d;
 	}
 }

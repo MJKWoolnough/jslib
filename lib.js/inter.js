@@ -106,8 +106,10 @@ export class Pipe {
 
 					if (!debounce) {
 						debounce = true;
+
 						queueMicrotask(() => {
 							cb(defs);
+
 							debounce = false;
 						});
 					}
@@ -139,11 +141,13 @@ export class Requester {
 	 */
 	request(...data) {
 		const r = this.#responder;
+
 		if (r === undefined) {
 			throw new Error("no responder set");
 		} else if (r instanceof Function) {
 			return r(...data);
 		}
+
 		return r;
 	}
 	/*
@@ -179,6 +183,7 @@ export class Subscription {
 		const [successSend, successReceive] = new Pipe().bind(3),
 		      errPipe = new Pipe(),
 		      [, errorReceive] = errPipe.bind(2);
+
 		fn(successSend, err => {
 			if (errPipe.length) {
 				errPipe.send(err);
@@ -186,6 +191,7 @@ export class Subscription {
 				throw err;
 			}
 		}, fn => this.#cancel = fn);
+
 		this.#success = successReceive;
 		this.#error = errorReceive;
 	}
@@ -206,6 +212,7 @@ export class Subscription {
 					eFn(e);
 				}
 			} : sFn);
+
 			this.#error(errorFn instanceof Function ? data => {
 				try {
 					sFn(errorFn(data));
@@ -214,7 +221,9 @@ export class Subscription {
 				}
 			} : eFn);
 		});
+
 		s.#cancelBind = s.#cancel = this.#cancelBind ??= () => this.#cancel?.();
+
 		return s;
 	}
 	/** This method sends a signal up the Subscription chain to the cancel function set during the construction of the original Subscription. */
@@ -241,6 +250,7 @@ export class Subscription {
 	finally(afterFn) {
 		return this.when(data => (afterFn(), data), error => {
 			afterFn();
+
 			throw error;
 		});
 	}
@@ -254,16 +264,21 @@ export class Subscription {
 	splitCancel(cancelOnEmpty = false) {
 		const [successSend, successReceive, successRemove] = new Pipe().bind(),
 		      [errorSend, errorReceive, errorRemove] = new Pipe().bind();
+
 		let n = 0;
+
 		this.when(successSend, errorSend);
+
 		return () => new Subscription((sFn, eFn, cancelFn) => {
+			n++;
+
 			successReceive(sFn);
 			errorReceive(eFn);
-			n++;
 			cancelFn(() => {
 				successRemove(sFn);
 				errorRemove(eFn);
 				cancelFn(() => {});
+
 				if (!--n && cancelOnEmpty) {
 					this.cancel();
 				}
@@ -282,6 +297,7 @@ export class Subscription {
 			for (const s of subs) {
 				s.when(success, error);
 			}
+
 			cancel(() => {
 				for(const s of subs) {
 					s.cancel();
@@ -316,8 +332,10 @@ export class Subscription {
 
 					if (!debounce) {
 						debounce = true;
+
 						queueMicrotask(() => {
 							sFn(defs);
+
 							debounce = false;
 						});
 					}
@@ -352,11 +370,13 @@ export class Subscription {
 		let successFn,
 		    errorFn,
 		    cancelFn;
+
 		const s = new Subscription((sFn, eFn, cFn) => {
 			successFn = sFn;
 			errorFn = eFn;
 			cancelFn = cFn;
-		});
+		      });
+
 		return [s, bindmask&1 ? successFn : undefined, bindmask&2 ? errorFn : undefined, bindmask&4 ? cancelFn : undefined];
 	}
 }
@@ -371,16 +391,19 @@ export class WaitGroup {
 	/** This method adds to the number of registered tasks. */
 	add() {
 		this.#waits++;
+
 		this.#updateWG();
 	}
 	/** This method adds to the number of complete tasks. */
 	done() {
 		this.#done++;
+
 		this.#updateWG();
 	}
 	/** This method adds to the number of failed tasks. */
 	error() {
 		this.#errors++;
+
 		this.#updateWG();
 	}
 	/**
@@ -392,6 +415,7 @@ export class WaitGroup {
 	 */
 	onUpdate(fn) {
 		this.#update.receive(fn);
+
 		return () => this.#update.remove(fn);
 	}
 	/**
@@ -403,6 +427,7 @@ export class WaitGroup {
 	 */
 	onComplete(fn) {
 		this.#complete.receive(fn);
+
 		return () => this.#complete.remove(fn);
 	}
 	#updateWG() {
@@ -410,8 +435,10 @@ export class WaitGroup {
 			"waits": this.#waits,
 			"done": this.#done,
 			"errors": this.#errors
-		};
+		      };
+
 		this.#update.send(data);
+
 		if (this.#done + this.#errors === this.#waits) {
 			this.#complete.send(data);
 		}
@@ -440,7 +467,9 @@ export class Pickup {
 	 */
 	get() {
 		const d = this.#data;
+
 		this.#data = undefined;
+
 		return d;
 	}
 }
