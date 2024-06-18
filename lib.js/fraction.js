@@ -42,6 +42,7 @@ export default class Fraction {
 		if (this.#denominator === num.#denominator) {
 			return new Fraction(this.#numerator + num.#numerator, this.#denominator);
 		}
+
 		return new Fraction(this.#numerator * num.#denominator + this.#denominator * num.#numerator, this.#denominator * num.#denominator);
 	}
 	/**
@@ -55,6 +56,7 @@ export default class Fraction {
 		if (this.#denominator === num.#denominator) {
 			return new Fraction(this.#numerator - num.#numerator, this.#denominator);
 		}
+
 		return new Fraction(this.#numerator * num.#denominator - this.#denominator * num.#numerator, this.#denominator * num.#denominator);
 	}
 	/**
@@ -96,7 +98,9 @@ export default class Fraction {
 		if (!this.#denominator || !num.#denominator) {
 			return NaN;
 		}
+
 		const d = this.#numerator * num.#denominator - this.#denominator * num.#numerator;
+
 		return d < 0n ? -1 : d > 0n ? 1: 0;
 	}
 	/**
@@ -134,9 +138,11 @@ export default class Fraction {
 		} else if (this.#numerator === this.#denominator) {
 			return Fraction.one;
 		}
+
 		const a = this.#numerator < 0n ? -this.#numerator : this.#numerator,
 		      b = this.#denominator,
 		      g = a > b ? gcd(a, b) : gcd(b, a);
+
 		return new Fraction(this.#numerator / g, b / g);
 	}
 	/**
@@ -156,6 +162,7 @@ export default class Fraction {
 		if (!this.#denominator) {
 			return NaN;
 		}
+
 		return Number(10000n * this.#numerator / this.#denominator) / 10000;
 	}
 	/**
