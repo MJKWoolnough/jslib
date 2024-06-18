@@ -38,18 +38,23 @@ const once = {"once": true},
  */
 export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
+
 	xh.open(props["method"] ?? "GET", url);
+
 	if (props.hasOwnProperty("headers") && typeof props["headers"] === "object") {
 		for (const [header, value] of Object.entries(props["headers"])) {
 			xh.setRequestHeader(header, value);
 		}
 	}
+
 	if (props["type"] !== undefined) {
 		xh.setRequestHeader("Content-Type", props["type"]);
 	}
+
 	if (props["user"] || props["password"]) {
 		xh.setRequestHeader("Authorization", "Basic " + btoa(`${props["user"] ?? ""}:${props["password"] ?? ""}`));
 	}
+
 	xh.addEventListener("readystatechange", () => {
 		if (xh.readyState === 4) {
 			if (xh.status >= 200 && xh.status < 300) {
@@ -63,19 +68,24 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 			}
 		}
 	});
+
 	if (props["onuploadprogress"]) {
 		xh.upload.addEventListener("progress", props["onuploadprogress"]);
 	}
+
 	if (props["ondownloadprogress"]) {
 		xh.addEventListener("progress", props["ondownloadprogress"]);
 	}
+
 	switch (props["response"]) {
 	case "text":
 		xh.overrideMimeType("text/plain");
+
 		break;
 	case "xml":
 		xh.overrideMimeType("text/xml");
 		xh.responseType = "document";
+
 		break;
 	case "json":
 		xh.overrideMimeType("application/json");
@@ -84,13 +94,16 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 	case "arraybuffer":
 		xh.responseType = props["response"];
 	}
+
 	if (props["signal"]) {
 		const signal = props["signal"];
+
 		signal.addEventListener("abort", () => {
 			xh.abort();
 			errorFn(signal.reason instanceof Error ? signal.reason : new Error(signal.reason));
 		}, once);
 	}
+
 	xh.send(props["data"] ?? null);
 }),
 /**
@@ -102,6 +115,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
  */
 WS = url => new Promise((successFn, errorFn) => {
 	const ws = new WSConn(url);
+
 	ws.addEventListener("open", () => {
 		ws.removeEventListener("error", errorFn);
 		successFn(ws);
@@ -139,14 +153,17 @@ export class WSConn extends WebSocket {
 			const w = this,
 			      ac = new AbortController(),
 			      o = {"signal": ac.signal};
+
 			w.addEventListener("message", sFn, o);
 			w.addEventListener("error", e => eFn(e.error), o);
 			w.addEventListener("close", e => {
 				const err = new Error(e.reason);
+
 				err.name = "CloseError";
 				eFn(err);
 				ac.abort();
 			}, o);
+
 			cFn(() => ac.abort());
 		}).when(ssFn, eeFn);
 	}
