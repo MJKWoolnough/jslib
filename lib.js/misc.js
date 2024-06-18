@@ -64,6 +64,7 @@ setAndReturn = (m, k, v) => {
  */
 pushAndReturn = (a, v) => {
 	a.push(v);
+
 	return v;
 },
 /**
@@ -77,6 +78,7 @@ pushAndReturn = (a, v) => {
  */
 addAndReturn = (s, v) => {
 	s.add(v);
+
 	return v;
 },
 /**
@@ -88,6 +90,7 @@ addAndReturn = (s, v) => {
  */
 queue = (() => {
 	let p = Promise.resolve();
+
 	return fn => p = p.finally(fn);
 })(),
 /**
@@ -102,10 +105,12 @@ queue = (() => {
 autoFocus = (node, inputSelect = true) => {
 	window.setTimeout(() => {
 		node.focus();
+
 		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
 			node.select();
 		}
 	});
+
 	return node;
 },
 /**
@@ -117,7 +122,9 @@ autoFocus = (node, inputSelect = true) => {
  */
 text2DOM = text => {
 	const t = document.createElement("template");
+
 	t.innerHTML = text;
+
 	return t.content;
 },
 /** A function to sort strings. */

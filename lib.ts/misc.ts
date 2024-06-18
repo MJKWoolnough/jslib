@@ -51,6 +51,7 @@ mod = (n: number, m: number) => ((n % m) + m) % m,
  */
 setAndReturn = <K, V>(m: {set: (k: K, v: V) => void}, k: K, v: V) => {
 	m.set(k, v);
+
 	return v;
 },
 /**
@@ -64,6 +65,7 @@ setAndReturn = <K, V>(m: {set: (k: K, v: V) => void}, k: K, v: V) => {
  */
 pushAndReturn = <V>(a: {push: (m: V) => void}, v: V) => {
 	a.push(v);
+
 	return v;
 },
 /**
@@ -77,6 +79,7 @@ pushAndReturn = <V>(a: {push: (m: V) => void}, v: V) => {
  */
 addAndReturn = <V>(s: {add: (m: V) => void}, v: V) => {
 	s.add(v);
+
 	return v;
 },
 /**
@@ -88,6 +91,7 @@ addAndReturn = <V>(s: {add: (m: V) => void}, v: V) => {
  */
 queue = (() => {
 	let p = Promise.resolve();
+
 	return (fn: () => Promise<any>) => p = p.finally(fn);
 })(),
 /**
@@ -102,10 +106,12 @@ queue = (() => {
 autoFocus = <T extends {focus(): void}>(node: T, inputSelect = true) => {
 	window.setTimeout(() => {
 		node.focus();
+
 		if ((node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) && inputSelect) {
 			node.select();
 		}
 	});
+
 	return node;
 },
 /**
@@ -117,7 +123,9 @@ autoFocus = <T extends {focus(): void}>(node: T, inputSelect = true) => {
  */
 text2DOM = (text: string) => {
 	const t = document.createElement("template");
+
 	t.innerHTML = text;
+
 	return t.content;
 },
 /** A function to sort strings. */
