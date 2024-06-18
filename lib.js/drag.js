@@ -53,7 +53,9 @@ export class DragTransfer {
 	 */
 	register(t) {
 		const key = this.#nextID++ + "";
+
 		this.#data.set(key, t);
+
 		return key;
 	}
 	/**
@@ -67,7 +69,9 @@ export class DragTransfer {
 	 */
 	get(e) {
 		e.preventDefault();
+
 		const t = this.#data.get(e.dataTransfer?.getData(this.#format) || this.#last);
+
 		return t instanceof Function ? t() : t?.transfer();
 	}
 	/**
@@ -81,7 +85,9 @@ export class DragTransfer {
 	 */
 	set(e, key, icon, xOffset = -5, yOffset = -5) {
 		this.#last = key;
+
 		e.dataTransfer?.setData(this.#format, key);
+
 		if (icon) {
 			e.dataTransfer?.setDragImage(icon, xOffset, yOffset);
 		}
@@ -93,6 +99,7 @@ export class DragTransfer {
 	 */
 	deregister(key) {
 		this.#data.delete(key);
+
 		if (this.#last === key) {
 			this.#last = "";
 		}
@@ -136,12 +143,15 @@ export class DragFiles {
 	 */
 	asForm(e, name) {
 		const f = new FormData();
+
 		if (e.dataTransfer) {
 			e.preventDefault();
+
 			for (const file of e.dataTransfer.files) {
 				f.append(name, file);
 			}
 		}
+
 		return f;
 	}
 	/**
@@ -160,8 +170,10 @@ export class DragFiles {
 					return false;
 				}
 			}
+
 			return true;
 		}
+
 		return false;
 	}
 }
@@ -179,11 +191,14 @@ export const setDragEffect = effects => e => {
 			for (const key of effects[effect] ?? []) {
 				if (key.is(e)) {
 					e.preventDefault();
+					
 					e.dataTransfer.dropEffect = effect;
+
 					return true;
 				}
 			}
 		}
 	}
+
 	return false;
 };

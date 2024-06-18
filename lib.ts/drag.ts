@@ -55,7 +55,9 @@ export class DragTransfer<T = any> {
 	 */
 	register(t: Transfer<T> | TransferFunc<T>): string {
 		const key = this.#nextID++ + "";
+
 		this.#data.set(key, t);
+
 		return key;
 	}
 	/**
@@ -69,7 +71,9 @@ export class DragTransfer<T = any> {
 	 */
 	get(e: DragEvent): T | undefined {
 		e.preventDefault();
+
 		const t = this.#data.get(e.dataTransfer?.getData(this.#format) || this.#last);
+
 		return t instanceof Function ? t() : t?.transfer();
 	}
 	/**
@@ -83,7 +87,9 @@ export class DragTransfer<T = any> {
 	 */
 	set(e: DragEvent, key: string, icon?: HTMLDivElement, xOffset: number = -5, yOffset: number = -5) {
 		this.#last = key;
+
 		e.dataTransfer?.setData(this.#format, key);
+
 		if (icon) {
 			e.dataTransfer?.setDragImage(icon, xOffset, yOffset);
 		}
@@ -95,6 +101,7 @@ export class DragTransfer<T = any> {
 	 */
 	deregister(key: string) {
 		this.#data.delete(key);
+
 		if (this.#last === key) {
 			this.#last = "";
 		}
@@ -138,12 +145,15 @@ export class DragFiles {
 	 */
 	asForm(e: DragEvent, name: string): FormData {
 		const f = new FormData();
+
 		if (e.dataTransfer) {
 			e.preventDefault();
+
 			for (const file of e.dataTransfer.files) {
 				f.append(name, file);
 			}
 		}
+
 		return f;
 	}
 	/**
@@ -162,8 +172,10 @@ export class DragFiles {
 					return false;
 				}
 			}
+
 			return true;
 		}
+
 		return false;
 	}
 }
@@ -181,11 +193,14 @@ export const setDragEffect = (effects: Partial<Record<Effect, (DragTransfer | Dr
 			for (const key of effects[effect as Effect] ?? []) {
 				if (key.is(e)) {
 					e.preventDefault();
+
 					e.dataTransfer.dropEffect = effect as Effect;
+
 					return true;
 				}
 			}
 		}
 	}
+
 	return false;
 };
