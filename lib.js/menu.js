@@ -63,6 +63,7 @@ export class MenuElement extends HTMLElement {
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot()).adoptedStyleSheets = menuStyle;
 		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": e => {
 			const da = document.activeElement;
+
 			switch (e.key) {
 			case "Escape":
 				if (!(this.parentNode instanceof SubMenuElement)) {
@@ -72,23 +73,28 @@ export class MenuElement extends HTMLElement {
 				if (this.parentNode instanceof SubMenuElement) {
 					this.parentNode[itemElement]()?.focus();
 				}
+
 				break;
 			case "Enter":
 				if (da instanceof ItemElement) {
 					da.select();
 				}
+
 				break;
 			case "ArrowRight":
 				const s = da?.parentNode;
+
 				if (da instanceof ItemElement && s instanceof SubMenuElement) {
 					s.select();
 					setTimeout(() => {
 						const m = s[menuElement]();
+
 						if (m) {
 							m.#s.assignedNodes()[0]?.focus();
 						}
 					});
 				}
+
 				break;
 			case "Tab":
 				e.preventDefault();
@@ -96,17 +102,23 @@ export class MenuElement extends HTMLElement {
 			case "ArrowUp":
 				const an = this.#s.assignedNodes().filter(e => !e.hasAttribute("disabled")),
 				      pos = an.findIndex(e => e.contains(da));
+
 				an.at(e.key === "ArrowUp" ? pos < 0 ? pos : pos - 1 : (pos + 1) % an.length)?.focus();
+
 				break;
 			default:
 				const ans = this.#s.assignedNodes().filter(i => i.getAttribute("key") === e.key && !i.hasAttribute("disabled"));
+
 				ans.at((ans.findIndex(e => e.contains(da)) + 1) % ans.length)?.focus();
+
 				if (ans.length === 1) {
 					ans[0]?.select();
 				}
 			}
+
 			e.stopPropagation();
 		}});
+
 		new MutationObserver(() => this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement))).observe(this, {"childList": true});
 	}
 	[blur]() {
@@ -127,12 +139,15 @@ export class MenuElement extends HTMLElement {
 					this.remove();
 				}
 			}, eventCapture)});
+
 			const {offsetParent} = this,
 			      x = parseInt(this.getAttribute("x") ?? "0") || 0,
 			      y = parseInt(this.getAttribute("y") ?? "0") || 0;
+
 			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-height": offsetParent.clientHeight + "px", "visibility": "hidden"}});
 			setTimeout(() => {
 				const width = Math.max(this.offsetWidth, this.scrollWidth) * 2 - this.clientWidth;
+
 				amendNode(this, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(x + width < offsetParent.clientWidth ? x : x - width, 0) + "px", "top": Math.max(y + this.offsetHeight < offsetParent.clientHeight ? y : y - this.offsetHeight, 0) + "px"}});
 				this.focus();
 			});
@@ -141,8 +156,10 @@ export class MenuElement extends HTMLElement {
 	disconnectedCallback() {
 		if (this.#c) {
 			amendNode(window, {"onmousedown": event(this.#c, eventCapture | eventRemove)});
+
 			this.#c = undefined;
 		}
+
 		for (const c of this.children) {
 			if (c instanceof SubMenuElement) {
 				c[disconnect]();
@@ -209,14 +226,17 @@ export class SubMenuElement extends HTMLElement {
 		new MutationObserver(() => {
 			this.#i = null;
 			this.#m = null;
+
 			for (const c of this.children) {
 				if (!this.#i && c instanceof ItemElement) {
 					this.#s.assign(this.#i = c);
+
 					if (this.#m) {
 						return;
 					}
 				} else if (!this.#m && c instanceof MenuElement) {
 					this.#m = c;
+
 					if (this.#i) {
 						return;
 					}
@@ -237,11 +257,13 @@ export class SubMenuElement extends HTMLElement {
 				let offsetParent = this,
 				    xShift = 0,
 				    yShift = 0;
+
 				while (offsetParent instanceof MenuElement || offsetParent instanceof SubMenuElement) {
 					xShift += offsetParent.offsetLeft - offsetParent.clientWidth + offsetParent.offsetWidth;
 					yShift += offsetParent.offsetTop - offsetParent.clientHeight + offsetParent.offsetHeight;
 					offsetParent = offsetParent.offsetParent;
 				}
+
 				amendNode(this, {"open": true});
 				this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-height": offsetParent.clientHeight + "px", "visibility": "hidden"}}));
 				setTimeout(() => {
@@ -277,6 +299,7 @@ export class SubMenuElement extends HTMLElement {
 				c[disconnect]();
 			}
 		}
+
 		amendNode(this, {"open": false});
 		this.#p.assign();
 	}
