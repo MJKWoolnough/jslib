@@ -36,6 +36,7 @@ export default class CSS extends CSSStyleSheet {
 	 */
 	constructor(prefix = "", idStart = 0) {
 		super();
+
 		this.#idPrefix = idRE.test(prefix) ? prefix : "_";
 		this.#id = idStart;
 	}
@@ -57,6 +58,7 @@ export default class CSS extends CSSStyleSheet {
 				this.insertRule(rule, this.cssRules.length);
 			}
 		}
+
 		return this;
 	}
 	/**
@@ -70,17 +72,20 @@ export default class CSS extends CSSStyleSheet {
 	at(at, defs) {
 		if (defs) {
 			let data = "";
+
 			for (const def in defs) {
 				for (const rule of compileRule(def, defs[def])) {
 					data += rule;
 				}
 			}
+
 			if (data) {
 				this.insertRule(at + "{" + data + "}", this.cssRules.length);
 			}
 		} else {
 			this.insertRule(at, this.cssRules.length);
 		}
+
 		return this;
 	}
 	/**
@@ -108,9 +113,11 @@ export default class CSS extends CSSStyleSheet {
 	 */
 	toString() {
 		let r = "";
+
 		for (const rule of this.cssRules) {
 			r += rule.cssText;
 		}
+
 		return r;
 	}
 	/**
@@ -120,8 +127,10 @@ export default class CSS extends CSSStyleSheet {
 	 */
 	render() {
 		const style = document.createElement("style");
+
 		style.setAttribute("type", "text/css");
 		style.textContent = this + "";
+
 		return style;
 	}
 }
@@ -129,12 +138,16 @@ export default class CSS extends CSSStyleSheet {
 const split = selector => {
 	const stack = [],
 	      parts = [];
+
 	let pos = 0;
+
 	for (let i = 0; i < selector.length; i++) {
 		const c = selector.charAt(i);
+
 		if (c === '"' || c === "'") {
 			for (i++; i < selector.length; i++) {
 				const d = selector.charAt(i);
+
 				if (d === "\\") {
 					i++;
 				} else if (d === c) {
@@ -143,6 +156,7 @@ const split = selector => {
 			}
 		} else if (c === "," && !stack.length) {
 			parts.push(selector.slice(pos, i));
+
 			pos = i + 1;
 		} else if (c === stack.at(-1)) {
 			stack.pop();
@@ -152,35 +166,45 @@ const split = selector => {
 			stack.push(")");
 		}
 	}
+
 	parts.push(selector.slice(pos, selector.length));
+
 	return parts;
       },
       join = (selector, add) => {
 	const addParts = split(add);
+
 	let out = "";
+
 	for (const part of split(selector)) {
 		for (const addPart of addParts) {
 			out += (out.length ? "," : "") + part + addPart;
 		}
 	}
+
 	return out;
       },
       isDef = v => Object.getPrototypeOf(v) === Object.prototype,
       idRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
       compileRule = (selector, def) => {
 	const rules = [];
+
 	let data = "";
+
 	for (const key in def) {
 		const v = def[key];
+
 		if (isDef(v)) {
 			rules.push(...compileRule(join(selector, key), v));
 		} else {
 			data += `${key}:${v};`;
 		}
 	}
+
 	if (data) {
 		rules.unshift(selector + "{" + data + "}");
 	}
+
 	return rules;
       },
       defaultCSS = new CSS();
@@ -217,8 +241,10 @@ render = defaultCSS.render.bind(defaultCSS),
 mixin = (base, add) => {
 	for (const key in add) {
 		const v = add[key];
+
 		if (isDef(v)) {
 			const w = base[key] ??= {};
+
 			if (isDef(w)) {
 				mixin(w, v);
 			}
@@ -226,5 +252,6 @@ mixin = (base, add) => {
 			base[key] = v;
 		}
 	}
+
 	return base;
 };
