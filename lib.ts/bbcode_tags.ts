@@ -16,17 +16,21 @@ import {a, audio as aaudio, blockquote, br, div, fieldset, h1 as ah1, h2 as ah2,
 
 const simple = (fn: DOMBind<Node>, style?: string) => (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		amendNode(n, process(fn({style}), t, p, tk.tagName));
 	}
       },
       textContents = (t: Tokeniser, endTag: string) => {
 	let contents = "";
+
 	while (true) {
 		const end = t.next().value;
+
 		if (!end || isCloseTag(end) && end.tagName === endTag) {
 			return contents;
 		}
+
 		contents += isString(end) ? end : end.fullText;
 	}
       };
@@ -59,6 +63,7 @@ highlight = simple(mark),
  */
 colour = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		if (tk.attr) {
 			amendNode(n, process(span({"style": {"color": tk.attr}}), t, p, tk.tagName));
@@ -74,8 +79,10 @@ color = colour,
 /** Font Size Tag, accepts an integer between 1 and 100 (inclusive) as a font size. */
 size = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		const size = tk.attr ? parseInt(tk.attr) : 0;
+
 		if (size > 0 && size <= 100) {
 			amendNode(n, process(span({"style": {"font-size": (size/10) + "em"}}), t, p, tk.tagName));
 		} else {
@@ -88,6 +95,7 @@ size = (n: Node, t: Tokeniser, p: Parsers) => {
  */
 font = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		if (tk.attr) {
 			amendNode(n, process(span({"style": {"font-family": tk.attr}}), t, p, tk.tagName));
@@ -113,6 +121,7 @@ hr = (n: Node) => amendNode(n, ahr()),
 /** Link Tag, will accepts a URL as an attribute. If no attribute is specified, it will attempt to parse the contents as a URL. */
 url = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		if (tk.attr) {
 			try {
@@ -123,14 +132,18 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 		} else {
 			const u = textContents(t, tk.tagName),
 			      endTag = t.next(true).value;
+
 			if (u && endTag && isCloseTag(endTag)) {
 				try {
 					amendNode(n, a({"href": (new URL(u, window.location.href)).href}, u));
+
 					return;
 				} catch {}
 			}
+
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, u);
+
 			if (endTag && isCloseTag(endTag)) {
 				p[textSymbol](n, endTag.fullText);
 			}
@@ -140,14 +153,17 @@ url = (n: Node, t: Tokeniser, p: Parsers) => {
 /** Audio Tag, will attempt to process the contents as a URL. */
 audio = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		const src = textContents(t, tk.tagName),
 		      endTag = t.next(true).value;
+
 		if (!endTag || !isCloseTag(endTag)) {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
 		} else if (!src) {
 			p[textSymbol](n, tk.fullText);
+
 			if (endTag && isCloseTag(endTag)) {
 				p[textSymbol](n, endTag.fullText);
 			}
@@ -173,53 +189,70 @@ audio = (n: Node, t: Tokeniser, p: Parsers) => {
  */
 img = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		let src = textContents(t, tk.tagName);
+
 		const endTag = t.next(true).value;
+
 		if (!endTag || !isCloseTag(endTag)) {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
+
 			return;
 		}
+
 		if (!src) {
 			p[textSymbol](n, tk.fullText);
+
 			if (endTag && isCloseTag(endTag)) {
 				p[textSymbol](n, endTag.fullText);
 			}
+
 			return;
 		}
+
 		try {
 			src = (new URL(src, window.location.href)).href;
 		} catch {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
 			p[textSymbol](n, endTag.fullText);
+
 			return;
 		}
+
 		const params: Record<string, string> = {src};
+
 		if (tk.attr) {
 			const [strWidth, strHeight] = tk.attr.split('x');
+
 			if (strWidth) {
 				const percent = strWidth.endsWith('%') ? '%' : '',
 				      width = parseInt(percent ? strWidth.slice(0, -1) : strWidth);
+
 				if (!isNaN(width)) {
 					params["width"] = width + percent;
 				}
 			}
+
 			if (strHeight) {
 				const percent = strHeight.endsWith('%') ? '%' : '',
 				      height = parseInt(percent ? strHeight.slice(0, -1) : strHeight);
+
 				if (!isNaN(height)) {
 					params["height"] = height + percent;
 				}
 			}
 		}
+
 		amendNode(n, aimg(params));
 	}
 },
 /** Pre-formatted Code Tag */
 code = (n: Node, t: Tokeniser) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		amendNode(n, pre(textContents(t, tk.tagName)));
 	}
@@ -245,16 +278,20 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 		      tableBody: HTMLTableRowElement[] = [],
 		      tableFooter: HTMLTableRowElement[] = [],
 		      {tagName} = tk;
+
 		let state = 0, // 1 - tr, 2 - thead, 4 -> tbody, 8 -> tfoot
 		    hasHeader = false,
 		    hasBody = false,
 		    hasFooter = false,
 		    currRow: HTMLTableRowElement | null = null;
+
 		while (true) {
 			const tk = t.next().value;
+
 			if (!tk) {
 				break;
 			}
+
 			if (isOpenTag(tk)) {
 				switch (tk.tagName) {
 				case "thead":
@@ -262,38 +299,47 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 						hasHeader = true;
 						state = 2;
 					}
+
 					break;
 				case "tbody":
 					if (!hasBody) {
 						hasBody = true;
 						state = 4;
 					}
+
 					break;
 				case "tfoot":
 					if (!hasFooter) {
 						hasFooter = true;
 						state = 8;
 					}
+
 					break;
 				case "tr":
 					if ((state&1) === 1) {
 						break;
 					}
+
 					if (state === 0) {
 						hasBody = true;
 						state = 4;
 					}
+
 					currRow = tr();
+
 					switch (state) {
 					case 2:
 						tableHeader.push(currRow);
+
 						break;
 					case 4:
 						tableBody.push(currRow);
+
 						break;
 					case 8:
 						tableFooter.push(currRow);
 					}
+
 					break;
 				case "th":
 				case "td":
@@ -310,6 +356,7 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 							hasFooter ? tfoot(tableFooter) : []
 						]));
 					}
+
 					return;
 				} else if ((state&1) === 1 && tk.tagName === "tr") {
 					state ^= 1;
@@ -320,11 +367,13 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 						if (tk.tagName === "thead") {
 							state = 0;
 						}
+
 						break;
 					case 4:
 						if (tk.tagName === "tbody") {
 							state = 0;
 						}
+
 						break;
 					case 8:
 						if (tk.tagName === "tfoot") {
@@ -339,19 +388,23 @@ table = (n: Node, t: Tokeniser, p: Parsers) => {
 /** Quotation Tag, will accept attribution as a param. */
 quote = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(1).value;
+
 	if (tk && isOpenTag(tk)) {
 		amendNode(n, fieldset([
 			tk.attr ? legend(tk.attr) : [],
 			process(blockquote(), t, p, tk.tagName)
 		]));
+
 		t.next(1);
 	}
 },
 /** The *list* tag creates a new list. The attribute determines what type of list, with no attribute resulting in an HTMLUListElement, and any of `a`, `A`, `i`, `I`, and `1` resulting in an HTMLOListElement with the type set to the specified value. Any children of the list should be wrapped in `[*] [/*]` tags, though the closing tag can be omitted. */
 list = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		let type = "";
+
 		switch (tk.attr) {
 		case 'a':
 		case 'A':
@@ -360,35 +413,47 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 		case '1':
 			type = tk.attr;
 		}
+
 		const l = type === "" ? ul() : ol({type}),
 			{tagName} = tk;
+
 		let currItem: HTMLLIElement | null = null;
+
 		while (true) {
 			const tk = t.next().value;
+
 			if (!tk || (isCloseTag(tk) && tk.tagName === tagName)) {
 				break;
 			}
+
 			if (isString(tk)) {
 				let pos = 0;
+
 				while (pos < tk.length) {
 					const open = tk.indexOf("[*]", pos),
 					      close = tk.indexOf("[/*]", pos);
+
 					if (open < close && open !== -1 || close === -1 && open !== -1) {
 						if (currItem) {
 							p[textSymbol](currItem, tk.slice(pos, open));
 						}
+
 						amendNode(l, currItem = li());
+
 						pos = open + 3;
 					} else if (close < open && close !== -1 || open === -1 && close !== -1) {
 						if (currItem) {
 							p[textSymbol](currItem, tk.slice(pos, close));
+
 							currItem = null;
 						}
+
 						pos = close + 4;
 					} else {
 						if (currItem) {
 							p[textSymbol](currItem, tk.slice(pos));
 						}
+
 						break;
 					}
 				}
@@ -400,6 +465,7 @@ list = (n: Node, t: Tokeniser, p: Parsers) => {
 				}
 			}
 		}
+
 		amendNode(n, l);
 	}
 },
@@ -441,6 +507,7 @@ all = Object.freeze({
 /** A special tag processor that ignores the tag and continues processing the inner text. */
 none = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		process(n, t, p, tk.tagName);
 	}
