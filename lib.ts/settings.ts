@@ -38,16 +38,19 @@ abstract class Setting<T> {
 	set(v: T): this {
 		const old = this.#value,
 		      sv = this[s](this.#value = v);
+
 		if (this.#value !== old || this.#value instanceof Object) {
 			if (sv === null) {
 				window.localStorage.removeItem(this.#name);
 			} else {
 				window.localStorage.setItem(this.#name, sv);
 			}
+
 			for (const fn of this.#fns) {
 				fn(v);
 			}
 		}
+
 		return this;
 	}
 	/**
@@ -57,6 +60,7 @@ abstract class Setting<T> {
 	 */
 	remove(): this {
 		window.localStorage.removeItem(this.#name);
+
 		return this;
 	}
 	/**
@@ -69,6 +73,7 @@ abstract class Setting<T> {
 	wait(fn: (value: T) => void): this {
 		fn(this.#value);
 		this.#fns.push(fn);
+
 		return this;
 	}
 }
@@ -112,7 +117,9 @@ export class IntSetting extends Setting<number> {
 	 */
 	constructor(name: string, starting: number = 0, min: number = -Infinity, max: number = Infinity) {
 		const n = parseInt(window.localStorage.getItem(name) ?? "");
+
 		super(name, isNaN(n) || n < min || n > max ? starting : n);
+
 		this.#min = min;
 		this.#max = max;
 	}
@@ -150,7 +157,9 @@ export class NumberSetting extends Setting<number> {
 	 */
 	constructor(name: string, starting: number = 0, min: number = -Infinity, max: number = Infinity) {
 		const n = parseFloat(window.localStorage.getItem(name) ?? "");
+
 		super(name, isNaN(n) || n < min || n > max ? starting : n);
+
 		this.#min = min;
 		this.#max = max;
 	}
@@ -192,15 +201,19 @@ export class JSONSetting<T> extends Setting<T> {
 	 */
 	constructor(name: string, starting: T, validator: (v: unknown) => v is T) {
 		const s = window.localStorage.getItem(name);
+
 		let value = starting;
+
 		if (s) {
 			try {
 				const v = JSON.parse(s);
+
 				if (validator(v)) {
 					value = v;
 				}
 			} catch {}
 		}
+
 		super(name, value);
 	}
 	/**
@@ -210,6 +223,7 @@ export class JSONSetting<T> extends Setting<T> {
 	 */
 	save(): this {
 		this.set(this.value);
+
 		return this;
 	}
 	[s](v: T) {

@@ -38,16 +38,19 @@ class Setting {
 	set(v) {
 		const old = this.#value,
 		      sv = this[s](this.#value = v);
+
 		if (this.#value !== old || this.#value instanceof Object) {
 			if (sv === null) {
 				window.localStorage.removeItem(this.#name);
 			} else {
 				window.localStorage.setItem(this.#name, sv);
 			}
+
 			for (const fn of this.#fns) {
 				fn(v);
 			}
 		}
+
 		return this;
 	}
 	/**
@@ -57,6 +60,7 @@ class Setting {
 	 */
 	remove() {
 		window.localStorage.removeItem(this.#name);
+
 		return this;
 	}
 	/**
@@ -69,6 +73,7 @@ class Setting {
 	wait(fn) {
 		fn(this.#value);
 		this.#fns.push(fn);
+
 		return this;
 	}
 }
@@ -112,7 +117,9 @@ export class IntSetting extends Setting {
 	 */
 	constructor(name, starting = 0, min = -Infinity, max = Infinity) {
 		const n = parseInt(window.localStorage.getItem(name) ?? "");
+
 		super(name, isNaN(n) || n < min || n > max ? starting : n);
+
 		this.#min = min;
 		this.#max = max;
 	}
@@ -150,7 +157,9 @@ export class NumberSetting extends Setting {
 	 */
 	constructor(name, starting = 0, min = -Infinity, max = Infinity) {
 		const n = parseFloat(window.localStorage.getItem(name) ?? "");
+
 		super(name, isNaN(n) || n < min || n > max ? starting : n);
+
 		this.#min = min;
 		this.#max = max;
 	}
@@ -192,15 +201,19 @@ export class JSONSetting extends Setting {
 	 */
 	constructor(name, starting, validator) {
 		const s = window.localStorage.getItem(name);
+
 		let value = starting;
+
 		if (s) {
 			try {
 				const v = JSON.parse(s);
+
 				if (validator(v)) {
 					value = v;
 				}
 			} catch {}
 		}
+
 		super(name, value);
 	}
 	/**
@@ -210,6 +223,7 @@ export class JSONSetting extends Setting {
 	 */
 	save() {
 		this.set(this.value);
+
 		return this;
 	}
 	[s](v) {
