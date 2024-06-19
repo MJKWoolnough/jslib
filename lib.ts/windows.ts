@@ -21,11 +21,15 @@ import {ns as svgNS} from './svg.js';
 
 const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 	const shell = w.parentNode;
+
 	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
 	}
+
 	dragging = true;
+
 	amendNode(shell, {"style": {"user-select": "none"}});
+
 	const originalLeft = w.offsetLeft,
 	      originalTop = w.offsetTop,
 	      originalWidth = w.offsetWidth,
@@ -34,9 +38,11 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 	      grabY = e.clientY,
 	      ac = new AbortController(),
 	      {signal} = ac;
+
 	amendNode(shell, {"onmousemove": event((e: MouseEvent) => {
 		const dx = e.clientX - grabX,
 		      dy = e.clientY - grabY;
+
 		switch (direction) {
 			case 0:
 			case 1:
@@ -79,9 +85,12 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 		if (e.button !== 0) {
 			return;
 		}
+
 		amendNode(shell, {"style": {"user-select": undefined}});
 		ac.abort();
+
 		dragging = false;
+
 		w.dispatchEvent(new CustomEvent("resized"));
 	}, 0, signal)});
       },
@@ -89,16 +98,22 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 	if (e.target instanceof HTMLButtonElement) {
 		return;
 	}
+
 	const shell = w.parentNode;
+
 	if (dragging || !(shell instanceof ShellElement) || e.button !== 0) {
 		return;
 	}
+
 	dragging = true;
+
 	amendNode(shell, {"style": {"user-select": "none"}});
+
 	const grabX = e.clientX - w.offsetLeft,
 	      grabY = e.clientY - w.offsetTop,
 	      ac = new AbortController(),
 	      {signal} = ac;
+
 	amendNode(shell, {"onmousemove": event((e: MouseEvent) => {
 		const snap = parseInt(shell.getAttribute("snap") || "0"),
 		      {offsetLeft: x1, offsetTop: y1, offsetWidth: width, offsetHeight: height} = w,
@@ -108,25 +123,30 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 		      y3 = e.clientY - grabY,
 		      x4 = x3 + width,
 		      y4 = y3 + height;
+
 		let mx = 0,
 		    my = 0;
+
 		if (snap > 0) {
 			if (x1 >= 0 && x3 < 0 && x3 >= -snap) {
 				mx = -x3;
 			} else if (x2 <= shell.offsetWidth && x4 > shell.offsetWidth && x4 <= shell.offsetWidth + snap) {
 				mx = shell.offsetWidth - x4;
 			}
+
 			if (y1 >= 0 && y3 < 0 && y3 >= -snap) {
 				my = -y3;
 			} else if (y2 <= shell.offsetHeight && y4 > shell.offsetHeight && y4 <= shell.offsetHeight + snap) {
 				my = shell.offsetHeight - y4;
 			}
+
 			for (const e of shell.childNodes) {
 				if (e instanceof WindowElement && e !== w) {
 					const x5 = e.offsetLeft,
 					      y5 = e.offsetTop,
 					      x6 = x5 + e.offsetWidth,
 					      y6 = y5 + e.offsetHeight;
+
 					if (y3 <= y6 && y4 >= y5) {
 						if (x2 <= x5 && x4 >= x5 && x4 <= x5 + snap) {
 							mx = x5 - x4;
@@ -134,6 +154,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 							mx = x6 - x3;
 						}
 					}
+
 					if (x3 <= x6 && x4 >= x5) {
 						if (y2 <= y5 && y4 >= y5 && y4 <= y5 + snap) {
 							my = y5 - y4;
@@ -144,14 +165,18 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				}
 			}
 		}
+
 		amendNode(w, {"style": {"--window-left": (x3 + mx) + "px", "--window-top": (y3 + my) + "px"}});
 	}, 0, signal), "onmouseup": event((e: MouseEvent) => {
 		if (e.button !== 0) {
 			return;
 		}
+
 		amendNode(shell, {"style": {"user-select": undefined}});
 		ac.abort();
+
 		dragging = false;
+
 		w.dispatchEvent(new CustomEvent("moved"));
 	}, 0, signal)});
       },
@@ -405,9 +430,11 @@ abstract class BaseElement extends HTMLElement {
 					w.remove();
 				}}, lang["OK"])))
 			      ]);
+
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
+
 	/**
 	 * The confirm method adds a {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm | confirm}-like window to the {@link WindowElement} or {@link ShellElement} it was called upon.
 	 *
@@ -437,9 +464,11 @@ abstract class BaseElement extends HTMLElement {
 					button({"onclick": () => w.remove()}, lang["CANCEL"])
 				])
 			      ]);
+
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
+
 	/**
 	 * The prompt method adds a {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt | prompt}-like window to the {@link WindowElement} or {@link ShellElement} it was called upon.
 	 *
@@ -462,6 +491,7 @@ abstract class BaseElement extends HTMLElement {
 				switch (e.key) {
 				case "Enter":
 					ok();
+
 					break;
 				case "Escape":
 					w.remove();
@@ -478,9 +508,11 @@ abstract class BaseElement extends HTMLElement {
 				data,
 				div({"style": "text-align: center"}, button({"onclick": ok}, lang["OK"]))
 			      ]);
+
 			this.addWindow(w) || reject(new Error("invalid target"));
 		});
 	}
+
 	abstract addWindow(w: WindowElement): boolean;
 }
 
@@ -499,14 +531,17 @@ abstract class BaseElement extends HTMLElement {
 export class ShellElement extends BaseElement {
 	constructor() {
 		super();
+
 		if (new.target !== ShellElement) {
 			return;
 		}
+
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			slot({"name": "desktop"}),
 			div(slot())
 		]).adoptedStyleSheets = shellStyle;
 	}
+
 	/**
 	 * Adds a {@link WindowElement} to the Shell and focuses it.
 	 *
@@ -520,21 +555,26 @@ export class ShellElement extends BaseElement {
 		} else if (w.nextElementSibling) {
 			w.focus();
 		}
+
 		return true;
 	}
+
 	/**
 	 * Repositions all {@link WindowElements} within the Shell to make sure they are all visible.
 	 */
 	realignWindows() {
 		const {offsetWidth: tw, offsetHeight: th} = this;
+
 		for (const e of this.childNodes) {
 			if (e instanceof WindowElement) {
 				const {offsetLeft: x, offsetTop: y, offsetWidth: w, offsetHeight: h} = e;
+
 				if (x + w > tw) {
 					amendNode(e, {"style": {"--window-left": Math.max(tw - w, 0) + "px"}});
 				} else if (x < 0) {
 					amendNode(e, {"style": {"--window-left": "0px"}});
 				}
+
 				if (y + h > th) {
 					amendNode(e, {"style": {"--window-top": Math.max(th - h) + "px"}});
 				} else if (y < 0) {
@@ -551,14 +591,17 @@ export class ShellElement extends BaseElement {
 export class DesktopElement extends HTMLElement {
 	constructor() {
 		super();
+
 		setTimeout(amendNode, 0, this, {"slot": "desktop"});
 		amendNode(this.attachShadow({"mode": "closed"}), slot({"slot": "desktop"})).adoptedStyleSheets = desktopStyle;
 	}
+
 	attributeChangedCallback(name: string, _: string, newValue: string) {
 		if (name === "slot" && newValue !== "desktop") {
 			amendNode(this, {"slot": "desktop"});
 		}
 	}
+
 	static get observedAttributes() {
 		return desktopObservedAttrs;
 	}
@@ -617,9 +660,12 @@ export class WindowElement extends BaseElement {
 	#child: WindowElement | null = null;
 	#parent: WindowElement | null = null;
 	#maximise: HTMLButtonElement;
+
 	constructor() {
 		super();
+
 		const onclick = () => this.focus();
+
 		amendNode(this.attachShadow({"mode": "closed"}), {"onclick": event(onclick, eventCapture)}, [
 			div(Array.from({length: 8}, (_, n) => div({"onmousedown": (e: MouseEvent) => resizeWindow(this, n, e)}))),
 			div({"part": "titlebar", "onmousedown": (e: MouseEvent) => moveWindow(this, e), "ondblclick": (e: Event) => {
@@ -639,45 +685,59 @@ export class WindowElement extends BaseElement {
 			this.#slot = div(slot()),
 			div()
 		]).adoptedStyleSheets = windowStyle;
+
 		setTimeout(amendNode, 0, this, {"onmousedown": event(onclick, eventCapture)});
 	}
+
 	connectedCallback() {
 		if (focusingWindow === this) {
 			focusingWindow = null;
 		}
 	}
+
 	disconnectedCallback() {
 		if (focusingWindow === this) {
 			return;
 		}
+
 		const p = this.#parent,
 		      c = this.#child;
+
 		if (p) {
 			amendNode(p.#slot, {"class": ["!hasChild"]});
+
 			p.#child = null;
 			this.#parent = null;
 		}
+
 		if (c) {
 			c.remove();
+
 			this.#child = null;
 		}
+
 		this.dispatchEvent(new CustomEvent("remove"));
 	}
+
 	attributeChangedCallback(name: string, _: string | null, newValue: string | null) {
 		switch (name) {
 		case "window-title":
 			clearNode(this.#title, {"title": newValue ?? ""}, newValue ?? "");
+
 			break;
 		case "window-icon":
 			amendNode(this.#icon, {"src": newValue ?? defaultIcon});
+
 			break;
 		case "maximised":
 			amendNode(this.#maximise, {"title": newValue === null ? lang["MAXIMISE"] : lang["RESTORE"]});
 		}
 	}
+
 	static get observedAttributes() {
 		return windowObservedAttrs;
 	}
+
 	/**
 	 * This method adds a `Window` as a child. If there is already a child, it is added as a child of that `Window`.
 	 *
@@ -688,16 +748,22 @@ export class WindowElement extends BaseElement {
 		if (!this.parentNode) {
 			return false;
 		}
+
 		if (this.#child) {
 			this.#child.addWindow(w);
+
 			return true;
 		}
+
 		this.#child = w;
 		w.#parent = this;
+
 		amendNode(this.#slot, {"class": ["hasChild"]});
 		amendNode(this.parentNode, w);
+
 		return true;
 	}
+
 	/**
 	 * The addControlButton method adds additional buttons to the titlebar of the `Window`.
 	 *
@@ -709,44 +775,59 @@ export class WindowElement extends BaseElement {
 	 */
 	addControlButton(icon: string, onclick: (this: WindowElement) => void, title?: string | Binding): () => void {
 		const b = button({"style": {"background-image": `url(${JSON.stringify(icon)})`}, "onclick": () => onclick.call(this), title});
+
 		amendNode(this.#extra, b);
+
 		return () => b.remove();
 	}
+
 	/** The focus method will unset a set `minimise` attribute and bring the deepest child to the top of the window stack. */
 	focus() {
 		amendNode(this, {"minimised": false});
+
 		const c = this.#child;
 		if (c) {
 			c.focus();
+
 			return;
 		}
+
 		if (this.parentNode && this.nextElementSibling) {
 			focusingWindow = this;
+
 			const scrolls: [Element, number, number][] = [],
 			      ni = document.createNodeIterator(this, NodeFilter.SHOW_ELEMENT);
+
 			for (let elm = this.#slot as Element | null; elm; elm = ni.nextNode() as Element | null) {
 				const {scrollTop, scrollLeft} = elm;
+
 				if (scrollTop || scrollLeft) {
 					scrolls.push([elm, scrollTop, scrollLeft]);
 				}
 			}
+
 			amendNode(this.parentNode, this);
+
 			for (const [elm, scrollTop, scrollLeft] of scrolls) {
 				elm.scrollTop = scrollTop;
 				elm.scrollLeft = scrollLeft;
 			}
 		}
+
 		if (!this.contains(document.activeElement)) {
 			super.focus();
 		}
 	}
+
 	close() {
 		if (this.#child) {
 			this.#child.focus();
 		} else if (this.dispatchEvent(new CustomEvent("close", {"cancelable": true}))) {
 			this.remove();
+
 			return true;
 		}
+
 		return false;
 	}
 }
