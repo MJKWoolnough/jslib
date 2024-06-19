@@ -149,6 +149,7 @@ export class Pagination extends HTMLElement {
 				if (page !== start) {
 					processPaginationSection(pageLinks, currPage, start, page - 1, this.#hrefBase);
 				}
+
 				start = page + 1
 			}
 		}
