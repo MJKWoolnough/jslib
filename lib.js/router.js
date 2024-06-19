@@ -36,10 +36,13 @@ history.replaceState(lastState, "");
 
 window.addEventListener("click", e => {
 	let target = e.target;
+
 	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
 		target = target.parentNode;
 	}
+
 	const href = target?.getAttribute("href");
+
 	if (href && goto(href)) {
 		e.preventDefault();
 	}
@@ -48,6 +51,7 @@ window.addEventListener("popstate", () => {
 	for (const r of routers) {
 		r[newState](window.location, history.state);
 	}
+
 	lastState = history.state;
 });
 
@@ -69,21 +73,27 @@ class Router extends HTMLElement {
 	}
 	#clear() {
 		this.#connected = false;
+
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
 	#match(match, nodeFn, url = window.location, defaultAttrs) {
 		const attrs = {},
 		      params = url.searchParams ?? new URLSearchParams(url.search),
 		      matches = url.pathname.match(match.path);
+
 		if (!matches) {
 			return false;
 		}
+
 		matches.shift();
+
 		for (const attr of match.matches) {
 			attrs[attr] = matches.shift();
 		}
+
 		for (const [param, value] of match.params) {
 			const p = params.get(param);
+
 			if (value.charAt(0) === ':' && value.length > 1) {
 				if (p) {
 					attrs[value.slice(1)] = p;
@@ -92,10 +102,13 @@ class Router extends HTMLElement {
 				return false;
 			}
 		}
+
 		if (url.hash === match.hash) {
 			this.#setNode(nodeFn(defaultAttrs ? Object.assign(attrs, defaultAttrs) : attrs));
+
 			return this.#connected = true;
 		}
+
 		return false;
 	}
 	#setNode(n) {
@@ -107,6 +120,7 @@ class Router extends HTMLElement {
 				return true;
 			}
 		}
+
 		return false;
 	}
 	/**
@@ -144,21 +158,29 @@ class Router extends HTMLElement {
 			"params": u.searchParams,
 			"hash": u.hash
 		      };
+
 		let path = u.pathname,
 		    r = match.startsWith("/") ? "^" : "";
+
 		for (let c = path.indexOf(':'); c >= 0; c = path.indexOf(':')) {
 			r += path.slice(0, c).replace(/[[\]()$*+.]/g, "\\$&") + "([^/]+)";
 			path = path.slice(c);
+
 			const s = path.indexOf('/'),
 			      t = s < 0 ? path.length : s;
+
 			matches.push(path.slice(1, t));
 			path = path.slice(t);
 		}
+
 		matchObj.path = new RegExp(r + path + (path.endsWith("/") ? "" : "$"));
+
 		this.#matchers.push([matchObj, nodeFn]);
+
 		if (!this.#connected && this.#marker.isConnected) {
 			this.#match(matchObj, nodeFn);
 		}
+
 		return this;
 	}
 	/**
@@ -170,16 +192,21 @@ class Router extends HTMLElement {
 	 */
 	setTransition(s) {
 		this.#swapper = s;
+
 		return this;
 	}
 	[newState](path, state, attrs) {
 		if (this.#marker.isConnected) {
 			const h = this.#history.get(state ?? 0);
+
 			this.#history.set(lastState, this.#marker);
+
 			if (h) {
 				this.#setNode(h);
+
 				return true;
 			} else if (this.#setRoute(path, attrs)) {
+
 				return true;
 			}
 		}
@@ -190,19 +217,24 @@ class Router extends HTMLElement {
 			for (const c of this.children) {
 				if (!(c instanceof Router)) {
 					const match = c.getAttribute("route-match");
+
 					if (match !== null) {
 						const element = c.cloneNode(true);
+
 						element.removeAttribute("route-match");
 						this.add(match, attrs => {
 							const node = element.cloneNode(true);
+
 							for (const attr in attrs) {
 								node.setAttribute(attr, attrs[attr]);
 							}
+
 							return node;
 						});
 					}
 				}
 			}
+
 			this.replaceChildren();
 		}
 	}
@@ -212,6 +244,7 @@ class Router extends HTMLElement {
 				return;
 			}
 		}
+
 		routers.add(this);
 		this.#clear();
 		this.replaceWith(this.#marker);
@@ -221,6 +254,7 @@ class Router extends HTMLElement {
 	/** Used to remove the Router from the DOM and disable its routing. It can be added to the DOM later to reactivate it. */
 	remove() {
 		this.#marker.remove();
+
 		routers.delete(this);
 	}
 }
@@ -235,21 +269,26 @@ customElements.define("x-route", class extends HTMLElement {
 		const c = this.#class ??= this.getAttribute("route-class") ?? "",
 		      i = this.#id ??= this.getAttribute("route-id") ?? "",
 		      t = this.#title ??= this.getAttribute("route-title") ?? "";
+
 		if (c) {
 			document.documentElement.classList.toggle(c, true);
 		}
+
 		if (i) {
 			document.documentElement.setAttribute("id", i);
 		}
+
 		if (t) {
 			document.title = t;
 		}
 	}
 	disconnectedCallback() {
 		const c = this.#class;
+
 		if (c) {
 			document.documentElement.classList.toggle(c, false);
 		}
+
 		if (this.#id && document.documentElement.getAttribute("id") === this.#id) {
 			document.documentElement.removeAttribute("id");
 		}
@@ -312,19 +351,25 @@ router = () => new Router(),
  */
 goto = window.goto = (href, attrs) => {
 	const url = new URL(href, window.location + "");
+
 	let handled = false;
+
 	if (url.host === window.location.host) {
 		const now = Date.now();
+
 		for (const r of routers) {
 			if (r[newState](url, now, attrs)) {
 				handled = true;
 			}
 		}
+
 		lastState = now;
+
 		if (handled) {
 			history.pushState(now, "", new URL(href, url));
 		}
 	}
+
 	return handled;
 },
 /**
@@ -339,6 +384,8 @@ registerTransition = (name, s) => {
 	if (swappers.has(name)) {
 		return false;
 	}
+
 	swappers.set(name, s);
+
 	return true;
 };
