@@ -177,6 +177,7 @@ setMenuLang({
 export class ShellElement extends BaseShellElement {
 	constructor() {
 		super();
+
 		const taskbar = ul({"part": "taskbar"}),
 		      self = this,
 		      windowData = new Map(),
@@ -184,15 +185,19 @@ export class ShellElement extends BaseShellElement {
 			if (type !== "attributes" || !(target instanceof WindowElement)) {
 				return;
 			}
+
 			const itm = windowData.get(target).firstChild;
+
 			switch (attributeName) {
 			case "window-icon":
 				amendNode(itm, {"src": target.getAttribute("window-icon") ?? undefined});
+
 				break;
 			case "window-title":
 				amendNode(itm, target.getAttribute("window-title") ?? "");
 			}
 		      }));
+
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			slot({"name": "desktop"}),
 			taskbar,
@@ -201,6 +206,7 @@ export class ShellElement extends BaseShellElement {
 					if (!(w instanceof WindowElement)) {
 						return;
 					}
+
 					if (!windowData.has(w) && !w.hasAttribute("window-hide")) {
 						const itm = li({"onclick": () => {
 							if (w.hasAttribute("minimised")) {
@@ -213,6 +219,7 @@ export class ShellElement extends BaseShellElement {
 							}
 						      }, "oncontextmenu": e => {
 							e.preventDefault();
+
 							amendNode(self, menu({"x": e.clientX, "y": e.clientY}, [
 								w.hasAttribute("minimised") ? item({"key": (menuItems["RESTORE"]+"").charAt(0), "onselect": () => {
 									amendNode(w, {"minimised": false});
@@ -224,6 +231,7 @@ export class ShellElement extends BaseShellElement {
 							img({"part": "icon", "src": w.getAttribute("window-icon") || undefined, "title": w.getAttribute("window-title") ?? undefined}),
 							span({"part": "title"}, w.getAttribute("window-title") || "")
 						      ]);
+
 						amendNode(taskbar, itm);
 						windowData.set(w, itm);
 						amendNode(w, {"onremove": event(() => {
