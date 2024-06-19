@@ -218,7 +218,6 @@ export class Tokeniser {
 
 		if (char) {
 			this.#buffer += char;
-
 			this.#pos++;
 		}
 
@@ -255,7 +254,6 @@ export class Tokeniser {
 		const buffer = this.#buffer.slice(0, this.#pos);
 
 		this.#buffer = this.#buffer.slice(this.#pos);
-
 		this.#pos = 0;
 
 		return buffer;
@@ -469,6 +467,7 @@ export class Phraser {
 
 		if (type !== TokenDone && type !== TokenError) {
 			this.#tokens.push(tk);
+
 			this.#pos++;
 		}
 
