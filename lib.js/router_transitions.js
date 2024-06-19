@@ -26,10 +26,13 @@ createTransition = (forCurrent, forNext = forCurrent.slice().reverse(), duration
 			forCurrent.map(k => Object.assign({"position": "absolute", "top": offsetTop + "px", "left": offsetLeft + "px", "width": offsetWidth + "px", "height": offsetHeight + "px"}, k)),
 			{duration}
 		      ));
+
 		current.before(next);
+
 		for (const anim of next.getAnimations().concat(current.getAnimations())) {
 			anim.cancel();
 		}
+
 		currentAnim.addEventListener("finish", () => current.remove(), {"once": true});
 		currentAnim.play();
 		next.animate(forNext, duration);
