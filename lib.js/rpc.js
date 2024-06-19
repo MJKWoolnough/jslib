@@ -23,7 +23,9 @@ const noop = () => {},
       noops = [noop, noop],
       newSet = (m, id) => {
 	const s = new Set();
+
 	m.set(id, s);
+
 	return s;
       },
       makeHandler = (sFn, eFn, typeCheck) => [a => {
@@ -44,6 +46,7 @@ export class RPCError {
 		this.code = code;
 		this.message = message;
 		this.data = data;
+
 		Object.freeze(this);
 	}
 	get name() {
@@ -97,6 +100,7 @@ export class RPC {
 			      e = message.error,
 			      i = +!!e,
 			      m = e ? new RPCError(e.code, e.message, e.data) : message.result;
+
 			if (id >= 0) {
 				(this.#r.get(id) ?? noops)[i](m);
 				this.#r.delete(id);
@@ -107,9 +111,11 @@ export class RPC {
 			}
 		}, this.#eFn ??= err => {
 			this.close();
+
 			for (const [, r] of this.#r) {
 				r[1](err);
 			}
+
 			for (const [, s] of this.#a) {
 				for (const r of s) {
 					r[1](err);
@@ -145,9 +151,12 @@ export class RPC {
 	 */
 	request(method, paramsOrTypeCheck, typeCheck) {
 		const c = this.#c;
+
 		return c ? new Promise((sFn, eFn) => {
 			typeCheck ??= paramsOrTypeCheck instanceof Function ? paramsOrTypeCheck : undefined;
+
 			const id = this.#id++;
+
 			this.#r.set(id, makeHandler(sFn, eFn, typeCheck));
 			c.send(JSON.stringify({
 				id,
@@ -174,9 +183,12 @@ export class RPC {
 		      s = a.get(id) ?? newSet(a, id),
 		      p = new Promise((sFn, eFn) => {
 			[h[0], h[1]] = makeHandler(sFn, eFn, typeCheck);
+
 			s.add(h);
 		      });
+
 		p.finally(() => s.delete(h)).catch(() => {});
+
 		return p;
 	}
 	/**
@@ -196,6 +208,7 @@ export class RPC {
 			const h = makeHandler(sFn, eFn, typeCheck),
 			      a = this.#a,
 			      s = a.get(id) ?? newSet(a, id);
+
 			s.add(h);
 			cFn(() => s.delete(h));
 		});
