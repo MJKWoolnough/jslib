@@ -27,7 +27,7 @@ javascript = (() => {
 		unicode.Mc,
 		unicode.Nd,
 		unicode.Pc,
-		unicode.Other_ID_Continue,
+		unicode.Other_ID_Continue
 	      ],
 	      idStart = idContinue.slice(0, 3),
 	      notID   = [unicode.Pattern_Syntax, unicode.Pattern_White_Space],
