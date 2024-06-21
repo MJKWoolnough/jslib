@@ -20,7 +20,7 @@ javascript = (() => {
 
 	const keywords = ["await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield"],
 	      unicodeGroups = (groups: string[]) => {
-		      return groups;
+		      return groups // TODO;
 	      },
 	      idContinue = unicodeGroups(["L", "Nl", "Other_ID_Start", "Mn", "Mc", "Nd", "Pc", "Other_ID_Continue"]),
 	      idStart = unicodeGroups(["L", "Nl", "Other_ID_Start"]),
