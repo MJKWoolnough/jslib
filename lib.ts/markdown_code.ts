@@ -69,7 +69,7 @@ javascript = (() => {
 
 		switch (c) {
 		case "":
-			if (tokenDepth.length == 0) {
+			if (tokenDepth.length === 0) {
 				return t.done();
 			}
 
@@ -98,7 +98,7 @@ javascript = (() => {
 						}, inputElement];
 					}
 
-					if (t.peek() == "") {
+					if (t.peek() === "") {
 						return t.error("unexpected EOF");
 					}
 				}
@@ -153,7 +153,7 @@ javascript = (() => {
 
 			const [tk, tf] = identifier(t);
 
-			if (tk.type == TokenIdentifier) {
+			if (tk.type === TokenIdentifier) {
 				tk.type = TokenPrivateIdentifier;
 
 				divisionAllowed = true;
@@ -171,7 +171,7 @@ javascript = (() => {
 		if (isIDStart(c)) {
 			const [tk, tf] = identifier(t);
 
-			if (tk.type == TokenIdentifier) {
+			if (tk.type === TokenIdentifier) {
 				if (tk.data === "true" || tk.data === "false") {
 					divisionAllowed = true;
 
@@ -182,12 +182,12 @@ javascript = (() => {
 				} else if (tk.data === "enum") {
 					divisionAllowed = true;
 					tk.type = TokenFutureReservedWord;
-				} else if (tk.data == "Infinity") {
+				} else if (tk.data === "Infinity") {
 					divisionAllowed = true;
 					tk.type = TokenNumericLiteral;
 				} else {
 					for (const kw of keywords) {
-						if (kw == tk.data) {
+						if (kw === tk.data) {
 							tk.type = TokenKeyword;
 
 							if (tk.data === "this") {
@@ -198,11 +198,11 @@ javascript = (() => {
 						}
 					}
 
-					if (tk.type == TokenIdentifier) {
-						if (tk.data[0] == "\\") {
+					if (tk.type === TokenIdentifier) {
+						if (tk.data[0] === "\\") {
 							let code = "";
 
-							if (tk.data[2] == '{') {
+							if (tk.data[2] === '{') {
 								let n = 3;
 
 								for (; tk.data[n] != '}'; n++) { }
@@ -214,7 +214,7 @@ javascript = (() => {
 
 							const r = parseInt(code, 16);
 
-							if (isNaN(r) || r == 92 || !isIDStart(String.fromCharCode(r))) {
+							if (isNaN(r) || r === 92 || !isIDStart(String.fromCharCode(r))) {
 								return t.error(`invalid unicode: ${tk.data}`);
 							}
 						}
@@ -262,7 +262,7 @@ javascript = (() => {
 		case '.':
 			if (t.accept(".")) {
 				if (!t.accept(".")) { // ...
-					if (t.peek() == "") {
+					if (t.peek() === "") {
 						return t.error("unexpected EOF");
 					}
 
@@ -552,7 +552,7 @@ javascript = (() => {
 
 		t.except("");
 
-		if (c == '\\') {
+		if (c === '\\') {
 			if (!t.accept("u")) {
 				t.except("");
 
@@ -616,7 +616,7 @@ javascript = (() => {
 		return true;
 	      },
 	      stringToken: TokenFn = (t: Tokeniser) => {
-		const chars = t.peek() == '"' ? doubleStringChars : singleStringChars;
+		const chars = t.peek() === '"' ? doubleStringChars : singleStringChars;
 
 		t.except("");
 
@@ -676,7 +676,7 @@ javascript = (() => {
 					const v = t.get();
 
 					return [{
-						"type": v[0] == '`' ?  TokenTemplateHead : TokenTemplateMiddle,
+						"type": v[0] === '`' ?  TokenTemplateHead : TokenTemplateMiddle,
 						"data": v
 					}, inputElement];
 				}
@@ -690,7 +690,7 @@ javascript = (() => {
 		const v = t.get();
 
 		return [{
-			"type": v[0] == '`' ? TokenNoSubstitutionTemplate : TokenTemplateTail,
+			"type": v[0] === '`' ? TokenNoSubstitutionTemplate : TokenTemplateTail,
 			"data": v
 		}, inputElement];
 	      };
@@ -712,7 +712,7 @@ export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, 
 
 		nodes.push(span(colour?.startsWith(".") ? {"class": colour} : {"style": colour ? "color: " + colour:  null}, tk.data));
 
-		if (noPre && tk.type == TokenLineTerminator) {
+		if (noPre && tk.type === TokenLineTerminator) {
 			nodes.push(br());
 		}
 	}
