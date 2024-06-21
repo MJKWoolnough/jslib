@@ -214,7 +214,7 @@ javascript = (() => {
 
 							const r = parseInt(code, 16);
 
-							if (isNaN(r) || r == 92 || !isIDStart(r)) {
+							if (isNaN(r) || r == 92 || !isIDStart(String.fromCharCode(r))) {
 								return t.error(`invalid unicode: ${tk.data}`);
 							}
 						}
