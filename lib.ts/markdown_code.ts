@@ -698,6 +698,13 @@ javascript = (() => {
 			"data": v
 		}, inputElement];
 	      };
+
+	return (tk: Tokeniser) => {
+		divisionAllowed = false;
+		tokenDepth.splice(0, tokenDepth.length);
+
+		return inputElement(tk);
+	};
 })();
 
 
