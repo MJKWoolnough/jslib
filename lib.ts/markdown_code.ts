@@ -19,18 +19,12 @@ javascript = (() => {
 	let divisionAllowed = false;
 
 	const keywords = ["await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield"],
-	      idContinue = [
-		unicode.L,
-		unicode.Nl,
-		unicode.Other_ID_Start,
-		unicode.Mn,
-		unicode.Mc,
-		unicode.Nd,
-		unicode.Pc,
-		unicode.Other_ID_Continue
-	      ],
-	      idStart = idContinue.slice(0, 3),
-	      notID   = [unicode.Pattern_Syntax, unicode.Pattern_White_Space],
+	      unicodeGroups = (groups: string[]) => {
+		      return groups;
+	      },
+	      idContinue = unicodeGroups(["L", "Nl", "Other_ID_Start", "Mn", "Mc", "Nd", "Pc", "Other_ID_Continue"]),
+	      idStart = unicodeGroups(["L", "Nl", "Other_ID_Start"]),
+	      notID   = unicodeGroups(["Pattern_Syntax", "Pattern_White_Space"]),
 	      zwnj  = String.fromCharCode(8204),
 	      zwj  = String.fromCharCode(8205),
 	      isIDStart = (c: string) => {
