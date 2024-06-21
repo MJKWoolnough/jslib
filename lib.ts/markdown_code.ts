@@ -59,7 +59,7 @@ javascript = (() => {
 		}
 
 		if (t.accept(lineTerminators)) {
-			t.acceptRun(lineTerminators)
+			t.acceptRun(lineTerminators);
 
 			return [{
 				"type": TokenLineTerminator,
@@ -67,20 +67,21 @@ javascript = (() => {
 			}, inputElement];
 		}
 
-		let allowDivision = divisionAllowed
+		let allowDivision = divisionAllowed;
 
-		divisionAllowed = false
+		divisionAllowed = false;
 
-		const c = t.peek()
+		const c = t.peek();
+
 		switch (c) {
 		case "":
 			if (tokenDepth.length == 0) {
-				return t.done()
+				return t.done();
 			}
 
 			return t.error("unexpected EOF");
 		case '/':
-			t.except("")
+			t.except("");
 			if (t.accept("/")) {
 				t.exceptRun(lineTerminators);
 
@@ -92,8 +93,8 @@ javascript = (() => {
 
 			if (t.accept("*")) {
 				while (true) {
-					t.exceptRun("*")
-					t.accept("*")
+					t.exceptRun("*");
+					t.accept("*");
 					if (t.accept("/")) {
 						divisionAllowed = allowDivision;
 
@@ -104,13 +105,13 @@ javascript = (() => {
 					}
 
 					if (t.peek() == "") {
-						return t.error("unexpected EOF")
+						return t.error("unexpected EOF");
 					}
 				}
 			}
 
 			if (allowDivision) {
-				t.accept("=")
+				t.accept("=");
 
 				return [{
 					"type": TokenDivPunctuator,
@@ -118,11 +119,11 @@ javascript = (() => {
 				}, inputElement];
 			}
 
-			divisionAllowed = true
+			divisionAllowed = true;
 
-			return regexp(t)
+			return regexp(t);
 		case '}':
-			t.except("")
+			t.except("");
 			switch (tokenDepth.at(-1)) {
 			case '{':
 				tokenDepth.pop();
@@ -148,7 +149,8 @@ javascript = (() => {
 
 			return template(t);
 		case '#':
-			t.except("")
+			t.except("");
+
 			if (!isIDStart(t.peek())) {
 				t.except("");
 
@@ -296,23 +298,23 @@ javascript = (() => {
 		case '*':
 			if (!t.accept("=")) { // <=, *=
 				if (t.peek() === c) { // <<, **
-					t.except("")
-					t.accept("=") // <<=, **=
+					t.except("");
+					t.accept("="); // <<=, **=
 				}
 			}
 
 			break;
 		case '=':
 			if (t.accept("=")) { // ==
-				t.accept("=") // ===
+				t.accept("="); // ===
 			} else {
-				t.accept(">") // =>
+				t.accept(">"); // =>
 			}
 
 			break;
 		case '!':
 			if (t.accept("=")) { // !=
-				t.accept("=") // !==
+				t.accept("="); // !==
 			}
 
 			break;
@@ -321,19 +323,19 @@ javascript = (() => {
 		case '&':
 		case '|':
 			if (t.peek() === c) {
-				t.except("") // ++, --, &&, ||
+				t.except(""); // ++, --, &&, ||
 
 				if (c === '&' || c === '|') {
-					t.accept("=")
+					t.accept("=");
 				}
 			} else {
-				t.accept("=") // +=, -=, &=, |=
+				t.accept("="); // +=, -=, &=, |=
 			}
 
 			break;
 		case '%':
 		case '^':
-			t.accept("=") // %=, ^=
+			t.accept("="); // %=, ^=
 
 			break;
 		default:
@@ -353,7 +355,7 @@ javascript = (() => {
 				return "unexpected EOF";
 			}
 
-			t.except("")
+			t.except("");
 
 			return `invalid regexp sequence: ${t.get()}`;
 		}
@@ -477,7 +479,7 @@ javascript = (() => {
 		if (t.accept("0")) {
 			if (t.accept("bB")) {
 				if (!numberRun(t, binaryDigit)) {
-					t.except("")
+					t.except("");
 
 					return t.error(`invalid number: ${t.get()}`);
 				}
@@ -673,7 +675,7 @@ javascript = (() => {
 
 				return t.error(`invalid escape sequence: ${t.get()}`);
 			case '$':
-				t.except("")
+				t.except("");
 				if (t.accept("{")) {
 					tokenDepth.push('$');
 
