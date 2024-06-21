@@ -1,4 +1,4 @@
-import type {TokenFn, TokenType, Tokeniser} from './parser.js';
+import type {TokenFn, Tokeniser, TokenType} from './parser.js';
 import {createDocumentFragment} from './dom.js';
 import {br, span} from './html.js';
 import Parser, {processToEnd} from './parser.js';
