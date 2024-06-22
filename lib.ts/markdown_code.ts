@@ -79,7 +79,7 @@ javascript = (() => {
 
 		switch (c) {
 		case "":
-			if (tokenDepth.length === 0) {
+			if (!tokenDepth.length) {
 				return t.done();
 			}
 
@@ -108,7 +108,7 @@ javascript = (() => {
 						}, inputElement];
 					}
 
-					if (t.peek() === "") {
+					if (!t.peek()) {
 						return errUnexpectedEOF(t);
 					}
 				}
