@@ -720,7 +720,7 @@ export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, 
 
 	for (const tk of processToEnd(Parser(contents, fn))) {
 		const colour = colours.get(tk.type),
-		      contents = noPre ? tk.data.split(lineSplit).map((s, n) => [n > 0 ? br() : [], s]) : tk.data;
+		      contents = noPre ? tk.data.split(lineSplit).map((s, n) => n > 0 ? [br(), s] : s) : tk.data;
 
 		if (colour === last && nodes.length > 0) {
 			amendNode(nodes.at(-1), contents);
