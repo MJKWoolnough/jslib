@@ -1,5 +1,5 @@
 import type {TokenFn, Tokeniser, TokenType} from './parser.js';
-import {createDocumentFragment} from './dom.js';
+import {amendNode, createDocumentFragment} from './dom.js';
 import {br, span} from './html.js';
 import Parser, {processToEnd} from './parser.js';
 
@@ -707,10 +707,19 @@ javascript = (() => {
 export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, noPre = true) => {
 	const nodes: HTMLElement[] = [];
 
-	for (const tk of processToEnd(Parser(contents, fn))) {
-		const colour = colours.get(tk.type);
+	let last: string | undefined;
 
-		nodes.push(span(colour ? colour.startsWith(".") ? {"class": colour} : {"style": "color: " + colour} : {}, noPre ? tk.data.split(lineSplit).map((s, n) => [n > 0 ? br() : [], s]) : tk.data));
+	for (const tk of processToEnd(Parser(contents, fn))) {
+		const colour = colours.get(tk.type),
+		      contents = noPre ? tk.data.split(lineSplit).map((s, n) => [n > 0 ? br() : [], s]) : tk.data;
+
+		if (colour === last && nodes.length > 0) {
+			amendNode(nodes.at(-1), contents);
+		} else {
+			nodes.push(span(colour ? colour.startsWith(".") ? {"class": colour} : {"style": "color: " + colour} : {}, contents));
+		}
+
+		last = colour;
 	}
 
 	return createDocumentFragment(nodes);
