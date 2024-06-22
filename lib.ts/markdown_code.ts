@@ -23,9 +23,9 @@ javascript = (() => {
 	      unicodeGroups = (groups: string[]) => new RegExp("^[" + groups.reduce((r, c) => r + `\p{${c}}`, "") + "]$"),
 	      idContinue = unicodeGroups(["L", "Nl", "Other_ID_Start", "Mn", "Mc", "Nd", "Pc", "Other_ID_Continue"]),
 	      idStart = unicodeGroups(["L", "Nl", "Other_ID_Start"]),
-	      notID   = unicodeGroups(["Pattern_Syntax", "Pattern_White_Space"]),
-	      zwnj  = String.fromCharCode(8204),
-	      zwj  = String.fromCharCode(8205),
+	      notID = unicodeGroups(["Pattern_Syntax", "Pattern_White_Space"]),
+	      zwnj = String.fromCharCode(8204),
+	      zwj = String.fromCharCode(8205),
 	      isIDStart = (c: string) => {
 		if (c === '$' || c === '_' || c === '\\') {
 			return true;
@@ -41,6 +41,17 @@ javascript = (() => {
 		return idContinue.test(c) && !notID.test(c);
 	      },
 	      tokenDepth: string[] = [],
+	      errUnexpectedEOF = "unexpected EOF",
+	      errInvalidRegexpSequence = "invalid regexp sequence",
+	      error = (errText: string) => (t: Tokeniser, text = t.get()) => t.error(errText + text),
+	      errInvalidCharacter = error("invalid character: "),
+	      errInvalidSequence = error("invalid sequence: "),
+	      errInvalidNumber = error("invalid number: "),
+	      errInvalidRegexpCharacter = error("invalid regexp character"),
+	      errInvalidUnicode = error("invalid unicode"),
+	      errUnexpectedBackslash = error("unexpected backslash"),
+	      errInvalidEscapeSequence = error("invalid escape sequence"),
+	      errUnexpectedLineTerminator = error("unexpected line terminator"),
 	      inputElement: TokenFn = (t: Tokeniser) => {
 		if (t.accept(whitespace)) {
 			t.acceptRun(whitespace);
@@ -72,7 +83,7 @@ javascript = (() => {
 				return t.done();
 			}
 
-			return t.error("unexpected EOF");
+			return t.error(errUnexpectedEOF);
 		case '/':
 			t.except("");
 			if (t.accept("/")) {
@@ -98,7 +109,7 @@ javascript = (() => {
 					}
 
 					if (t.peek() === "") {
-						return t.error("unexpected EOF");
+						return t.error(errUnexpectedEOF);
 					}
 				}
 			}
@@ -131,7 +142,7 @@ javascript = (() => {
 				return template(t);
 			}
 
-			return t.error(`invalid character: ${t.get()}`);
+			return errInvalidCharacter(t);
 		case "'":
 		case '"':
 			divisionAllowed = true;
@@ -147,7 +158,7 @@ javascript = (() => {
 			if (!isIDStart(t.peek())) {
 				t.except("");
 
-				return t.error(`invalid sequence: ${t.get()}`);
+				return errInvalidSequence(t);
 			}
 
 			const [tk, tf] = identifier(t);
@@ -214,7 +225,7 @@ javascript = (() => {
 							const r = parseInt(code, 16);
 
 							if (isNaN(r) || r === 92 || !isIDStart(String.fromCharCode(r))) {
-								return t.error(`invalid unicode: ${tk.data}`);
+								return errInvalidUnicode(t, tk.data);
 							}
 						}
 
@@ -251,7 +262,7 @@ javascript = (() => {
 		case ']':
 			const ld = tokenDepth.at(-1);
 			if (!(ld === '(' && c === ')') && !(ld === '[' && c === ']')) {
-				return t.error(`invalid character: ${t.get()}`);
+				return errInvalidCharacter(t);
 			}
 
 			divisionAllowed = true;
@@ -262,12 +273,12 @@ javascript = (() => {
 			if (t.accept(".")) {
 				if (!t.accept(".")) { // ...
 					if (t.peek() === "") {
-						return t.error("unexpected EOF");
+						return t.error(errUnexpectedEOF);
 					}
 
 					t.except("");
 
-					return t.error(`invalid sequence: ${t.get()}`);
+					return errInvalidSequence(t);
 				}
 			} else if (t.accept(decimalDigit)) {
 				numberRun(t, decimalDigit);
@@ -332,7 +343,7 @@ javascript = (() => {
 
 			break;
 		default:
-			return t.error(`invalid character: ${t.get()}`);
+			return errInvalidCharacter(t);
 		}
 
 		return [{
@@ -345,12 +356,12 @@ javascript = (() => {
 
 		if (!t.except(lineTerminators)) {
 			if (t.peek() === "") {
-				return "unexpected EOF";
+				return errUnexpectedEOF;
 			}
 
 			t.except("");
 
-			return `invalid regexp sequence: ${t.get()}`;
+			return errInvalidRegexpSequence + t.get();
 		}
 
 		return "";
@@ -378,7 +389,7 @@ javascript = (() => {
 
 		switch (c) {
 		case "":
-			return t.error("unexpected EOF");
+			return t.error(errUnexpectedEOF);
 		case '\\':
 			const err = regexpBackslashSequence(t);
 
@@ -389,7 +400,7 @@ javascript = (() => {
 			break;
 		case '[':
 			if (!regexpExpressionClass(t)) {
-				return t.error("unexpected EOF");
+				return t.error(errUnexpectedEOF);
 			}
 
 			break;
@@ -399,7 +410,7 @@ javascript = (() => {
 				t.get();
 				t.except("");
 
-				return t.error(`invalid regexp character: ${t.get()}`);
+				return errInvalidRegexpCharacter(t);
 			}
 
 			t.except("");
@@ -411,7 +422,7 @@ javascript = (() => {
 
 			switch (c) {
 			case "":
-				return t.error("unexpected EOF");
+				return t.error(errUnexpectedEOF);
 			case '\\':
 				const err = regexpBackslashSequence(t);
 
@@ -422,7 +433,7 @@ javascript = (() => {
 				break;
 			case '[':
 				if (!regexpExpressionClass(t)) {
-					return t.error("unexpected EOF");
+					return t.error(errUnexpectedEOF);
 				}
 
 				break;
@@ -434,7 +445,7 @@ javascript = (() => {
 				t.get();
 				t.except("");
 
-				return t.error(`invalid regexp character: ${t.get()}`);
+				return errInvalidRegexpCharacter(t);
 			}
 		}
 
@@ -474,7 +485,7 @@ javascript = (() => {
 				if (!numberRun(t, binaryDigit)) {
 					t.except("");
 
-					return t.error(`invalid number: ${t.get()}`);
+					return errInvalidNumber(t);
 				}
 
 				t.accept("n");
@@ -482,7 +493,7 @@ javascript = (() => {
 				if (!numberRun(t, octalDigit)) {
 					t.except("");
 
-					return t.error(`invalid number: ${t.get()}`);
+					return errInvalidNumber(t);
 				}
 
 				t.accept("n");
@@ -490,7 +501,7 @@ javascript = (() => {
 				if (!numberRun(t, hexDigit)) {
 					t.except("");
 
-					return t.error(`invalid number: ${t.get()}`);
+					return errInvalidNumber(t);
 				}
 
 				t.accept("n");
@@ -498,7 +509,7 @@ javascript = (() => {
 				if (!numberRun(t, decimalDigit)) {
 					t.except("");
 
-					return t.error(`invalid number: ${t.get()}`);
+					return errInvalidNumber(t);
 				}
 
 				if (t.accept("eE")) {
@@ -507,7 +518,7 @@ javascript = (() => {
 					if (!numberRun(t, decimalDigit)) {
 						t.except("");
 
-						return t.error(`invalid number: ${t.get()}`);
+						return errInvalidNumber(t);
 					}
 				}
 			} else {
@@ -517,7 +528,7 @@ javascript = (() => {
 			if (!numberRun(t, decimalDigit)) {
 				t.except("");
 
-				return t.error(`invalid number: ${t.get()}`);
+				return errInvalidNumber(t);
 			}
 
 			if (!t.accept("n")) {
@@ -525,7 +536,7 @@ javascript = (() => {
 					if (!numberRun(t, decimalDigit)) {
 						t.except("");
 
-						return t.error(`invalid number: ${t.get()}`);
+						return errInvalidNumber(t);
 					}
 				}
 
@@ -535,7 +546,7 @@ javascript = (() => {
 					if (!numberRun(t, decimalDigit)) {
 						t.except("");
 
-						return t.error(`invalid number: ${t.get()}`);
+						return errInvalidNumber(t);
 					}
 				}
 			}
@@ -555,10 +566,10 @@ javascript = (() => {
 			if (!t.accept("u")) {
 				t.except("");
 
-				return t.error(`unexpected backslash: ${t.get()}`);
+				return errUnexpectedBackslash(t);
 			}
 			if (!unicodeEscapeSequence(t)) {
-				return t.error(`invalid unicode: ${t.get()}`);
+				return errInvalidUnicode(t);
 			}
 		}
 
@@ -634,15 +645,15 @@ javascript = (() => {
 					continue;
 				}
 
-				return t.error(`invalid escape sequence: ${t.get()}`);
+				return errInvalidEscapeSequence(t);
 			default:
 				if (lineTerminators.includes(c)) {
 					t.except("");
 
-					return t.error(`unexpected line terminator: ${t.get()}`);
+					return errUnexpectedLineTerminator(t);
 				}
 
-				return t.error("unexpected EOF");
+				return t.error(errUnexpectedEOF);
 			}
 		}
 
@@ -666,7 +677,7 @@ javascript = (() => {
 
 				t.except("");
 
-				return t.error(`invalid escape sequence: ${t.get()}`);
+				return errInvalidEscapeSequence(t);
 			case '$':
 				t.except("");
 				if (t.accept("{")) {
@@ -680,7 +691,7 @@ javascript = (() => {
 					}, inputElement];
 				}
 			default:
-				return t.error("unexpected EOF");
+				return t.error(errUnexpectedEOF);
 			}
 		}
 
