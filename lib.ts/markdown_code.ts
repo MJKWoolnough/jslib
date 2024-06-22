@@ -20,9 +20,7 @@ javascript = (() => {
 	let divisionAllowed = false;
 
 	const keywords = ["await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield"],
-	      unicodeGroups = (groups: string[]) => {
-		      return groups // TODO;
-	      },
+	      unicodeGroups = (groups: string[]) => new RegExp("^[" + groups.reduce((r, c) => r + `\p{${c}}`, "") + "]$"),
 	      idContinue = unicodeGroups(["L", "Nl", "Other_ID_Start", "Mn", "Mc", "Nd", "Pc", "Other_ID_Continue"]),
 	      idStart = unicodeGroups(["L", "Nl", "Other_ID_Start"]),
 	      notID   = unicodeGroups(["Pattern_Syntax", "Pattern_White_Space"]),
@@ -33,14 +31,14 @@ javascript = (() => {
 			return true;
 		}
 
-		return idStart.includes(c) && !notID.includes(c);
+		return idStart.test(c) && !notID.test(c);
 	      },
 	      isIDContinue = (c: string) => {
 		if (c === '$' || c === '_' || c === '\\' || c === zwnj || c === zwj) {
 			return true;
 		}
 
-		return idContinue.includes(c) && !notID.includes(c);
+		return idContinue.test(c) && !notID.test(c);
 	      },
 	      tokenDepth: string[] = [],
 	      inputElement: TokenFn = (t: Tokeniser) => {
