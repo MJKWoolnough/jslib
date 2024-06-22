@@ -8,9 +8,9 @@ const whitespace = "\t\v\f \xa0\ufeff",
       singleEscapeChar = "'\"\\bfnrtv",
       binaryDigit = "01",
       octalDigit = "01234567",
-      decimalDigit     = "0123456789",
-      hexDigit         = "0123456789abcdefABCDEF",
-      stringChars       = "'\\" + lineTerminators + "\"",
+      decimalDigit = "0123456789",
+      hexDigit = "0123456789abcdefABCDEF",
+      stringChars = "'\\" + lineTerminators + "\"",
       doubleStringChars = stringChars.slice(1),
       singleStringChars = stringChars.slice(0, stringChars.length),
       lineSplit = new RegExp("[" + lineTerminators + "]");
@@ -703,7 +703,6 @@ javascript = (() => {
 		return inputElement(tk);
 	};
 })();
-
 
 export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, noPre = true) => {
 	const nodes: HTMLElement[] = [];
