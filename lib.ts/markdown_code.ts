@@ -41,9 +41,9 @@ javascript = (() => {
 		return idContinue.test(c) && !notID.test(c);
 	      },
 	      tokenDepth: string[] = [],
-	      errUnexpectedEOF = "unexpected EOF",
-	      errInvalidRegexpSequence = "invalid regexp sequence",
-	      error = (errText: string) => (t: Tokeniser, text = t.get()) => t.error(errText + text),
+	      error = (errText: string, override?: string) => (t: Tokeniser, text = override ?? t.get()) => t.error(errText + text),
+	      errUnexpectedEOF = error("unexpected EOF", ""),
+	      errInvalidRegexpSequence = error("invalid regexp sequence", ""),
 	      errInvalidCharacter = error("invalid character: "),
 	      errInvalidSequence = error("invalid sequence: "),
 	      errInvalidNumber = error("invalid number: "),
@@ -83,7 +83,7 @@ javascript = (() => {
 				return t.done();
 			}
 
-			return t.error(errUnexpectedEOF);
+			return errUnexpectedEOF(t);
 		case '/':
 			t.except("");
 			if (t.accept("/")) {
@@ -109,7 +109,7 @@ javascript = (() => {
 					}
 
 					if (t.peek() === "") {
-						return t.error(errUnexpectedEOF);
+						return errUnexpectedEOF(t);
 					}
 				}
 			}
@@ -273,7 +273,7 @@ javascript = (() => {
 			if (t.accept(".")) {
 				if (!t.accept(".")) { // ...
 					if (t.peek() === "") {
-						return t.error(errUnexpectedEOF);
+						return errUnexpectedEOF(t);
 					}
 
 					t.except("");
@@ -361,10 +361,10 @@ javascript = (() => {
 
 			t.except("");
 
-			return errInvalidRegexpSequence + t.get();
+			return errInvalidRegexpSequence;
 		}
 
-		return "";
+		return null;
 	      },
 	      regexpExpressionClass = (t: Tokeniser) => {
 		t.except("");
@@ -389,18 +389,18 @@ javascript = (() => {
 
 		switch (c) {
 		case "":
-			return t.error(errUnexpectedEOF);
+			return errUnexpectedEOF(t);
 		case '\\':
 			const err = regexpBackslashSequence(t);
 
 			if (err) {
-				return t.error(err)
+				return err(t)
 			}
 
 			break;
 		case '[':
 			if (!regexpExpressionClass(t)) {
-				return t.error(errUnexpectedEOF);
+				return errUnexpectedEOF(t);
 			}
 
 			break;
@@ -422,18 +422,18 @@ javascript = (() => {
 
 			switch (c) {
 			case "":
-				return t.error(errUnexpectedEOF);
+				return errUnexpectedEOF(t);
 			case '\\':
 				const err = regexpBackslashSequence(t);
 
 				if (err) {
-					return t.error(err);
+					return err(t);
 				}
 
 				break;
 			case '[':
 				if (!regexpExpressionClass(t)) {
-					return t.error(errUnexpectedEOF);
+					return errUnexpectedEOF(t);
 				}
 
 				break;
@@ -653,7 +653,7 @@ javascript = (() => {
 					return errUnexpectedLineTerminator(t);
 				}
 
-				return t.error(errUnexpectedEOF);
+				return errUnexpectedEOF(t);
 			}
 		}
 
@@ -691,7 +691,7 @@ javascript = (() => {
 					}, inputElement];
 				}
 			default:
-				return t.error(errUnexpectedEOF);
+				return errUnexpectedEOF(t);
 			}
 		}
 
