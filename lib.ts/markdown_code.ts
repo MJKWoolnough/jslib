@@ -12,7 +12,8 @@ const whitespace = "\t\v\f \xa0\ufeff",
       hexDigit         = "0123456789abcdefABCDEF",
       stringChars       = "'\\" + lineTerminators + "\"",
       doubleStringChars = stringChars.slice(1),
-      singleStringChars = stringChars.slice(0, stringChars.length);
+      singleStringChars = stringChars.slice(0, stringChars.length),
+      lineSplit = new RegExp("[" + lineTerminators + "]");
 
 export const [TokenWhitespace, TokenLineTerminator, TokenSingleLineComment, TokenMultiLineComment, TokenIdentifier, TokenPrivateIdentifier, TokenBooleanLiteral, TokenKeyword, TokenPunctuator, TokenNumericLiteral, TokenStringLiteral, TokenNoSubstitutionTemplate, TokenTemplateHead, TokenTemplateMiddle, TokenTemplateTail, TokenDivPunctuator, TokenRightBracePunctuator, TokenRegularExpressionLiteral, TokenNullLiteral, TokenFutureReservedWord] = Array.from({"length": 20}, n => n) as TokenType[],
 javascript = (() => {
@@ -710,11 +711,7 @@ export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, 
 	for (const tk of processToEnd(Parser(contents, fn))) {
 		const colour = colours.get(tk.type);
 
-		nodes.push(span(colour ? colour.startsWith(".") ? {"class": colour} : {"style": "color: " + colour} : {}, tk.data));
-
-		if (noPre && tk.type === TokenLineTerminator) {
-			nodes.push(br());
-		}
+		nodes.push(span(colour ? colour.startsWith(".") ? {"class": colour} : {"style": "color: " + colour} : {}, noPre ? tk.data.split(lineSplit).map((s, n) => [n > 0 ? br() : [], s]) : tk.data));
 	}
 
 	return createDocumentFragment(nodes);
