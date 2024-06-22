@@ -716,7 +716,7 @@ export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, 
 		if (colour === last && nodes.length > 0) {
 			amendNode(nodes.at(-1), contents);
 		} else {
-			nodes.push(span(colour ? colour.startsWith(".") ? {"class": colour} : {"style": "color: " + colour} : {}, contents));
+			nodes.push(span(colour ? colour.startsWith(".") ? {"class": colour.slice(1)} : {"style": "color: " + colour} : {}, contents));
 		}
 
 		last = colour;
