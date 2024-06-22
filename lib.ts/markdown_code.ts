@@ -710,7 +710,7 @@ export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, 
 	for (const tk of processToEnd(Parser(contents, fn))) {
 		const colour = colours.get(tk.type);
 
-		nodes.push(span(colour?.startsWith(".") ? {"class": colour} : {"style": colour ? "color: " + colour:  null}, tk.data));
+		nodes.push(span(colour ? colour.startsWith(".") ? {"class": colour} : {"style": "color: " + colour} : {}, tk.data));
 
 		if (noPre && tk.type === TokenLineTerminator) {
 			nodes.push(br());
