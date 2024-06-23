@@ -184,28 +184,20 @@ javascript = (() => {
 					divisionAllowed = true;
 					tk.type = TokenNumericLiteral;
 				} else {
-					for (const kw of keywords) {
-						if (kw === tk.data) {
-							tk.type = TokenKeyword;
+					if (keywords.includes(tk.data))  {
+						tk.type = TokenKeyword;
 
-							if (tk.data === "this") {
-								divisionAllowed = true
-							}
-
-							break;
+						if (tk.data === "this") {
+							divisionAllowed = true;
 						}
-					}
-
-					if (tk.type === TokenIdentifier) {
+					} else {
 						if (tk.data[0] === "\\") {
 							let code = "";
 
 							if (tk.data[2] === '{') {
-								let n = 3;
+								const pos = tk.data.indexOf("}");
 
-								for (; tk.data[n] != '}'; n++) { }
-
-								code = tk.data.slice(3, n);
+								code = tk.data.slice(3, pos === -1 ? 0 : pos);
 							} else {
 								code = tk.data.slice(2, 6);
 							}
@@ -273,7 +265,6 @@ javascript = (() => {
 
 				if (t.accept("eE")) {
 					t.accept("+-");
-
 					numberRun(t, decimalDigit);
 				}
 
@@ -614,7 +605,6 @@ javascript = (() => {
 		Loop:
 		while (true) {
 			const c = t.exceptRun(chars);
-
 			switch (c) {
 			case '"':
 			case '\'':
