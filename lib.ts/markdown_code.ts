@@ -26,20 +26,8 @@ javascript = (() => {
 	      notID = unicodeGroups(["Pattern_Syntax", "Pattern_White_Space"]),
 	      zwnj = String.fromCharCode(8204),
 	      zwj = String.fromCharCode(8205),
-	      isIDStart = (c: string) => {
-		if (c === '$' || c === '_' || c === '\\') {
-			return true;
-		}
-
-		return idStart.test(c) && !notID.test(c);
-	      },
-	      isIDContinue = (c: string) => {
-		if (c === '$' || c === '_' || c === '\\' || c === zwnj || c === zwj) {
-			return true;
-		}
-
-		return idContinue.test(c) && !notID.test(c);
-	      },
+	      isIDStart = (c: string) => c === '$' || c === '_' || c === '\\' || idStart.test(c) && !notID.test(c),
+	      isIDContinue = (c: string) => c === '$' || c === '_' || c === '\\' || c === zwnj || c === zwj || idContinue.test(c) && !notID.test(c),
 	      tokenDepth: string[] = [],
 	      error = (errText: string, override?: string) => (t: Tokeniser, text = override ?? t.get()) => t.error(errText + text),
 	      errUnexpectedEOF = error("unexpected EOF", ""),
