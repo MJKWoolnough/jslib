@@ -288,11 +288,8 @@ javascript = (() => {
 			break;
 		case '<':
 		case '*':
-			if (!t.accept("=")) { // <=, *=
-				if (t.peek() === c) { // <<, **
-					t.except("");
-					t.accept("="); // <<=, **=
-				}
+			if (!t.accept("=") /* <=, *= */ && t.accept(c)) { // <<, **
+				t.accept("="); // <<=, **=
 			}
 
 			break;
