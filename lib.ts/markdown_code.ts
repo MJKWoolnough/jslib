@@ -260,7 +260,7 @@ javascript = (() => {
 		case '.':
 			if (t.accept(".")) {
 				if (!t.accept(".")) { // ...
-					if (t.peek() === "") {
+					if (!t.peek()) {
 						return errUnexpectedEOF(t);
 					}
 
@@ -343,7 +343,7 @@ javascript = (() => {
 		t.except("");
 
 		if (!t.except(lineTerminators)) {
-			if (t.peek() === "") {
+			if (!t.peek()) {
 				return errUnexpectedEOF;
 			}
 
