@@ -17,8 +17,6 @@ const whitespace = "\t\v\f \xa0\ufeff",
 
 export const [TokenWhitespace, TokenLineTerminator, TokenSingleLineComment, TokenMultiLineComment, TokenIdentifier, TokenPrivateIdentifier, TokenBooleanLiteral, TokenKeyword, TokenPunctuator, TokenNumericLiteral, TokenStringLiteral, TokenNoSubstitutionTemplate, TokenTemplateHead, TokenTemplateMiddle, TokenTemplateTail, TokenDivPunctuator, TokenRightBracePunctuator, TokenRegularExpressionLiteral, TokenNullLiteral, TokenFutureReservedWord] = Array.from({"length": 20}, n => n) as TokenType[],
 javascript = (() => {
-	let divisionAllowed = false;
-
 	const keywords = ["await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield"],
 	      unicodeGroups = (...groups: string[]) => new RegExp("^[" + groups.reduce((r, c) => r + `\p{${c}}`, "") + "]$"),
 	      idContinue = unicodeGroups("L", "Nl", "Other_ID_Start", "Mn", "Mc", "Nd", "Pc", "Other_ID_Continue"),
@@ -28,7 +26,6 @@ javascript = (() => {
 	      zwj = String.fromCharCode(8205),
 	      isIDStart = (c: string) => c === '$' || c === '_' || c === '\\' || idStart.test(c) && !notID.test(c),
 	      isIDContinue = (c: string) => c === '$' || c === '_' || c === '\\' || c === zwnj || c === zwj || idContinue.test(c) && !notID.test(c),
-	      tokenDepth: string[] = [],
 	      error = (errText: string, override?: string) => (t: Tokeniser, text = override ?? t.get()) => t.error(errText + text),
 	      errUnexpectedEOF = error("unexpected EOF", ""),
 	      errInvalidRegexpSequence = error("invalid regexp sequence", ""),
@@ -690,7 +687,10 @@ javascript = (() => {
 			"type": v[0] === '`' ? TokenNoSubstitutionTemplate : TokenTemplateTail,
 			"data": v
 		}, inputElement];
-	      };
+	      },
+	      tokenDepth: string[] = [];
+
+	let divisionAllowed = false;
 
 	return (tk: Tokeniser) => {
 		divisionAllowed = false;
