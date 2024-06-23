@@ -86,6 +86,7 @@ javascript = (() => {
 			return errUnexpectedEOF(t);
 		case '/':
 			t.except("");
+
 			if (t.accept("/")) {
 				t.exceptRun(lineTerminators);
 
@@ -99,6 +100,7 @@ javascript = (() => {
 				while (true) {
 					t.exceptRun("*");
 					t.accept("*");
+
 					if (t.accept("/")) {
 						divisionAllowed = allowDivision;
 
@@ -128,6 +130,7 @@ javascript = (() => {
 			return regexp(t);
 		case '}':
 			t.except("");
+
 			switch (tokenDepth.at(-1)) {
 			case '{':
 				tokenDepth.pop();
@@ -392,7 +395,6 @@ javascript = (() => {
 			return errUnexpectedEOF(t);
 		case '\\':
 			const err = regexpBackslashSequence(t);
-
 			if (err) {
 				return err(t)
 			}
@@ -419,13 +421,11 @@ javascript = (() => {
 		Loop:
 		while (true) {
 			const c = t.exceptRun(lineTerminators + "\\[/");
-
 			switch (c) {
 			case "":
 				return errUnexpectedEOF(t);
 			case '\\':
 				const err = regexpBackslashSequence(t);
-
 				if (err) {
 					return err(t);
 				}
@@ -532,12 +532,10 @@ javascript = (() => {
 			}
 
 			if (!t.accept("n")) {
-				if (t.accept(".")) {
-					if (!numberRun(t, decimalDigit)) {
-						t.except("");
+				if (t.accept(".") && !numberRun(t, decimalDigit)) {
+					t.except("");
 
-						return errInvalidNumber(t);
-					}
+					return errInvalidNumber(t);
 				}
 
 				if (t.accept("eE")) {
@@ -568,6 +566,7 @@ javascript = (() => {
 
 				return errUnexpectedBackslash(t);
 			}
+
 			if (!unicodeEscapeSequence(t)) {
 				return errInvalidUnicode(t);
 			}
