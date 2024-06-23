@@ -547,13 +547,11 @@ javascript = (() => {
 
 		while(true) {
 			const c = t.peek();
-			if (isIDContinue(c)) {
-				t.except("");
-
-				continue;
+			if (!isIDContinue(c)) {
+				break;
 			}
 
-			break;
+			t.except("");
 		}
 
 		return [{
