@@ -380,7 +380,6 @@ javascript = (() => {
 
 			break;
 		default:
-
 			if (lineTerminators.includes(c)) {
 				t.get();
 				t.except("");
