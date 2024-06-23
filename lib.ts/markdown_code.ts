@@ -1,7 +1,7 @@
 import type {TokenFn, Tokeniser, TokenType} from './parser.js';
 import {amendNode, createDocumentFragment} from './dom.js';
 import {br, span} from './html.js';
-import Parser, {processToEnd} from './parser.js';
+import Parser, {TokenDone, TokenError} from './parser.js';
 
 const whitespace = "\t\v\f \xa0\ufeff",
       lineTerminators = "\n\r\u2028\u2029",
@@ -716,19 +716,30 @@ javascript = (() => {
 export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, noPre = true) => {
 	const nodes: HTMLElement[] = [];
 
-	let last: string | undefined;
+	let last: string | undefined,
+	    pos = 0;
 
-	for (const tk of processToEnd(Parser(contents, fn))) {
+	for (const tk of Parser(contents, fn)) {
+		if (tk.type === TokenDone) {
+			break;
+		}
+
 		const colour = colours.get(tk.type),
-		      contents = noPre ? tk.data.split(lineSplit).map((s, n) => n > 0 ? [br(), s] : s) : tk.data;
+		      data = tk.type === TokenError ? contents.slice(pos) : tk.data,
+		      textContents = noPre ? data.split(lineSplit).map((s, n) => n > 0 ? [br(), s] : s) : data;
 
 		if (colour === last && nodes.length > 0) {
-			amendNode(nodes.at(-1), contents);
+			amendNode(nodes.at(-1), textContents);
 		} else {
-			nodes.push(span(colour ? colour.startsWith(".") ? {"class": colour.slice(1)} : {"style": "color: " + colour} : {}, contents));
+			nodes.push(span(colour ? colour.startsWith(".") ? {"class": colour.slice(1)} : {"style": "color: " + colour} : {}, textContents));
 		}
 
 		last = colour;
+		pos += tk.data.length;
+
+		if (tk.type < 0) {
+			break;
+		}
 	}
 
 	return createDocumentFragment(nodes);
