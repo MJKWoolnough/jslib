@@ -11612,5 +11612,17 @@ type Tests = {
 
 			return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.exportPage(true)) === JSON.stringify([["Col A", "Col B", "CCC"],["1", "2", "3"]]));
 		}
-	})
+	}),
+	"markdown_code": {
+		"default": {
+			"simple": async () => {
+				const {default: code} = await import("./lib/markdown_code.js"),
+				      div = document.createElement("div");
+
+				div.append(code("", t => t.done(), new Map()));
+
+				return div.innerHTML === "";
+			}
+		}
+	}
 });
