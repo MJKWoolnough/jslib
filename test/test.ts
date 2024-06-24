@@ -11662,6 +11662,12 @@ type Tests = {
 					"fulltext": "aerrortext",
 					"result": `<span class="A">a</span><span class="E">errortext</span>`,
 					"colours": [[0, ".A"], [-2, ".E"]]
+				},
+				"error token with matching class": {
+					"tokens": [{"type": 0, "data": "a"}, {"type": 1, "data": "bbb"}, {"type": -2, "data": "an error occurred"}],
+					"fulltext": "abbberrortext",
+					"result": `<span class="A">a</span><span class="E">bbberrortext</span>`,
+					"colours": [[0, ".A"], [1, ".E"], [-2, ".E"]]
 				}
 			} as Record<string, Entry>).reduce((o, [name, {result = "", fulltext = "", tokens = [], colours = []}]) => {
 				o[name] = Object.defineProperty(async () => {
