@@ -11646,7 +11646,7 @@ type Tests = {
 					"colours": [[0, ".A"], [1, ".B"]]
 				}
 			} as Record<string, Entry>).reduce((o, [name, {result = "", tokens = [], colours = []}]) => {
-				o[name] = async () => {
+				o[name] = Object.defineProperty(async () => {
 					const {default: code} = await import("./lib/markdown_code.js"),
 					      tokenFn: TokenFn = t => tokens.length ? [tokens.shift()!, tokenFn] : t.done(),
 					      div = document.createElement("div");
@@ -11654,7 +11654,7 @@ type Tests = {
 					div.append(code("", tokenFn as any, new Map(colours)));
 
 					return div.innerHTML === result;
-				};
+				}, "toString", {"value": () => "[" + tokens.map(t => `{type: ${t.type}, data: "${t.data}"}`) + "] = `" + result + "`"});
 
 				return o;
 			}, {} as Record<string, () => Promise<boolean>>);
