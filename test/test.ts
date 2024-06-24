@@ -11668,7 +11668,12 @@ type Tests = {
 					"fulltext": "abbberrortext",
 					"result": `<span class="A">a</span><span class="E">bbberrortext</span>`,
 					"colours": [[0, ".A"], [1, ".E"], [-2, ".E"]]
-				}
+				},
+				"simple tokens with newlines": {
+					"tokens": [{"type": 0, "data": "a\n"}, {"type": 1, "data": "cb\nb\nbc"}],
+					"result": `<span class="A">a<br></span><span style="color: #fff">cb<br>b<br>bc</span>`,
+					"colours": [[0, ".A"], [1, "#fff"]]
+				},
 			} as Record<string, Entry>).reduce((o, [name, {result = "", fulltext = "", tokens = [], colours = []}]) => {
 				o[name] = Object.defineProperty(async () => {
 					const {default: code} = await import("./lib/markdown_code.js"),
