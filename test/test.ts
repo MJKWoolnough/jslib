@@ -11622,6 +11622,29 @@ type Tests = {
 				div.append(code("", t => t.done(), new Map()));
 
 				return div.innerHTML === "";
+			},
+			"simple tokens": async () => {
+				type Token = {
+					type: number;
+					data: string;
+				}
+
+				interface Tokeniser  {
+					done(): [Token, TokenFn];
+					error(): [Token, TokenFn];
+				}
+
+				type TokenFn = (p: Tokeniser) => [Token, TokenFn];
+
+				const {default: code} = await import("./lib/markdown_code.js"),
+				      {Tokeniser} = await import("./lib/parser.js"),
+				      tokens: Token[] = [{"type": 0, "data": "a"}, {"type": 1, "data": "bbb"}],
+				      tokenFn: TokenFn = t => tokens.length ? [tokens.shift()!, tokenFn] : t.done(),
+				      div = document.createElement("div");
+
+				div.append(code("", tokenFn as any, new Map([[0, ".A"], [1, "#fff"]])));
+
+				return div.innerHTML === `<span class="A">a</span><span style="color: #fff">bbb</span>`;
 			}
 		}
 	}
