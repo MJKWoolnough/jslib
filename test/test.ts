@@ -11644,7 +11644,12 @@ type Tests = {
 					"tokens": [{"type": 0, "data": "abc"}, {"type": 0, "data": "def"}, {"type": 0, "data": "ghi"}, {"type": 1, "data": "123"}, {"type": 1, "data": "456"}],
 					"result": `<span class="A">abcdefghi</span><span class="B">123456</span>`,
 					"colours": [[0, ".A"], [1, ".B"]]
-				}
+				},
+				"unknown token": {
+					"tokens": [{"type": 0, "data": "a"}, {"type": 1, "data": "bbb"}, {"type": 2, "data": "ccc"}, {"type": 0, "data": "ddd"}],
+					"result": `<span class="A">a</span><span>bbbccc</span><span class="A">ddd</span>`,
+					"colours": [[0, ".A"]]
+				},
 			} as Record<string, Entry>).reduce((o, [name, {result = "", tokens = [], colours = []}]) => {
 				o[name] = Object.defineProperty(async () => {
 					const {default: code} = await import("./lib/markdown_code.js"),
