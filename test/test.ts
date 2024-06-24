@@ -11629,6 +11629,7 @@ type Tests = {
 
 			type Entry = {
 				tokens?: Token[];
+				fulltext?: string;
 				result?: string;
 				colours?: [number, string][];
 			}
@@ -11650,13 +11651,19 @@ type Tests = {
 					"result": `<span class="A">a</span><span>bbbccc</span><span class="A">ddd</span>`,
 					"colours": [[0, ".A"]]
 				},
-			} as Record<string, Entry>).reduce((o, [name, {result = "", tokens = [], colours = []}]) => {
+				"error token": {
+					"tokens": [{"type": 0, "data": "a"}, {"type": -2, "data": "an error occurred"}],
+					"fulltext": "aerrortext",
+					"result": `<span class="A">a</span><span>errortext</span>`,
+					"colours": [[0, ".A"]]
+				},
+			} as Record<string, Entry>).reduce((o, [name, {result = "", fulltext = "", tokens = [], colours = []}]) => {
 				o[name] = Object.defineProperty(async () => {
 					const {default: code} = await import("./lib/markdown_code.js"),
 					      tokenFn: TokenFn = t => tokens.length ? [tokens.shift()!, tokenFn] : t.done(),
 					      div = document.createElement("div");
 
-					div.append(code("", tokenFn as any, new Map(colours)));
+					div.append(code(fulltext, tokenFn as any, new Map(colours)));
 
 					return div.innerHTML === result;
 				}, "toString", {"value": () => "[" + tokens.map(t => `{type: ${t.type}, data: "${t.data}"}`) + "] = `" + result + "`"});
