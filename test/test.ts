@@ -11639,6 +11639,11 @@ type Tests = {
 					"tokens": [{"type": 0, "data": "a"}, {"type": 1, "data": "bbb"}],
 					"result": `<span class="A">a</span><span style="color: #fff">bbb</span>`,
 					"colours": [[0, ".A"], [1, "#fff"]]
+				},
+				"multiple similar tokens in a row": {
+					"tokens": [{"type": 0, "data": "abc"}, {"type": 0, "data": "def"}, {"type": 0, "data": "ghi"}, {"type": 1, "data": "123"}, {"type": 1, "data": "456"}],
+					"result": `<span class="A">abcdefghi</span><span class="B">123456</span>`,
+					"colours": [[0, ".A"], [1, ".B"]]
 				}
 			} as Record<string, Entry>).reduce((o, [name, {result = "", tokens = [], colours = []}]) => {
 				o[name] = async () => {
