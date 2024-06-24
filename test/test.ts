@@ -11614,38 +11614,45 @@ type Tests = {
 		}
 	}),
 	"markdown_code": {
-		"default": {
-			"simple": async () => {
-				const {default: code} = await import("./lib/markdown_code.js"),
-				      div = document.createElement("div");
-
-				div.append(code("", t => t.done(), new Map()));
-
-				return div.innerHTML === "";
-			},
-			"simple tokens": async () => {
-				type Token = {
-					type: number;
-					data: string;
-				}
-
-				interface Tokeniser  {
-					done(): [Token, TokenFn];
-					error(): [Token, TokenFn];
-				}
-
-				type TokenFn = (p: Tokeniser) => [Token, TokenFn];
-
-				const {default: code} = await import("./lib/markdown_code.js"),
-				      {Tokeniser} = await import("./lib/parser.js"),
-				      tokens: Token[] = [{"type": 0, "data": "a"}, {"type": 1, "data": "bbb"}],
-				      tokenFn: TokenFn = t => tokens.length ? [tokens.shift()!, tokenFn] : t.done(),
-				      div = document.createElement("div");
-
-				div.append(code("", tokenFn as any, new Map([[0, ".A"], [1, "#fff"]])));
-
-				return div.innerHTML === `<span class="A">a</span><span style="color: #fff">bbb</span>`;
+		"default": (() => {
+			type Token = {
+				type: number;
+				data: string;
 			}
-		}
+
+			interface Tokeniser  {
+				done(): [Token, TokenFn];
+				error(): [Token, TokenFn];
+			}
+
+			type TokenFn = (p: Tokeniser) => [Token, TokenFn];
+
+			type Entry = {
+				tokens?: Token[];
+				result?: string;
+				colours?: [number, string][];
+			}
+
+			return Object.entries({
+				"simple": {},
+				"simple tokens": {
+					"tokens": [{"type": 0, "data": "a"}, {"type": 1, "data": "bbb"}],
+					"result": `<span class="A">a</span><span style="color: #fff">bbb</span>`,
+					"colours": [[0, ".A"], [1, "#fff"]]
+				}
+			} as Record<string, Entry>).reduce((o, [name, {result = "", tokens = [], colours = []}]) => {
+				o[name] = async () => {
+					const {default: code} = await import("./lib/markdown_code.js"),
+					      tokenFn: TokenFn = t => tokens.length ? [tokens.shift()!, tokenFn] : t.done(),
+					      div = document.createElement("div");
+
+					div.append(code("", tokenFn as any, new Map(colours)));
+
+					return div.innerHTML === result;
+				};
+
+				return o;
+			}, {} as Record<string, () => Promise<boolean>>);
+		})()
 	}
 });
