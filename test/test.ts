@@ -11704,6 +11704,10 @@ type Tests = {
 				"source": "",
 				"output": ""
 			},
+			"simple (a)": {
+				"source": "a",
+				"output": `<span class="identifier">a</span>`
+			}
 		} as Record<string, {source: string; output: string}>).reduce((o, [name, {source, output}]) => (o[name] = async () => {
 			const {default: code, javascript} = await import("./lib/markdown_code.js"),
 			      div = document.createElement("div");
