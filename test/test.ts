@@ -11709,16 +11709,16 @@ type Tests = {
 			      div = document.createElement("div");
 
 			div.append(code(source, javascript, new Map([
-				[2, "comment"],
-				[3, "comment"],
-				[4, "identifier"],
-				[5, "identifier"],
-				[6, "literal"],
-				[7, "keyword"],
-				[9, "literal"],
-				[10, "literal"],
-				[17, "literal"],
-				[18, "literal"]
+				[2, ".comment"],
+				[3, ".comment"],
+				[4, ".identifier"],
+				[5, ".identifier"],
+				[6, ".literal"],
+				[7, ".keyword"],
+				[9, ".literal"],
+				[10, ".literal"],
+				[17, ".literal"],
+				[18, ".literal"]
 			])));
 
 			return div.innerHTML === output;
