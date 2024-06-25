@@ -11632,6 +11632,7 @@ type Tests = {
 				fulltext?: string;
 				result?: string;
 				colours?: [number, string][];
+				noPre?: boolean;
 			}
 
 			return Object.entries({
@@ -11674,13 +11675,19 @@ type Tests = {
 					"result": `<span class="A">a<br></span><span style="color: #fff">cb<br>b<br>bc</span>`,
 					"colours": [[0, ".A"], [1, "#fff"]]
 				},
-			} as Record<string, Entry>).reduce((o, [name, {result = "", fulltext = "", tokens = [], colours = []}]) => {
+				"simple tokens with newlines, with noPre set": {
+					"tokens": [{"type": 0, "data": "a\n"}, {"type": 1, "data": "cb\nb\nbc"}],
+					"result": `<span class="A">a\n</span><span style="color: #fff">cb\nb\nbc</span>`,
+					"colours": [[0, ".A"], [1, "#fff"]],
+					"noPre": false
+				},
+			} as Record<string, Entry>).reduce((o, [name, {result = "", fulltext = "", tokens = [], colours = [], noPre = true}]) => {
 				o[name] = Object.defineProperty(async () => {
 					const {default: code} = await import("./lib/markdown_code.js"),
 					      tokenFn: TokenFn = t => tokens.length ? [tokens.shift()!, tokenFn] : t.done(),
 					      div = document.createElement("div");
 
-					div.append(code(fulltext, tokenFn as any, new Map(colours)));
+					div.append(code(fulltext, tokenFn as any, new Map(colours), noPre));
 
 					return div.innerHTML === result;
 				}, "toString", {"value": () => "[" + tokens.map(t => `{type: ${t.type}, data: "${t.data}"}`) + "] = `" + result + "`"});
