@@ -11699,7 +11699,12 @@ type Tests = {
 				return o;
 			}, {} as Record<string, () => Promise<boolean>>);
 		})(),
-		"javascript": Object.entries({} as Record<string, {source: string; output: string}>).reduce((o, [name, {source, output}]) => (o[name] = async () => {
+		"javascript": Object.entries({
+			"simple": {
+				"source": "",
+				"output": ""
+			},
+		} as Record<string, {source: string; output: string}>).reduce((o, [name, {source, output}]) => (o[name] = async () => {
 			const {default: code, javascript} = await import("./lib/markdown_code.js"),
 			      div = document.createElement("div");
 
