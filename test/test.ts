@@ -11707,6 +11707,10 @@ type Tests = {
 			"simple (a)": {
 				"source": "a",
 				"output": `<span class="identifier">a</span>`
+			},
+			"simple assignmet": {
+				"source": `a = 1;\nb = "2"`,
+				"output": `<span class="identifier">a</span><span> = </span><span class="literal">1</span><span>;<br></span><span class="identifier">b</span><span> = </span><span class="literal">"2"</span>`
 			}
 		} as Record<string, {source: string; output: string}>).reduce((o, [name, {source, output}]) => (o[name] = async () => {
 			const {default: code, javascript} = await import("./lib/markdown_code.js"),
