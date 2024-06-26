@@ -11732,6 +11732,10 @@ type Tests = {
 				"multi-line comment": {
 					"source": "/* abc\n\tmore\ncomment\n */",
 					"output": `<span class="comment">/* abc<br>\tmore<br>comment<br> */</span>`
+				},
+				"large test": {
+					"source": "const myFunc = function(aye, bee, cea) {\n\tconst num = [123, 4, lastNum(aye, \"beep\", () => window, val => val * 2, (myVar) => {myVar /= 2;return myVar;})], elm = document.getElementByID();\n\tconsole.log(bee, num, elm);}",
+					"output": `<span class="keyword">const</span><span> </span><span class="identifier">myFunc</span><span> = </span><span class="keyword">function</span><span>(</span><span class="identifier">aye</span><span>, </span><span class="identifier">bee</span><span>, </span><span class="identifier">cea</span><span>) {<br>\t</span><span class="keyword">const</span><span> </span><span class="identifier">num</span><span> = [</span><span class="literal">123</span><span>, </span><span class="literal">4</span><span>, </span><span class="identifier">lastNum</span><span>(</span><span class="identifier">aye</span><span>, </span><span class="literal">"beep"</span><span>, () =&gt; </span><span class="identifier">window</span><span>, </span><span class="identifier">val</span><span> =&gt; </span><span class="identifier">val</span><span> * </span><span class="literal">2</span><span>, (</span><span class="identifier">myVar</span><span>) =&gt; {</span><span class="identifier">myVar</span><span> /= </span><span class="literal">2</span><span>;</span><span class="keyword">return</span><span> </span><span class="identifier">myVar</span><span>;})], </span><span class="identifier">elm</span><span> = </span><span class="identifier">document</span><span>.</span><span class="identifier">getElementByID</span><span>();<br>\t</span><span class="identifier">console</span><span>.</span><span class="identifier">log</span><span>(</span><span class="identifier">bee</span><span>, </span><span class="identifier">num</span><span>, </span><span class="identifier">elm</span><span>);}</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
@@ -11750,7 +11754,7 @@ type Tests = {
 				[17, ".literal"],
 				[18, ".literal"]
 			])));
-			
+
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
 	}
