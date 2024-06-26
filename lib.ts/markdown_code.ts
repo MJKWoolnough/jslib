@@ -697,7 +697,7 @@ export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, 
 
 		const colour = colours.get(tk.type),
 		      data = tk.type === TokenError ? contents.slice(pos) : tk.data,
-		      textContents = noPre ? data.replaceAll("\t", "\u2003").split(lineSplit).map((s, n) => n > 0 ? [br(), s] : s) : data;
+		      textContents = noPre ? data.replaceAll("\t", "\u2003").replaceAll(" ", "\u00a0").split(lineSplit).map((s, n) => n > 0 ? [br(), s] : s) : data;
 
 		if (colour === last && nodes.length > 0) {
 			amendNode(nodes.at(-1), textContents);
