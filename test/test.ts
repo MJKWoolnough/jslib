@@ -11711,31 +11711,31 @@ type Tests = {
 				},
 				"simple assignmet": {
 					"source": `a = 1;\nb = "2"`,
-					"output": `<span class="identifier">a</span><span> = </span><span class="literal">1</span><span>;<br></span><span class="identifier">b</span><span> = </span><span class="literal">"2"</span>`
+					"output": `<span class="identifier">a</span><span>&nbsp;=&nbsp;</span><span class="literal">1</span><span>;<br></span><span class="identifier">b</span><span>&nbsp;=&nbsp;</span><span class="literal">"2"</span>`
 				},
 				"function": {
 					"source": `function A(a, b){\n	return c;\n}`,
-					"output": `<span class="keyword">function</span><span> </span><span class="identifier">A</span><span>(</span><span class="identifier">a</span><span>, </span><span class="identifier">b</span><span>){<br>\u2003</span><span class="keyword">return</span><span> </span><span class="identifier">c</span><span>;<br>}</span>`
+					"output": `<span class="keyword">function</span><span>&nbsp;</span><span class="identifier">A</span><span>(</span><span class="identifier">a</span><span>,&nbsp;</span><span class="identifier">b</span><span>){<br>\u2003</span><span class="keyword">return</span><span>&nbsp;</span><span class="identifier">c</span><span>;<br>}</span>`
 				},
 				"big number": {
 					"source": "Number(10000n * this.#numerator / this.#denominator) / 10000;",
-					"output": `<span class="identifier">Number</span><span>(</span><span class="literal">10000n</span><span> * </span><span class="keyword">this</span><span>.</span><span class="identifier">#numerator</span><span> / </span><span class="keyword">this</span><span>.</span><span class="identifier">#denominator</span><span>) / </span><span class="literal">10000</span><span>;</span>`
+					"output": `<span class="identifier">Number</span><span>(</span><span class="literal">10000n</span><span>&nbsp;*&nbsp;</span><span class="keyword">this</span><span>.</span><span class="identifier">#numerator</span><span>&nbsp;/&nbsp;</span><span class="keyword">this</span><span>.</span><span class="identifier">#denominator</span><span>)&nbsp;/&nbsp;</span><span class="literal">10000</span><span>;</span>`
 				},
 				"nullish coalescing": {
 					"source": "a ?? b",
-					"output": `<span class="identifier">a</span><span> ?? </span><span class="identifier">b</span>`
+					"output": `<span class="identifier">a</span><span>&nbsp;??&nbsp;</span><span class="identifier">b</span>`
 				},
 				"comment": {
 					"source": "// abc",
-					"output": `<span class="comment">// abc</span>`
+					"output": `<span class="comment">//&nbsp;abc</span>`
 				},
 				"multi-line comment": {
 					"source": "/* abc\n\tmore\ncomment\n */",
-					"output": `<span class="comment">/* abc<br>\u2003more<br>comment<br> */</span>`
+					"output": `<span class="comment">/*&nbsp;abc<br>\u2003more<br>comment<br>&nbsp;*/</span>`
 				},
 				"large test": {
 					"source": "const myFunc = function(aye, bee, cea) {\n\tconst num = [123, 4, lastNum(aye, \"beep\", () => window, val => val * 2, (myVar) => {myVar /= 2;return myVar;})], elm = document.getElementByID();\n\tconsole.log(bee, num, elm);}",
-					"output": `<span class="keyword">const</span><span> </span><span class="identifier">myFunc</span><span> = </span><span class="keyword">function</span><span>(</span><span class="identifier">aye</span><span>, </span><span class="identifier">bee</span><span>, </span><span class="identifier">cea</span><span>) {<br>\u2003</span><span class="keyword">const</span><span> </span><span class="identifier">num</span><span> = [</span><span class="literal">123</span><span>, </span><span class="literal">4</span><span>, </span><span class="identifier">lastNum</span><span>(</span><span class="identifier">aye</span><span>, </span><span class="literal">"beep"</span><span>, () =&gt; </span><span class="identifier">window</span><span>, </span><span class="identifier">val</span><span> =&gt; </span><span class="identifier">val</span><span> * </span><span class="literal">2</span><span>, (</span><span class="identifier">myVar</span><span>) =&gt; {</span><span class="identifier">myVar</span><span> /= </span><span class="literal">2</span><span>;</span><span class="keyword">return</span><span> </span><span class="identifier">myVar</span><span>;})], </span><span class="identifier">elm</span><span> = </span><span class="identifier">document</span><span>.</span><span class="identifier">getElementByID</span><span>();<br>\u2003</span><span class="identifier">console</span><span>.</span><span class="identifier">log</span><span>(</span><span class="identifier">bee</span><span>, </span><span class="identifier">num</span><span>, </span><span class="identifier">elm</span><span>);}</span>`
+					"output": `<span class="keyword">const</span><span>&nbsp;</span><span class="identifier">myFunc</span><span>&nbsp;=&nbsp;</span><span class="keyword">function</span><span>(</span><span class="identifier">aye</span><span>,&nbsp;</span><span class="identifier">bee</span><span>,&nbsp;</span><span class="identifier">cea</span><span>)&nbsp;{<br>\u2003</span><span class="keyword">const</span><span>&nbsp;</span><span class="identifier">num</span><span>&nbsp;=&nbsp;[</span><span class="literal">123</span><span>,&nbsp;</span><span class="literal">4</span><span>,&nbsp;</span><span class="identifier">lastNum</span><span>(</span><span class="identifier">aye</span><span>,&nbsp;</span><span class="literal">"beep"</span><span>,&nbsp;()&nbsp;=&gt;&nbsp;</span><span class="identifier">window</span><span>,&nbsp;</span><span class="identifier">val</span><span>&nbsp;=&gt;&nbsp;</span><span class="identifier">val</span><span>&nbsp;*&nbsp;</span><span class="literal">2</span><span>,&nbsp;(</span><span class="identifier">myVar</span><span>)&nbsp;=&gt;&nbsp;{</span><span class="identifier">myVar</span><span>&nbsp;/=&nbsp;</span><span class="literal">2</span><span>;</span><span class="keyword">return</span><span>&nbsp;</span><span class="identifier">myVar</span><span>;})],&nbsp;</span><span class="identifier">elm</span><span>&nbsp;=&nbsp;</span><span class="identifier">document</span><span>.</span><span class="identifier">getElementByID</span><span>();<br>\u2003</span><span class="identifier">console</span><span>.</span><span class="identifier">log</span><span>(</span><span class="identifier">bee</span><span>,&nbsp;</span><span class="identifier">num</span><span>,&nbsp;</span><span class="identifier">elm</span><span>);}</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
