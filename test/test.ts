@@ -11728,6 +11728,10 @@ type Tests = {
 				"comment": {
 					"source": "// abc",
 					"output": `<span class="comment">// abc</span>`
+				},
+				"multi-line comment": {
+					"source": "/* abc\n\tmore\ncomment\n */",
+					"output": `<span class="comment">/* abc<br>\tmore<br>comment<br> */</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
