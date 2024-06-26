@@ -11721,6 +11721,10 @@ type Tests = {
 					"source": "Number(10000n * this.#numerator / this.#denominator) / 10000;",
 					"output": `<span class="identifier">Number</span><span>(</span><span class="literal">10000n</span><span> * </span><span class="keyword">this</span><span>.</span><span class="identifier">#numerator</span><span> / </span><span class="keyword">this</span><span>.</span><span class="identifier">#denominator</span><span>) / </span><span class="literal">10000</span><span>;</span>`
 				},
+				"nullish coalescing": {
+					"source": "a ?? b",
+					"output": `<span class="identifier">a</span><span> ?? </span><span class="identifier">b</span>`
+				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
 			const {default: code, ...fns} = await import("./lib/markdown_code.js"),
