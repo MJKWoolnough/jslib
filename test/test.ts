@@ -11716,7 +11716,11 @@ type Tests = {
 				"function": {
 					"source": `function A(a, b){\n	return c;\n}`,
 					"output": `<span class="keyword">function</span><span> </span><span class="identifier">A</span><span>(</span><span class="identifier">a</span><span>, </span><span class="identifier">b</span><span>){<br>	</span><span class="keyword">return</span><span> </span><span class="identifier">c</span><span>;<br>}</span>`
-				}
+				},
+				"big number": {
+					"source": "Number(10000n * this.#numerator / this.#denominator) / 10000;",
+					"output": `<span class="identifier">Number</span><span>(</span><span class="literal">10000n</span><span> * </span><span class="keyword">this</span><span>.</span><span class="identifier">#numerator</span><span> / </span><span class="keyword">this</span><span>.</span><span class="identifier">#denominator</span><span>) / </span><span class="literal">10000</span><span>;</span>`
+				},
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
 			const {default: code, ...fns} = await import("./lib/markdown_code.js"),
