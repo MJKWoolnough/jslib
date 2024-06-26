@@ -11724,6 +11724,10 @@ type Tests = {
 				"nullish coalescing": {
 					"source": "a ?? b",
 					"output": `<span class="identifier">a</span><span> ?? </span><span class="identifier">b</span>`
+				},
+				"comment": {
+					"source": "// abc",
+					"output": `<span class="comment">// abc</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
@@ -11742,7 +11746,7 @@ type Tests = {
 				[17, ".literal"],
 				[18, ".literal"]
 			])));
-
+			
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
 	}
