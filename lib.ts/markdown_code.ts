@@ -356,6 +356,8 @@ javascript = (() => {
 				if (err) {
 					return err;
 				}
+
+				break;
 			default:
 				return errUnexpectedEOF(t);
 			}
