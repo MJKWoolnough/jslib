@@ -712,6 +712,7 @@ export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, 
 		pos += tk.data.length;
 
 		if (tk.type < 0) {
+			amendNode(nodes.at(-1), {"data-error": tk.data});
 			break;
 		}
 	}
