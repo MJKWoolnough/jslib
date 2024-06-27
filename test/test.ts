@@ -11749,6 +11749,10 @@ type Tests = {
 					"source": "/[a-z]+/g;/^[123]$/g",
 					"output": `<span class="regularexpressionliteral">/[a-z]+/g</span><span class="punctuator">;</span><span class="regularexpressionliteral">/^[123]$/g</span>`
 				},
+				"templates": {
+					"source": "`` `abc` `ab${ (val.a / 2) + 1 }c${str}`",
+					"output": "<span class=\"nosubstitutiontemplate\">``</span><span class=\"whitespace\">&nbsp;</span><span class=\"nosubstitutiontemplate\">`abc`</span><span class=\"whitespace\">&nbsp;</span><span class=\"templatehead\">`ab${</span><span class=\"whitespace\">&nbsp;</span><span class=\"punctuator\">(</span><span class=\"identifier\">val</span><span class=\"punctuator\">.</span><span class=\"identifier\">a</span><span class=\"whitespace\">&nbsp;</span><span class=\"divpunctuator\">/</span><span class=\"whitespace\">&nbsp;</span><span class=\"numericliteral\">2</span><span class=\"punctuator\">)</span><span class=\"whitespace\">&nbsp;</span><span class=\"punctuator\">+</span><span class=\"whitespace\">&nbsp;</span><span class=\"numericliteral\">1</span><span class=\"whitespace\">&nbsp;</span><span class=\"templatemiddle\">}c${</span><span class=\"identifier\">str</span><span class=\"templatetail\">}`</span>"
+				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
 			const {default: code, ...fns} = await import("./lib/markdown_code.js"),
