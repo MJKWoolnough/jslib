@@ -332,12 +332,12 @@ javascript = (() => {
 
 		if (!t.except(lineTerminators)) {
 			if (!t.peek()) {
-				return errUnexpectedEOF;
+				return errUnexpectedEOF(t);
 			}
 
 			t.except("");
 
-			return errInvalidRegexpSequence;
+			return errInvalidRegexpSequence(t);
 		}
 
 		return null;
@@ -350,13 +350,14 @@ javascript = (() => {
 			case ']':
 				t.except("");
 
-				return true;
+				return null;
 			case '\\':
-				if (!regexpBackslashSequence(t)) {
-					return false;
+				const err = regexpBackslashSequence(t);
+				if (err) {
+					return err;
 				}
 			default:
-				return false;
+				return errUnexpectedEOF(t);
 			}
 		}
 	      },
@@ -369,13 +370,14 @@ javascript = (() => {
 		case '\\':
 			const err = regexpBackslashSequence(t);
 			if (err) {
-				return err(t)
+				return err
 			}
 
 			break;
 		case '[':
-			if (!regexpExpressionClass(t)) {
-				return errUnexpectedEOF(t);
+			const errr = regexpExpressionClass(t);
+			if (errr) {
+				return errr;
 			}
 
 			break;
@@ -399,13 +401,14 @@ javascript = (() => {
 			case '\\':
 				const err = regexpBackslashSequence(t);
 				if (err) {
-					return err(t);
+					return err;
 				}
 
 				break;
 			case '[':
-				if (!regexpExpressionClass(t)) {
-					return errUnexpectedEOF(t);
+				const errr = regexpExpressionClass(t);
+				if (errr) {
+					return errr;
 				}
 
 				break;
