@@ -11655,19 +11655,19 @@ type Tests = {
 				"error token": {
 					"tokens": [{"type": 0, "data": "a"}, {"type": -2, "data": "an error occurred"}],
 					"fulltext": "aerrortext",
-					"result": `<span class="A">a</span><span>errortext</span>`,
+					"result": `<span class="A">a</span><span data-error="an error occurred">errortext</span>`,
 					"colours": [[0, ".A"]]
 				},
 				"error token with class": {
 					"tokens": [{"type": 0, "data": "a"}, {"type": -2, "data": "an error occurred"}],
 					"fulltext": "aerrortext",
-					"result": `<span class="A">a</span><span class="E">errortext</span>`,
+					"result": `<span class="A">a</span><span class="E" data-error="an error occurred">errortext</span>`,
 					"colours": [[0, ".A"], [-2, ".E"]]
 				},
 				"error token with matching class": {
 					"tokens": [{"type": 0, "data": "a"}, {"type": 1, "data": "bbb"}, {"type": -2, "data": "an error occurred"}],
 					"fulltext": "abbberrortext",
-					"result": `<span class="A">a</span><span class="E">bbberrortext</span>`,
+					"result": `<span class="A">a</span><span class="E" data-error="an error occurred">bbberrortext</span>`,
 					"colours": [[0, ".A"], [1, ".E"], [-2, ".E"]]
 				},
 				"simple tokens with newlines": {
