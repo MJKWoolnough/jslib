@@ -11756,6 +11756,10 @@ type Tests = {
 				"null": {
 					"source": "null",
 					"output": `<span class="nullliteral">null</span>`
+				},
+				"boolean": {
+					"source": "true false",
+					"output": `<span class="booleanliteral">true</span><span class="whitespace">&nbsp;</span><span class="booleanliteral">false</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
