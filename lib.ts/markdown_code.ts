@@ -696,7 +696,28 @@ python = (() => {
 	      isIDContinue = (c: string) => c === '_' || idContinue.test(c),
 	      stringPrefix = "rRuUfFbB",
 	      stringStart = `"'`,
-	      stringOrIdentifier = (_tk: Tokeniser) => {
+	      stringOrIdentifier = (tk: Tokeniser) => {
+		switch (tk.next()) {
+		case "r":
+		case "R":
+			tk.accept("fFbB");
+
+			break;
+		case "b":
+		case "B":
+		case "f":
+		case "F":
+			tk.accept("rR");
+		case "u":
+		case "U":
+			break;
+		}
+
+		if (stringStart.includes(tk.peek())) {
+			return string(tk);
+		}
+
+		return identifier(tk);
 	      },
 	      string = (_tk: Tokeniser) => {
 	      },
