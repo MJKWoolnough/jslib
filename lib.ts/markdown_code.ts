@@ -767,7 +767,17 @@ python = (() => {
 			"data": tk.get(),
 		}, main]
 	      },
-	      identifier = (_tk: Tokeniser) => {
+	      identifier = (tk: Tokeniser) => {
+		while (isIDContinue(tk.peek())) {
+			tk.next();
+		}
+
+		const ident = tk.get();
+
+		return [{
+			"type": keywords.includes(ident) ? TokenKeyword : TokenIdentifier,
+			"data": ident,
+		}, main]
 	      },
 	      baseNumber = (_tk: Tokeniser) => {
 	      },
