@@ -15,6 +15,8 @@ const whitespace = "\t\v\f \xa0\ufeff",
       singleStringChars = stringChars.slice(0, stringChars.length),
       lineSplit = new RegExp("[" + lineTerminators + "]"),
       error = (errText: string, override?: string) => (t: Tokeniser, text = override ?? t.get()) => t.error(errText + text),
+      errUnexpectedEOF = error("unexpected EOF", ""),
+      errInvalidCharacter = error("invalid character: "),
       unicodeGroups = (...groups: string[]) => new RegExp("^[" + groups.reduce((r, c) => r + "\\p{" + c + "}", "") + "]$", "u");
 
 export const [TokenWhitespace, TokenLineTerminator, TokenSingleLineComment, TokenMultiLineComment, TokenIdentifier, TokenPrivateIdentifier, TokenBooleanLiteral, TokenKeyword, TokenPunctuator, TokenNumericLiteral, TokenStringLiteral, TokenNoSubstitutionTemplate, TokenTemplateHead, TokenTemplateMiddle, TokenTemplateTail, TokenDivPunctuator, TokenRightBracePunctuator, TokenRegularExpressionLiteral, TokenNullLiteral, TokenFutureReservedWord] = Array.from({"length": 20}, (_, n) => n) as TokenType[],
@@ -27,9 +29,7 @@ javascript = (() => {
 	      zwj = String.fromCharCode(8205),
 	      isIDStart = (c: string) => c === '$' || c === '_' || c === '\\' || idStart.test(c) && !notID.test(c),
 	      isIDContinue = (c: string) => c === '$' || c === '_' || c === '\\' || c === zwnj || c === zwj || idContinue.test(c) && !notID.test(c),
-	      errUnexpectedEOF = error("unexpected EOF", ""),
 	      errInvalidRegexpSequence = error("invalid regexp sequence", ""),
-	      errInvalidCharacter = error("invalid character: "),
 	      errInvalidSequence = error("invalid sequence: "),
 	      errInvalidNumber = error("invalid number: "),
 	      errInvalidRegexpCharacter = error("invalid regexp character"),
@@ -719,7 +719,53 @@ python = (() => {
 
 		return identifier(tk);
 	      },
-	      string = (_tk: Tokeniser) => {
+	      string = (tk: Tokeniser) => {
+		const m = tk.next();
+
+		let triple = false;
+
+		if (tk.accept(m)) {
+			if (tk.accept(m)) {
+				triple = true;
+			} else {
+				return [{
+					"type": TokenStringLiteral,
+					"data": tk.get(),
+				}, main]
+			}
+		}
+
+		Loop:
+		while (true) {
+			const c = tk.exceptRun("\\\n" + m);
+
+			switch (c) {
+			default:
+				return errUnexpectedEOF(tk);
+			case "\\":
+				tk.next();
+				tk.next();
+
+				break;
+			case "\n":
+				if (!triple) {
+					return errInvalidCharacter(tk);
+				}
+
+				break;
+			case m:
+				tk.next();
+
+				if (!triple || !tk.accept(m) || !tk.accept(m)) {
+					break Loop;
+				}
+			}
+		}
+
+		return [{
+			"type": TokenStringLiteral,
+			"data": tk.get(),
+		}, main]
 	      },
 	      identifier = (_tk: Tokeniser) => {
 	      },
