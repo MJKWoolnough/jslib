@@ -792,6 +792,18 @@ python = (() => {
 
 		return null;
 	      },
+	      floatOrImaginary = (tk: Tokeniser) => {
+		if (tk.accept(".")) {
+			return float(tk);
+		}
+
+		tk.accept("jJ");
+
+		return [{
+			"type": TokenNumericLiteral,
+			"data": tk.get()
+		}, main];
+	      },
 	      baseNumber = (tk: Tokeniser) => {
 		const digits = tk.accept("xX") ? hexDigit : tk.accept("oO") ? octalDigit : tk.accept("bB") ? binaryDigit : "0",
 		      err = numberWithGrouping(tk, digits);
@@ -801,11 +813,7 @@ python = (() => {
 		}
 
 		if (digits === "0") {
-			if (tk.peek() === ".") {
-				return float(tk);
-			}
-			
-			tk.accept("jJ");
+			return floatOrImaginary(tk);
 		}
 		
 		return [{
@@ -813,7 +821,14 @@ python = (() => {
 			"data": tk.get()
 		}, main];
 	      },
-	      number = (_tk: Tokeniser) => {
+	      number = (tk: Tokeniser) => {
+		const err = numberWithGrouping(tk, decimalDigit);
+
+		if (err) {
+			return err;
+		}
+
+		return floatOrImaginary(tk);
 	      },
 	      float = (_tk: Tokeniser) => {
 	      },
