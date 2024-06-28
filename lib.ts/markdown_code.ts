@@ -17,6 +17,7 @@ const whitespace = "\t\v\f \xa0\ufeff",
       error = (errText: string, override?: string) => (t: Tokeniser, text = override ?? t.get()) => t.error(errText + text),
       errUnexpectedEOF = error("unexpected EOF", ""),
       errInvalidCharacter = error("invalid character: "),
+      errInvalidNumber = error("invalid number: "),
       unicodeGroups = (...groups: string[]) => new RegExp("^[" + groups.reduce((r, c) => r + "\\p{" + c + "}", "") + "]$", "u");
 
 export const [TokenWhitespace, TokenLineTerminator, TokenSingleLineComment, TokenMultiLineComment, TokenIdentifier, TokenPrivateIdentifier, TokenBooleanLiteral, TokenKeyword, TokenPunctuator, TokenNumericLiteral, TokenStringLiteral, TokenNoSubstitutionTemplate, TokenTemplateHead, TokenTemplateMiddle, TokenTemplateTail, TokenDivPunctuator, TokenRightBracePunctuator, TokenRegularExpressionLiteral, TokenNullLiteral, TokenFutureReservedWord] = Array.from({"length": 20}, (_, n) => n) as TokenType[],
@@ -31,7 +32,6 @@ javascript = (() => {
 	      isIDContinue = (c: string) => c === '$' || c === '_' || c === '\\' || c === zwnj || c === zwj || idContinue.test(c) && !notID.test(c),
 	      errInvalidRegexpSequence = error("invalid regexp sequence", ""),
 	      errInvalidSequence = error("invalid sequence: "),
-	      errInvalidNumber = error("invalid number: "),
 	      errInvalidRegexpCharacter = error("invalid regexp character"),
 	      errInvalidUnicode = error("invalid unicode"),
 	      errUnexpectedBackslash = error("unexpected backslash"),
@@ -779,9 +779,43 @@ python = (() => {
 			"data": ident,
 		}, main]
 	      },
-	      baseNumber = (_tk: Tokeniser) => {
+	      numberWithGrouping = (tk: Tokeniser, digits: string) => {
+		while (tk.accept("_")) {
+			const pos = tk.length;
+
+			tk.acceptRun(digits);
+
+			if (pos === tk.length) {
+				return errInvalidNumber(tk);
+			}
+		}
+
+		return null;
+	      },
+	      baseNumber = (tk: Tokeniser) => {
+		const digits = tk.accept("xX") ? hexDigit : tk.accept("oO") ? octalDigit : tk.accept("bB") ? binaryDigit : "0",
+		      err = numberWithGrouping(tk, digits);
+
+		if (err) {
+			return err;
+		}
+
+		if (digits === "0") {
+			if (tk.peek() === ".") {
+				return float(tk);
+			}
+			
+			tk.accept("jJ");
+		}
+		
+		return [{
+			"type": TokenNumericLiteral,
+			"data": tk.get()
+		}, main];
 	      },
 	      number = (_tk: Tokeniser) => {
+	      },
+	      float = (_tk: Tokeniser) => {
 	      },
 	      floatOrDelimiter = (_tk: Tokeniser) => {
 	      },
