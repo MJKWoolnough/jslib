@@ -693,10 +693,79 @@ python = (() => {
 	      idContinue = unicodeGroups("L", "Nl", "ID_Start", "Mn", "Mc", "Nd", "Pc", "ID_Continue"),
 	      idStart = unicodeGroups("Lu", "Ll", "Lt", "Lm", "Lo", "Nl", "ID_Start"),
 	      isIDStart = (c: string) => c === '_' || idStart.test(c),
-	      isIDContinue = (c: string) => c === '_' || idContinue.test(c);
+	      isIDContinue = (c: string) => c === '_' || idContinue.test(c),
+	      stringPrefix = "rRuUfFbB",
+	      stringStart = `"'`,
+	      stringOrIdentifier = (_tk: Tokeniser) => {
+	      },
+	      string = (_tk: Tokeniser) => {
+	      },
+	      identifier = (_tk: Tokeniser) => {
+	      },
+	      baseNumber = (_tk: Tokeniser) => {
+	      },
+	      number = (_tk: Tokeniser) => {
+	      },
+	      floatOrDelimiter = (_tk: Tokeniser) => {
+	      },
+	      operatorOrDelimiter = (_tk: Tokeniser) => {
+	      },
+	      main = (tk: Tokeniser) => {
+		if (tk.accept("\n")) {
+			tk.acceptRun("\n");
 
-	return (_tk: Tokeniser) => {
-	};
+			return [{
+				"type": TokenLineTerminator,
+				"data": tk.get()
+			}, main];
+		}
+
+		if (tk.accept(" \t")) {
+			tk.acceptRun(" \t");
+
+			return [{
+				"type": TokenWhitespace,
+				"data": tk.get()
+			}, main];
+		}
+
+		if (tk.accept("#")) {
+			tk.exceptRun("\n");
+
+			return [{
+				"type": TokenSingleLineComment,
+				"data": tk.get()
+			}, main];
+		}
+
+		if (stringPrefix.includes(tk.peek())) {
+			return stringOrIdentifier(tk);
+		}
+
+		if (stringStart.includes(tk.peek())) {
+			return string(tk);
+		}
+
+		if (isIDStart(tk.peek())) {
+			return identifier(tk);
+		}
+
+		if (tk.accept("0")) {
+			return baseNumber(tk);
+		}
+
+		if (tk.accept(decimalDigit)) {
+			return number(tk);
+		}
+
+		if (tk.accept(".")) {
+			return floatOrDelimiter(tk);
+		}
+
+		return operatorOrDelimiter(tk);
+	      };
+
+	return main;
 })();
 
 export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, noPre = true) => {
