@@ -687,6 +687,16 @@ javascript = (() => {
 
 		return inputElement(tk);
 	};
+})(),
+python = (() => {
+	const keywords = ["False", "await", "else", "import", "pass", "None", "break", "except", "in", "raise", "True", "class", "finally", "is", "return", "and", "continue", "for", "lambda", "try", "as", "def", "from", "nonlocal", "while", "assert", "del", "global", "not", "with", "async", "elif", "if", "or", "yield"],
+	      idContinue = unicodeGroups("L", "Nl", "ID_Start", "Mn", "Mc", "Nd", "Pc", "ID_Continue"),
+	      idStart = unicodeGroups("Lu", "Ll", "Lt", "Lm", "Lo", "Nl", "ID_Start"),
+	      isIDStart = (c: string) => c === '_' || idStart.test(c),
+	      isIDContinue = (c: string) => c === '_' || idContinue.test(c);
+
+	return (_tk: Tokeniser) => {
+	};
 })();
 
 export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, noPre = true) => {
