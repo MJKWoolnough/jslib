@@ -13,12 +13,13 @@ const whitespace = "\t\v\f \xa0\ufeff",
       stringChars = "'\\" + lineTerminators + "\"",
       doubleStringChars = stringChars.slice(1),
       singleStringChars = stringChars.slice(0, stringChars.length),
-      lineSplit = new RegExp("[" + lineTerminators + "]");
+      lineSplit = new RegExp("[" + lineTerminators + "]"),
+      error = (errText: string, override?: string) => (t: Tokeniser, text = override ?? t.get()) => t.error(errText + text),
+      unicodeGroups = (...groups: string[]) => new RegExp("^[" + groups.reduce((r, c) => r + "\\p{" + c + "}", "") + "]$", "u");
 
 export const [TokenWhitespace, TokenLineTerminator, TokenSingleLineComment, TokenMultiLineComment, TokenIdentifier, TokenPrivateIdentifier, TokenBooleanLiteral, TokenKeyword, TokenPunctuator, TokenNumericLiteral, TokenStringLiteral, TokenNoSubstitutionTemplate, TokenTemplateHead, TokenTemplateMiddle, TokenTemplateTail, TokenDivPunctuator, TokenRightBracePunctuator, TokenRegularExpressionLiteral, TokenNullLiteral, TokenFutureReservedWord] = Array.from({"length": 20}, (_, n) => n) as TokenType[],
 javascript = (() => {
 	const keywords = ["await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield"],
-	      unicodeGroups = (...groups: string[]) => new RegExp("^[" + groups.reduce((r, c) => r + "\\p{" + c + "}", "") + "]$", "u"),
 	      idContinue = unicodeGroups("L", "Nl", "ID_Start", "Mn", "Mc", "Nd", "Pc", "ID_Continue"),
 	      idStart = unicodeGroups("L", "Nl", "ID_Start"),
 	      notID = unicodeGroups("Pattern_Syntax", "Pattern_White_Space"),
@@ -26,7 +27,6 @@ javascript = (() => {
 	      zwj = String.fromCharCode(8205),
 	      isIDStart = (c: string) => c === '$' || c === '_' || c === '\\' || idStart.test(c) && !notID.test(c),
 	      isIDContinue = (c: string) => c === '$' || c === '_' || c === '\\' || c === zwnj || c === zwj || idContinue.test(c) && !notID.test(c),
-	      error = (errText: string, override?: string) => (t: Tokeniser, text = override ?? t.get()) => t.error(errText + text),
 	      errUnexpectedEOF = error("unexpected EOF", ""),
 	      errInvalidRegexpSequence = error("invalid regexp sequence", ""),
 	      errInvalidCharacter = error("invalid character: "),
