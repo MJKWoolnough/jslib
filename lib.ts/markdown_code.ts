@@ -80,7 +80,7 @@ javascript = (() => {
 					if (t.accept("/")) {
 						divisionAllowed = allowDivision;
 
-					return t.return(TokenMultiLineComment, inputElement);
+						return t.return(TokenMultiLineComment, inputElement);
 					}
 
 					if (!t.peek()) {
@@ -785,7 +785,27 @@ python = (() => {
 
 		return floatOrImaginary(tk);
 	      },
-	      float = (_tk: Tokeniser) => {
+	      exponential = (tk: Tokeniser) => {
+		tk.accept("+-");
+
+		if (!tk.accept(decimalDigit)) {
+			return errInvalidNumber(tk);
+		}
+
+		return numberWithGrouping(tk, decimalDigit);
+	      },
+	      float = (tk: Tokeniser) => {
+		if (!tk.accept(decimalDigit)) {
+			return errInvalidNumber(tk);
+		}
+
+		const err = numberWithGrouping(tk, decimalDigit) ?? (tk.accept("eE") && exponential(tk));
+
+		if (err) {
+			return err;
+		}
+
+		return imaginary(tk);
 	      },
 	      floatOrDelimiter = (tk: Tokeniser) => {
 		if (!tk.accept(decimalDigit)) {
