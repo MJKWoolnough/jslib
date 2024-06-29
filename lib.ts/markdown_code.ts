@@ -776,15 +776,7 @@ python = (() => {
 		
 		return tk.return(TokenNumericLiteral, main);
 	      },
-	      number = (tk: Tokeniser) => {
-		const err = numberWithGrouping(tk, decimalDigit);
-
-		if (err) {
-			return err;
-		}
-
-		return floatOrImaginary(tk);
-	      },
+	      number = (tk: Tokeniser) => numberWithGrouping(tk, decimalDigit) ?? floatOrImaginary(tk),
 	      exponential = (tk: Tokeniser) => {
 		tk.accept("+-");
 
@@ -799,13 +791,7 @@ python = (() => {
 			return errInvalidNumber(tk);
 		}
 
-		const err = numberWithGrouping(tk, decimalDigit) ?? (tk.accept("eE") && exponential(tk));
-
-		if (err) {
-			return err;
-		}
-
-		return imaginary(tk);
+		return numberWithGrouping(tk, decimalDigit) ?? (tk.accept("eE") && exponential(tk)) ?? imaginary(tk);
 	      },
 	      floatOrDelimiter = (tk: Tokeniser) => {
 		if (!tk.accept(decimalDigit)) {
