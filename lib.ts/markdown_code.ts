@@ -734,7 +734,7 @@ python = (() => {
 
 		return [{
 			"type": keywords.includes(ident) ? TokenKeyword : TokenIdentifier,
-			"data": ident,
+			"data": ident
 		}, main]
 	      },
 	      numberWithGrouping = (tk: Tokeniser, digits: string) => {
