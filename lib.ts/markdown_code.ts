@@ -800,7 +800,53 @@ python = (() => {
 
 		return imaginary(tk);
 	      },
-	      operatorOrDelimiter = (_tk: Tokeniser) => {
+	      operatorOrDelimiter = (tk: Tokeniser) => {
+		const c = tk.next();
+
+		switch (c) {
+		case "+":
+		case "%":
+		case "@":
+		case "&":
+		case "|":
+		case "^":
+		case ":":
+		case "=":
+			tk.accept("=");
+
+			break;
+		case "-":
+			tk.accept("=>");
+
+			break;
+		case "*":
+		case "/":
+		case "<":
+		case ">":
+			tk.accept(c);
+			tk.accept("=");
+
+			break;
+		case "!":
+			if (!tk.accept("=")) {
+				return errInvalidCharacter(tk);
+			}
+		case "~":
+		case ",":
+		case ".":
+		case ";":
+		case "(":
+		case ")":
+		case "[":
+		case "]":
+		case "{":
+		case "}":
+			break;
+		default:
+			return errUnexpectedEOF(tk);
+		}
+
+		return tk.return(TokenPunctuator, main);
 	      },
 	      main = (tk: Tokeniser) => {
 		if (tk.accept("\n")) {
