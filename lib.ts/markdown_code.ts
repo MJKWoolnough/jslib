@@ -733,7 +733,7 @@ python = (() => {
 		const ident = tk.get();
 
 		return [{
-			"type": keywords.includes(ident) ? TokenKeyword : TokenIdentifier,
+			"type": keywords.includes(ident) ? ident === "True" || ident === "False" ? TokenBooleanLiteral : ident === "None" ? TokenNullLiteral : TokenKeyword : TokenIdentifier,
 			"data": ident
 		}, main]
 	      },
