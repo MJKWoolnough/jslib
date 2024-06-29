@@ -41,19 +41,13 @@ javascript = (() => {
 		if (t.accept(whitespace)) {
 			t.acceptRun(whitespace);
 
-			return [{
-				"type": TokenWhitespace,
-				"data": t.get()
-			}, inputElement];
+			return t.return(TokenWhitespace, inputElement);
 		}
 
 		if (t.accept(lineTerminators)) {
 			t.acceptRun(lineTerminators);
 
-			return [{
-				"type": TokenLineTerminator,
-				"data": t.get()
-			}, inputElement];
+			return t.return(TokenLineTerminator, inputElement);
 		}
 
 		let allowDivision = divisionAllowed;
@@ -75,10 +69,7 @@ javascript = (() => {
 			if (t.accept("/")) {
 				t.exceptRun(lineTerminators);
 
-				return [{
-					"type": TokenSingleLineComment,
-					"data": t.get()
-				}, inputElement];
+				return t.return(TokenSingleLineComment, inputElement);
 			}
 
 			if (t.accept("*")) {
@@ -89,10 +80,7 @@ javascript = (() => {
 					if (t.accept("/")) {
 						divisionAllowed = allowDivision;
 
-						return [{
-							"type": TokenMultiLineComment,
-							"data": t.get()
-						}, inputElement];
+					return t.return(TokenMultiLineComment, inputElement);
 					}
 
 					if (!t.peek()) {
@@ -104,10 +92,7 @@ javascript = (() => {
 			if (allowDivision) {
 				t.accept("=");
 
-				return [{
-					"type": TokenDivPunctuator,
-					"data": t.get()
-				}, inputElement];
+				return t.return(TokenDivPunctuator, inputElement);
 			}
 
 			divisionAllowed = true;
@@ -120,10 +105,7 @@ javascript = (() => {
 			case '{':
 				tokenDepth.pop();
 
-				return [{
-					"type": TokenRightBracePunctuator,
-					"data": t.get()
-				}, inputElement];
+				return t.return(TokenRightBracePunctuator, inputElement);
 			case '$':
 				tokenDepth.pop();
 
@@ -270,10 +252,7 @@ javascript = (() => {
 
 				divisionAllowed = true;
 
-				return [{
-					"type": TokenNumericLiteral,
-					"data": t.get()
-				}, inputElement];
+				return t.return(TokenNumericLiteral, inputElement);
 			}
 
 			break;
@@ -322,10 +301,7 @@ javascript = (() => {
 			return errInvalidCharacter(t);
 		}
 
-		return [{
-			"type": TokenPunctuator,
-			"data": t.get()
-		}, inputElement];
+		return t.return(TokenPunctuator, inputElement);
 	      },
 	      regexpBackslashSequence = (t: Tokeniser) => {
 		t.except("");
@@ -436,10 +412,7 @@ javascript = (() => {
 			t.except("");
 		}
 
-		return [{
-			"type": TokenRegularExpressionLiteral,
-			"data": t.get()
-		}, inputElement];
+		return t.return(TokenRegularExpressionLiteral, inputElement);
 	      },
 	      numberRun = (t: Tokeniser, digits: string) => {
 		while (true) {
@@ -527,10 +500,7 @@ javascript = (() => {
 			}
 		}
 
-		return [{
-			"type": TokenNumericLiteral,
-			"data": t.get()
-		}, inputElement];
+		return t.return(TokenNumericLiteral, inputElement);
 	      },
 	      identifier: TokenFn = (t: Tokeniser) => {
 		const c = t.peek();
@@ -558,10 +528,7 @@ javascript = (() => {
 			t.except("");
 		}
 
-		return [{
-			"type": TokenIdentifier,
-			"data": t.get()
-		}, inputElement];
+		return t.return(TokenIdentifier, inputElement);
 	      },
 	      unicodeEscapeSequence = (t: Tokeniser) => {
 		if (t.accept("{")) {
@@ -630,10 +597,7 @@ javascript = (() => {
 			}
 		}
 
-		return [{
-			"type": TokenStringLiteral,
-			"data": t.get()
-		}, inputElement];
+		return t.return(TokenStringLiteral, inputElement);
 	      },
 	      template: TokenFn = (t: Tokeniser)  => {
 		Loop:
@@ -728,10 +692,7 @@ python = (() => {
 			if (tk.accept(m)) {
 				triple = true;
 			} else {
-				return [{
-					"type": TokenStringLiteral,
-					"data": tk.get(),
-				}, main]
+				return tk.return(TokenStringLiteral, main);
 			}
 		}
 
@@ -762,10 +723,7 @@ python = (() => {
 			}
 		}
 
-		return [{
-			"type": TokenStringLiteral,
-			"data": tk.get(),
-		}, main]
+		return tk.return(TokenStringLiteral, main);
 	      },
 	      identifier = (tk: Tokeniser) => {
 		while (isIDContinue(tk.peek())) {
@@ -795,10 +753,7 @@ python = (() => {
 	      imaginary = (tk: Tokeniser) => {
 		tk.accept("jJ");
 
-		return [{
-			"type": TokenNumericLiteral,
-			"data": tk.get()
-		}, main];
+		return tk.return(TokenNumericLiteral, main);
 	      },
 	      floatOrImaginary = (tk: Tokeniser) => {
 		if (tk.accept(".")) {
@@ -819,10 +774,7 @@ python = (() => {
 			return floatOrImaginary(tk);
 		}
 		
-		return [{
-			"type": TokenNumericLiteral,
-			"data": tk.get()
-		}, main];
+		return tk.return(TokenNumericLiteral, main);
 	      },
 	      number = (tk: Tokeniser) => {
 		const err = numberWithGrouping(tk, decimalDigit);
@@ -837,10 +789,7 @@ python = (() => {
 	      },
 	      floatOrDelimiter = (tk: Tokeniser) => {
 		if (!tk.accept(decimalDigit)) {
-			return [{
-				"type": TokenPunctuator,
-				"data": tk.get()
-			}, main];
+			return tk.return(TokenPunctuator, main);
 		}
 
 		return imaginary(tk);
@@ -851,28 +800,19 @@ python = (() => {
 		if (tk.accept("\n")) {
 			tk.acceptRun("\n");
 
-			return [{
-				"type": TokenLineTerminator,
-				"data": tk.get()
-			}, main];
+			return tk.return(TokenLineTerminator, main);
 		}
 
 		if (tk.accept(" \t")) {
 			tk.acceptRun(" \t");
 
-			return [{
-				"type": TokenWhitespace,
-				"data": tk.get()
-			}, main];
+			return tk.return(TokenWhitespace, main);
 		}
 
 		if (tk.accept("#")) {
 			tk.exceptRun("\n");
 
-			return [{
-				"type": TokenSingleLineComment,
-				"data": tk.get()
-			}, main];
+			return tk.return(TokenSingleLineComment, main);
 		}
 
 		if (stringPrefix.includes(tk.peek())) {
