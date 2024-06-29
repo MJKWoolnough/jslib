@@ -849,6 +849,10 @@ python = (() => {
 		return tk.return(TokenPunctuator, main);
 	      },
 	      main = (tk: Tokeniser) => {
+		if (!tk.peek()) {
+			return tk.done();
+		}
+
 		if (tk.accept("\n")) {
 			tk.acceptRun("\n");
 
