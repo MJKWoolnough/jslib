@@ -835,12 +835,21 @@ python = (() => {
 		case ",":
 		case ".":
 		case ";":
+			break;
 		case "(":
-		case ")":
 		case "[":
-		case "]":
 		case "{":
+			tokenDepth.push(c);
+
+			break;
+		case ")":
 		case "}":
+		case "]":
+			const d = tokenDepth.pop();
+			if (!(d === '(' && c === ')') && !(d === '[' && c === ']') && !(d === '{' && c ==='}')) {
+				return errInvalidCharacter(tk);
+			}
+
 			break;
 		default:
 			return errUnexpectedEOF(tk);
@@ -850,6 +859,10 @@ python = (() => {
 	      },
 	      main = (tk: Tokeniser) => {
 		if (!tk.peek()) {
+			if (tokenDepth.length) {
+				return errUnexpectedEOF(tk);
+			}
+
 			return tk.done();
 		}
 
@@ -896,9 +909,14 @@ python = (() => {
 		}
 
 		return operatorOrDelimiter(tk);
-	      };
+	      },
+	      tokenDepth: string[] = [];
 
-	return main;
+	return (tk: Tokeniser) => {
+		tokenDepth.splice(0, tokenDepth.length);
+
+		return main(tk);
+	};
 })();
 
 export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, noPre = true) => {
