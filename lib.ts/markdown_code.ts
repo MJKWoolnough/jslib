@@ -927,6 +927,39 @@ bash = (() => {
 			data
 		}, main];
 	      },
+	      identifier = (tk: Tokeniser) => {
+		return main(tk);
+	      },
+	      backtick = (tk: Tokeniser) => {
+		return main(tk);
+	      },
+	      string = (tk: Tokeniser) => {
+		const c = tk.next();
+
+		tokenDepth.push(c);
+
+		while (true) {
+			switch (tk.exceptRun("\\\n`$" + c)) {
+			case '\\':
+				tk.next();
+				tk.next();
+
+				break;
+			case '\n':
+				return errInvalidCharacter(tk);
+			case '`':
+				return backtick(tk);
+			case '$':
+				return tk.return(TokenStringLiteral, identifier);
+			case c:
+				tk.next();
+
+				return tk.return(TokenStringLiteral, main)
+			default:
+				return errUnexpectedEOF(tk);
+			}
+		}
+	      },
 	      operatorOrWord = (tk: Tokeniser) => {
 		switch (tk.peek()) {
 		case '<':
@@ -955,6 +988,9 @@ bash = (() => {
 			tk.accept("&");
 
 			break;
+		case '"':
+		case `'`:
+			return string(tk);
 		case "=":
 		case '(':
 		case ')':
@@ -969,6 +1005,10 @@ bash = (() => {
 	      },
 	      main = (tk: Tokeniser) => {
 		if (!tk.peek()) {
+			if (tokenDepth.length) {
+				return errUnexpectedEOF(tk);
+			}
+
 			return tk.done();
 		}
 
@@ -991,9 +1031,14 @@ bash = (() => {
 		}
 
 		return operatorOrWord(tk);
-	      };
+	      },
+	      tokenDepth: string[] = [];
 
-	return main;
+	return (tk: Tokeniser) => {
+		tokenDepth.splice(0, tokenDepth.length);
+
+		return main(tk);
+	};
 })();
 
 export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, noPre = true) => {
