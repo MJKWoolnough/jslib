@@ -914,6 +914,36 @@ python = (() => {
 
 		return main(tk);
 	};
+})(),
+bash = (() => {
+	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
+	      main = (tk: Tokeniser) => {
+		if (!tk.peek()) {
+			return tk.done();
+		}
+
+		if (tk.accept(" \t")) {
+			tk.acceptRun(" \t");
+
+			return tk.return(TokenWhitespace, main);
+		}
+
+		if (tk.accept("\n")) {
+			tk.acceptRun("\n");
+
+			return tk.return(TokenLineTerminator, main);
+		}
+
+		if (tk.accept("#")) {
+			tk.exceptRun("\n");
+
+			return tk.return(TokenSingleLineComment, main);
+		}
+
+		return tk.error("EOF");
+	      };
+
+	return main;
 })();
 
 export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, noPre = true) => {
