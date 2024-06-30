@@ -917,6 +917,50 @@ python = (() => {
 })(),
 bash = (() => {
 	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
+	      word = (tk: Tokeniser) => {
+		tk.exceptRun(" \t\n|&;<>()");
+
+		return tk.return(TokenKeyword, main);
+	      },
+	      operatorOrWord = (tk: Tokeniser) => {
+		switch (tk.peek()) {
+		case '<':
+			tk.next();
+			tk.accept("<&>");
+
+			break;
+		case '>':
+			tk.next();
+			tk.accept(">&|")
+
+			break;
+		case '|':
+			tk.next();
+			tk.accept("|&");
+
+			break;
+		case '&':
+			tk.next();
+			tk.accept("&");
+
+			break;
+		case ';':
+			tk.next();
+			tk.accept(";");
+			tk.accept("&");
+
+			break;
+		case '(':
+		case ')':
+			tk.next();
+
+			break;
+		default:
+			return word(tk);
+		}
+
+		return tk.return(TokenPunctuator, main);
+	      },
 	      main = (tk: Tokeniser) => {
 		if (!tk.peek()) {
 			return tk.done();
@@ -940,7 +984,7 @@ bash = (() => {
 			return tk.return(TokenSingleLineComment, main);
 		}
 
-		return tk.error("EOF");
+		return operatorOrWord(tk);
 	      };
 
 	return main;
