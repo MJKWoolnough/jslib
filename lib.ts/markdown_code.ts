@@ -1036,6 +1036,8 @@ bash = (() => {
 			tk.next();
 
 			break;
+		case "$":
+			return identifier(tk);
 		default:
 			return word(tk);
 		}
