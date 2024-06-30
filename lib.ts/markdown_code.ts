@@ -917,8 +917,8 @@ python = (() => {
 })(),
 bash = (() => {
 	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
-	      word = (tk: Tokeniser) => {
-		tk.exceptRun(" \t\n|&;<>()=");
+	      word: TokenFn = (tk: Tokeniser) => {
+		tk.exceptRun(" \t\n|&;<>()={}");
 
 		const data = tk.get();
 
@@ -930,21 +930,21 @@ bash = (() => {
 	      identifier = (tk: Tokeniser) => {
 		tk.next();
 
-		let next = main;
-
 		if (tk.accept("(")) {
 			tokenDepth.push(")");
 
-			next = word;
-		} else if (tk.accept("{")) {
-			tokenDepth.push("}");
-
-			next = word;
-		} else {
-			tk.exceptRun("\"'`(){}- \t\n");
+			return tk.return(TokenPunctuator, word);
 		}
 
-		return tk.return(TokenIdentifier, next);
+		if (tk.accept("{")) {
+			tokenDepth.push("}");
+
+			return tk.return(TokenPunctuator, word);
+		}
+
+		tk.exceptRun("\"'`(){}- \t\n");
+
+		return tk.return(TokenIdentifier, main);
 	      },
 	      backtick = (tk: Tokeniser) => {
 		tokenDepth.push("`")
@@ -1022,6 +1022,11 @@ bash = (() => {
 
 			return string(tk);
 		case '(':
+			tokenDepth.push(c);
+			tk.next();
+
+			break;
+		case '}':
 		case ')':
 			if (tokenDepth.pop() !== c) {
 				return errUnexpectedEOF(tk);
