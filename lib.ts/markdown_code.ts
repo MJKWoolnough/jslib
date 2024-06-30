@@ -920,7 +920,12 @@ bash = (() => {
 	      word = (tk: Tokeniser) => {
 		tk.exceptRun(" \t\n|&;<>()");
 
-		return tk.return(TokenKeyword, main);
+		const data = tk.get();
+
+		return [{
+			"type": keywords.includes(data) ? TokenReservedWord : TokenKeyword,
+			data
+		}, main];
 	      },
 	      operatorOrWord = (tk: Tokeniser) => {
 		switch (tk.peek()) {
