@@ -102,7 +102,7 @@ javascript = (() => {
 			t.except("");
 
 			switch (tokenDepth.at(-1)) {
-			case '{':
+			case '}':
 				tokenDepth.pop();
 
 				return t.return(TokenPunctuator, inputElement);
@@ -205,7 +205,7 @@ javascript = (() => {
 		case '{':
 		case '(':
 		case '[':
-			tokenDepth.push(c);
+			tokenDepth.push(c === "(" ? ")" : c === "[" ? "]" : "}");
 
 			break;
 		case '?':
@@ -222,13 +222,11 @@ javascript = (() => {
 			break;
 		case ')':
 		case ']':
-			const ld = tokenDepth.at(-1);
-			if (!(ld === '(' && c === ')') && !(ld === '[' && c === ']')) {
+			if (tokenDepth.pop() !== c) {
 				return errInvalidCharacter(t);
 			}
 
 			divisionAllowed = true;
-			tokenDepth.pop();
 
 			break;
 		case '.':
@@ -839,14 +837,13 @@ python = (() => {
 		case "(":
 		case "[":
 		case "{":
-			tokenDepth.push(c);
+			tokenDepth.push(c === "(" ? ")" : c === "[" ? "]" : "}");
 
 			break;
 		case ")":
 		case "}":
 		case "]":
-			const d = tokenDepth.pop();
-			if (!(d === '(' && c === ')') && !(d === '[' && c === ']') && !(d === '{' && c ==='}')) {
+			if (tokenDepth.pop() !== c) {
 				return errInvalidCharacter(tk);
 			}
 
