@@ -928,15 +928,31 @@ bash = (() => {
 		}, main];
 	      },
 	      identifier = (tk: Tokeniser) => {
-		return main(tk);
+		tk.next();
+
+		let next = main;
+
+		if (tk.accept("(")) {
+			tokenDepth.push(")");
+
+			next = word;
+		} else if (tk.accept("{")) {
+			tokenDepth.push("}");
+
+			next = word;
+		} else {
+			tk.exceptRun("\"'`(){}- \t\n");
+		}
+
+		return tk.return(TokenIdentifier, next);
 	      },
 	      backtick = (tk: Tokeniser) => {
-		return main(tk);
+		tokenDepth.push("`")
+
+		return tk.return(TokenPunctuator, main);
 	      },
 	      string = (tk: Tokeniser) => {
-		const c = tk.next();
-
-		tokenDepth.push(c);
+		const c = tokenDepth.at(-1);
 
 		while (true) {
 			switch (tk.exceptRun("\\\n`$" + c)) {
@@ -948,11 +964,13 @@ bash = (() => {
 			case '\n':
 				return errInvalidCharacter(tk);
 			case '`':
-				return backtick(tk);
+				return tk.return(TokenSingleLineComment, backtick);
 			case '$':
 				return tk.return(TokenStringLiteral, identifier);
 			case c:
 				tk.next();
+
+				tokenDepth.pop();
 
 				return tk.return(TokenStringLiteral, main)
 			default:
@@ -961,7 +979,9 @@ bash = (() => {
 		}
 	      },
 	      operatorOrWord = (tk: Tokeniser) => {
-		switch (tk.peek()) {
+		const c = tk.peek();
+
+		switch (c) {
 		case '<':
 			tk.next();
 			tk.accept("<&>");
@@ -990,10 +1010,24 @@ bash = (() => {
 			break;
 		case '"':
 		case `'`:
+			if (tokenDepth.at(-1) === c) {
+				tokenDepth.pop();
+
+				tk.next();
+
+				return tk.return(TokenStringLiteral, main);
+			}
+
+			tokenDepth.push(tk.next());
+
 			return string(tk);
-		case "=":
 		case '(':
 		case ')':
+			if (tokenDepth.pop() !== c) {
+				return errUnexpectedEOF(tk);
+			}
+
+		case "=":
 			tk.next();
 
 			break;
@@ -1010,6 +1044,12 @@ bash = (() => {
 			}
 
 			return tk.done();
+		}
+
+		const td = tokenDepth.at(-1);
+
+		if (td === "\"" || td === "'") {
+			return string(tk);
 		}
 
 		if (tk.accept(" \t")) {
