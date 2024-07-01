@@ -5,7 +5,6 @@ import Parser, {TokenDone, TokenError} from './parser.js';
 
 const whitespace = "\t\v\f \xa0\ufeff",
       lineTerminators = "\n\r\u2028\u2029",
-      singleEscapeChar = "'\"\\bfnrtv",
       binaryDigit = "01",
       octalDigit = "01234567",
       decimalDigit = "0123456789",
@@ -560,7 +559,7 @@ javascript = (() => {
 			return !t.accept(decimalDigit);
 		}
 
-		t.accept(singleEscapeChar);
+		t.except(lineTerminators);
 
 		return true;
 	      },
