@@ -953,7 +953,7 @@ bash = (() => {
 			return tk.return(TokenIdentifier, main);
 		      },
 		      backtick = (tk: Tokeniser) => {
-			tokenDepth.push("`")
+			tokenDepth.push("`");
 			tk.next();
 
 			return tk.return(TokenPunctuator, main);
@@ -979,7 +979,7 @@ bash = (() => {
 
 					tokenDepth.pop();
 
-					return tk.return(TokenStringLiteral, main)
+					return tk.return(TokenStringLiteral, main);
 				default:
 					return errUnexpectedEOF(tk);
 				}
@@ -996,7 +996,7 @@ bash = (() => {
 				break;
 			case '>':
 				tk.next();
-				tk.accept(">&|")
+				tk.accept(">&|");
 
 				break;
 			case '|':
