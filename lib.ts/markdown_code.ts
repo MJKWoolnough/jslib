@@ -3,15 +3,11 @@ import {amendNode, createDocumentFragment} from './dom.js';
 import {br, span} from './html.js';
 import Parser, {TokenDone, TokenError} from './parser.js';
 
-const whitespace = "\t\v\f \xa0\ufeff",
-      lineTerminators = "\n\r\u2028\u2029",
+const lineTerminators = "\n\r\u2028\u2029",
       binaryDigit = "01",
       octalDigit = "01234567",
       decimalDigit = "0123456789",
       hexDigit = "0123456789abcdefABCDEF",
-      stringChars = "'\\" + lineTerminators + "\"",
-      doubleStringChars = stringChars.slice(1),
-      singleStringChars = stringChars.slice(0, stringChars.length),
       lineSplit = new RegExp("[" + lineTerminators + "]"),
       error = (errText: string, override?: string) => (t: Tokeniser, text = override ?? t.get()) => t.error(errText + text),
       errUnexpectedEOF = error("unexpected EOF", ""),
@@ -22,6 +18,10 @@ const whitespace = "\t\v\f \xa0\ufeff",
 export const [TokenWhitespace, TokenLineTerminator, TokenSingleLineComment, TokenMultiLineComment, TokenIdentifier, TokenPrivateIdentifier, TokenBooleanLiteral, TokenKeyword, TokenPunctuator, TokenNumericLiteral, TokenStringLiteral, TokenNoSubstitutionTemplate, TokenTemplateHead, TokenTemplateMiddle, TokenTemplateTail, TokenRegularExpressionLiteral, TokenNullLiteral, TokenReservedWord] = Array.from({"length": 20}, (_, n) => n) as TokenType[],
 javascript = (() => {
 	const keywords = ["await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield"],
+	      whitespace = "\t\v\f \xa0\ufeff",
+	      stringChars = "'\\" + lineTerminators + "\"",
+	      doubleStringChars = stringChars.slice(1),
+	      singleStringChars = stringChars.slice(0, stringChars.length),
 	      idContinue = unicodeGroups("L", "Nl", "ID_Start", "Mn", "Mc", "Nd", "Pc", "ID_Continue"),
 	      idStart = unicodeGroups("L", "Nl", "ID_Start"),
 	      notID = unicodeGroups("Pattern_Syntax", "Pattern_White_Space"),
