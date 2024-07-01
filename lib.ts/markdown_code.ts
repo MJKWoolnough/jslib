@@ -918,7 +918,7 @@ python = (() => {
 bash = (() => {
 	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
 	      word: TokenFn = (tk: Tokeniser) => {
-		tk.exceptRun(" \t\n|&;<>()={}");
+		tk.exceptRun(" `\t\n|&;<>()={}");
 
 		const data = tk.get();
 
@@ -948,6 +948,7 @@ bash = (() => {
 	      },
 	      backtick = (tk: Tokeniser) => {
 		tokenDepth.push("`")
+		tk.next();
 
 		return tk.return(TokenPunctuator, main);
 	      },
@@ -964,7 +965,7 @@ bash = (() => {
 			case '\n':
 				return errInvalidCharacter(tk);
 			case '`':
-				return tk.return(TokenSingleLineComment, backtick);
+				return tk.return(TokenStringLiteral, backtick);
 			case '$':
 				return tk.return(TokenStringLiteral, identifier);
 			case c:
@@ -1031,13 +1032,22 @@ bash = (() => {
 			if (tokenDepth.pop() !== c) {
 				return errUnexpectedEOF(tk);
 			}
-
 		case "=":
 			tk.next();
 
 			break;
 		case "$":
 			return identifier(tk);
+		case '`':
+			if (tokenDepth.at(-1) !== c) {
+				return backtick(tk);
+			}
+
+			tokenDepth.pop();
+
+			tk.next();
+
+			break;
 		default:
 			return word(tk);
 		}
