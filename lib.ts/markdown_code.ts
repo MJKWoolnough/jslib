@@ -917,14 +917,22 @@ python = (() => {
 bash = (() => {
 	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
 	      word: TokenFn = (tk: Tokeniser) => {
-		tk.exceptRun(" `\t\n|&;<>()={}");
+		while (true) {
+			switch (tk.exceptRun(" `\\\t\n|&;<>()={}")) {
+			case "":
+				const data = tk.get();
 
-		const data = tk.get();
-
-		return [{
-			"type": keywords.includes(data) ? TokenReservedWord : tk.peek() === "=" ? TokenIdentifier : TokenKeyword,
-			data
-		}, main];
+				return [{
+					"type": keywords.includes(data) ? TokenReservedWord : tk.peek() === "=" ? TokenIdentifier : TokenKeyword,
+					data
+				}, main];
+			default:
+				return errUnexpectedEOF(tk);
+			case '\\':
+				tk.next();
+				tk.next();
+			}
+		}
 	      },
 	      identifier = (tk: Tokeniser) => {
 		tk.next();
