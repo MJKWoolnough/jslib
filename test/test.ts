@@ -11778,6 +11778,10 @@ type Tests = {
 				"identifiers": {
 					"source": "an identifier\na_nother",
 					"output": `<span class="identifier">an</span><span class="whitespace">&nbsp;</span><span class="identifier">identifier</span><span class="lineterminator"><br></span><span class="identifier">a_nother</span>`
+				},
+				"keywords": {
+					"source": "False True None pass raise continue class",
+					"output": ` <span class="booleanliteral">False</span><span class="whitespace">&nbsp;</span><span class="booleanliteral">True</span><span class="whitespace">&nbsp;</span><span class="nullliteral">None</span><span class="whitespace">&nbsp;</span><span class="keyword">pass</span><span class="whitespace">&nbsp;</span><span class="keyword">raise</span><span class="whitespace">&nbsp;</span><span class="keyword">continue</span><span class="whitespace">&nbsp;</span><span class="keyword">class</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
