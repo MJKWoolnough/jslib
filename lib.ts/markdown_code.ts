@@ -203,6 +203,8 @@ javascript = (() => {
 			t.except("");
 
 			switch (c) {
+			default:
+				return errInvalidCharacter(t);
 			case '{':
 			case '(':
 			case '[':
@@ -294,10 +296,6 @@ javascript = (() => {
 			case '%':
 			case '^':
 				t.accept("="); // %=, ^=
-
-				break;
-			default:
-				return errInvalidCharacter(t);
 			}
 
 			return t.return(TokenPunctuator, inputElement);
@@ -322,6 +320,8 @@ javascript = (() => {
 
 			while (true) {
 				switch (t.exceptRun("]\\")) {
+				default:
+					return errUnexpectedEOF(t);
 				case ']':
 					t.except("");
 
@@ -331,10 +331,6 @@ javascript = (() => {
 					if (err) {
 						return err;
 					}
-
-					break;
-				default:
-					return errUnexpectedEOF(t);
 				}
 			}
 		      },
@@ -373,6 +369,11 @@ javascript = (() => {
 			while (true) {
 				const c = t.exceptRun(lineTerminators + "\\[/");
 				switch (c) {
+				default:
+					t.get();
+					t.except("");
+
+					return errInvalidRegexpCharacter(t);
 				case "":
 					return errUnexpectedEOF(t);
 				case '\\':
@@ -382,22 +383,15 @@ javascript = (() => {
 					}
 
 					break;
+				case '/':
+					t.except("");
+
+					break Loop;
 				case '[':
 					const errr = regexpExpressionClass(t);
 					if (errr) {
 						return errr;
 					}
-
-					break;
-				case '/':
-					t.except("");
-
-					break Loop;
-				default:
-					t.get();
-					t.except("");
-
-					return errInvalidRegexpCharacter(t);
 				}
 			}
 
@@ -602,6 +596,8 @@ javascript = (() => {
 			Loop:
 			while (true) {
 				switch (t.exceptRun("`\\$")) {
+				default:
+					return errUnexpectedEOF(t);
 				case '`':
 					t.except("");
 
@@ -626,8 +622,6 @@ javascript = (() => {
 							"data": v
 						}, inputElement];
 					}
-				default:
-					return errUnexpectedEOF(t);
 				}
 			}
 
@@ -671,7 +665,6 @@ python = (() => {
 				tk.accept("rR");
 			case "u":
 			case "U":
-				break;
 			}
 
 			if (stringStart.includes(tk.peek())) {
@@ -801,6 +794,8 @@ python = (() => {
 			const c = tk.next();
 
 			switch (c) {
+			default:
+				return errUnexpectedEOF(tk);
 			case "+":
 			case "%":
 			case "@":
@@ -845,10 +840,6 @@ python = (() => {
 				if (tokenDepth.pop() !== c) {
 					return errInvalidCharacter(tk);
 				}
-
-				break;
-			default:
-				return errUnexpectedEOF(tk);
 			}
 
 			return tk.return(TokenPunctuator, main);
@@ -964,11 +955,8 @@ bash = (() => {
 
 			while (true) {
 				switch (tk.exceptRun(stops)) {
-				case '\\':
-					tk.next();
-					tk.next();
-
-					break;
+				default:
+					return errUnexpectedEOF(tk);
 				case '\n':
 					return errInvalidCharacter(tk);
 				case '`':
@@ -982,8 +970,9 @@ bash = (() => {
 					tokenDepth.pop();
 
 					return tk.return(TokenStringLiteral, main);
-				default:
-					return errUnexpectedEOF(tk);
+				case '\\':
+					tk.next();
+					tk.next();
 				}
 			}
 		      },
@@ -991,6 +980,8 @@ bash = (() => {
 			const c = tk.peek();
 
 			switch (c) {
+			default:
+				return word(tk);
 			case '<':
 				tk.next();
 				tk.accept("<&>");
@@ -1054,10 +1045,6 @@ bash = (() => {
 				tokenDepth.pop();
 
 				tk.next();
-
-				break;
-			default:
-				return word(tk);
 			}
 
 			return tk.return(TokenPunctuator, main);
