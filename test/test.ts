@@ -11761,6 +11761,12 @@ type Tests = {
 					"source": "true false",
 					"output": `<span class="booleanliteral">true</span><span class="whitespace">&nbsp;</span><span class="booleanliteral">false</span>`
 				}
+			},
+			"python": {
+				"linebreaks": {
+					"source": "\n \n\n \n\n\n",
+					"output": `<span class="lineterminator"><br></span><span class="whitespace">&nbsp;</span><span class="lineterminator"><br><br></span><span class="whitespace">&nbsp;</span><span class="lineterminator"><br><br><br></span>`
+				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
 			const {default: code, ...fns} = await import("./lib/markdown_code.js"),
@@ -11786,8 +11792,6 @@ type Tests = {
 				[16, ".nullliteral"],
 				[17, ".futurereservedword"]
 			])));
-
-			console.log(div.innerHTML, output);
 
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
