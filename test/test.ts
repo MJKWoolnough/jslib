@@ -11766,6 +11766,10 @@ type Tests = {
 				"linebreaks": {
 					"source": "\n \n\n \n\n\n",
 					"output": `<span class="lineterminator"><br></span><span class="whitespace">&nbsp;</span><span class="lineterminator"><br><br></span><span class="whitespace">&nbsp;</span><span class="lineterminator"><br><br><br></span>`
+				},
+				"whitespace": {
+					"source": " \t",
+					"output": `<span class="whitespace">&nbsp; </span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
