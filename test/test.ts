@@ -11774,6 +11774,10 @@ type Tests = {
 				"comments": {
 					"source": "# a comment\n\n# another comment",
 					"output": `<span class="singlelinecomment">#&nbsp;a&nbsp;comment</span><span class="lineterminator"><br><br></span><span class="singlelinecomment">#&nbsp;another&nbsp;comment</span>`
+				},
+				"identifiers": {
+					"source": "an identifier\na_nother",
+					"output": `<span class="identifier">an</span><span class="whitespace">&nbsp;</span><span class="identifier">identifier</span><span class="lineterminator"><br></span><span class="identifier">a_nother</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
