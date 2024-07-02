@@ -959,10 +959,11 @@ bash = (() => {
 			return tk.return(TokenPunctuator, main);
 		      },
 		      string = (tk: Tokeniser) => {
-			const c = tokenDepth.at(-1);
+			const c = tokenDepth.at(-1),
+			      stops = c === '"' ? "\\\n`$\"" : "\n'";
 
 			while (true) {
-				switch (tk.exceptRun("\\\n`$" + c)) {
+				switch (tk.exceptRun(stops)) {
 				case '\\':
 					tk.next();
 					tk.next();
@@ -974,7 +975,8 @@ bash = (() => {
 					return tk.return(TokenStringLiteral, backtick);
 				case '$':
 					return tk.return(TokenStringLiteral, identifier);
-				case c:
+				case "'":
+				case '"':
 					tk.next();
 
 					tokenDepth.pop();
