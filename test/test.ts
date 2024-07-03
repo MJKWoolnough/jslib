@@ -11798,6 +11798,10 @@ type Tests = {
 				"byte strings": {
 					"source": "b\"\\\"double\\\" quoted bytes\"\nB'single quoted bytes'\nbr\"raw bytes\"\nBR'also raw bytes'",
 					"output": `<span class="stringliteral">b"\\\"double\\\"&nbsp;quoted&nbsp;bytes"</span><span class="lineterminator"><br></span><span class="stringliteral">B'single&nbsp;quoted&nbsp;bytes'</span><span class="lineterminator"><br></span><span class="stringliteral">br"raw&nbsp;bytes"</span><span class="lineterminator"><br></span><span class="stringliteral">BR'also&nbsp;raw&nbsp;bytes'</span>`
+				},
+				"unicode strings": {
+					"source": "u\"\\\"double\\\" quoted unicode\"\nU'single quoted unicode'",
+					"output": `<span class="stringliteral">u"\\\"double\\\"&nbsp;quoted&nbsp;unicode"</span><span class="lineterminator"><br></span><span class="stringliteral">U'single&nbsp;quoted&nbsp;unicode'</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
