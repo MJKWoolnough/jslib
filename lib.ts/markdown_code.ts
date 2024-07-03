@@ -784,7 +784,7 @@ python = (() => {
 				return errInvalidNumber(tk);
 			}
 
-			return numberWithGrouping(tk, decimalDigit) ?? (tk.accept("eE") && exponential(tk)) ?? imaginary(tk);
+			return numberWithGrouping(tk, decimalDigit) ?? ((tk.accept("eE") && exponential(tk)) || imaginary(tk));
 		      },
 		      floatOrDelimiter = (tk: Tokeniser) => {
 			if (!tk.accept(decimalDigit)) {
