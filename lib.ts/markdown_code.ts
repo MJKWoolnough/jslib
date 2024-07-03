@@ -753,7 +753,7 @@ python = (() => {
 				return float(tk);
 			}
 
-			return imaginary(tk);
+			return tk.accept("eE") && exponential(tk) || imaginary(tk);
 		      },
 		      baseNumber = (tk: Tokeniser) => {
 			const digits = tk.accept("xX") ? hexDigit : tk.accept("oO") ? octalDigit : tk.accept("bB") ? binaryDigit : "0",
@@ -769,7 +769,11 @@ python = (() => {
 
 			return tk.return(TokenNumericLiteral, main);
 		      },
-		      number = (tk: Tokeniser) => numberWithGrouping(tk, decimalDigit) ?? floatOrImaginary(tk),
+		      number = (tk: Tokeniser) => {
+			tk.acceptRun(decimalDigit);
+
+			return numberWithGrouping(tk, decimalDigit) ?? floatOrImaginary(tk);
+		      },
 		      exponential = (tk: Tokeniser) => {
 			tk.accept("+-");
 
@@ -784,7 +788,7 @@ python = (() => {
 				return errInvalidNumber(tk);
 			}
 
-			return numberWithGrouping(tk, decimalDigit) ?? ((tk.accept("eE") && exponential(tk)) || imaginary(tk));
+			return numberWithGrouping(tk, decimalDigit) ?? (tk.accept("eE") && exponential(tk) || imaginary(tk));
 		      },
 		      floatOrDelimiter = (tk: Tokeniser) => {
 			if (!tk.accept(decimalDigit)) {
