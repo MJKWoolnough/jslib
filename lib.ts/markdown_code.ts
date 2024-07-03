@@ -710,7 +710,7 @@ python = (() => {
 				case m:
 					tk.next();
 
-					if (!triple || !tk.accept(m) || !tk.accept(m)) {
+					if (!triple || tk.accept(m) && tk.accept(m)) {
 						break Loop;
 					}
 				}
