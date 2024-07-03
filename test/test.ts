@@ -11802,6 +11802,10 @@ type Tests = {
 				"unicode strings": {
 					"source": "u\"\\\"double\\\" quoted unicode\"\nU'single quoted unicode'",
 					"output": `<span class="stringliteral">u"\\\"double\\\"&nbsp;quoted&nbsp;unicode"</span><span class="lineterminator"><br></span><span class="stringliteral">U'single&nbsp;quoted&nbsp;unicode'</span>`
+				},
+				"triple quoted strings": {
+					"source": `"""tri"p"le"""\nr"""raw triple"""`,
+					"output": `<span class="stringliteral">"""tri"p"le"""</span><span class="lineterminator"><br></span><span class="stringliteral">r"""raw&nbsp;triple"""</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
