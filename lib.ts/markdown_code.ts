@@ -652,28 +652,31 @@ python = (() => {
 
 	return (tk: Tokeniser) => {
 		const stringOrIdentifier = (tk: Tokeniser) => {
+			let raw = false;
+
 			switch (tk.next()) {
 			case "r":
 			case "R":
 				tk.accept("fFbB");
+				raw = true;
 
 				break;
 			case "b":
 			case "B":
 			case "f":
 			case "F":
-				tk.accept("rR");
+				raw = tk.accept("rR");
 			case "u":
 			case "U":
 			}
 
 			if (stringStart.includes(tk.peek())) {
-				return string(tk);
+				return string(tk, raw);
 			}
 
 			return identifier(tk);
 		      },
-		      string = (tk: Tokeniser) => {
+		      string = (tk: Tokeniser, raw = false) => {
 			const m = tk.next();
 
 			let triple = false;
@@ -688,7 +691,7 @@ python = (() => {
 
 			Loop:
 			while (true) {
-				const c = tk.exceptRun("\\\n" + m);
+				const c = tk.exceptRun("\n" + m + (raw ? "" : "\\" ));
 
 				switch (c) {
 				default:

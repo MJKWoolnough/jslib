@@ -11781,19 +11781,19 @@ type Tests = {
 				},
 				"keywords": {
 					"source": "False True None pass raise continue class",
-					"output": ` <span class="booleanliteral">False</span><span class="whitespace">&nbsp;</span><span class="booleanliteral">True</span><span class="whitespace">&nbsp;</span><span class="nullliteral">None</span><span class="whitespace">&nbsp;</span><span class="keyword">pass</span><span class="whitespace">&nbsp;</span><span class="keyword">raise</span><span class="whitespace">&nbsp;</span><span class="keyword">continue</span><span class="whitespace">&nbsp;</span><span class="keyword">class</span>`
+					"output": `<span class="booleanliteral">False</span><span class="whitespace">&nbsp;</span><span class="booleanliteral">True</span><span class="whitespace">&nbsp;</span><span class="nullliteral">None</span><span class="whitespace">&nbsp;</span><span class="keyword">pass</span><span class="whitespace">&nbsp;</span><span class="keyword">raise</span><span class="whitespace">&nbsp;</span><span class="keyword">continue</span><span class="whitespace">&nbsp;</span><span class="keyword">class</span>`
 				},
 				"simple strings": {
-					"source": "\"a double quoted string\"\n'a single quoted string'",
-					"output": `<span class="stringliteral">"a&nbsp;double&nbsp;quoted&nbsp;string"</span><span class="lineterminator"><br></span><span class="stringliteral">'a&nbsp;single&nbsp;quoted&nbsp;string'</span>`
+					"source": "\"a \\\"double\\\" quoted string\"\n'a single quoted string'",
+					"output": `<span class="stringliteral">"a&nbsp;\\\"double\\\"&nbsp;quoted&nbsp;string"</span><span class="lineterminator"><br></span><span class="stringliteral">'a&nbsp;single&nbsp;quoted&nbsp;string'</span>`
 				},
 				"f strings": {
 					"source": "f\"double quoted f string\"\nF\"single quoted f string\"\nfR\"formatted raw\"\nFr'also a raw formatted string'",
 					"output": `<span class="stringliteral">f"double&nbsp;quoted&nbsp;f&nbsp;string"</span><span class="lineterminator"><br></span><span class="stringliteral">F"single&nbsp;quoted&nbsp;f&nbsp;string"</span><span class="lineterminator"><br></span><span class="stringliteral">fR"formatted&nbsp;raw"</span><span class="lineterminator"><br></span><span class="stringliteral">Fr'also&nbsp;a&nbsp;raw&nbsp;formatted&nbsp;string'</span>`
 				},
 				"raw strings": {
-					"source": "r\"raw double quoted\"\nR'raw single quoted'\nrb\"raw bytes\"\nRB'also raw bytes'",
-					"output": `<span class="stringliteral">r"raw&nbsp;double&nbsp;quoted"</span><span class="lineterminator"><br></span><span class="stringliteral">R'raw&nbsp;single&nbsp;quoted'</span><span class="lineterminator"><br></span><span class="stringliteral">rb"raw&nbsp;bytes"</span><span class="lineterminator"><br></span><span class="stringliteral">RB'also&nbsp;raw&nbsp;bytes'</span>`
+					"source": "r\"raw \\\"double\\\" quoted\"\nR'raw single quoted'\nrb\"raw bytes\"\nRB'also raw bytes'",
+					"output": `<span class="stringliteral">r"raw&nbsp;\\"</span><span class="identifier">double</span><span data-error="unexpected EOF">\\"&nbsp;quoted"<br>R'raw&nbsp;single&nbsp;quoted'<br>rb"raw&nbsp;bytes"<br>RB'also&nbsp;raw&nbsp;bytes'</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
