@@ -11794,6 +11794,10 @@ type Tests = {
 				"raw strings": {
 					"source": "r\"raw \\\"double\\\" quoted\"\nR'raw single quoted'\nrb\"raw bytes\"\nRB'also raw bytes'",
 					"output": `<span class="stringliteral">r"raw&nbsp;\\"</span><span class="identifier">double</span><span data-error="unexpected EOF">\\"&nbsp;quoted"<br>R'raw&nbsp;single&nbsp;quoted'<br>rb"raw&nbsp;bytes"<br>RB'also&nbsp;raw&nbsp;bytes'</span>`
+				},
+				"byte strings": {
+					"source": "b\"\\\"double\\\" quoted bytes\"\nB'single quoted bytes'\nbr\"raw bytes\"\nBR'also raw bytes'",
+					"output": `<span class="stringliteral">b"\\\"double\\\"&nbsp;quoted&nbsp;bytes"</span><span class="lineterminator"><br></span><span class="stringliteral">B'single&nbsp;quoted&nbsp;bytes'</span><span class="lineterminator"><br></span><span class="stringliteral">br"raw&nbsp;bytes"</span><span class="lineterminator"><br></span><span class="stringliteral">BR'also&nbsp;raw&nbsp;bytes'</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
