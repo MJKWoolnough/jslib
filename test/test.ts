@@ -11806,6 +11806,10 @@ type Tests = {
 				"triple quoted strings": {
 					"source": `"""tri"p"le"""\nr"""raw triple"""`,
 					"output": `<span class="stringliteral">"""tri"p"le"""</span><span class="lineterminator"><br></span><span class="stringliteral">r"""raw&nbsp;triple"""</span>`
+				},
+				"integers": {
+					"source": "123 456 1e10 1j",
+					"output": `<span class="numericliteral">123</span><span class="whitespace">&nbsp;</span><span class="numericliteral">456</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1e10</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1j</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
