@@ -923,6 +923,10 @@ bash = (() => {
 		const word: TokenFn = (tk: Tokeniser) => {
 			while (true) {
 				switch (tk.exceptRun(" `\\\t\n|&;<>()={}")) {
+				default:
+					if (!tk.length()) {
+						return tokenDepth.length ? errUnexpectedEOF(tk) : tk.done();
+					}
 				case "":
 					const data = tk.get();
 
@@ -930,8 +934,6 @@ bash = (() => {
 						"type": keywords.includes(data) ? TokenReservedWord : tk.peek() === "=" ? TokenIdentifier : TokenKeyword,
 						data
 					}, main];
-				default:
-					return errUnexpectedEOF(tk);
 				case '\\':
 					tk.next();
 					tk.next();
