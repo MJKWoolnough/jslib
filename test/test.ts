@@ -11840,6 +11840,10 @@ type Tests = {
 				"simple strings": {
 					"source": "\"a string\" 'another string'",
 					"output": `<span class="stringliteral">"a&nbsp;string"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'another&nbsp;string'</span>`
+				},
+				"keywords": {
+					"source": "a word\nanother couple of words",
+					"output": `<span class="keyword">a</span><span class="whitespace">&nbsp;</span><span class="keyword">word</span><span class="lineterminator"><br></span><span class="keyword">another</span><span class="whitespace">&nbsp;</span><span class="keyword">couple</span><span class="whitespace">&nbsp;</span><span class="keyword">of</span><span class="whitespace">&nbsp;</span><span class="keyword">words</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
