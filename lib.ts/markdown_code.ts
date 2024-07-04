@@ -732,11 +732,11 @@ python = (() => {
 		      },
 		      numberWithGrouping = (tk: Tokeniser, digits: string) => {
 			while (tk.accept("_")) {
-				const pos = tk.length;
+				const pos = tk.length();
 
 				tk.acceptRun(digits);
 
-				if (pos === tk.length) {
+				if (pos === tk.length()) {
 					return errInvalidNumber(tk);
 				}
 			}
@@ -756,11 +756,18 @@ python = (() => {
 			return tk.accept("eE") && exponential(tk) || imaginary(tk);
 		      },
 		      baseNumber = (tk: Tokeniser) => {
-			const digits = tk.accept("xX") ? hexDigit : tk.accept("oO") ? octalDigit : tk.accept("bB") ? binaryDigit : "0",
-			      err = numberWithGrouping(tk, digits);
+			const digits = tk.accept("xX") ? hexDigit : tk.accept("oO") ? octalDigit : tk.accept("bB") ? binaryDigit : "0";
 
-			if (err) {
-				return err;
+			if (tk.accept(digits) || digits === "0") {
+				tk.acceptRun(digits);
+
+				const err = numberWithGrouping(tk, digits);
+
+				if (err) {
+					return err;
+				}
+			} else {
+				return errInvalidNumber(tk);
 			}
 
 			if (digits === "0") {
