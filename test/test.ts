@@ -11827,6 +11827,12 @@ type Tests = {
 					"source": "+ - @= <<= () !=",
 					"output": `<span class="punctuator">+</span><span class="whitespace">&nbsp;</span><span class="punctuator">-</span><span class="whitespace">&nbsp;</span><span class="punctuator">@=</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&lt;=</span><span class="whitespace">&nbsp;</span><span class="punctuator">()</span><span class="whitespace">&nbsp;</span><span class="punctuator">!=</span>`
 				}
+			},
+			"bash": {
+				"whitespace": {
+					"source": " \t \t\t  ",
+					"output": `<span class="whitespace">&nbsp; &nbsp;  &nbsp;&nbsp;</span>`
+				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
 			const {default: code, ...fns} = await import("./lib/markdown_code.js"),
