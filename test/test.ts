@@ -11808,16 +11808,16 @@ type Tests = {
 					"output": `<span class="stringliteral">"""tri"p"le"""</span><span class="lineterminator"><br></span><span class="stringliteral">r"""raw&nbsp;triple"""</span>`
 				},
 				"integers": {
-					"source": "123 456 1e10 1j",
-					"output": `<span class="numericliteral">123</span><span class="whitespace">&nbsp;</span><span class="numericliteral">456</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1e10</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1j</span>`
+					"source": "123 456 1e10 1j 1_2_3e4_5_6",
+					"output": `<span class="numericliteral">123</span><span class="whitespace">&nbsp;</span><span class="numericliteral">456</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1e10</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1j</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1_2_3e4_5_6</span>`
 				},
 				"zero": {
-					"source": "0 0000 0.00 000.0",
-					"output": `<span class="numericliteral">0</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0000</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0.00</span><span class="whitespace">&nbsp;</span><span class="numericliteral">000.0</span>`
+					"source": "0 0000 0.00 000.0 0_0.0_0",
+					"output": `<span class="numericliteral">0</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0000</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0.00</span><span class="whitespace">&nbsp;</span><span class="numericliteral">000.0</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0_0.0_0</span>`
 				},
 				"bases": {
-					"source": "0xdeadBEEF 0XF12 0b010101 0B1010101 0o765 0O123",
-					"output": `<span class="numericliteral">0x</span><span class="identifier">deadBEEF</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0X</span><span class="identifier">F12</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0b010101</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0B1010101</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0o765</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0O123</span>`
+					"source": "0xdeadBEEF 0XF12 0b010101 0B1010101 0o765 0O123 0x1_2_3",
+					"output": `<span class="numericliteral">0xdeadBEEF</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0XF12</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0b010101</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0B1010101</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0o765</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0O123</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0x1_2_3</span>`
 				},
 				"float": {
 					"source": "0.123 .456 3.14159E3j",
