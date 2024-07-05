@@ -11868,6 +11868,10 @@ type Tests = {
 				"comments": {
 					"source": "#!/bin/bash\n\n# a comment\nword",
 					"output": `<span class="singlelinecomment">#!/bin/bash</span><span class="lineterminator"><br><br></span><span class="singlelinecomment">#&nbsp;a&nbsp;comment</span><span class="lineterminator"><br></span><span class="keyword">word</span>`
+				},
+				"operators": {
+					"source": "| || & && ; ;; ;& ;;& |& < > << >> <& >| <← <> >&",
+					"output": `<span class="punctuator">|</span><span class="whitespace">&nbsp;</span><span class="punctuator">||</span><span class="whitespace">&nbsp;</span><span class="punctuator">&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&amp;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">|&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&lt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;|</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;</span><span class="keyword">←</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;&amp;</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
