@@ -11860,6 +11860,10 @@ type Tests = {
 				"strings with subshells": {
 					"source": "\"text$(a command \"inner string `another command` more text in inner\" param)more text\" 'quoted with `backticks`'",
 					"output": `<span class="stringliteral">"text</span><span class="punctuator">$(</span><span class="keyword">a</span><span class="whitespace">&nbsp;</span><span class="keyword">command</span><span class="whitespace">&nbsp;</span><span class="stringliteral">"inner&nbsp;string&nbsp;</span><span class="punctuator">\`</span><span class="keyword">another</span><span class="whitespace">&nbsp;</span><span class="keyword">command</span><span class="punctuator">\`</span><span class="stringliteral">&nbsp;more&nbsp;text&nbsp;in&nbsp;inner"</span><span class="whitespace">&nbsp;</span><span class="keyword">param</span><span class="punctuator">)</span><span class="stringliteral">more&nbsp;text"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'quoted&nbsp;with&nbsp;\`backticks\`'</span>`
+				},
+				"strings with escapes": {
+					"source": `"an escaped \\""`,
+					"output": `<span class="stringliteral">"an&nbsp;escaped&nbsp;\""</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
@@ -11886,8 +11890,6 @@ type Tests = {
 				[16, ".nullliteral"],
 				[17, ".futurereservedword"]
 			])));
-
-			console.log(div.innerHTML);
 
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
