@@ -11862,8 +11862,8 @@ type Tests = {
 					"output": `<span class="stringliteral">"text</span><span class="punctuator">$(</span><span class="keyword">a</span><span class="whitespace">&nbsp;</span><span class="keyword">command</span><span class="whitespace">&nbsp;</span><span class="stringliteral">"inner&nbsp;string&nbsp;</span><span class="punctuator">\`</span><span class="keyword">another</span><span class="whitespace">&nbsp;</span><span class="keyword">command</span><span class="punctuator">\`</span><span class="stringliteral">&nbsp;more&nbsp;text&nbsp;in&nbsp;inner"</span><span class="whitespace">&nbsp;</span><span class="keyword">param</span><span class="punctuator">)</span><span class="stringliteral">more&nbsp;text"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'quoted&nbsp;with&nbsp;\`backticks\`'</span>`
 				},
 				"strings with escapes": {
-					"source": `"an escaped \\""`,
-					"output": `<span class="stringliteral">"an&nbsp;escaped&nbsp;\\""</span>`
+					"source": `"an escaped \\" \\n"`,
+					"output": `<span class="stringliteral">"an&nbsp;escaped&nbsp;\\"&nbsp;\\n"</span>`
 				},
 				"comments": {
 					"source": "#!/bin/bash\n\n# a comment\nword",
@@ -11879,6 +11879,8 @@ type Tests = {
 			      div = document.createElement("div");
 
 			div.append(code(source, fns[testname as keyof typeof fns] as any, new Map([".whitespace", ".lineterminator", ".singlelinecomment", ".multilinecomment", ".identifier", ".privateidentifier", ".booleanliteral", ".keyword", ".punctuator", ".numericliteral", ".stringliteral", ".nosubstitutiontemplate", ".templatehead", ".templatemiddle", ".templatetail", ".regularexpressionliteral", ".nullliteral", ".futurereservedword"].map((c, n) => [n, c]))));
+
+			console.log(div.innerHTML);
 
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
