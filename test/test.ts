@@ -11848,6 +11848,10 @@ type Tests = {
 				"reserved words": {
 					"source": "for while do done case esac",
 					"output": `<span class="futurereservedword">for</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">while</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">do</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">done</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">case</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">esac</span>`
+				},
+				"identifiers": {
+					"source": "abc=1 $def",
+					"output": `<span class="identifier">abc</span><span class="punctuator">=</span><span class="keyword">1</span><span class="whitespace">&nbsp;</span><span class="identifier">$def</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
