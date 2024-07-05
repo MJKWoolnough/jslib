@@ -11863,7 +11863,11 @@ type Tests = {
 				},
 				"strings with escapes": {
 					"source": `"an escaped \\""`,
-					"output": `<span class="stringliteral">"an&nbsp;escaped&nbsp;\""</span>`
+					"output": `<span class="stringliteral">"an&nbsp;escaped&nbsp;\\""</span>`
+				},
+				"comments": {
+					"source": "#!/bin/bash\n\n# a comment\nword",
+					"output": `<span class="singlelinecomment">#!/bin/bash</span><span class="lineterminator"><br><br></span><span class="singlelinecomment">#&nbsp;a&nbsp;comment</span><span class="lineterminator"><br></span><span class="keyword">word</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
@@ -11890,6 +11894,7 @@ type Tests = {
 				[16, ".nullliteral"],
 				[17, ".futurereservedword"]
 			])));
+
 
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
