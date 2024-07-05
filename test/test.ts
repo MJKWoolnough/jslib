@@ -11874,27 +11874,7 @@ type Tests = {
 			const {default: code, ...fns} = await import("./lib/markdown_code.js"),
 			      div = document.createElement("div");
 
-			div.append(code(source, fns[testname as keyof typeof fns] as any, new Map([
-				[0, ".whitespace"],
-				[1, ".lineterminator"],
-				[2, ".singlelinecomment"],
-				[3, ".multilinecomment"],
-				[4, ".identifier"],
-				[5, ".privateidentifier"],
-				[6, ".booleanliteral"],
-				[7, ".keyword"],
-				[8, ".punctuator"],
-				[9, ".numericliteral"],
-				[10, ".stringliteral"],
-				[11, ".nosubstitutiontemplate"],
-				[12, ".templatehead"],
-				[13, ".templatemiddle"],
-				[14, ".templatetail"],
-				[15, ".regularexpressionliteral"],
-				[16, ".nullliteral"],
-				[17, ".futurereservedword"]
-			])));
-
+			div.append(code(source, fns[testname as keyof typeof fns] as any, new Map([".whitespace", ".lineterminator", ".singlelinecomment", ".multilinecomment", ".identifier", ".privateidentifier", ".booleanliteral", ".keyword", ".punctuator", ".numericliteral", ".stringliteral", ".nosubstitutiontemplate", ".templatehead", ".templatemiddle", ".templatetail", ".regularexpressionliteral", ".nullliteral", ".futurereservedword"].map((c, n) => [n, c]))));
 
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
