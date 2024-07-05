@@ -11852,6 +11852,10 @@ type Tests = {
 				"identifiers": {
 					"source": "abc=1 $def",
 					"output": `<span class="identifier">abc</span><span class="punctuator">=</span><span class="keyword">1</span><span class="whitespace">&nbsp;</span><span class="identifier">$def</span>`
+				},
+				"strings with identifiers": {
+					"source": "\"some text $anIdentifier and some more text\" 'quoted text $without identifier'",
+					"output": `<span class="stringliteral">"some&nbsp;text&nbsp;</span><span class="identifier">$anIdentifier</span><span class="stringliteral">&nbsp;and&nbsp;some&nbsp;more&nbsp;text"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'quoted&nbsp;text&nbsp;$without&nbsp;identifier'</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
