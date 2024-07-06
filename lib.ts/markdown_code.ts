@@ -917,7 +917,8 @@ python = (() => {
 	};
 })(),
 bash = (() => {
-	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"];
+	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
+	      numberChars = decimalDigit + "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz@_";
 
 	return (tk: Tokeniser) => {
 		const word: TokenFn = (tk: Tokeniser) => {
@@ -1006,6 +1007,17 @@ bash = (() => {
 			return tk.return(TokenNumericLiteral, main);
 		      },
 		      number = (tk: Tokeniser) => {
+			tk.acceptRun(decimalDigit);
+
+			if (tk.accept("#")) {
+				if (!tk.accept(numberChars)) {
+					return errInvalidCharacter(tk);
+				}
+
+				tk.acceptRun(numberChars);
+			}
+
+			return tk.return(TokenNumericLiteral, main);
 		      },
 		      arithmeticExpansion = (tk: Tokeniser) => {
 			let early = false;
