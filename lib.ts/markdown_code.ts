@@ -1007,6 +1007,10 @@ bash = (() => {
 			return tk.return(TokenNumericLiteral, main);
 		      },
 		      number = (tk: Tokeniser) => {
+			if (!tk.accept(decimalDigit)) {
+				return word(tk);
+			}
+
 			tk.acceptRun(decimalDigit);
 
 			if (tk.accept("#")) {
