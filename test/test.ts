@@ -11845,6 +11845,10 @@ type Tests = {
 					"source": "a word\nanother couple of words",
 					"output": `<span class="keyword">a</span><span class="whitespace">&nbsp;</span><span class="keyword">word</span><span class="lineterminator"><br></span><span class="keyword">another</span><span class="whitespace">&nbsp;</span><span class="keyword">couple</span><span class="whitespace">&nbsp;</span><span class="keyword">of</span><span class="whitespace">&nbsp;</span><span class="keyword">words</span>`
 				},
+				"keywords with spaces": {
+					"source": "a\\ word another\\ word",
+					"output": `<span class="keyword">a\\&nbsp;word</span><span class="whitespace">&nbsp;</span><span class="keyword">another\\&nbsp;word</span>`
+				},
 				"reserved words": {
 					"source": "for while do done case esac",
 					"output": `<span class="futurereservedword">for</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">while</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">do</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">done</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">case</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">esac</span>`
