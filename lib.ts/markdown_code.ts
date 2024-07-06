@@ -944,6 +944,12 @@ bash = (() => {
 			tk.next();
 
 			if (tk.accept("(")) {
+				if (tk.accept("(")) {
+					tokenDepth.push("))");
+
+					return tk.return(TokenPunctuator, main);
+				}
+
 				tokenDepth.push(")");
 
 				return tk.return(TokenPunctuator, word);
@@ -991,6 +997,44 @@ bash = (() => {
 					tk.next();
 				}
 			}
+		      },
+		      baseNumber = (tk: Tokeniser) => {
+		      },
+		      number = (tk: Tokeniser) => {
+		      },
+		      arithmeticExpansion = (tk: Tokeniser) => {
+			switch (tk.peek()) {
+			case '':
+				return errUnexpectedEOF(tk);
+			case "'":
+			case '"':
+			case '$':
+			case '+':
+			case '-':
+			case '!':
+			case '~':
+			case '*':
+			case '/':
+			case '%':
+			case '<':
+			case '>':
+			case '=':
+			case '&':
+			case '^':
+			case '|':
+			case '&':
+			case '?':
+			case ':':
+			case ',':
+			case ')':
+				break;
+			case '0':
+				return baseNumber(tk);
+			default:
+				return number(tk);
+			}
+
+			return tk.return(TokenPunctuator, main);
 		      },
 		      operatorOrWord = (tk: Tokeniser) => {
 			const c = tk.peek();
@@ -1096,6 +1140,10 @@ bash = (() => {
 				tk.exceptRun("\n");
 
 				return tk.return(TokenSingleLineComment, main);
+			}
+
+			if (td === "))") {
+				return arithmeticExpansion(tk);
 			}
 
 			return operatorOrWord(tk);
