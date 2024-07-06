@@ -921,6 +921,8 @@ bash = (() => {
 	      numberChars = decimalDigit + "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz@_";
 
 	return (tk: Tokeniser) => {
+		let hasEscape = false;
+
 		const word: TokenFn = (tk: Tokeniser) => {
 			while (true) {
 				switch (tk.exceptRun(" `\\\t\n|&;<>()={}")) {
@@ -932,12 +934,14 @@ bash = (() => {
 					const data = tk.get();
 
 					return [{
-						"type": keywords.includes(data) ? TokenReservedWord : tk.peek() === "=" ? TokenIdentifier : TokenKeyword,
+						"type": keywords.includes(data) ? TokenReservedWord : !hasEscape && tk.peek() === "=" ? TokenIdentifier : TokenKeyword,
 						data
 					}, main];
 				case '\\':
 					tk.next();
 					tk.next();
+
+					hasEscape = true;
 				}
 			}
 		      },
@@ -962,7 +966,7 @@ bash = (() => {
 				return tk.return(TokenPunctuator, word);
 			}
 
-			tk.exceptRun("\"'`(){}- \t\n");
+			tk.exceptRun("\\\"'`(){}- \t\n");
 
 			return tk.return(TokenIdentifier, main);
 		      },
