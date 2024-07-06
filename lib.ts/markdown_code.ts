@@ -998,38 +998,82 @@ bash = (() => {
 				}
 			}
 		      },
-		      baseNumber = (tk: Tokeniser) => {
+		      zero = (tk: Tokeniser) => {
+			tk.next();
+
+			const nums = tk.accept("xX") ? hexDigit : octalDigit;
 		      },
 		      number = (tk: Tokeniser) => {
 		      },
 		      arithmeticExpansion = (tk: Tokeniser) => {
-			switch (tk.peek()) {
+			let early = false;
+
+			const c = tk.peek();
+
+			switch (c) {
 			case '':
 				return errUnexpectedEOF(tk);
 			case "'":
 			case '"':
+				return string(tk);
 			case '$':
+				return identifier(tk);
 			case '+':
 			case '-':
+			case '&':
+			case '|':
+				early = true;
+			case '<':
+			case '>':
+				tk.next();
+
+				if (tk.accept(c) && early) {
+					break;
+				}
+
+				tk.accept("=");
+
+				break;
+			case '=':
 			case '!':
-			case '~':
 			case '*':
 			case '/':
 			case '%':
-			case '<':
-			case '>':
-			case '=':
-			case '&':
 			case '^':
-			case '|':
-			case '&':
+				tk.next();
+
+				tk.accept("=");
+
+				break;
+			case '~':
 			case '?':
 			case ':':
 			case ',':
+				tk.next();
+
+				break;
 			case ')':
+				tk.next();
+
+				if (!tk.accept(")")) {
+					return errInvalidCharacter(tk);
+				}
+
+				tokenDepth.pop();
+
+				break;
+			case '(':
+				tk.next();
+
+				if (!tk.accept("(")) {
+					return errInvalidCharacter(tk);
+				}
+
+				tokenDepth.push("))");
+
 				break;
 			case '0':
-				return baseNumber(tk);
+				return zero(tk);
 			default:
 				return number(tk);
 			}
