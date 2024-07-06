@@ -1001,7 +1001,9 @@ bash = (() => {
 		      zero = (tk: Tokeniser) => {
 			tk.next();
 
-			const nums = tk.accept("xX") ? hexDigit : octalDigit;
+			tk.acceptRun(tk.accept("xX") ? hexDigit : octalDigit);
+
+			return tk.return(TokenNumericLiteral, main);
 		      },
 		      number = (tk: Tokeniser) => {
 		      },
