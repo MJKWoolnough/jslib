@@ -11857,6 +11857,10 @@ type Tests = {
 					"source": "abc=1 $def",
 					"output": `<span class="identifier">abc</span><span class="punctuator">=</span><span class="keyword">1</span><span class="whitespace">&nbsp;</span><span class="identifier">$def</span>`
 				},
+				"identifiers with spaces": {
+					"source": "a\\ b\\ c=1 $d\\ e\\ f",
+					"output": `<span class="keyword">a\\&nbsp;b\\&nbsp;c</span><span class="punctuator">=</span><span class="keyword">1</span><span class="whitespace">&nbsp;</span><span class="identifier">$d</span><span class="keyword">\\&nbsp;e\\&nbsp;f</span>`
+				},
 				"strings with identifiers": {
 					"source": "\"some text $anIdentifier and some more text\" 'quoted text $without identifier'",
 					"output": `<span class="stringliteral">"some&nbsp;text&nbsp;</span><span class="identifier">$anIdentifier</span><span class="stringliteral">&nbsp;and&nbsp;some&nbsp;more&nbsp;text"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'quoted&nbsp;text&nbsp;$without&nbsp;identifier'</span>`
@@ -11887,8 +11891,6 @@ type Tests = {
 			      div = document.createElement("div");
 
 			div.append(code(source, fns[testname as keyof typeof fns] as any, new Map([".whitespace", ".lineterminator", ".singlelinecomment", ".multilinecomment", ".identifier", ".privateidentifier", ".booleanliteral", ".keyword", ".punctuator", ".numericliteral", ".stringliteral", ".nosubstitutiontemplate", ".templatehead", ".templatemiddle", ".templatetail", ".regularexpressionliteral", ".nullliteral", ".futurereservedword"].map((c, n) => [n, c]))));
-
-			console.log(div.innerHTML);
 
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
