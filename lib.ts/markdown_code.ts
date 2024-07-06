@@ -999,6 +999,19 @@ bash = (() => {
 				}
 			}
 		      },
+		      stringStart = (tk: Tokeniser, c: string) => {
+			if (tokenDepth.at(-1) === c) {
+				tokenDepth.pop();
+
+				tk.next();
+
+				return tk.return(TokenStringLiteral, main);
+			}
+
+			tokenDepth.push(tk.next());
+
+			return string(tk);
+		      },
 		      zero = (tk: Tokeniser) => {
 			tk.next();
 
@@ -1033,7 +1046,7 @@ bash = (() => {
 				return errUnexpectedEOF(tk);
 			case "'":
 			case '"':
-				return string(tk);
+				return stringStart(tk, c);
 			case '$':
 				return identifier(tk);
 			case '+':
@@ -1132,17 +1145,7 @@ bash = (() => {
 				break;
 			case '"':
 			case `'`:
-				if (tokenDepth.at(-1) === c) {
-					tokenDepth.pop();
-
-					tk.next();
-
-					return tk.return(TokenStringLiteral, main);
-				}
-
-				tokenDepth.push(tk.next());
-
-				return string(tk);
+				return stringStart(tk, c);
 			case '(':
 				tokenDepth.push(c);
 				tk.next();
