@@ -1,6 +1,6 @@
 import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
-import {div, input, li, ul} from './html.js';
+import {div, input, li, slot, ul} from './html.js';
 
 const style = [new CSS().add({
 	"#control": {
@@ -27,10 +27,14 @@ const style = [new CSS().add({
 			}
 		}
 	}
-      })];
+      })],
+      selected = {"class": {"selected": true}},
+      notSelected = {"class": {"selected": false}};
 
 export class MultiSelect extends HTMLElement {
 	#options: HTMLUListElement;
+	#selectedSlot: HTMLSlotElement;
+	#selected = new Set<HTMLOptionElement>();
 	#liToOption = new Map<HTMLLIElement, HTMLOptionElement>();
 	#optionToLI = new Map<HTMLOptionElement, HTMLLIElement>();
 
@@ -40,13 +44,14 @@ export class MultiSelect extends HTMLElement {
 		const self = this;
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
+			div({"id": "selected"}, this.#selectedSlot = slot()),
 			div({"id": "control"}, [
 				input({"oninput": function(this: HTMLInputElement) {
 					for (const child of self.#options.children) {
 						amendNode(child, {"style": child.textContent?.includes(this.value) ? false : "display: none"});
 					}
 				}}),
-				this.#options = ul({"tabindex": -1})
+				this.#options = ul({"onclick": (e: MouseEvent) => this.#handleSelect(e), "tabindex": -1})
 			])
 		]).adoptedStyleSheets = style;
 
@@ -59,6 +64,24 @@ export class MultiSelect extends HTMLElement {
 			"childList": true,
 			"subtree": true
 		});
+	}
+
+	#handleSelect(e: MouseEvent) {
+		const target = e.target as HTMLLIElement,
+		      option = this.#liToOption.get(target);
+
+		if (!option || option.hasAttribute("disabled")) {
+			return
+		}
+
+		if (this.#selected.delete(option)) {
+			amendNode(target, notSelected);
+		} else {
+			amendNode(target, selected);
+			this.#selected.add(option);
+		}
+
+		this.#selectedSlot.assign(...this.#selected);
 	}
 
 	#handleMutations(_mutations: MutationRecord[]) {
