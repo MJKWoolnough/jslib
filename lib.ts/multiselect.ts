@@ -25,6 +25,7 @@ export class MultiSelect extends HTMLElement {
 	}
 
 	#handleMutations(_mutations: MutationRecord[]) {
+		this.#parseContent();
 	}
 
 	#parseContent() {
