@@ -65,9 +65,7 @@ export class MultiSelect extends HTMLElement {
 
 		this.#parseContent();
 
-		const mo = new MutationObserver(mutations => this.#handleMutations(mutations));
-
-		mo.observe(this, {
+		new MutationObserver(() => this.#parseContent()).observe(this, {
 			"attributeFilter": ["value", "disabled", "label"],
 			"childList": true,
 			"subtree": true
@@ -101,10 +99,6 @@ export class MultiSelect extends HTMLElement {
 		}
 
 		this.#selectedSlot.assign(...this.#selected);
-	}
-
-	#handleMutations(_mutations: MutationRecord[]) {
-		this.#parseContent();
 	}
 
 	#parseContent() {
