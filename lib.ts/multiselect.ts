@@ -1,5 +1,33 @@
+import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
-import {input, li, ul} from './html.js';
+import {div, input, li, ul} from './html.js';
+
+const style = [new CSS().add({
+	"#control": {
+		":not(:focus-within) ul": {
+			"display": "none"
+		},
+
+		" ul": {
+			"list-style": "none",
+			"padding": 0,
+			"background": "var(--optionBackground, #fff)",
+			"color": "var(--optionColor, #000)",
+			"outline": "none",
+
+			" li.disabled": {
+				"background": "var(--optionDisabledBackground, #fff)",
+				"color": "var(--optionDisabledColor, #888)",
+			},
+
+			" li:not(.disabled):hover": {
+				"background": "var(--optionHoverBackground, #000)",
+				"color": "var(--optionHoverColor, #fff)",
+				"cursor": "pointer",
+			}
+		}
+	}
+      })];
 
 export class MultiSelect extends HTMLElement {
 	#options: HTMLUListElement;
@@ -12,13 +40,15 @@ export class MultiSelect extends HTMLElement {
 		const self = this;
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			this.#options = ul(),
-			input({"oninput": function(this: HTMLInputElement) {
-				for (const child of self.#options.children) {
-					amendNode(child, {"style": child.textContent?.includes(this.value) ? false : "display: none"});
-				}
-			}})
-		]);
+			div({"id": "control"}, [
+				input({"oninput": function(this: HTMLInputElement) {
+					for (const child of self.#options.children) {
+						amendNode(child, {"style": child.textContent?.includes(this.value) ? false : "display: none"});
+					}
+				}}),
+				this.#options = ul({"tabindex": -1})
+			])
+		]).adoptedStyleSheets = style;
 
 		this.#parseContent();
 
