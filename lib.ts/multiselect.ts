@@ -1,4 +1,4 @@
-import {amendNode, clearNode} from './dom.js';
+import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {li, ul} from './html.js';
 
 export class MultiSelect extends HTMLElement {
@@ -52,3 +52,5 @@ export class MultiSelect extends HTMLElement {
 		clearNode(this.#options, newElems);
 	};
 }
+
+export default bindCustomElement("multi-select", MultiSelect);
