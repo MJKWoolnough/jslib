@@ -1,5 +1,5 @@
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
-import {li, ul} from './html.js';
+import {input, li, ul} from './html.js';
 
 export class MultiSelect extends HTMLElement {
 	#options: HTMLUListElement;
@@ -9,8 +9,15 @@ export class MultiSelect extends HTMLElement {
 	constructor() {
 		super();
 
+		const self = this;
+
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			this.#options = ul()
+			this.#options = ul(),
+			input({"oninput": function(this: HTMLInputElement) {
+				for (const child of self.#options.children) {
+					amendNode(child, {"style": child.textContent?.includes(this.value) ? false : "display: none"});
+				}
+			}})
 		]);
 
 		this.#parseContent();
