@@ -28,6 +28,8 @@ const style = [new CSS().add({
 		}
 	}
       })],
+      enabled = {"class": {"disabled": true}},
+      disabled = {"class": {"disabled": false}},
       selected = {"class": {"selected": true}},
       notSelected = {"class": {"selected": false}};
 
@@ -90,7 +92,6 @@ export class MultiSelect extends HTMLElement {
 
 	#parseContent() {
 		const newElems: HTMLLIElement[] = [],
-		      disabled = {"class": {"disabled": false}},
 		      oldOptions = this.#optionToLI;
 
 		this.#optionToLI = new Map();
@@ -98,11 +99,10 @@ export class MultiSelect extends HTMLElement {
 
 		for (const elem of this.children) {
 			if (elem instanceof HTMLOptionElement) {
-				disabled.class.disabled = elem.hasAttribute("disabled");
-
 				const text = elem.getAttribute("label") ?? elem.innerText,
 				      existing = oldOptions.get(elem),
-				      item = existing?.innerText === text ? amendNode(existing, disabled) : li(disabled, text);
+				      state = elem.hasAttribute("disabled") ? disabled : enabled,
+				      item = existing?.innerText === text ? amendNode(existing, state) : li(state, text);
 
 				newElems.push(item);
 				this.#optionToLI.set(elem, item);
