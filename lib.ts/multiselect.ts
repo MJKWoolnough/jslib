@@ -24,12 +24,18 @@ const style = [new CSS().add({
 				"background": "var(--optionHoverBackground, #000)",
 				"color": "var(--optionHoverColor, #fff)",
 				"cursor": "pointer",
+			},
+
+			":not(.toggle) .selected": {
+				"display": "none"
 			}
 		}
 	}
       })],
-      enabled = {"class": {"disabled": true}},
-      disabled = {"class": {"disabled": false}},
+      toggle = {"class": {"toggle": true}},
+      noToggle = {"class": {"toggle": false}},
+      disabled = {"class": {"disabled": true}},
+      enabled = {"class": {"disabled": false}},
       selected = {"class": {"selected": true}},
       notSelected = {"class": {"selected": false}};
 
@@ -66,6 +72,17 @@ export class MultiSelect extends HTMLElement {
 			"childList": true,
 			"subtree": true
 		});
+	}
+
+	attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null) {
+		switch (name) {
+		case "toggle":
+			amendNode(this.#options, newValue === null ? noToggle : toggle);
+		}
+	}
+
+	static get observedAttributes() {
+		return ["toggle"]
 	}
 
 	#handleSelect(e: MouseEvent) {
