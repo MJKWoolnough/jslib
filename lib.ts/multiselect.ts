@@ -4,6 +4,8 @@ import {div, input, li, slot, ul} from './html.js';
 
 const style = [new CSS().add({
 	"#control": {
+		"position": "relative",
+
 		":not(:focus-within) ul": {
 			"display": "none"
 		},
@@ -14,6 +16,8 @@ const style = [new CSS().add({
 			"background": "var(--optionBackground, #fff)",
 			"color": "var(--optionColor, #000)",
 			"outline": "none",
+			"overflow-y": "scroll",
+			"position": "absolute",
 
 			" li.disabled": {
 				"background": "var(--optionDisabledBackground, #fff)",
@@ -59,7 +63,14 @@ export class MultiSelect extends HTMLElement {
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			div({"id": "selected"}, this.#selectedSlot = slot()),
 			div({"id": "control"}, [
-				input({"oninput": function(this: HTMLInputElement) {
+				input({"onfocus": function(this: HTMLInputElement) {
+					const {y: offsetY} = (this.parentElement as HTMLDivElement).getBoundingClientRect(),
+					      {y, height} = this.getBoundingClientRect(),
+					      wh = window.innerHeight,
+					      bottomGap = wh - y - height;
+
+					amendNode(self.#options, {"style": bottomGap > y ? `top: ${y - offsetY}px; max-height: ${bottomGap}px` : `bottom: ${y - offsetY}px; max-height: ${y}px`});
+				}, "oninput": function(this: HTMLInputElement) {
 					for (const child of self.#options.children) {
 						amendNode(child, {"style": child.textContent?.includes(this.value) ? false : "display: none"});
 					}
