@@ -100,7 +100,7 @@ export class MultiSelect extends HTMLElement {
 		this.#parseContent();
 
 		new MutationObserver(() => this.#parseContent()).observe(this, {
-			"attributeFilter": ["value", "disabled", "label"],
+			"attributeFilter": ["value", "disabled", "label", "select"],
 			"childList": true,
 			"subtree": true
 		});
@@ -161,6 +161,10 @@ export class MultiSelect extends HTMLElement {
 				newElems.push(item);
 				this.#optionToLI.set(elem, item);
 				this.#liToOption.set(item, elem);
+
+				if (elem.hasAttribute("selected")) {
+					this.#handleSelect(item);
+				}
 			}
 		}
 
