@@ -17,13 +17,13 @@ const style = [new CSS().add({
 
 			" li.disabled": {
 				"background": "var(--optionDisabledBackground, #fff)",
-				"color": "var(--optionDisabledColor, #888)",
+				"color": "var(--optionDisabledColor, #888)"
 			},
 
 			" li:not(.disabled):hover": {
 				"background": "var(--optionHoverBackground, #000)",
 				"color": "var(--optionHoverColor, #fff)",
-				"cursor": "pointer",
+				"cursor": "pointer"
 			},
 
 			":not(.toggle) .selected": {
@@ -80,7 +80,7 @@ export class MultiSelect extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["toggle"]
+		return ["toggle"];
 	}
 
 	#handleSelect(target: HTMLLIElement) {
