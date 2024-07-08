@@ -59,7 +59,7 @@ export class MultiSelect extends HTMLElement {
 						amendNode(child, {"style": child.textContent?.includes(this.value) ? false : "display: none"});
 					}
 				}}),
-				this.#options = ul({"onclick": (e: MouseEvent) => this.#handleSelect(e), "tabindex": -1})
+				this.#options = ul({"onclick": (e: MouseEvent) => this.#handleSelect(e.target as HTMLLIElement), "tabindex": -1})
 			])
 		]).adoptedStyleSheets = style;
 
@@ -83,9 +83,8 @@ export class MultiSelect extends HTMLElement {
 		return ["toggle"]
 	}
 
-	#handleSelect(e: MouseEvent) {
-		const target = e.target as HTMLLIElement,
-		      option = this.#liToOption.get(target);
+	#handleSelect(target: HTMLLIElement) {
+		const option = this.#liToOption.get(target);
 
 		if (!option || option.hasAttribute("disabled")) {
 			return
