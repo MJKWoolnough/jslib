@@ -3,6 +3,20 @@ import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {div, input, li, slot, ul} from './html.js';
 
 const style = [new CSS().add({
+	":host": {
+		"display": "block",
+		"border": "1px solid #000",
+
+		":focus-within": {
+			"border": "2px solid #000",
+		}
+	},
+	"#selected": {
+		"display": "flex",
+		"justify-content": "space-evenly",
+		"gap": "0.5em",
+		"flex-wrap": "wrap"
+	},
 	"#control": {
 		"position": "relative",
 
@@ -10,14 +24,23 @@ const style = [new CSS().add({
 			"display": "none"
 		},
 
+		" input": {
+			"border": 0,
+			"width": "100%",
+			"outline": "none",
+		},
+
 		" ul": {
 			"list-style": "none",
 			"padding": 0,
 			"background": "var(--optionBackground, #fff)",
+			"border": "1px solid #000",
 			"color": "var(--optionColor, #000)",
 			"outline": "none",
 			"overflow-y": "scroll",
 			"position": "absolute",
+			"width": "100%",
+			"left": "-1px",
 
 			" li.disabled": {
 				"background": "var(--optionDisabledBackground, #fff)",
