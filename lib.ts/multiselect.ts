@@ -41,6 +41,7 @@ const style = [new CSS().add({
 			"position": "absolute",
 			"width": "100%",
 			"left": "-1px",
+			"overscroll-behavior": "contain",
 
 			" li.disabled": {
 				"background": "var(--optionDisabledBackground, #fff)",
