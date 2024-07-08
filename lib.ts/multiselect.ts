@@ -77,6 +77,7 @@ export class MultiSelect extends HTMLElement {
 	#selected = new Set<HTMLOptionElement>();
 	#liToOption = new Map<HTMLLIElement, HTMLOptionElement>();
 	#optionToLI = new Map<HTMLOptionElement, HTMLLIElement>();
+	#input: HTMLInputElement;
 
 	constructor() {
 		super();
@@ -84,11 +85,9 @@ export class MultiSelect extends HTMLElement {
 		const self = this;
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
-			div({"id": "selected"}, this.#selectedSlot = slot()),
+			div({"id": "selected", "onclick": () => this.#input.select()}, this.#selectedSlot = slot()),
 			div({"id": "control"}, [
-				input({"onfocus": function(this: HTMLInputElement) {
-					self.#setOptionsPos(this);
-				}, "oninput": function(this: HTMLInputElement) {
+				this.#input = input({"onfocus": () => this.#setOptionsPos(), "oninput": function(this: HTMLInputElement) {
 					for (const child of self.#options.children) {
 						amendNode(child, {"style": child.textContent?.includes(this.value) ? false : "display: none"});
 					}
@@ -106,9 +105,9 @@ export class MultiSelect extends HTMLElement {
 		});
 	}
 
-	#setOptionsPos(input: HTMLInputElement) {
-		const {y: offsetY} = (input.parentElement as HTMLDivElement).getBoundingClientRect(),
-		      {y, height} = input.getBoundingClientRect(),
+	#setOptionsPos() {
+		const {y: offsetY} = (this.#input.parentElement as HTMLDivElement).getBoundingClientRect(),
+		      {y, height} = this.#input.getBoundingClientRect(),
 		      wh = window.innerHeight,
 		      bottomGap = wh - y - height;
 
@@ -141,6 +140,7 @@ export class MultiSelect extends HTMLElement {
 		}
 
 		this.#selectedSlot.assign(...this.#selected);
+		this.#setOptionsPos();
 	}
 
 	#parseContent() {
