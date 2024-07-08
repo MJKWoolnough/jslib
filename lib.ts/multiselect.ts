@@ -64,12 +64,7 @@ export class MultiSelect extends HTMLElement {
 			div({"id": "selected"}, this.#selectedSlot = slot()),
 			div({"id": "control"}, [
 				input({"onfocus": function(this: HTMLInputElement) {
-					const {y: offsetY} = (this.parentElement as HTMLDivElement).getBoundingClientRect(),
-					      {y, height} = this.getBoundingClientRect(),
-					      wh = window.innerHeight,
-					      bottomGap = wh - y - height;
-
-					amendNode(self.#options, {"style": bottomGap > y ? `top: ${y - offsetY}px; max-height: ${bottomGap}px` : `bottom: ${y - offsetY}px; max-height: ${y}px`});
+					self.#setOptionsPos(this);
 				}, "oninput": function(this: HTMLInputElement) {
 					for (const child of self.#options.children) {
 						amendNode(child, {"style": child.textContent?.includes(this.value) ? false : "display: none"});
@@ -86,6 +81,15 @@ export class MultiSelect extends HTMLElement {
 			"childList": true,
 			"subtree": true
 		});
+	}
+
+	#setOptionsPos(input: HTMLInputElement) {
+		const {y: offsetY} = (input.parentElement as HTMLDivElement).getBoundingClientRect(),
+		      {y, height} = input.getBoundingClientRect(),
+		      wh = window.innerHeight,
+		      bottomGap = wh - y - height;
+
+		amendNode(this.#options, {"style": bottomGap > y ? `top: ${y - offsetY}px; max-height: ${bottomGap}px` : `bottom: ${y - offsetY}px; max-height: ${y}px`});
 	}
 
 	attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null) {
