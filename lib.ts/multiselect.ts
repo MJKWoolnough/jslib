@@ -26,6 +26,11 @@ const style = [new CSS().add({
 				"cursor": "pointer"
 			},
 
+			" li.selected": {
+				"background": "var(--optionSelectedBackground, #888)",
+				"color": "var(--optionSelectedColor, #fff)",
+			},
+
 			":not(.toggle) .selected": {
 				"display": "none"
 			}
