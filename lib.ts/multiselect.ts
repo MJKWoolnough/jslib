@@ -169,7 +169,15 @@ export class MultiSelect extends HTMLElement {
 		}
 
 		clearNode(this.#options, newElems);
-	};
+	}
+
+	get value() {
+		return JSON.stringify(Array.from(this.#selected.values(), e => {
+			const o = this.#optionToLI.get(e)!
+
+			return o.getAttribute("value") ?? o.innerText;
+		}));
+	}
 }
 
 export default bindCustomElement("multi-select", MultiSelect);
