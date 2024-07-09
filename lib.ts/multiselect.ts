@@ -186,7 +186,7 @@ export class MultiSelect extends HTMLElement {
 
 	get value() {
 		return JSON.stringify(Array.from(this.#selected.values(), e => {
-			const o = this.#optionToLI.get(e)!
+			const o = this.#optionToLI.get(e)!;
 
 			return o.getAttribute("value") ?? o.innerText;
 		}));
@@ -194,12 +194,12 @@ export class MultiSelect extends HTMLElement {
 
 	set value(data: string | string[]) {
 		if (data instanceof Array) {
-			this.#set(data)
+			this.#set(data);
 		} else {
 			const arr = JSON.parse(data);
 
 			if (arr instanceof Array) {
-				this.#set(arr)
+				this.#set(arr);
 			}
 		}
 	}
