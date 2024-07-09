@@ -5,10 +5,11 @@ import {div, input, li, slot, ul} from './html.js';
 const style = [new CSS().add({
 	":host": {
 		"display": "block",
-		"border": "1px solid #000",
+		"background-color": "var(--backgroundColor, #fff)",
+		"border": "1px solid var(--borderColor, #000)",
 
 		":focus-within": {
-			"border": "2px solid #000"
+			"border-width": "2px"
 		}
 	},
 	"#selected": {
@@ -25,6 +26,7 @@ const style = [new CSS().add({
 		},
 
 		" input": {
+			"background-color": "var(--backgroundColor, #fff)",
 			"border": 0,
 			"width": "100%",
 			"outline": "none"
