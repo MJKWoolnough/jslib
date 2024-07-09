@@ -142,6 +142,7 @@ export class MultiSelect extends HTMLElement {
 
 		this.#selectedSlot.assign(...this.#selected);
 		this.#setOptionsPos();
+		this.dispatchEvent(new Event("change"));
 	}
 
 	#parseContent() {
