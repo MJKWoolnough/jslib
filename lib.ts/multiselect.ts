@@ -208,10 +208,7 @@ export class MultiSelect extends HTMLElement {
 		const values = new Set(data);
 
 		for (const [li, option] of this.#liToOption.entries()) {
-			const value = option.getAttribute("label") ?? option.innerText;
-
 			if (values.has(option.getAttribute("label") ?? option.innerText)) {
-				values.delete(value);
 				this.#setOption(li, false);
 			}
 		}
