@@ -8,7 +8,7 @@ const style = [new CSS().add({
 		"border": "1px solid #000",
 
 		":focus-within": {
-			"border": "2px solid #000",
+			"border": "2px solid #000"
 		}
 	},
 	"#selected": {
@@ -27,7 +27,7 @@ const style = [new CSS().add({
 		" input": {
 			"border": 0,
 			"width": "100%",
-			"outline": "none",
+			"outline": "none"
 		},
 
 		" ul": {
@@ -56,7 +56,7 @@ const style = [new CSS().add({
 
 			" li.selected": {
 				"background": "var(--optionSelectedBackground, #888)",
-				"color": "var(--optionSelectedColor, #fff)",
+				"color": "var(--optionSelectedColor, #fff)"
 			},
 
 			":not(.toggle) .selected": {
