@@ -87,7 +87,7 @@ export class MultiSelect extends HTMLElement {
 
 		const self = this;
 
-		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
+		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual", "delegatesFocus": true}), [
 			div({"id": "selected", "onclick": () => this.#input.select()}, this.#selectedSlot = slot()),
 			div({"id": "control"}, [
 				this.#input = input({"onfocus": () => this.#setOptionsPos(), "oninput": function(this: HTMLInputElement) {
