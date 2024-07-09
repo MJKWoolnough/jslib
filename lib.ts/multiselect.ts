@@ -127,6 +127,12 @@ export class MultiSelect extends HTMLElement {
 	}
 
 	#handleSelect(target: HTMLLIElement) {
+		this.#setOption(target);
+
+		this.#finaliseSet();
+	}
+
+	#setOption(target: HTMLLIElement) {
 		const option = this.#liToOption.get(target);
 
 		if (!option || option.hasAttribute("disabled")) {
@@ -140,6 +146,9 @@ export class MultiSelect extends HTMLElement {
 			this.#selected.add(option);
 		}
 
+	}
+
+	#finaliseSet() {
 		this.#selectedSlot.assign(...this.#selected);
 		this.#setOptionsPos();
 		this.dispatchEvent(new Event("change"));
