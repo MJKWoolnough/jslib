@@ -132,20 +132,21 @@ export class MultiSelect extends HTMLElement {
 		this.#finaliseSet();
 	}
 
-	#setOption(target: HTMLLIElement) {
+	#setOption(target: HTMLLIElement, toggle = true) {
 		const option = this.#liToOption.get(target);
 
 		if (!option || option.hasAttribute("disabled")) {
 			return
 		}
 
-		if (this.#selected.delete(option)) {
-			amendNode(target, notSelected);
+		if (this.#selected.has(option)) {
+			if (toggle && this.#selected.delete(option)) {
+				amendNode(target, notSelected);
+			}
 		} else {
 			amendNode(target, selected);
 			this.#selected.add(option);
 		}
-
 	}
 
 	#finaliseSet() {
@@ -187,6 +188,33 @@ export class MultiSelect extends HTMLElement {
 
 			return o.getAttribute("value") ?? o.innerText;
 		}));
+	}
+
+	set value(data: string | string[]) {
+		if (data instanceof Array) {
+			this.#set(data)
+		} else {
+			const arr = JSON.parse(data);
+
+			if (arr instanceof Array) {
+				this.#set(arr)
+			}
+		}
+	}
+
+	#set(data: string[]) {
+		const values = new Set(data);
+
+		for (const [li, option] of this.#liToOption.entries()) {
+			const value = option.getAttribute("label") ?? option.innerText;
+
+			if (values.has(option.getAttribute("label") ?? option.innerText)) {
+				values.delete(value);
+				this.#setOption(li, false);
+			}
+		}
+
+		this.#finaliseSet();
 	}
 }
 
