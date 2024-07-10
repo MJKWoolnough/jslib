@@ -176,7 +176,6 @@ export class MultiSelect extends HTMLElement {
 
 	#handleSelect(target: HTMLLIElement) {
 		this.#setOption(target);
-
 		this.#finaliseSet();
 	}
 
@@ -195,15 +194,16 @@ export class MultiSelect extends HTMLElement {
 			amendNode(target, selected);
 
 			const s = slot(),
-			      d = this.#selectedDiv.appendChild(div([
+			      d = div([
 				s,
 				div({"tabindex": -1, "class": "deselect", "onclick": (e: Event) => {
 					d.remove();
 					this.#setOption(target);
 					e.preventDefault();
 				}})
-			      ]));
+			      ]);
 
+			amendNode(this.#selectedDiv, d);
 			this.#selected.set(option, d);
 			s.assign(option);
 		}
