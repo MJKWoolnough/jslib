@@ -252,11 +252,15 @@ export class MultiSelect extends HTMLElement {
 	}
 
 	get value() {
-		return Array.from(this.#selected.keys(), e => {
+		const val: string[] = [];
+
+		for (const e of this.#selected.keys()) {
 			const o = this.#optionToLI.get(e)!;
 
-			return o.getAttribute("value") ?? o.innerText;
-		});
+			val.push(o.getAttribute("value") ?? o.innerText);
+		}
+
+		return val;
 	}
 
 	set value(data: string | string[]) {
