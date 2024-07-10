@@ -6,7 +6,7 @@ const style = [new CSS().add({
 	":host": {
 		"display": "block",
 		"background-color": "var(--backgroundColor, #fff)",
-		"border": "1px solid var(--borderColor, #000)",
+		"border": "var(--border, 1px solid #000)",
 
 		":focus-within": {
 			"border-width": "2px"
@@ -81,7 +81,7 @@ const style = [new CSS().add({
 			"list-style": "none",
 			"padding": 0,
 			"background": "var(--optionBackground, #fff)",
-			"border": "1px solid #000",
+			"border": "var(--optionsBorder, 1px solid #000)",
 			"color": "var(--optionColor, #000)",
 			"outline": "none",
 			"overflow-y": "scroll",
