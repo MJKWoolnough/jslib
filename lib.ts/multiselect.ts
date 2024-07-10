@@ -76,8 +76,8 @@ const style = [new CSS().add({
 
 export class MultiSelect extends HTMLElement {
 	#options: HTMLUListElement;
-	#selectedSlot: HTMLSlotElement;
-	#selected = new Set<HTMLOptionElement>();
+	#selected = new Map<HTMLOptionElement, HTMLDivElement>();
+	#selectedDiv: HTMLDivElement;
 	#liToOption = new Map<HTMLLIElement, HTMLOptionElement>();
 	#optionToLI = new Map<HTMLOptionElement, HTMLLIElement>();
 	#input: HTMLInputElement;
@@ -88,7 +88,7 @@ export class MultiSelect extends HTMLElement {
 		const self = this;
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual", "delegatesFocus": true}), [
-			div({"id": "selected"}, this.#selectedSlot = slot()),
+			this.#selectedDiv = div({"id": "selected"}),
 			div({"id": "control"}, [
 				this.#input = input({"autofocus": true, "onfocus": () => this.#setOptionsPos(), "oninput": function(this: HTMLInputElement) {
 					for (const child of self.#options.children) {
@@ -147,12 +147,16 @@ export class MultiSelect extends HTMLElement {
 			}
 		} else {
 			amendNode(target, selected);
-			this.#selected.add(option);
+
+			const s = slot();
+
+			this.#selected.set(option, this.#selectedDiv.appendChild(div(s)));
+
+			s.assign(option);
 		}
 	}
 
 	#finaliseSet() {
-		this.#selectedSlot.assign(...this.#selected);
 		this.#setOptionsPos();
 		this.dispatchEvent(new Event("change"));
 	}
@@ -181,7 +185,7 @@ export class MultiSelect extends HTMLElement {
 			}
 		}
 
-		for (const selected of this.#selected) {
+		for (const selected of this.#selected.keys()) {
 			if (!this.#optionToLI.has(selected)) {
 				this.#selected.delete(selected);
 			}
@@ -191,7 +195,7 @@ export class MultiSelect extends HTMLElement {
 	}
 
 	get value() {
-		return JSON.stringify(Array.from(this.#selected.values(), e => {
+		return JSON.stringify(Array.from(this.#selected.keys(), e => {
 			const o = this.#optionToLI.get(e)!;
 
 			return o.getAttribute("value") ?? o.innerText;
