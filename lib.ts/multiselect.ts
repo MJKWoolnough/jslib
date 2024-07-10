@@ -18,6 +18,51 @@ const style = [new CSS().add({
 		"gap": "0.5em",
 		"flex-wrap": "wrap"
 	},
+	"slot": {
+		"display": "inline-block"
+	},
+	".deselect": {
+		"display": "inline-block",
+		"background-color": "var(--removeBackgroundColor, #fff)",
+		"border": "0.15em solid var(--removeBorderColor, #f00)",
+		"border-radius": "50%",
+		"position": "relative",
+		"padding": "0.1em",
+		"margin-left": "0.2em",
+		"width": "0.4em",
+		"height": "0.4em",
+
+		":hover": {
+			"background-color": "var(--removeHoverBackgroundColor, #fff)",
+			"border-color": "var(--removeHoverBorderColor, #000)",
+
+			":before,:after": {
+				"background-color": "var(--removeHoverXColor, #000)"
+			}
+		},
+
+		":before,:after": {
+			"content": `" "`,
+			"display": "block",
+			"position": "absolute",
+			"background-color": "var(--removeXColor, #f00)",
+			"transform": "rotate(45deg)"
+		},
+
+		":before": {
+			"width": "0.1em",
+			"left": "0.25em",
+			"top": "0.05em",
+			"bottom": "0.05em"
+		},
+
+		":after": {
+			"height": "0.1em",
+			"top": "0.25em",
+			"left": "0.05em",
+			"right": "0.05em"
+		}
+	},
 	"#control": {
 		"position": "relative",
 
@@ -148,10 +193,17 @@ export class MultiSelect extends HTMLElement {
 		} else {
 			amendNode(target, selected);
 
-			const s = slot();
+			const s = slot(),
+			      d = this.#selectedDiv.appendChild(div([
+				s,
+				div({"tabindex": -1, "class": "deselect", "onclick": (e: Event) => {
+					d.remove();
+					this.#setOption(target);
+					e.preventDefault();
+				}})
+			      ]));
 
-			this.#selected.set(option, this.#selectedDiv.appendChild(div(s)));
-
+			this.#selected.set(option, d);
 			s.assign(option);
 		}
 	}
