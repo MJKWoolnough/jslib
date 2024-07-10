@@ -248,11 +248,11 @@ export class MultiSelect extends HTMLElement {
 	}
 
 	get value() {
-		return JSON.stringify(Array.from(this.#selected.keys(), e => {
+		return Array.from(this.#selected.keys(), e => {
 			const o = this.#optionToLI.get(e)!;
 
 			return o.getAttribute("value") ?? o.innerText;
-		}));
+		});
 	}
 
 	set value(data: string | string[]) {
