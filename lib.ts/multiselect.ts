@@ -31,6 +31,7 @@ const style = [new CSS().add({
 		"margin-left": "0.2em",
 		"width": "0.4em",
 		"height": "0.4em",
+		"cursor": "pointer",
 
 		":hover": {
 			"background-color": "var(--removeHoverBackgroundColor, #fff)",
