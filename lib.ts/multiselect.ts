@@ -122,11 +122,11 @@ const style = [new CSS().add({
 
 export class MultiSelect extends HTMLElement {
 	#options: HTMLUListElement;
-	#selected = new Map<HTMLOptionElement, HTMLDivElement>();
+	#input: HTMLInputElement;
 	#selectedDiv: HTMLDivElement;
+	#selected = new Map<HTMLOptionElement, HTMLDivElement>();
 	#liToOption = new Map<HTMLLIElement, HTMLOptionElement>();
 	#optionToLI = new Map<HTMLOptionElement, HTMLLIElement>();
-	#input: HTMLInputElement;
 
 	constructor() {
 		super();
