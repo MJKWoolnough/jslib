@@ -167,11 +167,15 @@ export class MultiSelect extends HTMLElement {
 		switch (name) {
 		case "toggle":
 			amendNode(this.#options, newValue === null ? noToggle : toggle);
+
+			break;
+		case "value":
+			this.value = newValue ?? [];
 		}
 	}
 
 	static get observedAttributes() {
-		return ["toggle"];
+		return ["toggle", "value"];
 	}
 
 	#handleSelect(target: HTMLLIElement) {
