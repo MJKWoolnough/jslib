@@ -181,6 +181,12 @@ export class MultiSelect extends HTMLElement {
 			}
 		}
 
+		for (const selected of this.#selected) {
+			if (!this.#optionToLI.has(selected)) {
+				this.#selected.delete(selected);
+			}
+		}
+
 		clearNode(this.#options, newElems);
 	}
 
