@@ -89,6 +89,7 @@ const style = [new CSS().add({
 			"position": "absolute",
 			"width": "100%",
 			"left": "-1px",
+			"max-height": "var(--optionMaxHeight, 100%)",
 			"overscroll-behavior": "contain",
 
 			" li.disabled": {
