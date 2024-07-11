@@ -618,10 +618,6 @@ export class DesktopElement extends HTMLElement {
  *
  * |  Attribute       |  Type  |  Description  |
  * |------------------|--------|---------------|
- * | --window-height | Number | CSS: Specifies the height of the `Window`. |
- * | --window-left   | Number | CSS: Specifies the `x` coordinate of the `Window`. |
- * | --window-top    | Number | CSS: Specifies the `y` coordinate of the `Window`. |
- * | --window-width  | Number | CSS: Specifies the width of the `Window`. |
  * | hide-close       | Toggle | Hides the `Close` button. |
  * | hide-maximise    | Toggle | Hides the `Maximise` button. |
  * | hide-minimise    | Toggle | Hides the `Minimise` button. |
@@ -631,6 +627,15 @@ export class DesktopElement extends HTMLElement {
  * | resizable        | Toggle | Allows the `Window` to be resized. |
  * | window-icon      | String | Sets the window icon. |
  * | window-title     | String | Sets the window title. |
+ *
+ * In addition, the following CSS variables can be set to modifiy the dimensions of the Window.
+ *
+ * |  Attribute      |  Description  |
+ * |-----------------|---------------|
+ * | --window-height | Specifies the height of the `Window`. |
+ * | --window-left   | Specifies the `x` coordinate of the `Window`. |
+ * | --window-top    | Specifies the `y` coordinate of the `Window`. |
+ * | --window-width  | Specifies the width of the `Window`. |
  *
  * Hover text on the default buttons can be modified via the {@link setLanguage} function.
  *
