@@ -2784,7 +2784,7 @@ The ShellElement class is a CustomElement that can contain a single [DesktopElem
 
 This element registers with the name `windows-shell`.
 
-This element handles the follow attributes.
+This element handles the following attributes.
 
 |  Attribute     |  Type  |  Description  |
 |----------------|--------|---------------|
@@ -2806,7 +2806,7 @@ The [ShellElement](#windows_shellelement) will determine whether `Windows` can b
 
 This element registers with the name `windows-windows`.
 
-This element handles the follow attributes:
+This element handles the following attributes:
 
 |  Attribute       |  Type  |  Description  |
 |------------------|--------|---------------|
