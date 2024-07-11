@@ -24,6 +24,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [math](#math)                               | Functions to create MathML elements. |
 | [menu](#menu)                               | Library for creating right-click menus. |
 | [misc](#misc)                               | Miscellaneous, simple, dependency-free functions. |
+| [multiselect](#multiselect)                 | Custom element for selecting multiple items from a list. |
 | [nodes](#nodes)                             | Classes for handling of collections of DOM Nodes. |
 | [pagination](#pagination)                   | Custom element for handling pagination. |
 | [parser](#parser)                           | The parser module can be used to parse text into token or phrase streams. |
@@ -47,7 +48,7 @@ Thematically, the above modules can be grouped into a few packages:
 |-----------|---------------|-----------|
 | Decorum   | A collection of DOM manipulation libs. | [Bind](#bind), [CSS](#css), [DOM](#dom), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), [RPC](#rpc), [StorageState](#storagestate), and [URLState](#urlstate). |
-| Guise     | Various modules to aid with UI and UX. | [DataTable](#datatable), [Drag](#drag), [Events](#events), [Menu](#menu), [Pagination](#pagination), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
+| Guise     | Various modules to aid with UI and UX. | [DataTable](#datatable), [Drag](#drag), [Events](#events), [Menu](#menu), [MultiSelect](#multiselect), [Pagination](#pagination), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
 | Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [CaseFold](#casefold), [Fraction](#fraction), [Load](#load), [Markdown](#markdown), [Misc](#misc), [Parser](#parser), [Router](#router), [Transitions](#router_transitions), [Settings](#settings), and [TypeGuard](#typeguard). |
 
 # Scripts
