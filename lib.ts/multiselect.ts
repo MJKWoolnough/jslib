@@ -81,15 +81,15 @@ const style = [new CSS().add({
 		" ul": {
 			"list-style": "none",
 			"padding": 0,
-			"background": "var(--optionBackground, #fff)",
+			"background": "var(--optionsBackground, #fff)",
 			"border": "var(--optionsBorder, 1px solid #000)",
-			"color": "var(--optionColor, #000)",
+			"color": "var(--optionsColor, #000)",
 			"outline": "none",
 			"overflow-y": "scroll",
 			"position": "absolute",
 			"width": "100%",
 			"left": "-1px",
-			"max-height": "var(--optionMaxHeight, 100%)",
+			"max-height": "var(--optionsMaxHeight, 100%)",
 			"overscroll-behavior": "contain",
 
 			" li.disabled": {
