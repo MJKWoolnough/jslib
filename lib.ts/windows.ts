@@ -521,7 +521,7 @@ abstract class BaseElement extends HTMLElement {
  *
  * This element registers with the name `windows-shell`.
  *
- * This element handles the follow attributes.
+ * This element handles the following attributes.
  *
  * |  Attribute     |  Type  |  Description  |
  * |----------------|--------|---------------|
@@ -614,7 +614,7 @@ export class DesktopElement extends HTMLElement {
  *
  * This element registers with the name `windows-windows`.
  *
- * This element handles the follow attributes:
+ * This element handles the following attributes:
  *
  * |  Attribute       |  Type  |  Description  |
  * |------------------|--------|---------------|
