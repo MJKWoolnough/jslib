@@ -175,6 +175,10 @@ const style = [new CSS().add({
  * | --removeHoverBorderColor     | #000           | Sets the border colour of the remove icon when hovered over. |
  * | --removeHoverXColor          | #000           | Sets the colour of the X in the remove icon when hovered over. |
  * | --removeXColor               | #f00           | Sets the colour of the X in the remove icon. |
+ * | --selectedBackground         | None           | Sets the colour of the selected options wrapper element. |
+ * | --selectedBorder             | None           | Sets the border of the selected options wrapper element. |
+ * | --selectedHoverBackground    | None           | Sets the colour of the selected options wrapper element when it is hovered over. |
+ * | --selectedHoverBorder        | None           | Sets the border of the selected options wrapper element when it is hovered over. |
  */
 export class MultiSelect extends HTMLElement {
 	#options;
