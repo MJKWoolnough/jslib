@@ -1867,23 +1867,23 @@ In addition, the following CSS vars control various aspects of styling for the e
 
 |  Variable                    |  Default       |  Description  |
 |------------------------------|----------------|---------------|
-| --backgroundColor            | #fff           | Sets the background colours of the main element. |
-| --optionDisabledBackground   | #fff           | Sets the background colour of disabled options. |
-| --optionDisabledColor        | #888           | Sets the font colour of disabled options. |
-| --optionHoverBackground      | #000           | Sets the background colour of non-disabled elements when hovered over. |
-| --optionHoverColor           | #fff           | Sets the font colour of non-disabled elements when hovered over. |
-| --optionSelectedBackground   | #888           | Sets the background colour of selected elements. |
-| --optionSelectedColor        | #fff           | Sets the font colour of selected elements. |
-| --optionsBackground          | #fff           | Sets the background colour of the options list. |
-| --optionsBorder              | 1px solid #000 | Sets the border of the options list.
-| --optionsColor               | #000           | Sets the font colour of the options list. | 
-| --optionsMaxHeight           | 100%           | Sets the maximum height of the options list. |
-| --removeBackgroundColor      | #fff           | Sets the background colour of the remove icon. |
-| --removeBorderColor          | #f00           | Sets the border colour of the remove icon. |
-| --removeHoverBackgroundColor | #fff           | Sets the background colour of the remove icon when hovered over. |
-| --removeHoverBorderColor     | #000           | Sets the border colour of the remove icon when hovered over. |
-| --removeHoverXColor          | #000           | Sets the colour of the X in the remove icon when hovered over. |
-| --removeXColor               | #f00           | Sets the colour of the X in the remove icon. |
+| -\-backgroundColor            | #fff           | Sets the background colours of the main element. |
+| -\-optionDisabledBackground   | #fff           | Sets the background colour of disabled options. |
+| -\-optionDisabledColor        | #888           | Sets the font colour of disabled options. |
+| -\-optionHoverBackground      | #000           | Sets the background colour of non-disabled elements when hovered over. |
+| -\-optionHoverColor           | #fff           | Sets the font colour of non-disabled elements when hovered over. |
+| -\-optionSelectedBackground   | #888           | Sets the background colour of selected elements. |
+| -\-optionSelectedColor        | #fff           | Sets the font colour of selected elements. |
+| -\-optionsBackground          | #fff           | Sets the background colour of the options list. |
+| -\-optionsBorder              | 1px solid #000 | Sets the border of the options list. |
+| -\-optionsColor               | #000           | Sets the font colour of the options list. |
+| -\-optionsMaxHeight           | 100%           | Sets the maximum height of the options list. |
+| -\-removeBackgroundColor      | #fff           | Sets the background colour of the remove icon. |
+| -\-removeBorderColor          | #f00           | Sets the border colour of the remove icon. |
+| -\-removeHoverBackgroundColor | #fff           | Sets the background colour of the remove icon when hovered over. |
+| -\-removeHoverBorderColor     | #000           | Sets the border colour of the remove icon when hovered over. |
+| -\-removeHoverXColor          | #000           | Sets the colour of the X in the remove icon when hovered over. |
+| -\-removeXColor               | #f00           | Sets the colour of the X in the remove icon. |
 
 ## <a name="nodes">nodes</a>
 
