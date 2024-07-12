@@ -1854,7 +1854,31 @@ The multiselect module adds a custom element that implements a Select-like input
 
 This module directly imports the [css](#css), [dom](#dom), and [html](#html) modules.
 
-The default export is a [DOMBind](#dom_dombind) for the MultiSelect class, which is a CustomElement that can contain many [HTMLOptionElement](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option) elements. This element registers with the name `multi-select`.
+This module exports the following:
+
+|  Export  |  Type  |  Description  |
+|----------|--------|---------------|
+| [MultiOption](#multiselect_multioption) | Class | Used to specify selectable options in a MultiSelect. |
+| [MultiSelect](#multiselect_multiselect) | Class | Used to create a set of options that can be selected. |
+| multioption | [DOMBind](#dom_dombind) | A DOMBind for MultiOption. |
+| multiselect | [DOMBind](#dom_dombind) | A DOMBind for MultiSelect. |
+
+### <a name="multiselect_multioption">MultiOption</a>
+
+The MultiOption class is a Custom Element that is used to specify options on the MultiSelect.
+
+This element registers with the name `multi-option`.
+
+This element is used much like the [Option](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option) element, except it can contain arbitrary HTML that is shows once the option is selected; specifically, it handles the following attributes:
+
+|  Attribute  |  Type   |  Description  |
+|-------------|---------|---------------|
+| value       | String  | When selected, this value will be appended to the MultiSelect.value attribute and be removed when deselected. |
+| label       | String  | The text to show in the options list for this option. |
+
+### <a name="multiselect_multiselect">MultiSelect</a>
+
+The MultiSelect class is a CustomElement that can contain many [MultiOption](#multiselect_multioption) elements. This element registers with the name `multi-select`.
 
 This element handles the following attributes:
 
