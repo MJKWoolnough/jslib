@@ -3,7 +3,7 @@ import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {div, input, li, slot, ul} from './html.js';
 
 /**
- * The multiselect module adds a custom element that implements a Select-like input element allowing multiple options to be selected and removed.
+ * The multiselect module adds custom elementthat implement a Select-like input element allowing multiple options to be selected and removed.
  *
  * This module directly imports the {@link module:css}, {@link module:dom}, and {@link module:html} modules.
  *
@@ -133,7 +133,7 @@ const style = [new CSS().add({
       notSelected = {"class": {"selected": false}};
 
 /**
- * The MultiSelect class is a CustomElement that can contain many {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option | Option} elements.
+ * The MultiSelect class is a CustomElement that can contain many {@link MultiOption | MultiOption} elements.
  *
  * This element registers with the name `multi-select`.
  *
@@ -334,6 +334,18 @@ export class MultiSelect extends HTMLElement {
 	}
 }
 
+/**
+ * The MultiOption class is a Custom Element that is used to specify options on the MultiSelect.
+ *
+ * This element registers with the name `multi-option`.
+ *
+ * This element is used much like the {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option | Option} element, except it can contain arbitrary HTML that is shows once the option is selected; specifically, it handles the following attributes:
+ *
+ * |  Attribute  |  Type   |  Description  |
+ * |-------------|---------|---------------|
+ * | value       | String  | When selected, this value will be appended to the MultiSelect.value attribute and be removed when deselected. |
+ * | label       | String  | The text to show in the options list for this option. |
+ */
 export class MultiOption extends HTMLElement {}
 
 export const
@@ -341,4 +353,7 @@ export const
  * A {@link dom:DOMBind | DOMBind} that creates a {@link MultiSelect}.
  */
 multiselect = bindCustomElement("multi-select", MultiSelect),
+/**
+ * A {@link dom:DOMBind | DOMBind} that creates a {@link MultiOption}.
+ */
 multioption = bindCustomElement("multi-option", MultiOption);
