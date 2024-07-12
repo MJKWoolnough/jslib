@@ -1885,7 +1885,7 @@ This element handles the following attributes:
 |  Attribute  |  Type   |  Description  |
 |-------------|---------|---------------|
 | toggle      | boolean | When set, selected options will be hidden in the options list until they are deselected. |
-| value       | Array   | An array containing the values of the selected options. Can be set to programatically select options. |
+| value       | Array   | An array containing the values of the selected options. Can be set to programmatically select options. |
 
 In addition, the following CSS vars control various aspects of styling for the element.
 
