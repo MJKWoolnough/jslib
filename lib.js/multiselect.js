@@ -28,7 +28,17 @@ const style = [new CSS().add({
 		"display": "flex",
 		"justify-content": "space-evenly",
 		"gap": "0.5em",
-		"flex-wrap": "wrap"
+		"flex-wrap": "wrap",
+
+		" div": {
+			"border": "var(--selectedBorder)",
+			"background-color": "var(--selectedBackground)",
+
+			":hover": {
+				"border": "var(--selectedHoverBorder, var(--selectedBorder))",
+				"background-color": "var(--selectedHoverBackground, var(--selectedBackground))",
+			}
+		}
 	},
 	"slot": {
 		"display": "inline-block"
