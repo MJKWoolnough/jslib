@@ -1889,8 +1889,8 @@ This element handles the following attributes:
 
 In addition, the following CSS vars control various aspects of styling for the element.
 
-|  Variable                    |  Default       |  Description  |
-|------------------------------|----------------|---------------|
+|  Variable                     |  Default       |  Description  |
+|-------------------------------|----------------|---------------|
 | -\-backgroundColor            | #fff           | Sets the background colours of the main element. |
 | -\-optionDisabledBackground   | #fff           | Sets the background colour of disabled options. |
 | -\-optionDisabledColor        | #888           | Sets the font colour of disabled options. |
@@ -1908,6 +1908,10 @@ In addition, the following CSS vars control various aspects of styling for the e
 | -\-removeHoverBorderColor     | #000           | Sets the border colour of the remove icon when hovered over. |
 | -\-removeHoverXColor          | #000           | Sets the colour of the X in the remove icon when hovered over. |
 | -\-removeXColor               | #f00           | Sets the colour of the X in the remove icon. |
+| -\-selectedBackground         | None           | Sets the colour of the selected options wrapper element. |
+| -\-selectedBorder             | None           | Sets the border of the selected options wrapper element. |
+| -\-selectedHoverBackground    | None           | Sets the colour of the selected options wrapper element when it is hovered over. |
+| -\-selectedHoverBorder        | None           | Sets the border of the selected options wrapper element when it is hovered over. |
 
 ## <a name="nodes">nodes</a>
 
