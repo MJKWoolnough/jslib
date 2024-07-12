@@ -334,7 +334,11 @@ export class MultiSelect extends HTMLElement {
 	}
 }
 
+export class MultiOption extends HTMLElement {}
+
+export const
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link MultiSelect}.
  */
-export default bindCustomElement("multi-select", MultiSelect);
+multiselect = bindCustomElement("multi-select", MultiSelect),
+multioption = bindCustomElement("multi-option", MultiOption);

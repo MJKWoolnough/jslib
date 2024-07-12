@@ -170,9 +170,9 @@ export class MultiSelect extends HTMLElement {
 	#options: HTMLUListElement;
 	#input: HTMLInputElement;
 	#selectedDiv: HTMLDivElement;
-	#selected = new Map<HTMLOptionElement, HTMLDivElement>();
-	#liToOption = new Map<HTMLLIElement, HTMLOptionElement>();
-	#optionToLI = new Map<HTMLOptionElement, HTMLLIElement>();
+	#selected = new Map<MultiOption, HTMLDivElement>();
+	#liToOption = new Map<HTMLLIElement, MultiOption>();
+	#optionToLI = new Map<MultiOption, HTMLLIElement>();
 
 	constructor() {
 		super();
@@ -272,7 +272,7 @@ export class MultiSelect extends HTMLElement {
 		this.#liToOption.clear();
 
 		for (const elem of this.children) {
-			if (elem instanceof HTMLOptionElement) {
+			if (elem instanceof MultiOption) {
 				const text = elem.getAttribute("label") ?? elem.innerText,
 				      existing = oldOptions.get(elem),
 				      state = elem.hasAttribute("disabled") ? disabled : enabled,
@@ -334,7 +334,11 @@ export class MultiSelect extends HTMLElement {
 	}
 }
 
+export class MultiOption extends HTMLElement {}
+
+export const
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link MultiSelect}.
  */
-export default bindCustomElement("multi-select", MultiSelect);
+multiselect = bindCustomElement("multi-select", MultiSelect),
+multioption = bindCustomElement("multi-option", MultiOption);
