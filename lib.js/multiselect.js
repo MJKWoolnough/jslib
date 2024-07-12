@@ -206,7 +206,7 @@ export class MultiSelect extends HTMLElement {
 		      wh = window.innerHeight,
 		      bottomGap = wh - y - height;
 
-		amendNode(this.#options, {"style": bottomGap > y ? `top: ${y - offsetY}px; max-height: min(${bottomGap}px, var(--optionsMaxHeight, 100%))` : `bottom: ${y - offsetY}px; max-height: min(${y}px, var(--optionsMaxHeight, 100%)`});
+		amendNode(this.#options, {"style": bottomGap > y ? `top: ${y - offsetY}px; max-height: min(${bottomGap}px, var(--optionsMaxHeight))` : `bottom: ${y - offsetY}px; max-height: min(${y}px, var(--optionsMaxHeight)`});
 	}
 
 	attributeChangedCallback(name, _oldValue, newValue) {
