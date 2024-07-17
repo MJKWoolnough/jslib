@@ -760,20 +760,19 @@ python = (() => {
 		      baseNumber = (tk: Tokeniser) => {
 			const digits = tk.accept("xX") ? hexDigit : tk.accept("oO") ? octalDigit : tk.accept("bB") ? binaryDigit : "0";
 
-			if (tk.accept(digits) || digits === "0") {
-				tk.acceptRun(digits);
+			tk.acceptRun(digits);
 
-				const err = numberWithGrouping(tk, digits);
-
-				if (err) {
-					return err;
-				}
-			} else {
-				return errInvalidNumber(tk);
+			const err = numberWithGrouping(tk, digits);
+			if (err) {
+				return err;
 			}
 
 			if (digits === "0") {
 				return floatOrImaginary(tk);
+			}
+
+			if (tk.length() == 2) {
+				return errInvalidNumber(tk);
 			}
 
 			return tk.return(TokenNumericLiteral, main);

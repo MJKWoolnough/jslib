@@ -11816,8 +11816,8 @@ type Tests = {
 					"output": `<span class="numericliteral">0</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0000</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0.00</span><span class="whitespace">&nbsp;</span><span class="numericliteral">000.0</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0_0.0_0</span>`
 				},
 				"bases": {
-					"source": "0xdeadBEEF 0XF12 0b010101 0B1010101 0o765 0O123 0x1_2_3",
-					"output": `<span class="numericliteral">0xdeadBEEF</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0XF12</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0b010101</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0B1010101</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0o765</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0O123</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0x1_2_3</span>`
+					"source": "0xdeadBEEF 0XF12 0b010101 0B1010101 0o765 0O123 0x1_2_3 0b_1110_0101",
+					"output": `<span class="numericliteral">0xdeadBEEF</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0XF12</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0b010101</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0B1010101</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0o765</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0O123</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0x1_2_3</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0b_1110_0101</span>`
 				},
 				"float": {
 					"source": "0.123 .456 3.14159E3j",
