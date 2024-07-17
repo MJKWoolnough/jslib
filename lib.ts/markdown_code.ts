@@ -677,21 +677,23 @@ python = (() => {
 			return identifier(tk);
 		      },
 		      string = (tk: Tokeniser, raw = false) => {
-			const m = tk.next();
+			const m = tk.next(),
+			      except = "\n" + m + (raw ? "" : "\\");
 
 			let triple = false;
 
 			if (tk.accept(m)) {
-				if (tk.accept(m)) {
-					triple = true;
-				} else {
+				if (!tk.accept(m)) {
 					return tk.return(TokenStringLiteral, main);
 				}
+
+				triple = true;
 			}
+
 
 			Loop:
 			while (true) {
-				const c = tk.exceptRun("\n" + m + (raw ? "" : "\\" ));
+				const c = tk.exceptRun(except);
 
 				switch (c) {
 				default:
