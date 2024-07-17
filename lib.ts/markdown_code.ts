@@ -804,6 +804,8 @@ python = (() => {
 				return tk.return(TokenPunctuator, main);
 			}
 
+			tk.acceptRun(decimalDigit)
+
 			return imaginary(tk);
 		      },
 		      operatorOrDelimiter = (tk: Tokeniser) => {
