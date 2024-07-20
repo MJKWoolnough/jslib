@@ -884,8 +884,10 @@ python = (() => {
 				return tk.return(TokenWhitespace, main);
 			}
 
-			if (tk.accept(" \t")) {
-				tk.acceptRun(" \t");
+			const ws = tokenDepth.length ? " \t\n" : " \t";
+
+			if (tk.accept(ws)) {
+				tk.acceptRun(ws);
 
 				return tk.return(TokenWhitespace, main);
 			}
