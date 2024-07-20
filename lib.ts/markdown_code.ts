@@ -876,6 +876,14 @@ python = (() => {
 				return tk.return(TokenLineTerminator, main);
 			}
 
+			if (tk.accept("\\")) {
+				if (!tk.accept("\n")) {
+					return errInvalidCharacter(tk);
+				}
+
+				return tk.return(TokenWhitespace, main);
+			}
+
 			if (tk.accept(" \t")) {
 				tk.acceptRun(" \t");
 
