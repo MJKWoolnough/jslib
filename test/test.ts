@@ -11826,7 +11826,11 @@ type Tests = {
 				"punctuators": {
 					"source": "+ - @= <<= () !=",
 					"output": `<span class="punctuator">+</span><span class="whitespace">&nbsp;</span><span class="punctuator">-</span><span class="whitespace">&nbsp;</span><span class="punctuator">@=</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&lt;=</span><span class="whitespace">&nbsp;</span><span class="punctuator">()</span><span class="whitespace">&nbsp;</span><span class="punctuator">!=</span>`
-				}
+				},
+				"newlines in brackets and parens": {
+					"source": "( \n ) \n [ \n ]",
+					"output": `<span class="punctuator">(</span><span class="whitespace">&nbsp;<br>&nbsp;</span><span class="punctuator">)</span><span class="whitespace">&nbsp;</span><span class="lineterminator"><br></span><span class="whitespace">&nbsp;</span><span class="punctuator">[</span><span class="whitespace">&nbsp;<br>&nbsp;</span><span class="punctuator">]</span>`
+				},
 			},
 			"bash": {
 				"whitespace": {
