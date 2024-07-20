@@ -11768,8 +11768,8 @@ type Tests = {
 					"output": `<span class="lineterminator"><br></span><span class="whitespace">&nbsp;</span><span class="lineterminator"><br><br></span><span class="whitespace">&nbsp;</span><span class="lineterminator"><br><br><br></span>`
 				},
 				"whitespace": {
-					"source": " \t",
-					"output": `<span class="whitespace">&nbsp; </span>`
+					"source": " \t\\\n",
+					"output": `<span class="whitespace">&nbsp; \\<br></span>`
 				},
 				"comments": {
 					"source": "# a comment\n\n# another comment",
@@ -11793,7 +11793,7 @@ type Tests = {
 				},
 				"raw strings": {
 					"source": "r\"raw \\\"double\\\" quoted\"\nR'raw single quoted'\nrb\"raw bytes\"\nRB'also raw bytes'",
-					"output": `<span class="stringliteral">r"raw&nbsp;\\"</span><span class="identifier">double</span><span data-error="unexpected EOF">\\"&nbsp;quoted"<br>R'raw&nbsp;single&nbsp;quoted'<br>rb"raw&nbsp;bytes"<br>RB'also&nbsp;raw&nbsp;bytes'</span>`
+					"output": `<span class="stringliteral">r"raw&nbsp;\\"</span><span class="identifier">double</span><span data-error="invalid character: \\">\\"&nbsp;quoted"<br>R'raw&nbsp;single&nbsp;quoted'<br>rb"raw&nbsp;bytes"<br>RB'also&nbsp;raw&nbsp;bytes'</span>`
 				},
 				"byte strings": {
 					"source": "b\"\\\"double\\\" quoted bytes\"\nB'single quoted bytes'\nbr\"raw bytes\"\nBR'also raw bytes'",
