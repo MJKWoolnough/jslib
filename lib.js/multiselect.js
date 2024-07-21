@@ -264,6 +264,7 @@ export class MultiSelect extends HTMLElement {
 					d.remove();
 					this.#setOption(target);
 					e.preventDefault();
+					this.#finaliseSet();
 				}})
 			      ]);
 
