@@ -111,7 +111,7 @@ const style = [new CSS().add({
 			"position": "absolute",
 			"width": "100%",
 			"left": "-1px",
-			"overscroll-behavior": "contain",
+			"overscroll-behavior": "none",
 			"z-index": 1000,
 
 			" li.disabled": {
