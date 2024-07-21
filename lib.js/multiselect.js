@@ -351,6 +351,8 @@ export class MultiSelect extends HTMLElement {
 		for (const [li, option] of this.#liToOption.entries()) {
 			if (values.has(option.getAttribute("label") ?? option.innerText)) {
 				this.#setOption(li, false);
+			} else if (this.#selected.has(option)) {
+				li.click();
 			}
 		}
 
