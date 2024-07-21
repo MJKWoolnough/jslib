@@ -232,11 +232,15 @@ export class MultiSelect extends HTMLElement {
 			break;
 		case "value":
 			this.value = newValue ?? [];
+
+			break;
+		case "placeholder":
+			amendNode(this.#input, {"placeholder": newValue});
 		}
 	}
 
 	static get observedAttributes() {
-		return ["toggle", "value"];
+		return ["toggle", "placeholder", "value"];
 	}
 
 	#handleSelect(target) {
