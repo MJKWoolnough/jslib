@@ -30,7 +30,7 @@ const style = [new CSS().add({
 		"gap": "0.5em",
 		"flex-wrap": "wrap",
 
-		" div": {
+		">div": {
 			"border": "var(--selectedBorder)",
 			"background-color": "var(--selectedBackground)",
 
