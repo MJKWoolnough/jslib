@@ -107,7 +107,7 @@ const style = [new CSS().add({
 			"border": "var(--optionsBorder, 1px solid #000)",
 			"color": "var(--optionsColor, #000)",
 			"outline": "none",
-			"overflow-y": "scroll",
+			"overflow-y": "auto",
 			"position": "absolute",
 			"width": "100%",
 			"left": "-1px",
@@ -221,7 +221,7 @@ export class MultiSelect extends HTMLElement {
 		      wh = window.innerHeight,
 		      bottomGap = wh - y - height;
 
-		amendNode(this.#options, {"style": bottomGap > y ? `top: ${y - offsetY}px; max-height: min(${bottomGap}px, var(--optionsMaxHeight))` : `bottom: ${y - offsetY}px; max-height: min(${y}px, var(--optionsMaxHeight)`});
+		amendNode(this.#options, {"style": bottomGap > y ? `top: ${y - offsetY}px; max-height: min(${bottomGap}px, var(--optionsMaxHeight, ${wh}px))` : `bottom: ${y - offsetY}px; max-height: min(${y}px, var(--optionsMaxHeight, ${wh}px)`});
 	}
 
 	attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null) {
