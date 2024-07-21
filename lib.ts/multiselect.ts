@@ -95,9 +95,28 @@ const style = [new CSS().add({
 
 		" input": {
 			"background-color": "transparent",
+			"box-sizing": "border-box",
 			"border": 0,
 			"width": "100%",
-			"outline": "none"
+			"outline": "none",
+			"padding-right": "1em"
+		},
+
+		":after": {
+			"content": `" "`,
+			"position": "absolute",
+			"right": "0.1em",
+			"bottom": "0.5em",
+			"width": 0,
+			"height": 0,
+			"border-left": "5px solid transparent",
+			"border-right": "5px solid transparent",
+			"border-top": "5px solid var(--arrowColor, #000)"
+		},
+
+		":focus-within:after": {
+			"border-top": "none",
+			"border-bottom": "5px solid var(--arrowColor, #000)",
 		},
 
 		" ul": {
