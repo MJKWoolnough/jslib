@@ -256,7 +256,11 @@ export class MultiSelect extends HTMLElement {
 		}
 
 		if (this.#selected.has(option)) {
-			if (toggle && this.#selected.delete(option)) {
+			const d = this.#selected.get(option);
+
+			if (toggle && d) {
+				d.remove();
+				this.#selected.delete(option);
 				amendNode(target, notSelected);
 			}
 		} else {
