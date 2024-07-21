@@ -94,7 +94,7 @@ const style = [new CSS().add({
 		},
 
 		" input": {
-			"background-color": "var(--backgroundColor, #fff)",
+			"background-color": "transparent",
 			"border": 0,
 			"width": "100%",
 			"outline": "none"
