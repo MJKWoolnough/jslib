@@ -201,8 +201,10 @@ const style = [new CSS().add({
  * | --removeXColor               | #f00           | Sets the colour of the X in the remove icon. |
  * | --selectedBackground         | None           | Sets the colour of the selected options wrapper element. |
  * | --selectedBorder             | None           | Sets the border of the selected options wrapper element. |
+ * | --selectedBorderRadius       | 0              | Sets the border radius of the selected options wrapper element. |
  * | --selectedHoverBackground    | None           | Sets the colour of the selected options wrapper element when it is hovered over. |
  * | --selectedHoverBorder        | None           | Sets the border of the selected options wrapper element when it is hovered over. |
+ * | --selectedPadding            | 0              | Sets the padding of the selected options wrapper element. |
  */
 export class MultiSelect extends HTMLElement {
 	#options;
