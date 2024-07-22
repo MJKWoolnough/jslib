@@ -171,13 +171,15 @@ const style = [new CSS().add({
  *
  * |  Attribute  |  Type   |  Description  |
  * |-------------|---------|---------------|
- * | toggle      | boolean | When set, selected options will be hidden in the options list until they are deselected. |
+ * | toggle      | Boolean | When set, selected options will be hidden in the options list until they are deselected. |
+ * | placeholder | String  | When set, sets the placeholder text on the input element. |
  * | value       | Array   | An array containing the values of the selected options. Can be set to programmatically select options. |
  *
  * In addition, the following CSS vars control various aspects of styling for the element.
  *
  * |  Variable                    |  Default       |  Description  |
  * |------------------------------|----------------|---------------|
+ * | --arrowColor                 | #000           | Sets the colour of the 'dropdown' arrow. |
  * | --backgroundColor            | #fff           | Sets the background colours of the main element. |
  * | --optionDisabledBackground   | #fff           | Sets the background colour of disabled options. |
  * | --optionDisabledColor        | #888           | Sets the font colour of disabled options. |
