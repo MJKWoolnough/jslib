@@ -252,7 +252,11 @@ export class MultiSelect extends HTMLElement {
 
 			break;
 		case "value":
-			this.value = newValue ?? [];
+			const arr = JSON.parse(newValue ?? "[]");
+
+			if (arr instanceof Array) {
+				this.value = arr;
+			}
 
 			break;
 		case "placeholder":
@@ -354,16 +358,8 @@ export class MultiSelect extends HTMLElement {
 		return val;
 	}
 
-	set value(data: string | string[]) {
-		if (data instanceof Array) {
-			this.#set(data);
-		} else {
-			const arr = JSON.parse(data);
-
-			if (arr instanceof Array) {
-				this.#set(arr);
-			}
-		}
+	set value(data: string[]) {
+		this.#set(data);
 	}
 
 	#set(data: string[]) {
