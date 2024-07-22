@@ -33,6 +33,8 @@ const style = [new CSS().add({
 		">div": {
 			"border": "var(--selectedBorder)",
 			"background-color": "var(--selectedBackground)",
+			"padding": "var(--selectedPadding, 0)",
+			"border-radius": "var(--selectedBorderRadius, 0)",
 
 			":hover": {
 				"border": "var(--selectedHoverBorder, var(--selectedBorder))",
