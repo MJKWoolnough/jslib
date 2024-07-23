@@ -8,7 +8,7 @@
 /**
  * This Function is used to create content based on the attributes given.
  */
-type NodeFn = (attrs: Record<string, ToString>) => Exclude<Element, Router>;
+type NodeFn = (attrs: Record<string, ToString>) => Exclude<ChildNode, Router>;
 
 type Match = {
 	path: RegExp;

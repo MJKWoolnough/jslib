@@ -8,7 +8,7 @@
 /**
  * This Function is used to create content based on the attributes given.
  *
- * @typedef {(attrs: Record<string, ToString>) => Exclude<Element, Router>} NodeFn
+ * @typedef {(attrs: Record<string, ToString>) => Exclude<ChildNode, Router>} NodeFn
  */
 
 /**
