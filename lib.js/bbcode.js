@@ -180,9 +180,9 @@ isString = t => typeof t === "string",
 /**
  * Intended for tag parsers, appends parse BBCode to the passed {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}.
  *
- * @param {Node} node         The {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} to append the parsed contents to.
+ * @param {Node}      node    The {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} to append the parsed contents to.
  * @param {Tokeniser} t       The Tokeniser to parse from.
- * @param {Parsers} p         The object containing the parsers.
+ * @param {Parsers}   p       The object containing the parsers.
  * @param {string} [closeTag] Optional string containing the name of the closing tag.
  *
  * @returns {Node} The passed in node.
@@ -215,9 +215,9 @@ process = (node, t, p, closeTag) => {
  * Intended for tag parses, this defines an opening tag, with a possible attribute.
  *
  * @typedef {Object} OpenTag
- * @property {string} tagName     This is the parsed tag name for the opening tag.
- * @property {string | null} attr This is the parsed attribute, if one was provided, or `null` if one was not.
- * @property {string} fullText    This is the full text of the parsed opening tag, including brackets and any attribute.
+ * @property {string}        tagName  This is the parsed tag name for the opening tag.
+ * @property {string | null} attr     This is the parsed attribute, if one was provided, or `null` if one was not.
+ * @property {string}        fullText This is the full text of the parsed opening tag, including brackets and any attribute.
  */
 
 /**
@@ -249,7 +249,7 @@ process = (node, t, p, closeTag) => {
  * This function parses the given text according, handling the tags with the given parsers, and appending all generated {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s to a {@link https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment | DocumentFragment}, which is returned.
  *
  * @param {Parsers} parsers The bbcode tag parsers.
- * @param {string} text     The text to be parsed.
+ * @param {string}  text    The text to be parsed.
  *
  * @return {DocumentFragment} DocumentFragment containing the parsed elements.
  */
