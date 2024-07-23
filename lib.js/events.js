@@ -125,10 +125,10 @@ export const
  *
  * NB: If the window loses focus, the module will generate a keyup event. This can be detected be checking the {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted| Event.isTrusted} field.
  *
- * @param {string | string[]} key A key combination string, or an array of key combination strings.
- * @param {(e: KeyboardEvent) => void} [onkeydown]     Function to be called when one of the key combinations is pressed.
- * @param {(e: KeyboardEvent) => void} [onkeyup]       Function to be called when one of the key combinations is released.
- * @param {boolean} [once=false]  When set to true, will only activate one time.
+ * @param {string | string[]}          key           A key combination string, or an array of key combination strings.
+ * @param {(e: KeyboardEvent) => void} [onkeydown]   Function to be called when one of the key combinations is pressed.
+ * @param {(e: KeyboardEvent) => void} [onkeyup]     Function to be called when one of the key combinations is released.
+ * @param {boolean}                    [once=false]  When set to true, will only activate one time.
  *
  * @return {[() => void, (now = true) => void, (newKey: string | string[], now = true) => void]} Array of functions as described above.
  */
@@ -198,7 +198,7 @@ keyEvent = (key, onkeydown, onkeyup, once = false) => {
  * NB: If the window loses focus, the module will run the onend function.
  *
  * @param {(e: MouseEvent) => void} onmousemove Function to be called when the mouse is moved.
- * @param {() => void} [onend]  Function to be called when the event is stopped.
+ * @param {() => void}              [onend]     Function to be called when the event is stopped.
  *
  * @return {[() => void, (run = true) => void]} Array of Functions as described above.
  */
@@ -229,7 +229,7 @@ mouseMoveEvent = (onmousemove, onend) => {
  *
  * NB: If the window loses focus, the module will generate a mouseup event. This can be detected be checking the {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted| Event.isTrusted} field.
  *
- * @param {number} button  Mouse button to detect being released.
+ * @param {number}                  button      Mouse button to detect being released.
  * @param {(e: MouseEvent) => void} onmousemove Function to be called when the mouse is moved.
  * @param {(e: MouseEvent) => void} onmouseup   Function to be called when the mouse button is released.
  *
