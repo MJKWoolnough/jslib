@@ -161,7 +161,7 @@ class Router extends HTMLElement {
 	 * | /search?mode=list&id=123&q=keyword | /no-search?mode=list<br>/search?mode=list<br>/search?id=:id&mode=list<br>/search?q=:query&mode=list&id=:id | false<br>true<br>true<br>true | <br><br>id = 123<br>id = 123 & query=keyword |
 	 * | /some-page#content | /some-page<br>/some-page#otherContent<br>/some-page#content | true<br>false<br>true |  |
 	 *
-	 * @param {string} match The string to match against.
+	 * @param {string} match  The string to match against.
 	 * @param {NodeFn} nodeFn The Function used to create the contents based on the URL.
 	 *
 	 * @return {Router} Returns `this` for easy chaining.
@@ -358,7 +358,7 @@ router = () => new Router(),
  *
  * This function may be called directly from HTML event handlers, as it is granted global scope in the page.
  *
- * @param {string} href                      The new location to 'go to'.
+ * @param {string}                   href    The new location to 'go to'.
  * @param {Record<string, ToString>} [attrs] Attributes to add/override ones derived from the URL.
  *
  * @return {boolean} Will return `true` if any Router has a route that matches the location, and `false` otherwise.
@@ -389,8 +389,8 @@ goto = (window as any).goto = (href: string, attrs?: Record<string, ToString>): 
 /**
  * This function will register a transition function with the specified name, allowing for transition effects and animation. This function will return true on a successful registration, and false if it fails, which will most likely be because of a name collision.
  *
- * @param {string} name A unique name for the transition.
- * @param {Swapper} s   A function that will swap nodes, with a possible animated transition. For the passed function, it is expected that the `next` node will replace the `current` node in the document immediately.
+ * @param {string}  name A unique name for the transition.
+ * @param {Swapper} s    A function that will swap nodes, with a possible animated transition. For the passed function, it is expected that the `next` node will replace the `current` node in the document immediately.
  *
  * @return {boolean} Will return `true` on a successful registration, and false otherwise.
  */
