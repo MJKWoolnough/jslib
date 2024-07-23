@@ -2354,7 +2354,7 @@ NB: You can retrieve the number of routes added with the Router.count field.
 #### <a name="router_router_add">add</a>
 ```typescript
 class Router {
-	add(match: string, nodeFn: (attrs: Record<string, ToString>) => Exclude<Element, Router>): this;
+	add(match: string, nodeFn: (attrs: Record<string, ToString>) => Exclude<ChildNode, Router>): this;
 }
 ```
 
