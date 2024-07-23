@@ -31,7 +31,7 @@ const once = {"once": true},
  * In its simplest incarnation, this function takes a URL and returns a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} which will return the string response from that URL. However, the passed {@link Properties} object can modify both how the request is sent and the response interpreted.
  *
  * @typeParam T
- * @param {string} url         The URL to request.
+ * @param {string}     url     The URL to request.
  * @param {Properties} [props] An optional object containing properties to modify the request.
  *
  * @return {Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest>} A promise resolving to a type that depends on the options passed.
@@ -132,8 +132,8 @@ export class WSConn extends WebSocket {
 	/**
 	 * The constructor is nearly identical to usage of the parent class except that the url param need not be absolute.
 	 *
-	 * @param {string} url                    - URL to connect to, can be absolute or relative.
-	 * @param {string | string[]} [protocols] - Either a single, or array of, [sub-]protocols.
+	 * @param {string}            url         URL to connect to, can be absolute or relative.
+	 * @param {string | string[]} [protocols] Either a single, or array of, [sub-]protocols.
 	 */
 	constructor(url, protocols) {
 		super(new URL(url, base), protocols);
@@ -144,7 +144,7 @@ export class WSConn extends WebSocket {
 	 * @typeParam {any} T = Success type
 	 * @typeParam {any} U = Error type
 	 * @param {(data: MessageEvent) => T} [ssFn] Function to be called when a message arrives.
-	 * @param {(data: Error) => U} [eeFn]        Function to be called when an error occurs.
+	 * @param {(data: Error) => U}        [eeFn] Function to be called when an error occurs.
 	 *
 	 * @returns {Subscription<T | U>} A {@link inter:Subscription | Subscription} object.
 	 */
