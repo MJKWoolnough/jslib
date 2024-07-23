@@ -130,9 +130,9 @@ isChildren = (propertiesOrChildren: Props | Children): propertiesOrChildren is C
  * NB: Due to how this function uses instanceof to determine what can be applied to it, it will fail in unexpected ways with types created from proxies of the DOM classes, such as those used with {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/open | window.open}.
  *
  * @typeParam {EventTarget | BoundChild | null} T
- * @param {T} [element]                   The EventTarget or Node to be modified.
+ * @param {T}                [element]    The EventTarget or Node to be modified.
  * @param {Props | Children} [properties] The properties to be added to the EventTarget or Node. Can be omitted with Children in its place.
- * @param {Children} [children]           Children to be added to a Node. Should be omitted if `properties` was set to a Children type.
+ * @param {Children}         [children]   Children to be added to a Node. Should be omitted if `properties` was set to a Children type.
  *
  * @return {T} The passed EventTarget, Node, or BoundChild.
  */
@@ -253,7 +253,7 @@ bindElement = <T extends Element>(ns: string, value: string) => wrapElem(value, 
  *
  * @typeParam {HTMLElement} T
  *
- * @param {string} name                          Name of the custom element.
+ * @param {string}                   name        Name of the custom element.
  * @param {CustomElementConstructor} constructor Constructor of the Custom Element
  * @param {ElementDefinitionOptions} [options]   Options to pass to customElements.define.
  *
@@ -330,7 +330,7 @@ createDocumentFragment = (children?: Children) => {
  *
  * @typeParam {Node} T
  * @param {Props | Children} [properties] The properties to be added to the EventTarget or Node. Can be omitted with Children in its place.
- * @param {Children} [Children]           Children to be added to the Node. Should be omitted if `properties` was set to a Children type.
+ * @param {Children}         [children]   Children to be added to the Node. Should be omitted if `properties` was set to a Children type.
  *
  * @return {T} The Node being cleared.
  */
