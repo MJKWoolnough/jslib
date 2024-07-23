@@ -21,6 +21,7 @@ import {Callable} from './misc.js';
  * This class implements a function that can take a new value to set the binding value. This function can also be called with no argument to simply get the value of the binding.
  *
  * @param {T} [v] The value to set the binding to.
+ *
  * @returns {T}   The value the binding is set to.
  */
 export class Binding extends Callable {
