@@ -79,11 +79,11 @@ export class DragTransfer<T = any> {
 	/**
 	 * This method is used during a {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragstart_event | dragstart} to mark the object being dragged. Requires the {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event | DragEvent} and the key returned from the {@link DragTransfer.register | register}method, and optionally takes a drag icon {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLDivElement | div} and `x` and `y` offsets from the cursor.
 	 *
-	 * @param {DragEvent} e The DragEvent.
-	 * @param {string} key The unique key returned from the `register` method.
-	 * @param {HTMLDivElement} [icon] A drag icon.
-	 * @param {number} [xOffset=-5] Icon `X` offset.
-	 * @param {number} [yOffset=-5] Icon `Y` offset.
+	 * @param {DragEvent}      e            The DragEvent.
+	 * @param {string}         key          The unique key returned from the `register` method.
+	 * @param {HTMLDivElement} [icon]       A drag icon.
+	 * @param {number}         [xOffset=-5] Icon `X` offset.
+	 * @param {number}         [yOffset=-5] Icon `Y` offset.
 	 */
 	set(e: DragEvent, key: string, icon?: HTMLDivElement, xOffset: number = -5, yOffset: number = -5) {
 		this.#last = key;
@@ -138,8 +138,8 @@ export class DragFiles {
 	 *
 	 * The {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault | preventDefault} method of the {@link https://developer.mozilla.org/en-US/docs/Web/API/DragEvent | DragEvent} object is called during this method.
 	 *
-	 * @param {DragEvent} e The DragEvent.
-	 * @param {string} name The form field name.
+	 * @param {DragEvent} e    The DragEvent.
+	 * @param {string}    name The form field name.
 	 *
 	 * @return {FormData}.
 	 */
