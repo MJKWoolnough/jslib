@@ -87,7 +87,7 @@ export class Pipe {
 	/**
 	 * This method calls the passed function with the values retrieved from the passed pipes and values.
 	 *
-	 * @param {Function} cb         The function that will be called with the values from all of the pipes.
+	 * @param {Function}                      cb    The function that will be called with the values from all of the pipes.
 	 * @param {...(Pipe | [Pipe, any] | any)} pipes The pipes or values to combine and pass to the callback function. A Pipe can be combined with an initial value in a tuple.
 	 *
 	 * @return {Function} Cancel function to stop the pipes being merged.
@@ -198,8 +198,8 @@ export class Subscription {
 	/**
 	 * This  method act similarly to the then method of the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} class, except that it can be activated multiple times.
 	 *
-	 * @param {((data: T) => TResult1) | null} [successFn] The Function to be called on a success.
-	 * @param {((data: any) => TResult2) | null} [errorFn] The Function to be called on an error.
+	 * @param {((data: T) => TResult1) | null}   [successFn] The Function to be called on a success.
+	 * @param {((data: any) => TResult2) | null} [errorFn]   The Function to be called on an error.
 	 *
 	 * @return {Subscription} A new Subscription that continues the Subscription chain.
 	 */
