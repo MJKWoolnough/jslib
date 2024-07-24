@@ -195,8 +195,8 @@ export class JSONSetting<T> extends Setting<T> {
 	 *
 	 * Otherwise this class just extends the base {@link Setting} class with the `T` type.
 	 *
-	 * @param {string} name            Setting name.
-	 * @param {T} starting             Default value.
+	 * @param {string}                 name      Setting name.
+	 * @param {T}                      starting  Default value.
 	 * @param {(v: unknown) => v is T} validator A validator Function.
 	 */
 	constructor(name: string, starting: T, validator: (v: unknown) => v is T) {
