@@ -243,8 +243,8 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	 *
 	 * The NodeArray type is wrapped with a Proxy to implement {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array | Array}-like indexing.
 	 *
-	 * @param {H} h                    A parent element, onto which all {@link Item} elements will be attached.
-	 * @param {Function} [s]           An optional starting sort function. Can be omitted, with 'elements' as the second param.
+	 * @param {H}           h          A parent element, onto which all {@link Item} elements will be attached.
+	 * @param {Function}    [s]        An optional starting sort function. Can be omitted, with 'elements' as the second param.
 	 * @param {Iterable<T>} [elements] An optional set of starting elements of type `T`.
 	 */
 	constructor(h: H, s?: sortFunc<T>, elements?: Iterable<T>);
@@ -374,7 +374,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 	/**
 	 * This function will create a NodeArray from the given parent {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}, iterating over every child and running the itemFn to generate an {@link Item} to be append to the NodeArray.
 	 *
-	 * @param {H} n Parent Node.
+	 * @param {H}                             n        Parent Node.
 	 * @param {(node: Node) => T | undefined} [itemFn] Function to create Items from nodes.
 	 *
 	 * @return {NodeArray<H, T>}
@@ -696,8 +696,8 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	 *
 	 * The sorting function is used to order {@link Item}s as they are inserted.
 	 *
-	 * @param {H} h                        The parent element, onto which all {@link Item} elements will be attached.
-	 * @param {Function} [s]               An optional starting sort function. Can be omitted, with 'elements' as the second param.
+	 * @param {H}                h         The parent element, onto which all {@link Item} elements will be attached.
+	 * @param {Function}         [s]       An optional starting sort function. Can be omitted, with 'elements' as the second param.
 	 * @param {Iterable<[K, T]>} [entries] An optional set of starting elements of type `T`.
 	 */
 	constructor(h: H, s?: sortFunc<T>, entries?: Iterable<[K, T]>);
@@ -756,8 +756,8 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	/**
 	 * The insertAfter method will insert a new {@link Item} after the {@link Item} denoted by the `after` key.
 	 *
-	 * @param {K} k The new key.
-	 * @param {T} item The new item.
+	 * @param {K} k     The new key.
+	 * @param {T} item  The new item.
 	 * @param {K} after The key to insert after.
 	 *
 	 * @return {boolean}  Will return `true` unless the `after` key cannot be found, in which case it will return false.
@@ -777,8 +777,8 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	/**
 	 * The insertBefore method will insert a new {@link Item} before the {@link Item} denoted by the `before` key.
 	 *
-	 * @param {K} k The new key.
-	 * @param {T} item The new item.
+	 * @param {K} k      The new key.
+	 * @param {T} item   The new item.
 	 * @param {K} before The key to insert before.
 	 *
 	 * @return {boolean}  Will return `true` unless the `after` key cannot be found, in which case it will return false.
