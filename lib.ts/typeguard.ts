@@ -272,8 +272,8 @@ Str = (r?: RegExp) => asTypeGuard((v: unknown): v is string => throwOrReturn(typ
 /**
  * The Tmpl function returns a TypeGuard that checks for template values.
  *
- * @param {string} first The Initial string part to match.
- * @param {(TypeGuard<string> | string)[]} ...s Remaining parts to match, must be an alternating list of TypeGuard<string> and string
+ * @param {string}                         first The Initial string part to match.
+ * @param {(TypeGuard<string> | string)[]} ...s  Remaining parts to match, must be an alternating list of TypeGuard<string> and string
  *
  * @return {TypeGuard<string>}
  */
@@ -595,7 +595,7 @@ Req = <T extends {}>(tg: TypeGuard<T>) => asTypeGuard((v: unknown): v is {[K in 
 /**
  * The Take function takes an existing TypeGuard create by the Obj function and transforms it to only check the keys passed into this function.
  *
- * @param {TypeGuard<{}>} tg tg   The TypeGuard created by a call to Obj.
+ * @param {TypeGuard<{}>}    tg   The TypeGuard created by a call to Obj.
  * @param {...(keyof any}[]} keys The list of keys to limit Object checking to.
  *
  * @return {TypeGuard<{}>}
@@ -612,7 +612,7 @@ Take = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
 /**
  * The Skip function takes an existing TypeGuard create by the Obj function and transforms it to not check the keys passed into this function.
  *
- * @param {TypeGuard<{}>} tg tg   The TypeGuard created by a call to Obj.
+ * @param {TypeGuard<{}>}    tg   The TypeGuard created by a call to Obj.
  * @param {...(keyof any}[]} keys The list of keys to be skipped within Obj checking.
  *
  * @return {TypeGuard<{}>}
@@ -663,8 +663,8 @@ BoolStr = () => asTypeGuard((v: unknown): v is `${boolean}` => throwOrReturn(typ
 /**
  * The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified.
  *
- * @param {TypeGuard<Exclude<keyof any, number>>} key The Key type.
- * @param {TypeGuard<any>} value                      The Value type.
+ * @param {TypeGuard<Exclude<keyof any, number>>} key   The Key type.
+ * @param {TypeGuard<any>}                        value The Value type.
  *
  * @return {Record<keyof any, any>}
  */
