@@ -11,9 +11,9 @@ export const
  *
  * NB: NB: Infinity is not a valid integer.
  *
- * @param {unknown} v              Value to be checked.
- * @param {number} [min=-Infinity] Minimum acceptable value.
- * @param {number} [max=+Infinity] Maximum acceptable value.
+ * @param {unknown} v               Value to be checked.
+ * @param {number}  [min=-Infinity] Minimum acceptable value.
+ * @param {number}  [max=+Infinity] Maximum acceptable value.
  *
  * @return {boolean} `true` if `v` is an integer between `min` and `max` inclusive.
  */
@@ -21,10 +21,10 @@ isInt = (v, min = -Infinity, max = Infinity) => typeof v === "number" && (v|0) =
 /**
  * This function determines whether `n` is a valid integer, as determined by the {@link isInt} function, and returns `n` if it is, or `def` otherwise.
  *
- * @param {unknown} n                     The value to be checked.
- * @param {number} [min=-Infinity]        Minimum acceptable value.
- * @param {number} [max=+Infinity]        Maximum acceptable value.
- * @param {number} [def=Math.max(min, 0)] Default value to be returned if `n` is unacceptable.
+ * @param {unknown} n                      The value to be checked.
+ * @param {number}  [min=-Infinity]        Minimum acceptable value.
+ * @param {number}  [max=+Infinity]        Maximum acceptable value.
+ * @param {number}  [def=Math.max(min, 0)] Default value to be returned if `n` is unacceptable.
  *
  * @return {number} The number `n` if it is an integer between `min` and `max` inclusively, or `def` (cast to an integer) otherwise.
  */
@@ -44,8 +44,8 @@ mod = (n, m) => ((n % m) + m) % m,
  * @typeParam K
  * @typeParam V
  * @param {{set: (K, V) => any}} m Map-like object.
- * @param {K} k                    Key for where value is to be stored.
- * @param {V} v                    Value to be stored.
+ * @param {K}                    k Key for where value is to be stored.
+ * @param {V}                    v Value to be stored.
  *
  * @return {V} The value `v`.
  */
@@ -58,7 +58,7 @@ setAndReturn = (m, k, v) => {
  *
  * @typeParam V
  * @param {{push: (V) => any}} a The Array-like object to push to.
- * @param {V} v                  The value to be pushed.
+ * @param {V}                  v The value to be pushed.
  *
  * @return {V} The value `v`.
  */
@@ -72,7 +72,7 @@ pushAndReturn = (a, v) => {
  *
  * @typeParam V
  * @param {{add: (V) => any}} a The Set-like object to add to.
- * @param {V} v                 The value to be added.
+ * @param {V}                 v The value to be added.
  *
  * @return {V} The value `v`.
  */
@@ -97,7 +97,7 @@ queue = (() => {
  * This function will schedule an element to be focused after the after the current event loop finishes. If the element is an {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement | HTMLInputElement} or a {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLTextAreaElement | HTMLTextAreaElement} the element will also be selected unless the `inputSelect` param is set to false.
  *
  * @typeParam {{focus(): void}} T
- * @param {T} node                     The Node to be focused.
+ * @param {T}       node               The Node to be focused.
  * @param {boolean} [inputSelect=true] Set to false to stop HTMLInputElements and HTMLTextAreaElements from being `selected`.
  *
  * @return {T} The passed node.
