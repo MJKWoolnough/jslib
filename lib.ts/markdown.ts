@@ -2477,8 +2477,9 @@ class ThematicBreakBlock extends LeafBlock {
 /**
  * The default export provides a markdown parser, that takes a markdown string, and an optional object that provides configuration; returns a DocumentFragment containing the result of the parsed code.
  *
- * @param {string} markdown         The markdown text to be parsed.
- * @param {Partial<UserTags>} [tgs] Optional configuration object that can be used to disable markdown extensions, and override how HTML nodes are generated.
+ * @param {string}            markdown The markdown text to be parsed.
+ * @param {Partial<UserTags>} [tgs]    Optional configuration object that can be used to disable markdown extensions, and override how HTML nodes are generated.
+ *
  * @return DocumentFragment The parsed nodes.
  */
 export default (markdown: string, tgs: Partial<UserTags> = {}) => {
