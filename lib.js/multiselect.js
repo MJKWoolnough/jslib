@@ -354,9 +354,7 @@ export class MultiSelect extends HTMLElement {
 		const val = [];
 
 		for (const e of this.#selected.keys()) {
-			const o = this.#optionToLI.get(e);
-
-			val.push(o.getAttribute("value") ?? o.innerText);
+			val.push(e.getAttribute("value") ?? e.innerText);
 		}
 
 		return val;
