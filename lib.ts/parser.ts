@@ -294,7 +294,7 @@ export class Tokeniser {
 	/**
 	 * acceptString() attempts to accept each character from the given string, in order, returning the number of characters accepted before a failure.
 	 *
-	 * @param {string} str              The ordered characters to be accepted.
+	 * @param {string}  str             The ordered characters to be accepted.
 	 * @param {boolean} [caseSensitive] Should the match be made respecting case; defaults to true.
 	 *
 	 * @return {number} Returns the number of characters accepted.
@@ -316,8 +316,8 @@ export class Tokeniser {
 	/**
 	 * acceptWord attempts to parse one of the words (string of characters) provided in the array.
 	 *
-	 * @param {string[]} words          The list of words (strings of characters) to match against.
-	 * @param {boolean} [caseSensitive] Determines whether matches are made in a case sensitive manner or not; defaults to true.
+	 * @param {string[]} words           The list of words (strings of characters) to match against.
+	 * @param {boolean}  [caseSensitive] Determines whether matches are made in a case sensitive manner or not; defaults to true.
 	 *
 	 * @return {string} The matched word, or empty string if not word in the list could be matched.
 	 */
@@ -437,7 +437,7 @@ export class Tokeniser {
 	 * return() creates the [Token, TokenFn] tuple, using the parsed characters as the data. If no TokenFn is supplied, Tokeniser.done() is used.
 	 *
 	 * @param {TokenType} type The type of the token to be returned.
-	 * @param {TokenFn} [fn]   Optional TokenFn; defaults to this.done().
+	 * @param {TokenFn}   [fn] Optional TokenFn; defaults to this.done().
 	 *
 	 * @return {[Token, TokenFn]} The return tuple which will return a Token to a parser and provide the next TokenFn to be used in later parsing.
 	 */
@@ -456,8 +456,8 @@ export class Phraser {
 	/**
 	 * Constructs a new Phraser.
 	 *
-	 * @param {string | StringParser} text The text/iterator to be used for parsing.
-	 * @param {TokenFn} parserFn           The initial TokenFn that will start the parsing.
+	 * @param {string | StringParser} text     The text/iterator to be used for parsing.
+	 * @param {TokenFn}               parserFn The initial TokenFn that will start the parsing.
 	 */
 	constructor(text: string | StringParser, parserFn: TokenFn) {
 		this.#parser = new Tokeniser(text);
@@ -605,7 +605,7 @@ export class Phraser {
 	 * return() creates the [Phrase, PhraseFn] tuple, using the parsed tokens as the data. If no PhraseFn is supplied, Phraser.done() is used.
 	 *
 	 * @param {PhraseType} type The type of the phrase to be returned.
-	 * @param {PhraserFn} [fn]   Optional PhraserFn; defaults to this.done().
+	 * @param {PhraserFn}  [fn] Optional PhraserFn; defaults to this.done().
 	 *
 	 * @return {[Phrase, PhraserFn]} The return tuple which will return a Phrase to a parser and provide the next PhraserFn to be used in later parsing.
 	 */
@@ -617,11 +617,11 @@ export class Phraser {
 /**
  * The default function can parse a text stream into either a stream of tokens or a stream of phrases, depending on whether a phrase parsing function is provided.
  *
- * @param {text | StringParser} text The text stream that will be parsed.
- * @param {TokenFn} parserFn         The initial token parsing function.
- * @param {PhraserFn} [phraserFn]    Optional phraser function to produce a phrase steam.
+ * @param {text | StringParser} text        The text stream that will be parsed.
+ * @param {TokenFn}             parserFn    The initial token parsing function.
+ * @param {PhraserFn}           [phraserFn] Optional phraser function to produce a phrase steam.
  *
- * @returns {Token | Phrase}         Returns a stream of either Tokens or Phrases.
+ * @returns {Token | Phrase} Returns a stream of either Tokens or Phrases.
  */
 export default (function* (text: string | StringParser, parserFn: TokenFn, phraserFn?: PhraserFn) {
 	const p = phraserFn ? new Phraser(text, parserFn) : new Tokeniser(text);
