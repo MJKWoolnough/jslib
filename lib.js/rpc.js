@@ -143,9 +143,9 @@ export class RPC {
 	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
 	 *
 	 * @typeParam {any} T
-	 * @param {string} method                                                     The method name to be called.
+	 * @param {string}                                        method              The method name to be called.
 	 * @param {Exclude<any, Function> | ((a: any) => a is T)} [paramsOrTypeCheck] Either the params to be sent to the specified method, or a typecheck function.
-	 * @param {(a: any) => a is T} [typeCheck]                                    A typecheck function, if one was supplied to the second param.
+	 * @param {(a: any) => a is T}                            [typeCheck]         A typecheck function, if one was supplied to the second param.
 	 *
 	 * @return {Promise<T>} A Promise that will resolve with the returned data from the remote procedure call.
 	 */
@@ -172,7 +172,7 @@ export class RPC {
 	 *
 	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
 	 *
-	 * @param {number} id                      The ID to wait for.
+	 * @param {number}             id          The ID to wait for.
 	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
 	 *
 	 * @return {Promise<T>} A Promise that will resolve with the returned data.
@@ -198,7 +198,7 @@ export class RPC {
 	 *
 	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
 	 *
-	 * @param {number} id                      The ID to wait for.
+	 * @param {number}             id          The ID to wait for.
 	 * @param {(a: any) => a is T} [typeCheck] An optional typecheck function.
 	 *
 	 * @return {Subscription<T>} A Subscription that will resolve whenever data is received.
