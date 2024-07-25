@@ -224,20 +224,24 @@ export class MultiSelect extends HTMLElement {
 	constructor() {
 		super();
 
-		const self = this;
+		const filterInput = value => {
+			for (const [child, contents] of this.#liContents) {
+				if (contents.includes(value)) {
+					this.#options.append(child);
+				} else {
+					child.remove();
+				}
+			}
+		};
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual", "delegatesFocus": true}), [
 			this.#selectedDiv = div({"id": "selected"}),
 			div({"id": "control"}, [
 				this.#input = input({"autofocus": true, "onfocus": () => this.#setOptionsPos(), "oninput": function() {
-					const value = this.value;
-
-					for (const [child, contents] of self.#liContents) {
-						if (contents.includes(value)) {
-							self.#options.append(child);
-						} else {
-							child.remove();
-						}
+					filterInput(this.value);
+				}, "onkeydown": function(e) {
+					if (e.key === "Escape") {
+						filterInput(this.value = "");
 					}
 				}}),
 				this.#options = ul({"onclick": e => this.#handleSelect(e.target), "tabindex": -1})
