@@ -213,6 +213,7 @@ export class MultiSelect extends HTMLElement {
 	#selected = new Map();
 	#liToOption = new Map();
 	#optionToLI = new Map();
+	#liContents = [];
 
 	constructor() {
 		super();
@@ -223,8 +224,14 @@ export class MultiSelect extends HTMLElement {
 			this.#selectedDiv = div({"id": "selected"}),
 			div({"id": "control"}, [
 				this.#input = input({"autofocus": true, "onfocus": () => this.#setOptionsPos(), "oninput": function() {
-					for (const child of self.#options.children) {
-						amendNode(child, {"style": child.textContent?.includes(this.value) ? false : "display: none"});
+					const value = this.value;
+
+					for (const [child, contents] of self.#liContents) {
+						if (contents.includes(value)) {
+							self.#options.append(child);
+						} else {
+							child.remove();
+						}
 					}
 				}}),
 				this.#options = ul({"onclick": e => this.#handleSelect(e.target), "tabindex": -1})
@@ -323,6 +330,7 @@ export class MultiSelect extends HTMLElement {
 
 		this.#optionToLI = new Map();
 		this.#liToOption.clear();
+		this.#liContents.splice(0, this.#liContents.length);
 
 		for (const elem of this.children) {
 			if (elem instanceof HTMLOptionElement) {
@@ -334,6 +342,7 @@ export class MultiSelect extends HTMLElement {
 				newElems.push(item);
 				this.#optionToLI.set(elem, item);
 				this.#liToOption.set(item, elem);
+				this.#liContents.push([item, text]);
 
 				if (elem.hasAttribute("selected")) {
 					this.#handleSelect(item);
