@@ -225,13 +225,15 @@ export class MultiSelect extends HTMLElement {
 		super();
 
 		const filterInput = (value: string) => setTimeout(() => {
+			const children: Element[] = [];
+
 			for (const [child, contents] of this.#liContents) {
 				if (contents.includes(value)) {
-					this.#options.append(child);
-				} else {
-					child.remove();
+					children.push(child);
 				}
 			}
+
+			clearNode(this.#options, children);
 		      });
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual", "delegatesFocus": true}), [
