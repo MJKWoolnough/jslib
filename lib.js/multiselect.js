@@ -224,7 +224,7 @@ export class MultiSelect extends HTMLElement {
 	constructor() {
 		super();
 
-		const filterInput = value => {
+		const filterInput = value => setTimeout(() => {
 			for (const [child, contents] of this.#liContents) {
 				if (contents.includes(value)) {
 					this.#options.append(child);
@@ -232,7 +232,7 @@ export class MultiSelect extends HTMLElement {
 					child.remove();
 				}
 			}
-		};
+		});
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual", "delegatesFocus": true}), [
 			this.#selectedDiv = div({"id": "selected"}),

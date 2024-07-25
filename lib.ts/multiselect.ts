@@ -224,7 +224,7 @@ export class MultiSelect extends HTMLElement {
 	constructor() {
 		super();
 
-		const filterInput = (value: string) => {
+		const filterInput = (value: string) => setTimeout(() => {
 			for (const [child, contents] of this.#liContents) {
 				if (contents.includes(value)) {
 					this.#options.append(child);
@@ -232,7 +232,7 @@ export class MultiSelect extends HTMLElement {
 					child.remove();
 				}
 			}
-		};
+		      });
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual", "delegatesFocus": true}), [
 			this.#selectedDiv = div({"id": "selected"}),
@@ -271,7 +271,7 @@ export class MultiSelect extends HTMLElement {
 
 			this.#parseContent();
 		}).observe(this, {
-			"attributeFilter": ["value", "disabled", "label", "select"],
+			"attributeFilter": ["value", "disabled", "label", "selected"],
 			"childList": true,
 			"subtree": true
 		});
