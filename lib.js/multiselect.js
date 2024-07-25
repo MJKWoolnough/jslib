@@ -271,7 +271,7 @@ export class MultiSelect extends HTMLElement {
 
 			this.#parseContent();
 		}).observe(this, {
-			"attributeFilter": ["value", "disabled", "label", "select"],
+			"attributeFilter": ["value", "disabled", "label", "selected"],
 			"childList": true,
 			"subtree": true
 		});
