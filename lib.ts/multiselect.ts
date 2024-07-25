@@ -220,11 +220,14 @@ export class MultiSelect extends HTMLElement {
 	#liToOption = new Map<HTMLLIElement, MultiOption>();
 	#optionToLI = new Map<MultiOption, HTMLLIElement>();
 	#liContents: [HTMLLIElement, String][] = [];
+	#filter = "";
 
 	constructor() {
 		super();
 
 		const filterInput = (value: string) => setTimeout(() => {
+			this.#filter = value;
+
 			const children: Element[] = [];
 
 			for (const [child, contents] of this.#liContents) {
@@ -371,7 +374,10 @@ export class MultiSelect extends HTMLElement {
 				      state = elem.hasAttribute("disabled") ? disabled : enabled,
 				      item = existing?.innerText === text ? amendNode(existing, state) : li(state, text);
 
-				newElems.push(item);
+				if (text.includes(this.#filter)) {
+					newElems.push(item);
+				}
+
 				this.#optionToLI.set(elem, item);
 				this.#liToOption.set(item, elem);
 				this.#liContents.push([item, text]);
