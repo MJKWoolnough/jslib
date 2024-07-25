@@ -41,8 +41,8 @@ export class Codec {
 	 *
 	 * It is recommended to use a checker function, and the {@link module:typeguard} module can aid with that.
 	 *
-	 * @param {string} name              Name to be used for the URL param.
-	 * @param {T}      value             Default value for the state.
+	 * @param {string}           name    Name to be used for the URL param.
+	 * @param {T}                value   Default value for the state.
 	 * @param {(v: T) => v is T} checker Function to confirm valid values.
 	 *
 	 * @return {StateBound<T>}
@@ -242,7 +242,7 @@ setParam = (name, value) => StateBound.setParam(name, value),
  * This functions transforms the current state to a search query.
  *
  * @param {Record<string, string>} [withVals] Additional key/value pairs to add to the URL. Will overwrite existing values.
- * @param {string[]} [without]                State keys to filter from the URL.
+ * @param {string[]}               [without]  State keys to filter from the URL.
  *
  * @return {string} The generated query string.
  */
