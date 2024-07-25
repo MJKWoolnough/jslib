@@ -95,7 +95,7 @@ const style = [new CSS().add({
 			"display": "none"
 		},
 
-		" input": {
+		">input": {
 			"background-color": "transparent",
 			"box-sizing": "border-box",
 			"border": 0,
@@ -135,20 +135,26 @@ const style = [new CSS().add({
 			"overscroll-behavior": "none",
 			"z-index": 1000,
 
-			" li.disabled": {
-				"background": "var(--optionDisabledBackground, #fff)",
-				"color": "var(--optionDisabledColor, #888)"
-			},
+			">li": {
+				".disabled": {
+					"background": "var(--optionDisabledBackground, #fff)",
+					"color": "var(--optionDisabledColor, #888)"
+				},
 
-			" li:not(.disabled):hover": {
-				"background": "var(--optionHoverBackground, #000)",
-				"color": "var(--optionHoverColor, #fff)",
-				"cursor": "pointer"
-			},
+				".filter": {
+					"display": "none"
+				},
 
-			" li.selected": {
-				"background": "var(--optionSelectedBackground, #888)",
-				"color": "var(--optionSelectedColor, #fff)"
+				":not(.disabled):hover": {
+					"background": "var(--optionHoverBackground, #000)",
+					"color": "var(--optionHoverColor, #fff)",
+					"cursor": "pointer"
+				},
+
+				".selected": {
+					"background": "var(--optionSelectedBackground, #888)",
+					"color": "var(--optionSelectedColor, #fff)"
+				}
 			},
 
 			":not(.toggle) .selected": {
