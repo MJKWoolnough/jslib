@@ -250,7 +250,27 @@ export class MultiSelect extends HTMLElement {
 
 		this.#parseContent();
 
-		new MutationObserver(() => this.#parseContent()).observe(this, {
+		new MutationObserver(ms => {
+			let update = false;
+
+			for (const m of ms) {
+				if (m.type === "childList") {
+					update = true;
+
+					break;
+				} else if (m.attributeName !== "value") {
+					update = true;
+				}
+			}
+
+			if (update) {
+				this.#parseContent();
+			} else {
+				this.dispatchEvent(new Event("change"));
+			}
+
+			this.#parseContent();
+		}).observe(this, {
 			"attributeFilter": ["value", "disabled", "label", "select"],
 			"childList": true,
 			"subtree": true
