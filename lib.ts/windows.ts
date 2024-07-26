@@ -409,9 +409,9 @@ abstract class BaseElement extends HTMLElement {
 	 *
 	 * The button text is set to the `OK` field of the language object, which can be set with {@link setLanguage}.
 	 *
-	 * @param {string | Binding} title  Title of the `alert` window.
-	 * @param {Children} message        Message to be displayed in the window.
-	 * @param {string | Binding} [icon] Optional icon.
+	 * @param {string | Binding} title   Title of the `alert` window.
+	 * @param {Children}         message Message to be displayed in the window.
+	 * @param {string | Binding} [icon]  Optional icon.
 	 *
 	 * @return {Promise<boolean>} The returned {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} will resolve to true if the button is clicked, and false if the dialogue window was closed.
 	 */
@@ -440,9 +440,9 @@ abstract class BaseElement extends HTMLElement {
 	 *
 	 * The text of the two buttons is set to the `OK` and `CANCEL` fields of the language object, which can be set with {@link setLanguage}.
 	 *
-	 * @param {string | Binding} title  Title of the `alert` window.
-	 * @param {Children} message        Message to be displayed in the window.
-	 * @param {string | Binding} [icon] Optional icon.
+	 * @param {string | Binding} title   Title of the `alert` window.
+	 * @param {Children}         message Message to be displayed in the window.
+	 * @param {string | Binding} [icon]  Optional icon.
 	 *
 	 * @return {Promise<boolean>} The returned {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} will resolve to true if the `OK` button is clicked, and false if the `CANCEL` button was clicked or the dialogue window was closed.
 	 */
@@ -474,10 +474,10 @@ abstract class BaseElement extends HTMLElement {
 	 *
 	 * The button text is set to the `OK` field of the language object, which can be set with {@link setLanguage}.
 	 *
-	 * @param {string | Binding} title   Title of the `alert` window.
-	 * @param {Children} message         Message to be displayed in the window.
-	 * @param {string} [defaultValue=""] The default value of the input box.
-	 * @param {string | Binding} [icon]  Optional icon.
+	 * @param {string | Binding} title             Title of the `alert` window.
+	 * @param {Children}         message           Message to be displayed in the window.
+	 * @param {string}           [defaultValue=""] The default value of the input box.
+	 * @param {string | Binding} [icon]            Optional icon.
 	 *
 	 * @return {Promise<string | null>} The returned {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} will resolve to the text entered if the `OK` button is clicked, or null if the dialogue window was closed.
 	 */
@@ -747,6 +747,7 @@ export class WindowElement extends BaseElement {
 	 * This method adds a `Window` as a child. If there is already a child, it is added as a child of that `Window`.
 	 *
 	 * @param {WindowElement} w The child window to be added.
+	 *
 	 * @return {boolean} Returns true if window was successfully added, and false otherwise, which should only occur if this window has no parent.
 	 */
 	addWindow(w: WindowElement): boolean {
@@ -772,9 +773,9 @@ export class WindowElement extends BaseElement {
 	/**
 	 * The addControlButton method adds additional buttons to the titlebar of the `Window`.
 	 *
-	 * @param {string} icon                           The icon to be displayed on the button.
+	 * @param {string}                        icon    The icon to be displayed on the button.
 	 * @param {(this: WindowElement) => void} onclick The function to call when the button is clicked.
-	 * @param {string | Binding} [title]              An optional title text for the button.
+	 * @param {string | Binding}             [title]  An optional title text for the button.
 	 *
 	 * @return {() => void} A Function to remove the button.
 	 */
