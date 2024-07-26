@@ -237,7 +237,8 @@ export class MultiSelect extends HTMLElement {
 			}
 
 			clearNode(this.#options, children);
-		      });
+		      }),
+		      self = this;
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual", "delegatesFocus": true}), [
 			this.#selectedDiv = div({"id": "selected"}),
@@ -245,7 +246,34 @@ export class MultiSelect extends HTMLElement {
 				this.#input = input({"autofocus": true, "onfocus": () => this.#setOptionsPos(), "oninput": function(this: HTMLInputElement) {
 					filterInput(this.value);
 				}, "onkeydown": function(this: HTMLInputElement, e: KeyboardEvent) {
-					if (e.key === "Escape") {
+					switch (e.key) {
+					case "Enter":
+						const value = this.value;
+
+						let selected: HTMLLIElement | null = null;
+
+						for (const [child, contents] of self.#liContents) {
+							if (contents.includes(value) && true) {
+								const option = self.#liToOption.get(child);
+
+								if (!option || option.hasAttribute("disabled") || self.#selected.has(option) && !self.#options.classList.contains("toggle")) {
+									continue;
+								}
+
+								if (selected) {
+									return;
+								}
+
+								selected = child;
+							}
+						}
+
+						if (!selected) {
+							return;
+						}
+
+						selected.click();
+					case "Escape":
 						filterInput(this.value = "");
 					}
 				}}),
