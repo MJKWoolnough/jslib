@@ -121,7 +121,7 @@ const style = [new CSS().add({
 			"border-bottom": "5px solid var(--arrowColor, #000)",
 		},
 
-		" ul": {
+		">ul": {
 			"list-style": "none",
 			"padding": 0,
 			"background": "var(--optionsBackground, #fff)",
