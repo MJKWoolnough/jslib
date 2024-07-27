@@ -33,6 +33,7 @@ const windowObservations = {
 		"overflow": "hidden",
 		"width": "var(--shell-width, 100%)",
 		"height": "var(--shell-height, 100%)",
+
 		">footer": {
 			"display": "flex",
 			"position": "absolute",
@@ -42,14 +43,17 @@ const windowObservations = {
 			"bottom": 0,
 			"left": 0,
 			"pointer-events": "none",
+
 			">div": {
 				"width": "200px",
 				"position": "relative",
+
 				">windows-window": {
 					"min-height": "auto",
 					"position": "relative",
 					"pointer-events": "auto",
 					"--overlay-on": "none",
+
 					":not([maximised])": {
 						"pointer-events": "none",
 						"visibility": "hidden"
@@ -59,6 +63,7 @@ const windowObservations = {
 
 		}
 	},
+
 	"::slotted(windows-window:last-of-type)": {
 	      "--overlay-on": "none"
 	}
