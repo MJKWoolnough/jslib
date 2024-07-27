@@ -225,6 +225,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 	"list-style": "none",
 	"padding": 0,
 	"z-index": 0,
+
 	"([maximised])": {
 		"left": 0,
 		"right": 0,
@@ -232,16 +233,20 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 		"bottom": 0,
 		"width": "auto",
 		"height": "auto",
+
 		">div:nth-child(2)>div>button:nth-of-type(2)": {
 			"background-image": `url('data:image/svg+xml,%3Csvg viewBox="0 0 15 13" xmlns="${svgNS}"%3E%3Cpath d="M1,5 h8 v-1 h-8 v8 h8 v-8 m-3,0 v-3 h8 v8 h-5 m5,-7 h-8" stroke="%23000" fill="none" /%3E%3C/svg%3E')`
 		}
 	},
+
 	"([resizable])": {
 		"border-width": 0,
+
 		">div": {
 			":nth-child(1)": {
 				"display": "block"
 			},
+
 			":nth-child(3)": {
 				"overflow": "auto",
 				"position": "absolute",
@@ -250,6 +255,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"right": 0,
 				"top": "calc(1em + 6px)"
 			},
+
 			":nth-child(4)": {
 				"top": "var(calc(--window-resize), -2px)",
 				"left": "var(calc(--window-resize), -2px)",
@@ -258,6 +264,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 			}
 		}
 	},
+
 	">div": {
 		":nth-child(1)>div": {
 			"position": "absolute",
@@ -265,6 +272,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 			"border-style": "solid",
 			"border-width": 0,
 			"z-index": -1,
+
 			":nth-child(1)": {
 				"top": "-2px",
 				"left": "-2px",
@@ -274,6 +282,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"border-left-width": "3px",
 				"border-top-width": "3px"
 			},
+
 			":nth-child(2)": {
 				"top": "-2px",
 				"left": "8px",
@@ -281,6 +290,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"border-top-width": "3px",
 				"cursor": "ns-resize"
 			},
+
 			":nth-child(3)": {
 				"top": "-2px",
 				"right": "-2px",
@@ -290,6 +300,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"border-right-width": "3px",
 				"cursor": "nesw-resize"
 			},
+
 			":nth-child(4)": {
 				"top": "8px",
 				"right": "-2px",
@@ -297,6 +308,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"border-right-width": "3px",
 				"cursor": "ew-resize"
 			},
+
 			":nth-child(5)": {
 				"bottom": "-2px",
 				"right": "-2px",
@@ -306,6 +318,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"border-bottom-width": "3px",
 				"cursor": "nwse-resize"
 			},
+
 			":nth-child(6)": {
 				"bottom": "-2px",
 				"left": "8px",
@@ -313,6 +326,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"border-bottom-width": "3px",
 				"cursor": "ns-resize"
 			},
+
 			":nth-child(7)": {
 				"bottom": "-2px",
 				"left": "-2px",
@@ -322,6 +336,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"border-bottom-width": "3px",
 				"cursor": "nesw-resize"
 			},
+
 			":nth-child(8)": {
 				"top": "8px",
 				"left": "-2px",
@@ -330,6 +345,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"cursor": "ew-resize"
 			}
 		},
+
 		":nth-child(2)": {
 			"white-space": "nowrap",
 			"height": "calc(1em + 6px)",
@@ -338,30 +354,37 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 			"user-select": "none",
 			"display": "flex",
 			"align-items": "center",
+
 			">span": {
 				"margin-right": "calc(3em + 24px)"
 			},
+
 			">img": {
 				"height": "1em",
 				"pointer-events": "none"
 			},
+
 			">div": {
 				"position": "absolute",
 				"right": 0,
 				"top": 0,
+
 				">button": {
 					":nth-of-type(1)": {
 						"background-image": `url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="${svgNS}"%3E%3Cpath d="M1,1 L9,9 M9,1 L1,9" stroke="black" /%3E%3C/svg%3E')`
 					},
+
 					":nth-of-type(2)": {
 						"background-image": `url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="${svgNS}"%3E%3Cpath d="M9,3 h-8 v-1 h8 v-1 h-8 v8 h8 v-8" stroke="black" fill="none" /%3E%3C/svg%3E')`
 					},
+
 					":nth-of-type(3)": {
 						"display": "var(--taskmanager-on, block)",
 						"background-image": `url('data:image/svg+xml,%3Csvg viewBox="0 0 10 10" xmlns="${svgNS}"%3E%3Cline x1="1" y1="9" x2="9" y2="9" stroke="black" /%3E%3C/svg%3E')`
 					}
 				}
 			},
+
 			" button": {
 				"padding": 0,
 				"border-width": "2px",
@@ -374,12 +397,15 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 				"height": "calc(1em + 8px)"
 			}
 		},
+
 		":nth-child(3)": {
 			"user-select": "contain",
+
 			":not(.hasChild)+div:nth-child(5)": {
 				"pointer-events": "none"
 			}
 		},
+
 		":nth-child(4)": {
 			"display": "var(--overlay-on, block)",
 			"position": "absolute",
@@ -391,6 +417,7 @@ const resizeWindow = (w: WindowElement, direction: number, e: MouseEvent) => {
 			"pointer-events": "none"
 		}
 	},
+
 	"([minimised]),>div:nth-child(1),([hide-titlebar])>div:nth-child(2),([hide-close])>div:nth-child(2)>div>button:nth-of-type(1),([hide-maximise])>div:nth-child(2)>div>button:nth-of-type(2),([hide-minimise])>div:nth-child(2)>div>button:nth-of-type(3),([window-hide])>div:nth-child(2)>div>button:nth-of-type(3)": {
 		"display": "none"
 	}
