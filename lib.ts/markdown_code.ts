@@ -803,7 +803,7 @@ python = (() => {
 				return tk.return(TokenPunctuator, main);
 			}
 
-			tk.acceptRun(decimalDigit)
+			tk.acceptRun(decimalDigit);
 
 			return imaginary(tk);
 		      },
