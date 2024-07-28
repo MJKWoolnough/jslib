@@ -1766,6 +1766,7 @@ The misc module contains various simple, dependency-free exports.
 | [autoFocus](#misc_autofocus) | Function | This function queues a focus method call to the passed element. |
 | [Callable](#misc_callable) | Class | This class provides a convenient way to extend a Function with class attributes and methods. |
 | [checkInt](#misc_checkint) | Function | This function determines whether the value passed is an integer, within a given range, returning either the valid integer or a default value. |
+| [debounce](#misc_debounce) | Function | This function prevents a updates from happening too often by limiting how often they can run. |
 | [isInt](#misc_isint) | Function | This function determines whether the value passed is an integer, within a given range. |
 | [mod](#misc_mod) | Function | This function performs the modulo operation on the two given numbers. |
 | [pushAndReturn](#misc_pushandreturn) | Function | This function adds a value to an Array and returns the value. |
@@ -1807,6 +1808,19 @@ The child class will need appropriate typing to make it correctly appear as the 
 ```
 
 This function determines whether `n` is a valid integer, as determined by the [isInt](#misc_isint) function, and returns `n` if it is, or `def` (cast to an integer) otherwise.
+
+### <a name="misc_debounce">debounce</a>
+```typescript
+(timer = 0, first = false) => (fn: Function) => void;
+```
+
+This function prevents a updates from happening too often by limiting how often they can run.
+
+The first param is a timeout in milliseconds before another update can run.
+
+The second param is a flag to determine whether or not the first or last update function should be run.
+
+The function returns a function which takes the update function that will be debounced.
 
 ### <a name="misc_isint">isInt</a>
 ```typescript
