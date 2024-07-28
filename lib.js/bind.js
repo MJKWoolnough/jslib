@@ -116,6 +116,8 @@ export class Binding extends Callable {
 
 		this.#pipe.receive(bFn);
 
+		fn(this.#value);
+
 		return () => this.#pipe.remove(bFn);
 	}
 

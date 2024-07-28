@@ -132,6 +132,8 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 
 		this.#pipe.receive(bFn);
 
+		fn(this.#value);
+
 		return () => this.#pipe.remove(bFn);
 	}
 
