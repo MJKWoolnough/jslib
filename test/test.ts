@@ -1307,6 +1307,31 @@ type Tests = {
 
 				return new Promise(sFn => sFn(parent.childElementCount === 5 && parent.children[0].textContent === "Z" && parent.children[1].textContent === "a" && parent.children[1].getAttribute("data-test") === "TEST" && parent.children[4].textContent === "e"));
 			},
+			"set": async () => {
+				const {default: bind} = await import("./lib/bind.js"),
+				      b = bind(new Set(["a", "b", "c"])),
+				      parent = b.toDOM(document.createElement("div"), k => {
+					      if (k === "b") {
+						      return null;
+					      }
+
+					      const e = document.createElement("span");
+
+					      e.innerText = k;
+
+					      return e;
+				      });
+
+				if (parent.childElementCount !== 2 || parent.children[0].textContent !== "a" || parent.children[1].textContent !== "c") {
+					return false;
+				}
+
+				parent.children[0].setAttribute("data-test", "TEST");
+
+				b(new Set(["Z", "a", "b", "c", "d", "e"]));
+
+				return new Promise(sFn => sFn(parent.childElementCount === 5 && parent.children[0].textContent === "Z" && parent.children[1].textContent === "a" && parent.children[1].getAttribute("data-test") === "TEST" && parent.children[4].textContent === "e"));
+			},
 			"value": async () => {
 				const {default: bind} = await import("./lib/bind.js"),
 				      b = bind("A"),
