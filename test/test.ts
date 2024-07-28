@@ -1255,6 +1255,81 @@ type Tests = {
 			onclick.value = () => a += 3;
 			elm.click();
 			return a === 4;
+		},
+		"toDOM": {
+			"map": async () => {
+				const {default: bind} = await import("./lib/bind.js"),
+				      b = bind(new Map<string, number>([["a", 1], ["b", 2], ["c", 3]])),
+				      parent = b.toDOM(document.createElement("div"), (k: string, v: number) => {
+					      if (k === "b") {
+						      return null;
+					      }
+
+					      const e = document.createElement("span");
+
+					      e.innerText = `${k} - ${v}`;
+
+					      return e;
+				      });
+
+				if (parent.childElementCount !== 2 || parent.children[0].textContent !== "a - 1" || parent.children[1].textContent !== "c - 3") {
+					return false;
+				}
+
+				parent.children[0].setAttribute("data-test", "TEST");
+
+				b(new Map<string, number>([["Z", 0], ["a", 1], ["b", 2], ["c", 3], ["d", 4], ["e", 5]]));
+
+				return new Promise(sFn => sFn(parent.childElementCount === 5 && parent.children[0].textContent === "Z - 0" && parent.children[1].textContent === "a - 1" && parent.children[1].getAttribute("data-test") === "TEST" && parent.children[4].textContent === "e - 5"));
+			},
+			"array": async () => {
+				const {default: bind} = await import("./lib/bind.js"),
+				      b = bind(["a", "b", "c"]),
+				      parent = b.toDOM(document.createElement("div"), k => {
+					      if (k === "b") {
+						      return null;
+					      }
+
+					      const e = document.createElement("span");
+
+					      e.innerText = k;
+
+					      return e;
+				      });
+
+				if (parent.childElementCount !== 2 || parent.children[0].textContent !== "a" || parent.children[1].textContent !== "c") {
+					return false;
+				}
+
+				parent.children[0].setAttribute("data-test", "TEST");
+
+				b(["Z", "a", "b", "c", "d", "e"]);
+
+				return new Promise(sFn => sFn(parent.childElementCount === 5 && parent.children[0].textContent === "Z" && parent.children[1].textContent === "a" && parent.children[1].getAttribute("data-test") === "TEST" && parent.children[4].textContent === "e"));
+			},
+			"value": async () => {
+				const {default: bind} = await import("./lib/bind.js"),
+				      b = bind("A"),
+				      parent = b.toDOM(document.createElement("div"), v => {
+					if (v === "A") {
+						const e = document.createElement("span");
+
+						e.innerText = "Z";
+
+						return e;
+					}
+
+					return null;
+				      });
+
+				if (parent.childElementCount !== 1 || parent.firstChild?.textContent !== "Z" || !(parent.firstChild instanceof HTMLSpanElement)) {
+					return false;
+				}
+
+				b("B");
+
+				return new Promise(sFn => sFn(parent.childElementCount === 0));
+			}
 		}
 	},
 	"html.js": {
