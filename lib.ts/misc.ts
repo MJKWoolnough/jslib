@@ -130,6 +130,14 @@ text2DOM = (text: string) => {
 },
 /** A function to sort strings. */
 stringSort = new Intl.Collator().compare,
+/**
+ * This function prevents a updates from happening too often by limiting how often they can run.
+ *
+ * @param {number}  [timer=0]     Timeout in milliseconds before another update can run.
+ * @param {boolean} [first=false] Flag to determine whether or not the first or last update function should be run.
+ *
+ * @return {(fn: Function) => void} A function which takes the update function that will be debounced.
+ */
 debounce = (timer = 0, first = false) => {
 	let bouncing = -1;
 
