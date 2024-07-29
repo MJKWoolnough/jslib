@@ -38,12 +38,14 @@ export class DragTransfer {
 	#nextID = 0;
 	#format;
 	#last = "";
+
 	/**
 	 * @param {string} format The format string uniquely identifies the drag type, as per the {@link https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer | DataTransfer)s {@link https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setData | setData} method.
 	 */
 	constructor(format) {
 		this.#format = format;
 	}
+
 	/**
 	 * This method registers a {@link Transfer} object, or a function that returns `T`, to this handler and returns a unique key for this objects format. The key can be used with both the {@link DragTransfer.set | set} and {@link DragTransfer.deregister | deregister} methods.
 	 *
@@ -58,6 +60,7 @@ export class DragTransfer {
 
 		return key;
 	}
+
 	/**
 	 * The get method finds the key associated with this objects format and returns the object linked to it, if available. Returns undefined if the DragEvent has not got this objects format registered, or the key is invalid.
 	 *
@@ -74,6 +77,7 @@ export class DragTransfer {
 
 		return t instanceof Function ? t() : t?.transfer();
 	}
+
 	/**
 	 * This method is used during a {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragstart_event | dragstart} to mark the object being dragged. Requires the {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event | DragEvent} and the key returned from the {@link DragTransfer.register | register}method, and optionally takes a drag icon {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLDivElement | div} and `x` and `y` offsets from the cursor.
 	 *
@@ -92,6 +96,7 @@ export class DragTransfer {
 			e.dataTransfer?.setDragImage(icon, xOffset, yOffset);
 		}
 	}
+
 	/**
 	 * This method takes the key returned from the {@link DragTransfer.register | register} method and stops it from being used as a drag target. Required for an item to be garbage collected.
 	 *
@@ -104,6 +109,7 @@ export class DragTransfer {
 			this.#last = "";
 		}
 	}
+
 	/**
 	 * To be used in {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event | dragover} and {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event | drop} events, this method determines is the passed {@link https://developer.mozilla.org/en-US/docs/Web/API/DragEvent DragEvent}'s {@link https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types | DataTransfer.types} array contains this objects format string, marking this object as a {@link CheckedDT} type.
 	 *
@@ -121,6 +127,7 @@ export class DragTransfer {
  */
 export class DragFiles {
 	#mimes;
+
 	/**
 	 * Takes a spread of mime types that this object will match files against.
 	 *
@@ -129,8 +136,10 @@ export class DragFiles {
 	constructor(...mimes) {
 		this.#mimes = Object.freeze(mimes);
 	}
+
 	/** This array is the list of mime types passed to the constructor. */
 	get mimes() { return this.#mimes; }
+
 	/**
 	 * This method attaches all files on the {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event | DragEvent} to a returned {@link https://developer.mozilla.org/en-US/docs/Web/API/FormData | FormData} object under the name provided.
 	 *
@@ -154,6 +163,7 @@ export class DragFiles {
 
 		return f;
 	}
+
 	/**
 	 * This method checks all items attached to the {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event | DragEvent}, returning true is all items are files that match the mime types provided to the constructor, and false otherwise.
 	 *
