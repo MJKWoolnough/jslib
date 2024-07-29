@@ -22,8 +22,10 @@ const isPipeWithDefault = v => v instanceof Array && v.length === 2 && v[0] inst
  */
 export class Pipe {
 	#out = [];
+
 	/** The field contains the number of functions currently registered on the Pipe. */
 	get length() { return this.#out.length }
+
 	/**
 	 * This function sends the data passed to any functions registered on the Pipe.
 	 *
@@ -38,6 +40,7 @@ export class Pipe {
 			} finally {}
 		}
 	}
+
 	/**
 	 * The passed function will be registered on the Pipe and will receive any future values sent along it.
 	 *
@@ -48,6 +51,7 @@ export class Pipe {
 	receive(fn) {
 		this.#out.push(fn);
 	}
+
 	/**
 	 * The passed function will be unregistered from the Pipe and will no longer receive values sent along it.
 	 *
@@ -68,6 +72,7 @@ export class Pipe {
 
 		return false;
 	}
+
 	/**
 	 * This method returns an Array of functions bound to the send, receive, and remove methods of the Pipe Class. The bindmask determines which methods are bound.
 	 *
@@ -84,6 +89,7 @@ export class Pipe {
 	bind(bindmask = 7) {
 		return [bindmask&1 ? data => this.send(data) : undefined, bindmask&2 ? fn => this.receive(fn) : undefined, bindmask&4 ? fn => this.remove(fn) : undefined];
 	}
+
 	/**
 	 * This method calls the passed function with the values retrieved from the passed pipes and values.
 	 *
@@ -132,6 +138,7 @@ export class Pipe {
 /** The Requester Class is used to allow a server to set a function or value for multiple clients to query. */
 export class Requester {
 	#responder;
+
 	/**
 	 * The request method sends data to a set responder and receives a response. Will throw an error if no responder is set.
 	 *
@@ -150,6 +157,7 @@ export class Requester {
 
 		return r;
 	}
+
 	/*
 	 * The responder method sets either the function that will respond to any request, or the value that will be the response to any request.
 	 *
@@ -168,6 +176,7 @@ export class Subscription {
 	#error;
 	#cancel;
 	#cancelBind;
+
 	/**
 	 * The constructor of the Subscription class takes a function that receives success, error, and cancel functions.
 	 *
@@ -195,6 +204,7 @@ export class Subscription {
 		this.#success = successReceive;
 		this.#error = errorReceive;
 	}
+
 	/**
 	 * This  method act similarly to the then method of the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} class, except that it can be activated multiple times.
 	 *
@@ -226,10 +236,12 @@ export class Subscription {
 
 		return s;
 	}
+
 	/** This method sends a signal up the Subscription chain to the cancel function set during the construction of the original Subscription. */
 	cancel() {
 		this.#cancel?.();
 	}
+
 	/**
 	 * The catch method act similarly to the catch method of the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} class, except that it can be activated multiple times.
 	 *
@@ -240,6 +252,7 @@ export class Subscription {
 	catch(errorFn) {
 		return this.when(undefined, errorFn);
 	}
+
 	/**
 	 * The finally method act similarly to the finally method of the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} class, except that it can be activated multiple times.
 	 *
@@ -254,6 +267,7 @@ export class Subscription {
 			throw error;
 		});
 	}
+
 	/**
 	 * This method creates a break in the cancel signal chain, so that any cancel signal simply removes that Subscription from it's parent.
 	 *
@@ -285,6 +299,7 @@ export class Subscription {
 			});
 		});
 	}
+
 	/**
 	 * The merge static method combines any number of Subscription objects into a single subscription, so that all parent success and catch calls are combined, and any cancel signal will be sent to all parents.
 	 *
@@ -305,6 +320,7 @@ export class Subscription {
 			});
 		});
 	}
+
 	/**
 	 *
 	 * This method combines the passed in Subscriptions into a single Subscription that fires whenever any of the passed Subscriptions do. The data passed to the success function is an array of the latest value from each of the Subscriptions.
@@ -353,6 +369,7 @@ export class Subscription {
 
 		return s;
 	}
+
 	/**
 	 * This method returns an Array of functions bound to the when, error, and cancel methods of the Subscription Class. The bindmask determines which methods are bound.
 	 *
@@ -388,24 +405,28 @@ export class WaitGroup {
 	#errors = 0;
 	#update = new Pipe();
 	#complete = new Pipe();
+
 	/** This method adds to the number of registered tasks. */
 	add() {
 		this.#waits++;
 
 		this.#updateWG();
 	}
+
 	/** This method adds to the number of complete tasks. */
 	done() {
 		this.#done++;
 
 		this.#updateWG();
 	}
+
 	/** This method adds to the number of failed tasks. */
 	error() {
 		this.#errors++;
 
 		this.#updateWG();
 	}
+
 	/**
 	 * This method registers a function to run whenever a task is added, completed, or failed.
 	 *
@@ -418,6 +439,7 @@ export class WaitGroup {
 
 		return () => this.#update.remove(fn);
 	}
+
 	/**
 	 * This method registers a function to run when all registered tasks are complete, successfully or otherwise.
 	 *
@@ -430,6 +452,7 @@ export class WaitGroup {
 
 		return () => this.#complete.remove(fn);
 	}
+
 	#updateWG() {
 		const data = {
 			"waits": this.#waits,
@@ -448,6 +471,7 @@ export class WaitGroup {
 /** The Pickup Class is used to pass a single value to a single recipient. */
 export class Pickup {
 	#data;
+
 	/**
 	 * Used to set the value on the class.
 	 *
@@ -458,6 +482,7 @@ export class Pickup {
 	set(d) {
 		return this.#data = d;
 	}
+
 	/*
 	 * Used to retrieve the value if one has been set. It will return `undefined` if no value is currently set.
 	 *
