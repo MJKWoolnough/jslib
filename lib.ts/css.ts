@@ -146,13 +146,16 @@ export default class CSS extends CSSStyleSheet {
 const split = (selector: string) => {
 	const stack: string[] = [],
 	      parts: string[] = [];
+
 	let pos = 0;
+
 	for (let i = 0; i < selector.length; i++) {
 		const c = selector.charAt(i);
 
 		if (c === '"' || c === "'") {
 			for (i++; i < selector.length; i++) {
 				const d = selector.charAt(i);
+
 				if (d === "\\") {
 					i++;
 				} else if (d === c) {
