@@ -68,24 +68,20 @@ export class Binding extends Callable {
 	}
 
 	[attr](n, name) {
-		const fn = (n, v) => amendNode(n, {[name]: v});
-
-		fn(n, this.#value);
-
-		return this.#handleRef(n, fn, n => !!n.parentNode);
+		return this.#handleRef(n, (n, v) => amendNode(n, {[name]: v}), n => !!n.parentNode, true);
 	}
 
 	get [child]() {
-		return this.#handleRef(new Text(this.#value + ""), (n, v) => n.textContent = v + "", n => !!n.parentNode);
+		return this.#handleRef(new Text(), (n, v) => n.textContent = v + "", n => !!n.parentNode, true);
 	}
 
-	#handleRef(r, update, isActive) {
+	#handleRef(r, update, isActive, runNow = false) {
 		let ref = r;
 
 		this.#refs++;
 
 		const wref = new WeakRef(r),
-		      fn = v => {
+		      fn = (v: T) => {
 			const r = ref ?? wref.deref();
 
 			if (!r) {
@@ -101,6 +97,10 @@ export class Binding extends Callable {
 		      };
 
 		this.#pipe.receive(fn);
+
+		if (runNow) {
+			update(r, this.#value);
+		}
 
 		return r;
 	}
@@ -141,7 +141,7 @@ export class Binding extends Callable {
 	toDOM(n, fn) {
 		let cache = new Map();
 
-		const ufn = (_, v) => {
+		return this.#handleRef(n, (n, v) => {
 			const es = [],
 			      elems = new Map();
 
@@ -183,11 +183,7 @@ export class Binding extends Callable {
 
 			clearNode(n, es);
 			cache = elems;
-		      };
-
-		ufn(n, this.#value);
-
-		return this.#handleRef(n, ufn , n => !!n.parentNode);
+		}, n => !!n.parentNode, true);
 	}
 
 	toString() {

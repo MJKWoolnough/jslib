@@ -84,18 +84,14 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 	}
 
 	[attr](n: Node, name: string) {
-		const fn = (n: Node, v: T) => amendNode(n, {[name]: v});
-
-		fn(n, this.#value);
-
-		return this.#handleRef(n, fn, n => !!n.parentNode);
+		return this.#handleRef(n, (n: Node, v: T) => amendNode(n, {[name]: v}), n => !!n.parentNode, true);
 	}
 
 	get [child]() {
-		return this.#handleRef(new Text(this.#value + ""), (n, v) => n.textContent = v + "", n => !!n.parentNode);
+		return this.#handleRef(new Text(), (n, v) => n.textContent = v + "", n => !!n.parentNode, true);
 	}
 
-	#handleRef<U extends Node | ReadOnlyBinding<any>>(r: U, update: (ref: U, value: T) => void, isActive: (ref: U) => boolean) {
+	#handleRef<U extends Node | ReadOnlyBinding<any>>(r: U, update: (ref: U, value: T) => void, isActive: (ref: U) => boolean, runNow = false) {
 		let ref: U | null = r;
 
 		this.#refs++;
@@ -117,6 +113,10 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 		      };
 
 		this.#pipe.receive(fn);
+
+		if (runNow) {
+			update(r, this.#value);
+		}
 
 		return r;
 	}
@@ -161,7 +161,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 	toDOM<N extends ParentNode>(n: N, fn: (k: any, v?: any) => (Children | null)) {
 		let cache = new Map<any, Children>();
 
-		const ufn = (_: N, v: T) => {
+		return this.#handleRef(n, (n: N, v: T) => {
 			const es: Children[] = [],
 			      elems = new Map<any, Children>();
 
@@ -203,11 +203,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 
 			clearNode(n, es);
 			cache = elems;
-		      };
-
-		ufn(n, this.#value);
-
-		return this.#handleRef(n, ufn , n => !!n.parentNode);
+		}, n => !!n.parentNode, true);
 	}
 
 	toString() {
