@@ -157,13 +157,13 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 				node[arr && prop[2] ? "removeEventListener" : "addEventListener"](k.slice(2), arr ? prop[0] : prop, arr ? prop[1] : false);
 			} else if (isNode) {
 				if (typeof prop === "boolean") {
-					if (k === "checked" && node instanceof HTMLInputElement) {
+					if (k === "checked" && "checked" in node) {
 						node.checked = prop;
 					}
 
 					node.toggleAttribute(k, prop);
 				} else if (prop === toggle) {
-					if (k === "checked" && node instanceof HTMLInputElement) {
+					if (k === "checked" && "checked" in node) {
 						node.checked = !node.checked;
 					}
 
@@ -202,7 +202,7 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 				} else if (isAttr(prop)) {
 					prop[attr](node, k);
 				} else if (prop !== null) {
-					if (k === "value" && (node instanceof HTMLInputElement || node instanceof HTMLSelectElement || node instanceof HTMLTextAreaElement) && typeof prop === "string") {
+					if (k === "value" && "value" in node && typeof prop === "string") {
 						node.value = prop;
 					}
 
