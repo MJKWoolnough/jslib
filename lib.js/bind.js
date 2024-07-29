@@ -22,7 +22,7 @@ import {Callable} from './misc.js';
  *
  * @param {T} [v] The value to set the binding to.
  *
- * @returns {T}   The value the binding is set to.
+ * @returns {T} The value the binding is set to.
  */
 export class Binding extends Callable {
 	#pipe = new Pipe();
