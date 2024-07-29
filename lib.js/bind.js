@@ -1,6 +1,6 @@
 import {amendNode, attr, child, clearNode, isEventListenerObject} from './dom.js';
 import {Pipe} from './inter.js';
-import {Callable, setAndReturn} from './misc.js';
+import {Callable} from './misc.js';
 
 /**
  * This modules contains a Function for creating {@link https://developer.mozilla.org/en-US/docs/Web/API/Attr | Attr} and {@link https://developer.mozilla.org/en-US/docs/Web/API/Text | Text} nodes that update their textContent automatically.
@@ -139,44 +139,50 @@ export class Binding extends Callable {
 	 * @return {ParentNode} The passed node.
 	 */
 	toDOM(n, fn) {
-		const elems = new Map();
+		let cache = new Map();
 
 		this.onChange(v => {
-			const es = [];
+			const es = [],
+			      elems = new Map();
 
 			if (v instanceof Map) {
 				for (const [k, u] of v.entries()) {
-					const e = elems.get(k) ?? setAndReturn(elems, k, fn(k, u));
+					const e = cache.get(k) ?? fn(k, u);
 
 					if (e) {
+						elems.set(k, e);
 						es.push(e);
 					}
 				}
 			} else if (v instanceof Array) {
 				for (const u of v) {
-					const e = elems.get(u) ?? setAndReturn(elems, u, fn(u));
+					const e = cache.get(u) ?? fn(u);
 
 					if (e) {
+						elems.set(u, e);
 						es.push(e);
 					}
 				}
 			} else if (v instanceof Set) {
 				for (const u of v) {
-					const e = elems.get(u) ?? setAndReturn(elems, u, fn(u));
+					const e = cache.get(u) ?? fn(u);
 
 					if (e) {
+						elems.set(u, e);
 						es.push(e);
 					}
 				}
 			} else {
-				const e = fn(v);
+				const e = cache.get(v) ?? fn(v);
 
 				if (e) {
+					elems.set(v, e);
 					es.push(e);
 				}
 			}
 
 			clearNode(n, es);
+			cache = elems;
 		});
 
 		return n;
