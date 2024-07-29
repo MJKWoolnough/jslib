@@ -1,6 +1,7 @@
 import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {div, input, li, slot, ul} from './html.js';
+import {debounce} from './misc.js';
 
 /**
  * The multiselect module adds custom elements that implement a Select-like input element allowing multiple options to be selected and removed.
@@ -221,22 +222,25 @@ export class MultiSelect extends HTMLElement {
 	#optionToLI = new Map<MultiOption, HTMLLIElement>();
 	#liContents: [HTMLLIElement, String][] = [];
 	#filter = "";
+	#debounce = debounce();
 
 	constructor() {
 		super();
 
 		const filterInput = (value: string) => setTimeout(() => {
-			this.#filter = value;
+			this.#debounce(() => {
+				this.#filter = value;
 
-			const children: Element[] = [];
+				const children: Element[] = [];
 
-			for (const [child, contents] of this.#liContents) {
-				if (contents.includes(value)) {
-					children.push(child);
+				for (const [child, contents] of this.#liContents) {
+					if (contents.includes(value)) {
+						children.push(child);
+					}
 				}
-			}
 
-			clearNode(this.#options, children);
+				clearNode(this.#options, children);
+			});
 		      }),
 		      self = this;
 

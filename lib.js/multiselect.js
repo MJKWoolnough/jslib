@@ -221,24 +221,27 @@ export class MultiSelect extends HTMLElement {
 	#optionToLI = new Map();
 	#liContents = [];
 	#filter = "";
+	#debounce = debounce();
 
 	constructor() {
 		super();
 
 		const filterInput = value => setTimeout(() => {
-			this.#filter = value;
+			this.#debounce(() => {
+				this.#filter = value;
 
-			const children = [];
+				const children = [];
 
-			for (const [child, contents] of this.#liContents) {
-				if (contents.includes(value)) {
-					children.push(child);
+				for (const [child, contents] of this.#liContents) {
+					if (contents.includes(value)) {
+						children.push(child);
+					}
 				}
-			}
 
-			clearNode(this.#options, children);
-		     }),
-		     self = this;
+				clearNode(this.#options, children);
+			});
+		      }),
+		      self = this;
 
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual", "delegatesFocus": true}), [
 			this.#selectedDiv = div({"id": "selected"}),
