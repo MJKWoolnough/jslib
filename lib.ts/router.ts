@@ -49,7 +49,6 @@ const update = Symbol("update"),
 let lastState = Date.now();
 
 history.replaceState(lastState, "");
-
 window.addEventListener("click", (e: Event) => {
 	let target = e.target as Element | null;
 
@@ -80,18 +79,22 @@ class Router extends HTMLElement {
 	#history = new Map<number, ChildNode>();
 	#matchers: MatchNode[] = [];
 	#swapper?: Swapper;
+
 	constructor() {
 		super();
 		mo.observe(this, {"childList": true});
 	}
+
 	get count() {
 		return this.#matchers.length;
 	}
+
 	#clear() {
 		this.#connected = false;
 
 		this.#marker.replaceWith(this.#marker = new Text());
 	}
+
 	#match(match: Match, nodeFn: NodeFn, url: LocationURL = window.location, defaultAttrs?: Record<string, ToString>) {
 		const attrs: Record<string, ToString> = {},
 		      params = url.searchParams ?? new URLSearchParams(url.search),
@@ -127,9 +130,11 @@ class Router extends HTMLElement {
 
 		return false;
 	}
+
 	#setNode(n: ChildNode) {
 		(this.#swapper ?? swappers.get(this.getAttribute("router-transition") ?? "") ?? defaultSwapper)(this.#marker, this.#marker = n);
 	}
+
 	#setRoute(path?: LocationURL, attrs?: Record<string, ToString>) {
 		for (const c of this.#matchers) {
 			if (this.#match(c[0], c[1], path, attrs)) {
@@ -139,6 +144,7 @@ class Router extends HTMLElement {
 
 		return false;
 	}
+
 	/**
 	 * This method adds routes to a Router, specifying both a path to be matched and the function that is used to generate the HTML for that route. Note that the nodeFn can be a {@link dom:DOMBind | DOMBind} function.
 	 *
@@ -200,6 +206,7 @@ class Router extends HTMLElement {
 
 		return this;
 	}
+
 	/**
 	 * The method is used to set the routers transition method. By default the router simply swaps the nodes, but this method allows for other effects and animations.
 	 *
@@ -212,6 +219,7 @@ class Router extends HTMLElement {
 
 		return this;
 	}
+
 	[newState](path: LocationURL, state: number, attrs?: Record<string, ToString>) {
 		if (this.#marker.isConnected) {
 			const h = this.#history.get(state ?? 0);
@@ -229,6 +237,7 @@ class Router extends HTMLElement {
 
 		return false;
 	}
+
 	[update]() {
 		if (this.#marker.isConnected) {
 			for (const c of this.children) {
@@ -254,6 +263,7 @@ class Router extends HTMLElement {
 			this.replaceChildren();
 		}
 	}
+
 	connectedCallback() {
 		for (let n = this.parentNode; n && n !== document; n = n instanceof ShadowRoot ? n.host : n.parentNode) {
 			if (!n.parentNode || n instanceof Router) {
@@ -267,6 +277,7 @@ class Router extends HTMLElement {
 		this.#setRoute(window.location);
 		this[update]();
 	}
+
 	/** Used to remove the Router from the DOM and disable its routing. It can be added to the DOM later to reactivate it. */
 	remove() {
 		this.#marker.remove();
@@ -280,6 +291,7 @@ customElements.define("x-route", class extends HTMLElement {
 	#class?: string;
 	#id?: string;
 	#title?: string;
+
 	connectedCallback() {
 		const c = this.#class ??= this.getAttribute("route-class") ?? "",
 		      i = this.#id ??= this.getAttribute("route-id") ?? "",
@@ -297,6 +309,7 @@ customElements.define("x-route", class extends HTMLElement {
 			document.title = t;
 		}
 	}
+
 	disconnectedCallback() {
 		const c = this.#class;
 		if (c) {
