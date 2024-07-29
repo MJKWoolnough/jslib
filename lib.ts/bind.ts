@@ -161,7 +161,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 	toDOM<N extends ParentNode>(n: N, fn: (k: any, v?: any) => (Children | null)) {
 		let cache = new Map<any, Children>();
 
-		this.onChange(v => {
+		const ufn = (_: N, v: T) => {
 			const es: Children[] = [],
 			      elems = new Map<any, Children>();
 
@@ -203,9 +203,11 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 
 			clearNode(n, es);
 			cache = elems;
-		});
+		      };
 
-		return n;
+		ufn(n, this.#value);
+
+		return this.#handleRef(n, ufn , n => !!n.parentNode);
 	}
 
 	toString() {

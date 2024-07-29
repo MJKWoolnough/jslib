@@ -141,7 +141,7 @@ export class Binding extends Callable {
 	toDOM(n, fn) {
 		let cache = new Map();
 
-		this.onChange(v => {
+		const ufn = (_, v) => {
 			const es = [],
 			      elems = new Map();
 
@@ -183,9 +183,11 @@ export class Binding extends Callable {
 
 			clearNode(n, es);
 			cache = elems;
-		});
+		      };
 
-		return n;
+		ufn(n, this.#value);
+
+		return this.#handleRef(n, ufn , n => !!n.parentNode);
 	}
 
 	toString() {
