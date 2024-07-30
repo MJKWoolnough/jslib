@@ -58,8 +58,10 @@ const blur = Symbol("blur"),
 export class MenuElement extends HTMLElement {
 	#s;
 	#c;
+
 	constructor() {
 		super();
+
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), this.#s = slot()).adoptedStyleSheets = menuStyle;
 		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this[blur](), "onkeydown": e => {
 			const da = document.activeElement;
@@ -121,6 +123,7 @@ export class MenuElement extends HTMLElement {
 
 		new MutationObserver(() => this.#s.assign(...Array.from(this.children).filter(e => e instanceof ItemElement || e instanceof SubMenuElement))).observe(this, {"childList": true});
 	}
+
 	[blur]() {
 		setTimeout(() => {
 			if (!this.contains(document.activeElement)) {
@@ -132,6 +135,7 @@ export class MenuElement extends HTMLElement {
 			}
 		});
 	}
+
 	connectedCallback() {
 		if (!(this.parentNode instanceof SubMenuElement)) {
 			amendNode(window, {"onmousedown": event(this.#c = e => {
@@ -153,6 +157,7 @@ export class MenuElement extends HTMLElement {
 			});
 		}
 	}
+
 	disconnectedCallback() {
 		if (this.#c) {
 			amendNode(window, {"onmousedown": event(this.#c, eventCapture | eventRemove)});
@@ -180,17 +185,20 @@ export class MenuElement extends HTMLElement {
 export class ItemElement extends HTMLElement {
 	constructor() {
 		super();
+
 		setTimeout(amendNode, 0, this, {"tabindex": -1, "onblur": () => this.parentNode?.[blur]?.(), "onclick": () => this.select(), "onmouseover": () => {
 			if (document.activeElement !== this) {
 				this.focus();
 			}
 		}});
 	}
+
 	focus() {
 		if (!this.hasAttribute("disabled") && (!(this.parentNode instanceof SubMenuElement) || !this.parentNode.hasAttribute("disabled"))) {
 			super.focus();
 		}
 	}
+
 	select() {
 		if (!this.hasAttribute("disabled")) {
 			if (this.parentNode instanceof SubMenuElement) {
@@ -217,12 +225,15 @@ export class SubMenuElement extends HTMLElement {
 	#m = null;
 	#i = null;
 	#f = false;
+
 	constructor() {
 		super();
+
 		amendNode(this.attachShadow({"mode": "closed", "slotAssignment": "manual"}), [
 			this.#s = slot(),
 			this.#p = slot()
 		]).adoptedStyleSheets = submenuStyle;
+
 		new MutationObserver(() => {
 			this.#i = null;
 			this.#m = null;
@@ -250,6 +261,7 @@ export class SubMenuElement extends HTMLElement {
 			}
 		}).observe(this, {"childList": true});
 	}
+
 	select() {
 		if (!this.hasAttribute("disabled")) {
 			const m = this.#m;
@@ -275,15 +287,19 @@ export class SubMenuElement extends HTMLElement {
 			}
 		}
 	}
+
 	[itemElement]() {
 		return this.#i;
 	}
+
 	[menuElement]() {
 		return this.#m;
 	}
+
 	focus() {
 		this.#i?.focus();
 	}
+
 	[blur]() {
 		if (this.#f) {
 			this.#f = false;
@@ -293,6 +309,7 @@ export class SubMenuElement extends HTMLElement {
 			this.parentNode?.[blur]?.();
 		}
 	}
+
 	[disconnect]() {
 		for (const c of this.#m?.children ?? []) {
 			if (c instanceof SubMenuElement) {
