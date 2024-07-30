@@ -197,6 +197,7 @@ const getChildNode = n => n instanceof Node ? n : n[node],
 export class NodeArray {
 	#root;
 	[realTarget];
+
 	/**
 	 * The NodeArray constructor takes a parent element, onto which all {@link Item} elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
 	 *
@@ -222,26 +223,33 @@ export class NodeArray {
 
 		return new Proxy(this, proxyObj);
 	}
+
 	get [node]() {
 		return this[realTarget].#root.h;
 	}
+
 	get length() {
 		return this[realTarget].#root.l;
 	}
+
 	at(index) {
 		const [node, pos] = getNode(this[realTarget].#root, index);
 
 		return pos !== -1 ? node.i : undefined;
 	}
+
 	concat(...items) {
 		return Array.from(this.values()).concat(...items);
 	}
+
 	copyWithin(_target, _start, _end) {
 		throw new Error("invalid");
 	}
+
 	*entries() {
 		yield *entries(this[realTarget].#root);
 	}
+
 	every(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (!callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -251,9 +259,11 @@ export class NodeArray {
 
 		return true;
 	}
+
 	fill(_value, _start, _end) {
 		throw new Error("invalid");
 	}
+
 	filter(callback, thisArg = this) {
 		const filter = [];
 
@@ -265,6 +275,7 @@ export class NodeArray {
 
 		return filter;
 	}
+
 	filterRemove(callback, thisArg = this) {
 		const root = this[realTarget].#root,
 		      filtered = [];
@@ -278,6 +289,7 @@ export class NodeArray {
 
 		return filtered;
 	}
+
 	find(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -287,6 +299,7 @@ export class NodeArray {
 
 		return undefined;
 	}
+
 	findIndex(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -296,6 +309,7 @@ export class NodeArray {
 
 		return -1;
 	}
+
 	findLast(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -305,6 +319,7 @@ export class NodeArray {
 
 		return undefined;
 	}
+
 	findLastIndex(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -314,17 +329,21 @@ export class NodeArray {
 
 		return -1;
 	}
+
 	flat(depth) {
 		return Array.from(this.values()).flat(depth);
 	}
+
 	flatMap(callback, thisArg = this) {
 		return this.map(callback, thisArg).flat();
 	}
+
 	forEach(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			callback.call(thisArg ?? globalThis, item, index, this);
 		}
 	}
+
 	/**
 	 * This function will create a NodeArray from the given parent {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}, iterating over every child and running the itemFn to generate an {@link Item} to be append to the NodeArray.
 	 *
@@ -348,6 +367,7 @@ export class NodeArray {
 
 		return s;
 	}
+
 	includes(valueToFind, fromIndex = 0) {
 		for (const [, item] of entries(this[realTarget].#root, fromIndex)) {
 			if (valueToFind === item) {
@@ -357,6 +377,7 @@ export class NodeArray {
 
 		return false;
 	}
+
 	indexOf(searchElement, fromIndex = 0) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex)) {
 			if (searchElement === item) {
@@ -366,14 +387,17 @@ export class NodeArray {
 
 		return -1;
 	}
+
 	join(separator) {
 		return Array.from(this.values()).join(separator);
 	}
+
 	*keys() {
 		for (let i = 0; i < this[realTarget].#root.l; i++) {
 			yield i;
 		}
 	}
+
 	lastIndexOf(searchElement, fromIndex = -1) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex, -1)) {
 			if (searchElement === item) {
@@ -383,6 +407,7 @@ export class NodeArray {
 
 		return -1;
 	}
+
 	map(callback, thisArg = this) {
 		const map = [];
 
@@ -392,6 +417,7 @@ export class NodeArray {
 
 		return map;
 	}
+
 	pop() {
 		const root = this[realTarget].#root,
 		      last = root.p;
@@ -402,6 +428,7 @@ export class NodeArray {
 
 		return last.i;
 	}
+
 	push(element, ...elements) {
 		const root = this[realTarget].#root;
 
@@ -413,6 +440,7 @@ export class NodeArray {
 
 		return root.l;
 	}
+
 	reduce(callbackfn, initialValue) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (initialValue === undefined) {
@@ -424,6 +452,7 @@ export class NodeArray {
 
 		return initialValue;
 	}
+
 	reduceRight(callbackfn, initialValue) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (initialValue === undefined) {
@@ -435,6 +464,7 @@ export class NodeArray {
 
 		return initialValue;
 	}
+
 	/**
 	 * The reverse method reverse the position of each {@link Item} and reverses the sorting algorithm.
 	 *
@@ -445,6 +475,7 @@ export class NodeArray {
 
 		return this;
 	}
+
 	shift() {
 		const root = this[realTarget].#root,
 		      first = root.n;
@@ -455,6 +486,7 @@ export class NodeArray {
 
 		return first.i;
 	}
+
 	slice(begin = 0, end) {
 		const root = this[realTarget].#root,
 		      slice = [];
@@ -479,6 +511,7 @@ export class NodeArray {
 
 		return slice;
 	}
+
 	some(callback, thisArg = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -488,6 +521,7 @@ export class NodeArray {
 
 		return false;
 	}
+
 	/**
 	 * The sort method works much like the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort | Array.sort} method, but new items will be inserted according to the sorting function provided.
 	 *
@@ -500,6 +534,7 @@ export class NodeArray {
 
 		return this;
 	}
+
 	splice(start, deleteCount = 0, ...items) {
 		const root = this[realTarget].#root,
 		      removed = [];
@@ -518,6 +553,7 @@ export class NodeArray {
 
 		return removed;
 	}
+
 	toReversed() {
 		const toRet = [];
 
@@ -527,9 +563,11 @@ export class NodeArray {
 
 		return toRet;
 	}
+
 	toSorted(compareFunction) {
 		return Array.from(this.values()).sort(compareFunction);
 	}
+
 	toSpliced(start, deleteCount = 0, ...items) {
 		const root = this[realTarget].#root,
 		      toRet = [];
@@ -558,6 +596,7 @@ export class NodeArray {
 
 		return toRet;
 	}
+
 	unshift(element, ...elements) {
 		const root = this[realTarget].#root;
 
@@ -569,11 +608,13 @@ export class NodeArray {
 
 		return root.l;
 	}
+
 	*values() {
 		for (let curr = this[realTarget].#root.n; curr.i; curr = curr.n) {
 			yield curr.i;
 		}
 	}
+
 	with(target, value) {
 		const root = this[realTarget].#root,
 		      toRet = [];
@@ -592,9 +633,11 @@ export class NodeArray {
 
 		return toRet;
 	}
+
 	*[Symbol.iterator]() {
 		yield* this.values();
 	}
+
 	get [Symbol.unscopables]() {
 		return {
 			__proto__: null,
@@ -640,6 +683,7 @@ export class NodeArray {
  */
 export class NodeMap {
 	#root;
+
 	/**
 	 * The NodeMap constructor takes a parent element, onto which all {@link Item} elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
 	 *
@@ -659,12 +703,15 @@ export class NodeMap {
 			replaceKey(root, k, item, root.p);
 		}
 	}
+
 	get [node]() {
 		return this.#root.h;
 	}
+
 	get size() {
 		return this.#root.l;
 	}
+
 	clear() {
 		const root = this.#root;
 
@@ -674,6 +721,7 @@ export class NodeMap {
 
 		root.m.clear();
 	}
+
 	delete(k) {
 		const root = this.#root,
 		      curr = root.m.get(k);
@@ -686,20 +734,25 @@ export class NodeMap {
 
 		return root.m.delete(k);
 	}
+
 	*entries() {
 		for (const [k, v] of this.#root.m) {
 			yield [k, v.i];
 		}
 	}
+
 	forEach(callbackfn, thisArg = this) {
 		this.#root.m.forEach((v, k) => callbackfn.call(thisArg ?? globalThis, v.i, k, this));
 	}
+
 	get(k) {
 		return this.#root.m.get(k)?.i;
 	}
+
 	has(k) {
 		return this.#root.m.has(k);
 	}
+
 	/**
 	 * The insertAfter method will insert a new {@link Item} after the {@link Item} denoted by the `after` key.
 	 *
@@ -721,6 +774,7 @@ export class NodeMap {
 
 		return true;
 	}
+
 	/**
 	 * The insertBefore method will insert a new {@link Item} before the {@link Item} denoted by the `before` key.
 	 *
@@ -742,6 +796,7 @@ export class NodeMap {
 
 		return true;
 	}
+
 	/**
 	 * The keyAt method returns the position of the key in within the sorted {@link Item}. It returns undefined if there is nothing at the specified position.
 	 *
@@ -762,9 +817,11 @@ export class NodeMap {
 
 		return undefined;
 	}
+
 	keys() {
 		return this.#root.m.keys();
 	}
+
 	/**
 	 * The position method returns the current sorted position of the {@link Item} described by the key.
 	 *
@@ -785,6 +842,7 @@ export class NodeMap {
 
 		return count;
 	}
+
 	/**
 	 * The reset method changes the key assigned to an {@link Item} without performing any sorting.
 	 *
@@ -803,6 +861,7 @@ export class NodeMap {
 			root.m.set(j, i);
 		}
 	}
+
 	/**
 	 * The reverse method reverse the position of each {@link Item} and reverses the sorting algorithm.
 	 *
@@ -813,6 +872,7 @@ export class NodeMap {
 
 		return this;
 	}
+
 	set(k, item) {
 		const root = this.#root;
 
@@ -820,6 +880,7 @@ export class NodeMap {
 
 		return this;
 	}
+
 	/**
 	 * The sort method sorts the {@link Item}s, and new items will be inserted according to the sorting function provided.
 	 *
@@ -832,17 +893,21 @@ export class NodeMap {
 
 		return this;
 	}
+
 	*values() {
 		for (const v of this.#root.m.values()) {
 			yield v.i;
 		}
 	}
+
 	*[Symbol.iterator]() {
 		yield* this.entries();
 	}
+
 	get [Symbol.species]() {
 		return NodeMap;
 	}
+
 	get [Symbol.toStringTag]() {
 		return "[object NodeMap]";
 	}

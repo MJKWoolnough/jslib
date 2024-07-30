@@ -236,6 +236,7 @@ const getChildNode = <T extends Item>(n: T) => (n instanceof Node ? n : n[node])
 export class NodeArray<T extends Item, H extends Node = Node> implements Array<T> {
 	#root: Root<T, H>;
 	[realTarget]!: this;
+
 	/**
 	 * The NodeArray constructor takes a parent element, onto which all {@link Item} elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
 	 *
@@ -263,27 +264,34 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return new Proxy<NodeArray<T, H>>(this, proxyObj);
 	}
+
 	get [node]() {
 		return this[realTarget].#root.h;
 	}
+
 	get length() {
 		return this[realTarget].#root.l;
 	}
+
 	at(index: number) {
 		const [node, pos] = getNode(this[realTarget].#root, index);
 
 		return pos !== -1 ? node.i : undefined;
 	}
+
 	concat(...items: ConcatArray<T>[]): T[];
 	concat(...items: (T | ConcatArray<T>)[]): T[] {
 		return Array.from(this.values()).concat(...items);
 	}
+
 	copyWithin(_target: number, _start?: number, _end?: number): this {
 		throw new Error("invalid");
 	}
+
 	*entries(): IterableIterator<[number, T]> {
 		yield *entries(this[realTarget].#root);
 	}
+
 	every(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (!callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -293,9 +301,11 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return true;
 	}
+
 	fill(_value: T, _start?: number, _end?: number): this {
 		throw new Error("invalid");
 	}
+
 	filter(callback: Callback<T, any, this>, thisArg: any = this) {
 		const filter: T[] = [];
 
@@ -307,6 +317,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return filter;
 	}
+
 	filterRemove(callback: Callback<T, any, this>, thisArg: any = this) {
 		const root = this[realTarget].#root,
 		      filtered: T[] = [];
@@ -320,6 +331,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return filtered;
 	}
+
 	find(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -329,6 +341,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return undefined;
 	}
+
 	findIndex(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -338,6 +351,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return -1;
 	}
+
 	findLast<S extends T>(predicate: (value: T, index: number, array: T[]) => value is S, thisArg?: any): S | undefined;
 	findLast(callback: Callback<T, any, this>, thisArg?: any): T | undefined;
 	findLast<S extends T>(callback: Callback<T, any, this> | ((value: T, index: number, array: T[]) => value is S), thisArg: any = this) {
@@ -349,6 +363,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return undefined;
 	}
+
 	findLastIndex(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -358,17 +373,21 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return -1;
 	}
+
 	flat<D extends number = 1>(depth?: D) {
 		return Array.from(this.values()).flat(depth) as FlatArray<any[], D>;
 	}
+
 	flatMap<U extends []>(callback: Callback<T, U, this>, thisArg: any = this) {
 		return this.map(callback, thisArg).flat();
 	}
+
 	forEach(callback: Callback<T, void, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			callback.call(thisArg ?? globalThis, item, index, this);
 		}
 	}
+
 	static from<_, H extends Node = Node>(n: H): NodeArray<Item, H>;
 	static from<T extends Item, H extends Node = Node>(n: H, itemFn: (node: Node) => T | undefined): NodeArray<T, H>;
 	/**
@@ -394,6 +413,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return s;
 	}
+
 	includes(valueToFind: T, fromIndex = 0) {
 		for (const [, item] of entries(this[realTarget].#root, fromIndex)) {
 			if (valueToFind === item) {
@@ -403,6 +423,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return false;
 	}
+
 	indexOf(searchElement: T, fromIndex = 0) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex)) {
 			if (searchElement === item) {
@@ -412,14 +433,17 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return -1;
 	}
+
 	join(separator?: string) {
 		return Array.from(this.values()).join(separator);
 	}
+
 	*keys() {
 		for (let i = 0; i < this[realTarget].#root.l; i++) {
 			yield i;
 		}
 	}
+
 	lastIndexOf(searchElement: T, fromIndex = -1) {
 		for (const [index, item] of entries(this[realTarget].#root, fromIndex, -1)) {
 			if (searchElement === item) {
@@ -429,6 +453,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return -1;
 	}
+
 	map<U>(callback: Callback<T, U, this>, thisArg: any = this) {
 		const map: U[] = [];
 
@@ -438,6 +463,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return map;
 	}
+
 	pop() {
 		const root = this[realTarget].#root,
 		      last = root.p;
@@ -448,6 +474,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return last.i;
 	}
+
 	push(element: T, ...elements: T[]) {
 		const root = this[realTarget].#root;
 
@@ -459,6 +486,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return root.l;
 	}
+
 	reduce<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
 	reduce(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T): T;
 	reduce(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
@@ -472,6 +500,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return initialValue;
 	}
+
 	reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
 	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T): T;
 	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
@@ -485,6 +514,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return initialValue;
 	}
+
 	/**
 	 * The reverse method reverse the position of each {@link Item} and reverses the sorting algorithm.
 	 *
@@ -495,6 +525,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return this;
 	}
+
 	shift() {
 		const root = this[realTarget].#root,
 		      first = root.n;
@@ -505,6 +536,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return first.i;
 	}
+
 	slice(begin = 0, end?: number) {
 		const root = this[realTarget].#root,
 		      slice: T[] = [];
@@ -529,6 +561,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return slice;
 	}
+
 	some(callback: Callback<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
@@ -538,6 +571,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return false;
 	}
+
 	/**
 	 * The sort method works much like the {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort | Array.sort} method, but new items will be inserted according to the sorting function provided.
 	 *
@@ -550,6 +584,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return this;
 	}
+
 	splice(start: number, deleteCount = 0, ...items: T[]) {
 		const root = this[realTarget].#root,
 		      removed: T[] = [];
@@ -568,6 +603,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return removed;
 	}
+
 	toReversed() {
 		const toRet: T[] = [];
 
@@ -577,9 +613,11 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return toRet;
 	}
+
 	toSorted(compareFunction?: sortFunc<T>) {
 		return Array.from(this.values()).sort(compareFunction);
 	}
+
 	toSpliced(start: number, deleteCount = 0, ...items: T[]) {
 		const root = this[realTarget].#root,
 		      toRet: T[] = [];
@@ -608,6 +646,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return toRet;
 	}
+
 	unshift(element: T, ...elements: T[]) {
 		const root = this[realTarget].#root;
 
@@ -619,11 +658,13 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return root.l;
 	}
+
 	*values(): IterableIterator<T> {
 		for (let curr = this[realTarget].#root.n; curr.i; curr = curr.n) {
 			yield curr.i;
 		}
 	}
+
 	with(target: number, value: T) {
 		const root = this[realTarget].#root,
 		      toRet: T[] = [];
@@ -642,9 +683,11 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 
 		return toRet;
 	}
+
 	*[Symbol.iterator]() {
 		yield* this.values();
 	}
+
 	get [Symbol.unscopables]() {
 		return {
 			__proto__: null,
@@ -665,6 +708,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 			"values": true
 		};
 	}
+
 	[n: number]: T;
 }
 
@@ -691,6 +735,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
  */
 export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K, T> {
 	#root: MapRoot<K, T, H>;
+
 	/**
 	 * The NodeMap constructor takes a parent element, onto which all {@link Item} elements will be attached, an optional starting sort function, and an optional set of starting elements of type `T`.
 	 *
@@ -712,12 +757,15 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 			replaceKey(root, k, item, root.p);
 		}
 	}
+
 	get [node]() {
 		return this.#root.h;
 	}
+
 	get size() {
 		return this.#root.l;
 	}
+
 	clear() {
 		const root = this.#root;
 
@@ -727,6 +775,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 
 		root.m.clear();
 	}
+
 	delete(k: K) {
 		const root = this.#root,
 		      curr = root.m.get(k);
@@ -739,6 +788,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 
 		return root.m.delete(k);
 	}
+
 	*entries(): IterableIterator<[K, T]> {
 		for (const [k, v] of this.#root.m) {
 			yield [k, v.i];
@@ -747,12 +797,15 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 	forEach(callbackfn: (value: T, key: K, map: NodeMap<K, T>) => void, thisArg: any = this) {
 		this.#root.m.forEach((v, k) => callbackfn.call(thisArg ?? globalThis, v.i, k, this));
 	}
+
 	get(k: K) {
 		return this.#root.m.get(k)?.i;
 	}
+
 	has(k: K) {
 		return this.#root.m.has(k);
 	}
+
 	/**
 	 * The insertAfter method will insert a new {@link Item} after the {@link Item} denoted by the `after` key.
 	 *
@@ -774,6 +827,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 
 		return true;
 	}
+
 	/**
 	 * The insertBefore method will insert a new {@link Item} before the {@link Item} denoted by the `before` key.
 	 *
@@ -795,6 +849,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 
 		return true;
 	}
+
 	/**
 	 * The keyAt method returns the position of the key in within the sorted {@link Item}. It returns undefined if there is nothing at the specified position.
 	 *
@@ -815,9 +870,11 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 
 		return undefined;
 	}
+
 	keys(): IterableIterator<K> {
 		return this.#root.m.keys();
 	}
+
 	/**
 	 * The position method returns the current sorted position of the {@link Item} described by the key.
 	 *
@@ -838,6 +895,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 
 		return count;
 	}
+
 	/**
 	 * The reset method changes the key assigned to an {@link Item} without performing any sorting.
 	 *
@@ -856,6 +914,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 			root.m.set(j, i);
 		}
 	}
+
 	/**
 	 * The reverse method reverse the position of each {@link Item} and reverses the sorting algorithm.
 	 *
@@ -866,6 +925,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 
 		return this;
 	}
+
 	set(k: K, item: T) {
 		const root = this.#root;
 
@@ -873,6 +933,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 
 		return this;
 	}
+
 	/**
 	 * The sort method sorts the {@link Item}s, and new items will be inserted according to the sorting function provided.
 	 *
@@ -885,17 +946,21 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 
 		return this;
 	}
+
 	*values(): IterableIterator<T> {
 		for (const v of this.#root.m.values()) {
 			yield v.i;
 		}
 	}
+
 	*[Symbol.iterator](): IterableIterator<[K, T]> {
 		yield* this.entries();
 	}
+
 	get [Symbol.species]() {
 		return NodeMap;
 	}
+
 	get [Symbol.toStringTag]() {
 		return "[object NodeMap]";
 	}
