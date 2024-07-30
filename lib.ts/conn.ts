@@ -13,32 +13,42 @@ import {Subscription} from './inter.js';
 export type Properties = {
 	/** Can change the request method. */
 	method?: string;
+
 	/** Allows the setting of a Basic Authorization username. */
 	user?: string;
+
 	/** Allows the settings of a Basic Authorization password. */
 	password?: string;
+
 	/** An object to allow the setting or arbitrary headers. */
 	headers?: object;
+
 	/** Sets the Content-Type of the request. */
 	type?: string;
+
 	/**
 	 * This determines the expected return type of the promise. One of `text`, `xml`, `json`, `blob`, `arraybuffer`, `document`, or `xh`. The default is `text` and `xh` simply returns the {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest | XMLHttpRequest} object as a response. Response type `json` will parse the retrieved text as JSON and return the parsed object.
 	 */
 	response?: "" | "text" | "xml" | "json" | "blob" | "arraybuffer" | "document" | "xh";
+
 	/**
 	 * This function is used to check whether parsed JSON matches the expected data structure.
 	 *
 	 * It is recommended to use a checker function when receiving data, and the {@link module:typeguard | TypeGuard} module can aid with that.
 	 * */
 	checker?: (data: unknown) => boolean;
+
 	/** This sets an event handler to monitor any upload progress. */
 	onuploadprogress?: (event: ProgressEvent) => void;
+
 	/** This sets an event handler to monitor any download process. */
 	ondownloadprogress?: (event: ProgressEvent) => void;
+
 	/**
 	 * This is an {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send#body | XMLHttpRequestBodyInit} and is send as the body of the request.
 	 */
 	data?: XMLHttpRequestBodyInit;
+
 	/**
 	 * An {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal | AbortSignal} to be used to cancel any request.
 	 */
