@@ -176,7 +176,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 				}
 			} else if (v instanceof Array) {
 				for (const u of v) {
-					const e = cache.get(u) ?? fn(u);
+					const e = !elems.has(u) && cache.get(u) || fn(u);
 
 					if (e) {
 						elems.set(u, e);

@@ -81,7 +81,7 @@ export class Binding extends Callable {
 		this.#refs++;
 
 		const wref = new WeakRef(r),
-		      fn = (v: T) => {
+		      fn = v => {
 			const r = ref ?? wref.deref();
 
 			if (!r) {
@@ -156,7 +156,7 @@ export class Binding extends Callable {
 				}
 			} else if (v instanceof Array) {
 				for (const u of v) {
-					const e = cache.get(u) ?? fn(u);
+					const e = !elems.has(u) && cache.get(u) || fn(u);
 
 					if (e) {
 						elems.set(u, e);
