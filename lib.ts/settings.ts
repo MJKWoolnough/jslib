@@ -17,17 +17,22 @@ abstract class Setting<T> {
 	#name: string;
 	#value: T;
 	#fns: ((value: T) => void)[] = [];
+
 	constructor(name: string, value: T) {
 		this.#name = name;
 		this.#value = value;
 	}
+
 	/** The name of the setting. */
 	get name() { return this.#name; }
+
 	/** The value of the setting, type defined by the child class. */
 	get value() { return this.#value; }
+
 	[s](v: T): string | null {
 		return v + "";
 	}
+
 	/**
 	 * Sets a new value to a Setting.
 	 *
@@ -53,6 +58,7 @@ abstract class Setting<T> {
 
 		return this;
 	}
+
 	/**
 	 * Removes the setting from localStorage.
 	 *
@@ -63,6 +69,7 @@ abstract class Setting<T> {
 
 		return this;
 	}
+
 	/**
 	 * The wait method takes a function to be called on every setting value change. It will be immediately called with the current value.
 	 *
@@ -92,6 +99,7 @@ export class BoolSetting extends Setting<boolean> {
 	constructor(name: string) {
 		super(name, window.localStorage.getItem(name) !== null);
 	}
+
 	[s](b: boolean) {
 		return b ? "" : null;
 	}
@@ -101,6 +109,7 @@ export class BoolSetting extends Setting<boolean> {
 export class IntSetting extends Setting<number> {
 	#min: number;
 	#max: number;
+
 	/**
 	 * The IntSetting class extends the `constructor` of {@link Setting} to, in addition to the string name and optional number starting value, take optional min and max numbers to be used for validation.
 	 *
@@ -123,6 +132,7 @@ export class IntSetting extends Setting<number> {
 		this.#min = min;
 		this.#max = max;
 	}
+
 	/**
 	 * This method acts as the base class, but will first validate that the number is within the bounds specified in the constructor.
 	 *
@@ -141,6 +151,7 @@ export class IntSetting extends Setting<number> {
 export class NumberSetting extends Setting<number> {
 	#min: number;
 	#max: number;
+
 	/**
 	 * The NumberSetting class extends the `constructor` of {@link Setting} to, in addition to the string name and optional number starting value, take optional min and max numbers to be used for validation.
 	 *
@@ -163,6 +174,7 @@ export class NumberSetting extends Setting<number> {
 		this.#min = min;
 		this.#max = max;
 	}
+
 	/**
 	 * This method acts as the base class, but will first validate that the number is within the bounds specified in the constructor.
 	 *
@@ -216,6 +228,7 @@ export class JSONSetting<T> extends Setting<T> {
 
 		super(name, value);
 	}
+
 	/**
 	 * This method will save any changes made to the stored `value` object, without having to re-set it.
 	 *
@@ -226,6 +239,7 @@ export class JSONSetting<T> extends Setting<T> {
 
 		return this;
 	}
+
 	[s](v: T) {
 		return JSON.stringify(v);
 	}
