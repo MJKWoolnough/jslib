@@ -10,12 +10,14 @@ const gcd = (a: bigint, b: bigint): bigint => b === 0n ? a : gcd(b, a % b);
 export default class Fraction {
 	#numerator: bigint;
 	#denominator: bigint;
+
 	/** A Fraction representing 0. */
 	static readonly zero = new Fraction(0n);
 	/** A Fraction representing 1. */
 	static readonly one = new Fraction(1n);
 	/** A Fraction representing {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN) | NaN}. */
 	static readonly NaN = new Fraction(0n, 0n);
+
 	/**
 	 * The constructor of Fraction takes a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt | BigInt} numerator and an optional {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt | BigInt} denominator and returns a Fraction accordingly. A zero (0n) denominator would create a Fraction equivalent of {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN}).
 	 *
@@ -31,6 +33,7 @@ export default class Fraction {
 			this.#denominator = denominator;
 		}
 	}
+
 	/**
 	 * The add method creates a new Fraction with the values set as the result of the addition of the two Fraction values.
 	 *
@@ -45,6 +48,7 @@ export default class Fraction {
 
 		return new Fraction(this.#numerator * num.#denominator + this.#denominator * num.#numerator, this.#denominator * num.#denominator);
 	}
+
 	/**
 	 * The sub method creates a new Fraction with the values set as the result of the passed Fraction subtracted from the base Fraction.
 	 *
@@ -59,6 +63,7 @@ export default class Fraction {
 
 		return new Fraction(this.#numerator * num.#denominator - this.#denominator * num.#numerator, this.#denominator * num.#denominator);
 	}
+
 	/**
 	 * The mul method creates a new Fraction with the values set as the result of the base Fraction multiplied by the passed Fraction.
 	 *
@@ -69,6 +74,7 @@ export default class Fraction {
 	mul(num: Fraction): Fraction {
 		return new Fraction(this.#numerator * num.#numerator, this.#denominator * num.#denominator);
 	}
+
 	/**
 	 * The div method creates a new Fraction with the values set as the result of the base Fraction multiplied by the passed Fraction.
 	 *
@@ -79,6 +85,7 @@ export default class Fraction {
 	div(num: Fraction): Fraction {
 		return new Fraction(this.#numerator * num.#denominator, this.#denominator * num.#numerator);
 	}
+
 	/**
 	 * The cmp method compares the base Fractions (A) to the passed Fraction (B), resulting in the following:
 	 *
@@ -103,6 +110,7 @@ export default class Fraction {
 
 		return d < 0n ? -1 : d > 0n ? 1: 0;
 	}
+
 	/**
 	 * The isNaN method returns true if the Fraction is equivalent to @{link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN | NaN}, which is when the denominator is equal to zero.
 	 *
@@ -111,6 +119,7 @@ export default class Fraction {
 	isNaN(): boolean {
 		return !this.#denominator;
 	}
+
 	/**
 	 * The sign method returns a number indicating the sign of the value:
 	 * |  Fraction Value  |  Return Value  |
@@ -125,6 +134,7 @@ export default class Fraction {
 	sign(): -1 | 0 | 1 | typeof NaN {
 		return !this.#denominator ? NaN : !this.#numerator ? 0 : this.#numerator < 0n ? -1 : 1;
 	}
+
 	/**
 	 * Returns a simplified version of the Fraction.
 	 *
@@ -145,6 +155,7 @@ export default class Fraction {
 
 		return new Fraction(this.#numerator / g, b / g);
 	}
+
 	/**
 	 * When the hint is set to "number", this method returns a normal javascript number representation of the Fraction value, to 5 decimal places. Otherwise, it returns a string representation of the fraction.
 	 *
@@ -153,6 +164,7 @@ export default class Fraction {
 	[Symbol.toPrimitive](hint: string) {
 		return hint === "number" ? this.toFloat() : this.toString();
 	}
+
 	/**
 	 * Converts a Fraction to a Number.
 	 *
@@ -165,6 +177,7 @@ export default class Fraction {
 
 		return Number(10000n * this.#numerator / this.#denominator) / 10000;
 	}
+
 	/**
 	 * Converts a Fraction to a string.
 	 *
@@ -206,6 +219,7 @@ export default class Fraction {
 	static min(a: Fraction, ...b: Fraction[]): Fraction {
 		return Fraction.#compare(a, b, -1);
 	}
+
 	/**
 	 * This static method returns the larger of the passed `Fraction`s, or Fraction.NaN if any param is Fraction.NaN.
 	 *
