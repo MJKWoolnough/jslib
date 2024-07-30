@@ -131,7 +131,7 @@ export class Binding extends Callable {
 	 *
 	 * Nodes are cached based on the first param that is passed to the node generating function.
 	 *
-	 * If the function returns a null value it will be skipped and not cached.
+	 * If the function returns a null value it will be skipped and not cached. Duplicated array values will also not be cached.
 	 *
 	 * @param {ParentNode} n  The node to which children will be attached to.
 	 * @param {Function}   fn The node generating function, which takes different values depending on the bound type and returns a {@link dom:Children | Children} or null;
