@@ -49,9 +49,11 @@ export class RPCError {
 
 		Object.freeze(this);
 	}
+
 	get name() {
 		return "RPCError";
 	}
+
 	toString() {
 		return this.message;
 	}
@@ -59,6 +61,7 @@ export class RPCError {
 
 class Queue extends Array {
 	#send;
+
 	constructor(send) {
 		super();
 
@@ -85,6 +88,7 @@ export class RPC {
 	#a = new Map();
 	#sFn;
 	#eFn;
+
 	/**
 	 * Creates an RPC object with a [Conn](#rpc_conn)
 	 *
@@ -93,6 +97,7 @@ export class RPC {
 	constructor(conn) {
 		this.#connInit(conn);
 	}
+
 	#connInit(conn) {
 		(this.#c = conn ?? new Queue(msg => this.#c?.send(msg))).when(this.#sFn ??= ({data}) => {
 			const message = JSON.parse(data),
@@ -123,6 +128,7 @@ export class RPC {
 			}
 		});
 	}
+
 	/**
 	 * Reuses the RPC object with a new {@link Conn}.
 	 *
@@ -135,6 +141,7 @@ export class RPC {
 
 		c?.close();
 	}
+
 	/**
 	 * The request method calls the remote procedure named by the `method` param, and sends any `params` data, JSON encoded, to it.
 	 *
@@ -165,6 +172,7 @@ export class RPC {
 			}));
 		}) : Promise.reject("RPC Closed");
 	}
+
 	/**
 	 * The await method will wait for a message with a matching ID, which must be negative, and resolve the promise with the data that message contains.
 	 *
@@ -191,6 +199,7 @@ export class RPC {
 
 		return p;
 	}
+
 	/**
 	 * The subscribe method will wait for a message with a matching ID, which must be negative, and resolve the {@link inter:Subscription} with the data that message contains for each message with that ID.
 	 *
@@ -213,6 +222,7 @@ export class RPC {
 			cFn(() => s.delete(h));
 		});
 	}
+
 	/** Closes the RPC connection. */
 	close() {
 		const c = this.#c;

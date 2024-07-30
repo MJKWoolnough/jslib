@@ -53,6 +53,7 @@ export class RPCError implements Error {
 	code: number;
 	message: string;
 	data?: any;
+
 	constructor(code: number, message: string, data?: any) {
 		this.code = code;
 		this.message = message;
@@ -60,9 +61,11 @@ export class RPCError implements Error {
 
 		Object.freeze(this);
 	}
+
 	get name() {
 		return "RPCError";
 	}
+
 	toString() {
 		return this.message;
 	}
@@ -96,6 +99,7 @@ export class RPC {
 	#a = new Map<number, Set<handler>>();
 	#sFn?: (data: {data: any}) => void;
 	#eFn?: (error: Error) => void;
+
 	/**
 	 * Creates an RPC object with a [Conn](#rpc_conn)
 	 *
@@ -104,6 +108,7 @@ export class RPC {
 	constructor(conn?: Conn) {
 		this.#connInit(conn);
 	}
+
 	#connInit(conn?: Conn) {
 		(this.#c = conn ?? new Queue((msg: string) => this.#c?.send(msg))).when(this.#sFn ??= ({data}) => {
 			const message = JSON.parse(data) as MessageData,
@@ -134,6 +139,7 @@ export class RPC {
 			}
 		});
 	}
+
 	/**
 	 * Reuses the RPC object with a new {@link Conn}.
 	 *
@@ -146,6 +152,7 @@ export class RPC {
 
 		c?.close();
 	}
+
 	request<T = any>(method: string, typeCheck?: (a: unknown) => a is T): Promise<T>;
 	request<T = any>(method: string, params: any, typeCheck?: (a: unknown) => a is T): Promise<T>;
 	/**
@@ -178,6 +185,7 @@ export class RPC {
 			}));
 		}) : Promise.reject("RPC Closed");
 	}
+
 	/**
 	 * The await method will wait for a message with a matching ID, which must be negative, and resolve the promise with the data that message contains.
 	 *
@@ -203,6 +211,7 @@ export class RPC {
 
 		return p;
 	}
+
 	/**
 	 * The subscribe method will wait for a message with a matching ID, which must be negative, and resolve the {@link inter:Subscription} with the data that message contains for each message with that ID.
 	 *
@@ -225,6 +234,7 @@ export class RPC {
 			cFn(() => s.delete(h));
 		});
 	}
+
 	/** Closes the RPC connection. */
 	close() {
 		const c = this.#c;
