@@ -222,6 +222,7 @@ export class MultiSelect extends HTMLElement {
 	#optionToLI = new Map<MultiOption, HTMLLIElement>();
 	#liContents: [HTMLLIElement, String][] = [];
 	#filter = "";
+	#filterType = 1;
 	#debounce = debounce();
 
 	constructor() {
@@ -231,11 +232,15 @@ export class MultiSelect extends HTMLElement {
 			this.#debounce(() => {
 				this.#filter = value;
 
-				const children: Element[] = [];
+				const children: [Element[], Element[]] = [[], []],
+				      prefix = (this.#filterType & 2) !== 0,
+				      contains = (this.#filterType & 1) !== 0
 
 				for (const [child, contents] of this.#liContents) {
-					if (contents.includes(value)) {
-						children.push(child);
+					if (prefix && contents.startsWith(value)) {
+						children[0].push(child);
+					} else if (contains && contents.includes(value)) {
+						children[1].push(child);
 					}
 				}
 
@@ -339,11 +344,26 @@ export class MultiSelect extends HTMLElement {
 			break;
 		case "placeholder":
 			amendNode(this.#input, {"placeholder": newValue});
+
+			break;
+		case "filter-type":
+			switch (newValue) {
+			case "prefix":
+				this.#filterType = 2;
+
+				break;
+			case "both":
+				this.#filterType = 3;
+
+				break;
+			default:
+				this.#filterType = 1;
+			}
 		}
 	}
 
 	static get observedAttributes() {
-		return ["toggle", "placeholder", "value"];
+		return ["toggle", "placeholder", "value", "filter-type"];
 	}
 
 	#handleSelect(target: HTMLLIElement) {
