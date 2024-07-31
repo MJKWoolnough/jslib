@@ -6,22 +6,28 @@ type Tests = {
 	class Counter extends Text {
 		#parent?: Counter;
 		#count = 0;
+
 		constructor(start: string, parent?: Counter) {
 			super(start);
 			this.#parent = parent;
 		}
+
 		add() {
 			this.textContent = (++this.#count) + "";
 			this.#parent?.add();
 		}
 	}
+
 	const processTests = (breadcrumbs: string, t: Tests, totalCount: Counter, successCount: Counter, errorCount: Counter) => {
 		const df = document.createDocumentFragment(),
 		      testList = document.createElement("ul");
+
 		for (const [name, test] of Object.entries(t)) {
 			if (test instanceof Function) {
 				const li = testList.appendChild(document.createElement("li"));
+
 				li.textContent = name;
+
 				li.setAttribute("title", test.toString());
 				totalCount.add();
 				test().catch(error => {
@@ -29,6 +35,7 @@ type Tests = {
 					alert(`Error in section ${breadcrumbs}, test "${name}": check console for details`);
 				}).then(pass => {
 					li.setAttribute("class", pass ? "pass" : "fail");
+
 					if (pass) {
 						successCount.add();
 					} else {
@@ -37,6 +44,7 @@ type Tests = {
 								node.toggleAttribute("open", true);
 							}
 						}
+
 						errorCount.add();
 					}
 				});
@@ -46,24 +54,30 @@ type Tests = {
 				      total = new Counter("0", totalCount),
 				      successful = new Counter("0", successCount),
 				      errors = document.createElement("span");
+
 				summary.append(name, ": ", successful, "/", total, errors);
 				details.append(processTests(breadcrumbs + name + "/", test, total, successful, errors.appendChild(new Counter("", errorCount))));
 			}
 		}
+
 		if (testList.childElementCount > 0) {
 			df.append(testList);
 		}
+
 		return df;
 	      },
 	      total = new Counter("0"),
 	      successful = new Counter("0"),
 	      errors = document.createElement("span"),
 	      tests = processTests("/", data, total, successful, errors.appendChild(new Counter("")));
+
 	let opened = false;
+
 	window.addEventListener("load", () => document.body.append("Tests: ", successful, "/", total, errors, tests));
 	window.addEventListener("keypress", (e: KeyboardEvent) => {
 		if (e.key === "o") {
 			opened = !opened;
+
 			Array.from(document.getElementsByTagName("details"), e => e.toggleAttribute("open", opened));
 		}
 	});
@@ -71,6 +85,7 @@ type Tests = {
 	"load.js": {
 		"pageLoad": async () => {
 			const {default: pageLoad} = await import("./lib/load.js");
+
 			return Promise.race([
 				pageLoad,
 				new Promise(sFn => setTimeout(() => sFn(false), 10000))
@@ -82,100 +97,125 @@ type Tests = {
 			"Send/Receive": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      p = new Pipe<boolean>();
+
 				let res: boolean = false;
+
 				p.receive(v => res = v);
 				p.send(true);
+
 				return res;
 			},
 			"Send/Multi-receive": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      p = new Pipe<number>();
+
 				let num = 0;
+
 				p.receive(v => num += v);
 				p.receive(v => num += v);
 				p.receive(v => num += v);
 				p.send(2);
+
 				return num === 6;
 			},
 			"Send/Multi-receive same fn": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      p = new Pipe<number>(),
 				      fn = (v: number) => num += v;
+
 				let num = 0;
+
 				p.receive(fn);
 				p.receive(fn);
 				p.receive(fn);
 				p.send(2);
+
 				return num === 6;
 			},
 			"Remove": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      p = new Pipe<number>(),
 				      fn = (v: number) => num += v;
+
 				let num = 0;
+
 				p.receive(fn);
 				p.receive(v => num += v);
 				p.receive(v => num += v);
 				p.remove(fn);
 				p.send(2);
+
 				return num === 4;
 			},
 			"Remove same fn": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      p = new Pipe<number>(),
 				      fn = (v: number) => num += v;
+
 				let num = 0;
+
 				p.receive(fn);
 				p.receive(fn);
 				p.receive(fn);
 				p.remove(fn);
 				p.send(2);
+
 				return num === 4;
 			},
 			"Bind": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      [send, receive, remove] = new Pipe<number>().bind(),
 				      fn = (v: number) => res += v;
+
 				let res = 0;
+
 				receive(fn);
 				send(2);
 				remove(fn);
 				send(1);
+
 				return res === 2;
 			},
 			"Bind (1)": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      b = new Pipe().bind(1);
+
 				return b[0] instanceof Function && b[1] === undefined && b[2] === undefined;
 			},
 			"Bind (2)": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      b = new Pipe().bind(2);
+
 				return b[0] === undefined && b[1] instanceof Function && b[2] === undefined;
 			},
 			"Bind (3)": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      b = new Pipe().bind(3);
+
 				return b[0] instanceof Function && b[1] instanceof Function && b[2] === undefined;
 			},
 			"Bind (4)": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      b = new Pipe().bind(4);
+
 				return b[0] === undefined && b[1] === undefined && b[2] instanceof Function;
 			},
 			"Bind (5)": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      b = new Pipe().bind(5);
+
 				return b[0] instanceof Function && b[1] === undefined && b[2] instanceof Function;
 			},
 			"Bind (6)": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      b = new Pipe().bind(6);
+
 				return b[0] === undefined && b[1] instanceof Function && b[2] instanceof Function;
 			},
 			"Bind (7)": async () => {
 				const {Pipe} = await import("./lib/inter.js"),
 				      b = new Pipe().bind(7);
+
 				return b[0] instanceof Function && b[1] instanceof Function && b[2] instanceof Function;
 			}
 		},
@@ -183,23 +223,29 @@ type Tests = {
 			"Respond/Request value": async () => {
 				const {Requester} = await import("./lib/inter.js"),
 				      r = new Requester<boolean>();
+
 				r.responder(true);
+
 				return r.request();
 			},
 			"Respond/Request fn": async () => {
 				const {Requester} = await import("./lib/inter.js"),
 				      r = new Requester<boolean>();
+
 				r.responder(() => true);
+
 				return r.request();
 			},
 			"No Responder": async () => {
 				const {Requester} = await import("./lib/inter.js"),
 				      r = new Requester<boolean>();
+
 				try {
 					r.request();
 				} catch(e) {
 					return true;
 				}
+
 				return false;
 			}
 		},
@@ -207,25 +253,34 @@ type Tests = {
 			"when": async () => {
 				let res = false,
 				    sFn = (_: boolean) => {};
+
 				const {Subscription} = await import("./lib/inter.js");
+
 				new Subscription<boolean>(s => sFn = s).when(b => res = b).catch(() => res = false);
+
 				sFn(true);
+
 				return res;
 			},
 			"when-chain": async () => {
 				let res = false,
 				    sFn = (_: boolean) => {};
+
 				const {Subscription} = await import("./lib/inter.js"),
 				      s = new Subscription<boolean>(s => sFn = s);
+
 				s.when(b => b).when(b => res = b).catch(() => res = false);
 				sFn(true);
+
 				return res;
 			},
 			"multi-then": async () => {
 				let res = 0,
 				    sFn = (_: number) => {};
+
 				const {Subscription} = await import("./lib/inter.js"),
 				      s = new Subscription<number>(s => sFn = s);
+
 				s.when(b => res += b).catch(() => res = 0);
 				s.when(b => res += b).catch(() => res = 0);
 				s.when(b => res += b).catch(() => res = 0);
@@ -235,75 +290,105 @@ type Tests = {
 			"multi-then-chain": async () => {
 				let res = 0,
 				    sFn = (_: number) => {};
+
 				const {Subscription} = await import("./lib/inter.js"),
 				      s = new Subscription<number>(s => sFn = s);
+
 				s.when(b => b + 1).when(b => res += b);
 				s.when(b => b + 2).when(b => res += b);
 				s.when(b => b + 3).when(b => res += b);
 				sFn(1);
+
 				return res === 9;
 			},
 			"catch": async () => {
 				let res = 0,
 				    eFn = (_: any) => {};
+
 				const {Subscription} = await import("./lib/inter.js");
+
 				new Subscription<boolean>((_, e) => eFn = e).catch(e => res += e);
+
 				eFn(1);
+
 				return res === 1;
 			},
 			"error catch": async () => {
 				let res = 0,
 				    sFn = (_: boolean) => {};
+
 				const {Subscription} = await import("./lib/inter.js");
+
 				new Subscription<boolean>(s => sFn = s).when(() => {throw 1}).catch(e => res += e);
+
 				sFn(false);
+
 				return res === 1;
 			},
 			"finally": async () => {
 				let res = 0,
 				    sFn = (_: boolean) => {};
+
 				const {Subscription} = await import("./lib/inter.js");
+
 				new Subscription<boolean>(s => sFn = s).finally(() => res++);
 				new Subscription<boolean>(() => {}).finally(() => res++);
+
 				sFn(false);
+
 				return res === 1;
 			},
 			"finally-chain": async () => {
 				let res = 0,
 				    sFn = (_: boolean) => {};
+
 				const {Subscription} = await import("./lib/inter.js");
+
 				new Subscription<boolean>(s => sFn = s).when(() => {}).finally(() => res++);
 				new Subscription<boolean>(() => {}).when(() => {}).finally(() => res++);
+
 				sFn(false);
+
 				return res === 1;
 			},
 			"error finally": async () => {
 				let res = 0,
 				    sFn = (_: boolean) => {};
+
 				const {Subscription} = await import("./lib/inter.js");
+
 				new Subscription<boolean>(s => sFn = s).when(() => {throw 1}).finally(() => res++).catch(() => res *= 5);
 				new Subscription<boolean>(() => {}).when(() => {throw 1}).finally(() => res += 3);
+
 				sFn(false);
+
 				return res === 5;
 			},
 			"cancel": async () => {
 				let res = 0;
+
 				const {Subscription} = await import("./lib/inter.js");
+
 				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).cancel();
 				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++));
+
 				return res === 1;
 			},
 			"chain-cancel": async () => {
 				let res = 0;
+
 				const {Subscription} = await import("./lib/inter.js");
+
 				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).when(() => {}).cancel();
 				new Subscription((_sFn, _eFn, cFn) => cFn(() => res++)).when(() => {});
+
 				return res === 1;
 			},
 			"splitCancel": async () => {
 				let res = 0,
 				    success = (_n: number) => {},
 				    error = (_n: number) => {};
+
 				const {Subscription} = await import("./lib/inter.js"),
 				      sc = new Subscription<number>((sFn, eFn, cFn) => {
 					      success = sFn;
@@ -312,6 +397,7 @@ type Tests = {
 				      }).splitCancel(),
 				      first = sc().when(n => res += n * 2, n => res += n * 3),
 				      second = sc().when(n => res += n * 5, n => res += n * 7);
+
 				success(1);
 				error(2);
 				first.cancel();
@@ -320,12 +406,14 @@ type Tests = {
 				second.cancel();
 				success(5);
 				error(6);
+
 				return res === 70;
 			},
 			"splitCancel with forward": async () => {
 				let res = 0,
 				    success = (_n: number) => {},
 				    error = (_n: number) => {};
+
 				const {Subscription} = await import("./lib/inter.js"),
 				      sc = new Subscription<number>((sFn, eFn, cFn) => {
 					      success = sFn;
@@ -334,6 +422,7 @@ type Tests = {
 				      }).splitCancel(true),
 				      first = sc().when(n => res += n * 2, n => res += n * 3),
 				      second = sc().when(n => res += n * 5, n => res += n * 7);
+
 				success(1);
 				error(2);
 				first.cancel();
@@ -342,6 +431,7 @@ type Tests = {
 				second.cancel();
 				success(5);
 				error(6);
+
 				return res === 700;
 			},
 			"merge": async () => {
@@ -350,6 +440,7 @@ type Tests = {
 				    secondSuccess: (s: string) => void,
 				    secondError: (e: any) => void,
 				    res = 0;
+
 				const {Subscription} = await import("./lib/inter.js"),
 				      s = Subscription.merge<number | string>(
 					new Subscription<number>((sFn, eFn, cFn) => {
@@ -363,52 +454,63 @@ type Tests = {
 						cFn(() => res *= 5);
 					})
 				      ).when(n => res += typeof n === "string" ? n.length : n, e => res *= e);
+
 				firstSuccess!(1);
 				firstError!(2);
 				secondSuccess!("123");
 				secondError!(3);
 				s.cancel();
+
 				return res === 225;
 			},
 			"bind (1)": async () => {
 				const {Subscription} = await import("./lib/inter.js"),
 				      [s, sFn, eFn, cFn] = Subscription.bind(1);
+
 				return s instanceof Subscription && sFn instanceof Function && eFn === undefined && cFn === undefined;
 			},
 			"bind (2)": async () => {
 				const {Subscription} = await import("./lib/inter.js"),
 				      [s, sFn, eFn, cFn] = Subscription.bind(2);
+
 				return s instanceof Subscription && sFn === undefined && eFn instanceof Function && cFn === undefined;
 			},
 			"bind (3)": async () => {
 				const {Subscription} = await import("./lib/inter.js"),
 				      [s, sFn, eFn, cFn] = Subscription.bind(3);
+
 				return s instanceof Subscription && sFn instanceof Function && eFn instanceof Function && cFn === undefined;
 			},
 			"bind (4)": async () => {
 				const {Subscription} = await import("./lib/inter.js"),
 				      [s, sFn, eFn, cFn] = Subscription.bind(4);
+
 				return s instanceof Subscription && sFn === undefined && eFn === undefined && cFn instanceof Function;
 			},
 			"bind (5)": async () => {
 				const {Subscription} = await import("./lib/inter.js"),
 				      [s, sFn, eFn, cFn] = Subscription.bind(5);
+
 				return s instanceof Subscription && sFn instanceof Function && eFn === undefined && cFn instanceof Function;
 			},
 			"bind (6)": async () => {
 				const {Subscription} = await import("./lib/inter.js"),
 				      [s, sFn, eFn, cFn] = Subscription.bind(6);
+
 				return s instanceof Subscription && sFn === undefined && eFn instanceof Function && cFn instanceof Function;
 			},
 			"bind (7)": async () => {
 				const {Subscription} = await import("./lib/inter.js"),
 				      [s, sFn, eFn, cFn] = Subscription.bind(7);
+
 				return s instanceof Subscription && sFn instanceof Function && eFn instanceof Function && cFn instanceof Function;
 			},
 			"bind": async () => {
 				const {Subscription} = await import("./lib/inter.js"),
 				      [s, sFn, eFn, cFn] = Subscription.bind<number>();
+
 				let res = 0;
+
 				cFn(() => res++);
 				s.when(num => res *= num, num => res %= num).cancel();
 				sFn(2);
@@ -416,82 +518,122 @@ type Tests = {
 				eFn(4);
 				s.cancel();
 				sFn(5);
+
 				return res === 15;
 			}
 		},
 		"WaitGroup": {
 			"add-done": async () => {
 				let res = 0;
+
 				const {WaitGroup} = await import("./lib/inter.js"),
 				      wg = new WaitGroup();
+
 				wg.onComplete(() => res = 1);
+
 				res++;
+
 				wg.add();
+
 				res++;
+
 				wg.done();
+
 				return res === 1;
 			},
 			"multi-add-done": async () => {
 				let res = 0;
+
 				const {WaitGroup} = await import("./lib/inter.js"),
 				      wg = new WaitGroup();
+
 				wg.onComplete(() => res = 1);
+
 				res++;
+
 				wg.add();
+
 				res++;
+
 				wg.add();
+
 				res++;
+
 				wg.done();
+
 				res++;
+
 				wg.done();
+
 				return res === 1;
 			},
 			"error-done": async () => {
 				let res = false;
+
 				const {WaitGroup} = await import("./lib/inter.js"),
 				      wg = new WaitGroup();
+
 				wg.onComplete(() => res = true);
 				wg.add();
 				wg.error();
+
 				return res;
 			},
 			"multi-error-done": async () => {
 				let res = 0;
+
 				const {WaitGroup} = await import("./lib/inter.js"),
 				      wg = new WaitGroup();
+
 				res++;
+
 				wg.onComplete(() => res = 1);
+
 				res++;
+
 				wg.add();
+
 				res++;
+
 				wg.add();
+
 				res++;
+
 				wg.error();
+
 				res++;
+
 				wg.error();
+
 				return res === 1;
 			},
 			"onUpdate": async () => {
 				let res = 0;
+
 				const {WaitGroup} = await import("./lib/inter.js"),
 				      wg = new WaitGroup();
+
 				wg.onUpdate(wi => res += wi.waits * 2 + wi.done * 3 + wi.errors * 5);
 				wg.add();
 				wg.add();
 				wg.error();
 				wg.done();
+
 				return res === 27;
 			},
 			"onUpdate/onComplete": async () => {
 				let res = 0;
+
 				const {WaitGroup} = await import("./lib/inter.js"),
 				      wg = new WaitGroup();
+
 				wg.onComplete(() => res *= 2);
 				wg.onUpdate(wi => res += wi.waits * 2 + wi.done * 3 + wi.errors * 5);
 				wg.add();
 				wg.add();
 				wg.error();
 				wg.done();
+
 				return res === 54;
 			}
 		}
@@ -501,84 +643,104 @@ type Tests = {
 			"type test (div)": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
 				      div = document.createElement("div");
+
 				return amendNode(div) === div && div instanceof HTMLDivElement;
 			},
 			"type test (span)": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
 				      span = document.createElement("span");
+
 				return amendNode(span) === span && span instanceof HTMLSpanElement;
 			},
 			"no property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div")).getAttribute("property") === null;
 			},
 			"string property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), {"property": "value"}).getAttribute("property") === "value";
 			},
 			"number property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), {"property": 1}).getAttribute("property") === "1";
 			},
 			"boolean property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), {"property": true}).getAttribute("property") === "";
 			},
 			"unset boolean property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"property": true}), {"property": false}).getAttribute("property") === null;
 			},
 			"ToString property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), {"property": {}}).getAttribute("property") === "[object Object]";
 			},
 			"remove string property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"property": "value"}), {"property": undefined}).getAttribute("property") === null;
 			},
 			"remove number property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"property": 1}), {"property": undefined}).getAttribute("property") === null;
 			},
 			"remove boolean property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"property": true}), {"property": undefined}).getAttribute("property") === null;
 			},
 			"remove ToString property": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"property": {}}), {"property": undefined}).getAttribute("property") === null;
 			},
 			"class set string": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), {"class": "class1 class2"}).getAttribute("class") === "class1 class2";
 			},
 			"class set array": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), {"class": ["class1", "class2"]}).getAttribute("class") === "class1 class2";
 			},
 			"class set multi-array": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2"]}), {"class": ["class3"]}).getAttribute("class") === "class1 class2 class3";
 			},
 			"class set array -> string": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2"]}), {"class": "class3"}).getAttribute("class") === "class3";
 			},
 			"class set DOMTokenList": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
 				      div = amendNode(document.createElement("div"), {"class": ["class1", "class2"]});
+
 				return amendNode(document.createElement("div"), {"class": div.classList}).getAttribute("class") === "class1 class2";
 			},
 			"class set/unset classes": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2"]}), {"class": ["!class2", "class3"]}).getAttribute("class") === "class1 class3";
 			},
 			"class toggle classes": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2"]}), {"class": ["~class2", "~class3"]}).getAttribute("class") === "class1 class3";
 			},
 			"class toggle with object": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(amendNode(document.createElement("div"), {"class": ["class1", "class2", "class3"]}), {"class": {"class2": false, "class3": null, "class4": true, "class5": null}}).getAttribute("class") === "class1 class4 class5";
 			},
 			"part set string": async () => {
@@ -624,15 +786,18 @@ type Tests = {
 			},
 			"style set string": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), {"style": "font-size: 2em; color: rgb(255, 0, 0);"}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
 			},
 			"style set object": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), {"style": {"font-size": "2em", "color": "rgb(255, 0, 0)"}}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
 			},
 			"style set CSSStyleDeclaration": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
 				      div = amendNode(document.createElement("div"), {"style": {"font-size": "2em", "color": "rgb(255, 0, 0)"}});
+
 				return amendNode(document.createElement("div"), {"style": div.style}).getAttribute("style") === "font-size: 2em; color: rgb(255, 0, 0);";
 			},
 			"set BoundAttr": async () => {
@@ -652,120 +817,161 @@ type Tests = {
 				type W = typeof window & {
 					ares: number;
 				};
+
 				const {amendNode} = await import("./lib/dom.js");
+
 				(window as W).ares = 0;
+
 				amendNode(document.createElement("div"), {"onclick": "window.ares++"}).click();
+
 				return (window as W).ares === 1;
 			},
 			"event string unset": async () => {
 				type W = typeof window & {
 					bres: number;
 				};
+
 				const {amendNode} = await import("./lib/dom.js");
+
 				(window as W).bres = 0;
+
 				amendNode(amendNode(document.createElement("div"), {"onclick": "window.bres++"}), {"onclick": undefined}).click();
+
 				return (window as W).bres === 0;
 			},
 			"event arrow fn set": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      div = amendNode(document.createElement("div"), {"onclick": () => res++});
+
 				div.click();
 				div.click();
+
 				return res === 2;
 			},
 			"event fn set": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      div = amendNode(document.createElement("div"), {"onclick": function(this: HTMLDivElement) {res += +(this === div)}});
+
 				div.click();
 				div.click();
+
 				return res === 2;
 			},
 			"event EventListenerObject set": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      he = {"handleEvent": function(this: object) {res += +(this === he)}},
 				      div = amendNode(document.createElement("div"), {"onclick": he});
+
 				div.click();
 				div.click();
+
 				return res === 2;
 			},
 			"event array arrow fn once set": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      div = amendNode(document.createElement("div"), {"onclick": [() => res++, {"once": true}, false]});
+
 				div.click();
 				div.click();
+
 				return res === 1;
 			},
 			"event array fn once set": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      div = amendNode(document.createElement("div"), {"onclick": [function(this: HTMLDivElement) {res += +(this === div)}, {"once": true}, false]});
+
 				div.click();
 				div.click();
+
 				return res === 1;
 			},
 			"event EventListenerObject once set": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      he = {"handleEvent": function(this: object) {res += +(this === he)}},
 				      div = amendNode(document.createElement("div"), {"onclick": [he, {"once": true}, false]});
+
 				div.click();
 				div.click();
+
 				return res === 1;
 			},
 			"event array arrow fn remove": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      fn = () => res++,
 				      div = amendNode(amendNode(document.createElement("div"), {"onclick": [fn, {}, false]}), {"onclick": [fn, {}, true]});
+
 				div.click();
 				div.click();
+
 				return res === 0;
 			},
 			"event array fn remove": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      fn = function(this: HTMLDivElement) {res += +(this === div)},
 				      div = amendNode(amendNode(document.createElement("div"), {"onclick": [fn, {}, false]}), {"onclick": [fn, {}, true]});
+
 				div.click();
 				div.click();
+
 				return res === 0;
 			},
 			"event EventListenerObject remove": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      he = {"handleEvent": function(this: object) {res += +(this === he)}},
 				      div = amendNode(amendNode(document.createElement("div"), {"onclick": [he, {}, false]}), {"onclick": [he, {}, true]});
+
 				div.click();
 				div.click();
+
 				return res === 0;
 			},
 			"event signal": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      ac = new AbortController(),
 				      div = amendNode(document.createElement("div"), {"onclick": [() => res++, {"signal": ac.signal}, false]});
+
 				div.click();
 				div.click();
 				ac.abort();
 				div.click();
+
 				return res === 2;
 			},
 			"string child": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), "Test String").innerText === "Test String";
 			},
 			"array string children": async () => {
 				const {amendNode} = await import("./lib/dom.js");
+
 				return amendNode(document.createElement("div"), ["Test", " String"]).innerText === "Test String";
 			},
 			"append node child": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
 				      span = document.createElement("span"),
 				      div = amendNode(document.createElement("div"), span);
+
 				return div.firstChild === span && div.lastChild === span;
 			},
 			"append node array": async () => {
@@ -773,12 +979,14 @@ type Tests = {
 				      span1 = document.createElement("span"),
 				      span2 = document.createElement("span"),
 				      div = amendNode(document.createElement("div"), [span1, span2]);
+
 				return div.firstChild === span1 && div.lastChild === span2;
 			},
 			"append string + node": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
 				      span = document.createElement("span"),
 				      div = amendNode(document.createElement("div"), ["Text", span]);
+
 				return div.firstChild instanceof Text && div.firstChild.textContent === "Text" && div.lastChild === span;
 			},
 			"append multi-array": async () => {
@@ -787,6 +995,7 @@ type Tests = {
 				      span2 = document.createElement("span"),
 				      span3 = document.createElement("span"),
 				      div = amendNode(document.createElement("div"), [span1, [span2, span3]]);
+
 				return div.firstChild === span1 && div.children[1] === span2 && div.lastChild === span3;
 			},
 			"append NodeList": async () => {
@@ -796,6 +1005,7 @@ type Tests = {
 				      span3 = document.createElement("span"),
 				      div1 = amendNode(document.createElement("div"), [span1, [span2, span3]]),
 				      div2 = amendNode(document.createElement("div"), div1.childNodes);
+
 				return div2.firstChild === span1 && div2.children[1] === span2 && div2.lastChild === span3;
 			},
 			"append HTMLCollection": async () => {
@@ -805,6 +1015,7 @@ type Tests = {
 				      span3 = document.createElement("span"),
 				      div1 = amendNode(document.createElement("div"), [span1, [span2, span3]]),
 				      div2 = amendNode(document.createElement("div"), div1.children);
+
 				return div2.firstChild === span1 && div2.children[1] === span2 && div2.lastChild === span3;
 			},
 			"append BoundChild": async () => {
@@ -821,54 +1032,70 @@ type Tests = {
 				const {amendNode} = await import("./lib/dom.js"),
 				      span = document.createElement("span"),
 				      div = amendNode(document.createElement("div"), {"property": "value"}, span);
+
 				return div.getAttribute("property") === "value" && div.firstChild === span;
 			},
 			"set property NamedNodeMap": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
 				      span = amendNode(document.createElement("span"), {"property": "value", "property2": 2}),
 				      div = amendNode(document.createElement("div"), span.attributes);
+
 				return div.getAttribute("property") === "value" && span.getAttribute("property") === "value" && div.getAttribute("property2") === "2" && span.getAttribute("property2") === "2";
 			},
 			"non-node event setting": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js");
+
 				amendNode(window, {"onevent": () => res++});
 				window.dispatchEvent(new CustomEvent("event"));
 				window.dispatchEvent(new CustomEvent("event"));
+
 				return res === 2;
 			},
 			"non-node event setting with once": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js");
+
 				amendNode(window, {"onevent": [() => res++, {"once": true}, false]});
 				window.dispatchEvent(new CustomEvent("event"));
 				window.dispatchEvent(new CustomEvent("event"));
+
 				return res === 1;
 			},
 			"non-node event setting with signal": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      ac = new AbortController();
+
 				amendNode(window, {"onevent": [() => res++, {"signal": ac.signal}, false]});
 				window.dispatchEvent(new CustomEvent("event"));
 				ac.abort();
 				window.dispatchEvent(new CustomEvent("event"));
+
 				return res === 1;
 			},
 			"non-node event setting with remove": async () => {
 				let res = 0;
+
 				const {amendNode} = await import("./lib/dom.js"),
 				      fn = () => res++;
+
 				amendNode(window, {"onevent": fn});
 				window.dispatchEvent(new CustomEvent("event"));
 				amendNode(window, {"onevent": [fn, {}, true]});
 				window.dispatchEvent(new CustomEvent("event"));
+
 				return res === 1;
 			},
 			"null": async () => {
 				const {amendNode} = await import("./lib/dom.js"),
 				      d = amendNode(document.createElement("div"), {"attr": "abc"});
+
 				amendNode(d, {"attr": null, "another": null});
+
 				return d.getAttribute("attr") === "abc" && d.getAttribute("another") === null;
 			},
 			"toggle": async () => {
@@ -916,48 +1143,56 @@ type Tests = {
 				const {event, eventCapture} = await import("./lib/dom.js"),
 				      fn = () => {},
 				      e = event(fn, eventCapture);
+
 				return e[0] === fn && e[1].capture === true && e[1].once === false && e[1].passive === false && e[1].signal === undefined && e[2] === false;
 			},
 			"capture remove": async () => {
 				const {event, eventCapture, eventRemove} = await import("./lib/dom.js"),
 				      fn = () => {},
 				      e = event(fn, eventCapture | eventRemove);
+
 				return e[0] === fn && e[1].capture === true && e[1].once === false && e[1].passive === false && e[1].signal === undefined && e[2] === true;
 			},
 			"once": async () => {
 				const {event, eventOnce} = await import("./lib/dom.js"),
 				      fn = {"handleEvent": () => {}},
 				      e = event(fn, eventOnce);
+
 				return e[0] === fn && e[1].capture === false && e[1].once === true && e[1].passive === false && e[1].signal === undefined && e[2] === false;
 			},
 			"once remove": async () => {
 				const {event, eventOnce, eventRemove} = await import("./lib/dom.js"),
 				      fn = {"handleEvent": () => {}},
 				      e = event(fn, eventOnce | eventRemove);
+
 				return e[0] === fn && e[1].capture === false && e[1].once === true && e[1].passive === false && e[1].signal === undefined && e[2] === true;
 			},
 			"passive": async () => {
 				const {event, eventPassive} = await import("./lib/dom.js"),
 				      fn = function () {},
 				      e = event(fn, eventPassive);
+
 				return e[0] === fn && e[1].capture === false && e[1].once === false && e[1].passive === true && e[1].signal === undefined && e[2] === false;
 			},
 			"passive remove": async () => {
 				const {event, eventPassive, eventRemove} = await import("./lib/dom.js"),
 				      fn = function () {},
 				      e = event(fn, eventPassive | eventRemove);
+
 				return e[0] === fn && e[1].capture === false && e[1].once === false && e[1].passive === true && e[1].signal === undefined && e[2] === true;
 			},
 			"all": async () => {
 				const {event, eventCapture, eventOnce, eventPassive} = await import("./lib/dom.js"),
 				      fn = {"handleEvent": function () {}},
 				      e = event(fn, eventCapture | eventOnce | eventPassive);
+
 				return e[0] === fn && e[1].capture === true && e[1].once === true && e[1].passive === true && e[1].signal === undefined && e[2] === false;
 			},
 			"all remove": async () => {
 				const {event, eventCapture, eventOnce, eventPassive, eventRemove} = await import("./lib/dom.js"),
 				      fn = {"handleEvent": function () {}},
 				      e = event(fn, eventCapture | eventOnce | eventPassive | eventRemove);
+
 				return e[0] === fn && e[1].capture === true && e[1].once === true && e[1].passive === true && e[1].signal === undefined && e[2] === true;
 			},
 			"signal": async () => {
@@ -965,27 +1200,32 @@ type Tests = {
 				      fn = () => {},
 				      ac = new AbortController(),
 				      e = event(fn, 0, ac.signal);
+
 				return e[0] === fn && e[1].capture === false && e[1].once === false && e[1].passive === false && e[1].signal === ac.signal && e[2] === false;
 			}
 		},
 		"createDocumentFragment": {
 			"createDocumentFragment": async () => {
 				const {createDocumentFragment} = await import("./lib/dom.js");
+
 				return createDocumentFragment() instanceof DocumentFragment;
 			},
 			"string append": async () => {
 				const {createDocumentFragment} = await import("./lib/dom.js");
+
 				return createDocumentFragment("Text").textContent === "Text";
 			},
 			"node append": async () => {
 				const {createDocumentFragment} = await import("./lib/dom.js"),
 				      div = document.createElement("div");
+
 				return createDocumentFragment(div).firstChild === div;
 			},
 			"array append": async () => {
 				const {createDocumentFragment} = await import("./lib/dom.js"),
 				      div = document.createElement("div"),
 				      df = createDocumentFragment(["Text", div]);
+
 				return df.firstChild instanceof Text && df.firstChild.textContent === "Text" && df.lastChild === div;
 			}
 		},
@@ -993,38 +1233,48 @@ type Tests = {
 			"empty": async () => {
 				const {clearNode} = await import("./lib/dom.js"),
 				      n = document.createElement("div");
+
 				n.append(document.createElement("div"), document.createElement("div"));
 				clearNode(n);
+
 				return n.childNodes.length === 0;
 			},
 			"empty with string": async () => {
 				const {clearNode} = await import("./lib/dom.js"),
 				      n = document.createElement("div");
+
 				n.append(document.createElement("div"), document.createElement("div"));
 				clearNode(n, "TEXT");
+
 				return n.textContent === "TEXT";
 			},
 			"empty with params + string": async () => {
 				const {clearNode} = await import("./lib/dom.js"),
 				      n = document.createElement("div");
+
 				n.append(document.createElement("div"), document.createElement("div"));
 				clearNode(n, {"property": "value"}, "TEXT");
+
 				return n.getAttribute("property") === "value" && n.textContent === "TEXT";
 			},
 			"empty with node": async () => {
 				const {clearNode} = await import("./lib/dom.js"),
 				      n = document.createElement("div"),
 				      s = document.createElement("span");
+
 				n.append(document.createElement("div"), document.createElement("div"));
 				clearNode(n, s);
+
 				return n.firstChild === s;
 			},
 			"empty with params + node": async () => {
 				const {clearNode} = await import("./lib/dom.js"),
 				      n = document.createElement("div"),
 				      s = document.createElement("span");
+
 				n.append(document.createElement("div"), document.createElement("div"));
 				clearNode(n, {"property": "value"}, s);
+
 				return n.getAttribute("property") === "value" && n.firstChild === s;
 			}
 		},
@@ -1079,7 +1329,9 @@ type Tests = {
 				      text = bind("HELLO"),
 				      elm = amendNode(document.createElement("div"), text),
 				      start = elm.textContent;
+
 				text.value = "GOODBYE";
+
 				return start === "HELLO" && elm.textContent === "GOODBYE";
 			},
 			"bind text (multiple)": async () => {
@@ -1090,7 +1342,9 @@ type Tests = {
 				      elm2 = amendNode(document.createElement("div"), ["Other ", text, " Text"]),
 				      start = elm.textContent,
 				      start2 = elm2.textContent;
+
 				text.value = "GOODBYE";
+
 				return start === "HELLO" && start2 == "Other HELLO Text" && elm.textContent === "GOODBYE" && elm2.textContent === "Other GOODBYE Text";
 			},
 			"bind attr": async () => {
@@ -1099,7 +1353,9 @@ type Tests = {
 				      attr = bind("FIRST"),
 				      elm = amendNode(document.createElement("div"), {"TEST": attr}),
 				      start = elm.getAttributeNS(null, "TEST");
+
 				attr.value = "SECOND";
+
 				return start === "FIRST" && elm.getAttributeNS(null, "TEST") === "SECOND";
 			},
 			"bind attr (multiple)": async () => {
@@ -1111,7 +1367,9 @@ type Tests = {
 				      start = elm.getAttributeNS(null, "TEST"),
 				      start2 = elm.getAttributeNS(null, "TEST2"),
 				      start3 = elm2.getAttributeNS(null, "TEST3");
+
 				attr.value = "SECOND";
+
 				return start === "FIRST" && start2 === "FIRST" && start3 === "FIRST" && elm.getAttributeNS(null, "TEST") === "SECOND" && elm.getAttributeNS(null, "TEST2") === "SECOND" && elm2.getAttributeNS(null, "TEST3") === "SECOND";
 			},
 			"bind text using fn": async () => {
@@ -1168,7 +1426,9 @@ type Tests = {
 				      text = bind`HELLO${a}WORLD`,
 				      elm = amendNode(document.createElement("div"), text),
 				      start = elm.textContent;
+
 				a.value = ",";
+
 				return new Promise(sFn => setTimeout(sFn)).then(() => start === "HELLO WORLD" && elm.textContent === "HELLO,WORLD");
 			},
 			"single bind (attr)": async () => {
@@ -1178,7 +1438,9 @@ type Tests = {
 				      text = bind`HELLO${a}WORLD`,
 				      elm = amendNode(document.createElement("div"), {text}),
 				      start = elm.getAttribute("text");
+
 				a.value = ",";
+
 				return new Promise(sFn => setTimeout(sFn)).then(() => start === "HELLO WORLD" && elm.getAttribute("text") === "HELLO,WORLD");
 			},
 			"double bind": async () => {
@@ -1189,8 +1451,10 @@ type Tests = {
 				      text = bind`1: ${a}\n2: ${b}`,
 				      elm = amendNode(document.createElement("div"), text),
 				      start = elm.textContent;
+
 				a.value = "Uno";
 				b.value = "Dos";
+
 				return new Promise(sFn => setTimeout(sFn)).then(() => start === `1: One\n2: Two` && elm.textContent === `1: Uno\n2: Dos`);
 			},
 			"double bind (attr)": async () => {
@@ -1201,8 +1465,10 @@ type Tests = {
 				      text = bind`1: ${a}\n2: ${b}`,
 				      elm = amendNode(document.createElement("div"), {text}),
 				      start = elm.getAttribute("text");
+
 				a.value = "Uno";
 				b.value = "Dos";
+
 				return new Promise(sFn => setTimeout(sFn)).then(() => start === `1: One\n2: Two` && elm.getAttribute("text") === `1: Uno\n2: Dos`);
 			},
 			"single bind using fn": async () => {
@@ -1250,10 +1516,15 @@ type Tests = {
 			      {default: bind} = await import("./lib/bind.js"),
 			      onclick = bind(() => a++),
 			      elm = amendNode(document.createElement("div"), {onclick});
+
 			let a = 0;
+
 			elm.click();
+
 			onclick.value = () => a += 3;
+
 			elm.click();
+
 			return a === 4;
 		},
 		"toDOM": {
@@ -1361,33 +1632,40 @@ type Tests = {
 		"elements": {
 			"a": async () => {
 				const {a} = await import("./lib/html.js");
+
 				return a() instanceof HTMLAnchorElement;
 			},
 			"a with child": async () => {
 				const {a} = await import("./lib/html.js"),
 				      child = a();
+
 				return a(child).firstChild === child;
 			},
 			"a with props": async () => {
 				const {a} = await import("./lib/html.js");
+
 				return a({"property": "value"}).getAttribute("property") === "value";
 			},
 			"a with props + child": async () => {
 				const {a} = await import("./lib/html.js"),
 				      child = a(),
 				      e = a({"property": "value"}, child);
+
 				return e.getAttribute("property") === "value" && e.firstChild === child;
 			},
 			"div": async () => {
 				const {div} = await import("./lib/html.js");
+
 				return div() instanceof HTMLDivElement;
 			},
 			"img": async () => {
 				const {img} = await import("./lib/html.js");
+
 				return img() instanceof HTMLImageElement;
 			},
 			"span": async () => {
 				const {span} = await import("./lib/html.js");
+
 				return span() instanceof HTMLSpanElement;
 			}
 		}
@@ -1396,33 +1674,40 @@ type Tests = {
 		"elements": {
 			"a": async () => {
 				const {a} = await import("./lib/svg.js");
+
 				return a() instanceof SVGAElement;
 			},
 			"a with child": async () => {
 				const {a} = await import("./lib/svg.js"),
 				      child = a();
+
 				return a(child).firstChild === child;
 			},
 			"a with props": async () => {
 				const {a} = await import("./lib/svg.js");
+
 				return a({"property": "value"}).getAttribute("property") === "value";
 			},
 			"a with props + child": async () => {
 				const {a} = await import("./lib/svg.js"),
 				      child = a(),
 				      e = a({"property": "value"}, child);
+
 				return e.getAttribute("property") === "value" && e.firstChild === child;
 			},
 			"g": async () => {
 				const {g} = await import("./lib/svg.js");
+
 				return g() instanceof SVGGElement;
 			},
 			"path": async () => {
 				const {path} = await import("./lib/svg.js");
+
 				return path() instanceof SVGPathElement;
 			},
 			"rect": async () => {
 				const {rect} = await import("./lib/svg.js");
+
 				return rect() instanceof SVGRectElement;
 			}
 		},
@@ -1431,18 +1716,22 @@ type Tests = {
 				const {ns, svgData} = await import("./lib/svg.js"),
 				      svg = document.createElementNS(ns, "svg"),
 				      rect = svg.appendChild(document.createElement("g")).appendChild(document.createElement("rect"));
+
 				svg.setAttribute("viewBox", "0 0 100 100");
 				rect.setAttribute("width", "100");
 				rect.setAttribute("height", "50");
+
 				return svgData(svg) === "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%3E%3Crect%20width%3D%22100%22%20height%3D%2250%22%3E%3C%2Frect%3E%3C%2Fg%3E%3C%2Fsvg%3E";
 			},
 			"symbol to string": async () => {
 				const {ns, svgData} = await import("./lib/svg.js"),
 				      svg = document.createElementNS(ns, "symbol"),
 				      rect = svg.appendChild(document.createElement("g")).appendChild(document.createElement("rect"));
+
 				svg.setAttribute("viewBox", "0 0 100 100");
 				rect.setAttribute("width", "100");
 				rect.setAttribute("height", "50");
+
 				return svgData(svg) === "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%3E%3Crect%20width%3D%22100%22%20height%3D%2250%22%3E%3C%2Frect%3E%3C%2Fg%3E%3C%2Fsvg%3E";
 			}
 		}
@@ -1451,27 +1740,32 @@ type Tests = {
 		"elements": {
 			"math": async () => {
 				const {math} = await import("./lib/math.js");
+
 				return math() instanceof MathMLElement;
 			},
 			"math with child": async () => {
 				const {math, ms} = await import("./lib/math.js"),
 				      child = ms();
+
 				return math(child).firstChild === child;
 			},
 			"math with props": async () => {
 				const {math} = await import("./lib/math.js");
+
 				return math({"property": "value"}).getAttribute("property") === "value";
 			},
 			"math with props + child": async () => {
 				const {math, ms} = await import("./lib/math.js"),
 				      child = ms(),
 				      e = math({"property": "value"}, child);
+
 				return e.getAttribute("property") === "value" && e.firstChild === child;
 			}
 		}
 	} : {
 		"Not Supported": async () => {
 			console.error("MathML not supported, test skipped.");
+
 			return true;
 		}
 	},
@@ -1479,137 +1773,173 @@ type Tests = {
 		"HTTPRequest": {
 			"GET": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/static").then(data => data === "123");
 			},
 			"blank GET echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo").then(data => data === "");
 			},
 			"blank GET data echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo", {"data": "BAD"}).then(data => data === "");
 			},
 			"blank POST echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo", {"method": "POST"}).then(data => data === "");
 			},
 			"simple echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo", {"method": "POST", "data": "123"}).then(data => data === "123");
 			},
 			"JSON number echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest<number>("/echo", {"method": "POST", "data": "123", "response": "json"}).then(data => data === 123);
 			},
 			"JSON number array echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest<[number, number]>("/echo", {"method": "POST", "data": "[123, 456]", "response": "json"}).then(data => data instanceof Array && data.length === 2 && data[0] === 123 && data[1] === 456);
 			},
 			"JSON number array echo with checker": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest<[number, number]>("/echo", {"method": "POST", "data": "[123, 456]", "response": "json", "checker": (data: unknown): data is [number, number] => data instanceof Array && data.length === 2 && data[0] === 123 && data[1] === 456}).then(() => true);
 			},
 			"JSON number array echo with failing checker": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest<[number, number]>("/echo", {"method": "POST", "data": "[123, 456]", "response": "json", "checker": (data: unknown): data is [number, number] => data instanceof Map}).then(() => false).catch(() => true);
 			},
 			"XML echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo", {"method": "POST", "data": "<xml><elm property=\"value\" /></xml>", "response": "xml"}).then(doc => doc instanceof XMLDocument && doc.children[0] && doc.children[0].localName === "xml" && doc.children[0].children[0] && doc.children[0].children[0].localName === "elm" && doc.children[0].children[0].getAttribute("property") === "value");
 			},
 			"Text simple echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo", {"method": "POST", "data": "123", "response": "text"}).then(data => data === "123");
 			},
 			"Blob echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo", {"method": "POST", "data": "123", "response": "blob"}).then(blob => blob.text().then(text => text === "123"));
 			},
 			"ArrayBuffer echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo", {"method": "POST", "data": "123", "response": "arraybuffer"}).then(ab => ab.byteLength === 3 && new Uint8Array(ab).toString() === "49,50,51");
 			},
 			"Content-Type override": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo", {"method": "POST", "data": "<xml><elm property=\"value\" /></xml>", "type": "application/xml", "response": "xh"}).then(xh => xh.getResponseHeader("Content-Type") === "application/xml");
 			},
 			"Document echo": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/echo", {"method": "POST", "data": "<xml><elm property=\"value\" /></xml>", "response": "document", "type": "text/xml"}).then(doc => doc instanceof Document && doc.children[0] && doc.children[0].localName === "xml" && doc.children[0].children[0] && doc.children[0].children[0].localName === "elm" && doc.children[0].children[0].getAttribute("property") === "value");
 			},
 			"GET request": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/request").then(data => data === `{"method":"GET"}`+"\n");
 			},
 			"POST request": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/request", {"method": "post"}).then(data => data === `{"method":"POST"}`+"\n");
 			},
 			"Username/Password": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/request", {"user": "username", "password": "password"}).then(data => data === `{"method":"GET","auth":"Basic ${btoa("username:password")}"}`+"\n");
 			},
 			"GET string data": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/request?a=123&b=456").then(data => data === `{"method":"GET","form":{"a":["123"],"b":["456"]}}`+"\n");
 			},
 			"POST string data": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js");
+
 				return HTTPRequest("/request", {"method": "post", "data": "123"}).then(data => data === `{"method":"POST","contentType":"text/plain;charset=UTF-8","contentLength":3,"postData":"123"}`+"\n");
 			},
 			"POST form data": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js"),
 				      fd = new FormData();
+
 				fd.set("name", "value");
 				fd.set("username", "password");
+
 				return HTTPRequest("/request", {"method": "post", "type": "application/x-www-form-urlencoded", "data": new URLSearchParams(fd as any).toString()}).then(data => data === `{"method":"POST","contentType":"application/x-www-form-urlencoded","contentLength":28,"form":{"name":["value"],"username":["password"]},"postForm":{"name":["value"],"username":["password"]}}`+"\n");
 			},
 			"aborter": async () => {
 				const {HTTPRequest} = await import("./lib/conn.js"),
 				      ac = new AbortController(),
 				      ret = HTTPRequest("/static", {"signal": ac.signal}).then(() => false, () => true);
+
 				ac.abort();
+
 				return ret;
 			}
 		},
 		"WS": {
 			"simple echo": async () => {
 				const {WS} = await import("./lib/conn.js");
+
 				return WS("/socket").then(ws => {
 					let fn = (_b: boolean) => {};
+
 					ws.when(({data}) => fn(data === "123"), () => fn(false));
 					ws.send("123");
+
 					return new Promise<boolean>(sFn => fn = sFn);
 				});
 			},
 			"double echo": async () => {
 				const {WS} = await import("./lib/conn.js");
+
 				return WS("/socket").then(ws => {
 					let fn = (_b: boolean) => {},
 					    r = 0,
 					    s = 0;
+
 					ws.when(({data}) => {
 						r++;
+
 						if (data === "123") {
 							s++;
 						} else if (data === "456") {
 							s *= 2;
 						}
+
 						if (r === 2) {
 							fn(s === 2)
 						}
 					}, () => fn(false));
+
 					ws.send("123");
 					ws.send("456");
+
 					return new Promise<boolean>(sFn => fn = sFn);
 				});
 			},
 			"error test": async () => {
 				const {WS} = await import("./lib/conn.js");
+
 				return WS("/socket-close").then(ws => {
 					let fn = (_b: boolean) => {};
+
 					ws.when(() => fn(false), () => fn(true));
 					ws.send("123");
+
 					return new Promise<boolean>(sFn => fn = sFn);
 				});
 			}
@@ -1619,88 +1949,112 @@ type Tests = {
 		"static test": async () => {
 			const {WS} = await import("./lib/conn.js"),
 			      {RPC} = await import("./lib/rpc.js");
+
 			return WS("/rpc").then(ws => new RPC(ws).request("static").then(d => d === "123"));
 		},
 		"echo test": async () => {
 			const {WS} = await import("./lib/conn.js"),
 			      {RPC} = await import("./lib/rpc.js");
+
 			return WS("/rpc").then(ws => new RPC(ws).request("echo", "456").then(d => d === "456"));
 		},
 		"broadcast test": async () => {
 			const {WS} = await import("./lib/conn.js"),
 			      {RPC} = await import("./lib/rpc.js");
+
 			return WS("/rpc").then(ws => {
 				const rpc = new RPC(ws);
+
 				let fn = (_b: boolean) => {},
 				    res = 0;
+
 				rpc.await(-1).then(data => res += +(data === "123"));
 				rpc.request("broadcast", "123").then(d => {
 					if (d) {
 						res *= 2;
 					}
+
 					fn(res === 2);
 				});
+
 				return new Promise<boolean>(sFn => fn = sFn);
 			});
 		},
 		"broadcast test, double recieve": async () => {
 			const {WS} = await import("./lib/conn.js"),
 			      {RPC} = await import("./lib/rpc.js");
+
 			return WS("/rpc").then(ws => {
 				const rpc = new RPC(ws);
+
 				let fn = (_b: boolean) => {},
 				    res = 0;
+
 				rpc.await(-1).then(data => res += +(data === "123"));
 				rpc.await(-1).then(data => res += +(data === "123"));
 				rpc.request("broadcast", "123").then(d => {
 					if (d) {
 						res *= 2;
 					}
+
 					fn(res === 4);
 				});
+
 				return new Promise<boolean>(sFn => fn = sFn);
 			});
 		},
 		"broadcast test, subscribed": async () => {
 			const {WS} = await import("./lib/conn.js"),
 			      {RPC} = await import("./lib/rpc.js");
+
 			return WS("/rpc").then(ws => {
 				const rpc = new RPC(ws);
+
 				let fn = (_b: boolean) => {},
 				    res = 0;
+
 				rpc.subscribe(-1).when(data => res += +(data === "123"));
 				rpc.request("broadcast", "123").then(d => {
 					if (d) {
 						res *= 2;
 					}
+
 					rpc.request("broadcast", "123").then(d => {
 						if (d) {
 							res *= 2;
 						}
+
 						fn(res === 6);
 					});
 				});
+
 				return new Promise<boolean>(sFn => fn = sFn);
 			});
 		},
 		"endpoint error": async () => {
 			const {WS} = await import("./lib/conn.js"),
 			      {RPC} = await import("./lib/rpc.js");
+
 			return WS("/rpc").then(ws => new RPC(ws).request("unknown").then(() => false).catch(() => true));
 		},
 		"close test": async () => {
 			const {WS} = await import("./lib/conn.js"),
 			      {RPC} = await import("./lib/rpc.js");
+
 			return WS("/rpc").then(ws => new RPC(ws).request("close").then(() => false).catch(() => true));
 		},
 		"close all test": async () => {
 			const {WS} = await import("./lib/conn.js"),
 			      {RPC} = await import("./lib/rpc.js");
+
 			return WS("/rpc").then(ws => {
 				const rpc = new RPC(ws);
+
 				let res = 0;
+
 				rpc.await(-1).catch(() => res++);
 				rpc.await(-2).catch(() => res++);
+
 				return rpc.request("close").then(() => false).catch(() => new Promise<boolean>(sFn => window.setTimeout(() => sFn(res === 2), 0)));
 			});
 		},
@@ -1717,52 +2071,70 @@ type Tests = {
 	"bbcode.js": {
 		"text": async () => {
 			const bbcode = (await import("./lib/bbcode.js")).default;
+
 			let ret = false;
+
 			bbcode({[(await import("./lib/bbcode.js")).text]: (_n: Node, t: string) => ret = t === " "}, " ");
+
 			return ret;
 		},
 		"long text": async () => {
 			const bbcode = (await import("./lib/bbcode.js")).default;
+
 			let ret = false;
+
 			bbcode({[(await import("./lib/bbcode.js")).text]: (_n: Node, t: string) => ret = t === "ABC 123"}, "ABC 123");
+
 			return ret;
 		},
 		"simple token check": async () => {
 			const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
+
 			let ret = false;
+
 			bbcode({
 				"a": (_n: Node, t: any) => {
 					const tk = t.next(true).value;
+
 					if (isOpenTag(tk)) {
 						ret = tk.tagName === "a";
 					}
 				},
 				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 			}, "[a]");
+
 			return ret;
 		},
 		"simple token with attr check": async () => {
 			const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
+
 			let ret = false;
+
 			bbcode({
 				"a": (_n: Node, t: any) => {
 					const tk = t.next(true).value;
+
 					if (isOpenTag(tk)) {
 						ret = tk.tagName === "a" && tk.attr === "b";
 					}
 				},
 				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 			}, "[a=b]");
+
 			return ret;
 		},
 		"simple token with close check": async () => {
 			const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
+
 			let ret = false;
+
 			bbcode({
 				"a": (_n: Node, t: any) => {
 					let tk = t.next(true).value;
+
 					if (isOpenTag(tk) && tk.tagName === "a") {
 						tk = t.next().value;
+
 						if (isCloseTag(tk)) {
 							ret = tk.tagName === "d";
 						}
@@ -1770,16 +2142,21 @@ type Tests = {
 				},
 				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 			}, "[a][/d]");
+
 			return ret;
 		},
 		"simple token with attr and close check": async () => {
 			const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
+
 			let ret = false;
+
 			bbcode({
 				"a": (_n: Node, t: any) => {
 					let tk = t.next(true).value;
+
 					if (isOpenTag(tk) && tk.tagName === "a" && tk.attr === "bc") {
 						tk = t.next().value;
+
 						if (isCloseTag(tk)) {
 							ret = tk.tagName === "d";
 						}
@@ -1787,11 +2164,14 @@ type Tests = {
 				},
 				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 			}, "[a=bc][/d]");
+
 			return ret;
 		},
 		"multi-token check": async () => {
 			const {default: bbcode, isCloseTag, isOpenTag, isString} = await import("./lib/bbcode.js");
+
 			let ret = false;
+
 			bbcode({
 				"a": (_n: Node, t: any) => {
 					const checks = [
@@ -1803,15 +2183,19 @@ type Tests = {
 						[isString, (data: any) => data === "MORE\nTEXT"],
 						[isCloseTag, (tk: any) => tk.tagName === "d"],
 						[isCloseTag, (tk: any) => tk.tagName === "a"]
-					] as [Function, Function][];
+					      ] as [Function, Function][];
+
 					ret = true;
+
 					for (let tk = t.next(true).value; tk; tk = t.next().value) {
 						const [typeCheck, valueCheck] = checks.shift()!;
+
 						ret &&= typeCheck(tk) && valueCheck(tk);
 					}
 				},
 				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 			}, "[a=bc][d][e=12\n3]TEXT[/e]MORE\nTEXT[/d][/a]");
+
 			return ret;
 		},
 		"process check": async () => {
@@ -1819,13 +2203,18 @@ type Tests = {
 			      base = {
 				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 			      };
+
 			let ret = 0;
+
 			bbcode(Object.assign({"a": (n: Node, t: any) => process(n, t, Object.assign({"b": () => ret++}, base), "a")}, base), "[b][a][b][b][/a][b]");
+
 			return ret === 2;
 		},
 		"quoted attr": async () => {
 			const {default: bbcode, isOpenTag} = await import("./lib/bbcode.js");
+
 			let ret = false;
+
 			bbcode({
 				"a": (_n: Node, t: any) => {
 					const checks = [
@@ -1833,110 +2222,153 @@ type Tests = {
 						[isOpenTag, (tk: any) => tk.tagName === "b" && tk.attr === ""],
 						[isOpenTag, (tk: any) => tk.tagName === "c" && tk.attr === "\""],
 						[isOpenTag, (tk: any) => tk.tagName === "d" && tk.attr === "]"]
-					] as [Function, Function][];
+					      ] as [Function, Function][];
+
 					ret = true;
+
 					for (let tk = t.next(true).value; tk; tk = t.next().value) {
 						const [typeCheck, valueCheck] = checks.shift()!;
+
 						ret &&= typeCheck(tk) && valueCheck(tk);
 					}
 				},
 				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 			}, `[a="bc"][b=""][c="\\""][d="]"]`);
+
 			return ret;
 		},
 		"isolation": async () => {
 			const {default: bbcode, isCloseTag, isOpenTag} = await import("./lib/bbcode.js");
+
 			let ret = false;
+
 			bbcode({
 				"a": (_n: Node, t: any) => {
 					let tk = t.next(1).value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "a") {
 						return;
 					}
+
 					t.next();
+
 					tk = t.next(1).value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "b") {
 						return;
 					}
+
 					t.next();
+
 					tk = t.next(1).value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "b") {
 						return;
 					}
+
 					t.next();
+
 					tk = t.next(1).value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "c") {
 						return;
 					}
+
 					tk = t.next().value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "d") {
 						return;
 					}
+
 					tk = t.next().value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "e") {
 						return;
 					}
+
 					for (let i = 0; i < 10; i++) {
 						if (t.next().value) {
 							return;
 						}
 					}
+
 					tk = t.next(1).value;
+
 					if (!isCloseTag(tk) || tk.tagName !== "c") {
 						return;
 					}
+
 					tk = t.next().value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "f") {
 						return;
 					}
+
 					for (let i = 0; i < 10; i++) {
 						if (t.next().value) {
 							return;
 						}
 					}
+
 					tk = t.next(1).value;
+
 					if (!isCloseTag(tk) || tk.tagName !== "b") {
 						return;
 					}
+
 					tk = t.next().value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "g") {
 						return;
 					}
+
 					tk = t.next().value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "h") {
 						return;
 					}
+
 					for (let i = 0; i < 10; i++) {
 						if (t.next().value) {
 							return;
 						}
 					}
+
 					tk = t.next(1).value;
+
 					if (!isCloseTag(tk) || tk.tagName !== "b") {
 						return;
 					}
+
 					for (let i = 0; i < 10; i++) {
 						if (t.next().value) {
 							return;
 						}
 					}
+
 					tk = t.next(1).value;
+
 					if (!isCloseTag(tk) || tk.tagName !== "a") {
 						return;
 					}
+
 					tk = t.next().value;
+
 					if (!isOpenTag(tk) || tk.tagName !== "i") {
 						return;
 					}
+
 					for (let i = 0; i < 10; i++) {
 						if (t.next().value) {
 							return;
 						}
 					}
+
 					ret = true;
 				},
 				[(await import("./lib/bbcode.js")).text]: (_n: Node, _t: string) => {}
 			}, `[a][b][b][c][d][e][/c][f][/b][g][h][/b][/a][i]`);
+
 			return ret;
 		},
 		"good tag after bad tag": async () => {
@@ -1950,7 +2382,7 @@ type Tests = {
 						[isOpenTag, (tk: any) => tk.tagName === "a" && tk.attr === null],
 						[isString, (data: any) => data === "Some text [b=\"Bad"],
 						[isOpenTag, (tk: any) => tk.tagName === "b" && tk.attr === "Good"]
-					] as [Function, Function][];
+					      ] as [Function, Function][];
 
 					ret = true;
 
@@ -1971,86 +2403,103 @@ type Tests = {
 			"b": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[b]TEXT[/b]").firstElementChild!.outerHTML === `<span style="font-weight: bold">TEXT</span>`;
 			},
 			"i": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[i]TEXT[/i]").firstElementChild!.outerHTML === `<span style="font-style: italic">TEXT</span>`;
 			},
 			"u": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[u]TEXT[/u]").firstElementChild!.outerHTML === `<span style="text-decoration: underline">TEXT</span>`;
 			},
 			"s": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[s]TEXT[/s]").firstElementChild!.outerHTML === `<span style="text-decoration: line-through">TEXT</span>`;
 			},
 			"left": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[left]TEXT[/left]").firstElementChild!.outerHTML === `<div style="text-align: left">TEXT</div>`;
 			},
 			"centre": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[centre]TEXT[/centre]").firstElementChild!.outerHTML === `<div style="text-align: center">TEXT</div>`;
 			},
 			"center": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[center]TEXT[/center]").firstElementChild!.outerHTML === `<div style="text-align: center">TEXT</div>`;
 			},
 			"right": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[right]TEXT[/right]").firstElementChild!.outerHTML === `<div style="text-align: right">TEXT</div>`;
 			},
 			"justify": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[justify]TEXT[/justify]").firstElementChild!.outerHTML === `<div style="text-align: justify">TEXT</div>`;
 			},
 			"full": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[full]TEXT[/full]").firstElementChild!.outerHTML === `<div style="text-align: justify">TEXT</div>`;
 			},
 			"h1": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[h1]TEXT[/h1]").firstElementChild!.outerHTML === `<h1>TEXT</h1>`;
 			},
 			"h2": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[h2]TEXT[/h2]").firstElementChild!.outerHTML === `<h2>TEXT</h2>`;
 			},
 			"h3": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[h3]TEXT[/h3]").firstElementChild!.outerHTML === `<h3>TEXT</h3>`;
 			},
 			"h4": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[h4]TEXT[/h4]").firstElementChild!.outerHTML === `<h4>TEXT</h4>`;
 			},
 			"h5": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[h5]TEXT[/h5]").firstElementChild!.outerHTML === `<h5>TEXT</h5>`;
 			},
 			"h6": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[h6]TEXT[/h6]").firstElementChild!.outerHTML === `<h6>TEXT</h6>`;
 			},
 			"highlight": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[highlight]TEXT[/highlight]").firstElementChild!.outerHTML === `<mark>TEXT</mark>`;
 			}
 		},
@@ -2058,26 +2507,31 @@ type Tests = {
 			"simple text": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[b]TEXT").firstElementChild!.innerHTML === `TEXT`;
 			},
 			"new line": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[b]\n").firstElementChild!.innerHTML === `<br>`;
 			},
 			"new lines": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[b]\n\n").firstElementChild!.innerHTML === `<br><br>`;
 			},
 			"text with lines": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[b]a\nb\nc").firstElementChild!.innerHTML === `a<br>b<br>c`;
 			},
 			"text with non-tag": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[b]a\n[c]b\nc[/c]").firstElementChild!.innerHTML === `a<br>[c]b<br>c[/c]`;
 			}
 		},
@@ -2085,77 +2539,92 @@ type Tests = {
 			"hr": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(all, "[b][hr][/b]").firstElementChild!.innerHTML === `<hr>`;
 			},
 			"colour": {
 				"colour with no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][colour]TEXT[/colour]").firstElementChild!.innerHTML === `[colour]TEXT[/colour]`;
 				},
 				"colour with short hex": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][colour=#f00]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(255, 0, 0);">TEXT</span>`;
 				},
 				"colour with long hex": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][colour=#00f]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(0, 0, 255);">TEXT</span>`;
 				},
 				"colour with colour name": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][colour=green]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: green;">TEXT</span>`;
 				},
 				"colour with rgb": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][colour=rgb(1, 2, 3)]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgb(1, 2, 3);">TEXT</span>`;
 				},
 				"colour with rgba": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][colour=rgba(1, 2, 3, 0.4)]TEXT[/colour]").firstElementChild!.innerHTML === `<span style="color: rgba(1, 2, 3, 0.4);">TEXT</span>`;
 				},
 				"colour with nonsense (XSS)": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][colour=green;123\">]TEXT[/colour]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
 				},
 				"color with no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][color]TEXT[/color]").firstElementChild!.innerHTML === `[color]TEXT[/color]`;
 				},
 				"color with short hex": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][color=#f00]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(255, 0, 0);">TEXT</span>`;
 				},
 				"color with long hex": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][color=#00f]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(0, 0, 255);">TEXT</span>`;
 				},
 				"color with colour name": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][color=green]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: green;">TEXT</span>`;
 				},
 				"color with rgb": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][color=rgb(1, 2, 3)]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgb(1, 2, 3);">TEXT</span>`;
 				},
 				"color with rgba": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][color=rgba(1, 2, 3, 0.4)]TEXT[/color]").firstElementChild!.innerHTML === `<span style="color: rgba(1, 2, 3, 0.4);">TEXT</span>`;
 				},
 				"color with nonsense (XSS)": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][color=green;123\">]TEXT[/color]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
 				}
 			},
@@ -2163,36 +2632,43 @@ type Tests = {
 				"size with no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][size]TEXT[/size]").firstElementChild!.innerHTML === `[size]TEXT[/size]`;
 				},
 				"size with minimum attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][size=1]TEXT[/size]").firstElementChild!.innerHTML === `<span style="font-size: 0.1em;">TEXT</span>`;
 				},
 				"size with maximum attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][size=100]TEXT[/size]").firstElementChild!.innerHTML === `<span style="font-size: 10em;">TEXT</span>`;
 				},
 				"size with below minimum attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][size=0]TEXT[/size]").firstElementChild!.innerHTML === `[size=0]TEXT[/size]`;
 				},
 				"size with above maximum attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][size=101]TEXT[/size]").firstElementChild!.innerHTML === `[size=101]TEXT[/size]`;
 				},
 				"size with non-integer attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][size=1.1]TEXT[/size]").firstElementChild!.innerHTML === `<span style="font-size: 0.1em;">TEXT</span>`;
 				},
 				"size with non-number attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][size=size]TEXT[/size]").firstElementChild!.innerHTML === `[size=size]TEXT[/size]`;
 				}
 			},
@@ -2200,21 +2676,25 @@ type Tests = {
 				"font with no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][font]TEXT[/font]").firstElementChild!.innerHTML === `[font]TEXT[/font]`;
 				},
 				"font with font attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][font=arial]TEXT[/font]").firstElementChild!.innerHTML === `<span style="font-family: arial;">TEXT</span>`;
 				},
 				"font with multiple fonts attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][font=arial, times]TEXT[/font]").firstElementChild!.innerHTML === `<span style="font-family: arial, times;">TEXT</span>`;
 				},
 				"font with nonsense attr (XSS)": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][font=arial;\"><XSS>]TEXT[/font]").firstElementChild!.innerHTML === `<span>TEXT</span>`;
 				}
 			},
@@ -2222,71 +2702,85 @@ type Tests = {
 				"url no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/TEXT">TEXT</a>`;
 				},
 				"url no attr, same protocol": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url]//example.com/test/[/url]").firstElementChild!.innerHTML === `<a href="${window.location.protocol}//example.com/test/">//example.com/test/</a>`;
 				},
 				"url no attr, full URL": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url]https://example.com/test2/[/url]").firstElementChild!.innerHTML === `<a href="https://example.com/test2/">https://example.com/test2/</a>`;
 				},
 				"url path attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url=test]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/test">TEXT</a>`;
 				},
 				"url same protocol attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url=//example.com/test/]TEXT[/url]").firstElementChild!.innerHTML === `<a href="${window.location.protocol}//example.com/test/">TEXT</a>`;
 				},
 				"url full url attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url=https://example.com/test2/]TEXT[/url]").firstElementChild!.innerHTML === `<a href="https://example.com/test2/">TEXT</a>`;
 				},
 				"url invalid text": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url]//#[/url]").firstElementChild!.innerHTML === `[url]//#[/url]`;
 				},
 				"url invalid attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url=//#]TEXT[/url]").firstElementChild!.innerHTML === `[url=//#]TEXT[/url]`;
 				},
 				"url empty attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url=][/url]").firstElementChild!.innerHTML === `[url=][/url]`;
 				},
 				"url no url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url][/url]").firstElementChild!.innerHTML === `[url][/url]`;
 				},
 				"url no end tag with attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url=http://example.com/]EXAMPLE").firstElementChild!.innerHTML === `<a href="http://example.com/">EXAMPLE</a>`;
 				},
 				"url no end tag with no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url]http://example.com").firstElementChild!.innerHTML === `[url]http://example.com`;
 				},
 				"url with inner tags and attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url=http://example.com][b]BOLD[/b] Text[/url]").firstElementChild!.innerHTML === `<a href="http://example.com/"><span style="font-weight: bold">BOLD</span> Text</a>`;
 				},
 				"url with inner tags and no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][url][b]BOLD[/b] Text[/url]").firstElementChild!.innerHTML === `<a href="${window.location.origin}/[b]BOLD[/b]%20Text">[b]BOLD[/b] Text</a>`;
 				}
 			},
@@ -2294,31 +2788,37 @@ type Tests = {
 				"audio with path url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][audio]AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="${window.location.origin}/AUDIO" controls=""></audio>`;
 				},
 				"audio with same protocol url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][audio]//example.com/AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="${window.location.protocol}//example.com/AUDIO" controls=""></audio>`;
 				},
 				"audio with full url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][audio]https://example.com/AUDIO[/audio]").firstElementChild!.innerHTML === `<audio src="https://example.com/AUDIO" controls=""></audio>`;
 				},
 				"audio with invalid url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][audio]//#[/audio]").firstElementChild!.innerHTML === `[audio]//#[/audio]`;
 				},
 				"audio with no url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][audio][/audio]").firstElementChild!.innerHTML === `[audio][/audio]`;
 				},
 				"audio with no end tag": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][audio]https://example.com/AUDIO").firstElementChild!.innerHTML === `[audio]https://example.com/AUDIO`;
 				}
 			},
@@ -2326,96 +2826,115 @@ type Tests = {
 				"img with no url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img][/img]").firstElementChild!.innerHTML === `[img][/img]`;
 				},
 				"img with relative url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
 				},
 				"img with same protocol url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img]//example.com/IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.protocol}//example.com/IMAGE">`;
 				},
 				"img with full url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img]https://example.com/IMAGE[/img]").firstElementChild!.innerHTML === `<img src="https://example.com/IMAGE">`;
 				},
 				"img with no end tag": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img]https://example.com/IMAGE").firstElementChild!.innerHTML === `[img]https://example.com/IMAGE`;
 				},
 				"img with invalid url": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img]//#[/url]").firstElementChild!.innerHTML === `[img]//#[/url]`;
 				},
 				"img with width": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10">`;
 				},
 				"img with height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=x10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" height="10">`;
 				},
 				"img with width and height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=20x10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20" height="10">`;
 				},
 				"img with percentage width": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10%">`;
 				},
 				"img with percentage height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=x10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" height="10%">`;
 				},
 				"img with percentage width and percentage height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=20%x10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20%" height="10%">`;
 				},
 				"img with width and percentage height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=20x10%]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20" height="10%">`;
 				},
 				"img with percentage width and height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=20%x10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="20%" height="10">`;
 				},
 				"img with invalid width": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=ax]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
 				},
 				"img with invalid height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=xa]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
 				},
 				"img with invalid width and invalid height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=axb]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE">`;
 				},
 				"img with invalid width and valid height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=ax10]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" height="10">`;
 				},
 				"img with valid width and invalid height": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][img=10xa]IMAGE[/img]").firstElementChild!.innerHTML === `<img src="${window.location.origin}/IMAGE" width="10">`;
 				}
 			},
@@ -2423,21 +2942,25 @@ type Tests = {
 				"code with no inner text": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][code][/code]").firstElementChild!.innerHTML === `<pre></pre>`;
 				},
 				"code with just text": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][code]TEXT[/code]").firstElementChild!.innerHTML === `<pre>TEXT</pre>`;
 				},
 				"code with text and tags": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i][/code]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
 				},
 				"code with no end tag": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][code]TEXT[i]MORE[u]TEXT[/u][/i]").firstElementChild!.innerHTML === `<pre>TEXT[i]MORE[u]TEXT[/u][/i]</pre>`;
 				}
 			}
@@ -2447,31 +2970,37 @@ type Tests = {
 				"quote empty, no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][quote][/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote></blockquote></fieldset>`;
 				},
 				"quote just text no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][quote]TEXT[/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote>TEXT</blockquote></fieldset>`;
 				},
 				"quote with tags no attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][quote]TEXT[code]MORE TEXT[/code][/quote]").firstElementChild!.innerHTML === `<fieldset><blockquote>TEXT<pre>MORE TEXT</pre></blockquote></fieldset>`;
 				},
 				"quote just text with attr": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][quote=NAME]TEXT[/quote]").firstElementChild!.innerHTML === `<fieldset><legend>NAME</legend><blockquote>TEXT</blockquote></fieldset>`;
 				},
 				"quote with unfinished tag, testing quote enclosure": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][quote=NAME][i]TEXT[/quote][u]MORE TEXT[/u]").firstElementChild!.innerHTML === `<fieldset><legend>NAME</legend><blockquote><span style="font-style: italic">TEXT</span></blockquote></fieldset><span style="text-decoration: underline">MORE TEXT</span>`;
 				},
 				"quote with unfinished tags, testing multiple quote enclosure": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][quote]START[quote=NAME][i]TEXT[/quote][u]MORE TEXT[/quote][s]LAST TEXT[/s]").firstElementChild!.innerHTML === `<fieldset><blockquote>START<fieldset><legend>NAME</legend><blockquote><span style="font-style: italic">TEXT</span></blockquote></fieldset><span style="text-decoration: underline">MORE TEXT</span></blockquote></fieldset><span style="text-decoration: line-through">LAST TEXT</span>`;
 				}
 			},
@@ -2479,76 +3008,91 @@ type Tests = {
 				"list with no contents": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list][/list]").firstElementChild!.innerHTML === `<ul></ul>`;
 				},
 				"list with text contents": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list]TEXT[/list]").firstElementChild!.innerHTML === `<ul></ul>`;
 				},
 				"list with 'a' type": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list=a][/list]").firstElementChild!.innerHTML === `<ol type="a"></ol>`;
 				},
 				"list with 'A' type": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list=A][/list]").firstElementChild!.innerHTML === `<ol type="A"></ol>`;
 				},
 				"list with 'i' type": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list=i][/list]").firstElementChild!.innerHTML === `<ol type="i"></ol>`;
 				},
 				"list with 'I' type": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list=I][/list]").firstElementChild!.innerHTML === `<ol type="I"></ol>`;
 				},
 				"list with '1' type": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list=1][/list]").firstElementChild!.innerHTML === `<ol type="1"></ol>`;
 				},
 				"list with invalid type": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list=b][/list]").firstElementChild!.innerHTML === `<ul></ul>`;
 				},
 				"list with single item": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list][*][/*][/list]").firstElementChild!.innerHTML === `<ul><li></li></ul>`;
 				},
 				"list with multiple items": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list][*][/*][*][/*][*][/*][/list]").firstElementChild!.innerHTML === `<ul><li></li><li></li><li></li></ul>`;
 				},
 				"list with multiple items and data": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list][*]TEXT[/*][*][b]BOLD TEXT[/b][/*][*][u]MORE [i]TEXT[/i][/u][/*][/list]").firstElementChild!.innerHTML === `<ul><li>TEXT</li><li><span style="font-weight: bold">BOLD TEXT</span></li><li><span style="text-decoration: underline">MORE <span style="font-style: italic">TEXT</span></span></li></ul>`;
 				},
 				"list with missing end tag": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list]").firstElementChild!.innerHTML === `<ul></ul>`;
 				},
 				"list with items and missing end tag": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list][*][/*][*][/*][*][/*]").firstElementChild!.innerHTML === `<ul><li></li><li></li><li></li></ul>`;
 				},
 				"list with missing item end tags": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list][*][*][*]").firstElementChild!.innerHTML === `<ul><li></li><li></li><li></li></ul>`;
 				},
 				"list with missing item end tags with data": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][list][*]TEXT[*][b]BOLD TEXT[/b][*][u]MORE [i]TEXT[/i][/u][/list]").firstElementChild!.innerHTML === `<ul><li>TEXT</li><li><span style="font-weight: bold">BOLD TEXT</span></li><li><span style="text-decoration: underline">MORE <span style="font-style: italic">TEXT</span></span></li></ul>`;
 				}
 			},
@@ -2556,61 +3100,73 @@ type Tests = {
 				"table tag empty": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][/table]").firstElementChild!.innerHTML === ``;
 				},
 				"table with empty row": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][tr][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr></tr></tbody></table>`;
 				},
 				"table with empty cell": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][tr][td][/td][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td></td></tr></tbody></table>`;
 				},
 				"table with missing end row tag": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][tr][td][/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td></td></tr></tbody></table>`;
 				},
 				"table with missing end cell tag": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][tr][td][/tr][/table]").firstElementChild!.innerHTML === ``;
 				},
 				"table with missing end cell and row tag": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][tr][td][/table]").firstElementChild!.innerHTML === ``;
 				},
 				"table with multiple cells": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][tr][td]A[/td][td]B[/td][/tr][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td>A</td><td>B</td></tr></tbody></table>`;
 				},
 				"table with multiple rows and cells": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][tr][td][h1]A[/h1][/td][td]B[/td][/tr][tr][td]C[/td][td]D[/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><td><h1>A</h1></td><td>B</td></tr><tr><td>C</td><td>D</td></tr></tbody></table>`;
 				},
 				"table with multiple rows, cells, and header cells": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][tr][th]1st[/th][td][h1]A[/h1][/td][td]B[/td][/tr][tr][th]2nd[/th][td]C[/td][td]D[/td][/table]").firstElementChild!.innerHTML === `<table><tbody><tr><th>1st</th><td><h1>A</h1></td><td>B</td></tr><tr><th>2nd</th><td>C</td><td>D</td></tr></tbody></table>`;
 				},
 				"table with header": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][thead][tr][th]A[/th][/tr][tr][td]B[/td][/tr][/thead][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th></tr><tr><td>B</td></tr></thead></table>`;
 				},
 				"table with footer": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][tfoot][tr][th]A[/th][/tr][tr][td]B[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><tfoot><tr><th>A</th></tr><tr><td>B</td></tr></tfoot></table>`;
 				},
 				"table with everything": async () => {
 					const {default: bbcode} = await import("./lib/bbcode.js"),
 					      {all} = await import("./lib/bbcode_tags.js");
+
 					return bbcode(all, "[b][table][thead][tr][th]A[/th][th]B[/th][/tr][/thead][tbody][tr][td]1[/td][td]2[/td][/tr][/tbody][tfoot][tr][td]I[/td][td]II[/td][/tr][/tfoot][/table]").firstElementChild!.innerHTML === `<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody><tfoot><tr><td>I</td><td>II</td></tr></tfoot></table>`;
 				}
 			}
@@ -2619,6 +3175,7 @@ type Tests = {
 			"none": async () => {
 				const {default: bbcode} = await import("./lib/bbcode.js"),
 				      {all, none} = await import("./lib/bbcode_tags.js");
+
 				return bbcode(Object.assign({none}, all), "[b][none]Stuff[hr]More Stuff[/none]").firstElementChild!.innerHTML === `Stuff<hr>More Stuff`;
 			}
 		}
@@ -2628,52 +3185,73 @@ type Tests = {
 			"get": async () => {
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_BoolSetting_1";
+
 				let v = new BoolSetting(name).value === false;
+
 				window.localStorage.setItem(name, "");
+
 				v &&= new BoolSetting(name).value === true;
+
 				window.localStorage.removeItem(name);
+
 				v &&= new BoolSetting(name).value === false;
+
 				return v;
 			},
 			"set": async () => {
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_BoolSetting_2",
 				      bs = new BoolSetting(name);
+
 				let b = bs.value === false && window.localStorage.getItem(name) === null;
+
 				bs.set(false);
+
 				b &&= bs.value === false && window.localStorage.getItem(name) === null;
+
 				bs.set(true);
+
 				b &&= bs.value === true && window.localStorage.getItem(name) === "";
+
 				bs.set(false);
+
 				b &&= bs.value === false && window.localStorage.getItem(name) === null;
+
 				return b;
 			},
 			"remove": async () => {
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_BoolSetting_3";
+
 				new BoolSetting(name).set(true).remove();
+
 				return window.localStorage.getItem(name) === null;
 			},
 			"name": async () => {
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_BoolSetting_4";
+
 				return new BoolSetting(name).name === name;
 			},
 			"wait": async () => {
 				let num = 0,
 				    v = 0;
+
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      bs = new BoolSetting("SETTINGS_BoolSetting_5").wait(b => {
 					      const needed = num === 2 || num === 5;
+
 					      num++;
 					      v += +(b === needed);
 				      });
+
 				bs.set(false);
 				bs.set(false);
 				bs.set(true);
 				bs.set(true);
 				bs.set(false);
 				bs.set(true);
+
 				return v === 3;
 			},
 			"multi-wait": async () => {
@@ -2681,23 +3259,28 @@ type Tests = {
 				    numw = 0,
 				    v = 0,
 				    w = 0;
+
 				const {BoolSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_BoolSetting_6",
 				      bs = new BoolSetting(name).wait(b => {
 					      const needed = numv === 2 || numv === 5;
+
 					      numv++;
 					      v += +(b === needed);
 				      }).wait(b => {
 					      const needed = numw === 2 || numw === 5;
+
 					      numw++;
 					      w += +(b === needed);
 				      });
+
 				bs.set(false);
 				bs.set(false);
 				bs.set(true);
 				bs.set(true);
 				bs.set(false);
 				bs.set(true);
+
 				return v === 3 && w === 3;
 			}
 		},
@@ -2705,63 +3288,93 @@ type Tests = {
 			"get": async () => {
 				const {IntSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_IntSetting_1";
+
 				let v = new IntSetting(name).value === 0;
+
 				window.localStorage.setItem(name, "1");
+
 				v &&= new IntSetting(name).value === 1;
+
 				window.localStorage.setItem(name, "2");
+
 				v &&= new IntSetting(name).value === 2;
+
 				window.localStorage.setItem(name, "-3");
+
 				v &&= new IntSetting(name).value === -3;
+
 				window.localStorage.setItem(name, "a");
+
 				v &&= new IntSetting(name).value === 0;
 				v &&= new IntSetting(name, 1).value === 1;
+
 				window.localStorage.removeItem(name);
+
 				v &&= new IntSetting(name).value === 0;
+
 				return v;
 			},
 			"set": async () => {
 				const {IntSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_IntSetting_2",
 				      is = new IntSetting(name);
+
 				let b = is.value === 0 && window.localStorage.getItem(name) === null;
+
 				is.set(1);
+
 				b &&= is.value === 1 && window.localStorage.getItem(name) === "1";
+
 				is.set(-2);
+
 				b &&= is.value === -2 && window.localStorage.getItem(name) === "-2";
+
 				is.set(0);
+
 				b &&= is.value === 0 && window.localStorage.getItem(name) === "0";
+
 				is.set(0.5);
+
 				b &&= is.value === 0 && window.localStorage.getItem(name) === "0";
+
 				window.localStorage.removeItem(name);
+
 				return b;
 			},
 			"remove": async () => {
 				const {IntSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_IntSetting_3";
+
 				new IntSetting(name).set(1).remove();
+
 				return window.localStorage.getItem(name) === null;
 			},
 			"name": async () => {
 				const {IntSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_IntSetting_4";
+
 				return new IntSetting(name).name === name;
 			},
 			"wait": async () => {
 				let num = 0,
 				    v = 0;
+
 				const {IntSetting} = await import("./lib/settings.js"),
 				      is = new IntSetting("SETTINGS_IntSetting_5").wait(i => {
 					const r = num++;
+
 					if (r&1) {
 						v += +(i === r);
 					} else {
 						v += +(i === -r);
 					}
 				      });
+
 				is.set(1);
 				is.set(-2);
 				is.set(3);
 				is.remove();
+
 				return v === 4;
 			},
 			"multi-wait": async () => {
@@ -2769,9 +3382,11 @@ type Tests = {
 				    numw = 0,
 				    v = 0,
 				    w = 0;
+
 				const {IntSetting} = await import("./lib/settings.js"),
 				      is = new IntSetting("SETTINGS_IntSetting_6").wait(i => {
 					const r = numv++;
+
 					if (r&1) {
 						v += +(i === r);
 					} else {
@@ -2779,28 +3394,36 @@ type Tests = {
 					}
 				      }).wait(i => {
 					const r = numw++;
+
 					if (r&1) {
 						w += +(i === r);
 					} else {
 						w += +(i === -r);
 					}
 				      });
+
 				is.set(1);
 				is.set(-2);
 				is.set(3);
 				is.remove();
+
 				return v === 4 && w === 4;
 			},
 			"min/max": async () => {
 				const {IntSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_IntSetting_7";
+
 				window.localStorage.setItem(name, "1");
+
 				let v = new IntSetting(name, -1, -10, 5).value === 1;
+
 				v &&= new IntSetting(name, 3, 2, 10).value === 3;
 				v &&= new IntSetting(name, -1, -2, 0).value === -1;
 				v &&= new IntSetting(name, 0, -1, 1).set(2).value === 1;
 				v &&= new IntSetting(name, 0, -1, 1).set(0.5).value === 1;
+
 				window.localStorage.removeItem(name);
+
 				return v;
 			}
 		},
@@ -2808,63 +3431,93 @@ type Tests = {
 			"get": async () => {
 				const {NumberSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_NumberSetting_1";
+
 				let v = new NumberSetting(name).value === 0;
+
 				window.localStorage.setItem(name, "1");
+
 				v &&= new NumberSetting(name).value === 1;
+
 				window.localStorage.setItem(name, "2.5");
+
 				v &&= new NumberSetting(name).value === 2.5;
+
 				window.localStorage.setItem(name, "-3.1");
+
 				v &&= new NumberSetting(name).value === -3.1;
+
 				window.localStorage.setItem(name, "a");
+
 				v &&= new NumberSetting(name).value === 0;
 				v &&= new NumberSetting(name, 1).value === 1;
+
 				window.localStorage.removeItem(name);
+
 				v &&= new NumberSetting(name).value === 0;
+
 				return v;
 			},
 			"set": async () => {
 				const {NumberSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_NumberSetting_2",
 				      ns = new NumberSetting(name);
+
 				let b = ns.value === 0 && window.localStorage.getItem(name) === null;
+
 				ns.set(1);
+
 				b &&= ns.value === 1 && window.localStorage.getItem(name) === "1";
+
 				ns.set(-2);
+
 				b &&= ns.value === -2 && window.localStorage.getItem(name) === "-2";
+
 				ns.set(0);
+
 				b &&= ns.value === 0 && window.localStorage.getItem(name) === "0";
+
 				ns.set(0.5);
+
 				b &&= ns.value === 0.5 && window.localStorage.getItem(name) === "0.5";
+
 				window.localStorage.removeItem(name);
+
 				return b;
 			},
 			"remove": async () => {
 				const {NumberSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_NumberSetting_3";
+
 				new NumberSetting(name).set(1).remove();
+
 				return window.localStorage.getItem(name) === null;
 			},
 			"name": async () => {
 				const {NumberSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_NumberSetting_4";
+
 				return new NumberSetting(name).name === name;
 			},
 			"wait": async () => {
 				let num = 0,
 				    v = 0;
+
 				const {NumberSetting} = await import("./lib/settings.js"),
 				      ns = new NumberSetting("SETTINGS_IntSetting_5", -0.5).wait(i => {
 					const r = num++;
+
 					if (r&1) {
 						v += +(i === r + 0.5);
 					} else {
 						v += +(i === -r - 0.5);
 					}
 				      });
+
 				ns.set(1.5);
 				ns.set(-2.5);
 				ns.set(3.5);
 				ns.remove();
+
 				return v === 4;
 			},
 			"multi-wait": async () => {
@@ -2872,9 +3525,11 @@ type Tests = {
 				    numw = 0,
 				    v = 0,
 				    w = 0;
+
 				const {NumberSetting} = await import("./lib/settings.js"),
 				      ns = new NumberSetting("SETTINGS_NumberSetting_6", -0.5).wait(i => {
 					const r = numv++;
+
 					if (r&1) {
 						v += +(i === r + 0.5);
 					} else {
@@ -2882,28 +3537,36 @@ type Tests = {
 					}
 				      }).wait(i => {
 					const r = numw++;
+
 					if (r&1) {
 						w += +(i === r + 0.5);
 					} else {
 						w += +(i === -r - 0.5);
 					}
 				      });
+
 				ns.set(1.5);
 				ns.set(-2.5);
 				ns.set(3.5);
 				ns.remove();
+
 				return v === 4 && w === 4;
 			},
 			"min/max": async () => {
 				const {NumberSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_NumberSetting_7";
+
 				window.localStorage.setItem(name, "1.5");
+
 				let v = new NumberSetting(name, -1, -10, 5).value === 1.5;
+
 				v &&= new NumberSetting(name, 3.5, 2, 10).value === 3.5;
 				v &&= new NumberSetting(name, -1, -2, 0).value === -1;
 				v &&= new NumberSetting(name, 0, -1, 2).set(2.5).value === 1.5;
 				v &&= new NumberSetting(name, 0, -1, 1).set(0.5).value === 0.5;
+
 				window.localStorage.removeItem(name);
+
 				return v;
 			}
 		},
@@ -2911,48 +3574,70 @@ type Tests = {
 			"get": async () => {
 				const {StringSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_StringSetting_1";
+
 				let v = new StringSetting(name).value === "";
+
 				window.localStorage.setItem(name, "A");
+
 				v &&= new StringSetting(name).value === "A";
+
 				window.localStorage.removeItem(name);
+
 				v &&= new StringSetting(name).value === "";
+
 				return v;
 			},
 			"set": async () => {
 				const {StringSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_StringSetting_2",
 				      ss = new StringSetting(name);
+
 				let b = ss.value === "" && window.localStorage.getItem(name) === null;
+
 				ss.set("");
+
 				b &&= ss.value === "" && window.localStorage.getItem(name) === null;
+
 				ss.set("A");
+
 				b &&= ss.value === "A" && window.localStorage.getItem(name) === "A";
+
 				ss.set("B");
+
 				b &&= ss.value === "B" && window.localStorage.getItem(name) === "B";
+
 				ss.set("");
+
 				b &&= ss.value === "" && window.localStorage.getItem(name) === "";
+
 				window.localStorage.removeItem(name);
+
 				return b;
 			},
 			"remove": async () => {
 				const {StringSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_StringSetting_3";
+
 				new StringSetting(name).set("A").remove();
+
 				return window.localStorage.getItem(name) === null;
 			},
 			"name": async () => {
 				const {StringSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_StringSetting_4";
+
 				return new StringSetting(name).name === name;
 			},
 			"wait": async () => {
 				let num = 0,
 				    v = 0;
+
 				const {StringSetting} = await import("./lib/settings.js"),
 				      ss = new StringSetting("SETTINGS_StringSetting_5").wait(s => {
 					      v += +(s === (num ? String.fromCharCode(num + 64) : ""));
 					      num++;
 				      });
+
 				ss.set("A");
 				ss.set("B");
 				ss.set("C");
@@ -2960,6 +3645,7 @@ type Tests = {
 				ss.set("E");
 				ss.set("F");
 				ss.remove();
+
 				return v === 7;
 			},
 			"multi-wait": async () => {
@@ -2967,6 +3653,7 @@ type Tests = {
 				    numw = 0,
 				    v = 0,
 				    w = 0;
+
 				const {StringSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_StringSetting_6",
 				      ss = new StringSetting(name).wait(s => {
@@ -2976,6 +3663,7 @@ type Tests = {
 					      w += +(s === (numw ? String.fromCharCode(numw + 64) : ""));
 					      numw++;
 				      });
+
 				ss.set("A");
 				ss.set("B");
 				ss.set("C");
@@ -2983,6 +3671,7 @@ type Tests = {
 				ss.set("E");
 				ss.set("F");
 				ss.remove();
+
 				return v === 7 && w === 7;
 			}
 		},
@@ -2992,79 +3681,110 @@ type Tests = {
 				      name = "SETTINGS_JSONSetting_1",
 				      def = {"A": 1},
 				      check = (o: any): o is typeof def => o instanceof Object && typeof o.A === "number";
+
 				let v = new JSONSetting(name, def, check).value.A === 1;
+
 				window.localStorage.setItem(name, "{\"A\":2}");
+
 				v &&= new JSONSetting(name, def, check).value.A === 2;
+
 				window.localStorage.setItem(name, "{\"B\":2}");
+
 				v &&= new JSONSetting(name, def, check).value.A === 1;
+
 				window.localStorage.setItem(name, "{\"A\":3}");
+
 				v &&= new JSONSetting(name, def, check).value.A === 3;
+
 				window.localStorage.removeItem(name);
+
 				v &&= new JSONSetting(name, def, check).value.A === 1;
+
 				return v;
 			},
 			"set": async () => {
 				type O = {
 					A: number;
 				}
+
 				const {JSONSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_JSONSetting_2",
 				      ss = new JSONSetting(name, {"A": 1} as O, (o: any): o is O => o instanceof Object && typeof o.A === "number");
+
 				let b = ss.value.A === 1 && window.localStorage.getItem(name) === null;
+
 				ss.set({"A": 1});
+
 				b &&= ss.value.A === 1 && window.localStorage.getItem(name) === "{\"A\":1}";
+
 				ss.set({"A": 2});
+
 				b &&= ss.value.A === 2 && window.localStorage.getItem(name) === "{\"A\":2}";
+
 				window.localStorage.removeItem(name);
+
 				return b;
 			},
 			"remove": async () => {
 				type O = {
 					A: number;
 				}
+
 				const {JSONSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_JSONSetting_3";
+
 				new JSONSetting(name, {"A": 1} as O, (o: any): o is O => o instanceof Object && typeof o.A === "number").set({"A": 2}).remove();
+
 				return window.localStorage.getItem(name) === null;
 			},
 			"name": async () => {
 				type O = {
 					A: number;
 				}
+
 				const {JSONSetting} = await import("./lib/settings.js"),
 				      name = "SETTINGS_JSONSetting_4";
+
 				return new JSONSetting(name, {"A": 1} as O, (o: any): o is O => o instanceof Object && typeof o.A === "number").name === name;
 			},
 			"wait": async () => {
 				type O = {
 					A: number;
 				}
+
 				let num = 0,
 				    v = 0;
+
 				const {JSONSetting} = await import("./lib/settings.js"),
 				      js = new JSONSetting("SETTINGS_JSONSetting_5", {"A": 1}, (o: any): o is O => o instanceof Object && typeof o.A === "number").wait(o => v += +(o.A === ++num));
+
 				js.set({"A": 2});
 				js.set({"A": 3});
 				js.set({"A": 4});
 				js.set({"A": 5});
 				js.remove();
+
 				return v === 5;
 			},
 			"multi-wait": async () => {
 				type O = {
 					A: number;
 				}
+
 				let numv = 0,
 				    numw = 0,
 				    v = 0,
 				    w = 0;
+
 				const {JSONSetting} = await import("./lib/settings.js"),
 				      js = new JSONSetting("SETTINGS_JSONSetting_5", {"A": 1}, (o: any): o is O => o instanceof Object && typeof o.A === "number").wait(o => v += +(o.A === ++numv)).wait(o => w += +(o.A === ++numw));
+
 				js.set({"A": 2});
 				js.set({"A": 3});
 				js.set({"A": 4});
 				js.set({"A": 5});
 				js.remove();
+
 				return v === 5 && w === 5;
 			}
 		}
@@ -3075,12 +3795,14 @@ type Tests = {
 				const {DragTransfer} = await import("./lib/drag.js"),
 				      dt = new DragTransfer<number>(""),
 				      t = {"transfer": () => 1};
+
 				return dt.register(t) === "0" && dt.register(t) === "1" && dt.register(t) === "2";
 			},
 			"register fn": async () => {
 				const {DragTransfer} = await import("./lib/drag.js"),
 				      dt = new DragTransfer<number>(""),
 				      t = () => 1;
+
 				return dt.register(t) === "0" && dt.register(t) === "1" && dt.register(t) === "2";
 			},
 			"get": async () => {
@@ -3089,6 +3811,7 @@ type Tests = {
 				      k1 = dt.register({"transfer": () => 1}),
 				      k2 = dt.register({"transfer": () => 2}),
 				      preventDefault = () => {};
+
 				return dt.get({"dataTransfer": {"getData": () => k1}, preventDefault} as any as DragEvent) === 1 && dt.get({"dataTransfer": {"getData": () => k2}, preventDefault} as any as DragEvent) === 2 && dt.get({"dataTransfer": {"getData": () => ""}, preventDefault} as any as DragEvent) === undefined;
 			},
 			"get fns": async () => {
@@ -3097,15 +3820,19 @@ type Tests = {
 				      k1 = dt.register(() => 1),
 				      k2 = dt.register(() => 2),
 				      preventDefault = () => {};
+
 				return dt.get({"dataTransfer": {"getData": () => k1}, preventDefault} as any as DragEvent) === 1 && dt.get({"dataTransfer": {"getData": () => k2}, preventDefault} as any as DragEvent) === 2 && dt.get({"dataTransfer": {"getData": () => ""}, preventDefault} as any as DragEvent) === undefined;
 			},
 			"set": async () => {
 				const {DragTransfer} = await import("./lib/drag.js"),
 				      dt = new DragTransfer<number>(""),
 				      e = {"dataTransfer": {"setData": () => ret++, "setDragImage": () => ret *= 3}} as any as DragEvent;
+
 				let ret = 0;
+
 				dt.set(e, "");
 				dt.set(e, "", document.createElement("div"));
+
 				return ret === 6;
 			},
 			"deregister": async () => {
@@ -3114,7 +3841,9 @@ type Tests = {
 				      k = dt.register({"transfer": () => 1}),
 				      e = {"dataTransfer": {"getData": () => k}, "preventDefault": () => {}} as any as DragEvent,
 				      v = +(dt.get(e) === 1) + +(dt.get(e) === 1);
+
 				dt.deregister(k);
+
 				return v === 2 && dt.get(e) === undefined;
 			},
 			"is": async () => {
@@ -3122,6 +3851,7 @@ type Tests = {
 				      dt1 = new DragTransfer("A"),
 				      dt2 = new DragTransfer("B"),
 				      e = {"dataTransfer": {"types": ["A"]}} as any as DragEvent;
+
 				return dt1.is(e) && !dt2.is(e);
 			}
 		},
@@ -3132,11 +3862,13 @@ type Tests = {
 				      file2 = new File(["B"], "b.tst"),
 				      f = new DragFiles("text/plain").asForm({"dataTransfer": {"files": [file1, file2]}, "preventDefault": () => {}} as any as DragEvent, "field"),
 				      fd = f.getAll("field");
+
 				return fd[0] === file1 && fd[1] === file2;
 			},
 			"is": async () => {
 				const {DragFiles} = await import("./lib/drag.js"),
 				      f = new DragFiles("text/plain", "some/mime");
+
 				return f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "file", "type": "text/plain"}]}} as any as DragEvent) &&
 				       f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "file", "type": "some/mime"}]}} as any as DragEvent) &&
 				       f.is({"dataTransfer": {"types": ["Files"], "items": [{"kind": "file", "type": "text/plain"}, {"kind": "file", "type": "some/mime"}]}} as any as DragEvent) &&
@@ -3150,8 +3882,10 @@ type Tests = {
 			"setDragEffect": async () => {
 				const {DragFiles, DragTransfer, setDragEffect} = await import("./lib/drag.js"),
 				      fn = setDragEffect({"link": [new DragFiles("text/plain"), new DragTransfer("A")], "copy": [new DragTransfer("B")]});
+
 				let icon = "",
 				    v = 0;
+
 				v += +(fn({"preventDefault": () => {}, "dataTransfer": {set dropEffect(e: string) {icon = e}, "types": ["Files"], "items": [{"kind": "file", "type": "text/plain"}]}} as any as DragEvent) && icon === "link");
 				icon = "";
 				v += +(!fn({"preventDefault": () => {}, "dataTransfer": {set dropEffect(e: string) {icon = e}, "types": ["Tiles"], "items": [{"kind": "file", "type": "text/plain"}]}} as any as DragEvent) && icon === "");
@@ -3160,6 +3894,7 @@ type Tests = {
 				v += +(fn({"preventDefault": () => {}, "dataTransfer": {set dropEffect(e: string) {icon = e}, "types": ["B"], "items": []}} as any as DragEvent) && icon === "copy");
 				icon = "";
 				v += +(!fn({"preventDefault": () => {}, "dataTransfer": {set dropEffect(e: string) {icon = e}, "types": ["C"], "items": []}} as any as DragEvent) && icon === "");
+
 				return v === 5;
 			}
 		}
@@ -3168,175 +3903,225 @@ type Tests = {
 		"mouseX/mouseY": {
 			"mouse coords": async () => {
 				const m = await import("./lib/events.js");
+
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 100, "clientY": 100}));
+
 				let {mouseX, mouseY} = m;
+
 				if (mouseX !== 100 || mouseY !== 100) {
 					return false;
 				}
+
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 9000, "clientY": 3000}));
+
 				({mouseX, mouseY} = m);
+
 				if (mouseX !== 9000 || mouseY !== 3000) {
 					return false;
 				}
+
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 0, "clientY": 0}));
+
 				({mouseX, mouseY} = m);
+
 				return mouseX === 0 && mouseY === 0;
 			}
 		},
 		"keyEvent": {
 			"single key keyEvent": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom1",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop();
+
 				return res === 3;
 			},
 			"single key keyEvent (after stop)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom2",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
+
 				return res === 3;
 			},
 			"single key keyEvent (no stop)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom3",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop(false);
+
 				return res === 1;
 			},
 			"single key keyEvent (double down)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom4",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop();
+
 				return res === 3;
 			},
 			"single key keyEvent (double stop)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom5",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop();
 				stop();
+
 				return res === 3;
 			},
 			"single key keyEvent (with up)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom6",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
 				stop();
+
 				return res === 3;
 			},
 			"single key keyEvent (multiple times)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom7",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop();
+
 				return res === 12;
 			},
 			"single key keyEvent (multiple times with once)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom8",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3, true);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop();
+
 				return res === 3;
 			},
 			"single key keyEvent (restarted)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom9",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3, true);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop();
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop();
+
 				return res === 12;
 			},
 			"multi key keyEvent": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom10",
 				      key2 = "Custom11",
 				      [start, stop] = keyEvent([key, key2], () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				stop();
+
 				return res === 3;
 			},
 			"multi key keyEvent (other key)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom12",
 				      key2 = "Custom13",
 				      [start, stop] = keyEvent([key, key2], () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {"key": key2}));
 				stop();
+
 				return res === 3;
 			},
 			"multi key keyEvent (both keys)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom14",
 				      key2 = "Custom15",
 				      [start, stop] = keyEvent([key, key2], () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				window.dispatchEvent(new KeyboardEvent("keydown", {"key": key2}));
 				stop();
+
 				return res === 18;
 			},
 			"single key keyEvent (with blur)": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom16",
 				      [start, stop] = keyEvent(key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				window.dispatchEvent(new FocusEvent("blur"));
 				stop(false);
+
 				return res === 3;
 			},
 			"change key": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom28",
 				      newKey = "Custom29",
 				      [start, stop, change] = keyEvent(key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key}));
 				window.dispatchEvent(new KeyboardEvent("keydown", {"key": newKey}));
@@ -3344,15 +4129,18 @@ type Tests = {
 				change(newKey);
 				window.dispatchEvent(new KeyboardEvent("keydown", {"key": newKey}));
 				stop();
+
 				return res === 12;
 			}
 		},
 		"key combinations": {
 			"Ctrl+ single key keyEvent": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom20",
 				      [start, stop] = keyEvent("Ctrl+"+key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, ctrlKey: false}));
 				stop();
@@ -3365,13 +4153,16 @@ type Tests = {
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, ctrlKey: false}));
 				stop();
 				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+
 				return res === 3;
 			},
 			"Shift+": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom21",
 				      [start, stop] = keyEvent("Shift+"+key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, shiftKey: true}));
 				stop();
@@ -3384,13 +4175,16 @@ type Tests = {
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, shiftKey: true}));
 				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
 				stop(false);
+
 				return res === 12;
 			},
 			"Alt+": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom22",
 				      [start, stop] = keyEvent("Alt+"+key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true}));
 				stop();
@@ -3403,13 +4197,16 @@ type Tests = {
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: false}));
 				stop();
 				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+
 				return res === 3;
 			},
 			"Meta+": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom23",
 				      [start, stop] = keyEvent("Meta+"+key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, metaKey: true}));
 				stop();
@@ -3422,13 +4219,16 @@ type Tests = {
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, metaKey: false}));
 				stop();
 				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
+
 				return res === 12;
 			},
 			"All mods": async () => {
 				let res = 0;
+
 				const {keyEvent} = await import("./lib/events.js"),
 				      key = "Custom24",
 				      [start, stop] = keyEvent("Alt+Control+Shift+Super+"+key, () => res++, () => res *= 3);
+
 				start();
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, metaKey: true}));
 				window.dispatchEvent(new KeyboardEvent("keyup", {key}));
@@ -3451,36 +4251,45 @@ type Tests = {
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, ctrlKey: true, metaKey: true, shiftKey: true}));
 				stop(false);
 				window.dispatchEvent(new KeyboardEvent("keydown", {key, altKey: true, ctrlKey: true, metaKey: true, shiftKey: true}));
+
 				return res === 40;
 			}
 		},
 		"mouseMoveEvent": {
 			"move": async () => {
 				let res = 0;
+
 				const {mouseMoveEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseMoveEvent((e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, () => res++);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
 				stop();
+
 				return res === 60;
 			},
 			"move (no stop run)": async () => {
 				let res = 0;
+
 				const {mouseMoveEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseMoveEvent((e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, () => res++);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
 				stop(false);
+
 				return res === 59;
 			},
 			"move (multi-start)": async () => {
 				let res = 0;
+
 				const {mouseMoveEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseMoveEvent((e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, () => res++);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				stop();
@@ -3490,66 +4299,84 @@ type Tests = {
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
 				stop();
+
 				return res === 61;
 			},
 			"move (with blur)": async () => {
 				let res = 0;
+
 				const {mouseMoveEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseMoveEvent((e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, () => res++);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
 				window.dispatchEvent(new FocusEvent("blur"));
 				stop(false);
+
 				return res === 60;
 			}
 		},
 		"mouseDragEvent": {
 			"drag 0": async () => {
 				let res = 0;
+
 				const {mouseDragEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				stop();
+
 				return res === 73;
 			},
 			"drag 1": async () => {
 				let res = 0;
+
 				const {mouseDragEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseDragEvent(1, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				stop();
+
 				return res === 73;
 			},
 			"drag 2": async () => {
 				let res = 0;
+
 				const {mouseDragEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseDragEvent(2, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				stop();
+
 				return res === 73;
 			},
 			"drag 0 (without stop)": async () => {
 				let res = 0;
+
 				const {mouseDragEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				stop(false);
+
 				return res === 27;
 			},
 			"drag 0 (with mouseup)": async () => {
 				let res = 0;
+
 				const {mouseDragEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
@@ -3557,12 +4384,15 @@ type Tests = {
 				window.dispatchEvent(new MouseEvent("mouseup", {"button": 2, "clientX": 20, "clientY": 6}));
 				window.dispatchEvent(new MouseEvent("mouseup", {"button": 0, "clientX": 10, "clientY": 4}));
 				stop(false);
+
 				return res === 105;
 			},
 			"drag 0 (with multiple mouseup)": async () => {
 				let res = 0;
+
 				const {mouseDragEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
@@ -3571,22 +4401,27 @@ type Tests = {
 				window.dispatchEvent(new MouseEvent("mouseup", {"button": 2, "clientX": 20, "clientY": 6}));
 				window.dispatchEvent(new MouseEvent("mouseup", {"button": 0, "clientX": 25, "clientY": 7}));
 				stop(false);
+
 				return res === 105;
 			},
 			"drag 0 (with multiple start)": async () => {
 				let res = 0;
+
 				const {mouseDragEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				stop(false);
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				stop();
+
 				return res === 73;
 			},
 			"drag 0 (with post stop event)": async () => {
 				let res = 0;
+
 				const {mouseDragEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
 				start();
@@ -3594,23 +4429,28 @@ type Tests = {
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				stop();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 10, "clientY": 4}));
+
 				return res === 73;
 			},
 			"drag 0 (with blur)": async () => {
 				let res = 0;
+
 				const {mouseDragEvent} = await import("./lib/events.js"),
 				      [start, stop] = mouseDragEvent(0, (e: MouseEvent) => res += 2 * e.clientX + 3 * e.clientY, (e: MouseEvent) => res += 5 * e.clientX + 7 * e.clientY);
+
 				start();
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 1, "clientY": 2}));
 				window.dispatchEvent(new MouseEvent("mousemove", {"clientX": 5, "clientY": 3}));
 				window.dispatchEvent(new FocusEvent("blur"));
 				stop(false);
+
 				return res === 73;
 			}
 		},
 		"hasKeyEvent": {
 			"hasKeyEvent": async () => {
 				let res = 0;
+
 				const {hasKeyEvent, keyEvent} = await import("./lib/events.js"),
 				      key1 = "Custom17",
 				      [start1, stop1] = keyEvent(key1, () => {}),
@@ -3618,6 +4458,7 @@ type Tests = {
 				      [start2, stop2] = keyEvent(key2, undefined, () => {}),
 				      key3 = "Custom19",
 				      [start3, stop3] = keyEvent(key2, () => {}, () => {});
+
 				start1();
 				start2();
 				start3();
@@ -3630,10 +4471,12 @@ type Tests = {
 				res += +(!hasKeyEvent(key2));
 				stop3();
 				res += +(!hasKeyEvent(key3));
+
 				return res === 4;
 			},
 			"hasKeyEvent + mods": async () => {
 				let res = 0;
+
 				const {hasKeyEvent, keyEvent} = await import("./lib/events.js"),
 				      key1 = "Custom25",
 				      [start1, stop1] = keyEvent(key1, () => {}),
@@ -3641,6 +4484,7 @@ type Tests = {
 				      [start2, stop2] = keyEvent(key2, undefined, () => {}),
 				      key3 = "Custom27",
 				      [start3, stop3] = keyEvent("Ctrl+"+key2, () => {}, () => {});
+
 				start1();
 				start2();
 				start3();
@@ -3657,6 +4501,7 @@ type Tests = {
 				start3();
 				res += +(hasKeyEvent("Ctrl+"+key2));
 				stop3();
+
 				return res === 11;
 			}
 		}
@@ -3665,122 +4510,151 @@ type Tests = {
 		"comparison": {
 			"0 == 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.cmp(Fraction.zero) === 0;
 			},
 			"1 == 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.cmp(Fraction.one) === 0;
 			},
 			"0 < 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.cmp(Fraction.one) === -1;
 			},
 			"1 > 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.cmp(Fraction.zero) === 1;
 			},
 			"2 == 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n).cmp(new Fraction(2n)) === 0;
 			},
 			"1 < 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.cmp(new Fraction(2n)) === -1;
 			},
 			"2 > 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n).cmp(Fraction.one) === 1;
 			},
 			"-1 < 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).cmp(Fraction.one) === -1;
 			},
 			"1 > -1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.cmp(new Fraction(-1n)) === 1;
 			},
 			"1 == 2/2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.cmp(new Fraction(2n, 2n)) === 0;
 			},
 			"2 == 6/3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n).cmp(new Fraction(6n, 3n)) === 0;
 			},
 			"-3 == -12/4": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-3n).cmp(new Fraction(-12n, 4n)) === 0;
 			},
 			"3 == -12/-4": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(3n).cmp(new Fraction(-12n, -4n)) === 0;
 			},
 			"1 ~= NaN": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return isNaN(Fraction.one.cmp(Fraction.NaN));
 			},
 			"NaN ~= 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return isNaN(Fraction.NaN.cmp(Fraction.one));
 			}
 		},
 		"isNaN": {
 			"NaN": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.NaN.isNaN();
 			},
 			"0 / 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(0n, 0n).isNaN();
 			},
 			"1 / 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 0n).isNaN();
 			},
 			"2 / 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n, 0n).isNaN();
 			},
 			"-1 / 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n, 0n).isNaN();
 			}
 		},
 		"sign": {
 			"0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.sign() === 0;
 			},
 			"1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.sign() === 1;
 			},
 			"2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n).sign() === 1;
 			},
 			"3/2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(3n, 2n).sign() === 1;
 			},
 			"-1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).sign() === -1;
 			},
 			"-2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-2n).sign() === -1;
 			},
 			"-3/2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-3n, 2n).sign() === -1;
 			},
 			"3/-2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(3n, -2n).sign() === -1;
 			},
 			"-3/-2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-3n, -2n).sign() === 1;
 			}
 		},
@@ -3788,100 +4662,124 @@ type Tests = {
 			"number": {
 				"0": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +Fraction.zero === 0;
 				},
 				"1": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +Fraction.one === 1;
 				},
 				"NaN": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return isNaN(+Fraction.NaN);
 				},
 				"-1": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +new Fraction(-1n) === -1;
 				},
 				"1/2": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +new Fraction(1n, 2n) === 0.5;
 				},
 				"2/4": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +new Fraction(2n, 4n) === 0.5;
 				},
 				"1/10": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +new Fraction(1n, 10n) === 0.1;
 				},
 				"30/3": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +new Fraction(30n, 3n) === 10;
 				},
 				"-1/2": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +new Fraction(-1n, 2n) === -0.5;
 				},
 				"2/-4": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +new Fraction(2n, -4n) === -0.5;
 				},
 				"-1/10": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +new Fraction(-1n, 10n) === -0.1;
 				},
 				"30/-3": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return +new Fraction(30n, -3n) === -10;
 				}
 			},
 			"string": {
 				"0": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return Fraction.zero + "" === "0";
 				},
 				"1": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return Fraction.one + "" === "1";
 				},
 				"NaN": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return Fraction.NaN + "" === "NaN";
 				},
 				"-1": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return new Fraction(-1n) + "" === "-1";
 				},
 				"1/2": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return new Fraction(1n, 2n) + "" === "1 / 2";
 				},
 				"2/4": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return new Fraction(2n, 4n) + "" === "2 / 4";
 				},
 				"1/10": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return new Fraction(1n, 10n) + "" === "1 / 10";
 				},
 				"30/3": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return new Fraction(30n, 3n) + "" === "30 / 3";
 				},
 				"-1/2": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return new Fraction(-1n, 2n) + "" === "-1 / 2";
 				},
 				"2/-4": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return new Fraction(2n, -4n) + "" === "-2 / 4";
 				},
 				"-1/10": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return new Fraction(-1n, 10n) + "" === "-1 / 10";
 				},
 				"30/-3": async () => {
 					const {default: Fraction} = await import("./lib/fraction.js");
+
 					return new Fraction(30n, -3n) + "" === "-30 / 3";
 				}
 			}
@@ -3889,294 +4787,364 @@ type Tests = {
 		"add": {
 			"0 + 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.add(Fraction.zero).cmp(Fraction.zero) === 0;
 			},
 			"0 + 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.add(Fraction.one).cmp(Fraction.one) === 0;
 			},
 			"1 + 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.add(Fraction.zero).cmp(Fraction.one) === 0;
 			},
 			"1 + 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.add(Fraction.one).cmp(new Fraction(2n)) === 0;
 			},
 			"1 + 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.add(new Fraction(2n)).cmp(new Fraction(3n)) === 0;
 			},
 			"-1 + 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).add(new Fraction(2n)).cmp(Fraction.one) === 0;
 			},
 			"-1 + -2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).add(new Fraction(-2n)).cmp(new Fraction(-3n)) === 0;
 			},
 			"1/2 + 1/2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).add(new Fraction(1n, 2n)).cmp(Fraction.one) === 0;
 			},
 			"1/2 + 1/3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).add(new Fraction(1n, 3n)).cmp(new Fraction(5n, 6n)) === 0;
 			},
 			"1/2 + 1/-3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).add(new Fraction(1n, -3n)).cmp(new Fraction(1n, 6n)) === 0;
 			},
 			"2/3 + 2/5": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n, 3n).add(new Fraction(2n, 5n)).cmp(new Fraction(16n, 15n)) === 0;
 			}
 		},
 		"sub": {
 			"0 - 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.sub(Fraction.zero).cmp(Fraction.zero) === 0;
 			},
 			"0 - 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.sub(Fraction.one).cmp(new Fraction(-1n)) === 0;
 			},
 			"1 - 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.sub(Fraction.zero).cmp(Fraction.one) === 0;
 			},
 			"1 - 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.sub(Fraction.one).cmp(Fraction.zero) === 0;
 			},
 			"1 - 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.sub(new Fraction(2n)).cmp(new Fraction(-1n)) === 0;
 			},
 			"-1 - 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).sub(new Fraction(2n)).cmp(new Fraction(-3n)) === 0;
 			},
 			"-1 - -2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).sub(new Fraction(-2n)).cmp(Fraction.one) === 0;
 			},
 			"1/2 - 1/2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).sub(new Fraction(1n, 2n)).cmp(Fraction.zero) === 0;
 			},
 			"1/2 - 1/3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).sub(new Fraction(1n, 3n)).cmp(new Fraction(1n, 6n)) === 0;
 			},
 			"1/2 - 1/-3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).sub(new Fraction(1n, -3n)).cmp(new Fraction(5n, 6n)) === 0;
 			},
 			"2/3 - 2/5": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n, 3n).sub(new Fraction(2n, 5n)).cmp(new Fraction(4n, 15n)) === 0;
 			}
 		},
 		"mul": {
 			"0 * 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.mul(Fraction.zero).cmp(Fraction.zero) === 0;
 			},
 			"0 * 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.mul(Fraction.one).cmp(Fraction.zero) === 0;
 			},
 			"1 * 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.mul(Fraction.zero).cmp(Fraction.zero) === 0;
 			},
 			"1 * 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.mul(Fraction.one).cmp(Fraction.one) === 0;
 			},
 			"1 * 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.mul(new Fraction(2n)).cmp(new Fraction(2n)) === 0;
 			},
 			"-1 * 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).mul(new Fraction(2n)).cmp(new Fraction(-2n)) === 0;
 			},
 			"-1 * -2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).mul(new Fraction(-2n)).cmp(new Fraction(2n)) === 0;
 			},
 			"1/2 * 1/2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).mul(new Fraction(1n, 2n)).cmp(new Fraction(1n, 4n)) === 0;
 			},
 			"1/2 * 1/3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).mul(new Fraction(1n, 3n)).cmp(new Fraction(1n, 6n)) === 0;
 			},
 			"1/2 * 1/-3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).mul(new Fraction(1n, -3n)).cmp(new Fraction(1n, -6n)) === 0;
 			},
 			"2/3 * 2/5": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n, 3n).mul(new Fraction(2n, 5n)).cmp(new Fraction(4n, 15n)) === 0;
 			}
 		},
 		"div": {
 			"0 / 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.div(Fraction.zero).isNaN();
 			},
 			"0 / 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.zero.div(Fraction.one).cmp(Fraction.zero) === 0;
 			},
 			"1 / 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.div(Fraction.zero).isNaN();
 			},
 			"1 / 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.div(Fraction.one).cmp(Fraction.one) === 0;
 			},
 			"1 / 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.one.div(new Fraction(2n)).cmp(new Fraction(1n, 2n)) === 0;
 			},
 			"-1 / 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).div(new Fraction(2n)).cmp(new Fraction(-1n, 2n)) === 0;
 			},
 			"-1 / -2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-1n).div(new Fraction(-2n)).cmp(new Fraction(1n, 2n)) === 0;
 			},
 			"1/2 / 1/2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).div(new Fraction(1n, 2n)).cmp(Fraction.one) === 0;
 			},
 			"1/2 / 1/3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).div(new Fraction(1n, 3n)).cmp(new Fraction(3n, 2n)) === 0;
 			},
 			"1/2 / 1/-3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(1n, 2n).div(new Fraction(1n, -3n)).cmp(new Fraction(-3n, 2n)) === 0;
 			},
 			"2/3 / 2/5": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n, 3n).div(new Fraction(2n, 5n)).cmp(new Fraction(10n, 6n)) === 0;
 			}
 		},
 		"min": {
 			"0, 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(Fraction.zero, Fraction.zero).cmp(Fraction.zero) === 0;
 			},
 			"0, 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(Fraction.zero, Fraction.one).cmp(Fraction.zero) === 0;
 			},
 			"1, 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(Fraction.one, Fraction.zero).cmp(Fraction.zero) === 0;
 			},
 			"1, 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(Fraction.one, Fraction.one).cmp(Fraction.one) === 0;
 			},
 			"1, 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(Fraction.one, new Fraction(2n)).cmp(Fraction.one) === 0;
 			},
 			"-1, 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(new Fraction(-1n), Fraction.zero).cmp(new Fraction(-1n)) === 0;
 			},
 			"-1, 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(new Fraction(-1n), Fraction.one).cmp(new Fraction(-1n)) === 0;
 			},
 			"-1, 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(new Fraction(-1n), new Fraction(2n)).cmp(new Fraction(-1n)) === 0;
 			},
 			"-1, 2, 3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(new Fraction(-1n), new Fraction(2n), new Fraction(3n)).cmp(new Fraction(-1n)) === 0;
 			},
 			"-1, 2, 3, -2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(new Fraction(-1n), new Fraction(2n), new Fraction(3n), new Fraction(-2n)).cmp(new Fraction(-2n)) === 0;
 			},
 			"-1, NaN, 3 -2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.min(new Fraction(-1n), Fraction.NaN, new Fraction(3n), new Fraction(-2n))  === Fraction.NaN;
 			}
 		},
 		"max": {
 			"0, 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(Fraction.zero, Fraction.zero).cmp(Fraction.zero) === 0;
 			},
 			"0, 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(Fraction.zero, Fraction.one).cmp(Fraction.one) === 0;
 			},
 			"1, 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(Fraction.one, Fraction.zero).cmp(Fraction.one) === 0;
 			},
 			"1, 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(Fraction.one, Fraction.one).cmp(Fraction.one) === 0;
 			},
 			"1, 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(Fraction.one, new Fraction(2n)).cmp(new Fraction(2n)) === 0;
 			},
 			"-1, 0": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(new Fraction(-1n), Fraction.zero).cmp(Fraction.zero) === 0;
 			},
 			"-1, 1": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(new Fraction(-1n), Fraction.one).cmp(Fraction.one) === 0;
 			},
 			"-1, 2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(new Fraction(-1n), new Fraction(2n)).cmp(new Fraction(2n)) === 0;
 			},
 			"-1, 2, 3": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(new Fraction(-1n), new Fraction(2n), new Fraction(3n)).cmp(new Fraction(3n)) === 0;
 			},
 			"-1, 2, 3, -2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(new Fraction(-1n), new Fraction(2n), new Fraction(3n), new Fraction(-2n)).cmp(new Fraction(3n)) === 0;
 			},
 			"-1, NaN, 3 -2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return Fraction.max(new Fraction(-1n), Fraction.NaN, new Fraction(3n), new Fraction(-2n))  === Fraction.NaN;
 			}
 		},
 		"simplify": {
 			"2/8": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(2n, 8n).simplify() + "" === "1 / 4";
 			},
 			"-2/8": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-2n, 8n).simplify() + "" === "-1 / 4";
 			},
 			"8/2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(8n, 2n).simplify() + "" === "4";
 			},
 			"-8/2": async () => {
 				const {default: Fraction} = await import("./lib/fraction.js");
+
 				return new Fraction(-8n, 2n).simplify() + "" === "-4";
 			}
 		}
@@ -4185,38 +5153,47 @@ type Tests = {
 		"compound selectors": {
 			"a": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("a", {"opacity": 0}) + "" === "a { opacity: 0; }";
 			},
 			"a:hover": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("a:hover", {"opacity": 0}) + "" === "a:hover { opacity: 0; }";
 			},
 			"div.className": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("div.className", {"opacity": 0}) + "" === "div.className { opacity: 0; }";
 			},
 			"#IDHERE": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("#IDHERE", {"opacity":0}) + "" === "#IDHERE { opacity: 0; }";
 			},
 			"ul::before": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("ul::before", {"opacity": 0}) + "" === "ul::before { opacity: 0; }";
 			},
 			"input[disabled]": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("input[disabled]", {"opacity": 0}) + "" === "input[disabled] { opacity: 0; }";
 			},
 			"no properties": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("a", {}) + "" === "";
 			},
 			"multiple properties": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("a", {"gap": 0, "opacity": 1, "order": 2}) + "" === "a { gap: 0px; opacity: 1; order: 2; }";
 			},
 			"multiple defs": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add({
 					"a": {"gap": 0, "opacity": 1, "order": 2},
 					"div": {"opacity": 0}
@@ -4226,38 +5203,46 @@ type Tests = {
 		"complex selectors": {
 			"div a": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("div a", {"opacity": 0}) + "" === "div a { opacity: 0; }";
 			},
 			"div a:not(:hover)": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("div a:not(:hover)", {"opacity": 0}) + "" === "div a:not(:hover) { opacity: 0; }";
 			},
 			"div + span > a:hover::before": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("div + span > a:hover::before", {"opacity": 0}) + "" === "div + span > a:hover::before { opacity: 0; }";
 			}
 		},
 		"multiple selectors": {
 			"div, a": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("div, a", {"opacity": 0}) + "" === "div, a { opacity: 0; }";
 			},
 			"span, ul > li, label + input": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("span, ul > li, label + input", {"opacity": 0}) + "" === "span, ul > li, label + input { opacity: 0; }";
 			}
 		},
 		"combined selectors": {
 			"div span, a span": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("div, a", {" span": {"opacity": 0}}) + "" === "div span, a span { opacity: 0; }";
 			},
 			"div + span, a + span": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("div, a", {" + span": {"opacity": 0}}) + "" === "div + span, a + span { opacity: 0; }";
 			},
 			"div, a, div > span, a > span": async () => {
 				const {default: CSS} = await import("./lib/css.js");
+
 				return new CSS().add("div, a", {"opacity": 0, " > span": {"order": 1}}) + "" === "div, a { opacity: 0; }div > span, a > span { order: 1; }";
 			}
 		},
@@ -4265,21 +5250,25 @@ type Tests = {
 			"basic ids": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
+
 				return css.id() === "_0" && css.id() === "_1" && css.id() === "_2";
 			},
 			"prefixed ids": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS("ID_");
+
 				return css.id() === "ID_0" && css.id() === "ID_1" && css.id() === "ID_2";
 			},
 			"different start": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS("", 10);
+
 				return css.id() === "_10" && css.id() === "_11" && css.id() === "_12";
 			},
 			"multiple ids": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      ids = new CSS().ids(3);
+
 				return ids[0] === "_0" && ids[1] === "_1" && ids[2] === "_2";
 			}
 		},
@@ -4287,12 +5276,14 @@ type Tests = {
 			"@supports": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
+
 				return css.at("@supports (display: flex)", {"a": {"opacity": 0}}) + "" === "@supports (display: flex) {\n  a { opacity: 0; }\n}";
 
 			},
 			"@media": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
+
 				return css.at("@media screen and (min-width: 900px)", {
 					"article": {
 						"padding": "1rem 3rem"
@@ -4302,11 +5293,13 @@ type Tests = {
 			"@namespace": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
+
 				return css.at(`@namespace svg url(http://www.w3.org/2000/svg)`) + "" === `@namespace svg url("http://www.w3.org/2000/svg");`;
 			},
 			"@keyframes": async () => {
 				const {default: CSS} = await import("./lib/css.js"),
 				      css = new CSS();
+
 				return (css.at("@keyframes identifier", {
 					"0%": {
 						"top": 0
@@ -4321,21 +5314,25 @@ type Tests = {
 			"shallow single": async () => {
 				const {mixin} = await import("./lib/css.js"),
 				      o = mixin({}, {"a": "b"});
+
 				return o["a"] === "b";
 			},
 			"shallow multiple": async () => {
 				const {mixin} = await import("./lib/css.js"),
 				      o = mixin({"existing1": "some value", "existing2": "be gone"}, {"a": "b", "existing2": "stay"});
+
 				return o["existing1"] === "some value" && o["existing2"] === "stay" && o["a"] === "b";
 			},
 			"deep single": async () => {
 				const {mixin} = await import("./lib/css.js"),
 				      o = mixin({}, {"a": {"b": "c"}});
+
 				return o["a"] instanceof Object && (o["a"] as Record<string, string>)["b"] === "c";
 			},
 			"deep merge": async () => {
 				const {mixin} = await import("./lib/css.js"),
 				      o = mixin({"existing": {"a": "b", "c": "d"}}, {"existing": {"c": "e", "f": "g"}});
+
 				return o["existing"] instanceof Object && (o["existing"] as Record<string, string>)["c"] === "e" && (o["existing"] as Record<string, string>)["f"] === "g";
 			}
 		}
@@ -4347,6 +5344,7 @@ type Tests = {
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					      n = new NodeArray(div);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n[node] === div;
 				},
@@ -4358,12 +5356,14 @@ type Tests = {
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(div, noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
+
 					return n.length === 2 && n[0].num === 1 && n[1].num === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
 				},
 				"some nodes without sort": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
@@ -4375,10 +5375,12 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(div, (a: MyNode, b: MyNode) => a.num - b.num, [{[node]: document.createElement("br"), num: 2}, {[node]: document.createElement("span"), num: 1}]);
+
 					return n.length === 2 && n[0].num === 1 && n[1].num === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
 				}
 			},
@@ -4386,42 +5388,51 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					return n.at(0) === undefined && n.at(-1) === undefined;
 				},
 				"two nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
+
 					return n.at(0)?.num === 1 && n.at(-1)?.num === 2;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.at(0)?.num === 0 && n.at(1)?.num === 1 && n.at(4)?.num === 4 && n.at(4) === n.at(-1) && n.at(3) === n.at(-2);
 				},
 				"many nodes big negative": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.at(-6) === undefined;
 				},
 				"many nodes big positive": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.at(5) === undefined;
 				}
 			},
@@ -4429,6 +5440,7 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					return n.concat([]).length === 0;
 				},
 				"a node": async () => {
@@ -4437,6 +5449,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray(document.createElement("div"), noSort, [aNode]),
 					      nn = n.concat();
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return nn.length === 1 && nn[0] === aNode;
 				},
@@ -4448,6 +5461,7 @@ type Tests = {
 					      n = new NodeArray(document.createElement("div"), noSort, [aNode]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      nn = n.concat(another);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return nn.length == 2 && nn[0] === aNode && nn[1] === another;
 				},
@@ -4460,6 +5474,7 @@ type Tests = {
 					      n = new NodeArray(document.createElement("div"), noSort, [aNode, bNode]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      nn = n.concat(another);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return nn.length == 3 && nn[0] === aNode && nn[1] === bNode && nn[2] == another;
 				},
@@ -4473,6 +5488,7 @@ type Tests = {
 					      n = new NodeArray(document.createElement("div"), noSort, [aNode, bNode]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      nn = n.concat(another, anotherOne);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return nn.length == 4 && nn[0] === aNode && nn[1] === bNode && nn[2] == another && nn[3] == anotherOne;
 				},
@@ -4486,6 +5502,7 @@ type Tests = {
 					      n = new NodeArray(document.createElement("div"), noSort, [aNode, bNode]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      nn = n.concat([another, anotherOne]);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return nn.length == 4 && nn[0] === aNode && nn[1] === bNode && nn[2] == another && nn[3] == anotherOne;
 				}
@@ -4493,11 +5510,13 @@ type Tests = {
 			"copyWithin": {
 				"should throw error": async () => {
 					const {NodeArray} = await import("./lib/nodes.js");
+
 					try {
 						new NodeArray(document.createElement("div")).copyWithin(0);
 					} catch {
 						return true;
 					}
+
 					return false;
 				}
 			},
@@ -4506,33 +5525,40 @@ type Tests = {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div")),
 					      g = n.entries();
+
 					return g.next().value === undefined;
 				},
 				"two nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]),
 					      g = n.entries(),
 					      a = g.next().value,
 					      b = g.next().value;
+
 					return a?.[0] === 0 && a?.[1].num === 1 && b?.[0] === 1 && b?.[1].num === 2 && g.next().value === undefined;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					let good = 0;
+
 					for (const [num, e] of n.entries()) {
 						if (num === good && e.num === num) {
 							good++;
 						}
 					}
+
 					return good === 5;
 				}
 			},
@@ -4540,48 +5566,59 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					let good = true;
+
 					return n.every(() => good = false) && good;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
+
 					return n.every(() => true);
 				},
 				"a node false": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
+
 					return !n.every(() => false);
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {};
+
 					let pos = 0;
+
 					return n.every(function(this: any, t, p, a){ return t.num === pos && p === pos++ && a === n && this === aThis}, aThis);
 				}
 			},
 			"fill": {
 				"should throw error": async () => {
 					const {NodeArray, node} = await import("./lib/nodes.js");
+
 					try {
 						// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 						new NodeArray(document.createElement("div")).fill({[node]: document.createElement("span")});
 					} catch {
 						return true;
 					}
+
 					return false;
 				}
 			},
@@ -4589,40 +5626,48 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					let good = true;
+
 					return n.filter(() => good = false) && good;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
 					      filtered = n.filter(() => true);
+
 					return filtered.length === 1 && filtered[0] === item;
 				},
 				"a node false": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
 					      filtered = n.filter(() => false);
+
 					return filtered.length === 0;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {},
 					      filtered = n.filter(function(this: any, e) { return e.num % 2 === 0 && this === aThis; }, aThis);
+
 					return filtered.length === 3 && filtered[0].num === 0 && filtered[1].num === 2 && filtered[2].num === 4;
 				}
 			},
@@ -4630,40 +5675,48 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					let good = true;
+
 					return n.filterRemove(() => good = false) && good;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
 					      filtered = n.filterRemove(() => true);
+
 					return filtered.length === 1 && filtered[0] === item && n.length === 0;
 				},
 				"a node false": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
 					      filtered = n.filterRemove(() => false);
+
 					return filtered.length === 0 && n.length === 1;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {},
 					      filtered = n.filterRemove(function(this: any, e) { return e.num % 2 === 0 && this === aThis; }, aThis);
+
 					return filtered.length === 3 && filtered[0].num === 0 && filtered[1].num === 2 && filtered[2].num === 4 && n[0].num === 1 && n[1].num === 3;
 				}
 			},
@@ -4671,37 +5724,45 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					let good = false;
+
 					return n.find(() => good = true) === undefined && !good;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.find(() => true) === item;
 				},
 				"a node false": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.find(() => false) === undefined;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {};
+
 					return n.find(function(this: any, e) { return e.num === 3 && this === aThis; }, aThis)?.num === 3;
 				}
 			},
@@ -4709,37 +5770,45 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					let good = false;
+
 					return n.findIndex(() => good = true) === -1 && !good;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.findIndex(() => true) === 0;
 				},
 				"a node false": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.findIndex(() => false) === -1;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {};
+
 					return n.findIndex(function(this: any, e) { return e.num === 3 && this === aThis; }, aThis) === 3;
 				}
 			},
@@ -4747,46 +5816,56 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					let good = false;
+
 					return n.findLast(() => good = true) === undefined && !good;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.findLast(() => true) === item;
 				},
 				"a node false": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.findLast(() => false) === undefined;
 				},
 				"many nodes true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.findLast(() => true)?.num === 4;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {};
+
 					return n.findLast(function(this: any, e) { return e.num === 3 && this === aThis; }, aThis)?.num === 3;
 				}
 			},
@@ -4794,32 +5873,43 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					let good = true;
+
 					n.forEach(() => good = false);
+
 					return good;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					let good = false;
+
 					n.forEach(e => good = e === item);
+
 					return good;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {};
+
 					let good = true;
+
 					n.forEach(function(this: any, e, n){good &&= e.num === n && this === aThis} , aThis);
+
 					return good
 				}
 			},
@@ -4828,6 +5918,7 @@ type Tests = {
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					      n = NodeArray.from(div);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.length === 0 && n[node] === div;
 				},
@@ -4836,6 +5927,7 @@ type Tests = {
 					      div = document.createElement("div"),
 					      child = div.appendChild(document.createElement("span")),
 					      n = NodeArray.from(div);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.length === 1 && n[node] === div && n.at(0) === child;
 				},
@@ -4854,6 +5946,7 @@ type Tests = {
 					      children = Array.from({length: 5}, () => div.appendChild(document.createElement("span"))),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = NodeArray.from(div, e => ({[node]: e, "num": pos++}));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.length === 5 && n.at(0)?.[node] === children[0] && n.at(0)?.num === 0 && n.at(4)?.[node] === children[4] && n.at(4)?.num === 4;
 				}
@@ -4862,6 +5955,7 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return !n.includes({[node]: document.createElement("div")});
 				},
@@ -4869,28 +5963,34 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.includes(item);
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.includes(n.at(0)!) && n.includes(n.at(4)!);
 				},
 				"many nodes with offset": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return !n.includes(n.at(0)!, 1) && n.includes(n.at(4)!, 4);
 				}
 			},
@@ -4898,6 +5998,7 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.indexOf({[node]: document.createElement("div")}) === -1;
 				},
@@ -4905,28 +6006,34 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.indexOf(item) === 0;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.indexOf(n.at(0)!) === 0 && n.indexOf(n.at(4)!) === 4;
 				},
 				"many nodes with offset": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.indexOf(n.at(0)!, 1) === -1 && n.indexOf(n.at(4)!, 4) === 4;
 				}
 			},
@@ -4934,24 +6041,29 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					return Array.from(n.keys()).join(",") === "";
 				},
 				"a node": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
+
 					return Array.from(n.keys()).join(",") === "0";
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return Array.from(n.keys()).join(",") === "0,1,2,3,4";
 				}
 			},
@@ -4959,6 +6071,7 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.lastIndexOf({[node]: document.createElement("div")}) === -1;
 				},
@@ -4966,28 +6079,34 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.lastIndexOf(item) === 0;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.lastIndexOf(n.at(0)!) === 0 && n.lastIndexOf(n.at(4)!) === 4;
 				},
 				"many nodes with offset": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.lastIndexOf(n.at(0)!, 1) === 0 && n.lastIndexOf(n.at(4)!, 3) === -1;
 				}
 			},
@@ -4996,27 +6115,33 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"));
+
 					return n.map(e => e.num).join(",") === "";
 				},
 				"a node": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
+
 					return n.map(e => e.num).join(",") === "1";
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.map(e => e.num).join(",") === "0,1,2,3,4";
 				}
 			},
@@ -5024,26 +6149,31 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					return n.pop() === undefined;
 				},
 				"a node": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(div, noSort, [{[node]: document.createElement("span"), num: 1}]);
+
 					return n.pop()?.num === 1 && n.pop() === undefined && n.length === 0 && div.children.length === 0;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(div, noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.pop()?.num === 4 && n.pop()?.num === 3 && n.length === 3 && div.children.length === 3;
 				}
 			},
@@ -5052,6 +6182,7 @@ type Tests = {
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span")},
 					      n = new NodeArray(document.createElement("div"));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.length === 0 && n.push(item) === 1 && n.length === 1 && n.at(0) === item && n[node].children?.[0] === item[node];
 				},
@@ -5067,13 +6198,16 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), (a, b) => b.num - a.num);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					for (let i = 0; i < 5; i++) {
 						n.push({[node]: document.createElement("span"), num: i});
 					}
+
 					return n.length === 5 && n.at(0)?.num === 4 && n.at(4)?.num === 0;
 				}
 			},
@@ -5081,6 +6215,7 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.reduce((v, c, i) => v + c.num + i, 0) === 0;
 				},
@@ -5088,19 +6223,23 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.reduce((v, c, i) => v + c.num + i, 0) === 1;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.reduce((v, c, i) => v * i + c.num, 0) === 64;
 				}
 			},
@@ -5108,6 +6247,7 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.reduceRight((v, c, i) => v + c.num + i, 0) === 0;
 				},
@@ -5115,19 +6255,23 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.reduceRight((v, c, i) => v + c.num + i, 0) === 1;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.reduceRight((v, c, i) => v * i + c.num, 0) === 0 && n.reduceRight((v, c, i) => v * (i + 1) + c.num, 0) === 119;
 				}
 			},
@@ -5135,27 +6279,33 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					return n.reverse().length === 0;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.reverse().at(0) === item;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items);
+
 					n.reverse();
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.at(0) === items[4] && n.at(4) === items[0] && n[node].children[0] === items[4][node] && n[node].children[4] === items[0][node]; 
 				},
@@ -5163,13 +6313,16 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					      item = {[node]: document.createElement("span"), "num": 99},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), (a, b) => a.num - b.num, items);
+
 					n.reverse();
 					n.push(item);
+
 					return n.at(0) === item; 
 				}
 			},
@@ -5177,26 +6330,31 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					return n.shift() === undefined;
 				},
 				"a node": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(div, noSort, [{[node]: document.createElement("span"), num: 1}]);
+
 					return n.shift()?.num === 1 && n.shift() === undefined && n.length === 0 && div.children.length === 0;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(div, noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.shift()?.num === 0 && n.shift()?.num === 1 && n.length === 3 && div.children.length === 3;
 				}
 			},
@@ -5204,50 +6362,59 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					return n.length === 0 && n.slice().length === 0;
 				},
 				"a node": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), "num": 99},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
 					      s = n.slice();
+
 					return n.length === 1 && s.length === 1 && s[0] === item;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice();
+
 					return n.length === 5 && s.length === 5 && s[0] === items[0] && s[4] === items[4];
 				},
 				"many nodes (+ve start)": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(1);
+
 					return n.length === 5 && s.length === 4 && s[0] === items[1] && s[3] === items[4];
 				},
 				"many nodes (-ve start)": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(-2);
+
 					return n.length === 5 && s.length === 2 && s[0] === items[3] && s[1] === items[4];
 				},
 				"many nodes (big +ve start)": async () => {
@@ -5265,55 +6432,65 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(-10);
+
 					return n.length === 5 && s.length === 5 && s[0] === items[0] && s[4] === items[4];
 				},
 				"many nodes (+ve end)": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(0, 2);
+
 					return n.length === 5 && s.length === 2 && s[0] === items[0] && s[1] === items[1];
 				},
 				"many nodes (-ve end)": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(0, -2);
+
 					return n.length === 5 && s.length === 3 && s[0] === items[0] && s[2] === items[2];
 				},
 				"many nodes (big +ve end)": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(0, 10);
+
 					return n.length === 5 && s.length === 5 && s[0] === items[0] && s[4] === items[4];
 				},
 				"many nodes (big -ve end)": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      s = n.slice(0, -10);
+
 					return n.length === 5 && s.length === 0;
 				}
 			},
@@ -5321,36 +6498,46 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					let good = true;
+
 					return !n.some(() => good = false) && good;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
+
 					let good = false;
+
 					return n.some(() => good = true) && good;
 				},
 				"a node false": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
+
 					let good = true;
+
 					return !n.some(() => good = false) && !good;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n.some(t => t.num === 3);
 				}
 			},
@@ -5359,35 +6546,45 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"));
+
 					n.sort((a, b) => b.num - a.num);
+
 					return n.length === 0;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(div, noSort, items);
+
 					n.sort((a, b) => b.num - a.num);
+
 					return n.at(0) === items[4] && n.at(1) === items[3] && n.at(2) === items[2] && n.at(3) === items[1] && n.at(4) === items[0] && div.children[0] === items[4][node] && div.children[4] === items[0][node];
 				},
 				"many nodes (re-sort)": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(div, (a, b) => a.num - b.num, items);
+
 					items[0].num = 6;
+
 					n.sort();
+
 					return n.at(0) === items[1] && div.firstChild === items[1][node] && n.at(4) === items[0] && div.lastChild === items[0][node];
 				}
 			},
@@ -5396,98 +6593,118 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"));
+
 					return n.length === 0 && n.splice(0, 1).length === 0 && n.length === 0;
 				},
 				"no nodes, add": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"));
+
 					return n.splice(0, 0, {[node]: document.createElement("span"), num: 1}).length === 0 && n.length === 1;
 				},
 				"no nodes, remove+add": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"));
+
 					return n.splice(0, 1, {[node]: document.createElement("span"), num: 1}).length === 0 && n.length === 1;
 				},
 				"one node, remove": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), "num": 99},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
+
 					return n.splice(0, 1)[0] === item && n.length === 0;
 				},
 				"one node, add one after": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 2}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]);
+
 					return n.splice(1, 0, items[1]).length === 0 && n.length === 2 && n.at(0) === items[0] && n.at(1) === items[1];
 				},
 				"one node, add one before": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 2}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]);
+
 					return n.splice(0, 0, items[1]).length === 0 && n.length === 2 && n.at(0) === items[1] && n.at(1) === items[0];
 				},
 				"one node, replace": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 2}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]);
+
 					return n.splice(0, 1, items[1])[0] === items[0] && n.length === 1 && n.at(0) === items[1];
 				},
 				"one node, add two after": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 3}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]);
+
 					return n.splice(1, 0, items[1], items[2]).length === 0 && n.length === 3 && n.at(0) === items[0] && n.at(1) === items[1] && n.at(2) === items[2];
 				},
 				"one node, add two before": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 3}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]);
+
 					return n.splice(0, 0, items[1], items[2]).length === 0 && n.length === 3 && n.at(0) === items[1] && n.at(1) === items[2] && n.at(2) === items[0];
 				},
 				"many nodes, remove many": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items),
 					      removed = n.splice(1, 2);
+
 					return removed.length === 2 && removed[0] === items[1] && removed[1] === items[2] && n.length === 3 && n.at(0) === items[0] && n.at(2) === items[4];
 				}
 			},
@@ -5495,26 +6712,31 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div")).toReversed();
+
 					return n.length === 0;
 				},
 				"a node true": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]).toReversed();
+
 					return n.at(0) === item;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items).toReversed();
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.at(0) === items[4] && n.at(4) === items[0];
 				},
@@ -5522,12 +6744,15 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					      item = {[node]: document.createElement("span"), "num": 99},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), (a, b) => a.num - b.num, items).toReversed();
+
 					n.push(item);
+
 					return n.at(0) == items[4] && n.at(4) === items[0] && n.at(5) === item;
 				}
 			},
@@ -5536,6 +6761,7 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div")).toSorted((a, b) => b.num - a.num);
@@ -5546,6 +6772,7 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
@@ -5559,15 +6786,18 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div")).toSpliced(0, 1);
+
 					return n.length === 0;
 				},
 				"no nodes, add": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div")).toSpliced(0, 0, {[node]: document.createElement("span"), num: 1});
@@ -5578,79 +6808,95 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div")).toSpliced(0, 1, {[node]: document.createElement("span"), num: 1});
+
 					return n.length === 1;
 				},
 				"one node, remove": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span"), "num": 99},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]).toSpliced(0, 1);
+
 					return n.length === 0;
 				},
 				"one node, add one after": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 2}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]).toSpliced(1, 0, items[1]);
+
 					return n.length === 2 && n.at(0) === items[0] && n.at(1) === items[1];
 				},
 				"one node, add one before": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 2}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]).toSpliced(0, 0, items[1]);
+
 					return n.length === 2 && n.at(0) === items[1] && n.at(1) === items[0];
 				},
 				"one node, replace": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 2}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]).toSpliced(0, 1, items[1]);
+
 					return n.length === 1 && n.at(0) === items[1];
 				},
 				"one node, add two after": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 3}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]).toSpliced(1, 0, items[1], items[2]);
+
 					return n.length === 3 && n.at(0) === items[0] && n.at(1) === items[1] && n.at(2) === items[2];
 				},
 				"one node, add two before": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 3}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [items[0]]).toSpliced(0, 0, items[1], items[2]);
+
 					return n.length === 3 && n.at(0) === items[1] && n.at(1) === items[2] && n.at(2) === items[0];
 				},
 				"many nodes, remove many": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					      items = Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, items).toSpliced(1, 2);
+
 					return n.length === 3 && n.at(0) === items[0] && n.at(2) === items[4];
 				}
 			},
@@ -5659,6 +6905,7 @@ type Tests = {
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      item = {[node]: document.createElement("span")},
 					      n = new NodeArray(document.createElement("div"));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.length === 0 && n.unshift(item) === 1 && n.length === 1 && n.at(0) === item && n[node].children?.[0] === item[node];
 				},
@@ -5667,6 +6914,7 @@ type Tests = {
 					      item = {[node]: document.createElement("span")},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.length === 5 && n.unshift(item) === 6 && n.length === 6 && n.at(0) === item && n[node].children[0] === item[node];
 				},
@@ -5674,13 +6922,16 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), (a, b) => a.num - b.num);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					for (let i = 0; i < 5; i++) {
 						n.unshift({[node]: document.createElement("span"), num: i});
 					}
+
 					return n.length === 5 && n.at(0)?.num === 0 && n.at(4)?.num === 4;
 				}
 			},
@@ -5695,27 +6946,33 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]),
 					      g = n.values(),
 					      a = g.next().value,
 					      b = g.next().value;
+
 					return a?.num === 1 && b?.num === 2 && g.next().value === undefined;
 				},
 				"many nodes (iterator)": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					let good = 0;
+
 					for (const e of n) {
 						if (e.num === good) {
 							good++;
 						}
 					}
+
 					return good === 5;
 				}
 			},
@@ -5723,6 +6980,7 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray, node} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					try {
 						// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 						n.with(0, {[node]: document.createElement("div")});
@@ -5736,6 +6994,7 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]),
@@ -5766,51 +7025,62 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeArray} = await import("./lib/nodes.js"),
 					      n = new NodeArray(document.createElement("div"));
+
 					return n[0] === undefined;
 				},
 				"two nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
+
 					return n[0]?.num === 1 && n[1]?.num === 2;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n[0]?.num === 0 && n[1]?.num === 1 && n[4]?.num === 4;
 				},
 				"many nodes big positive": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
+
 					return n[5] === undefined;
 				},
 				"negative index": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
+
 					return n[0]?.num === 1 && n[1]?.num === 2 && n[-1] === undefined;
 				},
 				"maximum index": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeArray, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}, {[node]: document.createElement("br"), num: 2}]);
+
 					return n[0]?.num === 1 && n[1]?.num === 2 && n[2] === undefined;
 				}
 			},
@@ -5839,6 +7109,7 @@ type Tests = {
 					const {NodeMap, node} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					      n = new NodeMap(div);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n[node] === div;
 				},
@@ -5846,30 +7117,36 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string, MyNode>(div, noSort, [["A", {[node]: document.createElement("span"), num: 1}], ["B", {[node]: document.createElement("br"), num: 2}]]);
+
 					return n.size === 2 && n.get("A")?.num === 1 && n.get("B")?.num === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
 				},
 				"some nodes without sort": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeMap, node} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string, MyNode>(div, [["A", {[node]: document.createElement("span"), num: 1}], ["B", {[node]: document.createElement("br"), num: 2}]]);
+
 					return n.size === 2 && n.get("A")?.num === 1 && n.get("B")?.num === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
 				},
 				"sorted nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeMap, node} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<MyNode>(div, (a: MyNode, b: MyNode) => a.num - b.num, [["A", {[node]: document.createElement("br"), num: 2}], ["B", {[node]: document.createElement("span"), num: 1}]]);
+
 					return n.size === 2 && div.firstChild instanceof HTMLSpanElement && div.lastChild instanceof HTMLBRElement;
 				}
 			},
@@ -5877,7 +7154,9 @@ type Tests = {
 				"empty": async () => {
 					const {NodeMap} = await import("./lib/nodes.js"),
 					      n = new NodeMap(document.createElement("div"));
+
 					n.clear();
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 0;
 				},
@@ -5888,7 +7167,9 @@ type Tests = {
 					      s = n.size,
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      l = n[node].children.length;
+
 					n.clear();
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return s === 1 && l === 1 && n.size === 0 && n[node].children.length === 0;
 				},
@@ -5910,8 +7191,10 @@ type Tests = {
 					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap(document.createElement("div"), noSort, [["a", {[node]: document.createElement("span")}]]);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					n.delete("a");
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 0 && n[node].children.length === 0;
 				},
@@ -5921,8 +7204,10 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap(div, noSort, items);
+
 					n.delete("B");
 					n.delete("D");
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 3 && div.children.length === 3 && div.firstChild === items[0][1][node] && div.lastChild === items[4][1][node] && div.children[1] === items[2][1][node];
 				}
@@ -5932,6 +7217,7 @@ type Tests = {
 					const {NodeMap} = await import("./lib/nodes.js"),
 					      n = new NodeMap(document.createElement("div")),
 					      g = n.entries();
+
 					return g.next().value === undefined;
 				},
 				"two nodes": async () => {
@@ -5942,6 +7228,7 @@ type Tests = {
 					      g = n.entries(),
 					      a = g.next().value,
 					      b = g.next().value;
+
 					return a?.[0] === "A" && a?.[1] === items[0][1] && b?.[0] === "B" && b?.[1] === items[1][1] && g.next().value === undefined;
 				}
 			},
@@ -5949,8 +7236,11 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeMap} = await import("./lib/nodes.js"),
 					      n = new NodeMap(document.createElement("div"));
+
 					let good = true;
+
 					n.forEach(() => good = false);
+
 					return good;
 				},
 				"a node true": async () => {
@@ -5958,9 +7248,12 @@ type Tests = {
 					      item = {[node]: document.createElement("span")},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray(document.createElement("div"), noSort, [item]);
+
 					let good = false;
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					n.forEach(e => good = e === item);
+
 					return good;
 				},
 				"many nodes": async () => {
@@ -5969,11 +7262,15 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(document.createElement("div"), noSort, items),
 					      aThis = {};
+
 					let good = true;
+
 					n.forEach(function(this: any, v: any, k: string, o: any) {
 						const i = items.shift();
+
 						good &&= k === i?.[0] && v === i?.[1] && this === aThis && o === n;
 					}, aThis);
+
 					return good
 				}
 			},
@@ -5983,6 +7280,7 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(document.createElement("div"), noSort, items);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.get("A") === items[0][1] && n.get("E") === items[4][1] && n.get("F") === undefined;
 				}
@@ -5993,6 +7291,7 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(document.createElement("div"), noSort, items);
+
 					return n.has("A") && n.has("E") && !n.has("F");
 				}
 			},
@@ -6004,6 +7303,7 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, items);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.insertAfter("F", item, "C") && n.size === 6 && div.children[3] === item[node];
 				},
@@ -6014,6 +7314,7 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, items);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return !n.insertAfter("F", item, "G") && n.size === 5;
 				},
@@ -6024,6 +7325,7 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, items);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.insertAfter("E", item, "C") && n.size === 5 && div.children[3] === item[node];
 				}
@@ -6036,6 +7338,7 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, items);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.insertBefore("F", item, "C") && n.size === 6 && div.children[2] === item[node];
 				},
@@ -6046,6 +7349,7 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, items);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return !n.insertBefore("F", item, "G") && n.size === 5;
 				},
@@ -6056,6 +7360,7 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, items);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.insertBefore("E", item, "C") && n.size === 5 && div.children[2] === item[node];
 				}
@@ -6065,6 +7370,7 @@ type Tests = {
 					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
+
 					return ([[0, "A"], [1, "B"], [2, "C"], [3, "D"], [4, "E"], [5, undefined]] as [number, string | undefined][]).every(([pos, key]) => n.keyAt(pos) === key);
 				}
 			},
@@ -6072,24 +7378,28 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeMap} = await import("./lib/nodes.js"),
 					      n = new NodeMap(document.createElement("div"));
+
 					return Array.from(n.keys()).join(",") === "";
 				},
 				"a node": async () => {
 					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(document.createElement("div"), noSort, [["A", {[node]: document.createElement("span")}]]);
+
 					return Array.from(n.keys()).join(",") === "A";
 				},
 				"many nodes": async () => {
 					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
+
 					return Array.from(n.keys()).join(",") === "A,B,C,D,E";
 				},
 				"many nodes (reversed)": async () => {
 					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(69 - num), {[node]: document.createElement("span")}]));
+
 					return Array.from(n.keys()).join(",") === "E,D,C,B,A";
 				}
 			},
@@ -6098,6 +7408,7 @@ type Tests = {
 					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
+
 					return ([["A", 0], ["B", 1], ["C", 2], ["D", 3], ["E", 4], ["F", -1]] as [string, number][]).every(([key, pos]) => n.position(key) === pos);
 				}
 			},
@@ -6108,7 +7419,9 @@ type Tests = {
 					      item = {[node]: document.createElement("span")},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, [["A", item]]);
+
 					n.reSet("A", "B");
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return div.firstChild === div.lastChild && div.firstChild === item[node] && n.size === 1 && !n.has("A") //&& n.get("B") === item;
 				},
@@ -6118,7 +7431,9 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, items);
+
 					n.reSet("C", "F");
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 5 && div.children[2] === items[2][1][node] && !n.has("C") && n.get("F") === items[2][1];
 				}
@@ -6127,6 +7442,7 @@ type Tests = {
 				"no nodes": async () => {
 					const {NodeMap} = await import("./lib/nodes.js"),
 					      n = new NodeMap(document.createElement("div"));
+
 					return n.reverse().size === 0;
 				},
 				"a node": async () => {
@@ -6135,6 +7451,7 @@ type Tests = {
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<MyNode>(div, noSort, [["A", item]]);
+
 					return div.firstChild === item[node];
 				},
 				"many nodes": async () => {
@@ -6143,7 +7460,9 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, items);
+
 					n.reverse();
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return div.firstChild === items[4][1][node] && div.lastChild === items[0][1][node]; 
 				},
@@ -6155,9 +7474,12 @@ type Tests = {
 					      item = {[node]: document.createElement("span"), "num": 99},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(div, noSort, items);
+
 					n.reverse();
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					n.set("F", item);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return div.firstChild === items[4][1][node] && div.lastChild === item[node]; 
 				}
@@ -6168,8 +7490,10 @@ type Tests = {
 					      div = document.createElement("div"),
 					      item = {[node]: document.createElement("span")},
 					      n = new NodeMap(div);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					n.set("A", item);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 1 && n.get("A") === item && div.firstChild === item[node];
 				},
@@ -6179,8 +7503,10 @@ type Tests = {
 					      item = {[node]: document.createElement("span")},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap(div, noSort, Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span")}]));
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					n.set("F", item);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 6 && n.get("F") === item && div.children[5] === item[node];
 				},
@@ -6188,15 +7514,18 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeMap, node} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]) as [string, MyNode][],
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string, MyNode>(div, (a, b) => b.num - a.num);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					for (const [key, item] of items) {
 						n.set(key, item);
 					}
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.size === 5 && div.firstChild === items[4][1][node] && div.lastChild === items[0][1][node];
 				}
@@ -6206,22 +7535,28 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeMap} = await import("./lib/nodes.js"),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string, MyNode>(document.createElement("div"));
+
 					n.sort((a, b) => b.num - a.num);
+
 					return n.size === 0;
 				},
 				"many nodes": async () => {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeMap, node, noSort} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]) as [string, MyNode][],
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string, MyNode>(div, noSort, items);
+
 					n.sort((a, b) => b.num - a.num);
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return div.children[0] === items[4][1][node] && div.children[1] === items[3][1][node] && div.children[2] === items[2][1][node] && div.children[3] === items[1][1][node] && div.children[4] === items[0][1][node];
 				},
@@ -6229,13 +7564,17 @@ type Tests = {
 					type MyNode = {
 						num: number;
 					}
+
 					const {NodeMap, node} = await import("./lib/nodes.js"),
 					      div = document.createElement("div"),
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]) as [string, MyNode][],
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string, MyNode>(div, (a, b) => a.num - b.num, items);
+
 					items[0][1].num = 6;
+
 					n.sort();
+
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return n.position("B") === 0 && div.firstChild === items[1][1][node] && n.position("A") === 4 && div.lastChild === items[0][1][node];
 				}
@@ -6245,6 +7584,7 @@ type Tests = {
 					const {NodeMap} = await import("./lib/nodes.js"),
 					      n = new NodeMap(document.createElement("div")),
 					      g = n.values();
+
 					return g.next().value === undefined;
 				},
 				"two nodes": async () => {
@@ -6255,6 +7595,7 @@ type Tests = {
 					      g = n.values(),
 					      a = g.next().value,
 					      b = g.next().value;
+
 					return a === items[0][1] && b === items[1][1] && g.next().value === undefined;
 				},
 				"many nodes (iterator)": async () => {
@@ -6262,13 +7603,16 @@ type Tests = {
 					      items = Array.from({length: 5}, (_, num) => [String.fromCharCode(65 + num), {[node]: document.createElement("span"), num}]),
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeMap<string>(document.createElement("div"), noSort, items);
+
 					let good = 0;
+
 					for (const item of n.values()) {
 					// @ts-ignore: Type Error
 						if (item === items.shift()?.[1]) {
 							good++;
 						}
 					}
+
 					return good === 5;
 				}
 			},
@@ -6297,76 +7641,94 @@ type Tests = {
 			"basic": {
 				"0": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return isInt(0);
 				},
 				"'0'": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt("0");
 				},
 				"1": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return isInt(1);
 				},
 				"-1": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return isInt(-1);
 				},
 				"'a'": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt('a');
 				},
 				"0.5": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt(0.5);
 				},
 				"true": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt(true);
 				},
 				"false": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt(false);
 				},
 				"NaN": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt(NaN);
 				},
 				"+Infinity": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt(+Infinity);
 				},
 				"-Infinity": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt(-Infinity);
 				}
 			},
 			"limits": {
 				"-2 <= x <= 5, x = -3": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt(-3, -2, 5);
 				},
 				"-2 <= x <= 5, x = -2": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return isInt(-2, -2, 5);
 				},
 				"-2 <= x <= 5, x = -1": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return isInt(-1, -2, 5);
 				},
 				"-2 <= x <= 5, x = 0": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return isInt(0, -2, 5);
 				},
 				"-2 <= x <= 5, x = 4": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return isInt(4, -2, 5);
 				},
 				"-2 <= x <= 5, x = 5": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return isInt(5, -2, 5);
 				},
 				"-2 <= x <= 5, x = 6": async () => {
 					const {isInt} = await import("./lib/misc.js");
+
 					return !isInt(6, -2, 5);
 				}
 			}
@@ -6374,64 +7736,79 @@ type Tests = {
 		"checkInt": {
 			"'a'": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt("a") === 0;
 			},
 			"0.5": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt(0.5) === 0;
 			},
 			"-2 <= x <= 5, x = -3": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt(-3, -2, 5) === 0;
 			},
 			"-2 <= x <= 5, x = 1": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt(1, -2, 5) === 1;
 			},
 			"-2 <= x <= 5, x = 6": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt(6, -2, 5) === 0;
 			},
 			"-2 <= x <= 5, x = -3, def = 2": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt(-3, -2, 5, 2) === 2;
 			},
 			"-2 <= x <= 5, x = 1, def = 2": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt(1, -2, 5, 2) === 1;
 			},
 			"-2 <= x <= 5, x = 6, def = 2": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt(6, -2, 5, 2) === 2;
 			},
 			"2 <= x <= 5, x = 6": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt(6, 2, 5) === 2;
 			},
 			"-2 <= x <= 5, x = 6, def = 2.5": async () => {
 				const {checkInt} = await import("./lib/misc.js");
+
 				return checkInt(6, -2, 5, 2.5) === 2;
 			}
 		},
 		"mod": {
 			"0 % 2 === 0": async () => {
 				const {mod} = await import("./lib/misc.js");
+
 				return mod(0, 2) === 0;
 			},
 			"1 % 2 === 1": async () => {
 				const {mod} = await import("./lib/misc.js");
+
 				return mod(1, 2) === 1;
 			},
 			"2 % 2 === 0": async () => {
 				const {mod} = await import("./lib/misc.js");
+
 				return mod(2, 2) === 0;
 			},
 			"-1 % 2 === 1": async () => {
 				const {mod} = await import("./lib/misc.js");
+
 				return mod(-1, 2) === 1;
 			},
 			"-2 % 2 === 0": async () => {
 				const {mod} = await import("./lib/misc.js");
+
 				return mod(-2, 2) === 0;
 			}
 		},
@@ -6439,11 +7816,13 @@ type Tests = {
 			"setAndReturn": async () => {
 				const {setAndReturn} = await import("./lib/misc.js"),
 				      m = new Map<string, number>();
+
 				return setAndReturn(m, "key", 3) === 3 && m.get("key") === 3;
 			},
 			"overwrite": async () => {
 				const {setAndReturn} = await import("./lib/misc.js"),
 				      m = new Map<string, number>([["key", 2]]);
+
 				return m.get("key") === 2 && setAndReturn(m, "key", 3) === 3 && m.get("key") === 3;
 			}
 		},
@@ -6451,48 +7830,62 @@ type Tests = {
 			"addAndReturn": async () => {
 				const {addAndReturn} = await import("./lib/misc.js"),
 				      s = new Set<number>();
+
 				return !s.has(3) && addAndReturn(s, 3) === 3 && s.has(3);
 			},
 			"overwrite": async () => {
 				const {addAndReturn} = await import("./lib/misc.js"),
 				      s = new Set<number>([3]);
+
 				return s.has(3) && addAndReturn(s, 3) === 3 && s.has(3);
 			}
 		},
 		"pushAndReturn": async () => {
 			const {pushAndReturn} = await import("./lib/misc.js"),
 			      a: number[] = [];
+
 			return a.length === 0 && pushAndReturn(a, 3) === 3 && a[0] === 3;
 		},
 		"queue": async () => {
 			const {queue} = await import("./lib/misc.js");
+
 			let res = 0;
+
 			queue(async () => res += 1);
 			queue(async () => res *= 2);
 			queue(async () => res += 3);
+
 			return queue(async () => res *= 5).then(() => res === 25);
 		},
 		"autoFocus": {
 			"focus()": async () => {
 				const {autoFocus} = await import("./lib/misc.js");
+
 				let res = 0;
+
 				class focusElement extends HTMLElement {
 					focus() {res++;}
 					select() {res *= 2;}
 				}
+
 				customElements.define("focus-element", focusElement);
 				autoFocus(new focusElement());
+
 				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 1), 100));
 			},
 			"select()": async () => {
 				const {autoFocus} = await import("./lib/misc.js");
+
 				let res = 0;
+
 				class selectElement extends HTMLInputElement {
 					focus() {res++;}
 					select() {res *= 2;}
 				}
+
 				customElements.define("select-element", selectElement, {"extends": "input"});
 				autoFocus(new selectElement());
+
 				return new Promise<boolean>(fn => window.setTimeout(() => fn(res === 2), 100));
 			}
 		},
@@ -6500,16 +7893,19 @@ type Tests = {
 			"html": async () => {
 				const {text2DOM} = await import("./lib/misc.js"),
 				      d = text2DOM("<div><br /></div>");
+
 				return d instanceof DocumentFragment && d.firstChild instanceof HTMLDivElement && d.firstChild?.firstChild instanceof HTMLBRElement;
 			},
 			"svg": async () => {
 				const {text2DOM} = await import("./lib/misc.js"),
 				      d = text2DOM("<svg><g></g></svg>");
+
 				return d instanceof DocumentFragment && d.firstChild instanceof SVGSVGElement && d.firstChild?.firstChild instanceof SVGGElement;
 			},
 			"mix": async () => {
 				const {text2DOM} = await import("./lib/misc.js"),
 				      d = text2DOM("<div><svg></svg></div>");
+
 				return d instanceof DocumentFragment && d.firstChild instanceof HTMLDivElement && d.firstChild?.firstChild instanceof SVGSVGElement;
 			}
 		},
@@ -6517,6 +7913,7 @@ type Tests = {
 			const {Callable}  = await import("./lib/misc.js"),
 			      Fn = class extends Callable<(o: number) => number> {
 				#num: number;
+
 				constructor(n: number) {
 					super((o: number) => this.#num = o);
 
@@ -9588,7 +10985,7 @@ type Tests = {
 					      tk = parser("123abc", p => [{
 							"type": 1 + +(p.next() === "1" && p.next() === "2" && p.next() === "3"),
 							"data": p.get()
-						}, () => p.done()]).next().value;
+					      }, () => p.done()]).next().value;
 
 					return tk.type === 2 && tk.data === "123";
 				},
@@ -9597,7 +10994,7 @@ type Tests = {
 					      tk = parser("abc", p => [{
 							"type": +(p.next() === "a" && p.next() === "b" && p.next() === "c" && p.next() === ""),
 							"data": p.get()
-						}, () => p.done()]).next().value;
+					      }, () => p.done()]).next().value;
 
 					return tk.type === 1 && tk.data === "abc";
 				}
@@ -10178,6 +11575,7 @@ type Tests = {
 						p.next();
 						p.next();
 						p.backup();
+
 						return [{"type": 1, "data": p.get()}, () => p.done()];
 					      }).next().value;
 
@@ -10190,6 +11588,7 @@ type Tests = {
 						p.next();
 						p.backup();
 						p.next();
+
 						return [{"type": 1, "data": p.get()}, () => p.done()];
 					      }).next().value;
 
@@ -10205,6 +11604,7 @@ type Tests = {
 						p.next();
 						p.reset();
 						p.next();
+
 						return [{"type": 1, "data": p.get()}, () => p.done()];
 					      }).next().value;
 
@@ -10216,6 +11616,7 @@ type Tests = {
 						p.next();
 						p.next();
 						p.reset();
+
 						return [{"type": 1, "data": p.get()}, () => p.done()];
 					      }).next().value;
 
