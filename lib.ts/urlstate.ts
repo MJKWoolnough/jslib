@@ -137,6 +137,7 @@ class StateBound<T> extends Binding<T> {
 	#last: string;
 	#checker: (v: any) => v is T;
 	#codec: Codec;
+
 	constructor(name: string, v: T, codec: Codec, checker: (v: any) => v is T = (_: unknown): _ is T => true) {
 		super(v);
 
@@ -154,12 +155,15 @@ class StateBound<T> extends Binding<T> {
 			this.#restore(newState);
 		}
 	}
+
 	get name() {
 		return this.#name;
 	}
+
 	get value() {
 		return super.value;
 	}
+
 	set value(v: T) {
 		super.value = v;
 
@@ -170,6 +174,7 @@ class StateBound<T> extends Binding<T> {
 			queueMicrotask(addStateToURL);
 		}
 	}
+
 	#restore(newState: string) {
 		if (newState === this.#last) {
 			return;
