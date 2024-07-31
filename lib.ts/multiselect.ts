@@ -180,6 +180,7 @@ const style = [new CSS().add({
  *
  * |  Attribute  |  Type   |  Description  |
  * |-------------|---------|---------------|
+ * | filter-type | String  | Can be set to one of 'contain', 'prefix', or 'both', which changes the filter type. Both will promote the prefix matches to the top. |
  * | toggle      | Boolean | When set, selected options will be hidden in the options list until they are deselected. |
  * | placeholder | String  | When set, sets the placeholder text on the input element. |
  * | value       | Array   | An array containing the values of the selected options. Can be set to programmatically select options. |
