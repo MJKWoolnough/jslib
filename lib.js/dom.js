@@ -228,6 +228,13 @@ amendNode = (element, properties, children) => {
  * @return {(props? Props | Children, children?: Children) => DOMBind<T>} Function used to create a `T` element with the specified properties and/or children.
  * */
 bindElement = (ns, value) => wrapElem(value, () => document.createElementNS(ns, value)),
+/**
+ * This function takes an XML namespace and returns a special object for which the keys are DOMBinds for that key and namespace.
+ *
+ * @param {string} ns XML Namespace to which the names will be bound.
+ *
+ * @return {Record<string, Element>} An object which contains correctly typed DOMBinds.
+ */
 tags = ns => new Proxy({}, {"get": (_, element) => wrapElem(element, () => document.createElementNS(ns, element))}),
 /**
  * This function acts as bindElement, but with Custom Elements, first defining the element and then acting as bindElement.

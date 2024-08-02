@@ -248,6 +248,13 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
  * @return {(props? Props | Children, children?: Children) => DOMBind<T>} Function used to create a `T` element with the specified properties and/or children.
  * */
 bindElement = <T extends Element>(ns: string, value: string) => wrapElem(value, () => document.createElementNS(ns, value) as T),
+/**
+ * This function takes an XML namespace and returns a special object for which the keys are DOMBinds for that key and namespace.
+ *
+ * @param {string} ns XML Namespace to which the names will be bound.
+ *
+ * @return {Record<string, Element>} An object which contains correctly typed DOMBinds.
+ */
 tags = <NS extends string>(ns: NS) => new Proxy({}, {"get": (_, element: string) => wrapElem(element, () => document.createElementNS(ns, element))}) as NS extends "http://www.w3.org/1999/xhtml" ? {[K in keyof HTMLElementTagNameMap]: DOMBind<HTMLElementTagNameMap[K]>} : NS extends "http://www.w3.org/2000/svg" ? {[K in keyof SVGElementTagNameMap]: DOMBind<SVGElementTagNameMap[K]>} : Record<string, DOMBind<NS extends "http://www.w3.org/1998/Math/MathML" ? MathMLElement :Element>>,
 /**
  * This function acts as bindElement, but with Custom Elements, first defining the element and then acting as bindElement.
