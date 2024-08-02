@@ -23,9 +23,8 @@ fi;
 
 if [ -n "$ts" ]; then
 	(
-		echo "import type {DOMBind} from './dom.js';";
-		echo "import {bindElement} from './dom.js';";
-		echo -en "\n/**\n * The html module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement)s.\n *\n * @module html\n * @requires module:dom\n */\n/** */\n\nexport const\n/** This constant contains the XMLNamespace of HTMLElements. */\nns = \"http://www.w3.org/1999/xhtml\",\n[";
+		echo "import {tags} from './dom.js';";
+		echo -en "\n/**\n * The html module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement)s.\n *\n * @module html\n * @requires module:dom\n */\n/** */\n\nexport const\n/** This constant contains the XMLNamespace of HTMLElements. */\nns = \"http://www.w3.org/1999/xhtml\",\n{";
 
 		first=true;
 
@@ -37,34 +36,20 @@ if [ -n "$ts" ]; then
 			fi;
 
 			if [ "$tag" = "var" ]; then
-				echo -n "vare";
+				echo -n "var: vare";
 			else
 				echo -n "$tag";
 			fi;
 		done;
 
-		echo -n "] = \"$tags\".split(\" \").map(e => bindElement(ns, e)) as [";
-
-		first=true;
-
-		for tag in $tags; do
-			if $first; then
-				first=false;
-			else
-				echo -n ", ";
-			fi;
-
-			echo -n "DOMBind<HTMLElementTagNameMap[\"$tag\"]>";
-		done;
-
-		echo "];";
+		echo -n "} = tags(ns);";
 	) > "$ts";
 fi;
 
 if [ -n "$js" ]; then
 	(
-		echo -e "import {bindElement} from './dom.js';\n";
-		echo -en "\n/**\n * The html module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement)s.\n *\n * @module html\n * @requires module:dom\n */\n/** */\n\nexport const\n/** This constant contains the XMLNamespace of HTMLElements. */\nns = \"http://www.w3.org/1999/xhtml\",\n[";
+		echo -e "import {tags} from './dom.js';\n";
+		echo -en "\n/**\n * The html module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement)s.\n *\n * @module html\n * @requires module:dom\n */\n/** */\n\nexport const\n/** This constant contains the XMLNamespace of HTMLElements. */\nns = \"http://www.w3.org/1999/xhtml\",\n{";
 
 		first=true;
 
@@ -76,12 +61,12 @@ if [ -n "$js" ]; then
 			fi;
 
 			if [ "$tag" = "var" ]; then
-				echo -n "vare";
+				echo -n "var: vare";
 			else
 				echo -n "$tag";
 			fi;
 		done;
 
-		echo "] = \"$tags\".split(\" \").map(e => bindElement(ns, e));";
+		echo "} = tags(ns);";
 	) > "$js";
 fi;
