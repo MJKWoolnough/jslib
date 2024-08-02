@@ -732,6 +732,7 @@ The dom module can be used to manipulate DOM elements.
 | isEventObject | Function | This function is a typeguard for objects that are either [EventArray](#dom_eventarray)s, Event Functions, or EventListenObjects. |
 | <a name="dom_props">Props</a> | Type | A [PropsObject](#dom_propsobject) or [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap). |
 | [PropsObject](#dom_propsobject) | Type | This object is used to set attributes and events on a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget with the [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode) functions. |
+| tags | Function | This function takes an XML namespace and returns a special object for which the keys are DOMBinds for that key and namespace. |
 | [toggle](#dom_toggle) | Function | Can be used directly to toggle an attribute, or accepts a callback to collect the state of the toggled attribute. |
 
 ### <a name="dom_amendnode">amendNode</a>
