@@ -1299,6 +1299,26 @@ type Tests = {
 				return div.name === "div";
 			}
 		},
+		"tags": {
+			"div": async () => {
+				const {tags} = await import("./lib/dom.js"),
+				      div = tags("http://www.w3.org/1999/xhtml")["div"];
+
+				return div() instanceof HTMLDivElement;
+			},
+			"raw": async () => {
+				const {tags} = await import("./lib/dom.js"),
+				      {div, span} = tags("http://www.w3.org/1999/xhtml");
+
+				return div(span).firstChild instanceof HTMLSpanElement;
+			},
+			"name": async () => {
+				const {tags} = await import("./lib/dom.js"),
+				      div = tags("http://www.w3.org/1999/xhtml")["div"];
+
+				return div.name === "div";
+			}
+		},
 		"bindCustomElement": {
 			"custom": async () => {
 				const {bindCustomElement} = await import("./lib/dom.js"),
