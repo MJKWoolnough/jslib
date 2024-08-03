@@ -228,7 +228,7 @@ amendNode = (element, properties, children) => {
  */
 tags = ns => new Proxy({}, {"get": (_, element) => wrapElem(element, () => document.createElementNS(ns, element))}),
 /**
- * This function acts as bindElement, but with Custom Elements, first defining the element and then acting as bindElement.
+ * This function registers the custom element and then returns a DOMBind for the element.
  *
  * @typeParam {HTMLElement} T
  *
