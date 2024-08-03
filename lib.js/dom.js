@@ -220,15 +220,6 @@ amendNode = (element, properties, children) => {
 	return element;
 },
 /**
- * This function binds the amendNode function with the first argument to to `document.createElementNS(ns, value)`. In addition, this function sets the name of the function to `value`.
- * @typeParam {Element} T
- * @param {string} ns    Namespace of the bound element.
- * @param {string} value Name of the element.
- *
- * @return {(props? Props | Children, children?: Children) => DOMBind<T>} Function used to create a `T` element with the specified properties and/or children.
- * */
-bindElement = (ns, value) => wrapElem(value, () => document.createElementNS(ns, value)),
-/**
  * This function takes an XML namespace and returns a special object for which the keys are DOMBinds for that key and namespace.
  *
  * @param {string} ns XML Namespace to which the names will be bound.
