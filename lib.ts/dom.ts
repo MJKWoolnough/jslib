@@ -246,7 +246,7 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
  *
  * @return {Record<string, Element>} An object which contains correctly typed DOMBinds.
  */
-tags = <NS extends string>(ns: NS) => new Proxy({}, {"get": (_, element: string) => wrapElem(element, () => document.createElementNS(ns, element))}) as NS extends "http://www.w3.org/1999/xhtml" ? {[K in keyof HTMLElementTagNameMap]: DOMBind<HTMLElementTagNameMap[K]>} : NS extends "http://www.w3.org/2000/svg" ? {[K in keyof SVGElementTagNameMap]: DOMBind<SVGElementTagNameMap[K]>} : Record<string, DOMBind<NS extends "http://www.w3.org/1998/Math/MathML" ? MathMLElement :Element>>,
+tags = <NS extends string>(ns: NS) => new Proxy({}, {"get": (_, element: string) => wrapElem(element, () => document.createElementNS(ns, element))}) as NS extends "http://www.w3.org/1999/xhtml" ? {[K in keyof HTMLElementTagNameMap]: DOMBind<HTMLElementTagNameMap[K]>} : NS extends "http://www.w3.org/2000/svg" ? {[K in keyof SVGElementTagNameMap]: DOMBind<SVGElementTagNameMap[K]>} : Record<string, DOMBind<NS extends "http://www.w3.org/1998/Math/MathML" ? MathMLElement : Element>>,
 /**
  * This function registers the custom element and then returns a DOMBind for the element.
  *
