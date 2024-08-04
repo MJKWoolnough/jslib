@@ -1,6 +1,5 @@
 import {tags} from './dom.js';
 
-
 /**
  * The html module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement | HTMLElement)s.
  *
