@@ -57,9 +57,9 @@ Thematically, the above modules can be grouped into a few packages:
 |--------------|---------------|
 | casefold     | The scripts generates the casefold module. |
 | circular     | This script walks a javascript import tree to determine if there are any circular imports, which may cause initialisation problems. The first argument specifies the root script. |
-| html         | This script generates the html module, either from a in-built list of HTML tags, or from a supplied list as the first argument and the output filename as the second |
-| math         | This script generates the math module, either from a in-built list of MathML tags, or from a supplied list as the first argument and the output filename as the second |
-| svg          | This script generates the svg module, either from a in-built list of SVG tags, or from a supplied list as the first argument and the output filename as the second. |
+| html         | This script generates the html module. |
+| math         | This script generates the math module. |
+| svg          | This script generates the svg module. |
 
 ## <a name="bbcode">bbcode</a>
 
