@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tags="annotation annotation-xml maction math menclose merror mfenced mfrac mi mmultiscripts mn mo mover mpadded mphantom mprescripts mroot mrow ms mspace msqrt mstyle msub msubsup msup mtable mtd mtext mtr munder munderover semantics";
+tags="annotation annotation-xml maction math merror mfrac mi mmultiscripts mn mo mover mpadded mphantom mprescripts mroot mrow ms mspace msqrt mstyle msub msubsup msup mtable mtd mtext mtr munder munderover semantics";
 
 (
 	cat <<-HEREDOC
@@ -31,7 +31,7 @@ tags="annotation annotation-xml maction math menclose merror mfenced mfrac mi mm
 		fi;
 
 		if [ "$tag" = "annotation-xml" ]; then
-			echo -n "annotationXML";
+			echo -n "\"$tag\": annotationXML";
 		else
 			echo -n "$tag";
 		fi;
