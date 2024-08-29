@@ -223,7 +223,7 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 |---------------|----------|---------------|
 | all           | [Parsers](#bbcode_parsers) | An object which contains all of the tag processors and the text processor. |
 | none          | [TagFn](#bbcode_tagfn) | A special tag processor that ignores the tag and continues processing the inner text. |
-| text          | Function | A text processor that converts all line breaks into HTMLBRElement's. |
+| text          | Function | A text processor that converts all line breaks into HTMLBRElements. |
 | *             | [TagFn](#bbcode_tagfn) | All remaining exports are tag processors |
 
 |  Tags         |  Description  |
@@ -234,7 +234,7 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 | colour/color  | The *colour* and *color* tags set the attribute of the tag as the font colour of the contained data. |
 | font          | The *font* tag sets the font of the contained data. |
 | full/justify  | The *full* and *justify* tags sets full alignment for the contained data. |
-| h1...h6       | Tags *h1*, *h2*, *h3*, *h4*, *h5*, and *h6* create HTMLHeadingElement's around the contained data. |
+| h1...h6       | Tags *h1*, *h2*, *h3*, *h4*, *h5*, and *h6* create HTMLHeadingElements around the contained data. |
 | highlight     | The *highlight* tag highlights the contained data. |
 | hr            | The *hr* tag inserts a horizontal rule, and has no Closing Tag. |
 | i             | The *i* tag sets italic on the contained data. |
@@ -831,7 +831,7 @@ The keys of this type refer to the attribute names that are to be set. The key d
 ```typescript
 (fn: (v: boolean) => void) => (v: boolean) => void;
 ```
-This function can be used directly in the params object of a amendNode call to toggle an attribute on or off (depending on it's previous state); e.g.
+This function can be used directly in the params object of a amendNode call to toggle an attribute on or off (depending on its previous state); e.g.
 
 ```typescript
 amendNode(myNode, {"attr": toggle});
@@ -911,7 +911,7 @@ export class DragTransfer<T = any> {
 }
 ```
 
-To be used in [dragover](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event) and [drop](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event) events, this method determines is the passed [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent)'s [DataTransfer.types](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types) array contains this objects format string, marking this object as a [CheckedDT](#drag_checkeddt) type.
+To be used in [dragover](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event) and [drop](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event) events, this method determines is the passed [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent)s [DataTransfer.types](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types) array contains this objects format string, marking this object as a [CheckedDT](#drag_checkeddt) type.
 
 ### <a name="drag_dragtransfer_register">register</a>
 ```typescript
@@ -2196,7 +2196,7 @@ The parse module can be used to parse text into token or phrase streams.
 | [TokenFn](#parser_tokenfn) | Type | TokenFn is used by the parsing function to parse a Token from a text stream. |
 | Tokeniser | Class | Tokeniser is a collection of methods that allow the easy parsing of a text stream. |
 | TokenType | Type | TokenType is used to ID a particular class of Tokens. Negative numbers represent built-in states, so only positive numbers should be used by implementing functions. |
-| TokenWithNumbers | Type | TokenWithNumbers represents a token which has it's position within the text stream as an absolute position (pos), a zero-indexed line number (line), and the position on that line (linePos). |
+| TokenWithNumbers | Type | TokenWithNumbers represents a token which has its position within the text stream as an absolute position (pos), a zero-indexed line number (line), and the position on that line (linePos). |
 | withNumbers | Function | withNumbers adds positional information to the tokens, either in the token stream or phrase stream. |
 
 <a name="parser_default">(default)</a>
@@ -2233,13 +2233,13 @@ A Phraser is a collection of methods that allow the easy parsing of a token stre
 
 |  Method  |  Description  |
 |----------|---------------|
-| accept | Adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added. |
+| accept | Adds the next token in the stream to the buffer if its TokenID is in the tokenTypes array provided. Returns true if a token was added. |
 | acceptRun | Successively adds tokens in the stream to the buffer as long they are their TokenID is in the tokenTypes array provided. Returns the TokenID of the last token added. |
 | backup | Restores the state to before the last call to next() (either directly, or via accept, acceptRun, except, or exceptRun). |
 | constructor | Takes either a string or an iterator returning characters, and an initial TokenFn to construct a new Phraser. |
 | done | Returns a Done phrase, optionally with a Done token with a done message, and a recursive PhraseFn which continually returns the same done Phrase. |
 | error | Returns an Error phrase, optionally with an Error token with an error message, and a recursive PhraseFn which continually returns the same error Phrase. |
-| except | Adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added. |
+| except | Adds the next token in the stream to the buffer as long as its TokenID is not in the tokenTypes array provided. Returns true if a token was added. |
 | exceptRun | Successively adds tokens in the stream to the buffer as long as their TokenID is not in the tokenTypes array provided. Returns the TokenID of the last token added.
 | get | Returns all of the tokens processed, clearing the buffer. |
 | length | Returns the number of tokens in the buffer. |
@@ -2608,15 +2608,15 @@ This module directly imports the [bind](#bind) and [misc](#misc) modules.
 
 |  Export  |  Description  |
 |----------|---------------|
-| [bindLocalStorage](#storagestate_bindlocalstorage) | This function creates a [Binding](#bind_binding) that retrieves it's value from localStorage, and stores it's value in localStorage when set. |
-| [bindSessionStorage](#storagestate_bindsessionstorage) | This function creates a [Binding](#bind_binding) that retrieves it's value from sessionStorage, and stores it's value in sessionStorage when set. |
+| [bindLocalStorage](#storagestate_bindlocalstorage) | This function creates a [Binding](#bind_binding) that retrieves its value from localStorage, and stores its value in localStorage when set. |
+| [bindSessionStorage](#storagestate_bindsessionstorage) | This function creates a [Binding](#bind_binding) that retrieves its value from sessionStorage, and stores its value in sessionStorage when set. |
 
 ### <a name="storagestate_bindlocalstorage">bindLocalStorage</a>
 ```typescript
 <T>(name: string, value: NoInfer<T>, typeguard: (v: unknown) => v is T = (_: unknown): _ is any => true): Binding<T>;
 ```
 
-This function creates a [Binding](#bind_binding) that retrieves it's value from localStorage, and stores it's value in localStorage when set.
+This function creates a [Binding](#bind_binding) that retrieves its value from localStorage, and stores its value in localStorage when set.
 
 The value automatically updates when another localStorage Binding Object with the same name is updated, or when the localStorage is set from another browsing context.
 
@@ -2627,7 +2627,7 @@ The value given is used when a value retrieved from localStorage doesn't succeed
 <T>(name: string, value: NoInfer<T>, typeguard: (v: unknown) => v is T = (_: unknown): _ is any => true): Binding<T>;
 ```
 
-This function creates a [Binding](#bind_binding) that retrieves it's value from sessionStorage, and stores it's value in sessionStorage when set.
+This function creates a [Binding](#bind_binding) that retrieves its value from sessionStorage, and stores its value in sessionStorage when set.
 
 The value automatically updates when another sessionStorage Binding Object with the same name is updated, or when the sessionStorage is set from another browsing context.
 
@@ -2699,7 +2699,7 @@ The module exports the following functions:
 | Or          | The Or function returns a TypeGuard that checks a value matches against any of the given TypeGuards. |
 | Part        | The Part function takes an existing TypeGuard created by the Obj function and transforms it to allow any of the defined keys to not exist (or to be 'undefined'). |
 | Rec         | The Rec function returns a TypeGuard that checks for an Object type where the keys and values are of the types specified. |
-| Recur       | The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have it's type specified manually when used this way. |
+| Recur       | The Recur function wraps an existing TypeGuard so it can be used recursively within within itself during TypeGuard creation. The base TypeGuard will need to have its type specified manually when used this way. |
 | Req         | The Req function takes an existing TypeGuard created by the Obj function and transforms it to require all of the defined keys to exist and to not be undefined. |
 | SetType     | The SetType function returns a TypeGuard that checks for an Set type where the values are of the type specified. |
 | Skip        | The Skip function takes an existing TypeGuard create by the Obj function and transforms it to not check the keys passed into this function. |
