@@ -650,7 +650,7 @@ export class DesktopElement extends HTMLElement {
  * | window-icon      | String | Sets the window icon. |
  * | window-title     | String | Sets the window title. |
  *
- * In addition, the following CSS variables can be set to modifiy the dimensions of the Window.
+ * In addition, the following CSS variables can be set to modify the dimensions of the Window.
  *
  * |  Attribute      |  Description  |
  * |-----------------|---------------|
