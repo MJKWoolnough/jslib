@@ -461,7 +461,7 @@ list = (n, t, p) => {
 		amendNode(n, l);
 	}
 },
-/** Basic Text processor that converts all line breaks into HTMLBRElement's. */
+/** Basic Text processor that converts all line breaks into HTMLBRElements. */
 text = (n, t) => amendNode(n, t.split("\n").map((s, n) => [n > 0 ? br() : [], s])),
 /** An object which contains all of the tag processors and the text processor. */
 all = Object.freeze({

@@ -363,7 +363,7 @@ clearNode: mElement = (n?: Node | BoundChild, properties?: Props | Children, chi
 	return amendNode(n, properties, children);
 },
 /**
- * This function can be used directly in the params object of a amendNode call to toggle an attribute on or off (depending on it's previous state); e.g.
+ * This function can be used directly in the params object of a amendNode call to toggle an attribute on or off (depending on its previous state); e.g.
  *
  * amendNode(myNode, {"attr": toggle});
  *

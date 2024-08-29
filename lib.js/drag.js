@@ -111,7 +111,7 @@ export class DragTransfer {
 	}
 
 	/**
-	 * To be used in {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event | dragover} and {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event | drop} events, this method determines is the passed {@link https://developer.mozilla.org/en-US/docs/Web/API/DragEvent DragEvent}'s {@link https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types | DataTransfer.types} array contains this objects format string, marking this object as a {@link CheckedDT} type.
+	 * To be used in {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event | dragover} and {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event | drop} events, this method determines is the passed {@link https://developer.mozilla.org/en-US/docs/Web/API/DragEvent DragEvent}s {@link https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types | DataTransfer.types} array contains this objects format string, marking this object as a {@link CheckedDT} type.
 	 *
 	 * @param {DragEvent} e The DragEvent.
 	 *

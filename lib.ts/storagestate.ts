@@ -1,3 +1,6 @@
+import {Binding} from './bind.js';
+import {setAndReturn} from './misc.js';
+
 /**
  * The storagestate module is used to create {@link bind:Binding | Binding}s that bind to Storage objects.
  *
@@ -6,9 +9,6 @@
  * @requires module:misc
  */
 /** */
-
-import {Binding} from './bind.js';
-import {setAndReturn} from './misc.js';
 
 class StorageBound<T> extends Binding<T> {
 	#storage: Storage;
@@ -75,7 +75,7 @@ const parseJSON = (val: string) => {
 
 export const
 /**
- * This function creates a {@link binding:Binding | Binding} that retrieves it's value from localStorage, and stores it's value in localStorage when set.
+ * This function creates a {@link binding:Binding | Binding} that retrieves its value from localStorage, and stores its value in localStorage when set.
  *
  * The value automatically updates when another localStorage Binding Object with the same name is updated, or when the localStorage is set from another browsing context.
  *
@@ -88,7 +88,7 @@ export const
  */
 bindLocalStorage = <T>(name: string, value: NoInfer<T>, typeguard: (v: unknown) => v is T = (_: unknown): _ is any => true) => new StorageBound(window.localStorage, name, value, typeguard),
 /**
- * This function creates a {@link binding:Binding | Binding} that retrieves it's value from sessionStorage, and stores it's value in sessionStorage when set.
+ * This function creates a {@link binding:Binding | Binding} that retrieves its value from sessionStorage, and stores its value in sessionStorage when set.
  *
  * The value automatically updates when another sessionStorage Binding Object with the same name is updated, or when the sessionStorage is set from another browsing context.
  *
