@@ -381,7 +381,7 @@ export class Subscription {
 	 *
 	 * @param {1 | 2 | 3 | 4 | 5 | 6 | 7} [bindmask] The bitmask to determine which functions are bound.
 	 *
-	 * @return {[Subscription<T>, ((data: T) => void) | undefined, ((data: any) => void) | undefiend, (data: () => void) => void) | undefined]} An Array containing the Subscription and the selected bound functions in the format: [Subscription<T>, *send bound function*,  *receive bound function*, *remove bound function*].
+	 * @return {[Subscription<T>, ((data: T) => void) | undefined, ((data: any) => void) | undefined, (data: () => void) => void) | undefined]} An Array containing the Subscription and the selected bound functions in the format: [Subscription<T>, *send bound function*,  *receive bound function*, *remove bound function*].
 	 */
 	static bind(bindmask = 7) {
 		let successFn,
@@ -432,7 +432,7 @@ export class WaitGroup {
 	 *
 	 * @param {(wi: WaitInfo) => void} fn The Function to call when any tasks are added, complete, or fail.
 	 *
-	 * @return {() => void} A function to unregister the supplied function.
+	 * @return {() => void} A function to deregister the supplied function.
 	 */
 	onUpdate(fn) {
 		this.#update.receive(fn);
@@ -445,7 +445,7 @@ export class WaitGroup {
 	 *
 	 * @param {(wi: WaitInfo) => void} fn The Function to call when all tasks are finished.
 	 *
-	 * @return {() => void} A function to unregister the supplied function.
+	 * @return {() => void} A function to deregister the supplied function.
 	 */
 	onComplete(fn) {
 		this.#complete.receive(fn);

@@ -413,7 +413,7 @@ export class Subscription<T> implements SubscriptionType<T> {
 	 *
 	 * @param {1 | 2 | 3 | 4 | 5 | 6 | 7} [bindmask] The bitmask to determine which functions are bound.
 	 *
-	 * @return {[Subscription<T>, ((data: T) => void) | undefined, ((data: any) => void) | undefiend, (data: () => void) => void) | undefined]} An Array containing the Subscription and the selected bound functions in the format: [Subscription<T>, *send bound function*,  *receive bound function*, *remove bound function*].
+	 * @return {[Subscription<T>, ((data: T) => void) | undefined, ((data: any) => void) | undefined, (data: () => void) => void) | undefined]} An Array containing the Subscription and the selected bound functions in the format: [Subscription<T>, *send bound function*,  *receive bound function*, *remove bound function*].
 	 */
 	static bind<T>(bindmask: 1): [Subscription<T>, (data: T) => void, undefined, undefined];
 	static bind<T>(bindmask: 2): [Subscription<T>, undefined, (data: any) => void, undefined];
@@ -471,7 +471,7 @@ export class WaitGroup {
 	 *
 	 * @param {(wi: WaitInfo) => void} fn The Function to call when any tasks are added, complete, or fail.
 	 *
-	 * @return {() => void} A function to unregister the supplied function.
+	 * @return {() => void} A function to deregister the supplied function.
 	 */
 	onUpdate(fn: (wi: WaitInfo) => void): () => void {
 		this.#update.receive(fn);
@@ -484,7 +484,7 @@ export class WaitGroup {
 	 *
 	 * @param {(wi: WaitInfo) => void} fn The Function to call when all tasks are finished.
 	 *
-	 * @return {() => void} A function to unregister the supplied function.
+	 * @return {() => void} A function to deregister the supplied function.
 	 */
 	onComplete(fn: (wi: WaitInfo) => void): () => void {
 		this.#complete.receive(fn);
