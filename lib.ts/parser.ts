@@ -83,7 +83,7 @@ type Nums = {
 	linePos: number;
 }
 
-/** TokenWithNumbers represents a token which has it's position within the text stream as an absolute position (pos), a zero-indexed line number (line), and the position on that line (linePos). */
+/** TokenWithNumbers represents a token which has its position within the text stream as an absolute position (pos), a zero-indexed line number (line), and the position on that line (linePos). */
 export type TokenWithNumbers = Token & Nums;
 
 /** PhraseWithNumbers represents a Phrase where the tokens are TokenWithNumbers. */
@@ -465,7 +465,7 @@ export class Phraser {
 	}
 
 	/**
-	 * next() adds the next token to the buffer (if it's not a TokenDone or TokenError) and returns the TokenType.
+	 * next() adds the next token to the buffer (if its not a TokenDone or TokenError) and returns the TokenType.
 	 *
 	 * @return {TokenType} The type of the next token in the stream.
 	 */
@@ -532,7 +532,7 @@ export class Phraser {
 	}
 
 	/**
-	 * accept() adds the next token in the stream to the buffer if it's TokenID is in the tokenTypes array provided. Returns true if a token was added.
+	 * accept() adds the next token in the stream to the buffer if its TokenID is in the tokenTypes array provided. Returns true if a token was added.
 	 *
 	 * @param {TokenType[]} ...tokenTypes The token types to match against.
 	 *
@@ -554,7 +554,7 @@ export class Phraser {
 	}
 
 	/**
-	 * except() adds the next token in the stream to the buffer as long as it's TokenID is not in the tokenTypes array provided. Returns true if a token was added.
+	 * except() adds the next token in the stream to the buffer as long as its TokenID is not in the tokenTypes array provided. Returns true if a token was added.
 	 *
 	 * @param {TokenType[]} ...tokenTypes The token types to match against.
 	 *
