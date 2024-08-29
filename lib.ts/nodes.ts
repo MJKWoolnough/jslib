@@ -1,3 +1,5 @@
+import {child as node} from './dom.js';
+
 /**
  * The nodes module contains Classes for aiding in the accessing of DOM {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}s.
  *
@@ -6,8 +8,6 @@
  * @requires module:misc
  */
 /** */
-
-import {child as node} from './dom.js';
 
 /**
  * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Item} of an Item type.

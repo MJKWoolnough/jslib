@@ -1,3 +1,8 @@
+import CaseFold from './casefold.js';
+import {text2DOM} from './misc.js';
+import {TokenDone, Tokeniser} from './parser.js';
+import Parser from './parser.js';
+
 /**
  * This module contains a full CommonMark parser with several optional (enabled by default) extensions.
  *
@@ -7,11 +12,6 @@
  * @requires module:parser
  */
 /** */
-
-import CaseFold from './casefold.js';
-import {text2DOM} from './misc.js';
-import {TokenDone, Tokeniser} from './parser.js';
-import Parser from './parser.js';
 
 /**
  * This type allows for the overriding of default processing behaviour.

@@ -1,3 +1,7 @@
+import type {Binding} from './bind.js';
+import {amendNode, bindCustomElement, clearNode} from './dom.js';
+import {a, li, ul} from './html.js';
+
 /**
  * The pagination module defines a simple {@link https://en.wikipedia.org/wiki/Pagination | pagination} creator.
  *
@@ -6,10 +10,6 @@
  * @requires module:html
  */
 /** */
-
-import type {Binding} from './bind.js';
-import {amendNode, bindCustomElement, clearNode} from './dom.js';
-import {a, li, ul} from './html.js';
 
 type Href = string | ((page: number) => string);
 

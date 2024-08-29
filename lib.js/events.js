@@ -1,3 +1,5 @@
+import {setAndReturn} from './misc.js';
+
 /**
  * The event module is used for easy creation of global events.
  *
@@ -5,8 +7,6 @@
  * @requires misc
  */
 /** */
-
-import {setAndReturn} from './misc.js';
 
 let nextMouseID = 0;
 

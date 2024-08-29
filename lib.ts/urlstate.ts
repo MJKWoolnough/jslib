@@ -1,3 +1,6 @@
+import {Binding} from './bind.js';
+import {Subscription} from './inter.js';
+
 /**
  * The urlstate module provides classes to create {@link module:bind | Binding}s that store and retrieve data from the URL query string.
  *
@@ -6,9 +9,6 @@
  * @requires module:inter
  */
 /** */
-
-import {Binding} from './bind.js';
-import {Subscription} from './inter.js';
 
 type CheckerFn<T> = (v: unknown) => v is T;
 

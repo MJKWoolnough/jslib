@@ -1,3 +1,6 @@
+import {amendNode, bindCustomElement, clearNode} from './dom.js';
+import {a, li, ul} from './html.js';
+
 /**
  * The pagination module defines a simple {@link https://en.wikipedia.org/wiki/Pagination | pagination} creator.
  *
@@ -6,9 +9,6 @@
  * @requires module:html
  */
 /** */
-
-import {amendNode, bindCustomElement, clearNode} from './dom.js';
-import {a, li, ul} from './html.js';
 
 const link = (page, href, contents) => {
 	if (href !== null) {

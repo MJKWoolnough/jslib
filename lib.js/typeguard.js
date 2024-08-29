@@ -1,3 +1,5 @@
+import {Callable, setAndReturn} from './misc.js';
+
 /**
  * The typeguard module provides the building blocks for creating type-safe typeguards.
  *
@@ -7,8 +9,6 @@
  * @requires module:misc
  */
 /** */
-
-import {Callable, setAndReturn} from './misc.js';
 
 let throwErrors = false,
     allowUndefined = null,
