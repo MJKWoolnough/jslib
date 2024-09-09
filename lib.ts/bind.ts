@@ -154,20 +154,30 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 	 *
 	 * @return {ParentNode} The passed node.
 	 */
-	toDOM<N extends ParentNode>(n: N, fn: (v: T extends Array<infer V> ? V : never) => (Children | null)): N;
-	toDOM<N extends ParentNode>(n: N, fn: (v: T extends Set<infer V> ? V : never) => (Children | null)): N;
-	toDOM<N extends ParentNode>(n: N, fn: (k: T extends Map<infer K, unknown> ? K : never, v: T extends Map<unknown, infer V> ? V : never) => (Children | null)): N;
-	toDOM<N extends ParentNode>(n: N, fn: (v: T extends Array<unknown> ? never : T extends Map<unknown, unknown> ? never :T) => (Children | null)): N;
-	toDOM<N extends ParentNode>(n: N, fn: (k: any, v?: any) => (Children | null)) {
+	toDOM<N extends ParentNode>(n: N, prefix: Children, fn: (v: T extends Array<infer V> ? V : never) => (Children | null), suffix?: Children): N;
+	toDOM<N extends ParentNode>(n: N, fn: (v: T extends Array<infer V> ? V : never) => (Children | null), prefix?: Children, suffix?: Children): N;
+	toDOM<N extends ParentNode>(n: N, prefix: Children, fn: (v: T extends Set<infer V> ? V : never) => (Children | null), suffix?: Children): N;
+	toDOM<N extends ParentNode>(n: N, fn: (v: T extends Set<infer V> ? V : never) => (Children | null), prefix?: Children, suffix?: Children): N;
+	toDOM<N extends ParentNode>(n: N, prefix: Children, fn: (k: T extends Map<infer K, unknown> ? K : never, v: T extends Map<unknown, infer V> ? V : never) => (Children | null), suffix?: Children): N;
+	toDOM<N extends ParentNode>(n: N, fn: (k: T extends Map<infer K, unknown> ? K : never, v: T extends Map<unknown, infer V> ? V : never) => (Children | null), prefix?: Children, suffix?: Children): N;
+	toDOM<N extends ParentNode>(n: N, prefix: Children, fn: (v: T extends Array<unknown> ? never : T extends Map<unknown, unknown> ? never : T extends Set<unknown> ? never : T) => (Children | null), suffix?: Children): N;
+	toDOM<N extends ParentNode>(n: N, fn: (v: T extends Array<unknown> ? never : T extends Map<unknown, unknown> ? never : T extends Set<unknown> ? never : T) => (Children | null)): N;
+	toDOM<N extends ParentNode>(n: N, prefix: Children | ((k: any, v?: any) => (Children | null)), fn?: Children | ((k: any, v?: any) => (Children | null)), suffix?: Children) {
+		const aPrefix = prefix instanceof Function ? [] : prefix,
+		      aSuffix = suffix ?? (fn instanceof Function ? [] : fn ?? []),
+		      aFn = prefix instanceof Function ? prefix : fn instanceof Function ? fn : null;
+
 		let cache = new Map<any, Children>();
 
-		return this.#handleRef(n, (n: N, v: T) => {
+		return aFn ? this.#handleRef(n, (n: N, v: T) => {
 			const es: Children[] = [],
 			      elems = new Map<any, Children>();
 
+			es.push(aPrefix);
+
 			if (v instanceof Map) {
 				for (const [k, u] of v.entries()) {
-					const e = cache.get(k) ?? fn(k, u);
+					const e = cache.get(k) ?? aFn(k, u);
 
 					if (e) {
 						elems.set(k, e);
@@ -176,7 +186,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 				}
 			} else if (v instanceof Array) {
 				for (const u of v) {
-					const e = !elems.has(u) && cache.get(u) || fn(u);
+					const e = !elems.has(u) && cache.get(u) || aFn(u);
 
 					if (e) {
 						elems.set(u, e);
@@ -185,7 +195,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 				}
 			} else if (v instanceof Set) {
 				for (const u of v) {
-					const e = cache.get(u) ?? fn(u);
+					const e = cache.get(u) ?? aFn(u);
 
 					if (e) {
 						elems.set(u, e);
@@ -193,7 +203,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 					}
 				}
 			} else {
-				const e = cache.get(v) ?? fn(v);
+				const e = cache.get(v) ?? aFn(v);
 
 				if (e) {
 					elems.set(v, e);
@@ -201,9 +211,11 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 				}
 			}
 
+			es.push(aSuffix);
+
 			clearNode(n, es);
 			cache = elems;
-		}, n => !!n.parentNode, true);
+		}, n => !!n.parentNode, true) : n;
 	}
 
 	toString() {
