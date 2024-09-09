@@ -1624,7 +1624,86 @@ type Tests = {
 				b("B");
 
 				return new Promise(sFn => sFn(parent.childElementCount === 0));
-			}
+			},
+			"map with prefix": async () => {
+				const {default: bind} = await import("./lib/bind.js"),
+				      b = bind(new Map<string, number>([["a", 1], ["b", 2], ["c", 3]])),
+				      br = document.createElement("br"),
+				      parent = b.toDOM(document.createElement("div"), br, (k: string, v: number) => {
+					      if (k === "b") {
+						      return null;
+					      }
+
+					      const e = document.createElement("span");
+
+					      e.innerText = `${k} - ${v}`;
+
+					      return e;
+				      });
+
+				if (parent.childElementCount !== 3 || parent.children[0] !== br || parent.children[1].textContent !== "a - 1" || parent.children[2].textContent !== "c - 3") {
+					return false;
+				}
+
+				parent.children[1].setAttribute("data-test", "TEST");
+
+				b(new Map<string, number>([["Z", 0], ["a", 1], ["b", 2], ["c", 3], ["d", 4], ["e", 5]]));
+
+				return new Promise(sFn => sFn(parent.childElementCount === 6 && parent.children[0] === br && parent.children[1].textContent === "Z - 0" && parent.children[2].textContent === "a - 1" && parent.children[2].getAttribute("data-test") === "TEST" && parent.children[5].textContent === "e - 5"));
+			},
+			"map with suffix": async () => {
+				const {default: bind} = await import("./lib/bind.js"),
+				      b = bind(new Map<string, number>([["a", 1], ["b", 2], ["c", 3]])),
+				      br = document.createElement("br"),
+				      parent = b.toDOM(document.createElement("div"), (k: string, v: number) => {
+					      if (k === "b") {
+						      return null;
+					      }
+
+					      const e = document.createElement("span");
+
+					      e.innerText = `${k} - ${v}`;
+
+					      return e;
+				      }, br);
+
+				if (parent.childElementCount !== 3 || parent.children[2] !== br || parent.children[0].textContent !== "a - 1" || parent.children[1].textContent !== "c - 3") {
+					return false;
+				}
+
+				parent.children[0].setAttribute("data-test", "TEST");
+
+				b(new Map<string, number>([["Z", 0], ["a", 1], ["b", 2], ["c", 3], ["d", 4], ["e", 5]]));
+
+				return new Promise(sFn => sFn(parent.childElementCount === 6 && parent.children[5] === br && parent.children[0].textContent === "Z - 0" && parent.children[1].textContent === "a - 1" && parent.children[1].getAttribute("data-test") === "TEST" && parent.children[4].textContent === "e - 5"));
+			},
+			"map with prefix and suffix": async () => {
+				const {default: bind} = await import("./lib/bind.js"),
+				      b = bind(new Map<string, number>([["a", 1], ["b", 2], ["c", 3]])),
+				      br = document.createElement("br"),
+				      hr = document.createElement("hr"),
+				      parent = b.toDOM(document.createElement("div"), br, (k: string, v: number) => {
+					      if (k === "b") {
+						      return null;
+					      }
+
+					      const e = document.createElement("span");
+
+					      e.innerText = `${k} - ${v}`;
+
+					      return e;
+				      }, hr);
+
+				if (parent.childElementCount !== 4 || parent.children[0] !== br || parent.children[1].textContent !== "a - 1" || parent.children[2].textContent !== "c - 3" || parent.children[3] !== hr) {
+					return false;
+				}
+
+				parent.children[1].setAttribute("data-test", "TEST");
+
+				b(new Map<string, number>([["Z", 0], ["a", 1], ["b", 2], ["c", 3], ["d", 4], ["e", 5]]));
+
+				return new Promise(sFn => sFn(parent.childElementCount === 7 && parent.children[0] === br && parent.children[1].textContent === "Z - 0" && parent.children[2].textContent === "a - 1" && parent.children[2].getAttribute("data-test") === "TEST" && parent.children[5].textContent === "e - 5" && parent.children[6] === hr));
+			},
 		}
 	},
 	"html.js": {
