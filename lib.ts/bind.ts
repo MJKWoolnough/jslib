@@ -217,7 +217,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 
 			clearNode(n, es);
 			cache = elems;
-		}, n => !!n.parentNode, true) : n;
+		}, n => !!n.parentNode, true) : clearNode(n, [aPrefix, aSuffix]);
 	}
 
 	toString() {

@@ -193,7 +193,7 @@ export class Binding extends Callable {
 
 			clearNode(n, es);
 			cache = elems;
-		}, n => !!n.parentNode, true) : n;
+		}, n => !!n.parentNode, true) : clearNode(n, [aPrefix, aSuffix]);
 	}
 
 	toString() {
