@@ -13262,8 +13262,8 @@ type Tests = {
 				},
 				"multiple tokens that have no colour set": {
 					"tokens": [{"type": 0, "data": "a\n"}, {"type": 1, "data": "cb\nb\nbc"}],
-					"result": `<span>a<br>cb<br>b<br>bc</span>`,
-				},
+					"result": `<span>a<br>cb<br>b<br>bc</span>`
+				}
 			} as Record<string, Entry>).reduce((o, [name, {result = "", fulltext = "", tokens = [], colours = [], noPre = true}]) => {
 				o[name] = Object.defineProperty(async () => {
 					const {default: code} = await import("./lib/markdown_code.js"),
@@ -13409,7 +13409,7 @@ type Tests = {
 				"newlines in brackets and parens": {
 					"source": "( \n ) \n [ \n ]",
 					"output": `<span class="punctuator">(</span><span class="whitespace">&nbsp;<br>&nbsp;</span><span class="punctuator">)</span><span class="whitespace">&nbsp;</span><span class="lineterminator"><br></span><span class="whitespace">&nbsp;</span><span class="punctuator">[</span><span class="whitespace">&nbsp;<br>&nbsp;</span><span class="punctuator">]</span>`
-				},
+				}
 			},
 			"bash": {
 				"whitespace": {
