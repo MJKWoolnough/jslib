@@ -152,7 +152,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 	 * @param {ParentNode} n        The node to which children will be attached to.
 	 * @param {Children}   [prefix] Child nodes to put before the output of the generating function.
 	 * @param {Function}   fn       The node generating function, which takes different values depending on the bound type and returns a {@link dom:Children | Children} or null;
-	 * @param {Children}   [prefix] Child nodes to put after the output of the generating function.
+	 * @param {Children}   [suffix] Child nodes to put after the output of the generating function.
 	 *
 	 * @return {ParentNode} The passed node.
 	 */
