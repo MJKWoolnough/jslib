@@ -46,7 +46,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 	#refs = 0;
 
 	constructor(value: T) {
-		super(function(this: unknown, v: T) {
+		super(function(this: unknown, v) {
 			if (v instanceof Event && this instanceof EventTarget && this === v.currentTarget) {
 				const value = self.#value;
 
@@ -84,7 +84,7 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 	}
 
 	[attr](n: Node, name: string) {
-		return this.#handleRef(n, (n: Node, v: T) => amendNode(n, {[name]: v}), n => !!n.parentNode, true);
+		return this.#handleRef(n, (n, v) => amendNode(n, {[name]: v}), n => !!n.parentNode, true);
 	}
 
 	get [child]() {
