@@ -1703,7 +1703,7 @@ type Tests = {
 				b(new Map<string, number>([["Z", 0], ["a", 1], ["b", 2], ["c", 3], ["d", 4], ["e", 5]]));
 
 				return new Promise(sFn => sFn(parent.childElementCount === 7 && parent.children[0] === br && parent.children[1].textContent === "Z - 0" && parent.children[2].textContent === "a - 1" && parent.children[2].getAttribute("data-test") === "TEST" && parent.children[5].textContent === "e - 5" && parent.children[6] === hr));
-			},
+			}
 		}
 	},
 	"html.js": {
