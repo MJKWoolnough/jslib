@@ -6,11 +6,12 @@ import {Callable} from './misc.js';
 /**
  * This modules contains a Function for creating DOM nodes (such as {@link https://developer.mozilla.org/en-US/docs/Web/API/Attr | Attr} and {@link https://developer.mozilla.org/en-US/docs/Web/API/Text | Text} nodes) that update their content automatically.
  *
- * This module directly imports the {@link module:dom}, and {@link modile:inter} modules.
+ * This module directly imports the {@link module:dom}, {@link module:inter} and {@link module:misc} modules.
  *
  * @module bind
  * @requires module:dom
  * @requires module:inter
+ * @requires module:misc
  */
 /** */
 
