@@ -235,7 +235,7 @@ export class MultiSelect extends HTMLElement {
 
 				const children: [Element[], Element[]] = [[], []],
 				      prefix = (this.#filterType & 2) !== 0,
-				      contains = (this.#filterType & 1) !== 0
+				      contains = (this.#filterType & 1) !== 0;
 
 				for (const [child, contents] of this.#liContents) {
 					if (prefix && contents.startsWith(value)) {
