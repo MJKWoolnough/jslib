@@ -253,7 +253,7 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 
 This modules contains a Function for creating DOM nodes (such as [Attr](https://developer.mozilla.org/en-US/docs/Web/API/Attr) and [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) nodes) that update their content automatically.
 
-This module directly imports the [dom](#dom), and [inter](#inter) modules.
+This module directly imports the [dom](#dom), [inter](#inter), and [misc](#misc) modules.
 
 |  Export  |  Type  |  Description  |
 |----------|--------|---------------|
