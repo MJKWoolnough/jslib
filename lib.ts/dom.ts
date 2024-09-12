@@ -211,6 +211,7 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 			}
 		}
 	}
+
 	if (node instanceof Node) {
 		if (typeof children === "string" && !node.firstChild) {
 			node.textContent = children;
@@ -237,6 +238,7 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 			}
 		}
 	}
+
 	return element;
 },
 /**

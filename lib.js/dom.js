@@ -191,6 +191,7 @@ amendNode = (element, properties, children) => {
 			}
 		}
 	}
+
 	if (node instanceof Node) {
 		if (typeof children === "string" && !node.firstChild) {
 			node.textContent = children;
@@ -217,6 +218,7 @@ amendNode = (element, properties, children) => {
 			}
 		}
 	}
+
 	return element;
 },
 /**
