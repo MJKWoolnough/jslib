@@ -80,17 +80,17 @@ interface NodeAttributes extends Node {
 	toggleAttribute(qualifiedName: string, force?: boolean): boolean;
 }
 
-const childrenArr = (children: Children, res: (Node | string)[] = []) => {
+const childrenArr = (children?: Children, res: DocumentFragment = new DocumentFragment()) => {
 	if (isChild(children)) {
-		res.push(children[child]);
+		res.append(children[child]);
 	} else if (typeof children === "string" || children instanceof Node) {
-		res.push(children);
+		res.append(children);
 	} else if (Array.isArray(children)) {
 		for (const c of children) {
 			childrenArr(c, res);
 		}
 	} else if (children instanceof NodeList || children instanceof HTMLCollection) {
-		res.push(...children);
+		res.append(...children);
 	}
 
 	return res;
@@ -102,8 +102,7 @@ const childrenArr = (children: Children, res: (Node | string)[] = []) => {
       isAttr = (prop: unknown): prop is BoundAttr => prop instanceof Object && attr in prop,
       isChild = (children: unknown): children is BoundChild => children instanceof Object && child in children,
       toggleSym = Symbol("toggle"),
-      wrapElem = <T extends Element>(name: string, fn: () => T) => Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(fn(), props, children), {"name": {"value": name}, [child]: {"get": fn}}) as DOMBind<T>,
-      maxElems = 32768;
+      wrapElem = <T extends Element>(name: string, fn: () => T) => Object.defineProperties((props?: Props | Children, children?: Children) => amendNode(fn(), props, children), {"name": {"value": name}, [child]: {"get": fn}}) as DOMBind<T>;
 
 export const
 /** This symbol is used to denote a special Object that provides its own Children. */
@@ -212,28 +211,15 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 		}
 	}
 
-	if (node instanceof Node) {
+	if (node instanceof DocumentFragment) {
+		childrenArr(children, node);
+	} else if (node instanceof Node) {
 		if (typeof children === "string" && !node.firstChild) {
 			node.textContent = children;
 		} else if (children instanceof Node) {
 			node.appendChild(children);
 		} else if (children) {
-			const c = childrenArr(children),
-			      canAppend = (node instanceof Element || node instanceof DocumentFragment);
-
-			if (c.length < maxElems && canAppend) {
-				node.append.apply(node, c);
-			} else {
-				const df = canAppend ? node : new DocumentFragment();
-
-				for (let i = 0; i < c.length; i += maxElems) {
-					df.append.apply(df, c.slice(i, i + maxElems));
-				}
-
-				if (!canAppend) {
-					node.appendChild(df);
-				}
-			}
+			node.appendChild(childrenArr(children));
 		}
 	}
 
@@ -304,27 +290,7 @@ event = (fn: Function | EventListenerObject, options: number, signal?: AbortSign
  *
  * @return {DocumentFragment} A DocumentFragment with specified children attached.
  */
-createDocumentFragment = (children?: Children) => {
-	const df = document.createDocumentFragment();
-
-	if (typeof children === "string") {
-		df.textContent = children;
-	} else if (children instanceof Node) {
-		df.append(children);
-	} else if (children !== undefined) {
-		const c = childrenArr(children);
-
-		if (c.length < maxElems) {
-			df.append.apply(df, c);
-		} else {
-			for (let i = 0; i < c.length; i += maxElems) {
-				df.append.apply(df, c.slice(i, i + maxElems));
-			}
-		}
-	}
-
-	return df;
-},
+createDocumentFragment = (children?: Children) => childrenArr(children),
 /**
  * This function acts identically to {@link amendNode} except that it clears any children before amending.
  *
@@ -348,13 +314,7 @@ clearNode: mElement = (n?: Node | BoundChild, properties?: Props | Children, chi
 	if (typeof children === "string") {
 		children = void (node.textContent = children);
 	} else if (children && node instanceof Element) {
-		const c = childrenArr(children);
-
-		if (c.length < maxElems) {
-			children = void node.replaceChildren.apply(node, c);
-		} else {
-			children = void node.replaceChildren(createDocumentFragment(c));
-		}
+		children = void node.replaceChildren(childrenArr(children));
 	} else {
 		while (node.lastChild) {
 			node.lastChild.remove();
