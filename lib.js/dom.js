@@ -302,6 +302,7 @@ createDocumentFragment = children => {
 			}
 		}
 	}
+
 	return df;
 },
 /**
