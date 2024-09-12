@@ -215,25 +215,23 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 	if (node instanceof Node) {
 		if (typeof children === "string" && !node.firstChild) {
 			node.textContent = children;
+		} else if (children instanceof Node) {
+			node.appendChild(children);
 		} else if (children) {
-			if (children instanceof Node) {
-				node.appendChild(children);
+			const c = childrenArr(children),
+			      canAppend = (node instanceof Element || node instanceof DocumentFragment);
+
+			if (c.length < maxElems && canAppend) {
+				node.append.apply(node, c);
 			} else {
-				const c = childrenArr(children),
-				      canAppend = (node instanceof Element || node instanceof DocumentFragment);
+				const df = canAppend ? node : new DocumentFragment();
 
-				if (c.length < maxElems && canAppend) {
-					node.append.apply(node, c);
-				} else {
-					const df = canAppend ? node : new DocumentFragment();
+				for (let i = 0; i < c.length; i += maxElems) {
+					df.append.apply(df, c.slice(i, i + maxElems));
+				}
 
-					for (let i = 0; i < c.length; i += maxElems) {
-						df.append.apply(df, c.slice(i, i + maxElems));
-					}
-
-					if (!canAppend) {
-						node.appendChild(df);
-					}
+				if (!canAppend) {
+					node.appendChild(df);
 				}
 			}
 		}
