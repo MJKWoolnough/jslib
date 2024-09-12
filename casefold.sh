@@ -66,7 +66,7 @@ printPrevious() {
 	esac;
 }
 
-declare source="$(
+echo "$(
 	cat <<HEREDOC
 /**
  * The casefold module provides a simple Unicode case-folding function.
@@ -75,19 +75,19 @@ declare source="$(
  */
 /** */
 
-const cf = new Map<string, string>(),#const cf = new Map(),
-      add = (from: number, ...to: number[]) => cf.set(String.fromCharCode(from), String.fromCharCode(...to)),#      add = (from, ...to) => cf.set(String.fromCharCode(from), String.fromCharCode(...to)),
-      addRange = (start: number, end: number, shift = 32) => {#      addRange = (start, end, shift = 32) => {
+const cf = new Map<string, string>(),
+      add = (from: number, ...to: number[]) => cf.set(String.fromCharCode(from), String.fromCharCode(...to)),
+      addRange = (start: number, end: number, shift = 32) => {
 	for (let i = start; i <= end; i++) {
 		add(i, i + shift);
 	}
       },
-      addRange953 = (start: number, end: number, shift: number) => {#      addRange953 = (start, end, shift) => {
+      addRange953 = (start: number, end: number, shift: number) => {
 	for (let i = start; i <= end; i++) {
 		add(i, i + shift, 953);
 	}
       },
-      altAdd = (start: number, end: number, shift = 1) => {#      altAdd = (start, end, shift = 1) => {
+      altAdd = (start: number, end: number, shift = 1) => {
 	for (let i = start; i <= end; i += 2) {
 		add(i, i + shift);
 	}
@@ -160,7 +160,7 @@ cat <<HEREDOC
  *
  * @return {string} The folded string.
  */
-export default (str: string): string => {#export default str => {
+export default (str: string): string => {
 	let ret = "";
 
 	for (const c of str) {
@@ -170,7 +170,4 @@ export default (str: string): string => {#export default str => {
 	return ret;
 }
 HEREDOC
-)";
-
-echo "$source" | cut -d'#' -f1 > lib.ts/casefold.ts;
-echo "$source" | cut -d'#' -f2 > lib.js/casefold.js;
+)" | tee lib.ts/casefold.ts | sed -e 's/: [^,}) ]*//g' -e 's/<.*>//' -e 's/(str)/str/' > lib.js/casefold.js;
