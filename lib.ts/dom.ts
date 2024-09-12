@@ -80,7 +80,7 @@ interface NodeAttributes extends Node {
 	toggleAttribute(qualifiedName: string, force?: boolean): boolean;
 }
 
-const childrenArr = (children?: Children, res: DocumentFragment = new DocumentFragment()) => {
+const childrenArr = (children?: Children, res = new DocumentFragment()) => {
 	if (isChild(children)) {
 		res.append(children[child]);
 	} else if (typeof children === "string" || children instanceof Node) {
