@@ -5,7 +5,8 @@ import {Subscription} from './inter.js';
  *
  * This module directly imports the {@link module:inter} module.
  *
- * @packageDocumentation
+ * @module conn
+ * @requires module:inter
  */
 
 /** This object modifies an HTTPRequest.
@@ -27,6 +28,7 @@ import {Subscription} from './inter.js';
 const once = {"once": true},
       base = new URL(window.location+"");
 
+export const
 /**
  * In its simplest incarnation, this function takes a URL and returns a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} which will return the string response from that URL. However, the passed {@link Properties} object can modify both how the request is sent and the response interpreted.
  *
@@ -36,7 +38,7 @@ const once = {"once": true},
  *
  * @return {Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest>} A promise resolving to a type that depends on the options passed.
  */
-export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
+HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
 	const xh = new XMLHttpRequest();
 
 	xh.open(props["method"] ?? "GET", url);
@@ -84,6 +86,7 @@ export const HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn)
 		break;
 	case "xml":
 		xh.overrideMimeType("text/xml");
+
 		xh.responseType = "document";
 
 		break;
@@ -120,6 +123,7 @@ WS = url => new Promise((successFn, errorFn) => {
 		ws.removeEventListener("error", errorFn);
 		successFn(ws);
 	}, once);
+
 	ws.addEventListener("error", errorFn, once);
 });
 
@@ -139,14 +143,14 @@ export class WSConn extends WebSocket {
 		super(new URL(url, base), protocols);
 	}
 	/**
-	 * This method acts like the {@link inter:Subscription/when | when} method of the {@link inter:Subscription} class from the {@link mod:inter} module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error. The method returns a {@link inter:Subscription} object with the success and error functions set to those provided.
+	 * This method acts like the {@link module:inter/Subscription.when | when} method of the {@link inter:Subscription | Subscription} class from the {@link module:inter | inter} module, taking an optional success function, which will receive a MessageEvent object, and an optional error function, which will receive an error. The method returns a {@link inter/Subscription} object with the success and error functions set to those provided.
 	 *
 	 * @typeParam {any} T = Success type
 	 * @typeParam {any} U = Error type
 	 * @param {(data: MessageEvent) => T} [ssFn] Function to be called when a message arrives.
 	 * @param {(data: Error) => U}        [eeFn] Function to be called when an error occurs.
 	 *
-	 * @returns {Subscription<T | U>} A {@link inter:Subscription | Subscription} object.
+	 * @return {Subscription<T | Y>} A {@link inter:Subscription | Subscription} object.
 	 */
 	when(ssFn, eeFn) {
 		return new Subscription((sFn, eFn, cFn) => {
