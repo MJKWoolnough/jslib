@@ -36,6 +36,7 @@ const maxMouseButton = 16,
 	mods.ctrlKey = ev.ctrlKey;
 	mods.metaKey = ev.metaKey;
 	mods.shiftKey = ev.shiftKey;
+
 	const {key, target} = ev,
 	      kc = combinationString(e({key}));
 
@@ -45,6 +46,7 @@ const maxMouseButton = 16,
 		for (const k of held) {
 			if (!k.startsWith(tfs) || k.slice(1) === key) {
 				processEvents(ev, ups.get(k));
+
 				held.delete(k);
 			}
 		}
@@ -198,7 +200,7 @@ keyEvent = (key, onkeydown, onkeyup, once = false) => {
  * NB: If the window loses focus, the module will run the onend function.
  *
  * @param {(e: MouseEvent) => void} onmousemove Function to be called when the mouse is moved.
- * @param {() => void}              [onend]     Function to be called when the event is stopped.
+ * @param {() => void}             [onend]      Function to be called when the event is stopped.
  *
  * @return {[() => void, (run = true) => void]} Array of Functions as described above.
  */
