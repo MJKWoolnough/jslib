@@ -1,7 +1,7 @@
 import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {button, div, input, label, li, slot, table, tbody, th, thead, tr, ul} from './html.js';
-import {autoFocus, checkInt, stringSort} from './misc.js';
+import {autoFocus, checkInt, pushAndReturn, stringSort} from './misc.js';
 
 /**
  * The datatable module adds a custom element for handling tabular data that can be filtered, sorted, and paged.
@@ -9,7 +9,6 @@ import {autoFocus, checkInt, stringSort} from './misc.js';
  * This module relies directly on the {@link module:css | CSS}, {@link module:dom | DOM}, {@link module:html | HTML}, {@link module:misc | Misc}, and {@link module:nodes | Nodes} modules.
  *
  * @module datatable
- * @requires module:bind
  * @requires module:css
  * @requires module:dom
  * @requires module:html
@@ -198,11 +197,11 @@ export class DataTable extends HTMLElement {
 	#body;
 	#slots = [];
 	#sorters = [];
+	#hasEmpty = [];
 	#headers = new Map();
 	#data = new Map();
 	#filteredData = [];
 	#sortedData = [];
-	#hasEmpty = [];
 	#page = 0;
 	#perPage = Infinity;
 	#ownHeaders = false;
@@ -455,7 +454,7 @@ export class DataTable extends HTMLElement {
 						}
 
 						if (this.#hasEmpty.length <= data.length) {
-							this.#hasEmpty.push(numberSorter);
+							this.#hasEmpty.push(false);
 						}
 
 						const cell = dsHasKey(child.dataset, "value") ? child.dataset["value"] : child.innerText,
@@ -507,7 +506,7 @@ export class DataTable extends HTMLElement {
 
 		for (const header of head.lastChild.children) {
 			if (header instanceof HTMLTableCellElement) {
-				this.#headers.set(header, count++);
+				this.#headers.set(header, count);
 
 				if (header.dataset["type"] === "string") {
 					this.#sorters[count] = stringSort;
@@ -684,8 +683,6 @@ export class DataTable extends HTMLElement {
 	/**
 	 * This method returns the data of the filtered and sorted table.
 	 *
-	 * @param {boolean} [title] When true, will prepend titles as first row of output.
-	 *
 	 * @return {string[][]} A two-dimensional array of the data.
 	 */
 	export(title = false) {
@@ -710,8 +707,6 @@ export class DataTable extends HTMLElement {
 
 	/**
 	 * This method returns the data of the visible portion of the table.
-	 *
-	 * @param {boolean} [title] When true, will prepend titles as first row of output.
 	 *
 	 * @return {string[][]} A two-dimensional array of the data.
 	 */
