@@ -90,6 +90,7 @@ export default class CSS extends CSSStyleSheet {
 					data += rule;
 				}
 			}
+
 			if (data) {
 				this.insertRule(at + "{" + data + "}", this.cssRules.length);
 			}
