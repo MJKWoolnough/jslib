@@ -273,6 +273,7 @@ code = (n: Node, t: Tokeniser) => {
  */
 table = (n: Node, t: Tokeniser, p: Parsers) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		const tableHeader: HTMLTableRowElement[] = [],
 		      tableBody: HTMLTableRowElement[] = [],
