@@ -156,7 +156,7 @@ text = Symbol("text"),
 /**
  * Intended for tag parsers, this function determines if a token is an {@link OpenTag}.
  *
- * @param {OpenTag | CloseTag | string} t Tag to determine if it is an `OpenTag`.
+ * @param {OpenTag | CloseTag | string} t Tag to determine if it is an OpenTag.
  *
  * @return {boolean} `true` if `t` is an `OpenTag`.
  */
@@ -164,28 +164,29 @@ isOpenTag = t => typeof t === "object" && t.attr !== undefined,
 /**
  * Intended for tag parsers, this function determines if a token is a {@link CloseTag}.
  *
- * @param {OpenTag | CloseTag | string} t Tag to determine if it is a `CloseTag`.
+ * @param {OpenTag | CloseTag | string} t Tag to determine if it is a CloseTag.
  *
- * @return {boolean} `true` if `t` is a `CloseTag`.
+ * @return {boolean} `true` if `t` is an `CloseTag`.
  */
 isCloseTag = t => typeof t === "object" && t.attr === undefined,
 /**
- * Intended for tag parsers, this function determines if a token is a `string`.
+ * Intended for tag parsers, this function determines if a token is a string.
  *
- * @param {OpenTag | CloseTag | string} t Tag to determine if it is a `string`.
+ * @param {OpenTag | CloseTag | string} t Tag to determine if it is a string.
  *
- * @return {boolean} `true` if `t` is a `string`.
+ * @return {boolean} `true` if `t` is an `string`.
  */
 isString = t => typeof t === "string",
 /**
  * Intended for tag parsers, appends parse BBCode to the passed {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node}.
  *
- * @param {Node}      node    The {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} to append the parsed contents to.
- * @param {Tokeniser} t       The Tokeniser to parse from.
- * @param {Parsers}   p       The object containing the parsers.
- * @param {string} [closeTag] Optional string containing the name of the closing tag.
+ * @typeParam {Node} T
+ * @param {T}         node      The {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} to append the parsed contents to.
+ * @param {Tokeniser} t         The Tokeniser to parse from.
+ * @param {Parsers}   p         The object containing the parsers.
+ * @param {string}   [closeTag] Optional string containing the name of the closing tag.
  *
- * @returns {Node} The passed in node.
+ * @return {T} The passed in node.
  */
 process = (node, t, p, closeTag) => {
 	while (true) {
