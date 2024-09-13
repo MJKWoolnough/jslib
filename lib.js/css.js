@@ -102,7 +102,7 @@ export default class CSS extends CSSStyleSheet {
 	}
 
 	/**
-	 * This method will return a number (n) of unique ids, as per the @{link CSS/id | id} method.
+	 * This method will return a number (n) of unique ids, as per the {@link CSS/id | id} method.
 	 *
 	 * @param {number} length Number of IDs to generate.
 	 *
