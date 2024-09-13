@@ -68,7 +68,7 @@ export class DragTransfer {
 	 *
 	 * @param {DragEvent} e The DragEvent.
 	 *
-	 * @return The value, or undefined.
+	 * @return {T | undefined} The value, or undefined.
 	 */
 	get(e) {
 		e.preventDefault();
@@ -201,7 +201,7 @@ export const setDragEffect = effects => e => {
 			for (const key of effects[effect] ?? []) {
 				if (key.is(e)) {
 					e.preventDefault();
-					
+
 					e.dataTransfer.dropEffect = effect;
 
 					return true;
