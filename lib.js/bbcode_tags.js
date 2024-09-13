@@ -151,9 +151,11 @@ url = (n, t, p) => {
 /** Audio Tag, will attempt to process the contents as a URL. */
 audio = (n, t, p) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		const src = textContents(t, tk.tagName),
 		      endTag = t.next(true).value;
+
 		if (!endTag || !isCloseTag(endTag)) {
 			p[textSymbol](n, tk.fullText);
 			p[textSymbol](n, src);
@@ -197,6 +199,7 @@ img = (n, t, p) => {
 
 			return;
 		}
+
 		if (!src) {
 			p[textSymbol](n, tk.fullText);
 
@@ -206,6 +209,7 @@ img = (n, t, p) => {
 
 			return;
 		}
+
 		try {
 			src = (new URL(src, window.location.href)).href;
 		} catch {
@@ -396,6 +400,7 @@ quote = (n, t, p) => {
 /** The *list* tag creates a new list. The attribute determines what type of list, with no attribute resulting in an HTMLUListElement, and any of `a`, `A`, `i`, `I`, and `1` resulting in an HTMLOListElement with the type set to the specified value. Any children of the list should be wrapped in `[*] [/*]` tags, though the closing tag can be omitted. */
 list = (n, t, p) => {
 	const tk = t.next(true).value;
+
 	if (tk && isOpenTag(tk)) {
 		let type = "";
 
@@ -433,10 +438,12 @@ list = (n, t, p) => {
 						}
 
 						amendNode(l, currItem = li());
+
 						pos = open + 3;
 					} else if (close < open && close !== -1 || open === -1 && close !== -1) {
 						if (currItem) {
 							p[textSymbol](currItem, tk.slice(pos, close));
+
 							currItem = null;
 						}
 
