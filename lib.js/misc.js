@@ -43,22 +43,23 @@ mod = (n, m) => ((n % m) + m) % m,
  *
  * @typeParam K
  * @typeParam V
- * @param {{set: (K, V) => any}} m Map-like object.
- * @param {K}                    k Key for where value is to be stored.
- * @param {V}                    v Value to be stored.
+ * @param {{set: (K, V) => void}} m Map-like object.
+ * @param {K}                     k Key for where value is to be stored.
+ * @param {V}                     v Value to be stored.
  *
  * @return {V} The value `v`.
  */
 setAndReturn = (m, k, v) => {
 	m.set(k, v);
+
 	return v;
 },
 /**
  * This functions pushes a value to a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array | Array}-like structure and returns the value.
  *
  * @typeParam V
- * @param {{push: (V) => any}} a The Array-like object to push to.
- * @param {V}                  v The value to be pushed.
+ * @param {{push: (V) => void}} a The Array-like object to push to.
+ * @param {V}                   v The value to be pushed.
  *
  * @return {V} The value `v`.
  */
@@ -71,8 +72,8 @@ pushAndReturn = (a, v) => {
  * This functions adds a value to a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set | Set}-like structure and returns the value.
  *
  * @typeParam V
- * @param {{add: (V) => any}} a The Set-like object to add to.
- * @param {V}                 v The value to be added.
+ * @param {{add: (V) => void}} a The Set-like object to add to.
+ * @param {V}                  v The value to be added.
  *
  * @return {V} The value `v`.
  */
@@ -166,4 +167,4 @@ export class Callable extends Function {
 	constructor(fn) {
 		return Object.setPrototypeOf(fn, new.target.prototype);
 	}
-}
+};
