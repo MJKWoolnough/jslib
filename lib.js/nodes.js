@@ -10,7 +10,7 @@ import {child as node} from './dom.js';
 /** */
 
 /**
- * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} of an Item type.
+ * This {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} is used to specify the {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Item} of an Item type.
  */
 export {child as node} from './dom.js';
 
@@ -205,7 +205,7 @@ export class NodeArray {
 	 *
 	 * The NodeArray type is wrapped with a Proxy to implement {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array | Array}-like indexing.
 	 *
-	 * @param {H}            h         A parent element, onto which all {@link Item} elements will be attached.
+	 * @param {H}           h          A parent element, onto which all {@link Item} elements will be attached.
 	 * @param {Function}    [s]        An optional starting sort function. Can be omitted, with 'elements' as the second param.
 	 * @param {Iterable<T>} [elements] An optional set of starting elements of type `T`.
 	 */
@@ -740,7 +740,6 @@ export class NodeMap {
 			yield [k, v.i];
 		}
 	}
-
 	forEach(callbackfn, thisArg = this) {
 		this.#root.m.forEach((v, k) => callbackfn.call(thisArg ?? globalThis, v.i, k, this));
 	}
