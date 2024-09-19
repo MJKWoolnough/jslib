@@ -90,7 +90,6 @@ export class MenuElement extends HTMLElement {
 					s.select();
 					setTimeout(() => {
 						const m = s[menuElement]();
-
 						if (m) {
 							m.#s.assignedNodes()[0]?.focus();
 						}
@@ -149,6 +148,7 @@ export class MenuElement extends HTMLElement {
 			      y = parseInt(this.getAttribute("y") ?? "0") || 0;
 
 			amendNode(this, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-height": offsetParent.clientHeight + "px", "visibility": "hidden"}});
+
 			setTimeout(() => {
 				const width = Math.max(this.offsetWidth, this.scrollWidth) * 2 - this.clientWidth;
 
@@ -253,9 +253,11 @@ export class SubMenuElement extends HTMLElement {
 					}
 				}
 			}
+
 			if (!this.#i) {
 				this.#s.assign();
 			}
+
 			if (!this.#m) {
 				this.#p.assign();
 			}
@@ -265,6 +267,7 @@ export class SubMenuElement extends HTMLElement {
 	select() {
 		if (!this.hasAttribute("disabled")) {
 			const m = this.#m;
+
 			if (m) {
 				let offsetParent = this,
 				    xShift = 0,
@@ -277,11 +280,15 @@ export class SubMenuElement extends HTMLElement {
 				}
 
 				amendNode(this, {"open": true});
+
 				this.#p.assign(amendNode(m, {"style": {"position": "absolute", "left": undefined, "top": undefined, "width": undefined, "max-height": offsetParent.clientHeight + "px", "visibility": "hidden"}}));
 				setTimeout(() => {
 					const width = Math.max(m.offsetWidth, m.scrollWidth) * 2 - m.clientWidth;
+
 					amendNode(m, {"style": {"visibility": undefined, "position": "absolute", "width": width + "px", "left": Math.max(xShift + width + this.offsetWidth < offsetParent.clientWidth ? this.offsetWidth : -width, -xShift) + "px", "top": Math.max(yShift + m.offsetHeight < offsetParent.clientHeight ? 0 : this.offsetHeight - m.offsetHeight, -yShift) + "px"}});
+
 					this.#f = true;
+
 					m.focus();
 				});
 			}
@@ -305,6 +312,7 @@ export class SubMenuElement extends HTMLElement {
 			this.#f = false;
 		} else {
 			amendNode(this, {"open": false});
+
 			this.#p.assign();
 			this.parentNode?.[blur]?.();
 		}
