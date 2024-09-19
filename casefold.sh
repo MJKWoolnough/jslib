@@ -94,16 +94,18 @@ const cf = new Map<string, string>(),
       };
 
 HEREDOC
+
 	while read line; do
 		from="$(( $(echo "$line" | cut -d';' -f1 | sed -e 's/^0*/0x/') ))";
 		to="$(echo -n "$line" | cut -d';' -f3 | sed -e 's/^ *0*/0x/' -e 's/ 0*/ 0x/g' | tr ' ' '\n' | while read char; do echo $(( $char ));done | tr '\n' ',' | sed -e 's/,$//')";
-
 		has953="$(echo "$to" | grep ",953$" > /dev/null && echo "true" || echo "false")";
 		toWithout953="$(echo "$to" | grep -v ",953$" || echo "$to" | sed -e 's/,953$//')";
 
 		if echo "$toWithout953" | grep "," &> /dev/null; then
 			printPrevious;
+
 			echo "add($from, ${to//,/, });";
+
 			mode=0;
 		else
 			case $mode in
