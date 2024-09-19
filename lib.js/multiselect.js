@@ -1,9 +1,10 @@
 import CSS from './css.js';
 import {amendNode, bindCustomElement, clearNode} from './dom.js';
 import {div, input, li, slot, ul} from './html.js';
+import {debounce} from './misc.js';
 
 /**
- * The multiselect module adds custom elementthat implement a Select-like input element allowing multiple options to be selected and removed.
+ * The multiselect module adds custom elements that implement a Select-like input element allowing multiple options to be selected and removed.
  *
  * This module directly imports the {@link module:css}, {@link module:dom}, and {@link module:html} modules.
  *
@@ -128,7 +129,7 @@ const style = [new CSS().add({
 			"border": "var(--optionsBorder, 1px solid #000)",
 			"color": "var(--optionsColor, #000)",
 			"outline": "none",
-			"overflow-y": "scroll",
+			"overflow-y": "auto",
 			"position": "absolute",
 			"width": "100%",
 			"left": "-1px",
@@ -420,7 +421,7 @@ export class MultiSelect extends HTMLElement {
 		this.#liContents.splice(0, this.#liContents.length);
 
 		for (const elem of this.children) {
-			if (elem instanceof HTMLOptionElement) {
+			if (elem instanceof MultiOption) {
 				const text = elem.getAttribute("label") ?? elem.innerText,
 				      existing = oldOptions.get(elem),
 				      state = elem.hasAttribute("disabled") ? disabled : enabled,
