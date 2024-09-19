@@ -5,8 +5,7 @@
  */
 /** */
 
-/*
- * This type is used by the {@link WaitGroup} Class to return information.
+/* This type is used by the {@link WaitGroup} Class to return information.
  *
  * @typedef WaitInfo
  * @property {number} done The number of complete tasks.
@@ -120,7 +119,6 @@ export class Pipe {
 						});
 					}
 				      };
-
 
 				pipe.receive(fn);
 				cancels.push(() => pipe.remove(fn));
@@ -303,7 +301,7 @@ export class Subscription {
 	/**
 	 * The merge static method combines any number of Subscription objects into a single subscription, so that all parent success and catch calls are combined, and any cancel signal will be sent to all parents.
 	 *
-	 * @param {...Subscription} subs The Subscriptions to be merged.
+	 * @param {...SubscriptionType} subs The Subscriptions to be merged.
 	 *
 	 * @return {Subscription} The merged Subscription Object.
 	 */
@@ -331,7 +329,7 @@ export class Subscription {
 	 * 
 	 * NB: The combined Subscription will fire in the next event loop, in order to collect all simultaneous changes.
 	 *
-	 * @param {...(Subscription | [Subscription, any])} subs The subscriptions to be merged, and with an option default type in a tuple.
+	 * @param {...(SubscriptionType | [SubscriptionType, any])} subs The subscriptions to be merged, and with an option default type in a tuple.
 	 *
 	 * @return {Subscription} The combined Subscription that will fire when any of the passed subscriptions fire.
 	 */
