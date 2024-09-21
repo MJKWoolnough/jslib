@@ -189,8 +189,6 @@ export const
  */
 setLanguage = l => {Object.assign(lang, l)};
 
-customElements.define("page-numbers", Pagination);
-
 /**
  * A {@link dom:DOMBind | DOMBind} that creates a {@link Pagination}.
  */
