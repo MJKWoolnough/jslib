@@ -200,7 +200,7 @@ class Router extends HTMLElement {
 
 		this.#matchers.push([matchObj, nodeFn]);
 
-		if (!this.#connected  && this.#marker.isConnected) {
+		if (!this.#connected && this.#marker.isConnected) {
 			this.#match(matchObj, nodeFn);
 		}
 
@@ -243,6 +243,7 @@ class Router extends HTMLElement {
 			for (const c of this.children) {
 				if (!(c instanceof Router)) {
 					const match = c.getAttribute("route-match");
+
 					if (match !== null) {
 						const element = c.cloneNode(true) as Element;
 
@@ -312,6 +313,7 @@ customElements.define("x-route", class extends HTMLElement {
 
 	disconnectedCallback() {
 		const c = this.#class;
+
 		if (c) {
 			document.documentElement.classList.toggle(c, false);
 		}
