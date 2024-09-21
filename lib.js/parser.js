@@ -102,7 +102,7 @@ processToEnd = function* (p) {
  */
 
 /**
- * The StringParser type represents an alternate to a string for parsing.
+ * The StringParser interface represents an alternate to a string for parsing.
  * type StringParser  = Iterator<string, void>;
  */
 
@@ -282,7 +282,7 @@ export class Tokeniser {
 	/**
 	 * acceptString() attempts to accept each character from the given string, in order, returning the number of characters accepted before a failure.
 	 *
-	 * @param {string} str The ordered characters to be accepted.
+	 * @param {string}  str             The ordered characters to be accepted.
 	 * @param {boolean} [caseSensitive] Should the match be made respecting case; defaults to true.
 	 *
 	 * @return {number} Returns the number of characters accepted.
@@ -611,7 +611,7 @@ export class Phraser {
  *
  * @returns {Token | Phrase} Returns a stream of either Tokens or Phrases.
  */
-export default (function* (text, parserFn, phraserFn) {
+export default function* (text, parserFn, phraserFn) {
 	const p = phraserFn ? new Phraser(text, parserFn) : new Tokeniser(text);
 
 	let fn = phraserFn ?? parserFn;
@@ -623,4 +623,4 @@ export default (function* (text, parserFn, phraserFn) {
 
 		fn = nextFn;
 	}
-});
+};
