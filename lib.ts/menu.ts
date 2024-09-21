@@ -223,6 +223,7 @@ export class SubMenuElement extends HTMLElement {
 	#m: MenuElement | null = null;
 	#i: ItemElement | null = null;
 	#f = false;
+
 	constructor() {
 		super();
 
