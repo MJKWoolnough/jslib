@@ -176,6 +176,7 @@ class Router extends HTMLElement {
 			      t = s < 0 ? path.length : s;
 
 			matches.push(path.slice(1, t));
+
 			path = path.slice(t);
 		}
 
@@ -214,10 +215,10 @@ class Router extends HTMLElement {
 
 				return true;
 			} else if (this.#setRoute(path, attrs)) {
-
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -265,7 +266,6 @@ class Router extends HTMLElement {
 	/** Used to remove the Router from the DOM and disable its routing. It can be added to the DOM later to reactivate it. */
 	remove() {
 		this.#marker.remove();
-
 		routers.delete(this);
 	}
 }
@@ -276,6 +276,7 @@ customElements.define("x-route", class extends HTMLElement {
 	#class;
 	#id;
 	#title;
+
 	connectedCallback() {
 		const c = this.#class ??= this.getAttribute("route-class") ?? "",
 		      i = this.#id ??= this.getAttribute("route-id") ?? "",
@@ -293,6 +294,7 @@ customElements.define("x-route", class extends HTMLElement {
 			document.title = t;
 		}
 	}
+
 	disconnectedCallback() {
 		const c = this.#class;
 
