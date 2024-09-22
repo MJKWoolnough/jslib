@@ -638,6 +638,7 @@ Skip = <T extends {}, Keys extends (keyof T)[]>(tg: TypeGuard<T>, ...keys: Keys)
  */
 Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
 	let ttg: TypeGuard<T>;
+
 	const name = str ?? "type_"+unknownTypes++; // need to generate type name here
 
 	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => setAndReturn(definitions, ttg ??= tg(), ["Recur", name]));
