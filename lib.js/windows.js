@@ -1,6 +1,6 @@
 import CSS from './css.js';
-import {amendNode, bindCustomElement, clearNode, event, eventCapture} from './dom.js';
-import {button, div, img, input, slot, span, toggle} from './html.js';
+import {amendNode, bindCustomElement, clearNode, event, eventCapture, toggle} from './dom.js';
+import {button, div, img, input, slot, span} from './html.js';
 import {autoFocus} from './misc.js';
 import {ns as svgNS} from './svg.js';
 
@@ -591,6 +591,7 @@ export class ShellElement extends BaseElement {
 		for (const e of this.childNodes) {
 			if (e instanceof WindowElement) {
 				const {offsetLeft: x, offsetTop: y, offsetWidth: w, offsetHeight: h} = e;
+
 				if (x + w > tw) {
 					amendNode(e, {"style": {"--window-left": Math.max(tw - w, 0) + "px"}});
 				} else if (x < 0) {
@@ -687,6 +688,7 @@ export class WindowElement extends BaseElement {
 	#child = null;
 	#parent = null;
 	#maximise;
+
 	constructor() {
 		super();
 
@@ -714,11 +716,13 @@ export class WindowElement extends BaseElement {
 
 		setTimeout(amendNode, 0, this, {"onmousedown": event(onclick, eventCapture)});
 	}
+
 	connectedCallback() {
 		if (focusingWindow === this) {
 			focusingWindow = null;
 		}
 	}
+
 	disconnectedCallback() {
 		if (focusingWindow === this) {
 			return;
@@ -766,6 +770,7 @@ export class WindowElement extends BaseElement {
 	 * This method adds a `Window` as a child. If there is already a child, it is added as a child of that `Window`.
 	 *
 	 * @param {WindowElement} w The child window to be added.
+	 *
 	 * @return {boolean} Returns true if window was successfully added, and false otherwise, which should only occur if this window has no parent.
 	 */
 	addWindow(w) {
