@@ -73,6 +73,7 @@ export class RPCError implements Error {
 
 class Queue extends Array<string> {
 	#send: (msg: string) => void;
+
 	constructor(send: (msg: string) => void) {
 		super();
 
