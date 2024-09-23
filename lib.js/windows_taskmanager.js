@@ -123,6 +123,7 @@ export class ShellElement extends BaseShellElement {
 				for (const i of taskbar.children) {
 					if (i.childElementCount === 0 && i instanceof HTMLDivElement) {
 						data.item = i;
+
 						break;
 					}
 				}
@@ -143,6 +144,7 @@ export class ShellElement extends BaseShellElement {
 			}
 		      })),
 		      taskbar = footer();
+
 		amendNode(this.attachShadow({"mode": "closed"}), [
 			slot({"name": "desktop"}),
 			taskbar,
