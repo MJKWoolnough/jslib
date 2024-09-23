@@ -802,7 +802,7 @@ export class WindowElement extends BaseElement {
 	 *
 	 * @param {string}                        icon    The icon to be displayed on the button.
 	 * @param {(this: WindowElement) => void} onclick The function to call when the button is clicked.
-	 * @param {string | Binding}             [title]  An optional title text for the button.
+	 * @param {string | Binding}              [title] An optional title text for the button.
 	 *
 	 * @return {() => void} A Function to remove the button.
 	 */
