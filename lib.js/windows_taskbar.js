@@ -238,7 +238,6 @@ export class ShellElement extends BaseShellElement {
 							}
 						      }, "oncontextmenu": e => {
 							e.preventDefault();
-
 							amendNode(self, menu({"x": e.clientX, "y": e.clientY}, [
 								w.hasAttribute("minimised") ? item({"key": (menuItems["RESTORE"]+"").charAt(0), "onselect": () => {
 									amendNode(w, {"minimised": false});
