@@ -157,18 +157,12 @@ export class Binding<T = string> extends Callable<(v: T) => T> implements BoundA
 	 *
 	 * @return {ParentNode} The passed node.
 	 */
-	toDOM<N extends ParentNode>(n: N, prefix: Children, fn: (v: T extends Array<infer V> ? V : never) => (Children | null), suffix?: Children): N;
-	toDOM<N extends ParentNode>(n: N, fn: (v: T extends Array<infer V> ? V : never) => (Children | null), prefix?: Children, suffix?: Children): N;
-	toDOM<N extends ParentNode>(n: N, prefix: Children, fn: (v: T extends Set<infer V> ? V : never) => (Children | null), suffix?: Children): N;
-	toDOM<N extends ParentNode>(n: N, fn: (v: T extends Set<infer V> ? V : never) => (Children | null), prefix?: Children, suffix?: Children): N;
-	toDOM<N extends ParentNode>(n: N, prefix: Children, fn: (k: T extends Map<infer K, unknown> ? K : never, v: T extends Map<unknown, infer V> ? V : never) => (Children | null), suffix?: Children): N;
-	toDOM<N extends ParentNode>(n: N, fn: (k: T extends Map<infer K, unknown> ? K : never, v: T extends Map<unknown, infer V> ? V : never) => (Children | null), prefix?: Children, suffix?: Children): N;
-	toDOM<N extends ParentNode>(n: N, prefix: Children, fn: (v: T extends Array<unknown> ? never : T extends Map<unknown, unknown> ? never : T extends Set<unknown> ? never : T) => (Children | null), suffix?: Children): N;
-	toDOM<N extends ParentNode>(n: N, fn: (v: T extends Array<unknown> ? never : T extends Map<unknown, unknown> ? never : T extends Set<unknown> ? never : T) => (Children | null)): N;
-	toDOM<N extends ParentNode>(n: N, prefix: Children | ((k: any, v?: any) => (Children | null)), fn?: Children | ((k: any, v?: any) => (Children | null)), suffix?: Children) {
+	toDOM<N extends ParentNode>(n: N, prefix: Children, fn: T extends Map<infer U, infer V> ? (k: U, v: V) => (Children | null) : (v: T extends Array<infer W> ? W : T extends Set<infer X> ? X : T) => (Children | null), suffix?: Children): N;
+	toDOM<N extends ParentNode>(n: N, fn: T extends Map<infer U, infer V> ? (k: U, v: V) => (Children | null) : (v: T extends Array<infer W> ? W : T extends Set<infer X> ? X : T) => (Children | null), suffix?: Children): N;
+	toDOM<N extends ParentNode>(n: N, prefix: Children | (T extends Map<infer U, infer V> ? (k: U, v: V) => (Children | null) : (v: T extends Array<infer W> ? W : T extends Set<infer X> ? X : T) => (Children | null)), fn?: Children | (T extends Map<infer U, infer V> ? (k: U, v: V) => (Children | null) : (v: T extends Array<infer W> ? W : T extends Set<infer X> ? X : T) => (Children | null)), suffix?: Children): N {
 		const aPrefix = prefix instanceof Function ? [] : prefix,
 		      aSuffix = suffix ?? (fn instanceof Function ? [] : fn ?? []),
-		      aFn = prefix instanceof Function ? prefix : fn instanceof Function ? fn : null;
+		      aFn = prefix instanceof Function ? prefix : fn instanceof Function ? fn as Function : null;
 
 		let cache = new Map<any, Children>();
 
