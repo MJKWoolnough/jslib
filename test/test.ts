@@ -5348,6 +5348,18 @@ type Tests = {
 				      ids = new CSS().ids(3);
 
 				return ids[0] === "_0" && ids[1] === "_1" && ids[2] === "_2";
+			},
+			"multiple ids from destructuring method call": async () => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      [a, b, c] = new CSS().ids();
+
+				return a === "_0" && b === "_1" && c === "_2";
+			},
+			"multiple ids from destructuring attribute": async () => {
+				const {default: CSS} = await import("./lib/css.js"),
+				      [a, b, c] = new CSS().ids;
+
+				return a === "_0" && b === "_1" && c === "_2";
 			}
 		},
 		"at": {
