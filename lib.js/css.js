@@ -187,7 +187,7 @@ const split = selector => {
 	return out;
       },
       isDef = v => Object.getPrototypeOf(v) === Object.prototype,
-      idRE = /^\-?[_a-z\240-\377][_a-z0-9\-\240-\377]*$/i,
+      idRE = /^\-?[_a-z\xa0-\xff][_a-z0-9\-\xa0-\xff]*$/i,
       compileRule = (selector, def) => {
 	const rules = [];
 
