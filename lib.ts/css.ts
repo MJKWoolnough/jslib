@@ -112,6 +112,11 @@ export default class CSS extends CSSStyleSheet {
 		return this.#idPrefix + this.#id++;
 	}
 
+	/**
+	 * This attribute can be used with array destructuring the generate IDs as with the 'id' method.
+	 *
+	 * Alternatively, it can be called with a number to generate an array of that many IDs.
+	 */
 	get ids() {
 		return this.#ids;
 	}
@@ -234,7 +239,7 @@ at = defaultCSS.at.bind(defaultCSS),
  */
 id = defaultCSS.id.bind(defaultCSS),
 /**
- * A binding to the {@link CSS/ids | ids} method on a default instantiation of the CSS class.
+ * A binding to the {@link CSS/ids | ids} attribute on a default instantiation of the CSS class.
  */
 ids = defaultCSS.ids,
 /**
