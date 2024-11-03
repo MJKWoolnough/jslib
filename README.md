@@ -446,7 +446,7 @@ This module contains an extension to the CSSStyleSheet class for simple generati
 | add       | Function | The [add](#css_css_add) method of a default instance of the default [CSS](#css_css) class. |
 | at        | Function | The [at](#css_css_at) method of a default instance of the default [CSS](#css_css) class. |
 | id        | Function | The [id](#css_css_id) method of a default instance of the default [CSS](#css_css) class. |
-| ids       | Function | The [ids](#css_css_id) method of a default instance of the default [CSS](#css_css) class. |
+| ids       | Function | The [ids](#css_css_id) attribute of a default instance of the default [CSS](#css_css) class. |
 | [mixin](#css_mixin) | Function | This function merges two [Def](#css_def) objects.
 | render    | Function | The [render](#css_css_render) method of a default instance of the default [CSS](#css_css) class. |
 
@@ -543,11 +543,15 @@ This method will return sequential unique ids to be used as either class names o
 #### <a name="css_css_ids">ids</a>
 ```typescript
 class CSS {
+	ids: Iterable<string> & Iterator<string>;
+	ids(): Iterable<string> & Iterator<string>;
 	ids(n: number): string[];
 }
 ```
 
-This method will return a number (n) of unique ids, as per the [id](#css_css_id) method.
+This attribute can be used with array destructuring the generate IDs as with the [id](#css_css_id) method.
+
+Alternatively, it can be called with a number to generate an array of that many IDs.
 
 #### <a name="css_css_render">render</a>
 ```typescript
