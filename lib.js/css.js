@@ -28,6 +28,7 @@
 export default class CSS extends CSSStyleSheet {
 	#idPrefix;
 	#id;
+	#ids;
 
 	/**
 	 * Used to create a new instance of the class.
@@ -40,6 +41,7 @@ export default class CSS extends CSSStyleSheet {
 
 		this.#idPrefix = idRE.test(prefix) ? prefix : "_";
 		this.#id = idStart;
+		this.#ids = Object.freeze(Object.assign(length => typeof length === "number" ? Array.from({length}, () => this.id()) : this.#ids, {"next": () => ({"value": this.id(), "done": false}), [Symbol.iterator]: () => this.#ids}));
 	}
 
 	/**
@@ -101,15 +103,8 @@ export default class CSS extends CSSStyleSheet {
 		return this.#idPrefix + this.#id++;
 	}
 
-	/**
-	 * This method will return a number (n) of unique ids, as per the {@link CSS/id | id} method.
-	 *
-	 * @param {number} length Number of IDs to generate.
-	 *
-	 * @return {string[]} Generated IDs.
-	 */
-	ids(length) {
-		return Array.from({length}, () => this.id());
+	get ids() {
+		return this.#ids;
 	}
 
 	/**
@@ -232,7 +227,7 @@ id = defaultCSS.id.bind(defaultCSS),
 /**
  * A binding to the {@link CSS/ids | ids} method on a default instantiation of the CSS class.
  */
-ids = defaultCSS.ids.bind(defaultCSS),
+ids = defaultCSS.ids,
 /**
  * A binding to the {@link CSS/render | render} method on a default instantiation of the CSS class.
  */

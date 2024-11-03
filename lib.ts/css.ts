@@ -34,6 +34,7 @@ type IDs<N extends number, U extends string[] = []> = U['length'] extends N ? U 
 export default class CSS extends CSSStyleSheet {
 	#idPrefix: string;
 	#id: number;
+	#ids: (<N extends number | undefined>(n?: N) => N extends number ? IDs<N> : Iterable<string> & Iterator<string>) & Iterable<string> & Iterator<string>;
 
 	/**
 	 * Used to create a new instance of the class.
@@ -46,6 +47,7 @@ export default class CSS extends CSSStyleSheet {
 
 		this.#idPrefix = idRE.test(prefix) ? prefix : "_";
 		this.#id = idStart;
+		this.#ids = Object.freeze(Object.assign(<N extends number | undefined>(length?: N) => (typeof length === "number" ? Array.from({length}, () => this.id()) : this.#ids) as N extends number ? IDs<N> : Iterable<string> & Iterator<string>, {"next": () => ({"value": this.id(), "done": false}), [Symbol.iterator]: () => this.#ids}));
 	}
 
 	/**
@@ -110,15 +112,8 @@ export default class CSS extends CSSStyleSheet {
 		return this.#idPrefix + this.#id++;
 	}
 
-	/**
-	 * This method will return a number (n) of unique ids, as per the {@link CSS/id | id} method.
-	 *
-	 * @param {number} length Number of IDs to generate.
-	 *
-	 * @return {string[]} Generated IDs.
-	 */
-	ids<N extends number>(length: N): string[] {
-		return Array.from({length}, () => this.id()) as IDs<N>;
+	get ids() {
+		return this.#ids;
 	}
 
 	/**
@@ -241,7 +236,7 @@ id = defaultCSS.id.bind(defaultCSS),
 /**
  * A binding to the {@link CSS/ids | ids} method on a default instantiation of the CSS class.
  */
-ids = defaultCSS.ids.bind(defaultCSS) as <N extends number>(length: N) => IDs<N>,
+ids = defaultCSS.ids,
 /**
  * A binding to the {@link CSS/render | render} method on a default instantiation of the CSS class.
  */
