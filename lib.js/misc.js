@@ -9,7 +9,7 @@ export const
 /**
  * This function determines whether `v` is a valid integer in the range provided (min <= v <= max).
  *
- * NB: NB: Infinity is not a valid integer.
+ * NB: Infinity is not a valid integer.
  *
  * @param {unknown} v               Value to be checked.
  * @param {number}  [min=-Infinity] Minimum acceptable value.
