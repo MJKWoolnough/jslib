@@ -65,7 +65,8 @@ interface requestReturn {
 }
 
 const once = {"once": true},
-      base = new URL(window.location+"");
+      base = new URL(window.location+""),
+      xmlHttpRequest = XMLHttpRequest;
 
 export const
 /**
@@ -78,7 +79,7 @@ export const
  * @return {Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest>} A promise resolving to a type that depends on the options passed.
  */
 HTTPRequest: requestReturn = <T = any>(url: string, props: Properties = {}): Promise<T | string | XMLDocument | Blob | ArrayBuffer | XMLHttpRequest> => new Promise((successFn, errorFn) => {
-	const xh = new XMLHttpRequest();
+	const xh = new xmlHttpRequest();
 
 	xh.open(props["method"] ?? "GET", url);
 
