@@ -2024,126 +2024,188 @@ type Tests = {
 		}
 	},
 	"rpc.js": {
-		"static test": async () => {
-			const {WS} = await import("./lib/conn.js"),
-			      {RPC} = await import("./lib/rpc.js");
+		"client": {
+			"static test": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
 
-			return WS("/rpc").then(ws => new RPC(ws).request("static").then(d => d === "123"));
-		},
-		"echo test": async () => {
-			const {WS} = await import("./lib/conn.js"),
-			      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => new RPC(ws).request("static").then(d => d === "123"));
+			},
+			"echo test": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
 
-			return WS("/rpc").then(ws => new RPC(ws).request("echo", "456").then(d => d === "456"));
-		},
-		"broadcast test": async () => {
-			const {WS} = await import("./lib/conn.js"),
-			      {RPC} = await import("./lib/rpc.js");
+				return WS("/rpc").then(ws => new RPC(ws).request("echo", "456").then(d => d === "456"));
+			},
+			"broadcast test": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
 
-			return WS("/rpc").then(ws => {
-				const rpc = new RPC(ws);
+				return WS("/rpc").then(ws => {
+					const rpc = new RPC(ws);
 
-				let fn = (_b: boolean) => {},
-				    res = 0;
+					let fn = (_b: boolean) => {},
+					    res = 0;
 
-				rpc.await(-1).then(data => res += +(data === "123"));
-				rpc.request("broadcast", "123").then(d => {
-					if (d) {
-						res *= 2;
-					}
-
-					fn(res === 2);
-				});
-
-				return new Promise<boolean>(sFn => fn = sFn);
-			});
-		},
-		"broadcast test, double recieve": async () => {
-			const {WS} = await import("./lib/conn.js"),
-			      {RPC} = await import("./lib/rpc.js");
-
-			return WS("/rpc").then(ws => {
-				const rpc = new RPC(ws);
-
-				let fn = (_b: boolean) => {},
-				    res = 0;
-
-				rpc.await(-1).then(data => res += +(data === "123"));
-				rpc.await(-1).then(data => res += +(data === "123"));
-				rpc.request("broadcast", "123").then(d => {
-					if (d) {
-						res *= 2;
-					}
-
-					fn(res === 4);
-				});
-
-				return new Promise<boolean>(sFn => fn = sFn);
-			});
-		},
-		"broadcast test, subscribed": async () => {
-			const {WS} = await import("./lib/conn.js"),
-			      {RPC} = await import("./lib/rpc.js");
-
-			return WS("/rpc").then(ws => {
-				const rpc = new RPC(ws);
-
-				let fn = (_b: boolean) => {},
-				    res = 0;
-
-				rpc.subscribe(-1).when(data => res += +(data === "123"));
-				rpc.request("broadcast", "123").then(d => {
-					if (d) {
-						res *= 2;
-					}
-
+					rpc.await(-1).then(data => res += +(data === "123"));
 					rpc.request("broadcast", "123").then(d => {
 						if (d) {
 							res *= 2;
 						}
 
-						fn(res === 6);
+						fn(res === 2);
 					});
+
+					return new Promise<boolean>(sFn => fn = sFn);
 				});
+			},
+			"broadcast test, double recieve": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
 
-				return new Promise<boolean>(sFn => fn = sFn);
-			});
+				return WS("/rpc").then(ws => {
+					const rpc = new RPC(ws);
+
+					let fn = (_b: boolean) => {},
+					    res = 0;
+
+					rpc.await(-1).then(data => res += +(data === "123"));
+					rpc.await(-1).then(data => res += +(data === "123"));
+					rpc.request("broadcast", "123").then(d => {
+						if (d) {
+							res *= 2;
+						}
+
+						fn(res === 4);
+					});
+
+					return new Promise<boolean>(sFn => fn = sFn);
+				});
+			},
+			"broadcast test, subscribed": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+
+				return WS("/rpc").then(ws => {
+					const rpc = new RPC(ws);
+
+					let fn = (_b: boolean) => {},
+					    res = 0;
+
+					rpc.subscribe(-1).when(data => res += +(data === "123"));
+					rpc.request("broadcast", "123").then(d => {
+						if (d) {
+							res *= 2;
+						}
+
+						rpc.request("broadcast", "123").then(d => {
+							if (d) {
+								res *= 2;
+							}
+
+							fn(res === 6);
+						});
+					});
+
+					return new Promise<boolean>(sFn => fn = sFn);
+				});
+			},
+			"endpoint error": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+
+				return WS("/rpc").then(ws => new RPC(ws).request("unknown").then(() => false).catch(() => true));
+			},
+			"close test": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+
+				return WS("/rpc").then(ws => new RPC(ws).request("close").then(() => false).catch(() => true));
+			},
+			"close all test": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js");
+
+				return WS("/rpc").then(ws => {
+					const rpc = new RPC(ws);
+
+					let res = 0;
+
+					rpc.await(-1).catch(() => res++);
+					rpc.await(-2).catch(() => res++);
+
+					return rpc.request("close").then(() => false).catch(() => new Promise<boolean>(sFn => window.setTimeout(() => sFn(res === 2), 0)));
+				});
+			},
+			"queue": async () => {
+				const {WS} = await import("./lib/conn.js"),
+				      {RPC} = await import("./lib/rpc.js"),
+				      rpc = new RPC();
+
+				setTimeout(() => WS("/rpc").then(ws => rpc.reconnect(ws)), 10);
+
+				return rpc.request("echo", "456").then(d => d === "456");
+			}
 		},
-		"endpoint error": async () => {
-			const {WS} = await import("./lib/conn.js"),
-			      {RPC} = await import("./lib/rpc.js");
+		"server": {
+			"simple": async () => {
+				let data = "",
+				    request: ((data: {data: string}) => void);
 
-			return WS("/rpc").then(ws => new RPC(ws).request("unknown").then(() => false).catch(() => true));
-		},
-		"close test": async () => {
-			const {WS} = await import("./lib/conn.js"),
-			      {RPC} = await import("./lib/rpc.js");
+				const {RPC} = await import("./lib/rpc.js"),
+				      conn = {
+					"close": () => {},
+					"send": (d: string) => data = d,
+					"when": (fn: (data: {data: string}) => void) => request = fn
+				      },
+				      rpc = new RPC(conn);
 
-			return WS("/rpc").then(ws => new RPC(ws).request("close").then(() => false).catch(() => true));
-		},
-		"close all test": async () => {
-			const {WS} = await import("./lib/conn.js"),
-			      {RPC} = await import("./lib/rpc.js");
+				rpc.register("myMethod", (data: [number, number]) => data[0] + data[1]);
 
-			return WS("/rpc").then(ws => {
-				const rpc = new RPC(ws);
+				request!({"data": `{"id":0,"method":"myMethod","params":[1,2]}`});
 
-				let res = 0;
+				return new Promise(sFn => setTimeout(sFn)).then(() => data === `{"id":0,"result":3}`);
+			},
+			"multiple endpoints": async () => {
+				let data = "",
+				    request: ((data: {data: string}) => void);
 
-				rpc.await(-1).catch(() => res++);
-				rpc.await(-2).catch(() => res++);
+				const {RPC} = await import("./lib/rpc.js"),
+				      conn = {
+					"close": () => {},
+					"send": (d: string) => data = d,
+					"when": (fn: (data: {data: string}) => void) => request = fn
+				      },
+				      rpc = new RPC(conn);
 
-				return rpc.request("close").then(() => false).catch(() => new Promise<boolean>(sFn => window.setTimeout(() => sFn(res === 2), 0)));
-			});
-		},
-		"queue": async () => {
-			const {WS} = await import("./lib/conn.js"),
-			      {RPC} = await import("./lib/rpc.js"),
-			      rpc = new RPC();
+				rpc.register("myFirstMethod", (data: [number, number]) => data[0] * data[1]);
+				rpc.register("mySecondMethod", (data: [number, number]) => data[0] + data[1]);
+				rpc.register("myThirdMethod", (data: [number, number]) => data[0] - data[1]);
 
-			setTimeout(() => WS("/rpc").then(ws => rpc.reconnect(ws)), 10);
+				request!({"data": `{"id":0,"method":"mySecondMethod","params":[1,2]}`});
 
-			return rpc.request("echo", "456").then(d => d === "456");
+				return new Promise(sFn => setTimeout(sFn)).then(() => data === `{"id":0,"result":3}`);
+			},
+			"multiple requests": async () => {
+				let data: string[] = [],
+				    request: ((data: {data: string}) => void);
+
+				const {RPC} = await import("./lib/rpc.js"),
+				      conn = {
+					"close": () => {},
+					"send": (d: string) => data.push(d),
+					"when": (fn: (data: {data: string}) => void) => request = fn
+				      },
+				      rpc = new RPC(conn);
+
+				rpc.register("myMethod", (data: [number, number]) => data[0] + data[1]);
+
+				request!({"data": `{"id":0,"method":"myMethod","params":[1,2]}`});
+				request!({"data": `{"id":1,"method":"myMethod","params":[2,3]}`});
+				request!({"data": `{"id":2,"method":"myMethod","params":[100,200]}`});
+
+				return new Promise(sFn => setTimeout(sFn)).then(() => data[0] === `{"id":0,"result":3}` && data[1] === `{"id":1,"result":5}` && data[2] ===  `{"id":2,"result":300}`);
+			},
 		}
 	},
 	"bbcode.js": {
