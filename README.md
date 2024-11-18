@@ -2469,6 +2469,7 @@ This unexported type is the interface used by [RPC](#rpc_rpc) to send and receiv
 | close | Closes the RPC connection. |
 | constructor | Creates an RPC object with a [Conn](#rpc_conn). If a Conn is not provided the requests will be queued until one is provided via reconnect.  |
 | reconnect | Reuses the RPC object with a new [Conn](#rpc_conn). |
+| [register](#rpc_rpc_register) | Allows the registration of endpoints for clients of the connection to call. |
 | [request](#rpc_rpc_request) | Calls a remote procedure and waits for a response. |
 | [subscribe](#rpc_rpc_subscribe) | Returns data each time a message with a specific ID is received. |
 
@@ -2484,6 +2485,17 @@ The await method will wait for a message with a matching ID, which must be negat
 The typeCheck function can be specified to check that the data returned matches the format expected.
 
 It is recommended to use a checker function, and the [TypeGuard](#typeguard) module can aid with that.
+
+#### <a name="rpc_rpc_register">register</a>
+```typescript
+class RPC {
+	register<T>(endpoint: string, fn?: (t: T) => unknown, typeguard?: (v: T) => v is T);
+}
+```
+
+The register method allows the registration of endpoints for clients of the connection to call.
+
+The function will be passed params and return values will be returned to the caller. If the function returns an RPCError type, or throws an exception, it will be returned as an error to the caller. Setting this to null or undefined will unregister the endpoint.
 
 #### <a name="rpc_rpc_request">request</a>
 ```typescript
