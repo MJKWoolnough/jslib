@@ -38,7 +38,9 @@ const noop = () => {},
 	} catch(e) {
 		eFn(e);
 	}
-      }, eFn];
+      }, eFn],
+      noTG = () => true,
+      noEndpoint = params => new RPCError(0, "unknown endpoint", params);
 
 /** This class is the error type for RPC, and contains a `code` number, `message` string, and a data field for any addition information of the error. */
 export class RPCError {
@@ -88,6 +90,7 @@ export class RPC {
 	#a = new Map();
 	#sFn;
 	#eFn;
+	#methods = new Map();
 
 	/**
 	 * Creates an RPC object with a [Conn](#rpc_conn)
@@ -100,18 +103,32 @@ export class RPC {
 
 	#connInit(conn) {
 		(this.#c = conn ?? new Queue(msg => this.#c?.send(msg))).when(this.#sFn ??= ({data}) => {
-			const message = JSON.parse(data),
-			      id = typeof message.id === "string" ? parseInt(message.id) : message.id,
-			      e = message.error,
-			      i = +!!e,
-			      m = e ? new RPCError(e.code, e.message, e.data) : message.result;
+			const {id, result, error, method, params} = JSON.parse(data);
 
-			if (id >= 0) {
-				(this.#r.get(id) ?? noops)[i](m);
-				this.#r.delete(id);
+			if (method) {
+			      const [fn, tg] = this.#methods.get(method) ?? [noEndpoint, noTG];
+
+				(tg(params) ? Promise.resolve(fn(params)) : Promise.reject(new RPCError(0, "bad or invalid params", params)))
+				.then(result => {
+					if (result instanceof RPCError) {
+						throw result;
+					}
+
+					this.#c?.send(JSON.stringify({id, result}));
+				})
+				.catch(err => this.#c?.send(JSON.stringify({id, "error": err instanceof RPCError ? err : new RPCError(0, err)})));
 			} else {
-				for (const r of this.#a.get(id) ?? []) {
-					r[i](m);
+				const mid = typeof id === "string" ? parseInt(id) : id,
+				      i = +!!error,
+				      m = error ? new RPCError(error.code, error.message, error.data) : result;
+
+				if (id >= 0) {
+					(this.#r.get(mid) ?? noops)[i](m);
+					this.#r.delete(mid);
+				} else {
+					for (const r of this.#a.get(mid) ?? []) {
+						r[i](m);
+					}
 				}
 			}
 		}, this.#eFn ??= err => {
@@ -220,6 +237,14 @@ export class RPC {
 			s.add(h);
 			cFn(() => s.delete(h));
 		});
+	}
+
+	register(endpoint, fn, typeguard) {
+		if (!fn) {
+			this.#methods.delete(endpoint);
+		} else {
+			this.#methods.set(endpoint, [fn, typeguard ?? noTG]);
+		}
 	}
 
 	/** Closes the RPC connection. */
