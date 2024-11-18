@@ -239,6 +239,13 @@ export class RPC {
 		});
 	}
 
+	/**
+	 * The register method allows the registration of endpoints for clients of the connection to call.
+	 *
+	 * @param {string}                 endpoint    The endpoint name.
+	 * @param {(t: T) => unknown}      [fn]        The function to be called for the endpoint. Params will be passed to the function and return values will be returned to the caller. If the function returns an RPCError type, or throws an exception, it will be returned as an error to the caller. Setting this to null or undefined will unregister the endpoint.
+	 * @param {(a: unknown) => a is T} [typeguard] An optional typeguard function that will check the parameters before they are passed to the function.
+	 */
 	register(endpoint, fn, typeguard) {
 		if (!fn) {
 			this.#methods.delete(endpoint);
