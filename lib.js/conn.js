@@ -26,7 +26,6 @@ import {Subscription} from './inter.js';
  */
 
 const once = {"once": true},
-      base = new URL(window.location+""),
       xmlHttpRequest = XMLHttpRequest;
 
 export const
@@ -141,6 +140,10 @@ export class WSConn extends WebSocket {
 	 * @param {string | string[]} [protocols] Either a single, or array of, [sub-]protocols.
 	 */
 	constructor(url, protocols) {
+		const base = new URL(window.location+"");
+
+		base.protocol = base.protocol === "https" ? "wss" : "ws";
+
 		super(new URL(url, base), protocols);
 	}
 	/**
@@ -173,5 +176,3 @@ export class WSConn extends WebSocket {
 		}).when(ssFn, eeFn);
 	}
 }
-
-base.protocol = base.protocol === "https" ? "wss" : "ws";
