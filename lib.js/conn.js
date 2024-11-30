@@ -113,6 +113,7 @@ HTTPRequest = (url, props = {}) => new Promise((successFn, errorFn) => {
  * This function takes a url and returns a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} which will resolve with an initiated {@link WSConn} on a successful connection.
  *
  * @param {string} url An absolute or relative URL to connect to.
+ * @param {string | string[]} [protocols] Optional protocol or list of protocols to use in WebSocket.
  *
  * @returns {Promise<WSConn>} A Promise that resolves to a WSConn.
  */
