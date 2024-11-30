@@ -155,8 +155,8 @@ HTTPRequest: requestReturn = <T = any>(url: string, props: Properties = {}): Pro
  *
  * @returns {Promise<WSConn>} A Promise that resolves to a WSConn.
  */
-WS = (url: string) => new Promise<WSConn>((successFn, errorFn) => {
-	const ws = new WSConn(url);
+WS = (url: string, protocols?: string | string[]) => new Promise<WSConn>((successFn, errorFn) => {
+	const ws = new WSConn(url, protocols);
 
 	ws.addEventListener("open", () => {
 		ws.removeEventListener("error", errorFn);
