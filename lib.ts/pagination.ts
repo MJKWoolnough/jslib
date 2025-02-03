@@ -20,15 +20,6 @@ const link = (page: number, href: Href | null, contents?: string | Binding) => {
 
 	return li({"part": "active page", "data-page": page}, contents ?? (page + 1) + "");
       },
-      processPaginationSection = (ret: HTMLLIElement[], currPage: number, from: number, to: number, href: Href | null) => {
-	if (ret.length !== 0) {
-		ret.push(li({"part": "separator"}));
-	}
-
-	for (let p = from; p <= to; p++) {
-		ret.push(currPage === p ? li({"part": "page current"}, (p+1)+"") : link(p, href));
-	}
-      },
       lang = {
 	"NEXT": "Next" as string | Binding,
 	"PREV": "Previous" as string | Binding
@@ -64,7 +55,7 @@ export class Pagination extends HTMLElement {
 	#end = 3;
 	#surround = 3;
 	#total = 1;
-	#page = 0;
+	#page = 1;
 	#hrefBase: Href | null = null;
 	#base: HTMLUListElement;
 
@@ -133,34 +124,25 @@ export class Pagination extends HTMLElement {
 			return;
 		}
 
-		const pageLinks: HTMLLIElement[] = [],
-		      total = this.#total - 1,
-		      currPage = this.#page < this.#total ? this.#page : total;
+		const total = this.#total - 1,
+		      currPage = this.#page < this.#total ? this.#page - 1 : total;
 		
-		let start = 0;
-
-		for (let page = 0; page <= this.#total; page++) {
-			if (
-				!(page < this.#end || page > total - this.#end ||
-				((this.#surround > currPage || page >= currPage - this.#surround) && page <= currPage + this.#surround) ||
-				this.#end > 0 && ((currPage - this.#surround - 1 === this.#end && page === this.#end) ||
-				(currPage + this.#surround + 1 === total - this.#end && page == total - this.#end)
-			))) {
-				if (page !== start) {
-					processPaginationSection(pageLinks, currPage, start, page - 1, this.#hrefBase);
-				}
-
-				start = page + 1
-			}
-		}
-
-		if (start < this.#total) {
-			processPaginationSection(pageLinks, currPage, start, total, this.#hrefBase);
-		}
-
 		clearNode(this.#base, [
 			currPage !== 0 ? amendNode(link(currPage - 1, this.#hrefBase, lang["PREV"]), {"part": "active page prev"}) : li({"part": "page prev"}, lang["PREV"]),
-			pageLinks,
+			Array.from({"length": this.#total}, (_, page) => {
+				if (
+					page < this.#end || page > total - this.#end ||
+					((this.#surround > currPage || page >= currPage - this.#surround) && page <= currPage + this.#surround) ||
+					this.#end > 0 && ((currPage - this.#surround - 1 === this.#end && page === this.#end) ||
+					(currPage + this.#surround + 1 === total - this.#end && page == total - this.#end)
+				)) {
+					return currPage === page ? li({"part": "page current"}, (page+1)+"") : link(page, this.#hrefBase);
+				} else if (page === currPage - this.#surround - 1 || page === currPage + this.#surround + 1){
+					return li({"part": "separator"});
+				}
+
+				return null;
+			}).filter(e => e != null),
 			currPage !== total ? amendNode(link(currPage + 1, this.#hrefBase, lang["NEXT"]), {"part": "active page next"}) : li({"part": "page next"}, lang["NEXT"])
 		]);
 	}
