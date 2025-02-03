@@ -100,20 +100,16 @@ export class Pagination extends HTMLElement {
 		return observedAttrs;
 	}
 
-	setAttributeNode(attribute) {
-		if ("realValue" in attribute) {
-			const rv = attribute["realValue"];
+	setAttributeNS(ns, key, value) {
+		if (value instanceof Function && key === "href") {
+			this.#hrefBase = value;
 
-			if (rv instanceof Function && attribute.name === "href") {
-				this.#hrefBase = rv;
+			this.#build();
 
-				this.#build();
-
-				return null;
-			}
+			return null;
 		}
 
-		return super.setAttributeNode(attribute);
+		return super.setAttributeNS(ns, key, value);
 	}
 
 	#build() {
