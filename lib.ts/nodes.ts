@@ -64,7 +64,9 @@ interface ItemOrRoot<T> {
 	c: ChildNode | undefined;
 }
 
-type Callback<T extends Item, U, thisType> = (element: T, index: number, array: thisType) => U;
+type Callback<T extends Item, U extends T> = (element: T, index: number, array: T[]) => element is U;
+
+type CallbackMap<T extends Item, U, thisType> = (element: T, index: number, array: thisType) => U;
 
 const getChildNode = <T extends Item>(n: T) => (n instanceof Node ? n : n[node]) as ChildNode,
       sortNodes = <T extends Item>(root: Root<T>, n: ItemNode<T>) => {
@@ -288,11 +290,11 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		throw new Error("invalid");
 	}
 
-	*entries(): IterableIterator<[number, T]> {
+	*entries(): ArrayIterator<[number, T]> {
 		yield *entries(this[realTarget].#root);
 	}
 
-	every(callback: Callback<T, any, this>, thisArg: any = this) {
+	every<U extends T>(callback: Callback<T, U>, thisArg: any = this): this is U[] {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (!callback.call(thisArg ?? globalThis, item, index, this)) {
 				return false;
@@ -306,7 +308,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		throw new Error("invalid");
 	}
 
-	filter(callback: Callback<T, any, this>, thisArg: any = this) {
+	filter<U extends T>(callback: Callback<T, U>, thisArg: any = this) {
 		const filter: T[] = [];
 
 		for (const [index, item] of entries(this[realTarget].#root)) {
@@ -318,7 +320,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return filter;
 	}
 
-	filterRemove(callback: Callback<T, any, this>, thisArg: any = this) {
+	filterRemove<U extends T>(callback: Callback<T, U>, thisArg: any = this) {
 		const root = this[realTarget].#root,
 		      filtered: T[] = [];
 
@@ -332,7 +334,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return filtered;
 	}
 
-	find(callback: Callback<T, any, this>, thisArg: any = this) {
+	find<U extends T>(callback: Callback<T, U>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return item;
@@ -342,7 +344,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return undefined;
 	}
 
-	findIndex(callback: Callback<T, any, this>, thisArg: any = this) {
+	findIndex<U extends T>(callback: Callback<T, U>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return index;
@@ -352,9 +354,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return -1;
 	}
 
-	findLast<S extends T>(predicate: (value: T, index: number, array: T[]) => value is S, thisArg?: any): S | undefined;
-	findLast(callback: Callback<T, any, this>, thisArg?: any): T | undefined;
-	findLast<S extends T>(callback: Callback<T, any, this> | ((value: T, index: number, array: T[]) => value is S), thisArg: any = this) {
+	findLast<U extends T>(callback: Callback<T, U> | ((value: T, index: number, array: T[]) => value is U), thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return item;
@@ -364,7 +364,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return undefined;
 	}
 
-	findLastIndex(callback: Callback<T, any, this>, thisArg: any = this) {
+	findLastIndex<U extends T>(callback: Callback<T, U>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return index;
@@ -378,11 +378,11 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return Array.from(this.values()).flat(depth) as FlatArray<any[], D>;
 	}
 
-	flatMap<U extends []>(callback: Callback<T, U, this>, thisArg: any = this) {
+	flatMap<U extends []>(callback: CallbackMap<T, U, this>, thisArg: any = this) {
 		return this.map(callback, thisArg).flat();
 	}
 
-	forEach(callback: Callback<T, void, this>, thisArg: any = this) {
+	forEach<U extends T>(callback: Callback<T, U>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			callback.call(thisArg ?? globalThis, item, index, this);
 		}
@@ -438,7 +438,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return Array.from(this.values()).join(separator);
 	}
 
-	*keys() {
+	*keys(): ArrayIterator<number> {
 		for (let i = 0; i < this[realTarget].#root.l; i++) {
 			yield i;
 		}
@@ -454,7 +454,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return -1;
 	}
 
-	map<U>(callback: Callback<T, U, this>, thisArg: any = this) {
+	map<U>(callback: CallbackMap<T, U, this>, thisArg: any = this) {
 		const map: U[] = [];
 
 		for (const [index, item] of entries(this[realTarget].#root)) {
@@ -487,8 +487,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return root.l;
 	}
 
-	reduce<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
-	reduce(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T): T;
+	reduce<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue?: U): U;
 	reduce(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (initialValue === undefined) {
@@ -501,8 +500,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return initialValue;
 	}
 
-	reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue: U): U;
-	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T): T;
+	reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, index: number, array: this) => U, initialValue?: U): U;
 	reduceRight(callbackfn: (previousValue: T, currentValue: T, index: number, array: this) => T, initialValue?: T): T | undefined {
 		for (const [index, item] of entries(this[realTarget].#root, -1, -1)) {
 			if (initialValue === undefined) {
@@ -562,7 +560,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return slice;
 	}
 
-	some(callback: Callback<T, any, this>, thisArg: any = this) {
+	some(callback: CallbackMap<T, any, this>, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (callback.call(thisArg ?? globalThis, item, index, this)) {
 				return true;
@@ -659,7 +657,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return root.l;
 	}
 
-	*values(): IterableIterator<T> {
+	*values(): ArrayIterator<T> {
 		for (let curr = this[realTarget].#root.n; curr.i; curr = curr.n) {
 			yield curr.i;
 		}
@@ -684,7 +682,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return toRet;
 	}
 
-	*[Symbol.iterator]() {
+	*[Symbol.iterator](): ArrayIterator<T> {
 		yield* this.values();
 	}
 
@@ -789,7 +787,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return root.m.delete(k);
 	}
 
-	*entries(): IterableIterator<[K, T]> {
+	*entries(): MapIterator<[K, T]> {
 		for (const [k, v] of this.#root.m) {
 			yield [k, v.i];
 		}
@@ -871,7 +869,7 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return undefined;
 	}
 
-	keys(): IterableIterator<K> {
+	keys(): MapIterator<K> {
 		return this.#root.m.keys();
 	}
 
@@ -947,13 +945,13 @@ export class NodeMap<K, T extends Item, H extends Node = Node> implements Map<K,
 		return this;
 	}
 
-	*values(): IterableIterator<T> {
+	*values(): MapIterator<T> {
 		for (const v of this.#root.m.values()) {
 			yield v.i;
 		}
 	}
 
-	*[Symbol.iterator](): IterableIterator<[K, T]> {
+	*[Symbol.iterator](): MapIterator<[K, T]> {
 		yield* this.entries();
 	}
 
