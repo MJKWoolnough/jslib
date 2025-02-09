@@ -1,10 +1,10 @@
 golang.org/x/net v0.23.0 h1:7EYJ93RZ9vYSZAIb2x3lnuvqO5zneoD6IvWjuhfxjTs=
 golang.org/x/net v0.23.0/go.mod h1:JKghWKKOSdJwpW2GEx0Ja7fmaKnMsbu+MWVZTokSYmg=
-vimagination.zapto.org/javascript v1.4.17 h1:FNTxYVj8PVpOYx0ZWXgwzlYt3dPrH2m9vp3ZFlJF5HA=
-vimagination.zapto.org/javascript v1.4.17/go.mod h1:VHox5R23pekFQihRLxhfKh3lvY9TbGhG5KhPtMnM2kw=
+vimagination.zapto.org/javascript v1.4.18 h1:VBbPX13Ul9y/O4nAw5RpDVbZ+NbXmNmn20b3pYJyCdk=
+vimagination.zapto.org/javascript v1.4.18/go.mod h1:VHox5R23pekFQihRLxhfKh3lvY9TbGhG5KhPtMnM2kw=
 vimagination.zapto.org/jsonrpc v1.2.1 h1:zsm7ndUizhxUi116DBJ4akKF2OnwBopzBGR1to7iaK4=
 vimagination.zapto.org/jsonrpc v1.2.1/go.mod h1:g41PBlAn31blw/VOQ2Vme2WUj0TI7OjPELvqn6luED4=
 vimagination.zapto.org/parser v1.0.4 h1:7REiRsbDlO7amHGjrCMudJaaw+E854njekVmTTsI2Hg=
 vimagination.zapto.org/parser v1.0.4/go.mod h1:MxM1MZY6A9AeEx6nahIQ6MJaGZqX80n6Vm3zGVqV9FU=
-vimagination.zapto.org/tsserver v1.0.12 h1:GF73VEgcluuNueKA+wijoPHJiZzbQ5QwnN5M9ydeteI=
-vimagination.zapto.org/tsserver v1.0.12/go.mod h1:1jEIKYDWuBQAKrhmFUmaRxtsHsV1jkmL1vfEbOH9qwo=
+vimagination.zapto.org/tsserver v1.0.13 h1:M/OUnREEjvt7n/QEq6sWwhUe1DndjMpSWpVUSbQpY48=
+vimagination.zapto.org/tsserver v1.0.13/go.mod h1:SM3KFliomp8T2qd/g/V16BqB8o7o49SiUVC8qL5GHAI=
