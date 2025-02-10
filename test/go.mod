@@ -6,7 +6,7 @@ toolchain go1.23.4
 
 require (
 	golang.org/x/net v0.23.0
-	vimagination.zapto.org/jsonrpc v1.2.1
+	vimagination.zapto.org/jsonrpc v1.3.0
 	vimagination.zapto.org/tsserver v1.0.13
 )
 
