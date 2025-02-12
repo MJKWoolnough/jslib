@@ -1,4 +1,4 @@
-import type {TokenFn, Tokeniser, TokenType} from './parser.js';
+import type {Token, TokenFn, Tokeniser, TokenType} from './parser.js';
 import {amendNode, createDocumentFragment} from './dom.js';
 import {br, span} from './html.js';
 import Parser, {TokenDone, TokenError} from './parser.js';
@@ -730,7 +730,7 @@ python = (() => {
 			return [{
 				"type": keywords.includes(ident) ? ident === "True" || ident === "False" ? TokenBooleanLiteral : ident === "None" ? TokenNullLiteral : TokenKeyword : TokenIdentifier,
 				"data": ident
-			}, main]
+			}, main] as [Token, TokenFn];
 		      },
 		      numberWithGrouping = (tk: Tokeniser, digits: string) => {
 			while (tk.accept("_")) {
