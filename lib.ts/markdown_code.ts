@@ -1251,7 +1251,7 @@ bash = (() => {
 				tk.next();
 
 				if ("\\\"'`(){}- \t\n".includes(tk.peek())) {
-					tokenDepth.push('{');
+					tokenDepth.push('}');
 
 					return tk.return(TokenPunctuator, main);
 				}
