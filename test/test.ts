@@ -5721,7 +5721,7 @@ type Tests = {
 
 					let good = true;
 
-					return n.every(() => good = false) && good;
+					return n.every((_): _ is any => good = false) && good;
 				},
 				"a node true": async () => {
 					type MyNode = {
@@ -5732,7 +5732,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
 
-					return n.every(() => true);
+					return n.every((_): _ is any => true);
 				},
 				"a node false": async () => {
 					type MyNode = {
@@ -5743,7 +5743,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [{[node]: document.createElement("span"), num: 1}]);
 
-					return !n.every(() => false);
+					return !n.every((_): _ is any => false);
 				},
 				"many nodes": async () => {
 					type MyNode = {
@@ -5757,7 +5757,7 @@ type Tests = {
 
 					let pos = 0;
 
-					return n.every(function(this: any, t, p, a){ return t.num === pos && p === pos++ && a === n && this === aThis}, aThis);
+					return n.every(function(this: any, t, p, a): t is any { return t.num === pos && p === pos++ && a === n && this === aThis}, aThis);
 				}
 			},
 			"fill": {
@@ -5781,7 +5781,7 @@ type Tests = {
 
 					let good = true;
 
-					return n.filter(() => good = false) && good;
+					return n.filter((_): _ is any => good = false) && good;
 				},
 				"a node true": async () => {
 					type MyNode = {
@@ -5792,7 +5792,7 @@ type Tests = {
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
-					      filtered = n.filter(() => true);
+					      filtered = n.filter((_): _ is any => true);
 
 					return filtered.length === 1 && filtered[0] === item;
 				},
@@ -5805,7 +5805,7 @@ type Tests = {
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
-					      filtered = n.filter(() => false);
+					      filtered = n.filter((_): _ is any => false);
 
 					return filtered.length === 0;
 				},
@@ -5818,7 +5818,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {},
-					      filtered = n.filter(function(this: any, e) { return e.num % 2 === 0 && this === aThis; }, aThis);
+					      filtered = n.filter(function(this: any, e): e is any { return e.num % 2 === 0 && this === aThis; }, aThis);
 
 					return filtered.length === 3 && filtered[0].num === 0 && filtered[1].num === 2 && filtered[2].num === 4;
 				}
@@ -5830,7 +5830,7 @@ type Tests = {
 
 					let good = true;
 
-					return n.filterRemove(() => good = false) && good;
+					return n.filterRemove((_): _ is any => good = false) && good;
 				},
 				"a node true": async () => {
 					type MyNode = {
@@ -5841,7 +5841,7 @@ type Tests = {
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
-					      filtered = n.filterRemove(() => true);
+					      filtered = n.filterRemove((_): _ is any => true);
 
 					return filtered.length === 1 && filtered[0] === item && n.length === 0;
 				},
@@ -5854,7 +5854,7 @@ type Tests = {
 					      item = {[node]: document.createElement("span"), num: 1},
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]),
-					      filtered = n.filterRemove(() => false);
+					      filtered = n.filterRemove((_): _ is any => false);
 
 					return filtered.length === 0 && n.length === 1;
 				},
@@ -5867,7 +5867,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {},
-					      filtered = n.filterRemove(function(this: any, e) { return e.num % 2 === 0 && this === aThis; }, aThis);
+					      filtered = n.filterRemove(function(this: any, e): e is any { return e.num % 2 === 0 && this === aThis; }, aThis);
 
 					return filtered.length === 3 && filtered[0].num === 0 && filtered[1].num === 2 && filtered[2].num === 4 && n[0].num === 1 && n[1].num === 3;
 				}
@@ -5879,7 +5879,7 @@ type Tests = {
 
 					let good = false;
 
-					return n.find(() => good = true) === undefined && !good;
+					return n.find((_): _ is any => good = true) === undefined && !good;
 				},
 				"a node true": async () => {
 					type MyNode = {
@@ -5891,7 +5891,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
 
-					return n.find(() => true) === item;
+					return n.find((_): _ is any => true) === item;
 				},
 				"a node false": async () => {
 					type MyNode = {
@@ -5903,7 +5903,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
 
-					return n.find(() => false) === undefined;
+					return n.find((_): _ is any => false) === undefined;
 				},
 				"many nodes": async () => {
 					type MyNode = {
@@ -5915,7 +5915,7 @@ type Tests = {
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {};
 
-					return n.find(function(this: any, e) { return e.num === 3 && this === aThis; }, aThis)?.num === 3;
+					return n.find(function(this: any, e): e is any { return e.num === 3 && this === aThis; }, aThis)?.num === 3;
 				}
 			},
 			"findIndex": {
@@ -5925,7 +5925,7 @@ type Tests = {
 
 					let good = false;
 
-					return n.findIndex(() => good = true) === -1 && !good;
+					return n.findIndex((_): _ is any => good = true) === -1 && !good;
 				},
 				"a node true": async () => {
 					type MyNode = {
@@ -5937,7 +5937,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
 
-					return n.findIndex(() => true) === 0;
+					return n.findIndex((_): _ is any => true) === 0;
 				},
 				"a node false": async () => {
 					type MyNode = {
@@ -5949,7 +5949,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
 
-					return n.findIndex(() => false) === -1;
+					return n.findIndex((_): _ is any => false) === -1;
 				},
 				"many nodes": async () => {
 					type MyNode = {
@@ -5961,7 +5961,7 @@ type Tests = {
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {};
 
-					return n.findIndex(function(this: any, e) { return e.num === 3 && this === aThis; }, aThis) === 3;
+					return n.findIndex(function(this: any, e): e is any { return e.num === 3 && this === aThis; }, aThis) === 3;
 				}
 			},
 			"findLast": {
@@ -5971,7 +5971,7 @@ type Tests = {
 
 					let good = false;
 
-					return n.findLast(() => good = true) === undefined && !good;
+					return n.findLast((_): _ is any => good = true) === undefined && !good;
 				},
 				"a node true": async () => {
 					type MyNode = {
@@ -5983,7 +5983,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
 
-					return n.findLast(() => true) === item;
+					return n.findLast((_): _ is any => true) === item;
 				},
 				"a node false": async () => {
 					type MyNode = {
@@ -5995,7 +5995,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, [item]);
 
-					return n.findLast(() => false) === undefined;
+					return n.findLast((_): _ is any => false) === undefined;
 				},
 				"many nodes true": async () => {
 					type MyNode = {
@@ -6006,7 +6006,7 @@ type Tests = {
 					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num})));
 
-					return n.findLast(() => true)?.num === 4;
+					return n.findLast((_): _ is any => true)?.num === 4;
 				},
 				"many nodes": async () => {
 					type MyNode = {
@@ -6018,7 +6018,7 @@ type Tests = {
 					      n = new NodeArray<MyNode>(document.createElement("div"), noSort, Array.from({length: 5}, (_, num) => ({[node]: document.createElement("span"), num}))),
 					      aThis = {};
 
-					return n.findLast(function(this: any, e) { return e.num === 3 && this === aThis; }, aThis)?.num === 3;
+					return n.findLast(function(this: any, e): e is any { return e.num === 3 && this === aThis; }, aThis)?.num === 3;
 				}
 			},
 			"forEach": {
@@ -6028,7 +6028,7 @@ type Tests = {
 
 					let good = true;
 
-					n.forEach(() => good = false);
+					n.forEach((_): _ is any => good = false);
 
 					return good;
 				},
@@ -6044,7 +6044,7 @@ type Tests = {
 
 					let good = false;
 
-					n.forEach(e => good = e === item);
+					n.forEach((e) => good = e === item);
 
 					return good;
 				},
@@ -6060,7 +6060,7 @@ type Tests = {
 
 					let good = true;
 
-					n.forEach(function(this: any, e, n){good &&= e.num === n && this === aThis} , aThis);
+					n.forEach(function(this: any, e, n) {good &&= e.num === n && this === aThis} , aThis);
 
 					return good
 				}
@@ -7381,6 +7381,7 @@ type Tests = {
 					      a = g.next().value,
 					      b = g.next().value;
 
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return a?.[0] === "A" && a?.[1] === items[0][1] && b?.[0] === "B" && b?.[1] === items[1][1] && g.next().value === undefined;
 				}
 			},
@@ -7748,6 +7749,7 @@ type Tests = {
 					      a = g.next().value,
 					      b = g.next().value;
 
+					// @ts-ignore: Type Error (at least partially) caused by: https://github.com/microsoft/TypeScript/issues/35562
 					return a === items[0][1] && b === items[1][1] && g.next().value === undefined;
 				},
 				"many nodes (iterator)": async () => {
