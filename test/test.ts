@@ -13547,6 +13547,10 @@ type Tests = {
 				"brace expansion": {
 					"source": `{1..2} {1..2..3} {1,2,3} a{bz,cz,dz}e {e..f}`,
 					"output": `<span class="stringliteral">{1..2}</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{1..2..3}</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{1,2,3}</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="stringliteral">{bz,cz,dz}</span><span class="keyword">e</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{e..f}</span>`
+				},
+				"brace grouping": {
+					"source": `{ a; } { a; b; c; }`,
+					"output": `<span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">b</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">c</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
