@@ -382,7 +382,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		return this.map(callback, thisArg).flat();
 	}
 
-	forEach<U extends T>(callback: Callback<T, U>, thisArg: any = this) {
+	forEach(callback: (element: T, index: number, array: T[]) => void, thisArg: any = this) {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			callback.call(thisArg ?? globalThis, item, index, this);
 		}
