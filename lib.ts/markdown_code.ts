@@ -8,6 +8,7 @@ const lineTerminators = "\n\r\u2028\u2029",
       octalDigit = "01234567",
       decimalDigit = "0123456789",
       hexDigit = "0123456789abcdefABCDEF",
+      letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
       lineSplit = new RegExp("[" + lineTerminators + "]"),
       error = (errText: string, override?: string) => (t: Tokeniser, text = override ?? t.get()) => t.error(errText + text),
       errUnexpectedEOF = error("unexpected EOF", ""),
@@ -931,7 +932,8 @@ python = (() => {
 })(),
 bash = (() => {
 	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
-	      numberChars = decimalDigit + "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz@_";
+	      numberChars = decimalDigit + "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz@_",
+	      errInvalidBraceExpansion = error("invalid brace expansion");
 
 	return (tk: Tokeniser) => {
 		let hasEscape = false;
@@ -1053,6 +1055,83 @@ bash = (() => {
 
 			return tk.return(TokenNumericLiteral, main);
 		      },
+		      braceExpansionWord = (tk: Tokeniser) => {
+			while (true) {
+				switch (tk.exceptRun(" `\\\t\n|&;<>()},")) {
+				default:
+					return errInvalidBraceExpansion(tk);
+				case '}':
+					tk.next();
+
+					return tk.return(TokenStringLiteral, main);
+				case '\\':
+					tk.next();
+				case ',':
+					tk.next();
+				}
+			}
+		      },
+		      braceExpansion = (tk: Tokeniser) => {
+			if (tk.accept(letters)) {
+				if (tk.acceptString("..")) {
+					if (!tk.accept(letters)) {
+						return errInvalidBraceExpansion(tk);
+					}
+
+					if (tk.acceptString("..")) {
+						if (!tk.accept(decimalDigit)) {
+							return errInvalidBraceExpansion(tk);
+						}
+
+						tk.acceptRun(decimalDigit);
+					}
+
+					if (!tk.accept("}")) {
+						return errInvalidBraceExpansion(tk);
+					}
+				} else {
+					return braceExpansionWord(tk);
+				}
+			} else if (tk.accept(decimalDigit)) {
+				switch (tk.acceptRun(decimalDigit)) {
+				default:
+					return errInvalidBraceExpansion(tk);
+				case ',':
+					return braceExpansionWord(tk);
+				case '.':
+					if (tk.acceptString("..")) {
+						if (!tk.accept(decimalDigit)) {
+						}
+
+						tk.acceptRun(decimalDigit);
+
+						if (tk.acceptString("..")) {
+							if (!tk.accept(decimalDigit)) {
+								return errInvalidBraceExpansion(tk);
+							}
+
+							tk.acceptRun(decimalDigit);
+						}
+
+						if (!tk.accept("}")) {
+							return errInvalidBraceExpansion(tk);
+						}
+					}
+				}
+			} else {
+				switch (tk.exceptRun(" `\\\t\n|&;<>()},")) {
+				case '\\':
+					tk.next();
+					tk.next();
+				case ',':
+					return braceExpansionWord(tk);
+				default:
+					return errInvalidBraceExpansion(tk);
+				}
+			}
+
+			return tk.return(TokenStringLiteral, main);
+		      },
 		      arithmeticExpansion = (tk: Tokeniser) => {
 			let early = false;
 
@@ -1168,6 +1247,16 @@ bash = (() => {
 				tk.next();
 
 				break;
+			case '{':
+				tk.next();
+
+				if ("\\\"'`(){}- \t\n".includes(tk.peek())) {
+					tokenDepth.push('{');
+
+					return tk.return(TokenPunctuator, main);
+				}
+
+				return braceExpansion(tk);
 			case '}':
 			case ')':
 				if (tokenDepth.pop() !== c) {
