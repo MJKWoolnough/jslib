@@ -1455,7 +1455,7 @@ r = (() => {
 
 			if (tk.accept("0")) {
 				if (tk.accept("x")) {
-					digits = hexDigit
+					digits = hexDigit;
 
 					if (!tk.accept(digits)) {
 						return errInvalidNumber(tk);
