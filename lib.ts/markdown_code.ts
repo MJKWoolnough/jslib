@@ -1582,7 +1582,7 @@ r = (() => {
 		      identifier = (tk: Tokeniser) => {
 			tk.acceptRun(identCont);
 
-			const token = {"type": TokenIdentifier, "data": tk.get()};
+			const token = {"type": TokenIdentifier, "data": tk.get()} as Token;
 
 			switch (token.data) {
 			case "NA":
@@ -1616,7 +1616,7 @@ r = (() => {
 				token.type = TokenKeyword;
 			}
 
-			return [token, expression];
+			return [token, expression] as [Token, TokenFn];
 		      },
 		      expression = (tk: Tokeniser) => {
 			if (!tk.peek()) {
