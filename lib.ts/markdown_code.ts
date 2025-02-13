@@ -1331,6 +1331,21 @@ r = (() => {
 		const operator = (tk: Tokeniser) => {
 		      },
 		      exponential = (tk: Tokeniser, digits = decimalDigit) => {
+			const e = digits === hexDigit ? "pP" : "eE";
+
+			if (tk.accept(e)) {
+				tk.accept("+-");
+
+				if (!tk.accept(digits)) {
+					return errInvalidNumber(tk);
+				}
+
+				tk.acceptRun(digits);
+			}
+
+			tk.accept("Li");
+
+			return tk.return(TokenNumericLiteral, expression);
 		      },
 		      float = (tk: Tokeniser, digits = decimalDigit) => {
 			if (digits === hexDigit && !tk.accept(digits)) {
@@ -1339,7 +1354,7 @@ r = (() => {
 
 			tk.acceptRun(digits);
 
-			if (tk.accept("L") || tk.accept("i")) {
+			if (tk.accept("Li")) {
 				return tk.return(TokenNumericLiteral, expression);
 			}
 
@@ -1385,7 +1400,7 @@ r = (() => {
 
 			tk.acceptRun(digits);
 
-			if (tk.accept("L") || tk.accept("i")) {
+			if (tk.accept("Li")) {
 				return tk.return(TokenNumericLiteral, expression);
 			} else if (tk.accept(".")) {
 				return float(tk, digits);
