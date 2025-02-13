@@ -1325,10 +1325,75 @@ bash = (() => {
 	};
 })(),
 r = (() => {
-	const identCont = decimalDigit + letters + "_.";
+	const identCont = decimalDigit + letters + "_.",
+	      printable = unicodeGroups("L", "Nl", "ID_Start", "Mn", "Mc", "Nd", "Pc", "ID_Continue", "P"),
+	      errInvalidOperator = error("invalid operator");
 
 	return (tk: Tokeniser) => {
 		const operator = (tk: Tokeniser) => {
+			if (tk.accept(";,")) {
+				return tk.return(TokenPunctuator, expression);
+			} else if (tk.accept("+*/^~$@?")) {
+			} else if (tk.accept(">=!")) {
+				tk.accept("=");
+			} else if (tk.accept("-")) {
+				tk.accept(">");
+				tk.accept(">");
+			} else if (tk.accept("<")) {
+				if (tk.accept("<") && !tk.accept("-")) {
+					return errInvalidOperator(tk);
+				} else {
+					tk.accept("=-");
+				}
+			} else if (tk.accept("%")) {
+				while (tk.peek() != "%" && (tk.peek() === " " || printable.test(tk.peek()))) {
+					tk.next();
+				}
+
+				if (!tk.accept("%")) {
+					return errInvalidOperator(tk);
+				}
+
+				return tk.return(TokenReservedWord, expression);
+			} else if (tk.accept(":")) {
+				tk.accept(":");
+			} else if (tk.accept("&")) {
+				tk.accept("&");
+			} else if (tk.accept("|")) {
+				tk.accept("|>");
+			} else if (tk.accept("[")) {
+				if (tk.accept("[")) {
+					tokenDepth.push("#");
+				} else {
+					tokenDepth.push("]");
+				}
+			} else if (tk.accept("(")) {
+				tokenDepth.push(")");
+			} else if (tk.accept("{")) {
+				tokenDepth.push("}");
+			} else if (tk.accept("]")) {
+				const last = tokenDepth.pop();
+
+				if (last === "#") {
+					if (!tk.accept("]")) {
+						return errInvalidOperator(tk);
+					}
+				} else if (last !== "]") {
+					return errInvalidOperator(tk);
+				}
+			} else if (tk.accept(")")) {
+				if (tokenDepth.pop() !== ")") {
+					return errInvalidOperator(tk);
+				}
+			} else if (tk.accept("}")) {
+				if (tokenDepth.pop() !== "}") {
+					return errInvalidOperator(tk);
+				}
+			} else {
+				return errInvalidOperator(tk);
+			}
+
+			return tk.return(TokenPunctuator, expression);
 		      },
 		      exponential = (tk: Tokeniser, digits = decimalDigit) => {
 			const e = digits === hexDigit ? "pP" : "eE";
