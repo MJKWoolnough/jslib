@@ -4,6 +4,7 @@ import {br, span} from './html.js';
 import Parser, {TokenDone, TokenError} from './parser.js';
 
 const lineTerminators = "\n\r\u2028\u2029",
+      whitespace = "\t\v\f \xa0\ufeff",
       binaryDigit = "01",
       octalDigit = "01234567",
       decimalDigit = "0123456789",
@@ -19,7 +20,6 @@ const lineTerminators = "\n\r\u2028\u2029",
 export const [TokenWhitespace, TokenLineTerminator, TokenSingleLineComment, TokenMultiLineComment, TokenIdentifier, TokenPrivateIdentifier, TokenBooleanLiteral, TokenKeyword, TokenPunctuator, TokenNumericLiteral, TokenStringLiteral, TokenNoSubstitutionTemplate, TokenTemplateHead, TokenTemplateMiddle, TokenTemplateTail, TokenRegularExpressionLiteral, TokenNullLiteral, TokenReservedWord] = Array.from({"length": 20}, (_, n) => n) as TokenType[],
 javascript = (() => {
 	const keywords = ["await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield"],
-	      whitespace = "\t\v\f \xa0\ufeff",
 	      stringChars = "'\\" + lineTerminators + "\"",
 	      doubleStringChars = stringChars.slice(1),
 	      singleStringChars = stringChars.slice(0, stringChars.length),
@@ -1322,6 +1322,60 @@ bash = (() => {
 		      tokenDepth: string[] = [];
 
 		return main(tk);
+	};
+})(),
+r = (() => {
+	return (tk: Tokeniser) => {
+		const operator = (tk: Tokeniser) => {
+		      },
+		      number = (tk: Tokeniser) => {
+		      },
+		      string = (tk: Tokeniser) => {
+		      },
+		      identifier = (tk: Tokeniser) => {
+		      },
+		      expression = (tk: Tokeniser) => {
+			if (!tk.peek()) {
+				if (tokenDepth.length) {
+					return errUnexpectedEOF(tk);
+				}
+
+				return tk.done();
+			}
+
+			if (tk.accept(whitespace)) {
+				tk.acceptRun(whitespace);
+
+				return tk.return(TokenWhitespace, expression);
+			}
+
+			if (tk.accept(lineTerminators)) {
+				return tk.return(TokenLineTerminator, expression);
+			}
+
+			if (tk.accept("#")) {
+				tk.exceptRun(lineTerminators);
+
+				return tk.return(TokenSingleLineComment, expression);
+			}
+
+			if (tk.accept(letters)) {
+				return identifier(tk);
+			}
+
+			const c = tk.peek();
+
+			if (c === `"` || c === `'`) {
+				return string(tk);
+			} else if (c === `.` || decimalDigit.includes(c)) {
+				return number(tk);
+			}
+
+			return operator(tk);
+		      },
+		      tokenDepth: string[] = [];
+
+		return expression(tk);
 	};
 })();
 
