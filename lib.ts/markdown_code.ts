@@ -1335,6 +1335,21 @@ r = (() => {
 		      float = (tk: Tokeniser, digits = decimalDigit) => {
 		      },
 		      ellipsisOrIdentifier = (tk: Tokeniser) => {
+			if (tk.accept(".")) {
+				if (tk.accept(".")) {
+					if (!tk.accept(identCont)) {
+						return tk.return(TokenReservedWord, expression);
+					}
+				} else if (tk.accept(decimalDigit)) {
+					tk.acceptRun(decimalDigit);
+
+					if (!tk.accept(identCont)) {
+						return tk.return(TokenReservedWord, expression);
+					}
+				}
+			}
+
+			return identifier(tk);
 		      },
 		      number = (tk: Tokeniser) => {
 			if (tk.accept(".")) {
