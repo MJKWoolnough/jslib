@@ -1325,6 +1325,8 @@ bash = (() => {
 	};
 })(),
 r = (() => {
+	const identCont = decimalDigit + letters + "_.";
+
 	return (tk: Tokeniser) => {
 		const operator = (tk: Tokeniser) => {
 		      },
@@ -1333,6 +1335,43 @@ r = (() => {
 		      string = (tk: Tokeniser) => {
 		      },
 		      identifier = (tk: Tokeniser) => {
+			tk.acceptRun(identCont);
+
+			const token = {"type": TokenIdentifier, "data": tk.get()};
+
+			switch (token.data) {
+			case "NA":
+			case "NA_character_":
+			case "NA_integer_":
+			case "NA_real_":
+			case "NA_complex_":
+			case "NULL":
+				token.type = TokenNullLiteral;
+
+				break;
+			case "TRUE":
+			case "FALSE":
+				token.type = TokenBooleanLiteral;
+
+				break;
+			case "Inf":
+			case "NaN":
+				token.type = TokenNumericLiteral;
+
+				break;
+			case "if":
+			case "else":
+			case "repeat":
+			case "while":
+			case "function":
+			case "for":
+			case "in":
+			case "next":
+			case "break":
+				token.type = TokenKeyword;
+			}
+
+			return [token, expression];
 		      },
 		      expression = (tk: Tokeniser) => {
 			if (!tk.peek()) {
