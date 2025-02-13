@@ -1330,7 +1330,42 @@ r = (() => {
 	return (tk: Tokeniser) => {
 		const operator = (tk: Tokeniser) => {
 		      },
+		      exponential = (tk: Tokeniser, digits = decimalDigit) => {
+		      },
+		      float = (tk: Tokeniser, digits = decimalDigit) => {
+		      },
+		      ellipsisOrIdentifier = (tk: Tokeniser) => {
+		      },
 		      number = (tk: Tokeniser) => {
+			if (tk.accept(".")) {
+				if (!tk.accept(decimalDigit)) {
+					return ellipsisOrIdentifier(tk);
+				}
+
+				return float(tk);
+			}
+
+			let digits = decimalDigit;
+
+			if (tk.accept("0")) {
+				if (tk.accept("x")) {
+					digits = hexDigit
+
+					if (!tk.accept(digits)) {
+						return errInvalidNumber(tk);
+					}
+				}
+			}
+
+			tk.acceptRun(digits);
+
+			if (tk.accept("L") || tk.accept("i")) {
+				return tk.return(TokenNumericLiteral, expression);
+			} else if (tk.accept(".")) {
+				return float(tk, digits);
+			}
+
+			return exponential(tk, digits)
 		      },
 		      string = (tk: Tokeniser) => {
 			const quote = tk.next(),
