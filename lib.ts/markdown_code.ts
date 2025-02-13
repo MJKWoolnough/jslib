@@ -1333,6 +1333,110 @@ r = (() => {
 		      number = (tk: Tokeniser) => {
 		      },
 		      string = (tk: Tokeniser) => {
+			const quote = tk.next(),
+			      chars = quote + "\\";
+
+			while (true) {
+				switch (tk.exceptRun(chars)) {
+				default:
+					return errInvalidCharacter(tk);
+				case quote:
+					tk.next();
+
+					return tk.return(TokenStringLiteral, expression);
+				case "":
+					return errInvalidCharacter(tk);
+				case "\\":
+					tk.next();
+
+					switch (tk.peek()) {
+					default:
+						return errInvalidCharacter(tk);
+					case "'":
+					case '"':
+					case 'n':
+					case 'r':
+					case 't':
+					case 'b':
+					case 'a':
+					case 'f':
+					case 'v':
+					case '\\':
+						tk.next();
+
+						break;
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+						tk.next();
+
+						if (!tk.accept(octalDigit) || !tk.accept(octalDigit)) {
+							return errInvalidCharacter(tk);
+						}
+
+						break;
+					case 'x':
+						tk.next();
+
+						if (!tk.accept(hexDigit) || !tk.accept(hexDigit)) {
+							return errInvalidCharacter(tk);
+						}
+
+						break;
+					case 'u':
+						tk.next();
+
+						const brace = tk.accept("{");
+
+						if (!tk.accept(hexDigit)) {
+							return errInvalidCharacter(tk);
+						}
+
+						if (brace) {
+							tk.accept(hexDigit);
+							tk.accept(hexDigit);
+							tk.accept(hexDigit);
+
+							if (!tk.accept("}")) {
+								return errInvalidCharacter(tk);
+							}
+						} else if (!tk.accept(hexDigit) || !tk.accept(hexDigit) || !tk.accept(hexDigit)) {
+							return errInvalidCharacter(tk);
+						}
+
+						break;
+					case 'U':
+						tk.next();
+
+						const longBrace = tk.accept("{");
+
+						if (!tk.accept(hexDigit)) {
+							return errInvalidCharacter(tk);
+						}
+
+						if (longBrace) {
+							tk.accept(hexDigit);
+							tk.accept(hexDigit);
+							tk.accept(hexDigit);
+							tk.accept(hexDigit);
+							tk.accept(hexDigit);
+							tk.accept(hexDigit);
+							tk.accept(hexDigit);
+
+							if (!tk.accept("}")) {
+								return errInvalidCharacter(tk);
+							}
+						} else if (!tk.accept(hexDigit) || !tk.accept(hexDigit) || !tk.accept(hexDigit) || !tk.accept(hexDigit) || !tk.accept(hexDigit) || !tk.accept(hexDigit) || !tk.accept(hexDigit)) {
+							return errInvalidCharacter(tk);
+						}
+					}
+				}
+			}
 		      },
 		      identifier = (tk: Tokeniser) => {
 			tk.acceptRun(identCont);
