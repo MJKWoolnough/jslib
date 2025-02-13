@@ -1333,6 +1333,17 @@ r = (() => {
 		      exponential = (tk: Tokeniser, digits = decimalDigit) => {
 		      },
 		      float = (tk: Tokeniser, digits = decimalDigit) => {
+			if (digits === hexDigit && !tk.accept(digits)) {
+				return errInvalidNumber(tk);
+			}
+
+			tk.acceptRun(digits);
+
+			if (tk.accept("L") || tk.accept("i")) {
+				return tk.return(TokenNumericLiteral, expression);
+			}
+
+			return exponential(tk, digits)
 		      },
 		      ellipsisOrIdentifier = (tk: Tokeniser) => {
 			if (tk.accept(".")) {
