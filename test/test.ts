@@ -13585,6 +13585,10 @@ type Tests = {
 				"float": {
 					"source": "0.123 .456 3.14159E3i",
 					"output": `<span class="numericliteral">0.123</span><span class="whitespace">&nbsp;</span><span class="numericliteral">.456</span><span class="whitespace">&nbsp;</span><span class="numericliteral">3.14159E3i</span>`
+				},
+				"hex": {
+					"source": "0xdeadBEEF 0x123p+ff 0xf.e",
+					"output": `<span class="numericliteral">0xdeadBEEF</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0x123p+ff</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0xf.e</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
