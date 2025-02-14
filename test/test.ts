@@ -13589,6 +13589,10 @@ type Tests = {
 				"hex": {
 					"source": "0xdeadBEEF 0x123p+ff 0xf.e",
 					"output": `<span class="numericliteral">0xdeadBEEF</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0x123p+ff</span><span class="whitespace">&nbsp;</span><span class="numericliteral">0xf.e</span>`
+				},
+				"booleans": {
+					"source": "TRUE FALSE",
+					"output": `<span class="booleanliteral">TRUE</span><span class="whitespace">&nbsp;</span><span class="booleanliteral">FALSE</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
