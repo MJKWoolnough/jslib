@@ -13565,6 +13565,10 @@ type Tests = {
 				"strings": {
 					"source": "\"a string\" 'another string'",
 					"output": `<span class="stringliteral">"a&nbsp;string"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'another&nbsp;string'</span>`
+				},
+				"keywords": {
+					"source": "if else repeat while function for in next break",
+					"output": `<span class="keyword">if</span><span class="whitespace">&nbsp;</span><span class="keyword">else</span><span class="whitespace">&nbsp;</span><span class="keyword">repeat</span><span class="whitespace">&nbsp;</span><span class="keyword">while</span><span class="whitespace">&nbsp;</span><span class="keyword">function</span><span class="whitespace">&nbsp;</span><span class="keyword">for</span><span class="whitespace">&nbsp;</span><span class="keyword">in</span><span class="whitespace">&nbsp;</span><span class="keyword">next</span><span class="whitespace">&nbsp;</span><span class="keyword">break</span>` 
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
