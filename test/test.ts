@@ -13497,8 +13497,8 @@ type Tests = {
 					"output": `<span class="lineterminator"><br><br><br><br></span>`
 				},
 				"simple strings": {
-					"source": "\"a string\" 'another string'",
-					"output": `<span class="stringliteral">"a&nbsp;string"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'another&nbsp;string'</span>`
+					"source": `"a \\"string\\"" 'another string'`,
+					"output": `<span class="stringliteral">"a&nbsp;\\"string\\""</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'another&nbsp;string'</span>`
 				},
 				"keywords": {
 					"source": "a word\nanother couple of words",
@@ -13551,6 +13551,12 @@ type Tests = {
 				"brace grouping": {
 					"source": `{ a; } { a; b; c; }`,
 					"output": `<span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">b</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">c</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span>`
+				}
+			},
+			"r": {
+				"whitespace": {
+					"source": " \t \t\t  ",
+					"output": `<span class="whitespace">&nbsp; &nbsp;  &nbsp;&nbsp;</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
