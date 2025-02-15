@@ -13613,6 +13613,10 @@ type Tests = {
 				"special operators" : {
 					"source": "%% %/% %*% %in% %o% %x% %||%",
 					"output": `<span class="futurereservedword">%%</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">%/%</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">%*%</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">%in%</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">%o%</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">%x%</span><span class="whitespace">&nbsp;</span><span data-error="invalid operator%">%||%</span>`
+				},
+				"groupings": {
+					"source": "[[ ( [ { [[ ]] } ] ) ] ]",
+					"output": `<span class="punctuator">[[</span><span class="whitespace">&nbsp;</span><span class="punctuator">(</span><span class="whitespace">&nbsp;</span><span class="punctuator">[</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="punctuator">[[</span><span class="whitespace">&nbsp;</span><span class="punctuator">]]</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">]</span><span class="whitespace">&nbsp;</span><span class="punctuator">)</span><span class="whitespace">&nbsp;</span><span data-error="invalid operator]">]&nbsp;]</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
