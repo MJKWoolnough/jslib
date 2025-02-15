@@ -1243,7 +1243,7 @@ bash = (() => {
 			case `'`:
 				return stringStart(tk, c);
 			case '(':
-				tokenDepth.push(c);
+				tokenDepth.push(')');
 				tk.next();
 
 				break;
