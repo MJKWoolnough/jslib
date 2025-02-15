@@ -13532,6 +13532,10 @@ type Tests = {
 					"source": `"an escaped \\" \\n"`,
 					"output": `<span class="stringliteral">"an&nbsp;escaped&nbsp;\\"&nbsp;\\n"</span>`
 				},
+				"string manipulation": {
+					"source": "\"${#arg} ${arg:1:2} ${arg@Q}\"",
+					"output": "<span class=\"stringliteral\">\"</span><span class=\"punctuator\">${</span><span class=\"keyword\">#arg</span><span class=\"punctuator\">}</span><span class=\"stringliteral\">&nbsp;</span><span class=\"punctuator\">${</span><span class=\"keyword\">arg:1:2</span><span class=\"punctuator\">}</span><span class=\"stringliteral\">&nbsp;</span><span class=\"punctuator\">${</span><span class=\"keyword\">arg@Q</span><span class=\"punctuator\">}</span><span class=\"stringliteral\">\"</span>"
+				},
 				"comments": {
 					"source": "#!/bin/bash\n\n# a comment\nword",
 					"output": `<span class="singlelinecomment">#!/bin/bash</span><span class="lineterminator"><br><br></span><span class="singlelinecomment">#&nbsp;a&nbsp;comment</span><span class="lineterminator"><br></span><span class="keyword">word</span>`
