@@ -13549,8 +13549,8 @@ type Tests = {
 					"output": `<span class="stringliteral">{1..2}</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{1..2..3}</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{1,2,3}</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="stringliteral">{bz,cz,dz}</span><span class="keyword">e</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{e..f}</span>`
 				},
 				"brace grouping": {
-					"source": `{ a; } { a; b; c; }`,
-					"output": `<span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">b</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">c</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span>`
+					"source": `{ a; } { a; b; c; } {`,
+					"output": `<span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">b</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">c</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span data-error="unexpected EOF"></span>`
 				},
 				"subshells": {
 					"source": "(a)\n(\na;\nb;\n)\n(a",
