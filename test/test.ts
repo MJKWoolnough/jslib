@@ -13601,6 +13601,10 @@ type Tests = {
 				"nulls": {
 					"source": "NULL NA NA_character_ NA_integer_ NA_real_ NA_complex_",
 					"output": `<span class="nullliteral">NULL</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA_character_</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA_integer_</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA_real_</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA_complex_</span>`
+				},
+				"ellipsis": {
+					"source": "... ..1 ..2 ..99",
+					"output": `<span class="futurereservedword">...</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">..1</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">..2</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">..99</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
