@@ -13597,6 +13597,10 @@ type Tests = {
 				"booleans": {
 					"source": "TRUE FALSE",
 					"output": `<span class="booleanliteral">TRUE</span><span class="whitespace">&nbsp;</span><span class="booleanliteral">FALSE</span>`
+				},
+				"nulls": {
+					"source": "NULL NA NA_character_ NA_integer_ NA_real_ NA_complex_",
+					"output": `<span class="nullliteral">NULL</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA_character_</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA_integer_</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA_real_</span><span class="whitespace">&nbsp;</span><span class="nullliteral">NA_complex_</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
