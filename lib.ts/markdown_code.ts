@@ -1677,6 +1677,22 @@ css = (() => {
 		      hashOrDelim = (tk: Tokeniser) => {
 		      },
 		      string = (tk: Tokeniser) => {
+			const close = tk.next(),
+			      chars = close + "\\";
+
+			while (true) {
+				switch (tk.acceptRun(chars)) {
+				default:
+					return errUnexpectedEOF(tk);
+				case close:
+					tk.next();
+
+					return tk.return(TokenStringLiteral, main);
+				case '\\':
+					tk.next();
+					tk.next();
+				}
+			}
 		      },
 		      numberOrDelim = (tk: Tokeniser) => {
 			tk.accept("+-");
