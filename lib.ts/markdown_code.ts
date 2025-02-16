@@ -1661,6 +1661,100 @@ r = (() => {
 
 		return expression(tk);
 	};
+})(),
+css = (() => {
+	const whitespace = "\n\t ";
+
+	return (tk: Tokeniser) => {
+		const commentOrPunctuator = (tk: Tokeniser) => {
+		      },
+		      identOrDelim = (tk: Tokeniser) => {
+		      },
+		      atOrDelim = (tk: Tokeniser) => {
+		      },
+		      cdoOrDelim = (tk: Tokeniser) => {
+		      },
+		      numberOrDelim = (tk: Tokeniser) => {
+		      },
+		      hashOrDelim = (tk: Tokeniser) => {
+		      },
+		      string = (tk: Tokeniser) => {
+		      },
+		      number = (tk: Tokeniser) => {
+		      },
+		      main = (tk: Tokeniser) => {
+			if (!tk.peek()) {
+				if (tokenDepth.length) {
+					return errUnexpectedEOF(tk);
+				}
+
+				return tk.done();
+			}
+
+			if (tk.accept(whitespace)) {
+				tk.acceptRun(whitespace);
+
+				return tk.return(TokenWhitespace, main);
+			}
+
+			if (tk.accept(decimalDigit)) {
+				return number(tk);
+			}
+
+			const c = tk.peek();
+
+			switch (c) {
+			case '"':
+			case "'":
+				return string(tk);
+			case '#':
+				return hashOrDelim(tk);
+			case '(':
+				tokenDepth.push(')');
+
+				return tk.return(TokenPunctuator, main);
+			case '[':
+				tokenDepth.push(']');
+
+				return tk.return(TokenPunctuator, main);
+			case '{':
+				tokenDepth.push('}');
+
+				return tk.return(TokenPunctuator, main);
+			case ')':
+			case ']':
+			case '}':
+				if (tokenDepth.pop() !== c) {
+					return errInvalidCharacter(tk);
+				}
+
+				return tk.return(TokenPunctuator, main);
+			case '+':
+			case '-':
+			case '.':
+				return numberOrDelim(tk);
+			case ',':
+			case ':':
+			case ';':
+				return tk.return(TokenPunctuator, main);
+			case '<':
+				return cdoOrDelim(tk);
+			case '@':
+				return atOrDelim(tk);
+			case '\\':
+				return identOrDelim(tk);
+			case '/':
+				return commentOrPunctuator(tk);
+			}
+
+			tk.next();
+
+			return tk.return(TokenPrivateIdentifier, main);
+		      },
+		      tokenDepth: string[] = [];
+
+		return main;
+	};
 })();
 
 export default (contents: string, fn: TokenFn, colours: Map<TokenType, string>, noPre = true) => {
