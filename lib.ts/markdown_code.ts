@@ -1663,7 +1663,43 @@ r = (() => {
 	};
 })(),
 css = (() => {
-	const whitespace = "\n\t ";
+	const whitespace = "\n\t ",
+	      isIdentStart = (tk: Tokeniser) => {
+		if (tk.accept(letters) || tk.accept("_")) {
+			return true;
+		}
+
+		if (tk.peek().charCodeAt(0) > 0x80) {
+			tk.next();
+
+			return true;
+		}
+
+		return false;
+	      },
+	      isIdentCont = (tk: Tokeniser) => isIdentStart(tk) || tk.accept(decimalDigit) || tk.accept("-"),
+	      isValidEscape = (tk: Tokeniser) => {
+		if (tk.accept("\\")) {
+			if (!tk.accept("\n")) {
+				return true;
+			}
+
+			tk.backup();
+		}
+
+		return false;
+	      },
+	      isIdentSequence = (tk: Tokeniser) => {
+		if (tk.accept("-")) {
+			if (tk.accept("-") || isIdentStart(tk) || isValidEscape(tk)) {
+				return true;
+			}
+
+			tk.backup();
+		}
+
+		return isIdentStart(tk) || isValidEscape(tk);
+	      };
 
 	return (tk: Tokeniser) => {
 		const commentOrPunctuator = (tk: Tokeniser) => {
@@ -1677,6 +1713,11 @@ css = (() => {
 		      cdoOrDelim = (tk: Tokeniser) => {
 		      },
 		      hashOrDelim = (tk: Tokeniser) => {
+			if (isIdentCont(tk) || isValidEscape(tk)) {
+				return ident(tk);
+			}
+
+			return tk.return(TokenReservedWord, main);
 		      },
 		      string = (tk: Tokeniser) => {
 			const close = tk.next(),
@@ -1713,12 +1754,8 @@ css = (() => {
 				return ident(tk);
 			}
 
-			if (tk.accept("\\")) {
-				if (!tk.accept("\n")) {
-					return ident(tk);
-				}
-
-				tk.backup();
+			if (isValidEscape(tk)) {
+				return ident(tk);
 			}
 
 			return tk.return(TokenReservedWord, main);
