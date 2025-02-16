@@ -1674,13 +1674,35 @@ css = (() => {
 		      },
 		      cdoOrDelim = (tk: Tokeniser) => {
 		      },
-		      numberOrDelim = (tk: Tokeniser) => {
-		      },
 		      hashOrDelim = (tk: Tokeniser) => {
 		      },
 		      string = (tk: Tokeniser) => {
 		      },
-		      number = (tk: Tokeniser) => {
+		      numberOrDelim = (tk: Tokeniser) => {
+			tk.accept("+-");
+
+			if (tk.accept(decimalDigit)) {
+				tk.acceptRun(decimalDigit);
+				tk.acceptRun(".");
+				tk.acceptRun(decimalDigit);
+			} else if (tk.accept(".")) {
+				tk.acceptRun(decimalDigit);
+			} else {
+				return tk.return(TokenReservedWord, main);
+			}
+
+			if (tk.accept("eE")) {
+				tk.accept("+-");
+
+				if (!tk.accept(decimalDigit)) {
+					return errInvalidNumber(tk);
+				}
+
+
+				tk.acceptRun(decimalDigit);
+			}
+
+			return tk.return(TokenNumericLiteral, main);
 		      },
 		      main = (tk: Tokeniser) => {
 			if (!tk.peek()) {
@@ -1697,11 +1719,11 @@ css = (() => {
 				return tk.return(TokenWhitespace, main);
 			}
 
-			if (tk.accept(decimalDigit)) {
-				return number(tk);
-			}
-
 			const c = tk.peek();
+
+			if (decimalDigit.includes(c)) {
+				return numberOrDelim(tk);
+			}
 
 			switch (c) {
 			case '"':
