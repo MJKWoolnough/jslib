@@ -1705,6 +1705,9 @@ css = (() => {
 		const commentOrPunctuator = (tk: Tokeniser) => {
 		      },
 		      ident = (tk: Tokeniser) => {
+			while (isIdentCont(tk) || isValidEscape(tk)) {}
+
+			return tk.return(TokenIdentifier, main);
 		      },
 		      identOrDelim = (tk: Tokeniser) => {
 			if (isValidEscape(tk)) {
@@ -1820,6 +1823,10 @@ css = (() => {
 				tk.acceptRun(whitespace);
 
 				return tk.return(TokenWhitespace, main);
+			}
+
+			if (isIdentStart(tk)) {
+				return ident(tk);
 			}
 
 			const c = tk.peek();
