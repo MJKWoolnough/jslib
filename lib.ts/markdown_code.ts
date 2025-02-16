@@ -1709,6 +1709,11 @@ css = (() => {
 		      identOrDelim = (tk: Tokeniser) => {
 		      },
 		      atOrDelim = (tk: Tokeniser) => {
+			if (isIdentSequence(tk)) {
+				return ident(tk);
+			}
+
+			return tk.return(TokenReservedWord, main);
 		      },
 		      cdoOrDelim = (tk: Tokeniser) => {
 			tk.next();
