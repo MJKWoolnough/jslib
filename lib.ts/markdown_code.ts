@@ -1703,6 +1703,24 @@ css = (() => {
 
 	return (tk: Tokeniser) => {
 		const commentOrPunctuator = (tk: Tokeniser) => {
+			tk.next();
+
+			if (!tk.accept("*")) {
+				return tk.return(TokenPunctuator, main);
+			}
+
+			while (true) {
+				switch (tk.acceptRun("*")) {
+				default:
+					return errUnexpectedEOF(tk);
+				case '*':
+					tk.next();
+
+					if (tk.accept("/")) {
+						return tk.return(TokenMultiLineComment, main);
+					}
+				}
+			}
 		      },
 		      ident = (tk: Tokeniser) => {
 			while (isIdentCont(tk) || isValidEscape(tk)) {}
