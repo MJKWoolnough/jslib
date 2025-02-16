@@ -1707,6 +1707,11 @@ css = (() => {
 		      ident = (tk: Tokeniser) => {
 		      },
 		      identOrDelim = (tk: Tokeniser) => {
+			if (isValidEscape(tk)) {
+				return ident(tk);
+			}
+
+			return tk.return(TokenReservedWord, main);
 		      },
 		      atOrDelim = (tk: Tokeniser) => {
 			if (isIdentSequence(tk)) {
@@ -1874,7 +1879,7 @@ css = (() => {
 		      },
 		      tokenDepth: string[] = [];
 
-		return main;
+		return main(tk);
 	};
 })();
 
