@@ -1711,6 +1711,17 @@ css = (() => {
 		      atOrDelim = (tk: Tokeniser) => {
 		      },
 		      cdoOrDelim = (tk: Tokeniser) => {
+			tk.next();
+
+			if (tk.accept("-")) {
+				if (tk.accept("-")) {
+					return tk.return(TokenSingleLineComment, main);
+				}
+
+				tk.backup();
+			}
+
+			return tk.return(TokenReservedWord, main);
 		      },
 		      hashOrDelim = (tk: Tokeniser) => {
 			if (isIdentCont(tk) || isValidEscape(tk)) {
