@@ -1668,6 +1668,8 @@ css = (() => {
 	return (tk: Tokeniser) => {
 		const commentOrPunctuator = (tk: Tokeniser) => {
 		      },
+		      ident = (tk: Tokeniser) => {
+		      },
 		      identOrDelim = (tk: Tokeniser) => {
 		      },
 		      atOrDelim = (tk: Tokeniser) => {
@@ -1693,6 +1695,33 @@ css = (() => {
 					tk.next();
 				}
 			}
+		      },
+		      numberCDCIdentOrDelim = (tk: Tokeniser) => {
+			tk.next();
+
+			if (tk.accept(decimalDigit)) {
+				tk.reset();
+
+				return numberOrDelim(tk);
+			}
+
+			if (tk.accept("-")) {
+				if (tk.accept(">")) {
+					return tk.return(TokenSingleLineComment, main);
+				}
+
+				return ident(tk);
+			}
+
+			if (tk.accept("\\")) {
+				if (!tk.accept("\n")) {
+					return ident(tk);
+				}
+
+				tk.backup();
+			}
+
+			return tk.return(TokenReservedWord, main);
 		      },
 		      numberOrDelim = (tk: Tokeniser) => {
 			tk.accept("+-");
@@ -1767,8 +1796,9 @@ css = (() => {
 				}
 
 				return tk.return(TokenPunctuator, main);
-			case '+':
 			case '-':
+				return numberCDCIdentOrDelim(tk);
+			case '+':
 			case '.':
 				return numberOrDelim(tk);
 			case ',':
