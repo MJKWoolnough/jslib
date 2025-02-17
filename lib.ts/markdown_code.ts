@@ -1766,7 +1766,7 @@ css = (() => {
 			      chars = close + "\\";
 
 			while (true) {
-				switch (tk.acceptRun(chars)) {
+				switch (tk.exceptRun(chars)) {
 				default:
 					return errUnexpectedEOF(tk);
 				case close:
