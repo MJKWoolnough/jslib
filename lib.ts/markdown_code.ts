@@ -1680,7 +1680,7 @@ css = (() => {
 	      isIdentCont = (tk: Tokeniser) => isIdentStart(tk) || tk.accept(decimalDigit) || tk.accept("-"),
 	      isValidEscape = (tk: Tokeniser) => {
 		if (tk.accept("\\")) {
-			if (!tk.accept("\n")) {
+			if (tk.except("\n")) {
 				return true;
 			}
 
@@ -1783,9 +1783,9 @@ css = (() => {
 			tk.next();
 
 			if (tk.accept(decimalDigit)) {
-				tk.reset();
+				tk.backup();
 
-				return numberOrDelim(tk);
+				return number(tk);
 			}
 
 			if (tk.accept("-")) {
@@ -1802,17 +1802,21 @@ css = (() => {
 
 			return tk.return(TokenReservedWord, main);
 		      },
-		      numberOrDelim = (tk: Tokeniser) => {
-			tk.accept("+-");
-
+		      number = (tk: Tokeniser) => {
 			if (tk.accept(decimalDigit)) {
 				tk.acceptRun(decimalDigit);
-				tk.acceptRun(".");
+
+				if (tk.accept(".") && !tk.accept(decimalDigit)) {
+					return errInvalidNumber(tk);
+				}
+
 				tk.acceptRun(decimalDigit);
 			} else if (tk.accept(".")) {
+				if (!tk.accept(decimalDigit)) {
+					return tk.return(TokenReservedWord, main);
+				}
+
 				tk.acceptRun(decimalDigit);
-			} else {
-				return tk.return(TokenReservedWord, main);
 			}
 
 			if (tk.accept("eE")) {
@@ -1847,11 +1851,11 @@ css = (() => {
 				return ident(tk);
 			}
 
-			const c = tk.peek();
-
-			if (decimalDigit.includes(c)) {
-				return numberOrDelim(tk);
+			if (tk.accept(decimalDigit)) {
+				return number(tk);
 			}
+
+			const c = tk.peek();
 
 			switch (c) {
 			case '"':
@@ -1887,8 +1891,13 @@ css = (() => {
 			case '-':
 				return numberCDCIdentOrDelim(tk);
 			case '+':
+				tk.next();
+
+				if (!(decimalDigit + ".").includes(tk.peek())) {
+					return tk.return(TokenPunctuator, main);
+				}
 			case '.':
-				return numberOrDelim(tk);
+				return number(tk);
 			case ',':
 			case ':':
 			case ';':
