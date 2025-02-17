@@ -1860,14 +1860,17 @@ css = (() => {
 			case '#':
 				return hashOrDelim(tk);
 			case '(':
+				tk.next();
 				tokenDepth.push(')');
 
 				return tk.return(TokenPunctuator, main);
 			case '[':
+				tk.next();
 				tokenDepth.push(']');
 
 				return tk.return(TokenPunctuator, main);
 			case '{':
+				tk.next();
 				tokenDepth.push('}');
 
 				return tk.return(TokenPunctuator, main);
@@ -1877,6 +1880,8 @@ css = (() => {
 				if (tokenDepth.pop() !== c) {
 					return errInvalidCharacter(tk);
 				}
+
+				tk.next();
 
 				return tk.return(TokenPunctuator, main);
 			case '-':
