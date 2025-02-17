@@ -13626,12 +13626,22 @@ type Tests = {
 					"source": "[[ ( [ { [[ ]] } ] ) ] ]",
 					"output": `<span class="punctuator">[[</span><span class="whitespace">&nbsp;</span><span class="punctuator">(</span><span class="whitespace">&nbsp;</span><span class="punctuator">[</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="punctuator">[[</span><span class="whitespace">&nbsp;</span><span class="punctuator">]]</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">]</span><span class="whitespace">&nbsp;</span><span class="punctuator">)</span><span class="whitespace">&nbsp;</span><span data-error="invalid operator]">]&nbsp;]</span>`
 				}
+			},
+			"css": {
+				"whitespace": {
+					"source": " \t \t\n\t  ",
+					"output": `<span class="whitespace">&nbsp; &nbsp; <br> &nbsp;&nbsp;</span>`
+				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
 			const {default: code, ...fns} = await import("./lib/markdown_code.js"),
 			      div = document.createElement("div");
 
 			div.append(code(source, fns[testname as keyof typeof fns] as any, new Map([".whitespace", ".lineterminator", ".singlelinecomment", ".multilinecomment", ".identifier", ".privateidentifier", ".booleanliteral", ".keyword", ".punctuator", ".numericliteral", ".stringliteral", ".nosubstitutiontemplate", ".templatehead", ".templatemiddle", ".templatetail", ".regularexpressionliteral", ".nullliteral", ".futurereservedword"].map((c, n) => [n, c]))));
+
+			if (div.innerHTML !== output) {
+				console.log(div.innerHTML);
+			}
 
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
