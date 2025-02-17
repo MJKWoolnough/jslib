@@ -13631,6 +13631,10 @@ type Tests = {
 				"whitespace": {
 					"source": " \t \t\n\t  ",
 					"output": `<span class="whitespace">&nbsp; &nbsp; <br> &nbsp;&nbsp;</span>`
+				},
+				"numbers": {
+					"source": "0 1 -1 +1 .1 1.234 -987.654 2e+45 -3E-1 1.23E+456",
+					"output": `<span class="numericliteral">0</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1</span><span class="whitespace">&nbsp;</span><span class="numericliteral">-1</span><span class="whitespace">&nbsp;</span><span class="numericliteral">+1</span><span class="whitespace">&nbsp;</span><span class="numericliteral">.1</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1.234</span><span class="whitespace">&nbsp;</span><span class="numericliteral">-987.654</span><span class="whitespace">&nbsp;</span><span class="numericliteral">2e+45</span><span class="whitespace">&nbsp;</span><span class="numericliteral">-3E-1</span><span class="whitespace">&nbsp;</span><span class="numericliteral">1.23E+456</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
