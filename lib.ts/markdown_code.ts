@@ -1903,6 +1903,7 @@ css = (() => {
 			case ',':
 			case ':':
 			case ';':
+			case '%':
 				return tk.return(TokenPunctuator, main);
 			case '<':
 				return cdoOrDelim(tk);
