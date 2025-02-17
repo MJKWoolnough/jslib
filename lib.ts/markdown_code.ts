@@ -1862,6 +1862,8 @@ css = (() => {
 			case "'":
 				return string(tk);
 			case '#':
+				tk.next();
+
 				return hashOrDelim(tk);
 			case '(':
 				tk.next();
@@ -1905,6 +1907,8 @@ css = (() => {
 			case '<':
 				return cdoOrDelim(tk);
 			case '@':
+				tk.next();
+
 				return atOrDelim(tk);
 			case '\\':
 				return identOrDelim(tk);
