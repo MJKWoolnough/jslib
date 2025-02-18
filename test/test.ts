@@ -13655,6 +13655,10 @@ type Tests = {
 				"comments": {
 					"source": "/**/ /* abc */ /* *** */",
 					"output": `<span class="multilinecomment">/**/</span><span class="whitespace">&nbsp;</span><span class="multilinecomment">/*&nbsp;abc&nbsp;*/</span><span class="whitespace">&nbsp;</span><span class="multilinecomment">/*&nbsp;***&nbsp;*/</span>`
+				},
+				"delims": {
+					"source": "# < > @ \\ ~ .",
+					"output": `<span class="punctuator">#</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">@</span><span class="whitespace">&nbsp;</span><span class="identifier">\\&nbsp;</span><span class="punctuator">~</span><span class="whitespace">&nbsp;</span><span class="punctuator">.</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
