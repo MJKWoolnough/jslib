@@ -13651,6 +13651,10 @@ type Tests = {
 				"CDO CDC": {
 					"source": "<-- -->",
 					"output": `<span class="singlelinecomment">&lt;--</span><span class="whitespace">&nbsp;</span><span class="singlelinecomment">--&gt;</span>`
+				},
+				"comments": {
+					"source": "/**/ /* abc */ /* *** */",
+					"output": `<span class="multilinecomment">/**/</span><span class="whitespace">&nbsp;</span><span class="multilinecomment">/*&nbsp;abc&nbsp;*/</span><span class="whitespace">&nbsp;</span><span class="multilinecomment">/*&nbsp;***&nbsp;*/</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
