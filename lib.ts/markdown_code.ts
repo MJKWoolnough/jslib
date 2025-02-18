@@ -1710,7 +1710,7 @@ css = (() => {
 			}
 
 			while (true) {
-				switch (tk.acceptRun("*")) {
+				switch (tk.exceptRun("*")) {
 				default:
 					return errUnexpectedEOF(tk);
 				case '*':
