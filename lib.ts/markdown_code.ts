@@ -1739,7 +1739,7 @@ css = (() => {
 				return ident(tk);
 			}
 
-			return tk.return(TokenReservedWord, main);
+			return tk.return(TokenPunctuator, main);
 		      },
 		      cdoOrDelim = (tk: Tokeniser) => {
 			tk.next();
@@ -1752,14 +1752,14 @@ css = (() => {
 				tk.backup();
 			}
 
-			return tk.return(TokenReservedWord, main);
+			return tk.return(TokenPunctuator, main);
 		      },
 		      hashOrDelim = (tk: Tokeniser) => {
 			if (isIdentCont(tk) || isValidEscape(tk)) {
 				return ident(tk);
 			}
 
-			return tk.return(TokenReservedWord, main);
+			return tk.return(TokenPunctuator, main);
 		      },
 		      string = (tk: Tokeniser) => {
 			const close = tk.next(),
@@ -1800,7 +1800,7 @@ css = (() => {
 				return ident(tk);
 			}
 
-			return tk.return(TokenReservedWord, main);
+			return tk.return(TokenPunctuator, main);
 		      },
 		      number = (tk: Tokeniser) => {
 			if (tk.accept(decimalDigit)) {
@@ -1813,7 +1813,7 @@ css = (() => {
 				tk.acceptRun(decimalDigit);
 			} else if (tk.accept(".")) {
 				if (!tk.accept(decimalDigit)) {
-					return tk.return(TokenReservedWord, main);
+					return tk.return(TokenPunctuator, main);
 				}
 
 				tk.acceptRun(decimalDigit);
@@ -1919,7 +1919,7 @@ css = (() => {
 
 			tk.next();
 
-			return tk.return(TokenPrivateIdentifier, main);
+			return tk.return(TokenPunctuator, main);
 		      },
 		      tokenDepth: string[] = [];
 

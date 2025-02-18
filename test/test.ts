@@ -13646,7 +13646,7 @@ type Tests = {
 				},
 				"idents": {
 					"source": "abc a123 .abc #abc @abc -abc --abc \\nabc ab\\nc",
-					"output": `<span class="identifier">abc</span><span class="whitespace">&nbsp;</span><span class="identifier">a123</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">.</span><span class="identifier">abc</span><span class="whitespace">&nbsp;</span><span class="identifier">#abc</span><span class="whitespace">&nbsp;</span><span class="identifier">@abc</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">-</span><span class="identifier">abc</span><span class="whitespace">&nbsp;</span><span class="identifier">--abc</span><span class="whitespace">&nbsp;</span><span class="identifier">\\nabc</span><span class="whitespace">&nbsp;</span><span class="identifier">ab\\nc</span>`
+					"output": `<span class="identifier">abc</span><span class="whitespace">&nbsp;</span><span class="identifier">a123</span><span class="whitespace">&nbsp;</span><span class="punctuator">.</span><span class="identifier">abc</span><span class="whitespace">&nbsp;</span><span class="identifier">#abc</span><span class="whitespace">&nbsp;</span><span class="identifier">@abc</span><span class="whitespace">&nbsp;</span><span class="punctuator">-</span><span class="identifier">abc</span><span class="whitespace">&nbsp;</span><span class="identifier">--abc</span><span class="whitespace">&nbsp;</span><span class="identifier">\\nabc</span><span class="whitespace">&nbsp;</span><span class="identifier">ab\\nc</span>`
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
@@ -13654,10 +13654,6 @@ type Tests = {
 			      div = document.createElement("div");
 
 			div.append(code(source, fns[testname as keyof typeof fns] as any, new Map([".whitespace", ".lineterminator", ".singlelinecomment", ".multilinecomment", ".identifier", ".privateidentifier", ".booleanliteral", ".keyword", ".punctuator", ".numericliteral", ".stringliteral", ".nosubstitutiontemplate", ".templatehead", ".templatemiddle", ".templatetail", ".regularexpressionliteral", ".nullliteral", ".futurereservedword"].map((c, n) => [n, c]))));
-
-			if (div.innerHTML !== output) {
-				console.log(div.innerHTML);
-			}
 
 			return div.innerHTML === output;
 		}, o), {} as Tests), o), {} as Record<string, Tests>)
