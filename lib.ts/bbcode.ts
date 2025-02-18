@@ -246,7 +246,7 @@ export type CloseTag = {
 }
 
 /**
- * Intended for tag parses, this type is a generator that will yield a token, which will either be a {@link CloseTag}, {@link OpenTag}, or string. When calling `next` on this Generator, you can pass in `true` to the `next` method retrieve the last token generated. If you pass in `1` to the `next` method, when it has just outputted an {@link OpenTag}, the processor will not move past the corresponding {@link CloseTag} until `1` is again passed to the `next` method.
+ * Intended for tag parsers, this type is a generator that will yield a token, which will either be a {@link CloseTag}, {@link OpenTag}, or string. When calling `next` on this Generator, you can pass in `true` to the `next` method retrieve the last token generated. If you pass in `1` to the `next` method, when it has just outputted an {@link OpenTag}, the processor will not move past the corresponding {@link CloseTag} until `1` is again passed to the `next` method.
  */
 export type Tokeniser = Generator<OpenTag | CloseTag | string, void, true | 1 | undefined>;
 
