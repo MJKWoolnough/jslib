@@ -933,6 +933,8 @@ python = (() => {
 bash = (() => {
 	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
 	      numberChars = decimalDigit + "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz@_",
+	      wordChars = "\\\"'`(){}- \t\n",
+	      wordBreakChars = " `\\\t\n|&;<>()={}",
 	      errInvalidBraceExpansion = error("invalid brace expansion");
 
 	return (tk: Tokeniser) => {
@@ -940,7 +942,7 @@ bash = (() => {
 
 		const word: TokenFn = (tk: Tokeniser) => {
 			while (true) {
-				switch (tk.exceptRun(" `\\\t\n|&;<>()={}")) {
+				switch (tk.exceptRun(wordBreakChars)) {
 				default:
 					if (!tk.length()) {
 						return tokenDepth.length ? errUnexpectedEOF(tk) : tk.done();
@@ -981,7 +983,7 @@ bash = (() => {
 				return tk.return(TokenPunctuator, word);
 			}
 
-			tk.exceptRun("\\\"'`(){}- \t\n");
+			tk.exceptRun(wordChars);
 
 			return tk.return(TokenIdentifier, main);
 		      },
@@ -1057,7 +1059,7 @@ bash = (() => {
 		      },
 		      braceExpansionWord = (tk: Tokeniser) => {
 			while (true) {
-				switch (tk.exceptRun(" `\\\t\n|&;<>()},")) {
+				switch (tk.exceptRun(wordBreakChars+",")) {
 				default:
 					return errInvalidBraceExpansion(tk);
 				case '}':
@@ -1249,7 +1251,7 @@ bash = (() => {
 			case '{':
 				tk.next();
 
-				if ("\\\"'`(){}- \t\n".includes(tk.peek())) {
+				if (wordChars.includes(tk.peek())) {
 					tokenDepth.push('}');
 
 					return tk.return(TokenPunctuator, main);
