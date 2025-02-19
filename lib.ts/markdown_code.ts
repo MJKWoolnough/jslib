@@ -1168,7 +1168,6 @@ bash = (() => {
 			case '%':
 			case '^':
 				tk.next();
-
 				tk.accept("=");
 
 				break;
@@ -1274,7 +1273,6 @@ bash = (() => {
 				}
 
 				tokenDepth.pop();
-
 				tk.next();
 			}
 
