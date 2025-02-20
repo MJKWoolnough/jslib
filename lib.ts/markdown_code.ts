@@ -1036,7 +1036,15 @@ bash = (() => {
 		      zero = (tk: Tokeniser) => {
 			tk.next();
 
-			tk.acceptRun(tk.accept("xX") ? hexDigit : octalDigit);
+			if (tk.accept("xX")) {
+				if (!tk.accept(hexDigit)) {
+					return errInvalidNumber(tk);
+				}
+
+				tk.acceptRun(hexDigit)
+			} else {
+				tk.acceptRun(octalDigit);
+			}
 
 			return tk.return(TokenNumericLiteral, main);
 		      },
