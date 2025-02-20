@@ -938,16 +938,16 @@ bash = (() => {
 	      errInvalidBraceExpansion = error("invalid brace expansion");
 
 	return (tk: Tokeniser) => {
-		let hasEscape = false;
-
 		const word: TokenFn = (tk: Tokeniser) => {
+			let hasEscape = false;
+
 			while (true) {
 				switch (tk.exceptRun(wordBreakChars)) {
-				default:
+				case "":
 					if (!tk.length()) {
 						return tokenDepth.length ? errUnexpectedEOF(tk) : tk.done();
 					}
-				case "":
+				default:
 					const data = tk.get();
 
 					return [{
