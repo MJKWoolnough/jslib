@@ -1111,6 +1111,7 @@ bash = (() => {
 				case '.':
 					if (tk.acceptString("..")) {
 						if (!tk.accept(decimalDigit)) {
+							return errInvalidBraceExpansion(tk);
 						}
 
 						tk.acceptRun(decimalDigit);
