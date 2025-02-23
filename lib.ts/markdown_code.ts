@@ -935,6 +935,7 @@ bash = (() => {
 	      numberChars = decimalDigit + "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz@_",
 	      wordChars = "\\\"'`(){}- \t\n",
 	      wordBreakChars = " `\\\t\n|&;<>()={}",
+	      dots = [".."],
 	      errInvalidBraceExpansion = error("invalid brace expansion");
 
 	return (tk: Tokeniser) => {
@@ -1083,12 +1084,12 @@ bash = (() => {
 		      },
 		      braceExpansion = (tk: Tokeniser) => {
 			if (tk.accept(letters)) {
-				if (tk.acceptString("..")) {
+				if (tk.acceptWord(dots)) {
 					if (!tk.accept(letters)) {
 						return errInvalidBraceExpansion(tk);
 					}
 
-					if (tk.acceptString("..")) {
+					if (tk.acceptWord(dots)) {
 						if (!tk.accept(decimalDigit)) {
 							return errInvalidBraceExpansion(tk);
 						}
@@ -1109,14 +1110,14 @@ bash = (() => {
 				case ',':
 					return braceExpansionWord(tk);
 				case '.':
-					if (tk.acceptString("..")) {
+					if (tk.acceptWord(dots)) {
 						if (!tk.accept(decimalDigit)) {
 							return errInvalidBraceExpansion(tk);
 						}
 
 						tk.acceptRun(decimalDigit);
 
-						if (tk.acceptString("..")) {
+						if (tk.acceptWord(dots)) {
 							if (!tk.accept(decimalDigit)) {
 								return errInvalidBraceExpansion(tk);
 							}
