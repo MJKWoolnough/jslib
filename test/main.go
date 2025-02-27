@@ -25,18 +25,18 @@ func main() {
 }
 
 func run() error {
-	var js bool
+	js := flag.Bool("js", false, "use JS versions")
 
-	flag.BoolVar(&js, "js", false, "use JS versions")
 	flag.Parse()
 
 	m := http.NewServeMux()
 
-	if js {
+	if *js {
 		m.Handle("/lib/", http.StripPrefix("/lib/", http.FileServer(http.Dir("../lib.js"))))
 	} else {
 		m.Handle("/lib/", http.StripPrefix("/lib/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("../lib.ts"))))))
 	}
+
 	m.Handle("/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("./")))))
 	m.Handle("/static", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("123")) }))
 	m.Handle("/echo", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -44,12 +44,15 @@ func run() error {
 		if ct != "" {
 			w.Header().Add("Content-Type", ct)
 		}
+
 		io.Copy(w, r.Body)
 		r.Body.Close()
 	}))
 	m.Handle("/request", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
+
 		postData, _ := io.ReadAll(r.Body)
+
 		json.NewEncoder(w).Encode(struct {
 			Method        string     `json:"method"`
 			Auth          string     `json:"auth,omitempty"`
@@ -75,7 +78,9 @@ func run() error {
 	m.Handle("/socket-close", websocket.Handler(func(conn *websocket.Conn) { conn.Close() }))
 	m.Handle("/rpc", websocket.Handler(func(conn *websocket.Conn) {
 		var jrpc *jsonrpc.Server
+
 		conn.SetDeadline(time.Now().Add(time.Second * 60))
+
 		jrpc = jsonrpc.New(conn, jsonrpc.HandlerFunc(func(method string, data json.RawMessage) (interface{}, error) {
 			switch method {
 			case "static":
@@ -98,19 +103,23 @@ func run() error {
 				Data:    method,
 			}
 		}))
+
 		jrpc.Handle()
 	}))
+
 	audio, _ := base64.StdEncoding.DecodeString("UklGRiwAAABXQVZFZm10IBAAAAABAAIARKwAABCxAgAEABAAZGF0YQgAAAAAAAAAAAD//w==")
+	image, _ := base64.StdEncoding.DecodeString("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVR4AWNoAAAAggCBTBfX3wAAAABJRU5ErkJggg==")
+
 	m.Handle("/AUDIO", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "audio/wav")
 		w.Header().Add("Content-Length", strconv.FormatUint(uint64(len(audio)), 10))
 		w.Write(audio)
 	}))
-	image, _ := base64.StdEncoding.DecodeString("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVR4AWNoAAAAggCBTBfX3wAAAABJRU5ErkJggg==")
 	m.Handle("/IMAGE", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "image/png")
 		w.Header().Add("Content-Length", strconv.FormatUint(uint64(len(image)), 10))
 		w.Write(image)
 	}))
+
 	return http.ListenAndServe(":8080", m)
 }
