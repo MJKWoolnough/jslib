@@ -1,6 +1,6 @@
 #!/bin/bash
 
-filesDone=""
+declare filesDone=""
 
 function depCheck {
 	declare file="$1";
@@ -33,7 +33,7 @@ function depCheck {
 	return 1;
 }
 
-start="$(realpath "$1")";
+declare start="$(realpath "$1")";
 
 if depCheck "$start" ""; then
 	echo "$start";
