@@ -13541,8 +13541,8 @@ type Tests = {
 					"output": `<span class="singlelinecomment">#!/bin/bash</span><span class="lineterminator"><br><br></span><span class="singlelinecomment">#&nbsp;a&nbsp;comment</span><span class="lineterminator"><br></span><span class="keyword">word</span>`
 				},
 				"operators": {
-					"source": "| || & && ; ;; ;& ;;& |& < > << >> <& >| <← <> >&",
-					"output": `<span class="punctuator">|</span><span class="whitespace">&nbsp;</span><span class="punctuator">||</span><span class="whitespace">&nbsp;</span><span class="punctuator">&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&amp;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">|&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&lt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;|</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;</span><span class="keyword">←</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;&amp;</span>`
+					"source": "| || & && ; ;; ;& ;;& |& < > >> <& >| <← <> >& <<",
+					"output": `<span class="punctuator">|</span><span class="whitespace">&nbsp;</span><span class="punctuator">||</span><span class="whitespace">&nbsp;</span><span class="punctuator">&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&amp;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">;;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">|&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;|</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;</span><span class="keyword">←</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;&amp;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&lt;</span><span data-error="unexpected EOF"></span>`
 				},
 				"arithmetic expansion": {
 					"source": "$(( 1 + 1 )) $(( a-- )) $(( 1 + (( 2 * $b )) + \"4\" ))",
@@ -13559,7 +13559,11 @@ type Tests = {
 				"subshells": {
 					"source": "(a)\n(\na;\nb;\n)\n(a",
 					"output": `<span class="punctuator">(</span><span class="keyword">a</span><span class="punctuator">)</span><span class="lineterminator"><br></span><span class="punctuator">(</span><span class="lineterminator"><br></span><span class="keyword">a</span><span class="punctuator">;</span><span class="lineterminator"><br></span><span class="keyword">b</span><span class="punctuator">;</span><span class="lineterminator"><br></span><span class="punctuator">)</span><span class="lineterminator"><br></span><span class="punctuator">(</span><span class="keyword">a</span><span data-error="unexpected EOF"></span>`,
-				}
+				},
+				"heredocs": {
+					"source": "<<abc\n123\n456\nabc",
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">123<br>456<br>abc</span>`
+				},
 			},
 			"r": {
 				"whitespace": {
