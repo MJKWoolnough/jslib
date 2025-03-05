@@ -1219,6 +1219,7 @@ bash = (() => {
 
 			if (!heredocs.at(-1)?.length) {
 				heredocs.pop();
+				tokenDepth.pop();
 			}
 
 			return t.return(TokenStringLiteral, main);
@@ -1294,7 +1295,7 @@ bash = (() => {
 				return errUnexpectedEOF(t);
 			}
 
-			if (t.accept(whitespace) || !t.acceptWord(escapedNewline)) {
+			if (t.accept(whitespace) || t.acceptWord(escapedNewline)) {
 				while (t.acceptRun(whitespace)) {
 					if (!t.acceptWord(escapedNewline)) {
 						break;
@@ -1342,6 +1343,7 @@ bash = (() => {
 			if (tokenDepth.at(-1) === 'H') {
 				heredocs.at(-1)?.push(unstring(tk.data));
 			} else {
+				tokenDepth.push('H');
 				heredocs.push([unstring(tk.data)]);
 			}
 
@@ -1357,7 +1359,7 @@ bash = (() => {
 				t.next();
 
 				if (t.accept("<")) {
-					if (t.accept("<-")) {
+					if (!t.accept("<-")) {
 						t.accept("-");
 
 						return t.return(TokenPunctuator, startHeredoc);
