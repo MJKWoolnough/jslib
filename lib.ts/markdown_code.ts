@@ -1,7 +1,7 @@
-import type {Token, TokenFn, Tokeniser, TokenType} from './parser.js';
+import type {Token, TokenFn, TokenType} from './parser.js';
 import {amendNode, createDocumentFragment} from './dom.js';
 import {br, span} from './html.js';
-import Parser, {TokenDone, TokenError} from './parser.js';
+import Parser, {TokenDone, TokenError, Tokeniser} from './parser.js';
 
 const lineTerminators = "\n\r\u2028\u2029",
       whitespace = "\t\v\f \xa0\ufeff",
@@ -932,231 +932,533 @@ python = (() => {
 })(),
 bash = (() => {
 	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
-	      numberChars = decimalDigit + "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz@_",
-	      wordChars = "\\\"'`(){}- \t\n",
-	      wordBreakChars = " `\\\t\n|&;<>()={}",
-	      dots = [".."],
-	      errInvalidBraceExpansion = error("invalid brace expansion");
+	      dotdot = [".."],
+	      escapedNewline = ["\\\n"],
+	      assignment = ["=", "+="],
+	      whitespace = " \t",
+	      newline = "\n",
+	      metachars = whitespace + newline + "|&;()<>",
+	      heredocsBreak = metachars + "\\\"'",
+	      heredocStringBreak = newline + "$",
+	      doubleStops = "\\\n`$\"",
+	      singleStops = "\n'",
+	      words = "\\\"'`(){}- \t\n",
+	      wordNoBracket = "\\\"'`(){}- \t\n]",
+	      wordBreak = " `\\\t\n$|&;<>(){",
+	      wordBreakNoBracket = wordBreak + "]",
+	      wordBreakNoBrace = wordBreak + "}",
+	      braceWordBreak = " `\\\t\n|&;<>()={},",
+	      identStart = letters + "_",
+	      identCont = decimalDigit + identStart,
+	      numberChars = identCont + "@";
 
 	return (tk: Tokeniser) => {
-		const word: TokenFn = (tk: Tokeniser) => {
-			let hasEscape = false;
+		const
+		      braceExpansionWord = (t: Tokeniser) => {
+			let hasComma = false;
 
 			while (true) {
-				switch (tk.exceptRun(wordBreakChars)) {
-				case "":
-					if (!tk.length()) {
-						return tokenDepth.length ? errUnexpectedEOF(tk) : tk.done();
-					}
-				default:
-					const data = tk.get();
-
-					return [{
-						"type": keywords.includes(data) ? TokenReservedWord : !hasEscape && tk.peek() === "=" ? TokenIdentifier : TokenKeyword,
-						data
-					}, main];
-				case '\\':
-					tk.next();
-					tk.next();
-
-					hasEscape = true;
-				}
-			}
-		      },
-		      identifier = (tk: Tokeniser) => {
-			tk.next();
-
-			if (tk.accept("(")) {
-				if (tk.accept("(")) {
-					tokenDepth.push("))");
-
-					return tk.return(TokenPunctuator, main);
-				}
-
-				tokenDepth.push(")");
-
-				return tk.return(TokenPunctuator, word);
-			}
-
-			if (tk.accept("{")) {
-				tokenDepth.push("}");
-
-				return tk.return(TokenPunctuator, word);
-			}
-
-			tk.exceptRun(wordChars);
-
-			return tk.return(TokenIdentifier, main);
-		      },
-		      backtick = (tk: Tokeniser) => {
-			tokenDepth.push("`");
-			tk.next();
-
-			return tk.return(TokenPunctuator, main);
-		      },
-		      string = (tk: Tokeniser) => {
-			const c = tokenDepth.at(-1),
-			      stops = c === '"' ? "\\\n`$\"" : "\n'";
-
-			while (true) {
-				switch (tk.exceptRun(stops)) {
-				default:
-					return errUnexpectedEOF(tk);
-				case '\n':
-					return errInvalidCharacter(tk);
-				case '`':
-					return tk.return(TokenStringLiteral, backtick);
-				case '$':
-					return tk.return(TokenStringLiteral, identifier);
-				case "'":
-				case '"':
-					tk.next();
-
-					tokenDepth.pop();
-
-					return tk.return(TokenStringLiteral, main);
-				case '\\':
-					tk.next();
-					tk.next();
-				}
-			}
-		      },
-		      stringStart = (tk: Tokeniser, c: string) => {
-			if (tokenDepth.at(-1) === c) {
-				tokenDepth.pop();
-
-				tk.next();
-
-				return tk.return(TokenStringLiteral, main);
-			}
-
-			tokenDepth.push(tk.next());
-
-			return string(tk);
-		      },
-		      zero = (tk: Tokeniser) => {
-			tk.next();
-
-			if (tk.accept("xX")) {
-				if (!tk.accept(hexDigit)) {
-					return errInvalidNumber(tk);
-				}
-
-				tk.acceptRun(hexDigit)
-			} else {
-				tk.acceptRun(octalDigit);
-			}
-
-			return tk.return(TokenNumericLiteral, main);
-		      },
-		      number = (tk: Tokeniser) => {
-			if (!tk.accept(decimalDigit)) {
-				return word(tk);
-			}
-
-			tk.acceptRun(decimalDigit);
-
-			if (tk.accept("#")) {
-				if (!tk.accept(numberChars)) {
-					return errInvalidCharacter(tk);
-				}
-
-				tk.acceptRun(numberChars);
-			}
-
-			return tk.return(TokenNumericLiteral, main);
-		      },
-		      braceExpansionWord = (tk: Tokeniser) => {
-			while (true) {
-				switch (tk.exceptRun(wordBreakChars+",")) {
-				default:
-					return errInvalidBraceExpansion(tk);
+				switch (t.exceptRun(braceWordBreak)) {
 				case '}':
-					tk.next();
+					if (hasComma) {
+						t.next();
 
-					return tk.return(TokenStringLiteral, main);
+						return t.return(TokenStringLiteral, main)
+					}
+				default:
+					return t.return(TokenKeyword, main);
 				case '\\':
-					tk.next();
+					t.next();
+					t.next();
 				case ',':
-					tk.next();
+					t.next();
+
+					hasComma = true;
 				}
 			}
 		      },
-		      braceExpansion = (tk: Tokeniser) => {
-			if (tk.accept(letters)) {
-				if (tk.acceptWord(dots)) {
-					if (!tk.accept(letters)) {
-						return errInvalidBraceExpansion(tk);
+		      braceExpansion = (t: Tokeniser) => {
+			if (t.accept(letters)) {
+				if (t.acceptWord(dotdot)) {
+					if (!t.accept(letters)) {
+						return t.return(TokenKeyword, main);
 					}
 
-					if (tk.acceptWord(dots)) {
-						if (!tk.accept(decimalDigit)) {
-							return errInvalidBraceExpansion(tk);
+					if (t.acceptWord(dotdot)) {
+						t.accept("-");
+
+						if (!t.accept(decimalDigit)) {
+							return t.return(TokenKeyword, main);
 						}
 
-						tk.acceptRun(decimalDigit);
+						t.acceptRun(decimalDigit);
 					}
 
-					if (!tk.accept("}")) {
-						return errInvalidBraceExpansion(tk);
+					if (!t.accept("}")) {
+						return t.return(TokenKeyword, main);
 					}
-				} else {
-					return braceExpansionWord(tk);
+
+					return t.return(TokenStringLiteral, main);
 				}
-			} else if (tk.accept(decimalDigit)) {
-				switch (tk.acceptRun(decimalDigit)) {
-				default:
-					return errInvalidBraceExpansion(tk);
-				case ',':
-					return braceExpansionWord(tk);
-				case '.':
-					if (tk.acceptWord(dots)) {
-						if (!tk.accept(decimalDigit)) {
-							return errInvalidBraceExpansion(tk);
-						}
+			} else {
+				t.accept("-");
 
-						tk.acceptRun(decimalDigit);
+				if (t.accept(decimalDigit)) {
+					switch (t.acceptRun(decimalDigit)) {
+					default:
+						return t.return(TokenKeyword, main);
+					case ',':
+						return braceExpansionWord(t);
+					case '.':
+						if (t.acceptWord(dotdot)) {
+							t.accept("-");
 
-						if (tk.acceptWord(dots)) {
-							if (!tk.accept(decimalDigit)) {
-								return errInvalidBraceExpansion(tk);
+							if (!t.accept(decimalDigit)) {
+								return t.return(TokenKeyword, main);
 							}
 
-							tk.acceptRun(decimalDigit);
-						}
+							t.acceptRun(decimalDigit);
 
-						if (!tk.accept("}")) {
-							return errInvalidBraceExpansion(tk);
+							if (t.acceptWord(dotdot)) {
+								t.accept("-");
+
+								if (!t.accept(decimalDigit)) {
+									return t.return(TokenKeyword, main);
+								}
+
+								t.acceptRun(decimalDigit);
+							}
+
+							if (!t.accept("}")) {
+								return t.return(TokenKeyword, main);
+							}
+
+							return t.return(TokenStringLiteral, main);
 						}
 					}
 				}
-			} else {
-				switch (tk.exceptRun(" `\\\t\n|&;<>()},")) {
-				case '\\':
-					tk.next();
-					tk.next();
-				case ',':
-					return braceExpansionWord(tk);
+			}
+
+			return braceExpansionWord(t);
+		      },
+		      startArrayAssign = (t: Tokeniser) => {
+			t.accept("[");
+			tokenDepth.push(']');
+
+			return t.return(TokenPunctuator, main);
+		      },
+		      word = (t: Tokeniser) => {
+			const tk = tokenDepth.at(-1),
+			      wb = tk === '}' ? wordBreakNoBrace : tk === ']' ? wordBreakNoBracket : wordBreak;
+
+			if (t.accept("\\")) {
+				t.next();
+			} else if (t.length() === 0 && t.accept(wb)) {
+				return errInvalidCharacter(t);
+			}
+
+			while (true) {
+				switch (t.exceptRun(wb)) {
+				case '':
+					if (!t.length()) {
+						if (!tokenDepth.length) {
+							return t.done();
+						}
+
+						return errUnexpectedEOF(t);
+					}
 				default:
-					return errInvalidBraceExpansion(tk);
+					return t.return(TokenKeyword, main);
+				case '{':
+					t.next();
+
+					if (t.accept(whitespace) || t.accept(newline)) {
+						t.backup();
+						t.backup();
+					} else if (!t.peek()) {
+						t.backup();
+					} else {
+						const pos = t.length() - 1,
+						      [tk] = braceExpansion(new Tokeniser({"next": () => ({"value": t.next(), "done": false})}));
+
+						while (pos < t.length()) {
+							t.backup();
+						}
+
+						if (tk.type === TokenStringLiteral) {
+							return t.return(TokenKeyword, main);
+						}
+					}
+
+					t.next();
+
+					break;
+				case '\\':
+					t.next();
+					t.next();
+
+					break;
+				case '$':
+					t.next();
+
+					if (t.accept(decimalDigit) || t.accept(identStart) || t.accept("({")) {
+						t.backup();
+						t.backup();
+
+						return t.return(TokenKeyword, main);
+					}
+				}
+			}
+		      },
+		      keywordIdentOrWord = (t: Tokeniser) => {
+			if (t.acceptWord(keywords)) {
+				return t.return(TokenReservedWord, main);
+			}
+
+			if (t.accept(identStart)) {
+				t.acceptRun(identCont);
+
+				const read = t.acceptWord(assignment);
+
+				if (read) {
+					for (const _ of read) {
+						t.backup();
+					}
+
+					return t.return(TokenIdentifier, main);
+				} else if (t.peek() === tokenDepth.at(-1)) {
+					return t.return(TokenKeyword, main);
+				} else if (t.peek() === '[') {
+					return t.return(TokenIdentifier, startArrayAssign);
 				}
 			}
 
-			return tk.return(TokenStringLiteral, main);
+			return word(t);
 		      },
-		      arithmeticExpansion = (tk: Tokeniser) => {
+		      number = (t: Tokeniser) => {
+			if (!t.accept(decimalDigit)) {
+				return keywordIdentOrWord(t);
+			}
+
+			t.acceptRun(decimalDigit);
+
+			if (t.accept("#")) {
+				if (!t.accept(numberChars)) {
+					return errInvalidNumber(t);
+				}
+
+				t.acceptRun(numberChars);
+			}
+
+			return t.return(TokenNumericLiteral, main);
+		      },
+		      zero = (t: Tokeniser) => {
+			t.next();
+
+			if (t.accept("xX")) {
+				if (!t.accept(hexDigit)) {
+					return errInvalidNumber(t);
+				}
+
+				t.acceptRun(hexDigit);
+			} else {
+				t.acceptRun(octalDigit);
+			}
+
+			return t.return(TokenNumericLiteral, main);
+		      },
+		      stringStart = (t: Tokeniser) => {
+			if (t.peek() === tokenDepth.at(-1)) {
+				tokenDepth.pop();
+				t.next();
+
+				return t.return(TokenStringLiteral, main);
+			}
+
+			tokenDepth.push(t.next());
+
+			return string(t);
+		      },
+		      backtick = (t: Tokeniser) => {
+			tokenDepth.push('`');
+			t.next();
+
+			return t.return(TokenPunctuator, main);
+		      },
+		      identifier = (t: Tokeniser) => {
+			t.next();
+
+			if (t.accept(decimalDigit)) {
+				return t.return(TokenIdentifier, main);
+			}
+
+			if (t.accept("(")) {
+				if (t.accept("(")) {
+					tokenDepth.push('>');
+
+					return t.return(TokenPunctuator, main);
+				}
+
+				tokenDepth.push(')');
+
+				return t.return(TokenPunctuator, main);
+			}
+
+			if (t.accept("{")) {
+				tokenDepth.push('}');
+
+				return t.return(TokenPunctuator, keywordIdentOrWord);
+			}
+
+			t.exceptRun(tokenDepth.at(-1) === ']' ? wordNoBracket : words);
+
+			return t.return(TokenIdentifier, main);
+		      },
+		      heredocEnd = (t: Tokeniser) => {
+			t.acceptString(heredocs.at(-1)!.shift()!);
+
+			if (!heredocs.at(-1)?.length) {
+				heredocs.pop();
+			}
+
+			return t.return(TokenStringLiteral, main);
+		      },
+		      heredocString = (t: Tokeniser) => {
+			const heredoc = heredocs.at(-1)![0];
+
+			while (true) {
+				const read = t.acceptString(heredoc);
+
+				if (read === heredoc.length && (t.peek() === '\n' || t.peek() === '')) {
+					for (let i = 0; i < read; i++) {
+						t.backup();
+					}
+
+					return t.return(TokenStringLiteral, heredocEnd);
+				}
+
+				switch (t.exceptRun(heredocStringBreak)) {
+				case '':
+					return errUnexpectedEOF(t);
+				case '$':
+					t.next();
+
+					if (t.accept(decimalDigit) || t.accept(identStart) || t.accept("({")) {
+						t.backup();
+						t.backup();
+
+						tokenDepth.push('h');
+
+						return t.return(TokenStringLiteral, identifier);
+					}
+
+					continue;
+				}
+
+				t.next();
+			}
+		      },
+		      unstring = (str: string) => {
+			let nextEscaped = false,
+			    sb = "";
+
+			for (const c of str) {
+				if (nextEscaped) {
+					switch (c) {
+					case 'n':
+						sb += "\n";
+
+						break;
+					case 't':
+						sb += "\t";
+					}
+
+					nextEscaped = false;
+				} else {
+					switch (c) {
+					case '\\':
+						nextEscaped = true;
+					case '"':
+					case "'":
+						continue;
+					}
+
+					sb += c;
+				}
+			}
+
+			return sb;
+		      },
+		      startHeredoc = (t: Tokeniser): [Token, TokenFn] => {
+			if (t.peek() === '' || t.accept(newline) || t.accept("#")) {
+				return errUnexpectedEOF(t);
+			}
+
+			if (t.accept(whitespace) || !t.acceptWord(escapedNewline)) {
+				while (t.acceptRun(whitespace)) {
+					if (!t.acceptWord(escapedNewline)) {
+						break;
+					}
+				}
+
+				return t.return(TokenWhitespace, startHeredoc);
+			}
+
+			let chars = heredocsBreak;
+
+			Loop:
+			while (true) {
+				switch (t.exceptRun(chars)) {
+				case '':
+					return errUnexpectedEOF(t);
+				case '\\':
+					t.next();
+					t.next();
+
+					break;
+				case "'":
+					t.next();
+
+					if (chars === heredocsBreak) {
+						chars = "'";
+					} else {
+						chars = heredocsBreak;
+					}
+
+					break;
+				case '"':
+					if (chars === heredocsBreak) {
+						chars = "\\\"";
+					} else {
+						chars = heredocsBreak;
+					}
+				default:
+					break Loop;
+				}
+			}
+
+			const tk = {"type": TokenKeyword, "data": t.get()};
+
+			if (tokenDepth.at(-1) === 'H') {
+				heredocs.at(-1)?.push(unstring(tk.data));
+			} else {
+				heredocs.push([unstring(tk.data)]);
+			}
+
+			return [tk, main];
+		      },
+		      operatorOrWord = (t: Tokeniser) => {
+			const c = t.peek();
+
+			switch (c) {
+			default:
+				return keywordIdentOrWord(t);
+			case '<':
+				t.next();
+
+				if (t.accept("<")) {
+					if (t.accept("<-")) {
+						t.accept("-");
+
+						return t.return(TokenPunctuator, startHeredoc);
+					}
+				} else {
+					t.accept("&>");
+				}
+
+				break;
+			case '>':
+				t.next();
+				t.accept(">&|");
+
+				break;
+			case '|':
+				t.next();
+				t.accept("&|");
+
+				break;
+			case '&':
+				t.next();
+
+				if (t.accept(">")) {
+					t.accept(">");
+				} else {
+					t.accept("&");
+				}
+
+				break;
+			case ';':
+				t.next();
+				t.accept(";");
+				t.accept("&");
+
+				break;
+			case '"':
+			case "'":
+				return stringStart(t);
+			case '(':
+				t.next();
+				tokenDepth.push(")");
+
+				break;
+			case '{':
+				t.next();
+
+				if (!words.includes(t.peek()) || t.peek() == '-') {
+					return braceExpansion(t);
+				}
+
+				tokenDepth.push("}");
+
+				break;
+			case '}':
+			case ')':
+			case ']':
+				t.next();
+
+				if (tokenDepth.pop() !== c) {
+					return errInvalidCharacter(t);
+				}
+
+				break;
+			case '+':
+				t.next();
+
+				if (!t.accept("=")) {
+					return errInvalidCharacter(t);
+				}
+
+				break;
+			case '=':
+				t.next();
+
+				break;
+			case '$':
+				return identifier(t);
+			case '`':
+				if (tokenDepth.at(-1) !== '`') {
+					return backtick(t);
+				}
+
+				tokenDepth.pop();
+				t.next();
+			}
+
+			return t.return(TokenPunctuator, main);
+		      },
+		      arithmeticExpansion = (t: Tokeniser) => {
 			let early = false;
 
-			const c = tk.peek();
+			const c = t.peek();
 
 			switch (c) {
 			case '':
-				return errUnexpectedEOF(tk);
-			case "'":
+				return errUnexpectedEOF(t);
 			case '"':
-				return stringStart(tk, c);
+			case "'":
+				return stringStart(t);
 			case '$':
-				return identifier(tk);
+				return identifier(t);
 			case '+':
 			case '-':
 			case '&':
@@ -1164,13 +1466,17 @@ bash = (() => {
 				early = true;
 			case '<':
 			case '>':
-				tk.next();
+				t.next();
 
-				if (tk.accept(c) && early) {
-					break;
+				if (t.peek() === c) {
+					t.next();
+
+					if (early) {
+						break;
+					}
 				}
 
-				tk.accept("=");
+				t.accept("=");
 
 				break;
 			case '=':
@@ -1179,157 +1485,125 @@ bash = (() => {
 			case '/':
 			case '%':
 			case '^':
-				tk.next();
-				tk.accept("=");
+				t.next()
+				t.accept("=");
 
 				break;
 			case '~':
 			case '?':
 			case ':':
 			case ',':
-				tk.next();
+				t.next();
 
 				break;
 			case ')':
-				tk.next();
+				t.next();
 
-				if (!tk.accept(")")) {
-					return errInvalidCharacter(tk);
+				if (tokenDepth.at(-1) === '>' && !t.accept(")")) {
+					return errInvalidCharacter(t);
 				}
 
 				tokenDepth.pop();
 
 				break;
 			case '(':
-				tk.next();
+				t.next();
 
-				if (!tk.accept("(")) {
-					return errInvalidCharacter(tk);
+				if (t.accept("(")) {
+					tokenDepth.push(">");
+				} else {
+					tokenDepth.push("/");
 				}
-
-				tokenDepth.push("))");
 
 				break;
 			case '0':
-				return zero(tk);
+				return zero(t);
 			default:
-				return number(tk);
+				return number(t);
 			}
 
-			return tk.return(TokenPunctuator, main);
+			return t.return(TokenPunctuator, main);
 		      },
-		      operatorOrWord = (tk: Tokeniser) => {
-			const c = tk.peek();
+		      string = (t: Tokeniser) => {
+			const stops = tokenDepth.at(-1) === '"' ? doubleStops : singleStops;
 
-			switch (c) {
-			default:
-				return word(tk);
-			case '<':
-				tk.next();
-				tk.accept("<&>");
+			while (true) {
+				switch (t.exceptRun(stops)) {
+				default:
+					return errUnexpectedEOF(t);
+				case '\n':
+					return errInvalidCharacter(t);
+				case '`':
+					return t.return(TokenStringLiteral, backtick);
+				case '$':
+					return t.return(TokenStringLiteral, identifier);
+				case '"':
+				case "'":
+					t.next();
+					tokenDepth.pop();
 
-				break;
-			case '>':
-				tk.next();
-				tk.accept(">&|");
-
-				break;
-			case '|':
-				tk.next();
-				tk.accept("|&");
-
-				break;
-			case '&':
-				tk.next();
-				tk.accept("&");
-
-				break;
-			case ';':
-				tk.next();
-				tk.accept(";");
-				tk.accept("&");
-
-				break;
-			case '"':
-			case `'`:
-				return stringStart(tk, c);
-			case '(':
-				tokenDepth.push(')');
-				tk.next();
-
-				break;
-			case '{':
-				tk.next();
-
-				if (wordChars.includes(tk.peek())) {
-					tokenDepth.push('}');
-
-					return tk.return(TokenPunctuator, main);
+					return t.return(TokenStringLiteral, main);
+				case '\\':
+					t.next();
+					t.next();
 				}
-
-				return braceExpansion(tk);
-			case '}':
-			case ')':
-				if (tokenDepth.pop() !== c) {
-					return errUnexpectedEOF(tk);
-				}
-			case "=":
-				tk.next();
-
-				break;
-			case "$":
-				return identifier(tk);
-			case '`':
-				if (tokenDepth.at(-1) !== c) {
-					return backtick(tk);
-				}
-
-				tokenDepth.pop();
-				tk.next();
 			}
-
-			return tk.return(TokenPunctuator, main);
 		      },
-		      main = (tk: Tokeniser) => {
-			if (!tk.peek()) {
-				if (tokenDepth.length) {
-					return errUnexpectedEOF(tk);
-				}
-
-				return tk.done();
-			}
-
+		      main = (t: Tokeniser) => {
 			const td = tokenDepth.at(-1);
 
-			if (td === "\"" || td === "'") {
-				return string(tk);
+			if (!t.peek()) {
+				if (!td) {
+					return t.done();
+				}
+
+				return errUnexpectedEOF(t);
 			}
 
-			if (tk.accept(" \t")) {
-				tk.acceptRun(" \t");
+			if (td === 'h') {
+				tokenDepth.pop();
 
-				return tk.return(TokenWhitespace, main);
+				return heredocString(t);
 			}
 
-			if (tk.accept("\n")) {
-				tk.acceptRun("\n");
-
-				return tk.return(TokenLineTerminator, main);
+			if (td === '"' || td === "'") {
+				return string(t);
 			}
 
-			if (tk.accept("#")) {
-				tk.exceptRun("\n");
+			if (t.accept(whitespace) || t.acceptWord(escapedNewline) !== "") {
+				while (t.acceptRun(whitespace)) {
+					if (!t.acceptWord(escapedNewline)) {
+						break;
+					}
+				}
 
-				return tk.return(TokenSingleLineComment, main);
+				return t.return(TokenWhitespace, main);
 			}
 
-			if (td === "))") {
-				return arithmeticExpansion(tk);
+			if (t.accept(newline)) {
+				if (td === 'H') {
+					return t.return(TokenLineTerminator, heredocString);
+				}
+
+				t.acceptRun(newline);
+
+				return t.return(TokenLineTerminator, main);
 			}
 
-			return operatorOrWord(tk);
+			if (t.accept("#")) {
+				t.exceptRun(newline);
+
+				return t.return(TokenSingleLineComment, main);
+			}
+
+			if (td === '>' || td === '/') {
+				return arithmeticExpansion(t);
+			}
+
+			return operatorOrWord(t);
 		      },
-		      tokenDepth: string[] = [];
+		      tokenDepth: string[] = [],
+		      heredocs: string[][] = [];
 
 		return main(tk);
 	};
