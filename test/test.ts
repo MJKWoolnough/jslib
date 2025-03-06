@@ -13595,6 +13595,10 @@ type Tests = {
 				"heredocs (9)": {
 					"source": "<<abc\na$(\necho abc;\n) 1\nabc",
 					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">a</span><span class="punctuator">$(</span><span class="lineterminator"><br></span><span class="keyword">echo</span><span class="whitespace">&nbsp;</span><span class="keyword">abc</span><span class="punctuator">;</span><span class="lineterminator"><br></span><span class="punctuator">)</span><span class="stringliteral">&nbsp;1<br>abc</span>`
+				},
+				"heredocs (10)": {
+					"source": "<<abc\na$(<<def) 1\nabc",
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">a</span><span class="punctuator">$(&lt;&lt;</span><span class="keyword">def</span><span data-error="invalid character: )">)&nbsp;1<br>abc</span>`
 				}
 			},
 			"r": {
