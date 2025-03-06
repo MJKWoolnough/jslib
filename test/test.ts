@@ -13599,6 +13599,10 @@ type Tests = {
 				"heredocs (10)": {
 					"source": "<<abc\na$(<<def) 1\nabc",
 					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">a</span><span class="punctuator">$(&lt;&lt;</span><span class="keyword">def</span><span data-error="invalid character: )">)&nbsp;1<br>abc</span>`
+				},
+				"heredocs (11)": {
+					"source": "<<abc\na$(<<def cat) 1\nabc",
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">a</span><span class="punctuator">$(&lt;&lt;</span><span class="keyword">def</span><span class="whitespace">&nbsp;</span><span class="keyword">cat</span><span data-error="invalid character: )">)&nbsp;1<br>abc</span>`
 				}
 			},
 			"r": {
