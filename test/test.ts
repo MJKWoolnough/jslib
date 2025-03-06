@@ -13607,6 +13607,10 @@ type Tests = {
 				"heredocs (12)": {
 					"source": "<<abc;$(<<def cat)\nabc\ndef\nabc",
 					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="punctuator">;$(&lt;&lt;</span><span class="keyword">def</span><span class="whitespace">&nbsp;</span><span class="keyword">cat</span><span data-error="invalid character: )">)<br>abc<br>def<br>abc</span>`
+				},
+				"heredocs (13)": {
+					"source": "<<abc;<<def;$(<<ghi;<<jkl\nghi\njkl\n)\nabc\ndef",
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="punctuator">;&lt;&lt;</span><span class="keyword">def</span><span class="punctuator">;$(&lt;&lt;</span><span class="keyword">ghi</span><span class="punctuator">;&lt;&lt;</span><span class="keyword">jkl</span><span class="lineterminator"><br></span><span class="stringliteral">ghi</span><span class="lineterminator"><br></span><span class="stringliteral">jkl</span><span class="lineterminator"><br></span><span class="punctuator">)</span><span class="lineterminator"><br></span><span class="stringliteral">abc</span><span class="lineterminator"><br></span><span class="stringliteral">def</span>`
 				}
 			},
 			"r": {
