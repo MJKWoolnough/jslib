@@ -13560,10 +13560,14 @@ type Tests = {
 					"source": "(a)\n(\na;\nb;\n)\n(a",
 					"output": `<span class="punctuator">(</span><span class="keyword">a</span><span class="punctuator">)</span><span class="lineterminator"><br></span><span class="punctuator">(</span><span class="lineterminator"><br></span><span class="keyword">a</span><span class="punctuator">;</span><span class="lineterminator"><br></span><span class="keyword">b</span><span class="punctuator">;</span><span class="lineterminator"><br></span><span class="punctuator">)</span><span class="lineterminator"><br></span><span class="punctuator">(</span><span class="keyword">a</span><span data-error="unexpected EOF"></span>`,
 				},
-				"heredocs": {
+				"heredocs (1)": {
 					"source": "<<abc\n123\n456\nabc",
 					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">123<br>456<br>abc</span>`
 				},
+				"heredocs (2)": {
+					"source": "<<a'b 'c\n123\n456\nab c\n",
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">a'b&nbsp;'c</span><span class="lineterminator"><br></span><span class="stringliteral">123<br>456<br>ab&nbsp;c</span><span class="lineterminator"><br></span>`
+				}
 			},
 			"r": {
 				"whitespace": {
