@@ -13567,6 +13567,10 @@ type Tests = {
 				"heredocs (2)": {
 					"source": "<<a'b 'c\n123\n456\nab c\n",
 					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">a'b&nbsp;'c</span><span class="lineterminator"><br></span><span class="stringliteral">123<br>456<br>ab&nbsp;c</span><span class="lineterminator"><br></span>`
+				},
+				"heredocs (3)": {
+					"source": "<<def\n123\n456\ndef\nabc",
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">def</span><span class="lineterminator"><br></span><span class="stringliteral">123<br>456<br>def</span><span class="lineterminator"><br></span><span class="keyword">abc</span>`
 				}
 			},
 			"r": {
