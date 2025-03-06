@@ -13587,6 +13587,10 @@ type Tests = {
 				"heredocs (7)": {
 					"source": "<<abc\na$abc\nabc",
 					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">a</span><span class="identifier">$abc</span><span class="stringliteral"><br>abc</span>`
+				},
+				"heredocs (8)": {
+					"source": "<<abc\na${abc} $99\nabc",
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">a</span><span class="punctuator">\${</span><span class="keyword">abc</span><span class="punctuator">}</span><span class="stringliteral">&nbsp;</span><span class="identifier">$9</span><span class="stringliteral">9<br>abc</span>`
 				}
 			},
 			"r": {
