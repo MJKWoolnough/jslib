@@ -13513,8 +13513,8 @@ type Tests = {
 					"output": `<span class="futurereservedword">for</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">while</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">do</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">done</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">case</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">esac</span>`
 				},
 				"identifiers": {
-					"source": "abc=1 $def",
-					"output": `<span class="identifier">abc</span><span class="punctuator">=</span><span class="keyword">1</span><span class="whitespace">&nbsp;</span><span class="identifier">$def</span>`
+					"source": "abc=1 $def $ident $name a\\nbc=a $0 $12 a$b a${b}c",
+					"output": `<span class="identifier">abc</span><span class="punctuator">=</span><span class="keyword">1</span><span class="whitespace">&nbsp;</span><span class="identifier">$def</span><span class="whitespace">&nbsp;</span><span class="identifier">$ident</span><span class="whitespace">&nbsp;</span><span class="identifier">$name</span><span class="whitespace">&nbsp;</span><span class="keyword">a\\nbc=a</span><span class="whitespace">&nbsp;</span><span class="identifier">$0</span><span class="whitespace">&nbsp;</span><span class="identifier">$1</span><span class="keyword">2</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="identifier">$b</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">\${</span><span class="keyword">b</span><span class="punctuator">}</span><span class="keyword">c</span>`
 				},
 				"identifiers with spaces": {
 					"source": "a\\ b\\ c=1 $d\\ e\\ f",
