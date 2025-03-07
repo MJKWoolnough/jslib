@@ -13619,6 +13619,10 @@ type Tests = {
 				"assignments": {
 					"source": "abc=a def[0]=b ghi[$i]=c jkl+=d",
 					"output": `<span class="identifier">abc</span><span class="punctuator">=</span><span class="keyword">a</span><span class="whitespace">&nbsp;</span><span class="identifier">def</span><span class="punctuator">[</span><span class="keyword">0</span><span class="punctuator">]=</span><span class="keyword">b</span><span class="whitespace">&nbsp;</span><span class="identifier">ghi</span><span class="punctuator">[</span><span class="identifier">$i</span><span class="punctuator">]=</span><span class="keyword">c</span><span class="whitespace">&nbsp;</span><span class="identifier">jkl</span><span class="punctuator">+=</span><span class="keyword">d</span>`
+				},
+				"unmatched braces": {
+					"source": "a={123 word{ word{a} word{\nword{",
+					"output": `<span class="identifier">a</span><span class="punctuator">=</span><span class="keyword">{123</span><span class="whitespace">&nbsp;</span><span class="keyword">word{</span><span class="whitespace">&nbsp;</span><span class="keyword">word{a}</span><span class="whitespace">&nbsp;</span><span class="keyword">word{</span><span class="lineterminator"><br></span><span class="keyword">word{</span>`
 				}
 			},
 			"r": {
