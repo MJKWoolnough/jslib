@@ -942,6 +942,7 @@ bash = (() => {
 	      heredocStringBreak = newline + "$",
 	      doubleStops = "\\`$\"",
 	      singleStops = "'",
+	      ansiStops = "'\\",
 	      words = "\\\"'`(){}- \t\n",
 	      wordNoBracket = "\\\"'`(){}- \t\n]",
 	      wordBreak = " `\\\t\n$|&;<>(){",
@@ -1173,9 +1174,11 @@ bash = (() => {
 				t.next();
 
 				return t.return(TokenStringLiteral, main);
+			} else if (t.accept("$") && t.accept("'")) {
+				tokenDepth.push('$');
+			} else {
+				tokenDepth.push(t.next());
 			}
-
-			tokenDepth.push(t.next());
 
 			return string(t);
 		      },
@@ -1208,6 +1211,14 @@ bash = (() => {
 				tokenDepth.push('}');
 
 				return t.return(TokenPunctuator, keywordIdentOrWord);
+			}
+
+			const td = tokenDepth.at(-1);
+
+			if (td !== '"' && td !== 'h' && t.accept("'\"")) {
+				t.reset();
+
+				return stringStart(t);
 			}
 
 			t.exceptRun(tokenDepth.at(-1) === ']' ? wordNoBracket : words);
@@ -1527,7 +1538,8 @@ bash = (() => {
 			return t.return(TokenPunctuator, main);
 		      },
 		      string = (t: Tokeniser) => {
-			const stops = tokenDepth.at(-1) === '"' ? doubleStops : singleStops;
+			const td = tokenDepth.at(-1),
+			      stops = td === '"' ? doubleStops : td === '$' ? ansiStops : singleStops;
 
 			while (true) {
 				switch (t.exceptRun(stops)) {
@@ -1555,11 +1567,11 @@ bash = (() => {
 			const td = tokenDepth.at(-1);
 
 			if (!t.peek()) {
-				if (!td) {
-					return t.done();
+				if (td) {
+					return errUnexpectedEOF(t);
 				}
 
-				return errUnexpectedEOF(t);
+				return t.done();
 			}
 
 			if (td === 'h') {
