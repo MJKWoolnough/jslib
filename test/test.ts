@@ -13635,8 +13635,8 @@ type Tests = {
 					"output": `<span class="lineterminator"><br><br><br><br></span>`
 				},
 				"strings": {
-					"source": "\"a string\" 'another string'",
-					"output": `<span class="stringliteral">"a&nbsp;string"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'another&nbsp;string'</span>`
+					"source": "\"a string\" 'another string' \"a\nstring\" 'a\nstring'",
+					"output": `<span class="stringliteral">"a&nbsp;string"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'another&nbsp;string'</span><span class="whitespace">&nbsp;</span><span class="stringliteral">"a<br>string"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'a<br>string'</span>`
 				},
 				"keywords": {
 					"source": "if else repeat while function for in next break",
