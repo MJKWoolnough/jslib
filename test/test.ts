@@ -13725,13 +13725,13 @@ type Tests = {
 					"output": `<span class="punctuator">#</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">&gt;</span><span class="whitespace">&nbsp;</span><span class="punctuator">@</span><span class="whitespace">&nbsp;</span><span class="identifier">\\&nbsp;</span><span class="punctuator">~</span><span class="whitespace">&nbsp;</span><span class="punctuator">.</span>`
 				}
 			}
-		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = async () => {
+		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = Object.defineProperty(async () => {
 			const {default: code, ...fns} = await import("./lib/markdown_code.js"),
 			      div = document.createElement("div");
 
 			div.append(code(source, fns[testname as keyof typeof fns] as any, new Map([".whitespace", ".lineterminator", ".singlelinecomment", ".multilinecomment", ".identifier", ".privateidentifier", ".booleanliteral", ".keyword", ".punctuator", ".numericliteral", ".stringliteral", ".nosubstitutiontemplate", ".templatehead", ".templatemiddle", ".templatetail", ".regularexpressionliteral", ".nullliteral", ".futurereservedword"].map((c, n) => [n, c]))));
 
 			return div.innerHTML === output;
-		}, o), {} as Tests), o), {} as Record<string, Tests>)
+		}, "toString", {"value": () => source + "\n\n=>\n\n" + output}), o), {} as Tests), o), {} as Record<string, Tests>)
 	}
 });
