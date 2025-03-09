@@ -954,8 +954,7 @@ bash = (() => {
 	      numberChars = identCont + "@";
 
 	return (tk: Tokeniser) => {
-		const
-		      braceExpansionWord = (t: Tokeniser) => {
+		const braceExpansionWord = (t: Tokeniser) => {
 			let hasComma = false;
 
 			while (true) {
