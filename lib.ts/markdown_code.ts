@@ -1497,7 +1497,7 @@ bash = (() => {
 			case '/':
 			case '%':
 			case '^':
-				t.next()
+				t.next();
 				t.accept("=");
 
 				break;
