@@ -1459,8 +1459,6 @@ bash = (() => {
 			return t.return(TokenPunctuator, main);
 		      },
 		      arithmeticExpansion = (t: Tokeniser) => {
-			let early = false;
-
 			const c = t.peek();
 
 			switch (c) {
@@ -1475,25 +1473,23 @@ bash = (() => {
 			case '-':
 			case '&':
 			case '|':
-				early = true;
-			case '<':
-			case '>':
 				t.next();
 
 				if (t.peek() === c) {
 					t.next();
-
-					if (early) {
-						break;
-					}
+				} else {
+					t.accept("=");
 				}
 
+				break;
+			case '<':
+			case '>':
+				t.next();
 				t.accept("=");
 
 				break;
 			case '=':
 			case '!':
-			case '*':
 			case '/':
 			case '%':
 			case '^':
@@ -1501,17 +1497,37 @@ bash = (() => {
 				t.accept("=");
 
 				break;
+			case '*':
+				t.next();
+				t.accept("*=");
+
+				break;
 			case '~':
-			case '?':
-			case ':':
 			case ',':
 				t.next();
+
+				break;
+			case '?':
+				t.next();
+				tokenDepth.push(":");
+
+				break;
+			case ':':
+				t.next();
+
+				if (tokenDepth.at(-1) !== ':') {
+					return errInvalidCharacter(t);
+				}
+
+				tokenDepth.pop();
 
 				break;
 			case ')':
 				t.next();
 
-				if (tokenDepth.at(-1) === '>' && !t.accept(")")) {
+				const td = tokenDepth.at(-1);
+
+				if ((td != '>' || !t.accept(")")) && td != '/') {
 					return errInvalidCharacter(t);
 				}
 
@@ -1520,12 +1536,7 @@ bash = (() => {
 				break;
 			case '(':
 				t.next();
-
-				if (t.accept("(")) {
-					tokenDepth.push(">");
-				} else {
-					tokenDepth.push("/");
-				}
+				tokenDepth.push("/");
 
 				break;
 			case '0':
@@ -1609,7 +1620,7 @@ bash = (() => {
 				return t.return(TokenSingleLineComment, main);
 			}
 
-			if (td === '>' || td === '/') {
+			if (td === '>' || td === '/' || td === ':') {
 				return arithmeticExpansion(t);
 			}
 
