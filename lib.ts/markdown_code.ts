@@ -968,6 +968,8 @@ bash = (() => {
 				case '\\':
 					t.next();
 					t.next();
+
+					break;
 				case ',':
 					t.next();
 
@@ -1318,6 +1320,8 @@ bash = (() => {
 			Loop:
 			while (true) {
 				switch (t.exceptRun(chars)) {
+				default:
+					break Loop;
 				case '':
 					return errUnexpectedEOF(t);
 				case '\\':
@@ -1341,8 +1345,6 @@ bash = (() => {
 					} else {
 						chars = heredocsBreak;
 					}
-				default:
-					break Loop;
 				}
 			}
 
