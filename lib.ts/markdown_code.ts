@@ -137,7 +137,6 @@ javascript = (() => {
 
 				if (tk.type === TokenIdentifier) {
 					tk.type = TokenPrivateIdentifier;
-
 					divisionAllowed = true;
 				}
 
@@ -156,7 +155,6 @@ javascript = (() => {
 				if (tk.type === TokenIdentifier) {
 					if (tk.data === "true" || tk.data === "false") {
 						divisionAllowed = true;
-
 						tk.type = TokenBooleanLiteral;
 					} else if (tk.data === "null") {
 						divisionAllowed = true;
