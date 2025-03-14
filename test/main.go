@@ -40,8 +40,7 @@ func run() error {
 	m.Handle("/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("./")))))
 	m.Handle("/static", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("123")) }))
 	m.Handle("/echo", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ct := r.Header.Get("Content-Type")
-		if ct != "" {
+		if ct := r.Header.Get("Content-Type"); ct != "" {
 			w.Header().Add("Content-Type", ct)
 		}
 
@@ -81,7 +80,7 @@ func run() error {
 
 		conn.SetDeadline(time.Now().Add(time.Second * 60))
 
-		jrpc = jsonrpc.New(conn, jsonrpc.HandlerFunc(func(method string, data json.RawMessage) (interface{}, error) {
+		jrpc = jsonrpc.New(conn, jsonrpc.HandlerFunc(func(method string, data json.RawMessage) (any, error) {
 			switch method {
 			case "static":
 				return "123", nil
@@ -92,11 +91,14 @@ func run() error {
 					ID:     -1,
 					Result: data,
 				})
+
 				return true, nil
 			case "close":
 				conn.Close()
+
 				return nil, nil
 			}
+
 			return nil, jsonrpc.Error{
 				Code:    1,
 				Message: "unknown endpoint",
