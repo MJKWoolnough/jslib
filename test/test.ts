@@ -2205,7 +2205,7 @@ type Tests = {
 				request!({"data": `{"id":2,"method":"myMethod","params":[100,200]}`});
 
 				return new Promise(sFn => setTimeout(sFn)).then(() => data[0] === `{"id":0,"result":3}` && data[1] === `{"id":1,"result":5}` && data[2] ===  `{"id":2,"result":300}`);
-			},
+			}
 		}
 	},
 	"bbcode.js": {
@@ -13550,7 +13550,7 @@ type Tests = {
 				},
 				"brace expansion": {
 					"source": `{1..2} {1..2..3} {1,2,3} a{bz,cz,dz}e {e..f}`,
-					"output": `<span class="stringliteral">{1..2}</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{1..2..3}</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{1,2,3}</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="stringliteral">{bz,cz,dz}</span><span class="keyword">e</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{e..f}</span>`,
+					"output": `<span class="stringliteral">{1..2}</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{1..2..3}</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{1,2,3}</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="stringliteral">{bz,cz,dz}</span><span class="keyword">e</span><span class="whitespace">&nbsp;</span><span class="stringliteral">{e..f}</span>`
 				},
 				"brace grouping": {
 					"source": `{ a; } { a; b; c; } {`,
@@ -13558,7 +13558,7 @@ type Tests = {
 				},
 				"subshells": {
 					"source": "(a)\n(\na;\nb;\n)\n(a",
-					"output": `<span class="punctuator">(</span><span class="keyword">a</span><span class="punctuator">)</span><span class="lineterminator"><br></span><span class="punctuator">(</span><span class="lineterminator"><br></span><span class="keyword">a</span><span class="punctuator">;</span><span class="lineterminator"><br></span><span class="keyword">b</span><span class="punctuator">;</span><span class="lineterminator"><br></span><span class="punctuator">)</span><span class="lineterminator"><br></span><span class="punctuator">(</span><span class="keyword">a</span><span data-error="unexpected EOF"></span>`,
+					"output": `<span class="punctuator">(</span><span class="keyword">a</span><span class="punctuator">)</span><span class="lineterminator"><br></span><span class="punctuator">(</span><span class="lineterminator"><br></span><span class="keyword">a</span><span class="punctuator">;</span><span class="lineterminator"><br></span><span class="keyword">b</span><span class="punctuator">;</span><span class="lineterminator"><br></span><span class="punctuator">)</span><span class="lineterminator"><br></span><span class="punctuator">(</span><span class="keyword">a</span><span data-error="unexpected EOF"></span>`
 				},
 				"heredocs (1)": {
 					"source": "<<abc\n123\n456\nabc",
