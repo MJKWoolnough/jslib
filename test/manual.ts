@@ -61,7 +61,7 @@ type ManualTests = {
 						});
 						Object.assign(w, {"result": resultFn!});
 						w.addEventListener("beforeunload", () => {
-							button.toggleAttribute("disabled", false)
+							button.toggleAttribute("disabled", false);
 							s();
 						});
 						w.addEventListener("error", (e: ErrorEvent) => {
