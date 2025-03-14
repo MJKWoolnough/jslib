@@ -287,7 +287,7 @@ document.body.prepend(router().add("/other-page/:id/:data", data => {
 	button.textContent = "Click Here";
 	button.addEventListener("click", () => goto("/other-page/123/def", {"test": 1, "data": "abc"}));
 	return button;
-}));`],
+}));`]
 		}
 	},
 	"urlstate.js": {
