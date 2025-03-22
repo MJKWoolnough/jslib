@@ -1187,6 +1187,20 @@ bash = (() => {
 
 			return t.return(TokenPunctuator, main);
 		      },
+		      parameterExpansionIdentifier = (t: Tokeniser) => {
+			return t.error("");
+		      },
+		      parameterExpansionIdentifierOrPreOperator = (t: Tokeniser) => {
+			if (t.accept("!#")) {
+				if (t.peek() != '}') {
+					return t.return(TokenPunctuator, parameterExpansionIdentifier);
+				}
+
+				return t.return(TokenKeyword, main);
+			}
+
+			return parameterExpansionIdentifier(t);
+		      },
 		      identifier = (t: Tokeniser) => {
 			t.next();
 
@@ -1209,7 +1223,7 @@ bash = (() => {
 			if (t.accept("{")) {
 				tokenDepth.push('}');
 
-				return t.return(TokenPunctuator, keywordIdentOrWord);
+				return t.return(TokenPunctuator, parameterExpansionIdentifierOrPreOperator);
 			}
 
 			const td = tokenDepth.at(-1);
