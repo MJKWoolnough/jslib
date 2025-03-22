@@ -1192,7 +1192,9 @@ bash = (() => {
 			return t.error("");
 		      },
 		      parameterExpansionPatternEnd = (t: Tokeniser) => {
-			return t.error("");
+			t.accept("/");
+
+			return t.return(TokenPunctuator, main);
 		      },
 		      parameterExpansionPattern = (t: Tokeniser) => {
 			let parens = 0;
