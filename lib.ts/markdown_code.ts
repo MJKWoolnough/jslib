@@ -1194,8 +1194,21 @@ bash = (() => {
 		      parameterExpansionPattern = (t: Tokeniser) => {
 			return t.error("");
 		      },
-		      parameterExpansionSubstringMid = (t: Tokeniser) => {
+		      parameterExpansionSubstringEnd = (t: Tokeniser) => {
 			return t.error("");
+		      },
+		      parameterExpansionSubstringMid = (t: Tokeniser) => {
+			if (t.accept(whitespace)) {
+				t.acceptRun(whitespace);
+
+				return t.return(TokenWhitespace, parameterExpansionSubstringMid);
+			}
+
+			if (t.accept(":")) {
+				return t.return(TokenPunctuator, parameterExpansionSubstringEnd);
+			}
+			
+			return errInvalidParameterExpansion(t);
 		      },
 		      parameterExpansionSubstringStart = (t: Tokeniser) => {
 			if (t.accept(whitespace)) {
