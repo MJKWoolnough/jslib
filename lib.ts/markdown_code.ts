@@ -1189,7 +1189,17 @@ bash = (() => {
 			return t.return(TokenPunctuator, main);
 		      },
 		      parameterExpansionOperator = (t: Tokeniser) => {
-			return t.error("");
+			if (t.accept("}")) {
+				tokenDepth.pop();
+
+				return t.return(TokenPunctuator, main);
+			}
+
+			if (!t.accept("UuLQEPAKak")) {
+				return errInvalidParameterExpansion(t);
+			}
+
+			return t.return(TokenIdentifier, main);
 		      },
 		      parameterExpansionPatternEnd = (t: Tokeniser) => {
 			t.accept("/");
