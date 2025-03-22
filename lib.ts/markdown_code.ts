@@ -1191,8 +1191,59 @@ bash = (() => {
 		      parameterExpansionOperator = (t: Tokeniser) => {
 			return t.error("");
 		      },
-		      parameterExpansionPattern = (t: Tokeniser) => {
+		      parameterExpansionPatternEnd = (t: Tokeniser) => {
 			return t.error("");
+		      },
+		      parameterExpansionPattern = (t: Tokeniser) => {
+			let parens = 0;
+
+			while (true) {
+				switch (t.exceptRun("\\()[/}")) {
+				case '}':
+					if (parens === 0) {
+						return t.return(TokenRegularExpressionLiteral, main);
+					}
+
+					return errInvalidParameterExpansion(t);
+				case '/':
+					if (parens === 0) {
+						return t.return(TokenRegularExpressionLiteral, parameterExpansionPatternEnd);
+					}
+				case '':
+					return errInvalidParameterExpansion(t);
+				case '\\':
+					t.next();
+					t.next();
+
+					break;
+				case '(':
+					t.next();
+
+					parens++;
+
+					break;
+				case ')':
+					t.next();
+
+					if (parens === 0) {
+						return errInvalidParameterExpansion(t);
+					}
+
+					parens--
+
+					break;
+				case '[':
+					while (!t.accept("]")) {
+						switch (t.exceptRun("\\]")) {
+						case '':
+							return errInvalidParameterExpansion(t);
+						case '\\':
+							t.next();
+							t.next();
+						}
+					}
+				}
+			}
 		      },
 		      parameterExpansionSubstringEnd = (t: Tokeniser) => {
 			if (t.accept(whitespace)) {
