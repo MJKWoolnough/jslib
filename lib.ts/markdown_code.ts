@@ -949,7 +949,8 @@ bash = (() => {
 	      braceWordBreak = " `\\\t\n|&;<>()={},",
 	      identStart = letters + "_",
 	      identCont = decimalDigit + identStart,
-	      numberChars = identCont + "@";
+	      numberChars = identCont + "@",
+	      errInvalidParameterExpansion = error("invalid parameter expansion");
 
 	return (tk: Tokeniser) => {
 		const braceExpansionWord = (t: Tokeniser) => {
@@ -1187,8 +1188,30 @@ bash = (() => {
 
 			return t.return(TokenPunctuator, main);
 		      },
-		      parameterExpansionIdentifier = (t: Tokeniser) => {
+		      parameterExpansionOperation = (t: Tokeniser) => {
 			return t.error("");
+		      },
+		      parameterExpansionArrayOrOperation = (t: Tokeniser) => {
+			return t.error("");
+		      },
+		      parameterExpansionIdentifier = (t: Tokeniser) => {
+			if (t.accept("@*")) {
+				return t.return(TokenKeyword, parameterExpansionOperation);
+			}
+
+			if (t.accept(decimalDigit)) {
+				t.acceptRun(decimalDigit);
+
+				return t.return(TokenNumericLiteral, parameterExpansionOperation);
+			}
+
+			if (!t.accept(identStart)) {
+				return errInvalidParameterExpansion(t);
+			}
+
+			t.acceptRun(identCont);
+
+			return t.return(TokenIdentifier, parameterExpansionArrayOrOperation);
 		      },
 		      parameterExpansionIdentifierOrPreOperator = (t: Tokeniser) => {
 			if (t.accept("!#")) {
