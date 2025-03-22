@@ -1188,8 +1188,53 @@ bash = (() => {
 
 			return t.return(TokenPunctuator, main);
 		      },
-		      parameterExpansionOperation = (t: Tokeniser) => {
+		      parameterExpansionOperator = (t: Tokeniser) => {
 			return t.error("");
+		      },
+		      parameterExpansionPattern = (t: Tokeniser) => {
+			return t.error("");
+		      },
+		      parameterExpansionSubstringStart = (t: Tokeniser) => {
+			return t.error("");
+		      },
+		      parameterExpansionOperation = (t: Tokeniser) => {
+			if (t.accept(":")) {
+				if (t.accept("-=#?+")) {
+					return t.return(TokenPunctuator, main);
+				}
+
+				return t.return(TokenPunctuator, parameterExpansionSubstringStart);
+			}
+
+			if (t.accept("/")) {
+				t.accept("/#%");
+
+				return t.return(TokenPunctuator, parameterExpansionPattern);
+			}
+
+			if (t.accept("*")) {
+				return t.return(TokenPunctuator, main);
+			}
+
+			if (t.accept("@")) {
+				return t.return(TokenPunctuator, parameterExpansionOperator);
+			}
+
+			if (t.accept("}")) {
+				tokenDepth.pop();
+
+				return t.return(TokenPunctuator, main);
+			}
+
+			for (const c of "#%^,") {
+				if (t.accept(c)) {
+					t.accept(c);
+
+					return t.return(TokenPunctuator, parameterExpansionPattern);
+				}
+			}
+
+			return errInvalidParameterExpansion(t);
 		      },
 		      parameterExpansionArrayOrOperation = (t: Tokeniser) => {
 			if (!t.accept("[")) {
