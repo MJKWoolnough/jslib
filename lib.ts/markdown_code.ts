@@ -1194,8 +1194,25 @@ bash = (() => {
 		      parameterExpansionPattern = (t: Tokeniser) => {
 			return t.error("");
 		      },
-		      parameterExpansionSubstringStart = (t: Tokeniser) => {
+		      parameterExpansionSubstringMid = (t: Tokeniser) => {
 			return t.error("");
+		      },
+		      parameterExpansionSubstringStart = (t: Tokeniser) => {
+			if (t.accept(whitespace)) {
+				t.acceptRun(whitespace);
+
+				return t.return(TokenWhitespace, parameterExpansionSubstringStart);
+			}
+
+			t.accept("-");
+
+			if (!t.accept(decimalDigit)) {
+				return errInvalidParameterExpansion(t);
+			}
+
+			t.acceptRun(decimalDigit);
+
+			return t.return(TokenNumericLiteral, parameterExpansionSubstringMid);
 		      },
 		      parameterExpansionOperation = (t: Tokeniser) => {
 			if (t.accept(":")) {
