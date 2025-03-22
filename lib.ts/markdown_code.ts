@@ -1192,7 +1192,13 @@ bash = (() => {
 			return t.error("");
 		      },
 		      parameterExpansionArrayOrOperation = (t: Tokeniser) => {
-			return t.error("");
+			if (!t.accept("[")) {
+				return parameterExpansionOperation(t);
+			}
+
+			tokenDepth.push('[');
+
+			return t.return(TokenPunctuator, main);
 		      },
 		      parameterExpansionIdentifier = (t: Tokeniser) => {
 			if (t.accept("@*")) {
@@ -1460,9 +1466,15 @@ bash = (() => {
 				tokenDepth.push("}");
 
 				break;
+			case ']':
+				if (tokenDepth.at(-1) === '[') {
+					t.next();
+					tokenDepth.pop();
+
+					return t.return(TokenPunctuator, parameterExpansionOperation);
+				}
 			case '}':
 			case ')':
-			case ']':
 				t.next();
 
 				if (tokenDepth.pop() !== c) {
