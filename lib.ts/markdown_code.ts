@@ -1195,7 +1195,20 @@ bash = (() => {
 			return t.error("");
 		      },
 		      parameterExpansionSubstringEnd = (t: Tokeniser) => {
-			return t.error("");
+			if (t.accept(whitespace)) {
+				t.acceptRun(whitespace);
+
+				return t.return(TokenWhitespace, parameterExpansionSubstringEnd);
+			}
+
+
+			if (!t.accept(decimalDigit)) {
+				return errInvalidParameterExpansion(t);
+			}
+
+			t.acceptRun(decimalDigit);
+
+			return t.return(TokenNumericLiteral, main);
 		      },
 		      parameterExpansionSubstringMid = (t: Tokeniser) => {
 			if (t.accept(whitespace)) {
