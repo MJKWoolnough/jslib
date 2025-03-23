@@ -1264,6 +1264,7 @@ bash = (() => {
 				return t.return(TokenWhitespace, parameterExpansionSubstringEnd);
 			}
 
+			t.accept("-");
 
 			if (!t.accept(decimalDigit)) {
 				return errInvalidParameterExpansion(t);
