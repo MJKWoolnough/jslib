@@ -1050,7 +1050,7 @@ bash = (() => {
 		      },
 		      word = (t: Tokeniser) => {
 			const tk = tokenDepth.at(-1),
-			      wb = tk === '}' ? wordBreakNoBrace : tk === ']' ? wordBreakNoBracket : wordBreak;
+			      wb = tk === '}' ? wordBreakNoBrace : tk === ']' || tk === '[' ? wordBreakNoBracket : wordBreak;
 
 			if (t.accept("\\")) {
 				t.next();
