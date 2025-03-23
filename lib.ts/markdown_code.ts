@@ -1285,7 +1285,7 @@ bash = (() => {
 				return t.return(TokenPunctuator, parameterExpansionSubstringEnd);
 			}
 			
-			return errInvalidParameterExpansion(t);
+			return main(t);
 		      },
 		      parameterExpansionSubstringStart = (t: Tokeniser) => {
 			if (t.accept(whitespace)) {
