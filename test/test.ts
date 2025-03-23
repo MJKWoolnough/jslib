@@ -13514,7 +13514,7 @@ type Tests = {
 				},
 				"identifiers": {
 					"source": "abc=1 $def $ident $name a\\nbc=a $0 $12 a$b a${b}c",
-					"output": `<span class="identifier">abc</span><span class="punctuator">=</span><span class="keyword">1</span><span class="whitespace">&nbsp;</span><span class="identifier">$def</span><span class="whitespace">&nbsp;</span><span class="identifier">$ident</span><span class="whitespace">&nbsp;</span><span class="identifier">$name</span><span class="whitespace">&nbsp;</span><span class="keyword">a\\nbc=a</span><span class="whitespace">&nbsp;</span><span class="identifier">$0</span><span class="whitespace">&nbsp;</span><span class="identifier">$1</span><span class="keyword">2</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="identifier">$b</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">\${</span><span class="keyword">b</span><span class="punctuator">}</span><span class="keyword">c</span>`
+					"output": `<span class="identifier">abc</span><span class="punctuator">=</span><span class="keyword">1</span><span class="whitespace">&nbsp;</span><span class="identifier">$def</span><span class="whitespace">&nbsp;</span><span class="identifier">$ident</span><span class="whitespace">&nbsp;</span><span class="identifier">$name</span><span class="whitespace">&nbsp;</span><span class="keyword">a\\nbc=a</span><span class="whitespace">&nbsp;</span><span class="identifier">$0</span><span class="whitespace">&nbsp;</span><span class="identifier">$1</span><span class="keyword">2</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="identifier">$b</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">\${</span><span class="identifier">b</span><span class="punctuator">}</span><span class="keyword">c</span>`
 				},
 				"identifiers with spaces": {
 					"source": "a\\ b\\ c=1 $d\\ e\\ f",
@@ -13534,7 +13534,7 @@ type Tests = {
 				},
 				"string manipulation": {
 					"source": "\"${#arg} ${arg:1:2} ${arg@Q}\"",
-					"output": "<span class=\"stringliteral\">\"</span><span class=\"punctuator\">${</span><span class=\"keyword\">#arg</span><span class=\"punctuator\">}</span><span class=\"stringliteral\">&nbsp;</span><span class=\"punctuator\">${</span><span class=\"keyword\">arg:1:2</span><span class=\"punctuator\">}</span><span class=\"stringliteral\">&nbsp;</span><span class=\"punctuator\">${</span><span class=\"keyword\">arg@Q</span><span class=\"punctuator\">}</span><span class=\"stringliteral\">\"</span>"
+					"output": "<span class=\"stringliteral\">\"</span><span class=\"punctuator\">${#</span><span class=\"identifier\">arg</span><span class=\"punctuator\">}</span><span class=\"stringliteral\">&nbsp;</span><span class=\"punctuator\">${</span><span class=\"identifier\">arg</span><span class=\"punctuator\">:</span><span class=\"numericliteral\">1</span><span class=\"punctuator\">:</span><span class=\"numericliteral\">2</span><span class=\"punctuator\">}</span><span class=\"stringliteral\">&nbsp;</span><span class=\"punctuator\">${</span><span class=\"identifier\">arg</span><span class=\"punctuator\">@</span><span class=\"identifier\">Q</span><span class=\"punctuator\">}</span><span class=\"stringliteral\">\"</span>"
 				},
 				"comments": {
 					"source": "#!/bin/bash\n\n# a comment\nword",
@@ -13590,7 +13590,7 @@ type Tests = {
 				},
 				"heredocs (8)": {
 					"source": "<<abc\na${abc} $99\nabc",
-					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">a</span><span class="punctuator">\${</span><span class="keyword">abc</span><span class="punctuator">}</span><span class="stringliteral">&nbsp;</span><span class="identifier">$9</span><span class="stringliteral">9<br>abc</span>`
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">abc</span><span class="lineterminator"><br></span><span class="stringliteral">a</span><span class="punctuator">\${</span><span class="identifier">abc</span><span class="punctuator">}</span><span class="stringliteral">&nbsp;</span><span class="identifier">$9</span><span class="stringliteral">9<br>abc</span>`
 				},
 				"heredocs (9)": {
 					"source": "<<abc\na$(\necho abc;\n) 1\nabc",
