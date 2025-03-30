@@ -946,6 +946,7 @@ bash = (() => {
 	      wordBreak = " `\\\t\n$|&;<>(){",
 	      wordBreakNoBracket = wordBreak + "]",
 	      wordBreakNoBrace = wordBreak + "}",
+	      wordBreakArithmetic = "\\\"'`(){} \t\n$+-!~*/%<=>&^|?:,",
 	      braceWordBreak = " `\\\t\n|&;<>()={},",
 	      identStart = letters + "_",
 	      identCont = decimalDigit + identStart,
@@ -1050,7 +1051,7 @@ bash = (() => {
 		      },
 		      word = (t: Tokeniser) => {
 			const tk = tokenDepth.at(-1),
-			      wb = tk === '}' ? wordBreakNoBrace : tk === ']' || tk === '[' ? wordBreakNoBracket : wordBreak;
+			      wb = tk === '}' ? wordBreakNoBrace : tk === ']' || tk === '[' ? wordBreakNoBracket : tk === '>' ? wordBreakArithmetic : wordBreak;
 
 			if (t.accept("\\")) {
 				t.next();
@@ -1415,7 +1416,7 @@ bash = (() => {
 				return stringStart(t);
 			}
 
-			t.exceptRun(tokenDepth.at(-1) === ']' ? wordNoBracket : words);
+			t.exceptRun(tokenDepth.at(-1) === ']' ? wordNoBracket : tokenDepth.at(-1) === '>' ? wordBreakArithmetic : words);
 
 			return t.return(TokenIdentifier, main);
 		      },
