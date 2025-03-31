@@ -951,7 +951,32 @@ bash = (() => {
 	      identStart = letters + "_",
 	      identCont = decimalDigit + identStart,
 	      numberChars = identCont + "@",
-	      errInvalidParameterExpansion = error("invalid parameter expansion");
+	      errInvalidParameterExpansion = error("invalid parameter expansion"),
+	      errIncorrectBacktick = error("incorrect backtick"),
+	      subTokeniser = function* (t: Tokeniser) {
+		while (true) {
+			if (t.peek() === '`') {
+				break;
+			}
+
+			let c = t.next();
+
+			if (c === '') {
+				break;
+			} else if (c === '\\') {
+				switch (t.peek()) {
+				case '':
+					break;
+				case '\\':
+				case '`':
+				case '$':
+					c = t.next();
+				}
+			}
+
+			yield c;
+		}
+	      };
 
 	return (tk: Tokeniser) => {
 		const braceExpansionWord = (t: Tokeniser) => {
@@ -1183,11 +1208,45 @@ bash = (() => {
 
 			return string(t);
 		      },
-		      backtick = (t: Tokeniser) => {
-			tokenDepth.push('`');
+		      startBacktick = (t: Tokeniser) => {
 			t.next();
 
-			return t.return(TokenPunctuator, main);
+			child = Parser(subTokeniser(t), bash);
+
+			return t.return(TokenPunctuator, backtick);
+		      },
+		      backtick = (t: Tokeniser): [Token, TokenFn] => {
+			const tk = child.next().value;
+
+			switch (tk.type) {
+			case TokenDone:
+				if (!t.accept("`")) {
+					return errIncorrectBacktick(t);
+				}
+
+				return t.return(TokenPunctuator, main);
+			case TokenError:
+				return t.error(tk.data);
+			}
+
+			let pos = t.length();
+
+			t.reset();
+
+			for (const c of tk.data) {
+				t.acceptRun("\\");
+				t.accept(c);
+			}
+
+			pos -= t.length();
+			tk.data = t.get();
+
+			while (t.length() != pos) {
+				t.next();
+			}
+
+
+			return [tk, backtick];
 		      },
 		      parameterExpansionOperator = (t: Tokeniser) => {
 			if (t.accept("}")) {
@@ -1651,7 +1710,7 @@ bash = (() => {
 				return identifier(t);
 			case '`':
 				if (tokenDepth.at(-1) !== '`') {
-					return backtick(t);
+					return startBacktick(t);
 				}
 
 				tokenDepth.pop();
@@ -1760,7 +1819,7 @@ bash = (() => {
 				case '\n':
 					return errInvalidCharacter(t);
 				case '`':
-					return t.return(TokenStringLiteral, backtick);
+					return t.return(TokenStringLiteral, startBacktick);
 				case '$':
 					return t.return(TokenStringLiteral, identifier);
 				case '"':
@@ -1830,6 +1889,8 @@ bash = (() => {
 		      },
 		      tokenDepth: string[] = [],
 		      heredocs: string[][] = [];
+
+		let child: Generator<Token, Token>;
 
 		return main(tk);
 	};
