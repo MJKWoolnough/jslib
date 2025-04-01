@@ -1876,6 +1876,10 @@ bash = (() => {
 			}
 
 			if (t.accept("#")) {
+				if (td === '}') {
+					return word(t);
+				}
+
 				t.exceptRun(newline);
 
 				return t.return(TokenSingleLineComment, main);
