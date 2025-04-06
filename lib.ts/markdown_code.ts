@@ -1301,7 +1301,7 @@ bash = (() => {
 						return errInvalidParameterExpansion(t);
 					}
 
-					parens--
+					parens--;
 
 					break;
 				case '[':
