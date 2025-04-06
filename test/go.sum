@@ -1,5 +1,9 @@
 golang.org/x/net v0.37.0 h1:1zLorHbz+LYj7MQlSf1+2tPIIgibq2eL5xkrGk6f+2c=
 golang.org/x/net v0.37.0/go.mod h1:ivrbrMbzFq5J41QOQh0siUuly180yBYtLp+CKbEaFx8=
+vimagination.zapto.org/httpencoding v1.0.0 h1:sSibnPq1pKROK4IBTNNCAKRPCijIZAaMQUBf/Mn5GA0=
+vimagination.zapto.org/httpencoding v1.0.0/go.mod h1:J2hxhPn3VjWestQQ036OYpDwwerfvIHmbtmTqpKVe0w=
+vimagination.zapto.org/httpfile v1.0.0 h1:Z7HI1Zz8VoLEp2+n/Vn1aFlT4m+I9MLX9N6buK3OFRQ=
+vimagination.zapto.org/httpfile v1.0.0/go.mod h1:KyGTgFHo8/mg4Ig/puJEipCWVebrAtYK+Go17Nhdg/s=
 vimagination.zapto.org/javascript v1.4.18 h1:VBbPX13Ul9y/O4nAw5RpDVbZ+NbXmNmn20b3pYJyCdk=
 vimagination.zapto.org/javascript v1.4.18/go.mod h1:VHox5R23pekFQihRLxhfKh3lvY9TbGhG5KhPtMnM2kw=
 vimagination.zapto.org/jsonrpc v1.3.0 h1:H4v/UCZzOZu1Ir8ucKP5WMQD+HiLr+p4acpTeB9ps9Q=

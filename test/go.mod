@@ -1,8 +1,6 @@
 module vimagination.zapto.org/jslib/test
 
-go 1.23.0
-
-toolchain go1.24.1
+go 1.24.1
 
 require (
 	golang.org/x/net v0.37.0
@@ -11,6 +9,8 @@ require (
 )
 
 require (
+	vimagination.zapto.org/httpencoding v1.0.0 // indirect
+	vimagination.zapto.org/httpfile v1.0.0 // indirect
 	vimagination.zapto.org/javascript v1.4.18 // indirect
 	vimagination.zapto.org/parser v1.0.4 // indirect
 )

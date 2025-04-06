@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 	"time"
 
 	"golang.org/x/net/websocket"
+	"vimagination.zapto.org/httpfile"
 	"vimagination.zapto.org/jsonrpc"
 	"vimagination.zapto.org/tsserver"
 )
@@ -38,7 +38,7 @@ func run() error {
 	}
 
 	m.Handle("/", http.FileServer(http.FS(tsserver.WrapFS(os.DirFS("./")))))
-	m.Handle("/static", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.Write([]byte("123")) }))
+	m.Handle("/static", httpfile.NewWithData("file", []byte("123")))
 	m.Handle("/echo", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if ct := r.Header.Get("Content-Type"); ct != "" {
 			w.Header().Add("Content-Type", ct)
@@ -112,16 +112,8 @@ func run() error {
 	audio, _ := base64.StdEncoding.DecodeString("UklGRiwAAABXQVZFZm10IBAAAAABAAIARKwAABCxAgAEABAAZGF0YQgAAAAAAAAAAAD//w==")
 	image, _ := base64.StdEncoding.DecodeString("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQAAAAA3bvkkAAAACklEQVR4AWNoAAAAggCBTBfX3wAAAABJRU5ErkJggg==")
 
-	m.Handle("/AUDIO", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "audio/wav")
-		w.Header().Add("Content-Length", strconv.FormatUint(uint64(len(audio)), 10))
-		w.Write(audio)
-	}))
-	m.Handle("/IMAGE", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "image/png")
-		w.Header().Add("Content-Length", strconv.FormatUint(uint64(len(image)), 10))
-		w.Write(image)
-	}))
+	m.Handle("/AUDIO", httpfile.NewWithData("audio.wav", audio))
+	m.Handle("/IMAGE", httpfile.NewWithData("image.png", image))
 
 	return http.ListenAndServe(":8080", m)
 }
