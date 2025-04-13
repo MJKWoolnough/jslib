@@ -1509,7 +1509,7 @@ bash = (() => {
 				case '$':
 					t.next();
 
-					if (t.accept(decimalDigit) || t.accept(identStart) || t.accept("({")) {
+					if (t.accept(decimalDigit) || t.accept(identStart) || t.accept("({$!?")) {
 						t.backup();
 						t.backup();
 
