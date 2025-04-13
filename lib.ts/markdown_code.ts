@@ -1480,7 +1480,7 @@ bash = (() => {
 			return t.return(TokenIdentifier, main);
 		      },
 		      heredocEnd = (t: Tokeniser) => {
-			t.acceptString(heredocs.at(-1)!.shift()!);
+			t.acceptString(heredocs.at(-1)!.shift()![1]);
 
 			if (!heredocs.at(-1)?.length) {
 				heredocs.pop();
@@ -1493,9 +1493,13 @@ bash = (() => {
 			const heredoc = heredocs.at(-1)![0];
 
 			while (true) {
-				const read = t.acceptString(heredoc);
+				if (heredoc[0]) {
+					t.acceptRun("\t");
+				}
 
-				if (read === heredoc.length && (t.peek() === '\n' || t.peek() === '')) {
+				const read = t.acceptString(heredoc[1]);
+
+				if (read === heredoc[1].length && (t.peek() === '\n' || t.peek() === '')) {
 					for (let i = 0; i < read; i++) {
 						t.backup();
 					}
@@ -1606,10 +1610,10 @@ bash = (() => {
 			const tk = {"type": TokenKeyword, "data": t.get()};
 
 			if (tokenDepth.at(-1) === 'H') {
-				heredocs.at(-1)?.push(unstring(tk.data));
+				heredocs.at(-1)?.push([nextHeredocIsStripped, unstring(tk.data)]);
 			} else {
 				tokenDepth.push('H');
-				heredocs.push([unstring(tk.data)]);
+				heredocs.push([[nextHeredocIsStripped, unstring(tk.data)]]);
 			}
 
 			return [tk, main];
@@ -1624,8 +1628,8 @@ bash = (() => {
 				t.next();
 
 				if (t.accept("<")) {
-					if (!t.accept("<-")) {
-						t.accept("-");
+					if (!t.accept("<")) {
+						nextHeredocIsStripped = t.accept("-");
 
 						return t.return(TokenPunctuator, startHeredoc);
 					}
@@ -1892,9 +1896,10 @@ bash = (() => {
 			return operatorOrWord(t);
 		      },
 		      tokenDepth: string[] = [],
-		      heredocs: string[][] = [];
+		      heredocs: [boolean, string][][] = [];
 
-		let child: Generator<Token, Token>;
+		let child: Generator<Token, Token>,
+		    nextHeredocIsStripped = false;
 
 		return main(tk);
 	};
