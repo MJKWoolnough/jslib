@@ -13614,7 +13614,7 @@ type Tests = {
 				},
 				"heredocs (14)": {
 					"source": "<<a\\\nbc\nabc\ndef\na\nbc",
-					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">a\\<br>bc</span><span class="lineterminator"><br></span><span class="stringliteral">abc</span><span class="lineterminator"><br></span><span class="keyword">def</span><span class="lineterminator"><br></span><span class="keyword">a</span><span class="lineterminator"><br></span><span class="keyword">bc</span>`
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">a\\<br>bc</span><span class="lineterminator"><br></span><span class="stringliteral">abc<br>def<br>a<br>bc</span>`
 				},
 				"heredocs (15)": {
 					"source": "<<abc\n$$\n$!\n$?\nabc",

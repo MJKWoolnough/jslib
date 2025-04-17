@@ -1553,9 +1553,9 @@ bash = (() => {
 					case "'":
 						continue;
 					}
-
-					sb += c;
 				}
+
+				sb += c;
 			}
 
 			return sb;
