@@ -1480,7 +1480,7 @@ bash = (() => {
 			return t.return(TokenIdentifier, main);
 		      },
 		      heredocEnd = (t: Tokeniser) => {
-			t.acceptString(heredocs.at(-1)!.shift()![1]);
+			t.acceptString(heredocs.at(-1)!.shift()![2]);
 
 			if (!heredocs.at(-1)?.length) {
 				heredocs.pop();
@@ -1490,16 +1490,17 @@ bash = (() => {
 			return t.return(TokenStringLiteral, main);
 		      },
 		      heredocString = (t: Tokeniser) => {
-			const heredoc = heredocs.at(-1)![0];
+			const heredoc = heredocs.at(-1)![0],
+			      breakChars = heredoc[1] ? heredocStringBreak : newline;
 
 			while (true) {
 				if (heredoc[0]) {
 					t.acceptRun("\t");
 				}
 
-				const read = t.acceptString(heredoc[1]);
+				const read = t.acceptString(heredoc[2]);
 
-				if (read === heredoc[1].length && (t.peek() === '\n' || t.peek() === '')) {
+				if (read === heredoc[2].length && (t.peek() === '\n' || t.peek() === '')) {
 					for (let i = 0; i < read; i++) {
 						t.backup();
 					}
@@ -1507,7 +1508,7 @@ bash = (() => {
 					return t.return(TokenStringLiteral, heredocEnd);
 				}
 
-				switch (t.exceptRun(heredocStringBreak)) {
+				switch (t.exceptRun(breakChars)) {
 				case '':
 					return errUnexpectedEOF(t);
 				case '$':
@@ -1607,13 +1608,15 @@ bash = (() => {
 				}
 			}
 
-			const tk = {"type": TokenKeyword, "data": t.get()};
+			const tk = {"type": TokenKeyword, "data": t.get()},
+			      delim = unstring(tk.data),
+			      expand = delim === tk.data;
 
 			if (tokenDepth.at(-1) === 'H') {
-				heredocs.at(-1)?.push([nextHeredocIsStripped, unstring(tk.data)]);
+				heredocs.at(-1)?.push([nextHeredocIsStripped, expand, delim]);
 			} else {
 				tokenDepth.push('H');
-				heredocs.push([[nextHeredocIsStripped, unstring(tk.data)]]);
+				heredocs.push([[nextHeredocIsStripped, expand, delim]]);
 			}
 
 			return [tk, main];
@@ -1896,7 +1899,7 @@ bash = (() => {
 			return operatorOrWord(t);
 		      },
 		      tokenDepth: string[] = [],
-		      heredocs: [boolean, string][][] = [];
+		      heredocs: [boolean, boolean, string][][] = [];
 
 		let child: Generator<Token, Token>,
 		    nextHeredocIsStripped = false;
