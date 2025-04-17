@@ -13632,6 +13632,14 @@ type Tests = {
 					"source": "<<'abc'\na$abc\nabc",
 					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">'abc'</span><span class="lineterminator"><br></span><span class="stringliteral">a$abc<br>abc</span>`
 				},
+				"heredocs (19)": {
+					"source": "<<\"\"abc\na$abc\nabc",
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">""abc</span><span class="lineterminator"><br></span><span class="stringliteral">a$abc<br>abc</span>`
+				},
+				"heredocs (20)": {
+					"source": "<<a\\ b\\ c\na$abc\na b c",
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">a\\&nbsp;b\\&nbsp;c</span><span class="lineterminator"><br></span><span class="stringliteral">a$abc<br>a&nbsp;b&nbsp;c</span>`,
+				},
 				"assignments": {
 					"source": "abc=a def[0]=b ghi[$i]=c jkl+=d",
 					"output": `<span class="identifier">abc</span><span class="punctuator">=</span><span class="keyword">a</span><span class="whitespace">&nbsp;</span><span class="identifier">def</span><span class="punctuator">[</span><span class="keyword">0</span><span class="punctuator">]=</span><span class="keyword">b</span><span class="whitespace">&nbsp;</span><span class="identifier">ghi</span><span class="punctuator">[</span><span class="identifier">$i</span><span class="punctuator">]=</span><span class="keyword">c</span><span class="whitespace">&nbsp;</span><span class="identifier">jkl</span><span class="punctuator">+=</span><span class="keyword">d</span>`
