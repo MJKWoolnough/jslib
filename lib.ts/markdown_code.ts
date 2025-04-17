@@ -1600,6 +1600,8 @@ bash = (() => {
 
 					break;
 				case '"':
+					t.next();
+
 					if (chars === heredocsBreak) {
 						chars = "\\\"";
 					} else {
