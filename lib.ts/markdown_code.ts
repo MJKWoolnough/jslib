@@ -1684,22 +1684,34 @@ bash = (() => {
 					return braceExpansion(t);
 				}
 
-				tokenDepth.push("}");
-
 				break;
 			case ']':
+				t.next();
+
 				if (tokenDepth.at(-1) === '[') {
-					t.next();
 					tokenDepth.pop();
 
 					return t.return(TokenPunctuator, parameterExpansionOperation);
 				}
-			case '}':
+
+				if (tokenDepth.at(-1) === ']') {
+					tokenDepth.pop();
+				}
+
+				break;
 			case ')':
 				t.next();
 
 				if (tokenDepth.pop() !== c) {
 					return errInvalidCharacter(t);
+				}
+
+				break;
+			case '}':
+				t.next();
+
+				if (tokenDepth.at(-1) === '}') {
+					tokenDepth.pop();
 				}
 
 				break;

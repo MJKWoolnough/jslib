@@ -13554,7 +13554,7 @@ type Tests = {
 				},
 				"brace grouping": {
 					"source": `{ a; } { a; b; c; } {`,
-					"output": `<span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">b</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">c</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span data-error="unexpected EOF"></span>`
+					"output": `<span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">b</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">c</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span>`
 				},
 				"subshells": {
 					"source": "(a)\n(\na;\nb;\n)\n(a",
