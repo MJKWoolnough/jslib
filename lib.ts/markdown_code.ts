@@ -1705,10 +1705,7 @@ bash = (() => {
 				break;
 			case '+':
 				t.next();
-
-				if (!t.accept("=")) {
-					return errInvalidCharacter(t);
-				}
+				t.accept("=");
 
 				break;
 			case '=':
