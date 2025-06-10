@@ -60,7 +60,7 @@ javascript = (() => {
 
 			switch (c) {
 			case "":
-				if (!tokenDepth.length) {
+				if (!state.length) {
 					return t.done();
 				}
 
@@ -103,13 +103,13 @@ javascript = (() => {
 			case '}':
 				t.except("");
 
-				switch (tokenDepth.at(-1)) {
+				switch (state.at(-1)) {
 				case '}':
-					tokenDepth.pop();
+					state.pop();
 
 					return t.return(TokenPunctuator, inputElement);
 				case '$':
-					tokenDepth.pop();
+					state.pop();
 
 					return template(t);
 				}
@@ -207,7 +207,7 @@ javascript = (() => {
 			case '{':
 			case '(':
 			case '[':
-				tokenDepth.push(c === "(" ? ")" : c === "[" ? "]" : "}");
+				state.push(c === "(" ? ")" : c === "[" ? "]" : "}");
 
 				break;
 			case '?':
@@ -224,7 +224,7 @@ javascript = (() => {
 				break;
 			case ')':
 			case ']':
-				if (tokenDepth.pop() !== c) {
+				if (state.pop() !== c) {
 					return errInvalidCharacter(t);
 				}
 
@@ -612,7 +612,7 @@ javascript = (() => {
 				case '$':
 					t.except("");
 					if (t.accept("{")) {
-						tokenDepth.push('$');
+						state.push('$');
 
 						const v = t.get();
 
@@ -633,7 +633,7 @@ javascript = (() => {
 				"data": v
 			}, inputElement];
 		      },
-		      tokenDepth: string[] = [];
+		      state: string[] = [];
 
 		let divisionAllowed = false;
 
@@ -847,13 +847,13 @@ python = (() => {
 			case "(":
 			case "[":
 			case "{":
-				tokenDepth.push(c === "(" ? ")" : c === "[" ? "]" : "}");
+				state.push(c === "(" ? ")" : c === "[" ? "]" : "}");
 
 				break;
 			case ")":
 			case "}":
 			case "]":
-				if (tokenDepth.pop() !== c) {
+				if (state.pop() !== c) {
 					return errInvalidCharacter(tk);
 				}
 			}
@@ -862,7 +862,7 @@ python = (() => {
 		      },
 		      main = (tk: Tokeniser) => {
 			if (!tk.peek()) {
-				if (tokenDepth.length) {
+				if (state.length) {
 					return errUnexpectedEOF(tk);
 				}
 
@@ -883,7 +883,7 @@ python = (() => {
 				return tk.return(TokenWhitespace, main);
 			}
 
-			const ws = tokenDepth.length ? " \t\n" : " \t";
+			const ws = state.length ? " \t\n" : " \t";
 
 			if (tk.accept(ws)) {
 				tk.acceptRun(ws);
@@ -923,7 +923,7 @@ python = (() => {
 
 			return operatorOrDelimiter(tk);
 		      },
-		      tokenDepth: string[] = [];
+		      state: string[] = [];
 
 		return main(tk);
 	};
@@ -1070,12 +1070,12 @@ bash = (() => {
 		      },
 		      startArrayAssign = (t: Tokeniser) => {
 			t.accept("[");
-			tokenDepth.push(']');
+			state.push(']');
 
 			return t.return(TokenPunctuator, main);
 		      },
 		      word = (t: Tokeniser) => {
-			const tk = tokenDepth.at(-1),
+			const tk = state.at(-1),
 			      wb = tk === '}' ? wordBreakNoBrace : tk === ']' || tk === '[' ? wordBreakNoBracket : tk === '>' ? wordBreakArithmetic : wordBreak;
 
 			if (t.accept("\\")) {
@@ -1088,7 +1088,7 @@ bash = (() => {
 				switch (t.exceptRun(wb)) {
 				case '':
 					if (!t.length()) {
-						if (!tokenDepth.length) {
+						if (!state.length) {
 							return t.done();
 						}
 
@@ -1153,7 +1153,7 @@ bash = (() => {
 					}
 
 					return t.return(TokenIdentifier, main);
-				} else if (t.peek() === tokenDepth.at(-1)) {
+				} else if (t.peek() === state.at(-1)) {
 					return t.return(TokenKeyword, main);
 				} else if (t.peek() === '[') {
 					return t.return(TokenIdentifier, startArrayAssign);
@@ -1195,15 +1195,15 @@ bash = (() => {
 			return t.return(TokenNumericLiteral, main);
 		      },
 		      stringStart = (t: Tokeniser) => {
-			if (t.peek() === tokenDepth.at(-1)) {
-				tokenDepth.pop();
+			if (t.peek() === state.at(-1)) {
+				state.pop();
 				t.next();
 
 				return t.return(TokenStringLiteral, main);
 			} else if (t.accept("$") && t.accept("'")) {
-				tokenDepth.push('$');
+				state.push('$');
 			} else {
-				tokenDepth.push(t.next());
+				state.push(t.next());
 			}
 
 			return string(t);
@@ -1250,7 +1250,7 @@ bash = (() => {
 		      },
 		      parameterExpansionOperator = (t: Tokeniser) => {
 			if (t.accept("}")) {
-				tokenDepth.pop();
+				state.pop();
 
 				return t.return(TokenPunctuator, main);
 			}
@@ -1388,7 +1388,7 @@ bash = (() => {
 			}
 
 			if (t.accept("}")) {
-				tokenDepth.pop();
+				state.pop();
 
 				return t.return(TokenPunctuator, main);
 			}
@@ -1408,7 +1408,7 @@ bash = (() => {
 				return parameterExpansionOperation(t);
 			}
 
-			tokenDepth.push('[');
+			state.push('[');
 
 			return t.return(TokenPunctuator, main);
 		      },
@@ -1451,23 +1451,23 @@ bash = (() => {
 
 			if (t.accept("(")) {
 				if (t.accept("(")) {
-					tokenDepth.push('>');
+					state.push('>');
 
 					return t.return(TokenPunctuator, main);
 				}
 
-				tokenDepth.push(')');
+				state.push(')');
 
 				return t.return(TokenPunctuator, main);
 			}
 
 			if (t.accept("{")) {
-				tokenDepth.push('}');
+				state.push('}');
 
 				return t.return(TokenPunctuator, parameterExpansionIdentifierOrPreOperator);
 			}
 
-			const td = tokenDepth.at(-1);
+			const td = state.at(-1);
 
 			if (td !== '"' && td !== 'h' && t.accept("'\"")) {
 				t.reset();
@@ -1475,7 +1475,7 @@ bash = (() => {
 				return stringStart(t);
 			}
 
-			t.exceptRun(tokenDepth.at(-1) === ']' ? wordNoBracket : tokenDepth.at(-1) === '>' ? wordBreakArithmetic : words);
+			t.exceptRun(state.at(-1) === ']' ? wordNoBracket : state.at(-1) === '>' ? wordBreakArithmetic : words);
 
 			return t.return(TokenIdentifier, main);
 		      },
@@ -1484,7 +1484,7 @@ bash = (() => {
 
 			if (!heredocs.at(-1)?.length) {
 				heredocs.pop();
-				tokenDepth.pop();
+				state.pop();
 			}
 
 			return t.return(TokenStringLiteral, main);
@@ -1518,7 +1518,7 @@ bash = (() => {
 						t.backup();
 						t.backup();
 
-						tokenDepth.push('h');
+						state.push('h');
 
 						return t.return(TokenStringLiteral, identifier);
 					}
@@ -1614,10 +1614,10 @@ bash = (() => {
 			      delim = unstring(tk.data),
 			      expand = delim === tk.data;
 
-			if (tokenDepth.at(-1) === 'H') {
+			if (state.at(-1) === 'H') {
 				heredocs.at(-1)?.push([nextHeredocIsStripped, expand, delim]);
 			} else {
-				tokenDepth.push('H');
+				state.push('H');
 				heredocs.push([[nextHeredocIsStripped, expand, delim]]);
 			}
 
@@ -1674,7 +1674,7 @@ bash = (() => {
 				return stringStart(t);
 			case '(':
 				t.next();
-				tokenDepth.push(")");
+				state.push(")");
 
 				break;
 			case '{':
@@ -1688,21 +1688,21 @@ bash = (() => {
 			case ']':
 				t.next();
 
-				if (tokenDepth.at(-1) === '[') {
-					tokenDepth.pop();
+				if (state.at(-1) === '[') {
+					state.pop();
 
 					return t.return(TokenPunctuator, parameterExpansionOperation);
 				}
 
-				if (tokenDepth.at(-1) === ']') {
-					tokenDepth.pop();
+				if (state.at(-1) === ']') {
+					state.pop();
 				}
 
 				break;
 			case ')':
 				t.next();
 
-				if (tokenDepth.pop() !== c) {
+				if (state.pop() !== c) {
 					return errInvalidCharacter(t);
 				}
 
@@ -1710,8 +1710,8 @@ bash = (() => {
 			case '}':
 				t.next();
 
-				if (tokenDepth.at(-1) === '}') {
-					tokenDepth.pop();
+				if (state.at(-1) === '}') {
+					state.pop();
 				}
 
 				break;
@@ -1727,11 +1727,11 @@ bash = (() => {
 			case '$':
 				return identifier(t);
 			case '`':
-				if (tokenDepth.at(-1) !== '`') {
+				if (state.at(-1) !== '`') {
 					return startBacktick(t);
 				}
 
-				tokenDepth.pop();
+				state.pop();
 				t.next();
 			}
 
@@ -1788,34 +1788,34 @@ bash = (() => {
 				break;
 			case '?':
 				t.next();
-				tokenDepth.push(":");
+				state.push(":");
 
 				break;
 			case ':':
 				t.next();
 
-				if (tokenDepth.at(-1) !== ':') {
+				if (state.at(-1) !== ':') {
 					return errInvalidCharacter(t);
 				}
 
-				tokenDepth.pop();
+				state.pop();
 
 				break;
 			case ')':
 				t.next();
 
-				const td = tokenDepth.at(-1);
+				const td = state.at(-1);
 
 				if ((td != '>' || !t.accept(")")) && td != '/') {
 					return errInvalidCharacter(t);
 				}
 
-				tokenDepth.pop();
+				state.pop();
 
 				break;
 			case '(':
 				t.next();
-				tokenDepth.push("/");
+				state.push("/");
 
 				break;
 			case '0':
@@ -1827,7 +1827,7 @@ bash = (() => {
 			return t.return(TokenPunctuator, main);
 		      },
 		      string = (t: Tokeniser) => {
-			const td = tokenDepth.at(-1),
+			const td = state.at(-1),
 			      stops = td === '"' ? doubleStops : td === '$' ? ansiStops : singleStops;
 
 			while (true) {
@@ -1843,7 +1843,7 @@ bash = (() => {
 				case '"':
 				case "'":
 					t.next();
-					tokenDepth.pop();
+					state.pop();
 
 					return t.return(TokenStringLiteral, main);
 				case '\\':
@@ -1853,7 +1853,7 @@ bash = (() => {
 			}
 		      },
 		      main = (t: Tokeniser) => {
-			const td = tokenDepth.at(-1);
+			const td = state.at(-1);
 
 			if (!t.peek()) {
 				if (td) {
@@ -1864,7 +1864,7 @@ bash = (() => {
 			}
 
 			if (td === 'h') {
-				tokenDepth.pop();
+				state.pop();
 
 				return heredocString(t);
 			}
@@ -1909,7 +1909,7 @@ bash = (() => {
 
 			return operatorOrWord(t);
 		      },
-		      tokenDepth: string[] = [],
+		      state: string[] = [],
 		      heredocs: [boolean, boolean, string][][] = [];
 
 		let child: Generator<Token, Token>,
@@ -1957,16 +1957,16 @@ r = (() => {
 				tk.accept("|>");
 			} else if (tk.accept("[")) {
 				if (tk.accept("[")) {
-					tokenDepth.push("#");
+					state.push("#");
 				} else {
-					tokenDepth.push("]");
+					state.push("]");
 				}
 			} else if (tk.accept("(")) {
-				tokenDepth.push(")");
+				state.push(")");
 			} else if (tk.accept("{")) {
-				tokenDepth.push("}");
+				state.push("}");
 			} else if (tk.accept("]")) {
-				const last = tokenDepth.pop();
+				const last = state.pop();
 
 				if (last === "#") {
 					if (!tk.accept("]")) {
@@ -1976,11 +1976,11 @@ r = (() => {
 					return errInvalidOperator(tk);
 				}
 			} else if (tk.accept(")")) {
-				if (tokenDepth.pop() !== ")") {
+				if (state.pop() !== ")") {
 					return errInvalidOperator(tk);
 				}
 			} else if (tk.accept("}")) {
-				if (tokenDepth.pop() !== "}") {
+				if (state.pop() !== "}") {
 					return errInvalidOperator(tk);
 				}
 			} else {
@@ -2214,7 +2214,7 @@ r = (() => {
 		      },
 		      expression = (tk: Tokeniser) => {
 			if (!tk.peek()) {
-				if (tokenDepth.length) {
+				if (state.length) {
 					return errUnexpectedEOF(tk);
 				}
 
@@ -2251,7 +2251,7 @@ r = (() => {
 
 			return operator(tk);
 		      },
-		      tokenDepth: string[] = [];
+		      state: string[] = [];
 
 		return expression(tk);
 	};
@@ -2428,7 +2428,7 @@ css = (() => {
 		      },
 		      main = (tk: Tokeniser) => {
 			if (!tk.peek()) {
-				if (tokenDepth.length) {
+				if (state.length) {
 					return errUnexpectedEOF(tk);
 				}
 
@@ -2461,23 +2461,23 @@ css = (() => {
 				return hashOrDelim(tk);
 			case '(':
 				tk.next();
-				tokenDepth.push(')');
+				state.push(')');
 
 				return tk.return(TokenPunctuator, main);
 			case '[':
 				tk.next();
-				tokenDepth.push(']');
+				state.push(']');
 
 				return tk.return(TokenPunctuator, main);
 			case '{':
 				tk.next();
-				tokenDepth.push('}');
+				state.push('}');
 
 				return tk.return(TokenPunctuator, main);
 			case ')':
 			case ']':
 			case '}':
-				if (tokenDepth.pop() !== c) {
+				if (state.pop() !== c) {
 					return errInvalidCharacter(tk);
 				}
 
@@ -2515,7 +2515,7 @@ css = (() => {
 
 			return tk.return(TokenPunctuator, main);
 		      },
-		      tokenDepth: string[] = [];
+		      state: string[] = [];
 
 		return main(tk);
 	};
