@@ -929,44 +929,125 @@ python = (() => {
 	};
 })(),
 bash = (() => {
-	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!"],
+	type heredocType = {
+		stripped: boolean;
+		expand: boolean;
+		delim: string;
+	}
+
+	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!", "break", "continue"],
+	      compoundStart = ["if", "while", "until", "for", "select", "{", "("],
+	      builtins = ["export", "readonly", "declare", "typeset", "local"],
 	      dotdot = [".."],
 	      escapedNewline = ["\\\n"],
 	      assignment = ["=", "+="],
+	      expansionOperators = ["#", "%", "^", ","],
+	      declareParams = "IAapfnxutrligF",
+	      typesetParams = declareParams.substring(2),
+	      exportParams = declareParams.substring(3, 6),
+	      readonlyParams = declareParams.substring(1, 5),
 	      whitespace = " \t",
 	      newline = "\n",
-	      metachars = whitespace + newline + "|&;()<>",
-	      heredocsBreak = metachars + "\\\"'",
+	      whitespaceNewline = whitespace + newline,
+	      heredocsBreak = whitespace + newline + "|&;()<>\\\"'",
 	      heredocStringBreak = newline + "$",
 	      doubleStops = "\\`$\"",
 	      singleStops = "'",
 	      ansiStops = "'\\",
-	      words = "\\\"'`(){}- \t\n",
-	      wordNoBracket = "\\\"'`(){}- \t\n]",
-	      wordBreak = " `\\\t\n$|&;<>(){",
-	      wordBreakNoBracket = wordBreak + "]",
-	      wordBreakNoBrace = wordBreak + "}",
-	      wordBreakArithmetic = "\\\"'`(){} \t\n$+-!~*/%<=>&^|?:,",
+	      wordB = "\\\"'`(){}- \t\n",
+	      wordBreak = "\\\"'`() \t\n$|&;<>{",
+	      wordBreakArithmetic = "\\\"'`(){} \t\n$+-!~/*%<=>&^|?:,;",
+	      wordBreakNoBrace = wordBreak + "#}]",
+	      wordBreakIndex = wordBreakArithmetic + "]",
+	      wordBreakCommandIndex = "\\\"'`(){} \t\n$+-!~/*%<=>&^|?:,]",
 	      braceWordBreak = " `\\\t\n|&;<>()={},",
+	      testWordBreak = " `\\\t\n\"'$|&;<>(){}!,",
+	      hexDigit = "0123456789ABCDEFabcdef",
+	      octalDigit = "012345678",
+	      decimalDigit = "0123456789",
+	      letters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz",
 	      identStart = letters + "_",
 	      identCont = decimalDigit + identStart,
 	      numberChars = identCont + "@",
+	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParens, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 32}, (_, n) => n),
 	      errInvalidParameterExpansion = error("invalid parameter expansion"),
 	      errIncorrectBacktick = error("incorrect backtick"),
+	      errInvalidKeyword = error("invalid keyword"),
+	      errInvalidIdentifier = error("invalid identifier"),
+	      errMissingClosingParen = error("missing closing paren"),
+	      errInvalidOperator = error("invalid operator"),
+	      parseWhitespace = (t: Tokeniser) => {
+		if (t.accept(whitespace) || t.acceptWord(escapedNewline, false) !== "") {
+			while (t.acceptRun(whitespace) !== '') {
+				if (t.acceptWord(escapedNewline, false) === "") {
+					break;
+				}
+			}
+
+			return true;
+		}
+
+		return false;
+	      },
+	      unstring = (str: string) => {
+		let sb = "",
+		    nextEscaped = false;
+
+		for (let c of str) {
+			if (nextEscaped) {
+				switch (c) {
+				case 'n':
+					c = '\n';
+
+					break;
+				case 't':
+					c = '\t';
+				}
+
+				nextEscaped = false
+			} else {
+				switch (c) {
+				case '"':
+				case '\'':
+					continue;
+				case '\\':
+					nextEscaped = true;
+
+					continue;
+				}
+			}
+
+			sb += c;
+		}
+
+		return sb;
+	      },
+	      isWhitespace = (t: Tokeniser) => {
+		switch (t.peek()) {
+		case ' ':
+		case '\t':
+		case '\n':
+		case '':
+			return true;
+		}
+
+		return false;
+	      },
+	      isWordSeperator = (t: Tokeniser) => isWhitespace(t) || t.peek() === ';',
 	      subTokeniser = function* (t: Tokeniser) {
 		while (true) {
 			if (t.peek() === '`') {
-				break;
+				return;
 			}
 
 			let c = t.next();
 
 			if (c === '') {
-				break;
+				return;
 			} else if (c === '\\') {
 				switch (t.peek()) {
 				case '':
-					break;
+					return;
 				case '\\':
 				case '`':
 				case '$':
@@ -979,7 +1060,8 @@ bash = (() => {
 	      };
 
 	return (tk: Tokeniser) => {
-		const braceExpansionWord = (t: Tokeniser) => {
+		const state: number[] = [],
+		      braceExpansionWord = (t: Tokeniser) => {
 			let hasComma = false;
 
 			while (true) {
@@ -988,10 +1070,10 @@ bash = (() => {
 					if (hasComma) {
 						t.next();
 
-						return t.return(TokenStringLiteral, main)
+						return t.return(TokenIdentifier, main);
 					}
 				default:
-					return t.return(TokenKeyword, main);
+					return word(t);
 				case '\\':
 					t.next();
 					t.next();
@@ -1004,115 +1086,196 @@ bash = (() => {
 				}
 			}
 		      },
+		      braceWord = (t: Tokeniser) => {
+			t.acceptRun(identCont);
+
+			if (!t.accept("}")) {
+				return braceExpansionWord(t);
+			}
+
+			return t.return(TokenKeyword, main);
+		      },
 		      braceExpansion = (t: Tokeniser) => {
 			if (t.accept(letters)) {
-				if (t.acceptWord(dotdot)) {
+				if (t.acceptWord(dotdot, false) !== "") {
 					if (!t.accept(letters)) {
-						return t.return(TokenKeyword, main);
+						return word(t);
 					}
 
-					if (t.acceptWord(dotdot)) {
+					if (t.acceptWord(dotdot, false) !== "") {
 						t.accept("-");
 
 						if (!t.accept(decimalDigit)) {
-							return t.return(TokenKeyword, main);
+							return word(t);
 						}
 
 						t.acceptRun(decimalDigit);
 					}
 
 					if (!t.accept("}")) {
-						return t.return(TokenKeyword, main);
+						return word(t);
 					}
 
-					return t.return(TokenStringLiteral, main);
+					return t.return(TokenIdentifier, main);
 				}
+
+				return braceWord(t);
+			} else if (t.accept("_")) {
+				return braceWord(t);
 			} else {
 				t.accept("-");
 
 				if (t.accept(decimalDigit)) {
 					switch (t.acceptRun(decimalDigit)) {
 					default:
-						return t.return(TokenKeyword, main);
+						return word(t);
 					case ',':
 						return braceExpansionWord(t);
 					case '.':
-						if (t.acceptWord(dotdot)) {
+						if (t.acceptWord(dotdot, false) !== "") {
 							t.accept("-");
 
 							if (!t.accept(decimalDigit)) {
-								return t.return(TokenKeyword, main);
+								return word(t);
 							}
 
 							t.acceptRun(decimalDigit);
 
-							if (t.acceptWord(dotdot)) {
+							if (t.acceptWord(dotdot, false) !== "") {
 								t.accept("-");
 
 								if (!t.accept(decimalDigit)) {
-									return t.return(TokenKeyword, main);
+									return word(t);
 								}
 
 								t.acceptRun(decimalDigit);
 							}
 
 							if (!t.accept("}")) {
-								return t.return(TokenKeyword, main);
+								return word(t);
 							}
 
-							return t.return(TokenStringLiteral, main);
+							return t.return(TokenIdentifier, main);
 						}
+
 					}
 				}
 			}
 
 			return braceExpansionWord(t);
 		      },
+		      value = (t: Tokeniser) => {
+			const isArray = state.at(-1) === stateArrayIndex;
+
+			if (isArray) {
+				state.pop();
+			}
+
+			switch (t.peek()) {
+			case '(':
+				t.next();
+
+				if (isArray || t.accept("(")) {
+					return errInvalidCharacter(t);
+				}
+
+				state.push(stateParens);
+
+				return t.return(TokenPunctuator, main);
+			case '$':
+				return identifier(t);
+			}
+
+			state.push(stateValue);
+
+			return main(t);
+		      },
+		      startAssign = (t: Tokeniser) => {
+			t.accept("+");
+			t.accept("-");
+
+			return t.return(TokenPunctuator, value);
+		      },
 		      startArrayAssign = (t: Tokeniser) => {
 			t.accept("[");
-			state.push(']');
+			state.push(stateArrayIndex);
 
 			return t.return(TokenPunctuator, main);
 		      },
 		      word = (t: Tokeniser) => {
-			const tk = state.at(-1),
-			      wb = tk === '}' ? wordBreakNoBrace : tk === ']' || tk === '[' ? wordBreakNoBracket : tk === '>' ? wordBreakArithmetic : wordBreak;
+			let wb: string;
 
-			if (t.accept("\\")) {
-				t.next();
-			} else if (t.length() === 0 && t.accept(wb)) {
+			const td = state.at(-1);
+
+			switch (td) {
+			case stateBraceExpansion:
+				wb = wordBreakNoBrace;
+
+				break;
+			case stateArrayIndex:
+			case stateBraceExpansionArrayIndex:
+				wb = wordBreakIndex;
+
+				break;
+			case stateCommandIndex:
+				wb = wordBreakCommandIndex;
+
+				break;
+			case stateArithmeticExpansion:
+			case stateArithmeticParens:
+			case stateTernary:
+			case stateForArithmetic:
+				wb = wordBreakArithmetic;
+
+				break;
+			case stateTest:
+			case stateTestBinary:
+				wb = testWordBreak;
+
+				break;
+			default:
+				wb = wordBreak;
+			}
+
+			setInCommand();
+
+			if (t.accept("\\") && t.next() === '') {
+				return errUnexpectedEOF(t);
+			}
+
+			if (t.length() === 0 && t.accept(wb)) {
 				return errInvalidCharacter(t);
 			}
 
 			while (true) {
 				switch (t.exceptRun(wb)) {
 				case '':
-					if (!t.length()) {
-						if (!state.length) {
-							return t.done();
-						}
-
+					if (t.length() === 0) {
 						return errUnexpectedEOF(t);
 					}
 				default:
 					return t.return(TokenKeyword, main);
 				case '{':
+					if (td === stateArrayIndex || td === stateBraceExpansionArrayIndex) {
+						return t.return(TokenKeyword, main);
+					}
+
+					const state = t.length();
+
 					t.next();
 
-					if (t.accept(whitespace) || t.accept(newline)) {
-						t.backup();
-						t.backup();
-					} else if (!t.peek()) {
-						t.backup();
+					if (t.accept(whitespace) || t.accept(newline) || t.peek() === '') {
+						t.reset();
+
+						while (t.length() < state) t.next();
 					} else {
-						const pos = t.length() - 1,
-						      [tk] = braceExpansion(new Tokeniser({"next": () => ({"value": t.next(), "done": false})}));
+						const [tk] = braceExpansion(new Tokeniser({"next": () => ({"value": t.next(), "done": false})}));
 
-						while (pos < t.length()) {
-							t.backup();
-						}
+						t.reset();
 
-						if (tk.type === TokenStringLiteral) {
+						while (t.length() < state) t.next();
+
+						if (tk.type === TokenIdentifier) {
 							return t.return(TokenKeyword, main);
 						}
 					}
@@ -1126,45 +1289,762 @@ bash = (() => {
 
 					break;
 				case '$':
+					const length = t.length();
+
 					t.next();
 
 					if (t.accept(decimalDigit) || t.accept(identStart) || t.accept("({")) {
-						t.backup();
-						t.backup();
+						t.reset();
+
+						while (t.length() < length) t.next();
 
 						return t.return(TokenKeyword, main);
 					}
 				}
 			}
 		      },
-		      keywordIdentOrWord = (t: Tokeniser) => {
-			if (t.acceptWord(keywords)) {
-				return t.return(TokenReservedWord, main);
+		      builtinArgs = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, builtinArgs);
+			} else if (!t.accept("-")) {
+				state.pop();
+
+				return main(t);
+			}
+
+			let params = declareParams;
+
+			switch (state.at(-1)) {
+			case stateBuiltinExport:
+				params = exportParams;
+
+				break;
+			case stateBuiltinReadonly:
+				params = readonlyParams;
+
+				break;
+			case stateBuiltinTypeset:
+				params = typesetParams;
+
+				break;
+			}
+
+			if (!t.accept(params)) {
+				return errInvalidCharacter(t);
+			}
+
+			t.acceptRun(params);
+
+			return t.return(TokenKeyword, builtinArgs);
+		      },
+		      builtin = (t: Tokeniser, bn: string) => {
+			switch (bn) {
+			case "export":
+				state.push(stateBuiltinExport);
+
+				break;
+			case "readonly":
+				state.push(stateBuiltinReadonly);
+
+				break;
+			case "typeset":
+				state.push(stateBuiltinTypeset);
+
+				break;
+			default:
+				state.push(stateBuiltinDeclare);
+			}
+
+			return t.return(TokenReservedWord, builtinArgs);
+		      },
+		      testPattern = (t: Tokeniser) => {
+			Loop:
+			while (true) {
+				switch (t.exceptRun("\\\"' \t\n$()")) {
+				default:
+					break Loop;
+				case '':
+					return errUnexpectedEOF(t);
+				case '\\':
+					t.next();
+					t.next();
+
+					break;
+				case '"':
+				case '\'':
+					state.push(stateTestPattern);
+
+					if (t.length() > 0) {
+						return t.return(TokenRegularExpressionLiteral, stringStart);
+					}
+
+					return stringStart(t);
+				case '$':
+					state.push(stateTestPattern);
+
+					if (t.length() > 0) {
+						return t.return(TokenRegularExpressionLiteral, identifier);
+					}
+
+					return identifier(t);
+				}
+			}
+
+			if (t.length() > 0) {
+				return t.return(TokenRegularExpressionLiteral, test);
+			}
+
+			return test(t)
+		      },
+		      testPatternStart = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, testPatternStart);
+			} else if (t.accept(newline)) {
+				t.acceptRun(newline);
+
+				return t.return(TokenLineTerminator, testPatternStart);
+			} else if (t.accept("#")) {
+				return errInvalidCharacter(t);
+			}
+
+			return testPattern(t);
+		      },
+		      testWord = (t: Tokeniser) => {
+			const c = t.peek();
+
+			if (c === '$') {
+				return identifier(t);
+			} else if (c === '"' || c === '\'') {
+				return stringStart(t);
+			} else if (c === ' ' || c === '\n') {
+				return test(t);
+			} else if (c === ')') {
+				return test(t);
+			} else if (c === '`') {
+				return startBacktick(t);
+			}
+
+			return keywordIdentOrWord(t);
+		      },
+		      testWordStart = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, testWordStart);
+			} else if (t.accept(newline)) {
+				t.acceptRun(newline);
+
+				return t.return(TokenLineTerminator, testWordStart);
+			} else if (t.accept("#")) {
+				return errInvalidCharacter(t);
+			}
+
+			return testWord(t)
+		      },
+		      testBinaryOperator = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, testBinaryOperator);
+			} else if (t.accept(newline)) {
+				t.acceptRun(newline);
+
+				return t.return(TokenLineTerminator, testBinaryOperator);
+			} else if (t.accept("#")) {
+				return errInvalidCharacter(t);
+			}
+
+			state.pop();
+
+			switch (t.peek()) {
+			case '':
+				return test(t);
+			case '=':
+				t.next();
+				t.accept("=~");
+
+				break;
+			case '!':
+				t.next();
+
+				if (!t.accept("=")) {
+					return errInvalidCharacter(t);
+				}
+
+				break;
+			case '<':
+			case '>':
+				t.next();
+
+				break;
+			case '-':
+				t.next();
+
+				if (t.accept("e")) {
+					if (!t.accept("qf")) {
+						return errInvalidCharacter(t);
+					}
+				} else if (t.accept("n")) {
+					if (!t.accept("et")) {
+						return errInvalidCharacter(t);
+					}
+				} else if (t.accept("gl")) {
+					if (!t.accept("et")) {
+						return errInvalidCharacter(t);
+					}
+				} else if (t.accept("o")) {
+					if (!t.accept("t")) {
+						return errInvalidCharacter(t);
+					}
+				} else {
+					return errInvalidCharacter(t);
+				}
+
+				if (!isWhitespace(t)) {
+					return errInvalidOperator(t);
+				}
+
+				return t.return(TokenKeyword, testWordStart);
+			default:
+				return test(t);
+			}
+
+			return t.return(TokenKeyword, testPatternStart);
+		      },
+		      testWordOrPunctuator = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, testWordOrPunctuator);
+			} else if (t.accept(newline)) {
+				t.acceptRun(newline);
+
+				return t.return(TokenLineTerminator, testWordOrPunctuator);
+			} else if (t.accept("#")) {
+				t.exceptRun("\n");
+
+				return t.return(TokenSingleLineComment, test);
+			}
+
+			const c = t.peek();
+
+			switch (c) {
+			case '':
+				return errUnexpectedEOF(t);
+			case '(':
+				t.next();
+				state.push(stateTest);
+
+				break;
+			case ')':
+				t.next();
+				state.pop();
+
+				if (state.at(-1) !== stateTest) {
+					return errInvalidCharacter(t);
+				}
+
+				return t.return(TokenPunctuator, testWordOrPunctuator);
+			case '|':
+				t.next();
+
+				if (!t.accept("|")) {
+					return errInvalidCharacter(t);
+				}
+
+				break;
+			case '&':
+				t.next();
+
+				if (!t.accept("&")) {
+					return errInvalidCharacter(t);
+				}
+			case '$':
+				state.push(stateTestBinary);
+
+				return identifier(t);
+			case '"':
+			case '\'':
+				state.push(stateTestBinary);
+
+				return stringStart(t);
+			case ']':
+				t.next();
+
+				if (t.accept("]") && isWhitespace(t)) {
+					state.pop();
+
+					if (state.at(-1) === stateTest) {
+						return errInvalidCharacter(t);
+					}
+
+					setInCommand();
+
+					return t.return(TokenKeyword, main);
+				}
+
+				t.reset();
+			default:
+				state.push(stateTestBinary);
+
+				return keywordIdentOrWord(t);
+			}
+
+			return t.return(TokenPunctuator, test);
+		      },
+		      test = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, test);
+			} else if (t.accept(newline)) {
+				t.acceptRun(newline);
+
+				return t.return(TokenLineTerminator, test);
+			} else if (t.accept("#")) {
+				t.exceptRun("\n");
+
+				return t.return(TokenSingleLineComment, test);
+			} else if (t.accept("!")) {
+				return t.return(TokenPunctuator, test);
+			}
+
+			if (t.accept("-") && t.accept("abcdefghknoprstuvwxzGLNORS") && isWhitespace(t)) {
+				return t.return(TokenKeyword, testWordStart)
+			}
+
+			t.reset();
+
+			return testWordOrPunctuator(t);
+		      },
+		      functionCloseParen = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, functionCloseParen);
+			}
+
+			if (!t.accept(")")) {
+				return errMissingClosingParen(t);
+			}
+
+			return t.return(TokenPunctuator, main);
+		      },
+		      functionOpenParen = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, functionOpenParen);
+			}
+
+			state.push(stateFunctionBody);
+
+			if (t.accept("(")) {
+				return t.return(TokenPunctuator, functionCloseParen);
+			}
+
+			return main(t);
+		      },
+		      functionK = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, functionK);
+			}
+
+			if (!t.accept(identStart)) {
+				return errInvalidIdentifier(t);
+			}
+
+			t.acceptRun(identCont);
+
+			return t.return(TokenIdentifier, functionOpenParen);
+		      },
+		      coproc = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, coproc);
+			}
+
+			if (t.acceptWord(keywords, false) !== "") {
+				if (isWordSeperator(t)) {
+					t.reset();
+
+					return main(t);
+				}
+
+				t.reset();
 			}
 
 			if (t.accept(identStart)) {
 				t.acceptRun(identCont);
 
-				const read = t.acceptWord(assignment);
+				const nameEnd = t.length();
 
-				if (read) {
-					for (const _ of read) {
-						t.backup();
+				if (t.accept(whitespace)) {
+					t.acceptRun(whitespace);
+
+					if (t.acceptWord(compoundStart, false) !== "" && isWordSeperator(t)) {
+						t.reset();
+
+						while (t.length() < nameEnd) t.next();
+
+						return t.return(TokenIdentifier, main)
 					}
-
-					return t.return(TokenIdentifier, main);
-				} else if (t.peek() === state.at(-1)) {
-					return t.return(TokenKeyword, main);
-				} else if (t.peek() === '[') {
-					return t.return(TokenIdentifier, startArrayAssign);
 				}
 			}
 
-			return word(t);
+			t.reset();
+
+			return main(t);
+		      },
+		      forInDo = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, forInDo);
+			} else if (t.accept(newline)) {
+				t.acceptRun(newline);
+
+				return t.return(TokenLineTerminator, forInDo);
+			} else if (t.accept("#")) {
+				t.exceptRun("\n");
+
+				return t.return(TokenSingleLineComment, forInDo);
+			}
+
+			state.push(stateLoopCondition);
+
+			if (t.acceptString("in", false) === 2 && isWordSeperator(t)) {
+				setInCommand();
+
+				return t.return(TokenKeyword, main);
+			}
+
+			t.reset();
+
+			return main(t)
+		      },
+		      selectStart = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, selectStart);
+			}
+
+			if (!t.accept(identStart)) {
+				return errInvalidIdentifier(t);
+			}
+
+			t.acceptRun(identCont);
+
+			return t.return(TokenIdentifier, forInDo);
+		      },
+		      forStart = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, forStart);
+			}
+
+			if (t.accept("(")) {
+				if (!t.accept("(")) {
+					return errInvalidCharacter(t);
+				}
+
+				state.push(stateLoopCondition);
+				state.push(stateForArithmetic);
+				setInCommand();
+
+				return t.return(TokenPunctuator, main)
+			}
+
+			if (!t.accept(identStart)) {
+				return errInvalidIdentifier(t);
+			}
+
+			t.acceptRun(identCont);
+
+			return t.return(TokenIdentifier, forInDo)
+		      },
+		      loopDo = (t: Tokeniser) => middleCompound(t, loopDo, "do", stateLoopBody, "missing do"),
+		      loopStart = (t: Tokeniser) => startCompound(t, loopStart, stateLoopCondition),
+		      caseIn = (t: Tokeniser) => middleCompound(t, caseIn, "in", stateCaseEnd, "missing in"),
+		      caseStart = (t: Tokeniser) => startCompound(t, caseStart, stateCaseParam),
+		      ifThen = (t: Tokeniser) => middleCompound(t, ifThen, "then", stateIfBody, "missing then"),
+		      ifStart = (t: Tokeniser) => startCompound(t, ifStart, stateIfTest),
+		      middleCompound = (t: Tokeniser, fn: TokenFn, kw: string, td: number, missing: string) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, fn);
+			} else if (t.accept(newline)) {
+				t.acceptRun(newline);
+
+				return t.return(TokenLineTerminator, fn);
+			} else if (t.accept("#")) {
+				t.exceptRun("\n");
+
+				return t.return(TokenSingleLineComment, fn);
+			}
+
+			state.pop();
+
+			if (t.acceptString(kw, false) === kw.length && isWhitespace(t)) {
+				state.push(td);
+
+				return t.return(TokenReservedWord, main)
+			}
+
+			return t.error(missing)
+		      },
+		      startCompound = (t: Tokeniser, fn: TokenFn, td: number) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, fn);
+			} else if (t.accept(newline)) {
+				t.acceptRun(newline);
+
+				return t.return(TokenLineTerminator, fn);
+			}
+
+			state.push(td);
+
+			return main(t)
+		      },
+		      time = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, time);
+			}
+
+			if (t.acceptString("-p", false) === 2 && isWordSeperator(t)) {
+				return t.return(TokenKeyword, main)
+			}
+
+			t.reset();
+
+			return main(t);
+		      },
+		      endCompound = (t: Tokeniser, td: number) => {
+			if (state.at(-1) !== td) {
+				return errInvalidKeyword(t);
+			}
+
+			state.pop();
+
+			return t.return(TokenReservedWord, main);
+		      },
+		      keyword = (t: Tokeniser, kw: string) => {
+			switch (kw) {
+			case "time":
+				if (state.at(-1) === stateFunctionBody) {
+					return errInvalidKeyword(t);
+				}
+
+				return t.return(TokenReservedWord, time);
+			case "if":
+				return t.return(TokenReservedWord, ifStart);
+			case "then":
+			case "in":
+				return errInvalidKeyword(t);
+			case "do":
+				if (state.at(-1) !== stateLoopCondition) {
+					return errInvalidKeyword(t);
+				}
+
+				state.pop();
+				state.push(stateLoopBody);
+
+				return t.return(TokenReservedWord, main);
+			case "elif":
+				if (state.at(-1) !== stateIfBody) {
+					return errInvalidKeyword(t);
+				}
+
+				state.pop();
+
+				return t.return(TokenReservedWord, ifStart);
+			case "else":
+				if (state.at(-1) !== stateIfBody) {
+					return errInvalidKeyword(t);
+				}
+
+				return t.return(TokenReservedWord, main);
+			case "fi":
+				return endCompound(t, stateIfBody);
+			case "case":
+				return t.return(TokenReservedWord, caseStart);
+			case "esac":
+				const td = state.at(-1);
+
+				if (td !== stateCaseBody && td !== stateCaseEnd) {
+					return errInvalidKeyword(t);
+				}
+
+				state.pop();
+
+				return t.return(TokenReservedWord, main);
+			case "while":
+			case "until":
+				return t.return(TokenReservedWord, loopStart);
+			case "done":
+				return endCompound(t, stateLoopBody);
+			case "for":
+				return t.return(TokenReservedWord, forStart);
+			case "select":
+				return t.return(TokenReservedWord, selectStart);
+			case "coproc":
+				if (state.at(-1) === stateFunctionBody) {
+					return errInvalidKeyword(t);
+				}
+
+				return t.return(TokenReservedWord, coproc);
+			case "function":
+				if (state.at(-1) === stateFunctionBody) {
+					return errInvalidKeyword(t);
+				}
+
+				return t.return(TokenReservedWord, functionK);
+			case "[[":
+				state.push(stateTest);
+
+				return t.return(TokenReservedWord, test);
+			case "continue":
+			case "break":
+				if (state.at(-1) !== stateLoopBody) {
+					return errInvalidKeyword(t);
+				}
+			default:
+				setInCommand();
+
+				return t.return(TokenReservedWord, main);
+			}
+		      },
+		      endCommandIndex = (t: Tokeniser) => {
+			state.pop();
+			setInCommand();
+
+			return main(t);
+		      },
+		      startCommandIndex = (t: Tokeniser) => {
+			t.next();
+
+			return t.return(TokenPunctuator, main);
+		      },
+		      hasCompleteBracket = (t: Tokeniser, s: number) => {
+			state.push(s);
+
+			const savedState = state.slice(),
+			      savedHeredocs = JSON.parse(JSON.stringify(heredoc)),
+			      savedChild = child,
+			      sub = Parser({"next": () => ({"value": t.next(), "done": false})}, main);
+
+			let hcb = false;
+
+			while (true) {
+				const tk = sub.next().value;
+
+				if (tk.type === TokenError) {
+					break;
+				}
+
+				if (state.length === savedState.length && tk.type === TokenPunctuator && tk.data === "]") {
+					hcb = true;
+
+					break;
+				} else if (state.length < savedState.length) {
+					break;
+				}
+			}
+
+			child = savedChild;
+			heredoc.splice(0, heredoc.length, ...savedHeredocs);
+			state.splice(0, state.length, ...savedState);
+			state.pop();
+
+			return hcb;
+		      },
+		      isArrayStart = (t: Tokeniser) => {
+			const l = t.length(),
+			      ici = t.accept("[") && !t.accept("]") && hasCompleteBracket(t, stateArrayIndex) && t.acceptWord(assignment, false) !== "";
+
+			t.reset();
+
+			while (t.length() < l) t.next();
+
+			return ici;
+		      },
+		      isCommandIndex = (t: Tokeniser) => {
+			const l = t.length(),
+			      ici = t.accept("[") && hasCompleteBracket(t, stateCommandIndex) && t.acceptWord(assignment, false) === "";
+
+			t.reset();
+
+			while (t.length() < l) t.next();
+
+			return ici;
+		      },
+		      identOrWord = (t: Tokeniser) => {
+			const td = state.at(-1);
+
+			if (td !== stateTest && td !== stateTestBinary) {
+				if (t.accept(identStart)) {
+					t.acceptRun(identCont);
+
+					const l = t.length();
+
+					if (t.acceptWord(assignment, false) !== "") {
+						t.reset();
+
+						while (t.length() < l) t.next();
+
+						return t.return(TokenIdentifier, startAssign);
+					} else if (!isInCommand() && isCommandIndex(t)) {
+						state.push(stateCommandIndex);
+
+						return t.return(TokenKeyword, startCommandIndex);
+					} else {
+						const c = t.peek();
+
+						if (!isInCommand() && c === '[' || isArrayStart(t)) {
+							return t.return(TokenIdentifier, startArrayAssign);
+						} else if (c === '}' && td === stateBrace || c === ')' && td === stateParens || td === stateBraceExpansion) {
+							return t.return(TokenKeyword, main);
+						} else if (!isInCommand()) {
+							t.acceptRun(whitespace);
+
+							const isFunc = t.accept("(");
+
+							t.reset();
+
+							while (t.length() < l) t.next();
+
+							if (isFunc) {
+								return t.return(TokenIdentifier, functionOpenParen);
+							}
+						}
+					}
+				} else if (t.accept(decimalDigit)) {
+					t.acceptRun(decimalDigit);
+
+					switch (t.peek()) {
+					case '<':
+					case '>':
+						return t.return(TokenNumericLiteral, main);
+					}
+				}
+			}
+
+			return word(t)
+		      },
+		      keywordIdentOrWord = (t: Tokeniser) => {
+			if (!isInCommand()) {
+				const td = state.at(-1);
+
+				if (td !== stateTest && td !== stateTestBinary) {
+					const kw = t.acceptWord(keywords, false);
+
+					if (!isWordSeperator(t)) {
+						if (state.at(-1) === stateFunctionBody) {
+							return errInvalidKeyword(t);
+						}
+
+						t.reset();
+					} else if (kw !== "") {
+						return keyword(t, kw);
+					}
+
+					const bn = t.acceptWord(builtins, false);
+
+					if (!isWordSeperator(t)) {
+						t.reset();
+					} else if (bn !== "") {
+						return builtin(t, bn);
+					}
+				}
+			}
+
+			return identOrWord(t);
 		      },
 		      number = (t: Tokeniser) => {
 			if (!t.accept(decimalDigit)) {
-				return keywordIdentOrWord(t);
+				return word(t);
 			}
 
 			t.acceptRun(decimalDigit);
@@ -1184,7 +2064,7 @@ bash = (() => {
 
 			if (t.accept("xX")) {
 				if (!t.accept(hexDigit)) {
-					return errInvalidNumber(t);
+					return word(t);
 				}
 
 				t.acceptRun(hexDigit);
@@ -1194,26 +2074,420 @@ bash = (() => {
 
 			return t.return(TokenNumericLiteral, main);
 		      },
-		      stringStart = (t: Tokeniser) => {
-			if (t.peek() === state.at(-1)) {
-				state.pop();
+		      stringStart = (t: Tokeniser): [Token, TokenFn] => {
+			if (t.accept("$") && t.accept("'")) {
+				state.push(stateStringSpecial);
+			} else if (t.accept("'")) {
+				state.push(stateStringSingle);
+			} else {
 				t.next();
 
-				return t.return(TokenStringLiteral, main);
-			} else if (t.accept("$") && t.accept("'")) {
-				state.push('$');
-			} else {
-				state.push(t.next());
+				state.push(stateStringDouble);
 			}
 
 			return string(t);
 		      },
-		      startBacktick = (t: Tokeniser) => {
+		      parameterExpansionOperator = (t: Tokeniser) => {
+			if (t.accept("}")) {
+				state.pop();
+
+				return t.return(TokenPunctuator, main);
+			}
+
+			if (!t.accept("UuLQEPAKak")) {
+				return errInvalidParameterExpansion(t);
+			}
+
+			return t.return(TokenKeyword, main);
+		      },
+		      parameterExpansionPatternEnd = (t: Tokeniser) => {
+			t.accept("/");
+
+			return t.return(TokenPunctuator, main);
+		      },
+		      parameterExpansionPattern = (t: Tokeniser) => {
+			let parens = 0;
+
+			while (true) {
+				switch (t.exceptRun("\\()[/}")) {
+				case '}':
+					if (parens === 0) {
+						return t.return(TokenRegularExpressionLiteral, main);
+					}
+
+					return errInvalidCharacter(t);
+				case '/':
+					if (parens === 0) {
+						return t.return(TokenRegularExpressionLiteral, parameterExpansionPatternEnd);
+					}
+
+					return errInvalidCharacter(t);
+				case '':
+					return errUnexpectedEOF(t);
+				case '\\':
+					t.next();
+					t.next();
+
+					break;
+				case '(':
+					t.next();
+
+					parens++;
+
+					break;
+				case ')':
+					t.next();
+
+					if (parens === 0) {
+						return errInvalidCharacter(t);
+					}
+
+					parens--;
+
+					break;
+				case '[':
+					while (!t.accept("]")) {
+						switch (t.exceptRun("\\]")) {
+						case '':
+							return errUnexpectedEOF(t);
+						case '\\':
+							t.next();
+							t.next();
+						}
+					}
+				}
+			}
+		      },
+		      parameterExpansionSubstringEnd = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, parameterExpansionSubstringEnd);
+			}
+
+			t.accept("-");
+
+			if (!t.accept(decimalDigit)) {
+				return errInvalidParameterExpansion(t);
+			}
+
+			t.acceptRun(decimalDigit);
+
+			return t.return(TokenNumericLiteral, main);
+		      },
+		      parameterExpansionSubstringMid = (t: Tokeniser): [Token, TokenFn] => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, parameterExpansionSubstringMid);
+			}
+
+			if (t.accept(":")) {
+				return (t.return(TokenPunctuator, parameterExpansionSubstringEnd));
+			}
+
+			return main(t);
+		      },
+		      parameterExpansionSubstringStart = (t: Tokeniser) => {
+			if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, parameterExpansionSubstringStart);
+			}
+
+			t.accept("-");
+
+			if (!t.accept(decimalDigit)) {
+				return errInvalidParameterExpansion(t);
+			}
+
+			t.acceptRun(decimalDigit);
+
+			return t.return(TokenNumericLiteral, parameterExpansionSubstringMid);
+		      },
+		      parameterExpansionOperation = (t: Tokeniser) => {
+			if (t.accept(":")) {
+				if (t.accept("-=#?+")) {
+					return t.return(TokenPunctuator, main);
+				}
+
+				return t.return(TokenPunctuator, parameterExpansionSubstringStart);
+			} else if (t.accept("/")) {
+				t.accept("/#%");
+
+				return t.return(TokenPunctuator, parameterExpansionPattern)
+			} else if (t.accept("*")) {
+				return t.return(TokenPunctuator, main);
+			} else if (t.accept("@")) {
+				return t.return(TokenPunctuator, parameterExpansionOperator);
+			} else if (t.accept("}")) {
+				state.pop();
+
+				return t.return(TokenPunctuator, main);
+			}
+
+			for (const c of expansionOperators) {
+				if (t.accept(c)) {
+					t.accept(c);
+
+					return t.return(TokenPunctuator, parameterExpansionPattern);
+				}
+			}
+
+			return errInvalidParameterExpansion(t);
+		      },
+		      parameterExpansionArrayEnd = (t: Tokeniser) => {
+			if (!t.accept("]")) {
+				return errInvalidCharacter(t);
+			}
+
+			return t.return(TokenPunctuator, parameterExpansionOperation);
+		      },
+		      parameterExpansionArraySpecial = (t: Tokeniser): [Token, TokenFn] => {
+			if (t.accept("*@")) {
+				return t.return(TokenKeyword, parameterExpansionArrayEnd);
+			}
+
+			state.push(stateBraceExpansionArrayIndex);
+
+			return main(t);
+		      },
+		      parameterExpansionArrayOrOperation = (t: Tokeniser) => {
+			if (!t.accept("[")) {
+				return parameterExpansionOperation(t);
+			}
+
+			return t.return(TokenPunctuator, parameterExpansionArraySpecial);
+		      },
+		      parameterExpansionIdentifier = (t: Tokeniser) => {
+			if (t.accept("@*")) {
+				return t.return(TokenReservedWord, parameterExpansionOperation);
+			}
+
+			if (t.accept(decimalDigit)) {
+				t.acceptRun(decimalDigit);
+
+				return t.return(TokenNumericLiteral, parameterExpansionOperation);
+			}
+
+			if (!t.accept(identStart)) {
+				return errInvalidParameterExpansion(t);
+			}
+
+			t.acceptRun(identCont);
+
+			return t.return(TokenIdentifier, parameterExpansionArrayOrOperation);
+		      },
+		      parameterExpansionIdentifierOrPreOperator = (t: Tokeniser) => {
+			if (t.accept("!#")) {
+				if (t.peek() !== '}') {
+					return t.return(TokenPunctuator, parameterExpansionIdentifier);
+				}
+
+				return t.return(TokenKeyword, main);
+			}
+
+			return parameterExpansionIdentifier(t);
+		      },
+		      identifier = (t: Tokeniser) => {
 			t.next();
 
-			child = Parser(subTokeniser(t), bash);
+			if (t.accept(decimalDigit)) {
+				return t.return(TokenIdentifier, main);
+			} else if (t.accept("(")) {
+				if (t.accept("(")) {
+					state.push(stateArithmeticExpansion);
 
-			return t.return(TokenPunctuator, backtick);
+					return t.return(TokenPunctuator, main);
+				}
+
+				state.push(stateParens);
+
+				return t.return(TokenPunctuator, main);
+			} else if (t.accept("{")) {
+				state.push(stateBraceExpansion);
+
+				return t.return(TokenPunctuator, parameterExpansionIdentifierOrPreOperator);
+			} else if (t.accept("$?!@*")) {
+				return t.return(TokenIdentifier, main);
+			} else {
+				const td = state.at(-1);
+
+				if (td !== stateStringDouble && td !== stateHeredocIdentifier && t.accept("'\"")) {
+					t.reset();
+
+					return stringStart(t);
+				}
+			}
+
+			let wb = "";
+
+			switch (state.at(-1)) {
+			case stateBraceExpansion:
+				wb = wordBreakNoBrace;
+
+				break;
+			case stateArrayIndex:
+			case stateBraceExpansionArrayIndex:
+				wb = wordBreakIndex;
+
+				break;
+			case stateCommandIndex:
+				wb = wordBreakCommandIndex;
+
+				break;
+			case stateArithmeticExpansion:
+			case stateArithmeticParens:
+			case stateTernary:
+			case stateForArithmetic:
+				wb = wordBreakArithmetic;
+
+				break;
+			case stateTest:
+			case stateTestBinary:
+				wb = testWordBreak;
+
+				break;
+			default:
+				wb = wordBreak;
+			}
+
+			t.exceptRun(wb);
+
+			return t.return(TokenIdentifier, main);
+		      },
+		      heredocEnd = (t: Tokeniser) => {
+			const h = heredoc.at(-1)![0];
+
+			heredoc.at(-1)!.shift();
+
+			t.acceptString(h.delim, false);
+
+			if (heredoc.at(-1)!.length === 0) {
+				heredoc.pop();
+				state.pop();
+			}
+
+			return t.return(TokenStringLiteral, main);
+		      },
+		      heredocString = (t: Tokeniser): [Token, TokenFn] => {
+			const h = heredoc.at(-1)![0];
+
+			if (h.stripped && t.accept("\t")) {
+				t.acceptRun("\t");
+
+				return t.return(TokenWhitespace, heredocString);
+			}
+
+			let charBreak = newline;
+
+			if (h.expand) {
+				charBreak = heredocStringBreak;
+			}
+
+			while (true) {
+				const l = t.length();
+
+				if (t.acceptString(h.delim, false) === h.delim.length && (t.peek() === '\n' || t.peek() === '')) {
+					t.reset();
+
+					while (t.length() < l) t.next();
+
+					const str = t.get();
+
+					if (str.length === 0) {
+						return heredocEnd(t);
+					}
+
+					return [{"type": TokenStringLiteral, "data": str}, heredocEnd]
+				}
+
+				switch (t.exceptRun(charBreak)) {
+				case '':
+					return errUnexpectedEOF(t);
+				case '$':
+					const lb = t.length();
+
+					t.next();
+
+					if (t.accept(decimalDigit) || t.accept(identStart) || t.accept("({$!?")) {
+						t.reset();
+
+						while (t.length() < lb) t.next();
+
+						state.push(stateHeredocIdentifier);
+
+						const str = t.get();
+
+						if (str.length === 0) {
+							return identifier(t);
+						}
+
+						return [{"type": TokenStringLiteral, "data": str}, identifier];
+					}
+
+					continue;
+				case '\n':
+					t.next();
+
+					if (h.stripped && t.peek() === '\t') {
+						return t.return(TokenStringLiteral, heredocString);
+					}
+				}
+			}
+		      },
+		      startHeredoc = (t: Tokeniser): [Token, TokenFn] => {
+			if (t.peek() === "" || t.accept(newline) || t.accept("#")) {
+				return errUnexpectedEOF(t);
+			} else if (parseWhitespace(t)) {
+				return t.return(TokenWhitespace, startHeredoc);
+			}
+
+			let chars = heredocsBreak;
+
+			Loop:
+			while (true) {
+				switch (t.exceptRun(chars)) {
+				case "":
+					return errUnexpectedEOF(t);
+				case '\\':
+					t.next();
+					t.next();
+
+					break;
+				case '\'':
+					t.next();
+
+					if (chars === heredocsBreak) {
+						chars = "'";
+					} else {
+						chars = heredocsBreak;
+					}
+
+					break;
+				case '"':
+					t.next();
+
+					if (chars === heredocsBreak) {
+						chars = "\\\"";
+					} else {
+						chars = heredocsBreak;
+					}
+
+					break;
+				default:
+					break Loop;
+				}
+			}
+
+			const tk: Token = {type: TokenKeyword, data: t.get()},
+			      hdt: heredocType = {stripped: nextHeredocIsStripped, delim: unstring(tk.data), expand: false}
+
+			hdt.expand = hdt.delim === tk.data;
+
+			if (state.at(-1) === stateHeredoc) {
+				heredoc.at(-1)!.push(hdt);
+			} else {
+				state.push(stateHeredoc);
+
+				heredoc.push([hdt])
+			}
+
+			return [tk, main];
 		      },
 		      backtick = (t: Tokeniser): [Token, TokenFn] => {
 			const tk = child.next().value;
@@ -1241,387 +2515,18 @@ bash = (() => {
 			pos -= t.length();
 			tk.data = t.get();
 
-			while (t.length() != pos) {
+			while (t.length() !== pos) {
 				t.next();
 			}
-
 
 			return [tk, backtick];
 		      },
-		      parameterExpansionOperator = (t: Tokeniser) => {
-			if (t.accept("}")) {
-				state.pop();
-
-				return t.return(TokenPunctuator, main);
-			}
-
-			if (!t.accept("UuLQEPAKak")) {
-				return errInvalidParameterExpansion(t);
-			}
-
-			return t.return(TokenIdentifier, main);
-		      },
-		      parameterExpansionPatternEnd = (t: Tokeniser) => {
-			t.accept("/");
-
-			return t.return(TokenPunctuator, main);
-		      },
-		      parameterExpansionPattern = (t: Tokeniser) => {
-			let parens = 0;
-
-			while (true) {
-				switch (t.exceptRun("\\()[/}")) {
-				case '}':
-					if (parens === 0) {
-						return t.return(TokenRegularExpressionLiteral, main);
-					}
-
-					return errInvalidParameterExpansion(t);
-				case '/':
-					if (parens === 0) {
-						return t.return(TokenRegularExpressionLiteral, parameterExpansionPatternEnd);
-					}
-				case '':
-					return errInvalidParameterExpansion(t);
-				case '\\':
-					t.next();
-					t.next();
-
-					break;
-				case '(':
-					t.next();
-
-					parens++;
-
-					break;
-				case ')':
-					t.next();
-
-					if (parens === 0) {
-						return errInvalidParameterExpansion(t);
-					}
-
-					parens--;
-
-					break;
-				case '[':
-					while (!t.accept("]")) {
-						switch (t.exceptRun("\\]")) {
-						case '':
-							return errInvalidParameterExpansion(t);
-						case '\\':
-							t.next();
-							t.next();
-						}
-					}
-				}
-			}
-		      },
-		      parameterExpansionSubstringEnd = (t: Tokeniser) => {
-			if (t.accept(whitespace)) {
-				t.acceptRun(whitespace);
-
-				return t.return(TokenWhitespace, parameterExpansionSubstringEnd);
-			}
-
-			t.accept("-");
-
-			if (!t.accept(decimalDigit)) {
-				return errInvalidParameterExpansion(t);
-			}
-
-			t.acceptRun(decimalDigit);
-
-			return t.return(TokenNumericLiteral, main);
-		      },
-		      parameterExpansionSubstringMid = (t: Tokeniser) => {
-			if (t.accept(whitespace)) {
-				t.acceptRun(whitespace);
-
-				return t.return(TokenWhitespace, parameterExpansionSubstringMid);
-			}
-
-			if (t.accept(":")) {
-				return t.return(TokenPunctuator, parameterExpansionSubstringEnd);
-			}
-			
-			return main(t);
-		      },
-		      parameterExpansionSubstringStart = (t: Tokeniser) => {
-			if (t.accept(whitespace)) {
-				t.acceptRun(whitespace);
-
-				return t.return(TokenWhitespace, parameterExpansionSubstringStart);
-			}
-
-			t.accept("-");
-
-			if (!t.accept(decimalDigit)) {
-				return errInvalidParameterExpansion(t);
-			}
-
-			t.acceptRun(decimalDigit);
-
-			return t.return(TokenNumericLiteral, parameterExpansionSubstringMid);
-		      },
-		      parameterExpansionOperation = (t: Tokeniser) => {
-			if (t.accept(":")) {
-				if (t.accept("-=#?+")) {
-					return t.return(TokenPunctuator, main);
-				}
-
-				return t.return(TokenPunctuator, parameterExpansionSubstringStart);
-			}
-
-			if (t.accept("/")) {
-				t.accept("/#%");
-
-				return t.return(TokenPunctuator, parameterExpansionPattern);
-			}
-
-			if (t.accept("*")) {
-				return t.return(TokenPunctuator, main);
-			}
-
-			if (t.accept("@")) {
-				return t.return(TokenPunctuator, parameterExpansionOperator);
-			}
-
-			if (t.accept("}")) {
-				state.pop();
-
-				return t.return(TokenPunctuator, main);
-			}
-
-			for (const c of "#%^,") {
-				if (t.accept(c)) {
-					t.accept(c);
-
-					return t.return(TokenPunctuator, parameterExpansionPattern);
-				}
-			}
-
-			return errInvalidParameterExpansion(t);
-		      },
-		      parameterExpansionArrayOrOperation = (t: Tokeniser) => {
-			if (!t.accept("[")) {
-				return parameterExpansionOperation(t);
-			}
-
-			state.push('[');
-
-			return t.return(TokenPunctuator, main);
-		      },
-		      parameterExpansionIdentifier = (t: Tokeniser) => {
-			if (t.accept("@*")) {
-				return t.return(TokenKeyword, parameterExpansionOperation);
-			}
-
-			if (t.accept(decimalDigit)) {
-				t.acceptRun(decimalDigit);
-
-				return t.return(TokenNumericLiteral, parameterExpansionOperation);
-			}
-
-			if (!t.accept(identStart)) {
-				return errInvalidParameterExpansion(t);
-			}
-
-			t.acceptRun(identCont);
-
-			return t.return(TokenIdentifier, parameterExpansionArrayOrOperation);
-		      },
-		      parameterExpansionIdentifierOrPreOperator = (t: Tokeniser) => {
-			if (t.accept("!#")) {
-				if (t.peek() != '}') {
-					return t.return(TokenPunctuator, parameterExpansionIdentifier);
-				}
-
-				return t.return(TokenKeyword, main);
-			}
-
-			return parameterExpansionIdentifier(t);
-		      },
-		      identifier = (t: Tokeniser) => {
+		      startBacktick = (t: Tokeniser) => {
 			t.next();
 
-			if (t.accept(decimalDigit)) {
-				return t.return(TokenIdentifier, main);
-			}
+			child = Parser(subTokeniser(t), bash);
 
-			if (t.accept("(")) {
-				if (t.accept("(")) {
-					state.push('>');
-
-					return t.return(TokenPunctuator, main);
-				}
-
-				state.push(')');
-
-				return t.return(TokenPunctuator, main);
-			}
-
-			if (t.accept("{")) {
-				state.push('}');
-
-				return t.return(TokenPunctuator, parameterExpansionIdentifierOrPreOperator);
-			}
-
-			const td = state.at(-1);
-
-			if (td !== '"' && td !== 'h' && t.accept("'\"")) {
-				t.reset();
-
-				return stringStart(t);
-			}
-
-			t.exceptRun(state.at(-1) === ']' ? wordNoBracket : state.at(-1) === '>' ? wordBreakArithmetic : words);
-
-			return t.return(TokenIdentifier, main);
-		      },
-		      heredocEnd = (t: Tokeniser) => {
-			t.acceptString(heredocs.at(-1)!.shift()![2]);
-
-			if (!heredocs.at(-1)?.length) {
-				heredocs.pop();
-				state.pop();
-			}
-
-			return t.return(TokenStringLiteral, main);
-		      },
-		      heredocString = (t: Tokeniser) => {
-			const heredoc = heredocs.at(-1)![0],
-			      breakChars = heredoc[1] ? heredocStringBreak : newline;
-
-			while (true) {
-				if (heredoc[0]) {
-					t.acceptRun("\t");
-				}
-
-				const read = t.acceptString(heredoc[2]);
-
-				if (read === heredoc[2].length && (t.peek() === '\n' || t.peek() === '')) {
-					for (let i = 0; i < read; i++) {
-						t.backup();
-					}
-
-					return t.return(TokenStringLiteral, heredocEnd);
-				}
-
-				switch (t.exceptRun(breakChars)) {
-				case '':
-					return errUnexpectedEOF(t);
-				case '$':
-					t.next();
-
-					if (t.accept(decimalDigit) || t.accept(identStart) || t.accept("({$!?")) {
-						t.backup();
-						t.backup();
-
-						state.push('h');
-
-						return t.return(TokenStringLiteral, identifier);
-					}
-
-					continue;
-				}
-
-				t.next();
-			}
-		      },
-		      unstring = (str: string) => {
-			let nextEscaped = false,
-			    sb = "";
-
-			for (const c of str) {
-				if (nextEscaped) {
-					switch (c) {
-					case 'n':
-						sb += "\n";
-
-						break;
-					case 't':
-						sb += "\t";
-					}
-
-					nextEscaped = false;
-				} else {
-					switch (c) {
-					case '\\':
-						nextEscaped = true;
-					case '"':
-					case "'":
-						continue;
-					}
-				}
-
-				sb += c;
-			}
-
-			return sb;
-		      },
-		      startHeredoc = (t: Tokeniser): [Token, TokenFn] => {
-			if (t.peek() === '' || t.accept(newline) || t.accept("#")) {
-				return errUnexpectedEOF(t);
-			}
-
-			if (t.accept(whitespace) || t.acceptWord(escapedNewline)) {
-				while (t.acceptRun(whitespace)) {
-					if (!t.acceptWord(escapedNewline)) {
-						break;
-					}
-				}
-
-				return t.return(TokenWhitespace, startHeredoc);
-			}
-
-			let chars = heredocsBreak;
-
-			Loop:
-			while (true) {
-				switch (t.exceptRun(chars)) {
-				default:
-					break Loop;
-				case '':
-					return errUnexpectedEOF(t);
-				case '\\':
-					t.next();
-					t.next();
-
-					break;
-				case "'":
-					t.next();
-
-					if (chars === heredocsBreak) {
-						chars = "'";
-					} else {
-						chars = heredocsBreak;
-					}
-
-					break;
-				case '"':
-					t.next();
-
-					if (chars === heredocsBreak) {
-						chars = "\\\"";
-					} else {
-						chars = heredocsBreak;
-					}
-				}
-			}
-
-			const tk = {"type": TokenKeyword, "data": t.get()},
-			      delim = unstring(tk.data),
-			      expand = delim === tk.data;
-
-			if (state.at(-1) === 'H') {
-				heredocs.at(-1)?.push([nextHeredocIsStripped, expand, delim]);
-			} else {
-				state.push('H');
-				heredocs.push([[nextHeredocIsStripped, expand, delim]]);
-			}
-
-			return [tk, main];
+			return t.return(TokenPunctuator, backtick);
 		      },
 		      operatorOrWord = (t: Tokeniser) => {
 			const c = t.peek();
@@ -1651,6 +2556,7 @@ bash = (() => {
 			case '|':
 				t.next();
 				t.accept("&|");
+				endCommand();
 
 				break;
 			case '&':
@@ -1659,80 +2565,127 @@ bash = (() => {
 				if (t.accept(">")) {
 					t.accept(">");
 				} else {
-					t.accept("&");
+					endCommand();
+
+					if (!t.accept("&")) {
+						const td = state.at(-1);
+
+						if (td === stateIfTest) {
+							return t.return(TokenPunctuator, ifThen);
+						} else if (td === stateLoopCondition) {
+							return t.return(TokenPunctuator, loopDo)
+						}
+					}
 				}
 
 				break;
 			case ';':
 				t.next();
-				t.accept(";");
-				t.accept("&");
+
+				let l = t.accept(";");
+
+				if (t.accept("&")) {
+					l = true;
+				}
+
+				endCommand();
+
+				if (l) {
+					if (state.at(-1) !== stateCaseBody) {
+						return errInvalidCharacter(t);
+					} else {
+						state.pop();
+						state.push(stateCaseEnd);
+					}
+				}
+
+				const td = state.at(-1);
+
+				if (td === stateIfTest) {
+					return t.return(TokenPunctuator, ifThen);
+				} else if (td === stateLoopCondition) {
+					return t.return(TokenPunctuator, loopDo);
+				}
 
 				break;
 			case '"':
-			case "'":
+			case '\'':
+				setInCommand();
+
 				return stringStart(t);
 			case '(':
+				if (isInCommand()) {
+					return errInvalidCharacter(t);
+				}
+
 				t.next();
-				state.push(")");
+				setInCommand();
+				state.push(t.accept("(") ? stateArithmeticExpansion : stateParens);
 
 				break;
 			case '{':
 				t.next();
 
-				if (!words.includes(t.peek()) || t.peek() == '-') {
+				const tk = t.peek();
+
+				if (!wordB.includes(tk) || tk === '-') {
+					setInCommand();
+
 					return braceExpansion(t);
+				} else if (whitespaceNewline.includes(tk) && !isInCommand()) {
+					state.push(stateBrace);
 				}
 
 				break;
 			case ']':
 				t.next();
 
-				if (state.at(-1) === '[') {
+				if (state.at(-1) === stateBraceExpansionArrayIndex) {
 					state.pop();
 
 					return t.return(TokenPunctuator, parameterExpansionOperation);
 				}
 
-				if (state.at(-1) === ']') {
-					state.pop();
-				}
-
 				break;
 			case ')':
-				t.next();
+				endCommand();
 
-				if (state.pop() !== c) {
+				const tda = state.at(-1);
+
+				if (tda === stateParens) {
+					state.pop();
+				} else if (tda === stateCaseEnd) {
+					state.pop();
+					state.push(stateCaseBody);
+				} else if (tda === stateTestBinary) {
+					return testBinaryOperator(t);
+				} else {
+					t.next();
+
 					return errInvalidCharacter(t);
 				}
+
+				t.next();
 
 				break;
 			case '}':
 				t.next();
 
-				if (state.at(-1) === '}') {
+				const tdb = state.at(-1);
+
+				if (tdb === stateBrace || tdb === stateBraceExpansion) {
 					state.pop();
 				}
 
 				break;
-			case '+':
-				t.next();
-				t.accept("=");
-
-				break;
-			case '=':
-				t.next();
-
-				break;
 			case '$':
+				setInCommand();
+
 				return identifier(t);
 			case '`':
-				if (state.at(-1) !== '`') {
-					return startBacktick(t);
-				}
+				setInCommand();
 
-				state.pop();
-				t.next();
+				return startBacktick(t);
 			}
 
 			return t.return(TokenPunctuator, main);
@@ -1741,10 +2694,8 @@ bash = (() => {
 			const c = t.peek();
 
 			switch (c) {
-			case '':
-				return errUnexpectedEOF(t);
 			case '"':
-			case "'":
+			case '\'':
 				return stringStart(t);
 			case '$':
 				return identifier(t);
@@ -1763,10 +2714,6 @@ bash = (() => {
 				break;
 			case '<':
 			case '>':
-				t.next();
-				t.accept("=");
-
-				break;
 			case '=':
 			case '!':
 			case '/':
@@ -1788,25 +2735,37 @@ bash = (() => {
 				break;
 			case '?':
 				t.next();
-				state.push(":");
+				state.push(stateTernary);
 
 				break;
 			case ':':
 				t.next();
 
-				if (state.at(-1) !== ':') {
+				if (state.at(-1) !== stateTernary) {
 					return errInvalidCharacter(t);
 				}
 
 				state.pop();
 
 				break;
-			case ')':
+			case ']':
 				t.next();
 
 				const td = state.at(-1);
+				
+				if (td === stateCommandIndex) {
+					return t.return(TokenPunctuator, endCommandIndex);
+				} else if (td === stateArrayIndex) {
+					return t.return(TokenPunctuator, startAssign);
+				}
 
-				if ((td != '>' || !t.accept(")")) && td != '/') {
+				return errInvalidCharacter(t);
+			case ')':
+				t.next();
+
+				const tda = state.at(-1);
+
+				if ((tda !== stateArithmeticExpansion && tda !== stateForArithmetic || !t.accept(")")) && tda !== stateArithmeticParens) {
 					return errInvalidCharacter(t);
 				}
 
@@ -1815,33 +2774,48 @@ bash = (() => {
 				break;
 			case '(':
 				t.next();
-				state.push("/");
+				state.push(stateArithmeticParens);
 
 				break;
 			case '0':
 				return zero(t);
+			case ';':
+				if (state.at(-1) !== stateForArithmetic) {
+					return errInvalidCharacter(t);
+				}
+
+				t.next();
+
+				break;
+			case '{':
+			case '}':
+				t.next();
+
+				if (state.at(-1) === stateCommandIndex) {
+					return t.return(TokenPunctuator, main);
+				}
+
+				return errInvalidCharacter(t);
 			default:
-				return number(t);
+				return number(t)
 			}
 
 			return t.return(TokenPunctuator, main);
 		      },
 		      string = (t: Tokeniser) => {
 			const td = state.at(-1),
-			      stops = td === '"' ? doubleStops : td === '$' ? ansiStops : singleStops;
+			      stops = td === stateStringDouble ? doubleStops : td === stateStringSpecial ? ansiStops : singleStops;
 
 			while (true) {
 				switch (t.exceptRun(stops)) {
 				default:
 					return errUnexpectedEOF(t);
-				case '\n':
-					return errInvalidCharacter(t);
 				case '`':
 					return t.return(TokenStringLiteral, startBacktick);
 				case '$':
 					return t.return(TokenStringLiteral, identifier);
 				case '"':
-				case "'":
+				case'\'':
 					t.next();
 					state.pop();
 
@@ -1853,67 +2827,127 @@ bash = (() => {
 			}
 		      },
 		      main = (t: Tokeniser) => {
-			const td = state.at(-1);
+			let td = state.at(-1);
 
-			if (!t.peek()) {
-				if (td) {
-					return errUnexpectedEOF(t);
-				}
+			if (td === stateValue && (isWhitespace(t) || t.peek() === ';')) {
+				state.pop();
 
-				return t.done();
+				td = state.at(-1);
 			}
 
-			if (td === 'h') {
+			if (isWhitespace(t) && td === stateCaseParam) {
+				return caseIn(t);
+			} else if (td === stateTestPattern) {
+				state.pop();
+
+				return testPattern(t);
+			} else if (t.peek() === '') {
+				if (isInCommand()) {
+					endCommand();
+
+					td = state.at(-1);
+				}
+
+				if (td === stateFunctionBody) {
+					state.pop();
+
+					td = state.at(-1);
+				}
+
+				if (td === undefined) {
+					return t.done();
+				}
+
+				return errUnexpectedEOF(t);
+			} else if (td === stateHeredocIdentifier) {
 				state.pop();
 
 				return heredocString(t);
-			}
-
-			if (td === '"' || td === "'") {
+			} else if (td === stateStringDouble || td === stateStringSingle) {
 				return string(t);
-			}
+			} else if (td === stateTest) {
+				return testWord(t);
+			} else if (parseWhitespace(t)) {
+				if (td === stateArrayIndex || td === stateBraceExpansionArrayIndex) {
+					state.pop();
 
-			if (t.accept(whitespace) || t.acceptWord(escapedNewline) !== "") {
-				while (t.acceptRun(whitespace)) {
-					if (!t.acceptWord(escapedNewline)) {
-						break;
+					if (!isInCommand()) {
+						state.push(td);
 					}
+				} else if (td === stateTestBinary) {
+					return t.return(TokenWhitespace, testBinaryOperator);
+				}
+
+				if (td === stateCommandIndex) {
+					return t.return(TokenKeyword, main);
 				}
 
 				return t.return(TokenWhitespace, main);
-			}
+			} else if (t.accept(newline)) {
+				endCommand();
 
-			if (t.accept(newline)) {
-				if (td === 'H') {
+				td = state.at(-1);
+				if (td === stateHeredoc) {
 					return t.return(TokenLineTerminator, heredocString);
 				}
 
+				endCommand();
 				t.acceptRun(newline);
 
-				return t.return(TokenLineTerminator, main);
-			}
+				if (td === stateIfTest) {
+					return t.return(TokenLineTerminator, ifThen);
+				} else if (td === stateLoopCondition) {
+					return t.return(TokenLineTerminator, loopDo);
+				} else if (td === stateTestBinary) {
+					return t.return(TokenLineTerminator, testBinaryOperator);
+				}
 
-			if (t.accept("#")) {
-				if (td === '}') {
+				if (td === stateCommandIndex) {
+					return t.return(TokenKeyword, main);
+				}
+
+				return t.return(TokenLineTerminator, main);
+			} else if (t.accept("#")) {
+				if (td === stateBraceExpansion || td === stateCommandIndex) {
 					return word(t);
+				} else if (td === stateArithmeticExpansion || td === stateArithmeticParens || td === stateTernary || td === stateForArithmetic || td === stateArrayIndex) {
+					return errInvalidCharacter(t);
 				}
 
 				t.exceptRun(newline);
 
 				return t.return(TokenSingleLineComment, main);
-			}
-
-			if (td === '>' || td === '/' || td === ':') {
+			} else if (td === stateArithmeticExpansion || td === stateArithmeticParens || td === stateTernary || td === stateForArithmetic || td === stateArrayIndex || td === stateCommandIndex) {
 				return arithmeticExpansion(t);
 			}
 
 			return operatorOrWord(t);
 		      },
-		      state: string[] = [],
-		      heredocs: [boolean, boolean, string][][] = [];
+		      isInCommand = () => state.at(-1) === stateInCommand,
+		      endCommand = () => isInCommand() && state.pop(),
+		      setInCommand = () => {
+			switch (state.at(-1)) {
+			default:
+				state.push(stateInCommand);
+			case stateArrayIndex:
+			case stateBraceExpansionArrayIndex:
+			case stateInCommand:
+			case stateHeredocIdentifier:
+			case stateStringDouble:
+			case stateArithmeticExpansion:
+			case stateBraceExpansion:
+			case stateCaseParam:
+			case stateForArithmetic:
+			case stateTest:
+			case stateTestBinary:
+			case stateValue:
+			case stateCommandIndex:
+			}
+		      },
+		      heredoc: heredocType[][] = [];
 
-		let child: Generator<Token, Token>,
-		    nextHeredocIsStripped = false;
+		let nextHeredocIsStripped = false,
+		    child: Generator<Token, Token>;
 
 		return main(tk);
 	};
