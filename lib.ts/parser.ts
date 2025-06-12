@@ -465,6 +465,7 @@ export class Phraser {
 	#fn: TokenFn;
 	#tokens: Token[] = [];
 	#pos = 0;
+	#stateNum = 0;
 
 	/**
 	 * Constructs a new Phraser.
@@ -513,6 +514,17 @@ export class Phraser {
 		this.#pos = 0;
 	}
 
+	state() {
+		const pos = this.#pos,
+		      stateNum = this.#stateNum;
+
+		return () => {
+			if (this.#stateNum === stateNum) {
+				this.#pos = pos;
+			}
+		};
+	}
+
 	/**
 	 * length() returns the number of tokens in the buffer.
 	 *
@@ -531,6 +543,7 @@ export class Phraser {
 		const tks = this.#tokens.splice(0, this.#pos);
 
 		this.#pos = 0;
+		this.#stateNum++;
 
 		return tks;
 	}
