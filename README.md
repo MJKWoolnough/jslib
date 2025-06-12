@@ -2252,6 +2252,7 @@ A Phraser is a collection of methods that allow the easy parsing of a token stre
 | peek | Looks ahead at the next token in the stream without adding it to the buffer, and returns the TokenID. |
 | reset | Restores the state to after the last get() call (or init, if get() has not been called). |
 | return | Creates the [Phrase, PhraseFn] tuple, using the parsed tokens as the data. If no PhraseFn is supplied, Phraser.done() is used. |
+| state  | Returns a function that can be called to reset the phraser state to point at which this method was called; the function becomes invalid if the 'get' method is called. |
 
 <a name="parser_token">Token</a>
 ```typescript
@@ -2293,6 +2294,7 @@ A Tokeniser is a collection of methods that allow the easy parsing of a text str
 | peek | Looks ahead at the next character in the stream without adding it to the buffer. |
 | reset | Restores the state to after the last get() call (or init, if get() has not been called). |
 | return | Creates the [Token, TokenFn] tuple, using the parsed characters as the data. If no TokenFn is supplied, Tokeniser.done() is used. |
+| state  | Returns a function that can be called to reset the tokeniser state to point at which this method was called; the function becomes invalid if the 'get' method is called. |
 
 ## <a name="router">router</a>
 
