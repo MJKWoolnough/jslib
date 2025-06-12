@@ -249,6 +249,7 @@ export class Tokeniser {
 		this.#pos = 0;
 	}
 
+	/** state() returns a function that can be called to reset the tokeniser state to point at which this method was called; the function becomes invalid if the 'get' method is called. */
 	state() {
 		const pos = this.#pos,
 		      stateNum = this.#stateNum;
@@ -514,6 +515,7 @@ export class Phraser {
 		this.#pos = 0;
 	}
 
+	/** state() returns a function that can be called to reset the phraser state to point at which this method was called; the function becomes invalid if the 'get' method is called. */
 	state() {
 		const pos = this.#pos,
 		      stateNum = this.#stateNum;
