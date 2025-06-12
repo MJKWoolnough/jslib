@@ -11227,6 +11227,51 @@ type Tests = {
 					return tk.type === 1 && tk.data === "ab";
 				}
 			},
+			"state": {
+				"next": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abc", p => {
+						p.next();
+						p.next();
+						p.next();
+
+						const state = p.state();
+
+						p.next();
+						p.next();
+						p.next();
+
+						state();
+
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.data === "abc";
+				},
+				"reset": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      tk = parser("abc", p => {
+						p.next();
+						p.next();
+						p.next();
+
+						const state = p.state();
+
+						p.reset();
+						state();
+
+						return [{
+							"type": 1,
+							"data": p.get()
+						}, () => p.done()];
+					      }).next().value;
+
+					return tk.data === "abc";
+				},
+			},
 			"accept": {
 				"abc": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
@@ -13762,10 +13807,6 @@ type Tests = {
 			      div = document.createElement("div");
 
 			div.append(code(source, fns[testname as keyof typeof fns] as any, new Map([".whitespace", ".lineterminator", ".singlelinecomment", ".multilinecomment", ".identifier", ".privateidentifier", ".booleanliteral", ".keyword", ".punctuator", ".numericliteral", ".stringliteral", ".nosubstitutiontemplate", ".templatehead", ".templatemiddle", ".templatetail", ".regularexpressionliteral", ".nullliteral", ".futurereservedword"].map((c, n) => [n, c]))));
-
-			if (div.innerHTML !== output) {
-				console.log(div.innerHTML);
-			}
 
 			return div.innerHTML === output;
 		}, "toString", {"value": () => source + "\n\n=>\n\n" + output}), o), {} as Tests), o), {} as Record<string, Tests>)
