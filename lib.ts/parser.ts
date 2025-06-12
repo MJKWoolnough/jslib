@@ -202,6 +202,7 @@ export class Tokeniser {
 	#text: StringParser = pseudoIterator;
 	#buffer = "";
 	#pos = 0;
+	#stateNum = 0;
 
 	/**
 	 * Constructs a new Tokeniser.
@@ -248,6 +249,17 @@ export class Tokeniser {
 		this.#pos = 0;
 	}
 
+	state() {
+		const pos = this.#pos,
+		      stateNum = this.#stateNum;
+
+		return () => {
+			if (this.#stateNum === stateNum) {
+				this.#pos = pos;
+			}
+		};
+	}
+
 	/**
 	 * length() returns the number of characters in the buffer that would be returned by a call to get().
 	 *
@@ -267,6 +279,7 @@ export class Tokeniser {
 
 		this.#buffer = this.#buffer.slice(this.#pos);
 		this.#pos = 0;
+		this.#stateNum++;
 
 		return buffer;
 	}
