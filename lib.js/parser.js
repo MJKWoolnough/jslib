@@ -103,7 +103,7 @@ processToEnd = function* (p) {
 
 /**
  * The StringParser interface represents an alternate to a string for parsing.
- * type StringParser  = Iterator<string, void>;
+ * type StringParser = Iterator<string, void>;
  */
 
 const noChar = {
