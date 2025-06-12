@@ -11822,6 +11822,40 @@ type Tests = {
 					return JSON.stringify(p) === `{"type":1,"data":[]}`;
 				}
 			},
+			"state": {
+				"next": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => [{"type": 2, "data": "abcde"}, () => p.done()]], p => {
+						p.next();
+
+						const state = p.state();
+
+						p.next();
+
+						state();
+
+						return [{"type": 1, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":1,"data":[{"type":1,"data":"12345"}]}`;
+				},
+				"reset": async () => {
+					const {default: parser} = await import("./lib/parser.js"),
+					      p = parser("", p => [{"type": 1, "data": "12345"}, () => [{"type": 2, "data": "abcde"}, () => p.done()]], p => {
+						p.next();
+
+						const state = p.state();
+
+						p.reset();
+
+						state();
+
+						return [{"type": 1, "data": p.get()}, () => p.done()];
+					      }).next().value;
+
+					return JSON.stringify(p) === `{"type":1,"data":[{"type":1,"data":"12345"}]}`;
+				}
+			},
 			"accept": {
 				"12345abcde": async () => {
 					const {default: parser} = await import("./lib/parser.js"),
