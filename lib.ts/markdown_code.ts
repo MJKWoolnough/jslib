@@ -1192,7 +1192,7 @@ bash = (() => {
 		      },
 		      startAssign = (t: Tokeniser) => {
 			t.accept("+");
-			t.accept("-");
+			t.accept("=");
 
 			return t.return(TokenPunctuator, value);
 		      },
