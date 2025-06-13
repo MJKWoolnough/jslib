@@ -13738,6 +13738,10 @@ type Tests = {
 				"params": {
 					"source": "a=1 b+= c[ d ]=e f g[ h ]=f",
 					"output": `<span class="identifier">a</span><span class="punctuator">=</span><span class="keyword">1</span><span class="whitespace">&nbsp;</span><span class="identifier">b</span><span class="punctuator">+=</span><span class="whitespace">&nbsp;</span><span class="identifier">c</span><span class="punctuator">[</span><span class="whitespace">&nbsp;</span><span class="keyword">d</span><span class="whitespace">&nbsp;</span><span class="punctuator">]=</span><span class="keyword">e</span><span class="whitespace">&nbsp;</span><span class="keyword">f</span><span class="whitespace">&nbsp;</span><span class="keyword">g[</span><span class="whitespace">&nbsp;</span><span class="keyword">h</span><span class="whitespace">&nbsp;</span><span class="punctuator">]</span><span class="keyword">=f</span>`
+				},
+				"param-like as word": {
+					"source": "a[ b ]",
+					"output": `<span class="keyword">a</span><span class="punctuator">[</span><span class="keyword">&nbsp;b&nbsp;</span><span class="punctuator">]</span>`
 				}
 			},
 			"r": {
