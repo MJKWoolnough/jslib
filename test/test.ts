@@ -13579,11 +13579,11 @@ type Tests = {
 					"source": `"a \\"string\\"" 'another string' \"a\nstring\" 'a\nstring' $\"a string\" $'a \\'string'`,
 					"output": `<span class="stringliteral">"a&nbsp;\\"string\\""</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'another&nbsp;string'</span><span class="whitespace">&nbsp;</span><span class="stringliteral">"a<br>string"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">'a<br>string'</span><span class="whitespace">&nbsp;</span><span class="stringliteral">$"a&nbsp;string"</span><span class="whitespace">&nbsp;</span><span class="stringliteral">$'a&nbsp;\\'string'</span>`
 				},
-				"keywords": {
+				"words": {
 					"source": "a word\nanother couple of words",
 					"output": `<span class="keyword">a</span><span class="whitespace">&nbsp;</span><span class="keyword">word</span><span class="lineterminator"><br></span><span class="keyword">another</span><span class="whitespace">&nbsp;</span><span class="keyword">couple</span><span class="whitespace">&nbsp;</span><span class="keyword">of</span><span class="whitespace">&nbsp;</span><span class="keyword">words</span>`
 				},
-				"keywords with spaces": {
+				"words with spaces": {
 					"source": "a\\ word another\\ word",
 					"output": `<span class="keyword">a\\&nbsp;word</span><span class="whitespace">&nbsp;</span><span class="keyword">another\\&nbsp;word</span>`
 				},
