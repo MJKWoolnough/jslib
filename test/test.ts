@@ -13742,6 +13742,10 @@ type Tests = {
 				"param-like as word": {
 					"source": "a[ b ]",
 					"output": `<span class="keyword">a</span><span class="punctuator">[</span><span class="keyword">&nbsp;b&nbsp;</span><span class="punctuator">]</span>`
+				},
+				"keyword: time": {
+					"source": "time a; time -p b; time c if; time if",
+					"output": `<span class="futurereservedword">time</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">time</span><span class="whitespace">&nbsp;</span><span class="keyword">-p</span><span class="whitespace">&nbsp;</span><span class="keyword">b</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">time</span><span class="whitespace">&nbsp;</span><span class="keyword">c</span><span class="whitespace">&nbsp;</span><span class="keyword">if</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">time</span><span class="whitespace">&nbsp;</span><span class="futurereservedword">if</span><span data-error="unexpected EOF"></span>`
 				}
 			},
 			"r": {
