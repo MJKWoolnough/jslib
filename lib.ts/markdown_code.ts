@@ -1260,20 +1260,16 @@ bash = (() => {
 						return t.return(TokenKeyword, main);
 					}
 
-					const state = t.length();
+					const state = t.state();
 
 					t.next();
 
 					if (t.accept(whitespace) || t.accept(newline) || t.peek() === '') {
-						t.reset();
-
-						while (t.length() < state) t.next();
+						state();
 					} else {
 						const [tk] = braceExpansion(new Tokeniser({"next": () => ({"value": t.next(), "done": false})}));
 
-						t.reset();
-
-						while (t.length() < state) t.next();
+						state();
 
 						if (tk.type === TokenIdentifier) {
 							return t.return(TokenKeyword, main);
@@ -1289,14 +1285,12 @@ bash = (() => {
 
 					break;
 				case '$':
-					const length = t.length();
+					const stateb = t.state();
 
 					t.next();
 
 					if (t.accept(decimalDigit) || t.accept(identStart) || t.accept("({")) {
-						t.reset();
-
-						while (t.length() < length) t.next();
+						stateb();
 
 						return t.return(TokenKeyword, main);
 					}
@@ -1664,15 +1658,13 @@ bash = (() => {
 			if (t.accept(identStart)) {
 				t.acceptRun(identCont);
 
-				const nameEnd = t.length();
+				const state = t.state();
 
 				if (t.accept(whitespace)) {
 					t.acceptRun(whitespace);
 
 					if (t.acceptWord(compoundStart, false) !== "" && isWordSeperator(t)) {
-						t.reset();
-
-						while (t.length() < nameEnd) t.next();
+						state();
 
 						return t.return(TokenIdentifier, main)
 					}
@@ -1941,22 +1933,18 @@ bash = (() => {
 			return hcb;
 		      },
 		      isArrayStart = (t: Tokeniser) => {
-			const l = t.length(),
+			const state = t.state(),
 			      ici = t.accept("[") && !t.accept("]") && hasCompleteBracket(t, stateArrayIndex) && t.acceptWord(assignment, false) !== "";
 
-			t.reset();
-
-			while (t.length() < l) t.next();
+			state();
 
 			return ici;
 		      },
 		      isCommandIndex = (t: Tokeniser) => {
-			const l = t.length(),
+			const state = t.state(),
 			      ici = t.accept("[") && hasCompleteBracket(t, stateCommandIndex) && t.acceptWord(assignment, false) === "";
 
-			t.reset();
-
-			while (t.length() < l) t.next();
+			state();
 
 			return ici;
 		      },
@@ -1967,12 +1955,10 @@ bash = (() => {
 				if (t.accept(identStart)) {
 					t.acceptRun(identCont);
 
-					const l = t.length();
+					const stateb = t.state();
 
 					if (t.acceptWord(assignment, false) !== "") {
-						t.reset();
-
-						while (t.length() < l) t.next();
+						stateb();
 
 						return t.return(TokenIdentifier, startAssign);
 					} else if (!isInCommand() && isCommandIndex(t)) {
@@ -1991,9 +1977,7 @@ bash = (() => {
 
 							const isFunc = t.accept("(");
 
-							t.reset();
-
-							while (t.length() < l) t.next();
+							stateb();
 
 							if (isFunc) {
 								return t.return(TokenIdentifier, functionOpenParen);
@@ -2380,12 +2364,10 @@ bash = (() => {
 			}
 
 			while (true) {
-				const l = t.length();
+				const stateb = t.state();
 
 				if (t.acceptString(h.delim, false) === h.delim.length && (t.peek() === '\n' || t.peek() === '')) {
-					t.reset();
-
-					while (t.length() < l) t.next();
+					stateb();
 
 					const str = t.get();
 
@@ -2400,14 +2382,12 @@ bash = (() => {
 				case '':
 					return errUnexpectedEOF(t);
 				case '$':
-					const lb = t.length();
+					const stateb = t.state();;
 
 					t.next();
 
 					if (t.accept(decimalDigit) || t.accept(identStart) || t.accept("({$!?")) {
-						t.reset();
-
-						while (t.length() < lb) t.next();
+						stateb();
 
 						state.push(stateHeredocIdentifier);
 
