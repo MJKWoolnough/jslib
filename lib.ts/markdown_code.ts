@@ -2600,6 +2600,7 @@ bash = (() => {
 
 				t.next();
 				setInCommand();
+
 				state.push(t.accept("(") ? stateArithmeticExpansion : stateParens);
 
 				break;
@@ -2613,6 +2614,7 @@ bash = (() => {
 
 					return braceExpansion(t);
 				} else if (whitespaceNewline.includes(tk) && !isInCommand()) {
+					setInCommand();
 					state.push(stateBrace);
 				}
 
@@ -2904,7 +2906,15 @@ bash = (() => {
 			return operatorOrWord(t);
 		      },
 		      isInCommand = () => state.at(-1) === stateInCommand,
-		      endCommand = () => isInCommand() && state.pop(),
+		      endCommand = () => {
+			if (isInCommand()) {
+				state.pop();
+
+				if (state.at(-1) === stateFunctionBody) {
+					state.pop();
+				}
+			}
+		      },
 		      setInCommand = () => {
 			switch (state.at(-1)) {
 			default:
