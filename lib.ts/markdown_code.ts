@@ -1431,7 +1431,7 @@ bash = (() => {
 				return errInvalidCharacter(t);
 			}
 
-			return testWord(t)
+			return testWordOrPunctuator(t)
 		      },
 		      testBinaryOperator = (t: Tokeniser) => {
 			if (parseWhitespace(t)) {
@@ -1559,16 +1559,14 @@ bash = (() => {
 			case ']':
 				t.next();
 
-				if (t.accept("]") && isWhitespace(t)) {
+				if (t.accept("]") && isWordSeperator(t)) {
 					state.pop();
 
 					if (state.at(-1) === stateTest) {
 						return errInvalidCharacter(t);
 					}
 
-					setInCommand();
-
-					return t.return(TokenKeyword, main);
+					return t.return(TokenReservedWord, main);
 				}
 
 				t.reset();
@@ -1874,6 +1872,7 @@ bash = (() => {
 
 				return t.return(TokenReservedWord, functionK);
 			case "[[":
+				setInCommand();
 				state.push(stateTest);
 
 				return t.return(TokenReservedWord, test);
@@ -2849,6 +2848,8 @@ bash = (() => {
 				return string(t);
 			} else if (td === stateTest) {
 				return testWord(t);
+			} else if (td === stateTestBinary) {
+				return testBinaryOperator(t);
 			} else if (parseWhitespace(t)) {
 				if (td === stateArrayIndex || td === stateBraceExpansionArrayIndex) {
 					state.pop();
@@ -2856,8 +2857,6 @@ bash = (() => {
 					if (!isInCommand()) {
 						state.push(td);
 					}
-				} else if (td === stateTestBinary) {
-					return t.return(TokenWhitespace, testBinaryOperator);
 				}
 
 				if (td === stateCommandIndex) {
@@ -2880,8 +2879,6 @@ bash = (() => {
 					return t.return(TokenLineTerminator, ifThen);
 				} else if (td === stateLoopCondition) {
 					return t.return(TokenLineTerminator, loopDo);
-				} else if (td === stateTestBinary) {
-					return t.return(TokenLineTerminator, testBinaryOperator);
 				}
 
 				if (td === stateCommandIndex) {
