@@ -1412,8 +1412,6 @@ bash = (() => {
 				return stringStart(t);
 			} else if (c === ' ' || c === '\n') {
 				return test(t);
-			} else if (c === ')') {
-				return test(t);
 			} else if (c === '`') {
 				return startBacktick(t);
 			}
