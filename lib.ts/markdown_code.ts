@@ -2829,12 +2829,6 @@ bash = (() => {
 					td = state.at(-1);
 				}
 
-				if (td === stateFunctionBody) {
-					state.pop();
-
-					td = state.at(-1);
-				}
-
 				if (td === undefined) {
 					return t.done();
 				}
