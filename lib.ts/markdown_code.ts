@@ -2638,8 +2638,6 @@ bash = (() => {
 				} else if (tda === stateCaseEnd) {
 					state.pop();
 					state.push(stateCaseBody);
-				} else if (tda === stateTestBinary) {
-					return testBinaryOperator(t);
 				} else {
 					t.next();
 
