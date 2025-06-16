@@ -937,7 +937,7 @@ bash = (() => {
 
 	const keywords = ["if", "then", "else", "elif", "fi", "case", "esac", "while", "for", "in", "do", "done", "time", "until", "coproc", "select", "function", "{", "}", "[[", "]]", "!", "break", "continue"],
 	      compoundStart = ["if", "while", "until", "for", "select", "{", "("],
-	      builtins = ["export", "readonly", "declare", "typeset", "local"],
+	      builtins = ["export", "readonly", "declare", "typeset", "local", "let"],
 	      dotdot = [".."],
 	      escapedNewline = ["\\\n"],
 	      assignment = ["=", "+="],
@@ -969,7 +969,7 @@ bash = (() => {
 	      identStart = letters + "_",
 	      identCont = decimalDigit + identStart,
 	      numberChars = identCont + "@",
-	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParens, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 32}, (_, n) => n),
+	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinLet, stateBuiltinLetExpression, stateBuiltinLetParens, stateBuiltinLetTernary, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParens, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 36}, (_, n) => n),
 	      errInvalidParameterExpansion = error("invalid parameter expansion"),
 	      errIncorrectBacktick = error("incorrect backtick"),
 	      errInvalidKeyword = error("invalid keyword"),
@@ -1194,6 +1194,10 @@ bash = (() => {
 			t.accept("+");
 			t.accept("=");
 
+			if (state.at(-1) === stateBuiltinLetExpression) {
+				return t.return(TokenPunctuator, main);
+			}
+
 			return t.return(TokenPunctuator, value);
 		      },
 		      startArrayAssign = (t: Tokeniser) => {
@@ -1346,6 +1350,15 @@ bash = (() => {
 			}
 
 			return t.return(TokenReservedWord, builtinArgs);
+		      },
+		      letExpressionOrWord = (t: Tokeniser) => {
+			const ret = identOrWord(t);
+
+			if (ret[0].type === TokenIdentifier) {
+				state.push(stateBuiltinLetExpression);
+			}
+
+			return ret;
 		      },
 		      testPattern = (t: Tokeniser) => {
 			Loop:
@@ -2011,6 +2024,10 @@ bash = (() => {
 
 					if (!isWordSeperator(t)) {
 						t.reset();
+					} else if (bn === "let") {
+						state.push(stateBuiltinLet)
+
+						return t.return(TokenReservedWord, main);
 					} else if (bn !== "") {
 						return builtin(t, bn);
 					}
@@ -2708,13 +2725,22 @@ bash = (() => {
 				break;
 			case '?':
 				t.next();
-				state.push(stateTernary);
+
+				const tdb = state.at(-1);
+
+				if (tdb === stateBuiltinLetExpression || tdb == stateBuiltinLetParens || tdb === stateBuiltinLetTernary) {
+					state.push(stateBuiltinLetTernary);
+				} else {
+					state.push(stateTernary);
+				}
 
 				break;
 			case ':':
 				t.next();
 
-				if (state.at(-1) !== stateTernary) {
+				const tdc = state.at(-1);
+
+				if (tdc !== stateTernary && tdc !== stateBuiltinLetTernary ) {
 					return errInvalidCharacter(t);
 				}
 
@@ -2738,7 +2764,7 @@ bash = (() => {
 
 				const tda = state.at(-1);
 
-				if ((tda !== stateArithmeticExpansion && tda !== stateForArithmetic || !t.accept(")")) && tda !== stateArithmeticParens) {
+				if ((tda !== stateArithmeticExpansion && tda !== stateForArithmetic || !t.accept(")")) && tda !== stateArithmeticParens && tda !== stateBuiltinLetParens) {
 					return errInvalidCharacter(t);
 				}
 
@@ -2747,13 +2773,24 @@ bash = (() => {
 				break;
 			case '(':
 				t.next();
-				state.push(stateArithmeticParens);
+
+				const tdd = state.at(-1);
+
+				if (tdd === stateBuiltinLetExpression || tdd === stateBuiltinLetParens || tdd === stateBuiltinLetTernary) {
+					state.push(stateBuiltinLetParens);
+				} else {
+					state.push(stateArithmeticParens);
+				}
 
 				break;
 			case '0':
 				return zero(t);
 			case ';':
-				if (state.at(-1) !== stateForArithmetic) {
+				const tdf = state.at(-1);
+
+				if (tdf === stateBuiltinLetExpression) {
+					endCommand();
+				} else if (tdf !== stateForArithmetic) {
 					return errInvalidCharacter(t);
 				}
 
@@ -2761,10 +2798,23 @@ bash = (() => {
 
 				break;
 			case '{':
-			case '}':
-				t.next();
+				const tde = state.at(-1);
 
+				if (tde === stateBuiltinLetExpression || tde === stateBuiltinLetParens || tde === stateBuiltinLetTernary) {
+					t.next();
+
+					const ret = braceExpansion(t);
+
+					if (ret[0].type === TokenIdentifier) {
+						return ret;
+					}
+
+					return errInvalidCharacter(t);
+				}
+			case '}':
 				if (state.at(-1) === stateCommandIndex) {
+					t.next();
+
 					return t.return(TokenPunctuator, main);
 				}
 
@@ -2815,11 +2865,9 @@ bash = (() => {
 
 				return testPattern(t);
 			} else if (t.peek() === '') {
-				if (isInCommand()) {
-					endCommand();
+				endCommand();
 
-					td = state.at(-1);
-				}
+				td = state.at(-1);
 
 				if (td === undefined) {
 					return t.done();
@@ -2843,6 +2891,8 @@ bash = (() => {
 					if (!isInCommand()) {
 						state.push(td);
 					}
+				} else if (td === stateBuiltinLetExpression) {
+					state.pop();
 				}
 
 				if (td === stateCommandIndex) {
@@ -2875,21 +2925,35 @@ bash = (() => {
 			} else if (t.accept("#")) {
 				if (td === stateBraceExpansion || td === stateCommandIndex) {
 					return word(t);
-				} else if (td === stateArithmeticExpansion || td === stateArithmeticParens || td === stateTernary || td === stateForArithmetic || td === stateArrayIndex) {
+				} else if (td === stateArithmeticExpansion || td === stateArithmeticParens || td === stateTernary || td === stateForArithmetic || td === stateArrayIndex || td === stateBuiltinLetExpression || td === stateBuiltinLetParens || td === stateBuiltinLetTernary) {
 					return errInvalidCharacter(t);
 				}
 
 				t.exceptRun(newline);
 
 				return t.return(TokenSingleLineComment, main);
-			} else if (td === stateArithmeticExpansion || td === stateArithmeticParens || td === stateTernary || td === stateForArithmetic || td === stateArrayIndex || td === stateCommandIndex) {
+			} else if (td === stateArithmeticExpansion || td === stateArithmeticParens || td === stateTernary || td === stateForArithmetic || td === stateArrayIndex || td === stateCommandIndex || td === stateBuiltinLetExpression || td === stateBuiltinLetParens || td === stateBuiltinLetTernary) {
 				return arithmeticExpansion(t);
+			} else if (td === stateBuiltinLet) {
+				return letExpressionOrWord(t);
 			}
 
 			return operatorOrWord(t);
 		      },
 		      isInCommand = () => state.at(-1) === stateInCommand,
 		      endCommand = () => {
+			let td = state.at(-1);
+
+			if (td === stateBuiltinLetExpression) {
+				state.pop();
+
+				td = state.at(-1);
+			}
+
+			if (td === stateBuiltinLet) {
+				state.pop();
+			}
+
 			if (isInCommand()) {
 				state.pop();
 
@@ -2915,6 +2979,10 @@ bash = (() => {
 			case stateTestBinary:
 			case stateValue:
 			case stateCommandIndex:
+			case stateBuiltinLet:
+			case stateBuiltinLetExpression:
+			case stateBuiltinLetParens:
+			case stateBuiltinLetTernary:
 			}
 		      },
 		      heredoc: heredocType[][] = [];
