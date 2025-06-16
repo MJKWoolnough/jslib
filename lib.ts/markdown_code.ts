@@ -1249,10 +1249,6 @@ bash = (() => {
 
 			while (true) {
 				switch (t.exceptRun(wb)) {
-				case '':
-					if (t.length() === 0) {
-						return errUnexpectedEOF(t);
-					}
 				default:
 					return t.return(TokenKeyword, main);
 				case '{':
