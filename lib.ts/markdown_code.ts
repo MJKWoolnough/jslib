@@ -1229,6 +1229,9 @@ bash = (() => {
 			case stateArithmeticParens:
 			case stateTernary:
 			case stateForArithmetic:
+			case stateBuiltinLetExpression:
+			case stateBuiltinLetParens:
+			case stateBuiltinLetTernary:
 				wb = wordBreakArithmetic;
 
 				break;
