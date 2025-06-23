@@ -2198,7 +2198,7 @@ bash = (() => {
 		      },
 		      parameterExpansionOperation = (t: Tokeniser) => {
 			if (t.accept(":")) {
-				if (t.accept("-=#?+")) {
+				if (t.accept("-=?+")) {
 					return t.return(TokenPunctuator, main);
 				}
 
