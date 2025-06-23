@@ -2203,6 +2203,8 @@ bash = (() => {
 				}
 
 				return t.return(TokenPunctuator, parameterExpansionSubstringStart);
+			} else if (t.accept("-=?+")) {
+				return t.return(TokenPunctuator, main);
 			} else if (t.accept("/")) {
 				t.accept("/#%");
 
