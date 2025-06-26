@@ -2670,6 +2670,7 @@ bash = (() => {
 
 				if (tdb === stateBrace || tdb === stateBraceExpansion) {
 					state.pop();
+					endCommand();
 				}
 
 				break;
