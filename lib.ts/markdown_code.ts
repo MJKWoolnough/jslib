@@ -1451,7 +1451,9 @@ bash = (() => {
 
 				return t.return(TokenLineTerminator, testBinaryOperator);
 			} else if (t.accept("#")) {
-				return errInvalidCharacter(t);
+				t.exceptRun(newline);
+
+				return t.return(TokenSingleLineComment, testBinaryOperator);
 			}
 
 			state.pop();
@@ -1521,7 +1523,7 @@ bash = (() => {
 			} else if (t.accept("#")) {
 				t.exceptRun("\n");
 
-				return t.return(TokenSingleLineComment, test);
+				return t.return(TokenSingleLineComment, testWordOrPunctuator);
 			}
 
 			const c = t.peek();
