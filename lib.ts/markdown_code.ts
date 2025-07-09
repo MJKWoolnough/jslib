@@ -2529,8 +2529,6 @@ bash = (() => {
 			const c = t.peek();
 
 			switch (c) {
-			default:
-				return keywordIdentOrWord(t);
 			case '<':
 				t.next();
 
@@ -2636,16 +2634,6 @@ bash = (() => {
 				}
 
 				break;
-			case ']':
-				t.next();
-
-				if (state.at(-1) === stateBraceExpansionArrayIndex) {
-					state.pop();
-
-					return t.return(TokenPunctuator, parameterExpansionOperation);
-				}
-
-				break;
 			case ')':
 				endCommand();
 
@@ -2684,6 +2672,15 @@ bash = (() => {
 				setInCommand();
 
 				return startBacktick(t);
+			case ']':
+				if (state.at(-1) === stateBraceExpansionArrayIndex) {
+					t.next();
+					state.pop();
+
+					return t.return(TokenPunctuator, parameterExpansionOperation);
+				}
+			default:
+				return keywordIdentOrWord(t);
 			}
 
 			return t.return(TokenPunctuator, main);
