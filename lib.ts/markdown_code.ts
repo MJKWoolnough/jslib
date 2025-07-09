@@ -2532,7 +2532,9 @@ bash = (() => {
 			case '<':
 				t.next();
 
-				if (t.accept("<")) {
+				if (t.accept("(")) {
+					state.push(stateParens);
+				} else if (t.accept("<")) {
 					if (!t.accept("<")) {
 						nextHeredocIsStripped = t.accept("-");
 
@@ -2545,7 +2547,12 @@ bash = (() => {
 				break;
 			case '>':
 				t.next();
-				t.accept(">&|");
+
+				if (t.accept("(")) {
+					state.push(stateParens);
+				} else {
+					t.accept(">&|");
+				}
 
 				break;
 			case '|':
