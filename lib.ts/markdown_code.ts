@@ -1890,7 +1890,22 @@ bash = (() => {
 				return t.return(TokenReservedWord, test);
 			case "continue":
 			case "break":
-				if (state.at(-1) !== stateLoopBody) {
+				let inLoop = false;
+
+				Loop:
+				for (const s of state.toReversed()) {
+					switch (s) {
+					case stateIfBody:
+					case stateCaseBody:
+						continue;
+					case stateLoopBody:
+						inLoop = true;
+					default:
+						break Loop
+					}
+				}
+
+				if (!inLoop) {
 					return errInvalidKeyword(t);
 				}
 			default:
