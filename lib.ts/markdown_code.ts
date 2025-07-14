@@ -1355,7 +1355,7 @@ bash = (() => {
 			return t.return(TokenReservedWord, builtinArgs);
 		      },
 		      letExpressionOrWord = (t: Tokeniser) => {
-			const ret = identOrWord(t);
+			const ret = operatorOrWord(t);
 
 			if (ret[0].type === TokenIdentifier) {
 				state.push(stateBuiltinLetExpression);
