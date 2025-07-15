@@ -954,13 +954,12 @@ bash = (() => {
 	      doubleStops = "\\`$\"",
 	      singleStops = "'",
 	      ansiStops = "'\\",
-	      wordB = "\\\"'`(){}- \t\n",
 	      wordBreak = "\\\"'`() \t\n$|&;<>{",
+	      wordBreakBrace = "\\\"'`() \t\n$|&;,<>}",
 	      wordBreakArithmetic = "\\\"'`(){} \t\n$+-!~/*%<=>&^|?:,;",
 	      wordBreakNoBrace = wordBreak + "#}]",
 	      wordBreakIndex = wordBreakArithmetic + "]",
 	      wordBreakCommandIndex = "\\\"'`(){} \t\n$+-!~/*%<=>&^|?:,]",
-	      braceWordBreak = " `\\\t\n|&;<>()={},",
 	      testWordBreak = " `\\\t\n\"'$|&;<>(){}!,",
 	      hexDigit = "0123456789ABCDEFabcdef",
 	      octalDigit = "012345678",
@@ -969,7 +968,7 @@ bash = (() => {
 	      identStart = letters + "_",
 	      identCont = decimalDigit + identStart,
 	      numberChars = identCont + "@",
-	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinLet, stateBuiltinLetExpression, stateBuiltinLetParens, stateBuiltinLetTernary, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParens, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 36}, (_, n) => n),
+	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionWord, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinLet, stateBuiltinLetExpression, stateBuiltinLetParens, stateBuiltinLetTernary, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParens, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 37}, (_, n) => n),
 	      errInvalidParameterExpansion = error("invalid parameter expansion"),
 	      errIncorrectBacktick = error("incorrect backtick"),
 	      errInvalidKeyword = error("invalid keyword"),
@@ -1061,108 +1060,80 @@ bash = (() => {
 
 	return (tk: Tokeniser) => {
 		const state: number[] = [],
-		      braceExpansionWord = (t: Tokeniser) => {
-			let hasComma = false;
+		      isBraceExpansionWord = (t: Tokeniser) => {
+			state.push(stateBraceExpansionWord);
+
+			const savedState = state.slice(),
+			      savedHeredocs = JSON.parse(JSON.stringify(heredoc)),
+			      savedChild = child,
+			      sub = Parser({"next": () => ({"value": t.next(), "done": false})}, main);
+
+			let hasComma = false,
+			    isBEW = false;
 
 			while (true) {
-				switch (t.exceptRun(braceWordBreak)) {
-				case '}':
-					if (hasComma) {
-						t.next();
+				const tk = sub.next().value;
 
-						return t.return(TokenIdentifier, main);
-					}
-				default:
-					return word(t);
-				case '\\':
-					t.next();
-					t.next();
-
+				if (tk.type === TokenError) {
 					break;
-				case ',':
-					t.next();
+				}
 
-					hasComma = true;
+				if (state.length <= savedState.length) {
+					if (tk.type === TokenPunctuator && tk.data === "}") {
+						isBEW = hasComma;
+
+						break;
+					} else if (tk.type === TokenPunctuator && tk.data == ",") {
+						hasComma = true
+					} else if (tk.type === TokenPunctuator && tk.data == ";") {
+						break;
+					} else if (tk.type === TokenWhitespace || tk.type == TokenLineTerminator) {
+						break;
+					}
+				} else if (tk.type === TokenDone) {
+					break;
 				}
 			}
-		      },
-		      braceWord = (t: Tokeniser) => {
-			t.acceptRun(identCont);
 
-			if (!t.accept("}")) {
-				return braceExpansionWord(t);
-			}
+			child = savedChild;
+			heredoc.splice(0, heredoc.length, ...savedHeredocs);
+			state.splice(0, state.length, ...savedState);
+			state.pop();
 
-			return t.return(TokenKeyword, main);
+			return isBEW;
 		      },
 		      braceExpansion = (t: Tokeniser) => {
-			if (t.accept(letters)) {
-				if (t.acceptWord(dotdot, false) !== "") {
-					if (!t.accept(letters)) {
-						return word(t);
-					}
+			const tstate = t.state();
 
-					if (t.acceptWord(dotdot, false) !== "") {
-						t.accept("-");
+			if ((t.accept("-") && t.accept(decimalDigit) || t.accept(decimalDigit)) && t.acceptRun(decimalDigit) == '.' && t.acceptWord(dotdot, false) != "" && (t.accept("-") && t.accept(decimalDigit) || t.accept(decimalDigit)) && (t.acceptRun(decimalDigit) == '}' || (t.acceptWord(dotdot, false) != "" && t.accept("-") && t.accept(decimalDigit) || t.accept(decimalDigit) && t.acceptRun(decimalDigit) == '}'))) {
+				t.next()
 
-						if (!t.accept(decimalDigit)) {
-							return word(t);
-						}
-
-						t.acceptRun(decimalDigit);
-					}
-
-					if (!t.accept("}")) {
-						return word(t);
-					}
-
-					return t.return(TokenIdentifier, main);
-				}
-
-				return braceWord(t);
-			} else if (t.accept("_")) {
-				return braceWord(t);
-			} else {
-				t.accept("-");
-
-				if (t.accept(decimalDigit)) {
-					switch (t.acceptRun(decimalDigit)) {
-					default:
-						return word(t);
-					case ',':
-						return braceExpansionWord(t);
-					case '.':
-						if (t.acceptWord(dotdot, false) !== "") {
-							t.accept("-");
-
-							if (!t.accept(decimalDigit)) {
-								return word(t);
-							}
-
-							t.acceptRun(decimalDigit);
-
-							if (t.acceptWord(dotdot, false) !== "") {
-								t.accept("-");
-
-								if (!t.accept(decimalDigit)) {
-									return word(t);
-								}
-
-								t.acceptRun(decimalDigit);
-							}
-
-							if (!t.accept("}")) {
-								return word(t);
-							}
-
-							return t.return(TokenIdentifier, main);
-						}
-
-					}
-				}
+				return t.return(TokenIdentifier, main);
 			}
 
-			return braceExpansionWord(t);
+			tstate();
+
+			if (t.accept(letters) && t.acceptRun(letters) == '.' && t.acceptWord(dotdot, false) != "" && t.accept(letters) && (t.acceptRun(letters) == '}' || t.acceptWord(dotdot, false) != "" && (t.accept("-") && t.accept(decimalDigit) || t.accept(decimalDigit)) && t.acceptRun(decimalDigit) == '}')) {
+				t.next()
+
+				return t.return(TokenIdentifier, main);
+			}
+
+			tstate();
+
+			const bew = isBraceExpansionWord(t);
+
+			tstate();
+
+			if (bew) {
+				state.push(stateBraceExpansionWord);
+
+				return t.return(TokenPunctuator, main)
+			} else if (state.at(-1) == stateBuiltinLetExpression) {
+				return errInvalidCharacter(t)
+			}
+
+			return word(t)
 		      },
 		      value = (t: Tokeniser) => {
 			const isArray = state.at(-1) === stateArrayIndex;
@@ -1216,6 +1187,10 @@ bash = (() => {
 				wb = wordBreakNoBrace;
 
 				break;
+			case stateBraceExpansionWord:
+				wb = wordBreakBrace;
+
+				break;
 			case stateArrayIndex:
 			case stateBraceExpansionArrayIndex:
 				wb = wordBreakIndex;
@@ -1263,18 +1238,21 @@ bash = (() => {
 						return t.return(TokenKeyword, main);
 					}
 
-					const state = t.state();
+					const tstate = t.state();
 
 					t.next();
 
 					if (t.accept(whitespace) || t.accept(newline) || t.peek() === '') {
-						state();
+						tstate();
 					} else {
 						const [tk] = braceExpansion(new Tokeniser({"next": () => ({"value": t.next(), "done": false})}));
 
-						state();
+						tstate();
 
-						if (tk.type === TokenIdentifier) {
+						switch (tk.type) {
+						case TokenPunctuator:
+							state.pop();
+						case TokenIdentifier:
 							return t.return(TokenKeyword, main);
 						}
 					}
@@ -2646,13 +2624,13 @@ bash = (() => {
 
 				const tk = t.peek();
 
-				if (!wordB.includes(tk) || tk === '-') {
+				if (whitespaceNewline.includes(tk) && !isInCommand()) {
+					setInCommand();
+					state.push(stateBrace);
+				} else {
 					setInCommand();
 
 					return braceExpansion(t);
-				} else if (whitespaceNewline.includes(tk) && !isInCommand()) {
-					setInCommand();
-					state.push(stateBrace);
 				}
 
 				break;
@@ -2683,6 +2661,8 @@ bash = (() => {
 				if (tdb === stateBrace || tdb === stateBraceExpansion) {
 					state.pop();
 					endCommand();
+				} else if (tdb == stateBraceExpansionWord) {
+					state.pop();
 				}
 
 				break;
@@ -2690,6 +2670,14 @@ bash = (() => {
 				setInCommand();
 
 				return identifier(t);
+			case ',':
+				if (state.at(-1) != stateBraceExpansionWord) {
+					return keywordIdentOrWord(t);
+				}
+
+				t.next();
+
+				break;
 			case '`':
 				setInCommand();
 
@@ -2830,13 +2818,7 @@ bash = (() => {
 				if (tde === stateBuiltinLetExpression || tde === stateBuiltinLetParens || tde === stateBuiltinLetTernary) {
 					t.next();
 
-					const ret = braceExpansion(t);
-
-					if (ret[0].type === TokenIdentifier) {
-						return ret;
-					}
-
-					return errInvalidCharacter(t);
+					return braceExpansion(t);
 				}
 			case '}':
 				if (state.at(-1) === stateCommandIndex) {
@@ -2994,6 +2976,7 @@ bash = (() => {
 			default:
 				state.push(stateInCommand);
 			case stateArrayIndex:
+			case stateBraceExpansionWord:
 			case stateBraceExpansionArrayIndex:
 			case stateInCommand:
 			case stateHeredocIdentifier:

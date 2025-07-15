@@ -13624,7 +13624,7 @@ type Tests = {
 				},
 				"brace expansion": {
 					"source": `{1..2} {1..2..3} {1,2,3} a{bz,cz,dz}e {e..f}`,
-					"output": `<span class="identifier">{1..2}</span><span class="whitespace">&nbsp;</span><span class="identifier">{1..2..3}</span><span class="whitespace">&nbsp;</span><span class="identifier">{1,2,3}</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="identifier">{bz,cz,dz}</span><span class="keyword">e</span><span class="whitespace">&nbsp;</span><span class="identifier">{e..f}</span>`
+					"output": `<span class="identifier">{1..2}</span><span class="whitespace">&nbsp;</span><span class="identifier">{1..2..3}</span><span class="whitespace">&nbsp;</span><span class="punctuator">{</span><span class="keyword">1</span><span class="punctuator">,</span><span class="keyword">2</span><span class="punctuator">,</span><span class="keyword">3</span><span class="punctuator">}</span><span class="whitespace">&nbsp;</span><span class="keyword">a</span><span class="punctuator">{</span><span class="keyword">bz</span><span class="punctuator">,</span><span class="keyword">cz</span><span class="punctuator">,</span><span class="keyword">dz</span><span class="punctuator">}</span><span class="keyword">e</span><span class="whitespace">&nbsp;</span><span class="identifier">{e..f}</span>`
 				},
 				"brace grouping": {
 					"source": `{ a; } { a; b; c; } { { a; } } {`,
