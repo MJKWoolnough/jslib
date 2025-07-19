@@ -968,7 +968,7 @@ bash = (() => {
 	      identStart = letters + "_",
 	      identCont = decimalDigit + identStart,
 	      numberChars = identCont + "@",
-	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionWord, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinLet, stateBuiltinLetExpression, stateBuiltinLetParens, stateBuiltinLetTernary, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParens, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 37}, (_, n) => n),
+	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionWord, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinLet, stateBuiltinLetExpression, stateBuiltinLetParens, stateBuiltinLetTernary, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParens, stateParensGroup, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 38}, (_, n) => n),
 	      errInvalidParameterExpansion = error("invalid parameter expansion"),
 	      errIncorrectBacktick = error("incorrect backtick"),
 	      errInvalidKeyword = error("invalid keyword"),
@@ -2518,6 +2518,30 @@ bash = (() => {
 
 			return t.return(TokenPunctuator, backtick);
 		      },
+		      endGroup = (t: Tokeniser) => {
+			const cstate = t.state();
+
+			let next = main;
+
+			t.acceptRun(whitespace);
+
+			switch (state.at(-1)) {
+			case stateIfTest:
+				if (t.acceptString("then") === 4 && isWordSeperator(t)) {
+					next = ifThen;
+				}
+
+				break;
+			case stateLoopCondition:
+				if (t.acceptString("do") === 2 && isWordSeperator(t)) {
+					next = loopDo;
+				}
+			}
+
+			cstate();
+
+			return t.return(TokenPunctuator, next);
+		      },
 		      operatorOrWord = (t: Tokeniser) => {
 			const c = t.peek();
 
@@ -2616,7 +2640,7 @@ bash = (() => {
 				t.next();
 				setInCommand();
 
-				state.push(t.accept("(") ? stateArithmeticExpansion : stateParens);
+				state.push(t.accept("(") ? stateArithmeticExpansion : stateParensGroup);
 
 				break;
 			case '{':
@@ -2636,21 +2660,23 @@ bash = (() => {
 				break;
 			case ')':
 				endCommand();
+				t.next();
 
 				const tda = state.at(-1);
 
-				if (tda === stateParens) {
+				if (tda === stateParensGroup) {
+					state.pop();
+					endCommand();
+
+					return endGroup(t);
+				} else if (tda === stateParens) {
 					state.pop();
 				} else if (tda === stateCaseEnd) {
 					state.pop();
 					state.push(stateCaseBody);
 				} else {
-					t.next();
-
 					return errInvalidCharacter(t);
 				}
-
-				t.next();
 
 				break;
 			case '}':
@@ -2658,7 +2684,12 @@ bash = (() => {
 
 				const tdb = state.at(-1);
 
-				if (tdb === stateBrace || tdb === stateBraceExpansion) {
+				if (tdb === stateBrace) {
+					state.pop();
+					endCommand();
+
+					return endGroup(t);
+				} else if (tdb === stateBraceExpansion) {
 					state.pop();
 					endCommand();
 				} else if (tdb == stateBraceExpansionWord) {
