@@ -3013,6 +3013,7 @@ bash = (() => {
 			case stateHeredocIdentifier:
 			case stateStringDouble:
 			case stateArithmeticExpansion:
+			case stateArithmeticParens:
 			case stateBraceExpansion:
 			case stateCaseParam:
 			case stateForArithmetic:
