@@ -1,8 +1,8 @@
 #!/bin/bash
 
-declare filesDone=""
+declare filesDone="";
 
-function depCheck {
+function depCheck() {
 	declare file="$1";
 
 	if [ ! -z "$(echo "$filesDone" | grep "$file")" ]; then
@@ -16,7 +16,7 @@ function depCheck {
 		declare realImport="$(realpath "$dir/$import")";
 
 		if [ ! -z "$(echo "$deps" | grep "$realImport")" ]; then
-			echo "CIRCULAR: $file <-> $realImport"
+			echo "CIRCULAR: $file <-> $realImport";
 
 			return 0;
 		else
