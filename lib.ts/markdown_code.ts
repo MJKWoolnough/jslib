@@ -2043,7 +2043,7 @@ bash = (() => {
 
 			if (t.accept("#")) {
 				if (!t.accept(numberChars)) {
-					return errInvalidNumber(t);
+					return identOrWord(t);
 				}
 
 				t.acceptRun(numberChars);
