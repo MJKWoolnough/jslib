@@ -97,7 +97,11 @@ HEREDOC
 
 	while read line; do
 		from="$(( $(echo "$line" | cut -d';' -f1 | sed -e 's/^0*/0x/') ))";
-		to="$(echo -n "$line" | cut -d';' -f3 | sed -e 's/^ *0*/0x/' -e 's/ 0*/ 0x/g' | tr ' ' '\n' | while read char; do echo $(( $char ));done | tr '\n' ',' | sed -e 's/,$//')";
+		to="$(
+			echo -n "$line" | cut -d';' -f3 | sed -e 's/^ *0*/0x/' -e 's/ 0*/ 0x/g' | tr ' ' '\n' | while read char; do
+				echo $(( $char ));
+			done | tr '\n' ',' | sed -e 's/,$//';
+		)";
 		has953="$(echo "$to" | grep ",953$" > /dev/null && echo "true" || echo "false")";
 		toWithout953="$(echo "$to" | grep -v ",953$" || echo "$to" | sed -e 's/,953$//')";
 
@@ -151,7 +155,7 @@ HEREDOC
 	done < <(curl "https://www.unicode.org/Public/UCD/latest/ucd/CaseFolding.txt" 2> /dev/null | grep -v " [ST];" | grep -v "^#" | grep -v "^$");
 
 	printPrevious;
-cat <<HEREDOC
+	cat <<HEREDOC
 
 /**
  * The default export folds the case on the given string according to the following table of mappings:
