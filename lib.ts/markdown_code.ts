@@ -1106,7 +1106,7 @@ bash = (() => {
 			const tstate = t.state();
 
 			if ((t.accept("-") && t.accept(decimalDigit) || t.accept(decimalDigit)) && t.acceptRun(decimalDigit) == '.' && t.acceptWord(dotdot, false) != "" && (t.accept("-") && t.accept(decimalDigit) || t.accept(decimalDigit)) && (t.acceptRun(decimalDigit) == '}' || (t.acceptWord(dotdot, false) != "" && t.accept("-") && t.accept(decimalDigit) || t.accept(decimalDigit) && t.acceptRun(decimalDigit) == '}'))) {
-				t.next()
+				t.next();
 
 				return t.return(TokenIdentifier, main);
 			}
@@ -1114,7 +1114,7 @@ bash = (() => {
 			tstate();
 
 			if (t.accept(letters) && t.acceptRun(letters) == '.' && t.acceptWord(dotdot, false) != "" && t.accept(letters) && (t.acceptRun(letters) == '}' || t.acceptWord(dotdot, false) != "" && (t.accept("-") && t.accept(decimalDigit) || t.accept(decimalDigit)) && t.acceptRun(decimalDigit) == '}')) {
-				t.next()
+				t.next();
 
 				return t.return(TokenIdentifier, main);
 			}
@@ -2023,7 +2023,7 @@ bash = (() => {
 					if (!isWordSeperator(t)) {
 						t.reset();
 					} else if (bn === "let") {
-						state.push(stateBuiltinLet)
+						state.push(stateBuiltinLet);
 
 						return t.return(TokenReservedWord, main);
 					} else if (bn !== "") {
