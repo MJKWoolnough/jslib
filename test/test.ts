@@ -13346,7 +13346,7 @@ type Tests = {
 			return new Promise(fn => setTimeout(fn)).then(() => JSON.stringify(dt.exportPage(true)) === JSON.stringify([["Col A", "Col B", "CCC"],["1", "2", "3"]]));
 		}
 	}),
-	"markdown_code": {
+	"highlight": {
 		"default": (() => {
 			type Token = {
 				type: number;
@@ -13420,7 +13420,7 @@ type Tests = {
 				}
 			} as Record<string, Entry>).reduce((o, [name, {result = "", fulltext = "", tokens = [], colours = [], noPre = true}]) => {
 				o[name] = Object.defineProperty(async () => {
-					const {default: code} = await import("./lib/markdown_code.js"),
+					const {default: code} = await import("./lib/highlight.js"),
 					      tokenFn: TokenFn = t => tokens.length ? [tokens.shift()!, tokenFn] : t.done(),
 					      div = document.createElement("div");
 
@@ -13904,7 +13904,7 @@ type Tests = {
 				}
 			}
 		} as Record<string, Record<string, {source: string; output: string}>>).reduce((o, [testname, tests]) => (o[testname] = Object.entries(tests).reduce((o, [name, {source, output}]) => (o[name] = Object.defineProperty(async () => {
-			const {default: code, ...fns} = await import("./lib/markdown_code.js"),
+			const {default: code, ...fns} = await import("./lib/highlight.js"),
 			      div = document.createElement("div");
 
 			div.append(code(source, fns[testname as keyof typeof fns] as any, new Map([".whitespace", ".lineterminator", ".singlelinecomment", ".multilinecomment", ".identifier", ".privateidentifier", ".booleanliteral", ".keyword", ".punctuator", ".numericliteral", ".stringliteral", ".nosubstitutiontemplate", ".templatehead", ".templatemiddle", ".templatetail", ".regularexpressionliteral", ".nullliteral", ".futurereservedword"].map((c, n) => [n, c]))));
