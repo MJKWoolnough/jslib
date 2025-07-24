@@ -13716,7 +13716,11 @@ type Tests = {
 				},
 				"heredocs (20)": {
 					"source": "<<a\\ b\\ c\na$abc\na b c",
-					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">a\\&nbsp;b\\&nbsp;c</span><span class="lineterminator"><br></span><span class="stringliteral">a$abc<br>a&nbsp;b&nbsp;c</span>`,
+					"output": `<span class="punctuator">&lt;&lt;</span><span class="keyword">a\\&nbsp;b\\&nbsp;c</span><span class="lineterminator"><br></span><span class="stringliteral">a$abc<br>a&nbsp;b&nbsp;c</span>`
+				},
+				"heredocs (21)": {
+					"source": "a <<ABC; b <<DEF\n123\nABC\n456\nDEF",
+					"output": `<span class="keyword">a</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&lt;</span><span class="keyword">ABC</span><span class="punctuator">;</span><span class="whitespace">&nbsp;</span><span class="keyword">b</span><span class="whitespace">&nbsp;</span><span class="punctuator">&lt;&lt;</span><span class="keyword">DEF</span><span class="lineterminator"><br></span><span class="stringliteral">123<br>ABC</span><span class="lineterminator"><br></span><span class="stringliteral">456<br>DEF</span>`
 				},
 				"assignments": {
 					"source": "abc=a def[0]=b ghi[$i]=c jkl+=d",
