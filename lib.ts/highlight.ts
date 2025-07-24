@@ -2465,9 +2465,12 @@ bash = (() => {
 			}
 
 			const tk: Token = {type: TokenKeyword, data: t.get()},
-			      hdt: heredocType = {stripped: nextHeredocIsStripped, delim: unstring(tk.data), expand: false}
+			      hdt: heredocType = {stripped: nextHeredocIsStripped, delim: unstring(tk.data), expand: false},
+			      inCommand = isInCommand();
 
 			hdt.expand = hdt.delim === tk.data;
+
+			endCommand();
 
 			if (state.at(-1) === stateHeredoc) {
 				heredoc.at(-1)!.push(hdt);
@@ -2475,6 +2478,10 @@ bash = (() => {
 				state.push(stateHeredoc);
 
 				heredoc.push([hdt])
+			}
+
+			if (inCommand) {
+				setInCommand();
 			}
 
 			return [tk, main];
