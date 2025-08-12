@@ -958,6 +958,7 @@ bash = (() => {
 	      wordBreakBrace = "\\\"'`() \t\n$|&;,<>}",
 	      wordBreakArithmetic = "\\\"'`(){} \t\n$+-!~/*%<=>&^|?:,;",
 	      wordBreakNoBrace = wordBreak + "#}]",
+	      wordBreakSubstring    = wordBreakNoBrace + ":",
 	      wordBreakIndex = wordBreakArithmetic + "]",
 	      wordBreakCommandIndex = "\\\"'`(){} \t\n$+-!~/*%<=>&^|?:,]",
 	      testWordBreak = " `\\\t\n\"'$|&;<>(){}!,",
@@ -968,7 +969,7 @@ bash = (() => {
 	      identStart = letters + "_",
 	      identCont = decimalDigit + identStart,
 	      numberChars = identCont + "@",
-	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionWord, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinLet, stateBuiltinLetExpression, stateBuiltinLetParens, stateBuiltinLetTernary, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParens, stateParensGroup, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 38}, (_, n) => n),
+	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionWord, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinLet, stateBuiltinLetExpression, stateBuiltinLetParens, stateBuiltinLetTernary, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParameterExpansionSubString, stateParens, stateParensGroup, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 39}, (_, n) => n),
 	      errInvalidParameterExpansion = error("invalid parameter expansion"),
 	      errIncorrectBacktick = error("incorrect backtick"),
 	      errInvalidKeyword = error("invalid keyword"),
@@ -1185,6 +1186,10 @@ bash = (() => {
 			switch (td) {
 			case stateBraceExpansion:
 				wb = wordBreakNoBrace;
+
+				break;
+			case stateParameterExpansionSubString:
+				wb = wordBreakSubstring
 
 				break;
 			case stateBraceExpansionWord:
@@ -2150,46 +2155,14 @@ bash = (() => {
 				}
 			}
 		      },
-		      parameterExpansionSubstringEnd = (t: Tokeniser) => {
-			if (parseWhitespace(t)) {
-				return t.return(TokenWhitespace, parameterExpansionSubstringEnd);
-			}
-
-			t.accept("-");
-
-			if (!t.accept(decimalDigit)) {
-				return errInvalidParameterExpansion(t);
-			}
-
-			t.acceptRun(decimalDigit);
-
-			return t.return(TokenNumericLiteral, main);
-		      },
-		      parameterExpansionSubstringMid = (t: Tokeniser): [Token, TokenFn] => {
-			if (parseWhitespace(t)) {
-				return t.return(TokenWhitespace, parameterExpansionSubstringMid);
-			}
-
-			if (t.accept(":")) {
-				return (t.return(TokenPunctuator, parameterExpansionSubstringEnd));
-			}
-
-			return main(t);
-		      },
 		      parameterExpansionSubstringStart = (t: Tokeniser) => {
 			if (parseWhitespace(t)) {
 				return t.return(TokenWhitespace, parameterExpansionSubstringStart);
 			}
 
-			t.accept("-");
+			state.push(stateParameterExpansionSubString);
 
-			if (!t.accept(decimalDigit)) {
-				return errInvalidParameterExpansion(t);
-			}
-
-			t.acceptRun(decimalDigit);
-
-			return t.return(TokenNumericLiteral, parameterExpansionSubstringMid);
+			return main(t)
 		      },
 		      parameterExpansionOperation = (t: Tokeniser) => {
 			if (t.accept(":")) {
@@ -2313,6 +2286,10 @@ bash = (() => {
 			switch (state.at(-1)) {
 			case stateBraceExpansion:
 				wb = wordBreakNoBrace;
+
+				break;
+			case stateParameterExpansionSubString:
+				wb = wordBreakSubstring
 
 				break;
 			case stateArrayIndex:
@@ -2701,7 +2678,21 @@ bash = (() => {
 					endCommand();
 				} else if (tdb == stateBraceExpansionWord) {
 					state.pop();
+				} else if (tdb == stateParameterExpansionSubString) {
+					state.pop();
+					state.pop();
 				}
+
+				break;
+			case ':':
+				const tdc = state.at(-1);
+
+				if (tdc != stateParameterExpansionSubString) {
+					return keywordIdentOrWord(t);
+				}
+
+				state.pop();
+				t.next();
 
 				break;
 			case '$':
@@ -3032,6 +3023,7 @@ bash = (() => {
 			case stateBuiltinLetExpression:
 			case stateBuiltinLetParens:
 			case stateBuiltinLetTernary:
+			case stateParameterExpansionSubString:
 			}
 		      },
 		      heredoc: heredocType[][] = [];
