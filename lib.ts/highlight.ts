@@ -1369,6 +1369,16 @@ bash = (() => {
 
 					return stringStart(t);
 				case '$':
+					const statea = t.state();
+
+					t.next()
+
+					if (isWhitespace(t)) {
+						break Loop;
+					}
+
+					statea();
+
 					state.push(stateTestPattern);
 
 					if (t.length() > 0) {
