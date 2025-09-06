@@ -1347,9 +1347,26 @@ bash = (() => {
 			return ret;
 		      },
 		      testPattern = (t: Tokeniser) => {
+			let depth = 0;
 			Loop:
 			while (true) {
 				switch (t.exceptRun("\\\"' \t\n$()")) {
+				case '(':
+					t.next();
+
+					depth++;
+
+					break;
+				case ')':
+					if (depth === 0) {
+						break Loop;
+					}
+
+					depth--;
+
+					t.next();
+
+					break;
 				default:
 					break Loop;
 				case '':
