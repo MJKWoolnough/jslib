@@ -2346,6 +2346,10 @@ bash = (() => {
 
 			t.exceptRun(wb);
 
+			if (t.length() === 1) {
+				return t.return(TokenKeyword, main);
+			}
+
 			return t.return(TokenIdentifier, main);
 		      },
 		      heredocEnd = (t: Tokeniser) => {
