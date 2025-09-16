@@ -2778,7 +2778,15 @@ bash = (() => {
 
 				break;
 			case '<':
+				t.next();
+				t.accept("=<");
+
+				break;
 			case '>':
+				t.next();
+				t.accept("=>");
+
+				break;
 			case '=':
 			case '!':
 			case '/':
