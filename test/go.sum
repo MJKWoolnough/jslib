@@ -1,9 +1,9 @@
 golang.org/x/net v0.39.0 h1:ZCu7HMWDxpXpaiKdhzIfaltL9Lp31x/3fCP11bc6/fY=
 golang.org/x/net v0.39.0/go.mod h1:X7NRbYVEA+ewNkCNyJ513WmMdQ3BineSwVtN2zD/d+E=
-vimagination.zapto.org/httpencoding v1.0.0 h1:sSibnPq1pKROK4IBTNNCAKRPCijIZAaMQUBf/Mn5GA0=
-vimagination.zapto.org/httpencoding v1.0.0/go.mod h1:J2hxhPn3VjWestQQ036OYpDwwerfvIHmbtmTqpKVe0w=
-vimagination.zapto.org/httpfile v1.0.0 h1:Z7HI1Zz8VoLEp2+n/Vn1aFlT4m+I9MLX9N6buK3OFRQ=
-vimagination.zapto.org/httpfile v1.0.0/go.mod h1:KyGTgFHo8/mg4Ig/puJEipCWVebrAtYK+Go17Nhdg/s=
+vimagination.zapto.org/httpencoding v1.1.1 h1:QKE0Cz6yq50DtoWnPunBCKEUvh2loyT5q8+hA9nlzDk=
+vimagination.zapto.org/httpencoding v1.1.1/go.mod h1:jnEwxHVkbtkSBKt42IeT4FoNhRjDUqI1uBYjL9pmY3o=
+vimagination.zapto.org/httpfile v1.1.2 h1:D2spkmY6TMZwjM/spCKLwfTroTCjaMI9h0yWOJmczk0=
+vimagination.zapto.org/httpfile v1.1.2/go.mod h1:ClcCL5LE40iCk9yyC3MfncFEC/cOubhPh37jiy2yh3w=
 vimagination.zapto.org/javascript v1.5.0 h1:MNQynA27nKt5LFewhtyCPBXBsSgZPl7oKAMlghmkv2w=
 vimagination.zapto.org/javascript v1.5.0/go.mod h1:VHox5R23pekFQihRLxhfKh3lvY9TbGhG5KhPtMnM2kw=
 vimagination.zapto.org/jsonrpc v1.3.0 h1:H4v/UCZzOZu1Ir8ucKP5WMQD+HiLr+p4acpTeB9ps9Q=
