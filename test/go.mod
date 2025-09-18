@@ -11,6 +11,6 @@ require (
 
 require (
 	vimagination.zapto.org/httpencoding v1.1.1 // indirect
-	vimagination.zapto.org/javascript v1.5.0 // indirect
+	vimagination.zapto.org/javascript v1.5.1 // indirect
 	vimagination.zapto.org/parser v1.0.4 // indirect
 )

@@ -4,8 +4,8 @@ vimagination.zapto.org/httpencoding v1.1.1 h1:QKE0Cz6yq50DtoWnPunBCKEUvh2loyT5q8
 vimagination.zapto.org/httpencoding v1.1.1/go.mod h1:jnEwxHVkbtkSBKt42IeT4FoNhRjDUqI1uBYjL9pmY3o=
 vimagination.zapto.org/httpfile v1.1.2 h1:D2spkmY6TMZwjM/spCKLwfTroTCjaMI9h0yWOJmczk0=
 vimagination.zapto.org/httpfile v1.1.2/go.mod h1:ClcCL5LE40iCk9yyC3MfncFEC/cOubhPh37jiy2yh3w=
-vimagination.zapto.org/javascript v1.5.0 h1:MNQynA27nKt5LFewhtyCPBXBsSgZPl7oKAMlghmkv2w=
-vimagination.zapto.org/javascript v1.5.0/go.mod h1:VHox5R23pekFQihRLxhfKh3lvY9TbGhG5KhPtMnM2kw=
+vimagination.zapto.org/javascript v1.5.1 h1:ykiuPlQL6NCjryMiT9a1iLjoJX9ATS0pgUtjXqCbkVI=
+vimagination.zapto.org/javascript v1.5.1/go.mod h1:VHox5R23pekFQihRLxhfKh3lvY9TbGhG5KhPtMnM2kw=
 vimagination.zapto.org/jsonrpc v1.3.0 h1:H4v/UCZzOZu1Ir8ucKP5WMQD+HiLr+p4acpTeB9ps9Q=
 vimagination.zapto.org/jsonrpc v1.3.0/go.mod h1:g41PBlAn31blw/VOQ2Vme2WUj0TI7OjPELvqn6luED4=
 vimagination.zapto.org/parser v1.0.4 h1:7REiRsbDlO7amHGjrCMudJaaw+E854njekVmTTsI2Hg=
