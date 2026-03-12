@@ -56,7 +56,7 @@ Thematically, the above modules can be grouped into a few packages:
 |  Script      |  Description  |
 |--------------|---------------|
 | casefold     | The scripts generates the casefold module. |
-| circular     | This script walks a javascript import tree to determine if there are any circular imports, which may cause initialisation problems. The first argument specifies the root script. |
+| circular     | This script walks a JavaScript import tree to determine if there are any circular imports, which may cause initialisation problems. The first argument specifies the root script. |
 | html         | This script generates the html module. |
 | math         | This script generates the math module. |
 | svg          | This script generates the svg module. |
@@ -1203,7 +1203,7 @@ class Fraction {
 }
 ```
 
-When the hint is set to "number", this method returns a normal javascript number representation of the Fraction value, to 5 decimal places. Otherwise, it returns a string representation of the fraction.
+When the hint is set to "number", this method returns a normal JavaScript number representation of the Fraction value, to 5 decimal places. Otherwise, it returns a string representation of the fraction.
 
 See [toPrimitive](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toPrimitive) documentation for how to use this symbol.
 
@@ -1833,7 +1833,7 @@ NB: Infinity is not a valid integer.
 (n: number, m: number) => number;
 ```
 
-Javascript does not have a built-in modulo operator, and as such this function is useful to perform it. It does the following:
+JavaScript does not have a built-in modulo operator, and as such this function is useful to perform it. It does the following:
 
 ```typescript
 ((n % m) + m) % m;
@@ -2338,7 +2338,7 @@ The `router` function creates a new router, which should be added to the DOM in 
 | remove | Used to remove the Router from the DOM and disable its routing. It can be added to the DOM later to reactivate it. |
 | [setTransition](#router_router_settransition) | Used to set a transition function. |
 
-In addition to being able to be used from javascript, the Router can be added directly with HTML using the `x-router` tag. When used in this way, routes can be added by adding children to the Router with the `route-match` attribute set to the matching route, as per the [add](#router_router_add) method.
+In addition to being able to be used from JavaScript, the Router can be added directly with HTML using the `x-router` tag. When used in this way, routes can be added by adding children to the Router with the `route-match` attribute set to the matching route, as per the [add](#router_router_add) method.
 
 The `x-router` can take a `router-transition` attribute, the name of which can be set to a name/function combo that is registered with the [registerTransition](#router_registertransition) function to allow an animated transition between routes.
 
