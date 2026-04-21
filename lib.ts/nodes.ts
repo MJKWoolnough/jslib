@@ -294,7 +294,7 @@ export class NodeArray<T extends Item, H extends Node = Node> implements Array<T
 		yield *entries(this[realTarget].#root);
 	}
 
-	every<U extends T>(callback: Callback<T, U>, thisArg: any = this): this is U[] {
+	every<U extends T>(callback: Callback<T, U>, thisArg?: any): this is U[] {
 		for (const [index, item] of entries(this[realTarget].#root)) {
 			if (!callback.call(thisArg ?? globalThis, item, index, this)) {
 				return false;
