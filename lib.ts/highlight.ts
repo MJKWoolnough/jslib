@@ -968,6 +968,7 @@ bash = (() => {
 	      letters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz",
 	      identStart = letters + "_",
 	      identCont = decimalDigit + identStart,
+	      functionCont = identCont + "-",
 	      numberChars = identCont + "@",
 	      [stateArithmeticExpansion, stateArithmeticParens, stateArrayIndex, stateBrace, stateBraceExpansion, stateBraceExpansionWord, stateBraceExpansionArrayIndex, stateBuiltinDeclare, stateBuiltinExport, stateBuiltinLet, stateBuiltinLetExpression, stateBuiltinLetParens, stateBuiltinLetTernary, stateBuiltinReadonly, stateBuiltinTypeset, stateCaseBody, stateCaseEnd, stateCaseParam, stateCommandIndex, stateForArithmetic, stateFunctionBody, stateHeredoc, stateHeredocIdentifier, stateIfBody, stateIfTest, stateInCommand, stateLoopBody, stateLoopCondition, stateParameterExpansionSubString, stateParens, stateParensGroup, stateStringDouble, stateStringSingle, stateStringSpecial, stateTernary, stateTest, stateTestBinary, stateTestPattern, stateValue] = Array.from({"length": 39}, (_, n) => n),
 	      errInvalidParameterExpansion = error("invalid parameter expansion"),
@@ -1656,7 +1657,7 @@ bash = (() => {
 				return errInvalidIdentifier(t);
 			}
 
-			t.acceptRun(identCont);
+			t.acceptRun(functionCont);
 
 			return t.return(TokenIdentifier, functionOpenParen);
 		      },
@@ -2009,11 +2010,15 @@ bash = (() => {
 						} else if (c === '}' && td === stateBrace || c === ')' && td === stateParens || td === stateBraceExpansion) {
 							return t.return(TokenKeyword, main);
 						} else if (!isInCommand()) {
+							t.acceptRun(functionCont);
+
+					const statec = t.state();
+
 							t.acceptRun(whitespace);
 
 							const isFunc = t.accept("(");
 
-							stateb();
+							statec();
 
 							if (isFunc) {
 								return t.return(TokenIdentifier, functionOpenParen);
