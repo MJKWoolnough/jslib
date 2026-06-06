@@ -50,7 +50,7 @@ let lastState = Date.now();
 
 history.replaceState(lastState, "");
 window.addEventListener("click", (e: Event) => {
-	let target = e.target as Element | null;
+	let target = (e.composed ? e.composedPath()[0] ?? e.target : e.target) as Element | null;
 
 	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
 		target = target.parentNode as Element;

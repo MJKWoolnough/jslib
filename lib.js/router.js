@@ -34,7 +34,7 @@ let lastState = Date.now();
 
 history.replaceState(lastState, "");
 window.addEventListener("click", e => {
-	let target = e.target;
+	let target = e.composed ? e.composedPath()[0] ?? e.target : e.target;
 
 	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
 		target = target.parentNode;
