@@ -17,16 +17,7 @@
  * @typedef {(current: ChildNode, next: ChildNode) => void} Swapper
  * */
 
-const update = Symbol("update"),
-      newState = Symbol("newState"),
-      routers = new Set(),
-      mo = new MutationObserver(records => {
-	for (const record of records) {
-		if (record.type === "childList" && record.target instanceof Router && record.addedNodes.length) {
-			record.target[update]();
-		}
-	}
-      }),
+const routers = new Set(),
       defaultSwapper = (current, next) => current.replaceWith(next),
       swappers = new Map([["", defaultSwapper]]);
 
@@ -34,7 +25,7 @@ let lastState = Date.now();
 
 history.replaceState(lastState, "");
 window.addEventListener("click", e => {
-	let target = e.composed ? e.composedPath()[0] ?? e.target : e.target;
+	let target = (e.composed ? e.composedPath()[0] ?? e.target : e.target);
 
 	while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
 		target = target.parentNode;
@@ -46,14 +37,6 @@ window.addEventListener("click", e => {
 		e.preventDefault();
 	}
 });
-window.addEventListener("popstate", () => {
-	for (const r of routers) {
-		r[newState](window.location, history.state);
-	}
-
-	lastState = history.state;
-});
-
 /**
  * This class is registered as the `x-router` tag, and should be created with the {@link router} Function.
  */
@@ -64,9 +47,51 @@ class Router extends HTMLElement {
 	#matchers = [];
 	#swapper;
 
+	static #mo = new MutationObserver(records => {
+	  for (const record of records) {
+		  if (record.type === "childList" && record.target instanceof Router && record.addedNodes.length) {
+			  record.target.#update();
+		  }
+	  }
+	});
+
+	static {
+		window.addEventListener("popstate", () => {
+			for (const r of routers) {
+				r.#newState(window.location, history.state);
+			}
+
+			lastState = history.state;
+		});
+
+		window.goto = (href, attrs) => {
+			const url = new URL(href, window.location + "");
+
+			let handled = false;
+
+			if (url.host === window.location.host) {
+				const now = Date.now();
+
+				for (const r of routers) {
+					if (r.#newState(url, now, attrs)) {
+						handled = true;
+					}
+				}
+
+				lastState = now;
+
+				if (handled) {
+					history.pushState(now, "", new URL(href, url));
+				}
+			}
+
+			return handled;
+		}
+	}
+
 	constructor() {
 		super();
-		mo.observe(this, {"childList": true});
+		Router.#mo.observe(this, {"childList": true});
 	}
 
 	get count() {
@@ -204,7 +229,7 @@ class Router extends HTMLElement {
 		return this;
 	}
 
-	[newState](path, state, attrs) {
+	#newState(path, state, attrs) {
 		if (this.#marker.isConnected) {
 			const h = this.#history.get(state ?? 0);
 
@@ -222,7 +247,7 @@ class Router extends HTMLElement {
 		return false;
 	}
 
-	[update]() {
+	#update() {
 		if (this.#marker.isConnected) {
 			for (const c of this.children) {
 				if (!(c instanceof Router)) {
@@ -260,7 +285,7 @@ class Router extends HTMLElement {
 		this.#clear();
 		this.replaceWith(this.#marker);
 		this.#setRoute(window.location);
-		this[update]();
+		this.#update();
 	}
 
 	/** Used to remove the Router from the DOM and disable its routing. It can be added to the DOM later to reactivate it. */
@@ -362,29 +387,7 @@ router = () => new Router(),
  *
  * @return {boolean} Will return `true` if any Router has a route that matches the location, and `false` otherwise.
  */
-goto = window.goto = (href, attrs) => {
-	const url = new URL(href, window.location + "");
-
-	let handled = false;
-
-	if (url.host === window.location.host) {
-		const now = Date.now();
-
-		for (const r of routers) {
-			if (r[newState](url, now, attrs)) {
-				handled = true;
-			}
-		}
-
-		lastState = now;
-
-		if (handled) {
-			history.pushState(now, "", new URL(href, url));
-		}
-	}
-
-	return handled;
-},
+goto = window.goto,
 /**
  * This function will register a transition function with the specified name, allowing for transition effects and animation. This function will return true on a successful registration, and false if it fails, which will most likely be because of a name collision.
  *

@@ -33,16 +33,7 @@ interface ToString {
 /** A Swapper Function swaps to nodes in the DOM, with a possible transition effect. */
 type Swapper = (current: ChildNode, next: ChildNode) => void;
 
-const update = Symbol("update"),
-      newState = Symbol("newState"),
-      routers = new Set<Router>(),
-      mo = new MutationObserver(records => {
-	for (const record of records) {
-		if (record.type === "childList" && record.target instanceof Router && record.addedNodes.length) {
-			record.target[update]();
-		}
-	}
-      }),
+const routers = new Set<Router>(),
       defaultSwapper = (current: ChildNode, next: ChildNode) => current.replaceWith(next),
       swappers = new Map<string, Swapper>([["", defaultSwapper]]);
 
@@ -62,14 +53,6 @@ window.addEventListener("click", (e: Event) => {
 		e.preventDefault();
 	}
 });
-window.addEventListener("popstate", () => {
-	for (const r of routers) {
-		r[newState](window.location, history.state);
-	}
-
-	lastState = history.state;
-});
-
 /**
  * This class is registered as the `x-router` tag, and should be created with the {@link router} Function.
  */
@@ -80,9 +63,51 @@ class Router extends HTMLElement {
 	#matchers: MatchNode[] = [];
 	#swapper?: Swapper;
 
+	static #mo = new MutationObserver(records => {
+	  for (const record of records) {
+		  if (record.type === "childList" && record.target instanceof Router && record.addedNodes.length) {
+			  record.target.#update();
+		  }
+	  }
+	});
+
+	static {
+		window.addEventListener("popstate", () => {
+			for (const r of routers) {
+				r.#newState(window.location, history.state);
+			}
+
+			lastState = history.state;
+		});
+
+		(window as any).goto = (href: string, attrs?: Record<string, ToString>) => {
+			const url = new URL(href, window.location + "");
+
+			let handled = false;
+
+			if (url.host === window.location.host) {
+				const now = Date.now();
+
+				for (const r of routers) {
+					if (r.#newState(url, now, attrs)) {
+						handled = true;
+					}
+				}
+
+				lastState = now;
+
+				if (handled) {
+					history.pushState(now, "", new URL(href, url));
+				}
+			}
+
+			return handled;
+		}
+	}
+
 	constructor() {
 		super();
-		mo.observe(this, {"childList": true});
+		Router.#mo.observe(this, {"childList": true});
 	}
 
 	get count() {
@@ -220,7 +245,7 @@ class Router extends HTMLElement {
 		return this;
 	}
 
-	[newState](path: LocationURL, state: number, attrs?: Record<string, ToString>) {
+	#newState(path: LocationURL, state: number, attrs?: Record<string, ToString>) {
 		if (this.#marker.isConnected) {
 			const h = this.#history.get(state ?? 0);
 
@@ -238,7 +263,7 @@ class Router extends HTMLElement {
 		return false;
 	}
 
-	[update]() {
+	#update() {
 		if (this.#marker.isConnected) {
 			for (const c of this.children) {
 				if (!(c instanceof Router)) {
@@ -276,7 +301,7 @@ class Router extends HTMLElement {
 		this.#clear();
 		this.replaceWith(this.#marker);
 		this.#setRoute(window.location);
-		this[update]();
+		this.#update();
 	}
 
 	/** Used to remove the Router from the DOM and disable its routing. It can be added to the DOM later to reactivate it. */
@@ -378,29 +403,7 @@ router = () => new Router(),
  *
  * @return {boolean} Will return `true` if any Router has a route that matches the location, and `false` otherwise.
  */
-goto = (window as any).goto = (href: string, attrs?: Record<string, ToString>): boolean => {
-	const url = new URL(href, window.location + "");
-
-	let handled = false;
-
-	if (url.host === window.location.host) {
-		const now = Date.now();
-
-		for (const r of routers) {
-			if (r[newState](url, now, attrs)) {
-				handled = true;
-			}
-		}
-
-		lastState = now;
-
-		if (handled) {
-			history.pushState(now, "", new URL(href, url));
-		}
-	}
-
-	return handled;
-},
+goto = (window as any).goto as (href: string, attrs?: Record<string, ToString>) => boolean,
 /**
  * This function will register a transition function with the specified name, allowing for transition effects and animation. This function will return true on a successful registration, and false if it fails, which will most likely be because of a name collision.
  *
