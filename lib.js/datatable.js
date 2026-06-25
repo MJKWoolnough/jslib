@@ -144,7 +144,7 @@ let debounceTarget = null,
  * </data-table>
  * ```
  *
- * The follow data-* attributes have special meaning to header cells and determine how sorting and filtering take place:
+ * The following data-* attributes have special meaning to header cells and determine how sorting and filtering take place:
  *
  * |  Attribute               |  Type     |  Description  |
  * |--------------------------|-----------|---------------|
