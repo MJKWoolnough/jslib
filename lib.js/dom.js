@@ -212,7 +212,7 @@ amendNode = (element, properties, children) => {
  *
  * @return {Record<string, Element>} An object which contains correctly typed DOMBinds.
  */
-tags = ns => new Proxy({}, {"get": (_, element) => wrapElem(element, () => document.createElementNS(ns, element))}),
+tags = (ns, xml = document) => new Proxy({}, {"get": (_, element) => wrapElem(element, () => xml.createElementNS(ns, element))}),
 /**
  * This function registers the custom element and then returns a DOMBind for the element.
  *
