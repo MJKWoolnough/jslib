@@ -412,7 +412,7 @@ This object modifies an HTTPRequest. It allows setting of the following:
 (url: string, protocols?: string | string[]) => new Promise<WSConn>;
 ```
 
-This function takes a url, and an options protocol string or protocol string array, and returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which will resolve with an initiated [WSConn](#conn_wsconn) on a successful connection.
+This function takes a url, and an options protocol string or protocol string array, and returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which will resolve with an initiated [WSConn](#conn_wsconn) on a successful connection. If the connections closes before the open event fires, it is considered and error and the Promise will be rejected.
 
 #### Examples
 ```typescript
