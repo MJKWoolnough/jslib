@@ -735,7 +735,7 @@ The dom module can be used to manipulate DOM elements.
 | isEventObject | Function | This function is a typeguard for objects that are either [EventArray](#dom_eventarray)s, Event Functions, or EventListenObjects. |
 | <a name="dom_props">Props</a> | Type | A [PropsObject](#dom_propsobject) or [NamedNodeMap](https://developer.mozilla.org/en-US/docs/Web/API/NamedNodeMap). |
 | [PropsObject](#dom_propsobject) | Type | This object is used to set attributes and events on a [Node](https://developer.mozilla.org/en-US/docs/Web/API/Node) or EventTarget with the [amendNode](#dom_amendnode) and [clearNode](#dom_clearnode) functions. |
-| tags | Function | This function takes an XML namespace and returns a special object for which the keys are DOMBinds for that key and namespace. |
+| [tags](#dom_tags) | Function | This function takes an XML namespace and returns a special object for which the keys are DOMBinds for that key and namespace. |
 | [toggle](#dom_toggle) | Function | Can be used directly to toggle an attribute, or accepts a callback to collect the state of the toggled attribute. |
 
 ### <a name="dom_amendnode">amendNode</a>
@@ -832,6 +832,17 @@ The keys of this type refer to the attribute names that are to be set. The key d
 | `class`, `part` | An array of strings, a [DOMTokenList](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList), or an object with string keys and boolean or undefined values, to be used to toggle classes or parts. For the array and DOMTokenList, if a class or part begins with a `!`, the class/part will be removed, if the class or part begins with a `~`, the class/part will be toggled, otherwise the class or class will be set. For the object, a value that equates to true will set the class or part, and a value that equates to false (except nullables, which will toggle the class or part) will unset the class or part. |
 | `style` | A [CSSStyleDeclaration](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration) can be used to set the style directly, or an Object can be used to set individual style properties. |
 | `*` | For any key, a string or any object with a toString method can be used to set the field explicitly, a number can be used and converted to a string, a boolean can be used to toggle an attribute, and a undefined value can be used to remove an attribute. If a null value is specified, no action will be taken. |
+
+### <a name="dom_tags">tags</a>
+```typescript
+<NS extends string>(ns: NS, xml: Document = document) => NS extends "http://www.w3.org/1999/xhtml" ? {[K in keyof HTMLElementTagNameMap]: DOMBind<HTMLElementTagNameMap[K]>} : NS extends "http://www.w3.org/2000/svg" ? {[K in keyof SVGElementTagNameMap]: DOMBind<SVGElementTagNameMap[K]>} : NS extends "http://www.w3.org/1998/Math/MathML" ? {[K in keyof MathMLElementTagNameMap]: DOMBind<MathMLElementTagNameMap[K]>} : Record<string, DOMBind<Element>>
+```
+
+This function takes an XML namespace and returns a special object for which the keys are DOMBinds for that key and namespace.
+
+The first argument is the namespace to create the element in. For the HTML namespace (http://www.w3.org/1999/xhtml), the SVG namespace (http://www.w3.org/2000/svg), and the MathML namespace (http://www.w3.org/1998/Math/MathML), the returned object will correctly subtype the [DOMBinds](#dom_dombind) returned with the appropriate element type; for all other namespaces the element creation functions will have type `DOMBind<Element>`;
+
+The second argument is a Document that will be used instead of the global `document` object when creating elements.
 
 ### <a name="dom_toggle">Toggle</a>
 ```typescript
