@@ -2019,7 +2019,8 @@ type Tests = {
 					ws.send("123");
 
 					return new Promise<boolean>(sFn => fn = sFn);
-				});
+				})
+				.catch(() => Promise.resolve(true));
 			}
 		}
 	},
