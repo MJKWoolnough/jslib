@@ -149,7 +149,7 @@ HTTPRequest: requestReturn = <T = any>(url: string, props: Properties = {}): Pro
 	xh.send(props["data"] ?? null);
 }),
 /**
- * This function takes a url and returns a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} which will resolve with an initiated {@link WSConn} on a successful connection.
+ * This function takes a url and returns a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise | Promise} which will resolve with an initiated {@link WSConn} on a successful connection. If the connections closes before the open event fires, it is considered and error and the Promise will be rejected.
  *
  * @param {string}            url         An absolute or relative URL to connect to.
  * @param {string | string[]} [protocols] Optional protocol or list of protocols to use in WebSocket.
