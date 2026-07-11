@@ -122,10 +122,12 @@ WS = (url, protocols) => new Promise((successFn, errorFn) => {
 
 	ws.addEventListener("open", () => {
 		ws.removeEventListener("error", errorFn);
+		ws.removeEventListener("close", errorFn);
 		successFn(ws);
 	}, once);
 
 	ws.addEventListener("error", errorFn, once);
+	ws.addEventListener("close", errorFn, once);
 });
 
 /**

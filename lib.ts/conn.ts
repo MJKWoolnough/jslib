@@ -161,10 +161,12 @@ WS = (url: string, protocols?: string | string[]) => new Promise<WSConn>((succes
 
 	ws.addEventListener("open", () => {
 		ws.removeEventListener("error", errorFn);
+		ws.removeEventListener("close", errorFn);
 		successFn(ws);
 	}, once);
 
 	ws.addEventListener("error", errorFn, once);
+	ws.addEventListener("close", errorFn, once);
 });
 
 /**
