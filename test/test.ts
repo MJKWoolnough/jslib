@@ -1999,7 +1999,7 @@ type Tests = {
 						}
 
 						if (r === 2) {
-							fn(s === 2)
+							fn(s === 2);
 						}
 					}, () => fn(false));
 
@@ -8342,7 +8342,7 @@ type Tests = {
 					      t2 = Tmpl("", Str(), "", Str(), ""),
 					      t3 = Tmpl("", Str(), "", Str(), "", Str(), "");
 
-					return JSON.stringify(t.def()) === `["","string"]` && JSON.stringify(t2.def()) === `["","string"]` && JSON.stringify(t3.def()) === `["","string"]`
+					return JSON.stringify(t.def()) === `["","string"]` && JSON.stringify(t2.def()) === `["","string"]` && JSON.stringify(t3.def()) === `["","string"]`;
 				},
 				"with ${ in a Val, but still a template": async () => {
 					const {IntStr, Tmpl, Val} = await import("./lib/typeguard.js"),
@@ -9335,7 +9335,7 @@ type Tests = {
 
 					try {
 						a.throw(null);
-						
+
 						return false;
 					} catch(e) {
 						return true;
@@ -11531,7 +11531,7 @@ type Tests = {
 						return p.done();
 					}).next();
 
-					return l === 3
+					return l === 3;
 				},
 				"run": async () => {
 					let l = 0;
@@ -11545,7 +11545,7 @@ type Tests = {
 						return p.done();
 					}).next();
 
-					return l === 5
+					return l === 5;
 				}
 			},
 			"except": {
