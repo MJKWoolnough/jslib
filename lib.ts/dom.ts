@@ -228,7 +228,8 @@ amendNode: mElement = (element?: EventTarget | BoundChild | null, properties?: P
 /**
  * This function takes an XML namespace and returns a special object for which the keys are DOMBinds for that key and namespace.
  *
- * @param {string} ns XML Namespace to which the names will be bound.
+ * @param {string}   ns    XML Namespace to which the names will be bound.
+ * @param {Document} [xml] Document to be used instead of global `document` object when creating elements.
  *
  * @return {Record<string, Element>} An object which contains correctly typed DOMBinds.
  */
