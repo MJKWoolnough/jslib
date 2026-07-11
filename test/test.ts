@@ -1296,6 +1296,18 @@ type Tests = {
 				      div = tags("http://www.w3.org/1999/xhtml")["div"];
 
 				return div.name === "div";
+			},
+			"can use a custom XMLDocument with tags": async () => {
+				const {tags} = await import("./lib/dom.js"),
+				      officeNS = "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
+				      textNS = "urn:oasis:names:tc:opendocument:xmlns:text:1.0",
+				      odf = document.implementation.createDocument(officeNS, "document-content"),
+				      {spreadsheet} = tags(officeNS, odf),
+				      {p} = tags(textNS, odf),
+				      ssi = spreadsheet(),
+				      pi = p();
+
+				return ssi instanceof Element && ssi.namespaceURI === officeNS && ssi.ownerDocument === odf && pi instanceof Element && pi.namespaceURI === textNS && pi.ownerDocument === odf;
 			}
 		},
 		"bindCustomElement": {
