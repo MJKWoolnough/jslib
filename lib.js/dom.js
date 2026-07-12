@@ -185,7 +185,7 @@ amendNode = (element, properties, children) => {
 						node.value = prop;
 					}
 
-					node.setAttributeNS(null, k);
+					node.setAttributeNS(null, k, prop);
 				}
 			}
 		}
