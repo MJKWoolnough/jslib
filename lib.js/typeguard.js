@@ -805,6 +805,7 @@ Func = args => asTypeGuard(v => throwOrReturn(v instanceof Function && (args ===
  */
 Forbid = (t, u) => asTypeGuard(v => {
 	let forbid = false;
+
 	try {
 		if (u(v)) {
 			forbid = true;
@@ -812,7 +813,7 @@ Forbid = (t, u) => asTypeGuard(v => {
 	} catch(e) {}
 
 	if (forbid) {
-		return throwOrReturn(false, "forbid")
+		return throwOrReturn(false, "forbid");
 	}
 
 	return t(v);

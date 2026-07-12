@@ -123,7 +123,7 @@ const throwUnknownError = (v: boolean) => {
 			for (const d of def[1] as Definition[]) {
 				if (d[0] === "") {
 					if (simple.has(d[1])) {
-						continue
+						continue;
 					}
 
 					simple.add(d[1]);
@@ -134,7 +134,7 @@ const throwUnknownError = (v: boolean) => {
 		} else if ((def[0] !== "" || def[1] !== "never")) {
 			if (def[0] === "") {
 				if (simple.has(def[1])) {
-					continue
+					continue;
 				}
 
 				simple.add(def[1]);
@@ -842,6 +842,7 @@ Func = <T extends Function>(args?: number) => asTypeGuard((v: unknown): v is T =
  */
 Forbid = <T, U>(t: TypeGuard<T>, u: TypeGuard<U>) => asTypeGuard((v: unknown): v is Exclude<T, U> => {
 	let forbid = false;
+
 	try {
 		if (u(v)) {
 			forbid = true;
@@ -849,7 +850,7 @@ Forbid = <T, U>(t: TypeGuard<T>, u: TypeGuard<U>) => asTypeGuard((v: unknown): v
 	} catch(e) {}
 
 	if (forbid) {
-		return throwOrReturn(false, "forbid")
+		return throwOrReturn(false, "forbid");
 	}
 
 	return t(v);
