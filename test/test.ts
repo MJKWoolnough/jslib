@@ -4677,6 +4677,19 @@ type Tests = {
 			      b = await fn(11);
 
 			return a === 2 && b === 12;
+		},
+		"multiple fns": async () => {
+			const {default: Worker} = await import("./lib/worker.js");
+
+			const w = Worker(),
+			      fnA = w((a: number) => a + 1),
+			      fnB = w((a: number) => a * 2),
+			      a = await fnA(5),
+			      b = await fnA(15),
+			      c = await fnB(5),
+			      d = await fnB(15);
+
+			return a === 6 && b === 16 && c === 10 && d === 30;
 		}
 	},
 	"fraction.js": {
