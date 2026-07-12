@@ -342,7 +342,7 @@ javascript = (() => {
 			case '\\':
 				const err = regexpBackslashSequence(t);
 				if (err) {
-					return err
+					return err;
 				}
 
 				break;
@@ -1005,7 +1005,7 @@ bash = (() => {
 					c = '\t';
 				}
 
-				nextEscaped = false
+				nextEscaped = false;
 			} else {
 				switch (c) {
 				case '"':
@@ -1086,7 +1086,7 @@ bash = (() => {
 
 						break;
 					} else if (tk.type === TokenPunctuator && tk.data == ",") {
-						hasComma = true
+						hasComma = true;
 					} else if (tk.type === TokenPunctuator && tk.data == ";") {
 						break;
 					} else if (tk.type === TokenWhitespace || tk.type == TokenLineTerminator) {
@@ -1130,12 +1130,12 @@ bash = (() => {
 			if (bew) {
 				state.push(stateBraceExpansionWord);
 
-				return t.return(TokenPunctuator, main)
+				return t.return(TokenPunctuator, main);
 			} else if (state.at(-1) == stateBuiltinLetExpression) {
-				return errInvalidCharacter(t)
+				return errInvalidCharacter(t);
 			}
 
-			return word(t)
+			return word(t);
 		      },
 		      value = (t: Tokeniser) => {
 			const isArray = state.at(-1) === stateArrayIndex;
@@ -1190,7 +1190,7 @@ bash = (() => {
 
 				break;
 			case stateParameterExpansionSubString:
-				wb = wordBreakSubstring
+				wb = wordBreakSubstring;
 
 				break;
 			case stateBraceExpansionWord:
@@ -1389,7 +1389,7 @@ bash = (() => {
 				case '$':
 					const statea = t.state();
 
-					t.next()
+					t.next();
 
 					if (isWhitespace(t)) {
 						break Loop;
@@ -1411,7 +1411,7 @@ bash = (() => {
 				return t.return(TokenRegularExpressionLiteral, test);
 			}
 
-			return test(t)
+			return test(t);
 		      },
 		      testPatternStart = (t: Tokeniser) => {
 			if (parseWhitespace(t)) {
@@ -1452,7 +1452,7 @@ bash = (() => {
 				return errInvalidCharacter(t);
 			}
 
-			return testWordOrPunctuator(t)
+			return testWordOrPunctuator(t);
 		      },
 		      testBinaryOperator = (t: Tokeniser) => {
 			if (parseWhitespace(t)) {
@@ -1617,7 +1617,7 @@ bash = (() => {
 			}
 
 			if (t.accept("-") && t.accept("abcdefghknoprstuvwxzGLNORS") && isWhitespace(t)) {
-				return t.return(TokenKeyword, testWordStart)
+				return t.return(TokenKeyword, testWordStart);
 			}
 
 			t.reset();
@@ -1687,7 +1687,7 @@ bash = (() => {
 					if (t.acceptWord(compoundStart, false) !== "" && isWordSeperator(t)) {
 						state();
 
-						return t.return(TokenIdentifier, main)
+						return t.return(TokenIdentifier, main);
 					}
 				}
 			}
@@ -1719,7 +1719,7 @@ bash = (() => {
 
 			t.reset();
 
-			return main(t)
+			return main(t);
 		      },
 		      selectStart = (t: Tokeniser) => {
 			if (parseWhitespace(t)) {
@@ -1748,7 +1748,7 @@ bash = (() => {
 				state.push(stateForArithmetic);
 				setInCommand();
 
-				return t.return(TokenPunctuator, main)
+				return t.return(TokenPunctuator, main);
 			}
 
 			if (!t.accept(identStart)) {
@@ -1757,7 +1757,7 @@ bash = (() => {
 
 			t.acceptRun(identCont);
 
-			return t.return(TokenIdentifier, forInDo)
+			return t.return(TokenIdentifier, forInDo);
 		      },
 		      loopDo = (t: Tokeniser) => middleCompound(t, loopDo, "do", stateLoopBody, "missing do"),
 		      loopStart = (t: Tokeniser) => startCompound(t, loopStart, stateLoopCondition),
@@ -1783,10 +1783,10 @@ bash = (() => {
 			if (t.acceptString(kw, false) === kw.length && isWhitespace(t)) {
 				state.push(td);
 
-				return t.return(TokenReservedWord, main)
+				return t.return(TokenReservedWord, main);
 			}
 
-			return t.error(missing)
+			return t.error(missing);
 		      },
 		      startCompound = (t: Tokeniser, fn: TokenFn, td: number) => {
 			if (parseWhitespace(t)) {
@@ -1799,7 +1799,7 @@ bash = (() => {
 
 			state.push(td);
 
-			return main(t)
+			return main(t);
 		      },
 		      time = (t: Tokeniser) => {
 			if (parseWhitespace(t)) {
@@ -1807,7 +1807,7 @@ bash = (() => {
 			}
 
 			if (t.acceptString("-p", false) === 2 && isWordSeperator(t)) {
-				return t.return(TokenKeyword, main)
+				return t.return(TokenKeyword, main);
 			}
 
 			t.reset();
@@ -1912,7 +1912,7 @@ bash = (() => {
 					case stateLoopBody:
 						inLoop = true;
 					default:
-						break Loop
+						break Loop;
 					}
 				}
 
@@ -2036,7 +2036,7 @@ bash = (() => {
 				}
 			}
 
-			return word(t)
+			return word(t);
 		      },
 		      keywordIdentOrWord = (t: Tokeniser) => {
 			if (!isInCommand()) {
@@ -2194,7 +2194,7 @@ bash = (() => {
 
 			state.push(stateParameterExpansionSubString);
 
-			return main(t)
+			return main(t);
 		      },
 		      parameterExpansionOperation = (t: Tokeniser) => {
 			if (t.accept(":")) {
@@ -2208,7 +2208,7 @@ bash = (() => {
 			} else if (t.accept("/")) {
 				t.accept("/#%");
 
-				return t.return(TokenPunctuator, parameterExpansionPattern)
+				return t.return(TokenPunctuator, parameterExpansionPattern);
 			} else if (t.accept("*")) {
 				return t.return(TokenPunctuator, main);
 			} else if (t.accept("@")) {
@@ -2321,7 +2321,7 @@ bash = (() => {
 
 				break;
 			case stateParameterExpansionSubString:
-				wb = wordBreakSubstring
+				wb = wordBreakSubstring;
 
 				break;
 			case stateArrayIndex:
@@ -2490,7 +2490,7 @@ bash = (() => {
 			} else {
 				state.push(stateHeredoc);
 
-				heredoc.push([hdt])
+				heredoc.push([hdt]);
 			}
 
 			if (inCommand) {
@@ -2612,7 +2612,7 @@ bash = (() => {
 						if (td === stateIfTest) {
 							return t.return(TokenPunctuator, ifThen);
 						} else if (td === stateLoopCondition) {
-							return t.return(TokenPunctuator, loopDo)
+							return t.return(TokenPunctuator, loopDo);
 						}
 					}
 				}
@@ -2839,7 +2839,7 @@ bash = (() => {
 				t.next();
 
 				const td = state.at(-1);
-				
+
 				if (td === stateCommandIndex) {
 					return t.return(TokenPunctuator, endCommandIndex);
 				} else if (td === stateArrayIndex) {
@@ -2902,7 +2902,7 @@ bash = (() => {
 
 				return errInvalidCharacter(t);
 			default:
-				return number(t)
+				return number(t);
 			}
 
 			return t.return(TokenPunctuator, main);
@@ -3177,7 +3177,7 @@ r = (() => {
 				return tk.return(TokenNumericLiteral, expression);
 			}
 
-			return exponential(tk, digits)
+			return exponential(tk, digits);
 		      },
 		      ellipsisOrIdentifier = (tk: Tokeniser) => {
 			if (tk.accept(".")) {
@@ -3225,7 +3225,7 @@ r = (() => {
 				return float(tk, digits);
 			}
 
-			return exponential(tk, digits)
+			return exponential(tk, digits);
 		      },
 		      string = (tk: Tokeniser) => {
 			const quote = tk.next(),
