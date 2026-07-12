@@ -4659,6 +4659,16 @@ type Tests = {
 			}
 		}
 	},
+	"worker.js": {
+		"simple add": async () => {
+			const {default: Worker} = await import("./lib/worker.js");
+
+			const w = Worker(),
+			      fn = w((a: number) => a + 1);
+
+			return await fn(1) === 2;
+		}
+	},
 	"fraction.js": {
 		"comparison": {
 			"0 == 0": async () => {
