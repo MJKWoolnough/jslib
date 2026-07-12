@@ -4690,6 +4690,16 @@ type Tests = {
 			      d = await fnB(15);
 
 			return a === 6 && b === 16 && c === 10 && d === 30;
+		},
+		"error handling": async () => {
+			const {default: Worker} = await import("./lib/worker.js");
+
+			const w = Worker(),
+			      fn = w(() => {throw Error("123");});
+
+			return fn()
+			.then(() => false)
+			.catch((e: Error) => e.message === "123");
 		}
 	},
 	"fraction.js": {
