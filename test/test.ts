@@ -3404,8 +3404,9 @@ type Tests = {
 				bs.set(true);
 				bs.set(false);
 				bs.set(true);
+				bs.set(false);
 
-				return v === 3;
+				return v === 2;
 			},
 			"multi-wait": async () => {
 				let numv = 0,
@@ -3433,8 +3434,9 @@ type Tests = {
 				bs.set(true);
 				bs.set(false);
 				bs.set(true);
+				bs.set(false);
 
-				return v === 3 && w === 3;
+				return v === 2 && w === 2;
 			}
 		},
 		"IntSetting": {
