@@ -4667,6 +4667,16 @@ type Tests = {
 			      fn = w((a: number) => a + 1);
 
 			return await fn(1) === 2;
+		},
+		"double run": async () => {
+			const {default: Worker} = await import("./lib/worker.js");
+
+			const w = Worker(),
+			      fn = w((a: number) => a + 1),
+			      a = await fn(1),
+			      b = await fn(11);
+
+			return a === 2 && b === 12;
 		}
 	},
 	"fraction.js": {
