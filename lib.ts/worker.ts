@@ -1,3 +1,10 @@
+/**
+ * This module contains a function that allows for simple wrapping of functions to be used in a Worker thread.
+ *
+ * @module worker
+ */
+/** */
+
 type FnInit = [number, string];
 type FnCall = [number, number, unknown[]];
 type MessageData = FnInit | FnCall;
