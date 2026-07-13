@@ -41,6 +41,13 @@ script = toURL("(" + (() => {
 	});
 }).toString() + ")()");
 
+/**
+ * This function initialises a new Worker thread, returning a function that registers functions with that thread.
+ *
+ * The returned function is a registration function that takes a user-supplied function and passes it to the Worker thread. The registration function returns a function that matches the signature of the user-supplied function, except that the return will be wrapped in a Promise.
+ *
+ * The user-supplied function must not be closed over variables that it references.
+ */
 export default () => {
 	const w = new Worker(script, {"type": "module"}),
 	      calls = new Map<number, [Function, Function]>();
