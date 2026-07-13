@@ -1,14 +1,14 @@
-type MessageData = [number, number | string, unknown[]];
+type MessageData = [number, number, unknown[]];
 type Message = Omit<MessageEvent, "data"> & {data: MessageData};
 
 const script = URL.createObjectURL(new Blob(["(" + (() => {
 	const fns = new Map<number, Function>(),
 	      buf: MessageData[] = [],
-	      handleFn = (md: MessageData) => {
+	      handleFn = (fn: Function, cID: number, args: unknown[]) => {
 		try {
-			postMessage([md[1], fns.get(md[0])!.apply(null, md[2])]);
+			postMessage([cID, fn(...args)]);
 		} catch (e) {
-			postMessage([-md[1], e]);
+			postMessage([-cID, e]);
 		}
 	      };
 
@@ -19,15 +19,19 @@ const script = URL.createObjectURL(new Blob(["(" + (() => {
 				fns.set(-e.data[0], fn);
 
 				for (const data of buf) {
-					handleFn(data);
+					handleFn(fn, data[1] as number, data[2]);
 				}
 
 				buf.splice(0, buf.length);
 			});
-		} else if (!fns.has(e.data[0])) {
-			buf.push(e.data);
 		} else {
-			handleFn(e.data);
+			const fn = fns.get(e.data[0]);
+
+			if (fn) {
+				handleFn(fn, e.data[1] as number, e.data[2]);
+			} else {
+				buf.push(e.data);
+			}
 		}
 	});
 }).toString() + ")()"], {"type": "application/javascript"}));
