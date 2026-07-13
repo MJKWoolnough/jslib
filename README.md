@@ -39,6 +39,7 @@ JSLib is a collection of lightweight JavaScript/Typescript modules and scripts f
 | [windows](#windows)                         | Custom Elements that act as application Windows. |
 | [windows_taskbar](#windows_taskbar)         | Custom Element that lists Windows on a TaskBar. |
 | [windows_taskmanager](#windows_taskmanager) | Custom Element that allows minimisation of Windows. |
+| [worker](#worker)                           | Function that allows for simple wrapping of functions to be used in a Worker thread. |
 
 # Packages
 
@@ -49,14 +50,13 @@ Thematically, the above modules can be grouped into a few packages:
 | Decorum   | A collection of DOM manipulation libs. | [Bind](#bind), [CSS](#css), [DOM](#dom), [HTML](#html), [Math](#math), [Nodes](#nodes), and [SVG](#svg). |
 | Duct      | Communication libraries. | [Conn](#conn), [Inter](#inter), [RPC](#rpc), [StorageState](#storagestate), and [URLState](#urlstate). |
 | Guise     | Various modules to aid with UI and UX. | [DataTable](#datatable), [Drag](#drag), [Events](#events), [Menu](#menu), [MultiSelect](#multiselect), [Pagination](#pagination), and the [Windows](#windows) ([Taskbar](#windows_taskbar), [Taskmanager]([#windows_taskmanager)) modules. |
-| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [CaseFold](#casefold), [Fraction](#fraction), [Load](#load), [Markdown](#markdown), [Misc](#misc), [Parser](#parser), [Router](#router), [Transitions](#router_transitions), [Settings](#settings), and [TypeGuard](#typeguard). |
+| Sundry    | Modules that do not yet form a larger package. | [BBCode](#bbcode) (& [Tags](#bbcode_tags)), [CaseFold](#casefold), [Fraction](#fraction), [Load](#load), [Markdown](#markdown), [Misc](#misc), [Parser](#parser), [Router](#router), [Transitions](#router_transitions), [Settings](#settings), [TypeGuard](#typeguard), and [Worker](#worker). |
 
 # Scripts
 
 |  Script      |  Description  |
 |--------------|---------------|
 | casefold     | The scripts generates the casefold module. |
-| circular     | This script walks a JavaScript import tree to determine if there are any circular imports, which may cause initialisation problems. The first argument specifies the root script. |
 | html         | This script generates the html module. |
 | math         | This script generates the math module. |
 | svg          | This script generates the svg module. |
@@ -3055,3 +3055,13 @@ This module directly imports the [css](#css), [dom](#dom),[html](#html), and [wi
 | ShellElement | Class    | A drop-in replacement for the [windows](#windows) module [ShellElement](#windows_shellelement). Registered with customElements as `windows-shell-taskmanager`. |
 
 NB: Any [custom control buttons](#windows_windowelement_addcontrolbutton) will not be displayed on the title-bar while minimised.
+
+# <a name="worker">worker</a>
+
+This module contains a function that allows for simple wrapping of functions to be used in a Worker thread.
+
+This module has a single export, a function that initialises a new Worker thread, returning a function that registers functions with that thread.
+
+The returned function is a registration function that takes a user-supplied function and passes it to the Worker thread. The registration function returns a function that matches the signature of the user-supplied function, except that the return will be wrapped in a Promise.
+
+The user-supplied function must not be closed over variables that it references.
