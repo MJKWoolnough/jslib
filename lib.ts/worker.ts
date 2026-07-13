@@ -16,11 +16,11 @@ script = toURL("(" + (() => {
 	      },
 	      isFnInit = (md: MessageData): md is FnInit => md[0] < 0;
 
-	addEventListener("message", (e: Message) => {
-		if (isFnInit(e.data)) {
-			import(e.data[1] as string)
+	addEventListener("message", ({data}: Message) => {
+		if (isFnInit(data)) {
+			import(data[1])
 			.then(({"default": fn}) => {
-				fns.set(-e.data[0], fn);
+				fns.set(-data[0], fn);
 
 				for (const data of buf) {
 					handleFn(fn, data[1], data[2]);
@@ -29,12 +29,12 @@ script = toURL("(" + (() => {
 				buf.splice(0, buf.length);
 			});
 		} else {
-			const fn = fns.get(e.data[0]);
+			const fn = fns.get(data[0]);
 
 			if (fn) {
-				handleFn(fn, e.data[1], e.data[2]);
+				handleFn(fn, data[1], data[2]);
 			} else {
-				buf.push(e.data);
+				buf.push(data);
 			}
 		}
 	});
