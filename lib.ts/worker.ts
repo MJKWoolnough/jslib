@@ -1,7 +1,8 @@
-type MessageData = [number, number, unknown[]];
+type MessageData = [number, number | string, unknown[]];
 type Message = Omit<MessageEvent, "data"> & {data: MessageData};
 
-const script = URL.createObjectURL(new Blob(["(" + (() => {
+const toURL = (js: string) => URL.createObjectURL(new Blob([js], {"type": "application/javascript"})),
+script = toURL("(" + (() => {
 	const fns = new Map<number, Function>(),
 	      buf: MessageData[] = [],
 	      handleFn = (fn: Function, cID: number, args: unknown[]) => {
@@ -14,7 +15,7 @@ const script = URL.createObjectURL(new Blob(["(" + (() => {
 
 	addEventListener("message", (e: Message) => {
 		if (e.data[0] < 0) {
-			import(URL.createObjectURL(new Blob(["export default "+ e.data[1]], {"type": "application/javascript"})))
+			import(e.data[1] as string)
 			.then(({"default": fn}) => {
 				fns.set(-e.data[0], fn);
 
@@ -34,7 +35,7 @@ const script = URL.createObjectURL(new Blob(["(" + (() => {
 			}
 		}
 	});
-}).toString() + ")()"], {"type": "application/javascript"}));
+}).toString() + ")()");
 
 export default () => {
 	const w = new Worker(script, {"type": "module"}),
@@ -48,7 +49,7 @@ export default () => {
 	return <T extends (...args: any[]) => any>(fn: T) => {
 		const fnID = ++fns;
 
-		w.postMessage([-fnID, fn.toString()]);
+		w.postMessage([-fnID, toURL("export default " + fn.toString())]);
 
 		return (...args: Parameters<T>) => new Promise<Awaited<ReturnType<T>>>((sFn, eFn) => {
 			const cID = ++callID;
