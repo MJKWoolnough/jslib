@@ -1,26 +1,29 @@
-type MessageData = [number, number | string, unknown[]];
+type FnInit = [number, string];
+type FnCall = [number, number, unknown[]];
+type MessageData = FnInit | FnCall;
 type Message = Omit<MessageEvent, "data"> & {data: MessageData};
 
 const toURL = (js: string) => URL.createObjectURL(new Blob([js], {"type": "application/javascript"})),
 script = toURL("(" + (() => {
 	const fns = new Map<number, Function>(),
-	      buf: MessageData[] = [],
+	      buf: FnCall[] = [],
 	      handleFn = (fn: Function, cID: number, args: unknown[]) => {
 		try {
 			postMessage([cID, fn(...args)]);
 		} catch (e) {
 			postMessage([-cID, e]);
 		}
-	      };
+	      },
+	      isFnInit = (md: MessageData): md is FnInit => md[0] < 0;
 
 	addEventListener("message", (e: Message) => {
-		if (e.data[0] < 0) {
+		if (isFnInit(e.data)) {
 			import(e.data[1] as string)
 			.then(({"default": fn}) => {
 				fns.set(-e.data[0], fn);
 
 				for (const data of buf) {
-					handleFn(fn, data[1] as number, data[2]);
+					handleFn(fn, data[1], data[2]);
 				}
 
 				buf.splice(0, buf.length);
@@ -29,7 +32,7 @@ script = toURL("(" + (() => {
 			const fn = fns.get(e.data[0]);
 
 			if (fn) {
-				handleFn(fn, e.data[1] as number, e.data[2]);
+				handleFn(fn, e.data[1], e.data[2]);
 			} else {
 				buf.push(e.data);
 			}
