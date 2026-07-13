@@ -2,6 +2,7 @@ type FnInit = [number, string];
 type FnCall = [number, number, unknown[]];
 type MessageData = FnInit | FnCall;
 type Message = Omit<MessageEvent, "data"> & {data: MessageData};
+type Response = Omit<MessageEvent, "data"> & {data: [number, unknown]};
 
 const toURL = (js: string) => URL.createObjectURL(new Blob([js], {"type": "application/javascript"})),
 script = toURL("(" + (() => {
@@ -44,7 +45,15 @@ export default () => {
 	const w = new Worker(script, {"type": "module"}),
 	      calls = new Map<number, [Function, Function]>();
 
-	w.addEventListener("message", (e: Message) => calls.get(Math.abs(e.data[0]))![+(e.data[0] < 0)](e.data[1]));
+	w.addEventListener("message", ({data: [cID, ret]}: Response) => {
+		const callID = Math.abs(cID),
+		      fn = calls.get(callID);
+
+		if (fn) {
+			calls.delete(callID);
+			fn[+(cID < 0)](ret);
+		}
+	});
 
 	let callID = 0,
 	    fns = 0;
