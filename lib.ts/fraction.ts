@@ -157,7 +157,7 @@ export default class Fraction {
 	}
 
 	/**
-	 * When the hint is set to "number", this method returns a normal javascript number representation of the Fraction value, to 5 decimal places. Otherwise, it returns a string representation of the fraction.
+	 * When the hint is set to "number", this method returns a normal JavaScript number representation of the Fraction value, to 5 decimal places. Otherwise, it returns a string representation of the fraction.
 	 *
 	 * See {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/toPrimitive | toPrimitive} documentation for how to use this symbol.
 	 */
