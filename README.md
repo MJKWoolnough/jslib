@@ -215,7 +215,7 @@ This type is a generator that will yield a token, which will either be a [CloseT
 
 ## <a name="bbcode_tags">bbcode_tags</a>
 
-This module contains many standard [BBCode](https://en.wikipedia.org/wiki/BBCode) tags parsers, and a default text processor.
+This module contains many standard [BBCode](https://en.wikipedia.org/wiki/BBCode) tag parsers, and a default text processor.
 
 This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#html) modules.
 
@@ -251,7 +251,7 @@ This module directly imports the [bbcode](#bbcode), [dom](#dom), and [html](#htm
 
 ## <a name="bind">bind</a>
 
-This modules contains a Function for creating DOM nodes (such as [Attr](https://developer.mozilla.org/en-US/docs/Web/API/Attr) and [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) nodes) that update their content automatically.
+This module contains a Function for creating DOM nodes (such as [Attr](https://developer.mozilla.org/en-US/docs/Web/API/Attr) and [Text](https://developer.mozilla.org/en-US/docs/Web/API/Text) nodes) that update their content automatically.
 
 This module directly imports the [dom](#dom), [inter](#inter), and [misc](#misc) modules.
 
@@ -928,7 +928,7 @@ export class DragTransfer<T = any> {
 }
 ```
 
-To be used in [dragover](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event) and [drop](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event) events, this method determines is the passed [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent)s [DataTransfer.types](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types) array contains this objects format string, marking this object as a [CheckedDT](#drag_checkeddt) type.
+To be used in [dragover](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event) and [drop](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event) events, this method determines if the passed [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent)s [DataTransfer.types](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types) array contains this objects format string, marking this object as a [CheckedDT](#drag_checkeddt) type.
 
 ### <a name="drag_dragtransfer_register">register</a>
 ```typescript
