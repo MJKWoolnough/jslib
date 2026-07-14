@@ -131,7 +131,7 @@ export const
  *
  * The last function returned allows the registered key(s) to be changed to the newKey string/array passed. The `now` param will be passed to the stop function when cancelling the previously assigned keys.
  *
- * NB: If the window loses focus, the module will generate a keyup event. This can be detected be checking the {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted| Event.isTrusted} field.
+ * NB: If the window loses focus, the module will generate a keyup event. This can be detected be checking the {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted | Event.isTrusted} field.
  *
  * @param {string | string[]}          key           A key combination string, or an array of key combination strings.
  * @param {(e: KeyboardEvent) => void} [onkeydown]   Function to be called when one of the key combinations is pressed.
@@ -235,7 +235,7 @@ mouseMoveEvent = (onmousemove: MouseFn, onend?: () => void) => {
  *
  * The function returns an array of two functions, the first of which activates the event, the second of which deactivates the event and will run any mouseup event handler unless false is passed into the function.
  *
- * NB: If the window loses focus, the module will generate a mouseup event. This can be detected be checking the {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted| Event.isTrusted} field.
+ * NB: If the window loses focus, the module will generate a mouseup event. This can be detected be checking the {@link https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted | Event.isTrusted} field.
  *
  * @param {number}                  button      Mouse button to detect being released.
  * @param {(e: MouseEvent) => void} onmousemove Function to be called when the mouse is moved.
