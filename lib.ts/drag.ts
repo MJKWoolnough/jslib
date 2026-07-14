@@ -81,7 +81,7 @@ export class DragTransfer<T = any> {
 	}
 
 	/**
-	 * This method is used during a {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragstart_event | dragstart} to mark the object being dragged. Requires the {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event | DragEvent} and the key returned from the {@link DragTransfer.register | register}method, and optionally takes a drag icon {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLDivElement | div} and `x` and `y` offsets from the cursor.
+	 * This method is used during a {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragstart_event | dragstart} to mark the object being dragged. Requires the {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event | DragEvent} and the key returned from the {@link DragTransfer.register | register} method, and optionally takes a drag icon {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLDivElement | div} and `x` and `y` offsets from the cursor.
 	 *
 	 * @param {DragEvent}      e            The DragEvent.
 	 * @param {string}         key          The unique key returned from the `register` method.
