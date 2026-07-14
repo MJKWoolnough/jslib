@@ -21,7 +21,7 @@ export const
 noSort = () => 0;
 
 /**
- * This unexported type satisfies any type has used the {@link node} {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} to delegate a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} element, or is a {@link https://developer.mozilla.org/en-US/docs/Web/API/Text Text} Node or {@link https://developer.mozilla.org/en-US/docs/Web/API/Element Element}.
+ * This unexported type satisfies any type has used the {@link node} {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol | Symbol} to delegate a {@link https://developer.mozilla.org/en-US/docs/Web/API/Node | Node} element, or is a {@link https://developer.mozilla.org/en-US/docs/Web/API/Text | Text} Node or {@link https://developer.mozilla.org/en-US/docs/Web/API/Element | Element}.
  *
  * @typedef {Object} Item
  * @property {Node} {@link node}
