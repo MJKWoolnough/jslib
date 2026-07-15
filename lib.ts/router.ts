@@ -64,11 +64,11 @@ class Router extends HTMLElement {
 	#swapper?: Swapper;
 
 	static #mo = new MutationObserver(records => {
-	  for (const record of records) {
-		  if (record.type === "childList" && record.target instanceof Router && record.addedNodes.length) {
-			  record.target.#update();
-		  }
-	  }
+		for (const record of records) {
+			if (record.type === "childList" && record.target instanceof Router && record.addedNodes.length) {
+				record.target.#update();
+			}
+		}
 	});
 
 	static {
