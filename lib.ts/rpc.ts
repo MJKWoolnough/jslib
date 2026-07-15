@@ -120,7 +120,7 @@ export class RPC {
 			const {id, result, error, method, params} = JSON.parse(data) as MessageData;
 
 			if (method) {
-			      const [fn, tg] = this.#methods.get(method) ?? [noEndpoint, noTG];
+				const [fn, tg] = this.#methods.get(method) ?? [noEndpoint, noTG];
 
 				(tg(params) ? Promise.resolve(fn(params)) : Promise.reject(new RPCError(0, "bad or invalid params", params)))
 				.then(result => {
