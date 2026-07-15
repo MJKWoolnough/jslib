@@ -112,23 +112,23 @@ class StateBound<T> extends Binding<T> {
 	static {
 		window.addEventListener("popstate", () => {
 			getStateFromURL();
-
 			StateBound.#processState();
 		});
 		window.addEventListener("click", (e: Event) => {
 			let target = e.target as Element | null;
+
 			while (target && !(target instanceof HTMLAnchorElement || target instanceof HTMLAreaElement || target instanceof SVGAElement)) {
 				target = target.parentNode as Element;
 			}
 
 			const href = target?.getAttribute("href");
+
 			if (href && goto(href)) {
 				e.preventDefault();
 			}
 		});
 
 		getStateFromURL();
-
 		queueMicrotask(() => setURLChanged(history.state ?? 0));
 	}
 
@@ -205,6 +205,7 @@ class StateBound<T> extends Binding<T> {
 
 	static goto(href: string) {
 		const url = new URL(href, window.location + "");
+
 		if (url.host === window.location.host && url.pathname === window.location.pathname) {
 			history.pushState(Date.now(), "", url);
 			getStateFromURL();
