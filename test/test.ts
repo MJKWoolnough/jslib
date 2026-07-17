@@ -8052,6 +8052,12 @@ type Tests = {
 				m.set("key", 1);
 
 				return getOrSet(m, "key", 2) === 1 && m.get("key") === 1;
+			},
+			"no set default": async () => {
+				const {getOrSet} = await import("./lib/misc.js"),
+				      m = new Map<string, number>();
+
+				return getOrSet(m, "key", 1, false) === 1 && m.get("key") === undefined;
 			}
 		},
 		"addAndReturn": {
