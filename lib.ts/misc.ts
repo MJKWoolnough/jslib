@@ -54,8 +54,24 @@ setAndReturn = <K, V>(m: {set: (k: K, v: V) => void}, k: K, v: V) => {
 
 	return v;
 },
+/**
+ * This const is used in the getOrSet function to indicate that the passed default value is actually a function that returns the value; useful for expensive object creation.
+ */
 IS_FUNC = 1,
+/**
+ * This const is used in the getOrSet function to indicate that the default value shouldn't be set.
+ */
 NO_SET_DEFAULT = 2,
+/**
+ * This function retrieves the given key from the passed Map-like object, returning the default value if the key doesn't exist and optionally setting that value to the key.
+ *
+ * @typeParam K
+ * @typeParam V
+ * @param {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined} m   Map-like object
+ * @param {K}                                                                              k   Key for where value is to be stored.
+ * @param {V | () => V}                                                                    def Default value to be returned if key does not exists; or, if IS_FUNC is passed, a function that returns the default value.
+ * @param {...IS_FUNC|NO_SET_DEFAULT}                                                      opt Options to alter behaviour of function; IS_FUNC indicates that the passed default value is a function that returns the default value; NO_SET_DEFAULT indicates that the default value should not be set in the map if the key doesn't exist.
+ */
 getOrSet: {
 	<K, V>(m: {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined}, k: K, def: () => V, ...opt: [typeof IS_FUNC] | [typeof NO_SET_DEFAULT, typeof IS_FUNC] | [typeof IS_FUNC, typeof NO_SET_DEFAULT]): V;
 	<K, V>(m: {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined}, k: K, def: V, ...opt: [] | [typeof NO_SET_DEFAULT] | [typeof IS_FUNC, typeof NO_SET_DEFAULT] | [typeof NO_SET_DEFAULT, typeof IS_FUNC]): V;
