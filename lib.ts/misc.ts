@@ -54,7 +54,7 @@ setAndReturn = <K, V>(m: {set: (k: K, v: V) => void}, k: K, v: V) => {
 
 	return v;
 },
-getOrSet = <K, V>(m: {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined}, k: K, def: V) => m.has(k) ? m.get(k) : setAndReturn(m, k, def),
+getOrSet = <K, V>(m: {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined}, k: K, def: V, opt: boolean = true) => m.has(k) ? m.get(k) : opt ? setAndReturn(m, k, def) : def,
 /**
  * This functions pushes a value to a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array | Array}-like structure and returns the value.
  *
