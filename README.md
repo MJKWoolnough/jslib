@@ -1775,6 +1775,7 @@ The misc module contains various simple, dependency-free exports.
 | [Callable](#misc_callable) | Class | This class provides a convenient way to extend a Function with class attributes and methods. |
 | [checkInt](#misc_checkint) | Function | This function determines whether the value passed is an integer, within a given range, returning either the valid integer or a default value. |
 | [debounce](#misc_debounce) | Function | This function prevents a updates from happening too often by limiting how often they can run. |
+| [getOrSet](#misc_getorset) | Function | This function retrieves the given key from the passed Map-like object, returning the default value if the key doesn't exist and optionally setting that value to the key. |
 | [isInt](#misc_isint) | Function | This function determines whether the value passed is an integer, within a given range. |
 | [mod](#misc_mod) | Function | This function performs the modulo operation on the two given numbers. |
 | [pushAndReturn](#misc_pushandreturn) | Function | This function adds a value to an Array and returns the value. |
@@ -1829,6 +1830,22 @@ The first param is a timeout in milliseconds before another update can run.
 The second param is a flag to determine whether or not the first or last update function should be run.
 
 The function returns a function which takes the update function that will be debounced.
+
+### <a name="misc_getorset">getOrSet</a>
+```typescript
+<K, V>(m: {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined}, k: K, def: () => V, ...opt: [typeof IS_FUNC] | [typeof NO_SET_DEFAULT, typeof IS_FUNC] | [typeof IS_FUNC, typeof NO_SET_DEFAULT]): V;
+<K, V>(m: {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined}, k: K, def: V, ...opt: [] | [typeof NO_SET_DEFAULT] | [typeof IS_FUNC, typeof NO_SET_DEFAULT] | [typeof NO_SET_DEFAULT, typeof IS_FUNC]): V;
+} = (m, k, def, ...opt) => m.has(k) ? m.get(k) : opt.includes(NO_SET_DEFAULT) ? opt.includes(IS_FUNC) ? (def as Function)() : def : setAndReturn(m, k, opt.includes(IS_FUNC) ? (def as Function)() : def),
+```
+
+This function retrieves the given key from the passed Map-like object, returning the default value if the key doesn't exist and optionally setting that value to the key.
+
+The following consts are defined to alter the behaviour of this function:
+
+| Const          | Description |
+|----------------|-------------|
+| IS_FUNC        | Used to indicate that the passed default value is actually a function that returns the value; useful for expensive object creation. |
+| NO_SET_DEFAULT | Used to indicate that the default value shouldn't be set. |
 
 ### <a name="misc_isint">isInt</a>
 ```typescript
