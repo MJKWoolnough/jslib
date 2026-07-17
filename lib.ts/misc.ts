@@ -54,7 +54,12 @@ setAndReturn = <K, V>(m: {set: (k: K, v: V) => void}, k: K, v: V) => {
 
 	return v;
 },
-getOrSet = <K, V>(m: {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined}, k: K, def: V, opt: boolean = true) => m.has(k) ? m.get(k) : opt ? setAndReturn(m, k, def) : def,
+IS_FUNC = 1,
+NO_SET_DEFAULT = 2,
+getOrSet: {
+	<K, V>(m: {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined}, k: K, def: () => V, ...opt: [typeof IS_FUNC] | [typeof NO_SET_DEFAULT, typeof IS_FUNC] | [typeof IS_FUNC, typeof NO_SET_DEFAULT]): V;
+	<K, V>(m: {set: (k: K,v: V) => void, has: (k: K) => boolean, get: (k: K) => V | undefined}, k: K, def: V, ...opt: [] | [typeof NO_SET_DEFAULT] | [typeof IS_FUNC, typeof NO_SET_DEFAULT] | [typeof NO_SET_DEFAULT, typeof IS_FUNC]): V;
+} = (m, k, def, ...opt) => m.has(k) ? m.get(k) : opt.includes(NO_SET_DEFAULT) ? opt.includes(IS_FUNC) ? (def as Function)() : def : setAndReturn(m, k, opt.includes(IS_FUNC) ? (def as Function)() : def),
 /**
  * This functions pushes a value to a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array | Array}-like structure and returns the value.
  *
