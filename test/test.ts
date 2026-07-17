@@ -8038,6 +8038,22 @@ type Tests = {
 				return m.get("key") === 2 && setAndReturn(m, "key", 3) === 3 && m.get("key") === 3;
 			}
 		},
+		"getOrSet": {
+			"without value": async () => {
+				const {getOrSet} = await import("./lib/misc.js"),
+				      m = new Map<string, number>();
+
+				return getOrSet(m, "key", 1) === 1 && m.get("key") === 1;
+			},
+			"with value": async () => {
+				const {getOrSet} = await import("./lib/misc.js"),
+				      m = new Map<string, number>();
+
+				m.set("key", 1);
+
+				return getOrSet(m, "key", 2) === 1 && m.get("key") === 1;
+			}
+		},
 		"addAndReturn": {
 			"addAndReturn": async () => {
 				const {addAndReturn} = await import("./lib/misc.js"),
