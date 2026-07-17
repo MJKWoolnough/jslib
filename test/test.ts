@@ -8054,10 +8054,22 @@ type Tests = {
 				return getOrSet(m, "key", 2) === 1 && m.get("key") === 1;
 			},
 			"no set default": async () => {
-				const {getOrSet} = await import("./lib/misc.js"),
+				const {getOrSet, NO_SET_DEFAULT} = await import("./lib/misc.js"),
 				      m = new Map<string, number>();
 
-				return getOrSet(m, "key", 1, false) === 1 && m.get("key") === undefined;
+				return getOrSet(m, "key", 1, NO_SET_DEFAULT) === 1 && m.get("key") === undefined;
+			},
+			"v is func": async () => {
+				const {getOrSet, IS_FUNC} = await import("./lib/misc.js"),
+				      m = new Map<string, number>();
+
+				return getOrSet(m, "key", () => 1, IS_FUNC) === 1 && m.get("key") === 1;
+			},
+			"v is func, no set default": async () => {
+				const {getOrSet, IS_FUNC, NO_SET_DEFAULT} = await import("./lib/misc.js"),
+				      m = new Map<string, number>();
+
+				return getOrSet(m, "key", () => 1, IS_FUNC, NO_SET_DEFAULT) === 1 && getOrSet(m, "key", () => 1, NO_SET_DEFAULT, IS_FUNC) === 1 && m.get("key") === undefined;
 			}
 		},
 		"addAndReturn": {
