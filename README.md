@@ -2737,7 +2737,7 @@ The module exports the following functions:
 | Forbid      | The Forbid function returns a TypeGuard that disallows certain types from an existing type. |
 | Func        | The Func function returns a TypeGuard that checks a value is a function. An optional number of arguments can be specified as an additional check. |
 | Int         | The Int function returns a TypeGuard that checks for integers, and takes optional min and max (inclusive) values to range check. |
-| IntStr      | The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types. |
+| IntStr      | The IntStr function returns a TypeGuard that checks for a string value that represents an integer, and takes optional min and max (inclusive) values to range check. Intended to be used with Rec for integer key types. |
 | MapType     | The MapType function returns a TypeGuard that checks for an Map type where the keys and values are of the types specified. |
 | Null        | The Null function returns a TypeGuard that checks for `null`. |
 | Num         | The Num function returns a TypeGuard that checks for numbers, and takes optional min and max (inclusive) values to range check. |
