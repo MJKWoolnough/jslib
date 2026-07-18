@@ -644,7 +644,10 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
 	return asTypeGuard((v: unknown): v is T => (ttg ??= tg())(v), () => setAndReturn(definitions, ttg ??= tg(), ["Recur", name]));
 },
 /**
- * The NumStr function returns a TypeGuard that checks for a string value that represents an number.
+ * The NumStr function returns a TypeGuard that checks for a string value that represents a number, and takes optional min and max (inclusive) values to range check.
+ *
+ * @param {number} min Minimum value for the number.
+ * @param {number} max Maximum value for the number.
  *
  * @return {TypeGuard<`${number}`>}
  */
