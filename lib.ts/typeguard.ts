@@ -648,7 +648,7 @@ Recur = <T>(tg: () => TypeGuard<T>, str?: string) => {
  *
  * @return {TypeGuard<`${number}`>}
  */
-NumStr = () => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v, "NumStr"), ["Template", ["", numberDef, ""]]),
+NumStr = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is `${number}` => throwOrReturn(typeof v === "string" && parseFloat(v) + "" === v && min <= parseFloat(v) && parseFloat(v) <= max, "NumStr"), ["Template", min !== -Infinity ? ["", ["", "number", `${min} <= n` + (max !== Infinity ? ` <= ${max}` : "")], ""] : max !== Infinity ? ["", ["", "number", `n <= ${max}`], ""] : ["", numberDef, ""]]),
 /**
  * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
