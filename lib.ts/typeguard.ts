@@ -1,4 +1,4 @@
-import {Callable, setAndReturn} from './misc.js';
+import {Callable, isInt, setAndReturn} from './misc.js';
 
 /**
  * The typeguard module provides the building blocks for creating type-safe typeguards.
@@ -374,7 +374,7 @@ Num = (min = -Infinity, max = Infinity) => asTypeGuard((v: unknown): v is number
  *
  * @return {TypeGuard<number>}
  */
-Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard((v: unknown): v is number => throwOrReturn(typeof v === "number" && Number.isInteger(v) && v >= min && v <= max, "integer"), min > Number.MIN_SAFE_INTEGER ? ["", "number", `${min} <= i` + (max < Number.MAX_SAFE_INTEGER ? ` <= ${max}` : "")] : max < Number.MAX_SAFE_INTEGER ? ["", "number", `i <= ${max}`] : numberDef),
+Int = (min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER) => asTypeGuard((v: unknown): v is number => throwOrReturn(isInt(v, min, max), "integer"), min > Number.MIN_SAFE_INTEGER ? ["", "number", `${min} <= i` + (max < Number.MAX_SAFE_INTEGER ? ` <= ${max}` : "")] : max < Number.MAX_SAFE_INTEGER ? ["", "number", `i <= ${max}`] : numberDef),
 /**
  * The BigInt function returns a TypeGuard that checks for bigints, and takes optional min and max (inclusive) values to range check.
  *
