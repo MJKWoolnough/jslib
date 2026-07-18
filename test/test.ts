@@ -7905,6 +7905,11 @@ type Tests = {
 					const {isInt} = await import("./lib/misc.js");
 
 					return !isInt(-Infinity);
+				},
+				"Number.MAX_SAFE_INTEGER": async () => {
+					const {isInt} = await import("./lib/misc.js");
+
+					return isInt(Number.MAX_SAFE_INTEGER);
 				}
 			},
 			"limits": {
@@ -7995,6 +8000,11 @@ type Tests = {
 				const {checkInt} = await import("./lib/misc.js");
 
 				return checkInt(6, -2, 5, 2.5) === 2;
+			},
+			"Number.MAX_SAFE_INTEGER": async () => {
+				const {checkInt} = await import("./lib/misc.js");
+
+				return checkInt(Number.MAX_SAFE_INTEGER) === Number.MAX_SAFE_INTEGER;
 			}
 		},
 		"mod": {
