@@ -17,7 +17,7 @@ export const
  *
  * @return {boolean} `true` if `v` is an integer between `min` and `max` inclusive.
  */
-isInt = (v, min = -Infinity, max = Infinity) => typeof v === "number" && (v|0) === v && v >= min && v <= max,
+isInt = (v, min = -Infinity, max = Infinity) => typeof v === "number" && Number.isInteger(v) && v >= min && v <= max,
 /**
  * This function determines whether `n` is a valid integer, as determined by the {@link isInt} function, and returns `n` if it is, or `def` otherwise.
  *
