@@ -620,7 +620,7 @@ NumStr = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typ
  *
  * @return {TypeGuard<`${number}`>}
  */
-IntStr = () => asTypeGuard(v => throwOrReturn(typeof v === "string" && parseInt(v) + "" === v, "IntStr"), ["Template", ["", numberDef, ""]]),
+IntStr = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof v === "string" && isInt(parseInt(v), min, max), "IntStr"), ["Template", min !== -Infinity ? ["", ["", "number", `${min} <= i` + (max !== Infinity ? ` <= ${max}` : "")], ""] : max !== Infinity ? ["", ["", "number", `i <= ${max}`], ""] : ["", numberDef, ""]]),
 /**
  * The BoolStr function returns a TypeGuard that checks for a string value that represents an boolean.
  *
