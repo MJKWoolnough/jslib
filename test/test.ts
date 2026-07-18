@@ -10983,6 +10983,12 @@ type Tests = {
 					      i = IntStr();
 
 					return !i(0) && !i(1) && !i(true);
+				},
+				"limits": async () => {
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr(0, 1000);
+
+					return i("0") && i("1000") && !i("1001") && !i("-1");
 				}
 			},
 			"throws": {
@@ -11011,17 +11017,57 @@ type Tests = {
 					}
 				}
 			},
-			"def": async () => {
-				const {IntStr} = await import("./lib/typeguard.js"),
-				      i = IntStr();
+			"def": {
+				"any": async () => {
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr();
 
-				return JSON.stringify(i.def()) === `["Template",["",["","number"],""]]`;
+					return JSON.stringify(i.def()) === `["Template",["",["","number"],""]]`;
+				},
+				"with min": async () => {
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr(0);
+
+					return JSON.stringify(i.def()) === `["Template",["",["","number","0 <= i"],""]]`;
+				},
+				"with max": async () => {
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr(-Infinity, 0);
+
+					return JSON.stringify(i.def()) === `["Template",["",["","number","i <= 0"],""]]`;
+				},
+				"with min and max": async () => {
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr(5, 10);
+
+					return JSON.stringify(i.def()) === `["Template",["",["","number","5 <= i <= 10"],""]]`;
+				}
 			},
-			"toString": async () => {
-				const {IntStr} = await import("./lib/typeguard.js"),
-				      i = IntStr();
+			"toString": {
+				"any": async () => {
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr();
 
-				return i.toString() === "`${number}`";
+					return i.toString() === "`${number}`";
+				},
+				"with min": async () => {
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr(0);
+
+					return i.toString() === "`${number /* 0 <= i */}`";
+				},
+				"with max": async () => {
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr(-Infinity, 0);
+
+					return i.toString() === "`${number /* i <= 0 */}`";
+				},
+				"with min and max": async () => {
+					const {IntStr} = await import("./lib/typeguard.js"),
+					      i = IntStr(5, 10);
+
+					return i.toString() === "`${number /* 5 <= i <= 10 */}`";
+				}
 			}
 		},
 		"BoolStr": {
