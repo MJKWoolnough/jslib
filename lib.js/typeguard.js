@@ -618,6 +618,9 @@ NumStr = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typ
 /**
  * The IntStr function returns a TypeGuard that checks for a string value that represents an integer. Intended to be used with Rec for integer key types.
  *
+ * @param {number} min Minimum value for the integer.
+ * @param {number} max Maximum value for the integer.
+ *
  * @return {TypeGuard<`${number}`>}
  */
 IntStr = (min = -Infinity, max = Infinity) => asTypeGuard(v => throwOrReturn(typeof v === "string" && isInt(parseInt(v), min, max), "IntStr"), ["Template", min !== -Infinity ? ["", ["", "number", `${min} <= i` + (max !== Infinity ? ` <= ${max}` : "")], ""] : max !== Infinity ? ["", ["", "number", `i <= ${max}`], ""] : ["", numberDef, ""]]),
