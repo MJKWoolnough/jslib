@@ -8,7 +8,7 @@ declare tags="annotation annotation-xml maction math merror mfrac mi mmultiscrip
 	import {tags} from './dom.js';
 
 	/**
-	 * The math module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/MathMLElement | MathMLElement)s.
+	 * The math module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/MathMLElement | MathMLElement}s.
 	 *
 	 * @module math
 	 * @requires module:dom
