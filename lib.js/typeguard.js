@@ -86,7 +86,7 @@ const throwUnknownError = v => {
 			for (const d of def[1]) {
 				if (d[0] === "") {
 					if (simple.has(d[1])) {
-						continue
+						continue;
 					}
 
 					simple.add(d[1]);
@@ -97,7 +97,7 @@ const throwUnknownError = v => {
 		} else if ((def[0] !== "" || def[1] !== "never")) {
 			if (def[0] === "") {
 				if (simple.has(def[1])) {
-					continue
+					continue;
 				}
 
 				simple.add(def[1]);
