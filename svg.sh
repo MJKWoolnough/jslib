@@ -8,7 +8,7 @@ declare tags="a animate animateMotion animateTransform circle clipPath defs desc
 	import {tags} from './dom.js';
 
 	/**
-	 * The svg module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/SVGElement | SVGElement)s.
+	 * The svg module exports function for the creation of {@link https://developer.mozilla.org/en-US/docs/Web/API/SVGElement | SVGElement}s.
 	 *
 	 * @module svg
 	 * @requires module:dom
