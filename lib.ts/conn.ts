@@ -218,4 +218,3 @@ export class WSConn extends WebSocket {
 		}).when<T, U>(ssFn, eeFn);
 	}
 }
-
